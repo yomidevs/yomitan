@@ -34,6 +34,7 @@
             <a href="#!sentence-parsing" class="outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="sentence-parsing"></span></span><span class="outline-item-label">Sentence Parsing</span></a>
             <a href="#!translation"      class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="translation"></span></span><span class="outline-item-label">Translation</span></a>
             <a href="#!anki"             class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="note-card"></span></span><span class="outline-item-label">Anki</span></a>
+            <a href="#!clipboard"        class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="clipboard"></span></span><span class="outline-item-label">Clipboard</span></a>
             <a href="#!shortcuts"        class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="keyboard"></span></span><span class="outline-item-label">Shortcuts</span></a>
             <a href="#!backup"           class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="backup"></span></span><span class="outline-item-label">Backup</span></a>
             <a href="#!security"         class="outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="lock"></span></span><span class="outline-item-label">Security</span></a>
@@ -951,69 +952,6 @@
                 </p>
             </div>
         </div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Open a native browser window when copying Japanese text
-                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" id="clipboard-enable-background-monitor"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    When Japanese text is copied to the clipboard, a browser window popup searching for the clipboard
-                    text will be opened.
-                    This can be useful for using Yomichan to scan text from external applications.
-                </p>
-                <p>
-                    This feature requires Yomichan to have clipboard reading permissions, and when this option is enabled,
-                    the clipboard will be frequently polled for new text.
-                </p>
-                <p>
-                    Alternatively, this feature can be enabled only on the search page, and clipboard contents polling will
-                    only be performed when the search page is already open.
-                </p>
-                <p>
-                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-        </div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Maximum clipboard text search length</div>
-                <div class="settings-item-description">Limit the number of text characters used when searching clipboard content.</div>
-            </div>
-            <div class="settings-item-right">
-                <input type="number" min="0" step="1" data-setting="clipboard.maximumSearchLength">
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Clipboard text search mode</div>
-                <div class="settings-item-description">Change how the search page reacts to new text in the clipboard.</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="clipboard.autoSearchContent"
-                    data-transform='[
-                        {
-                            "step": "pre",
-                            "type": "toBoolean"
-                        },
-                        {
-                            "step": "post",
-                            "type": "toString"
-                        }
-                    ]'
-                >
-                    <option value="true">Search for definitions</option>
-                    <option value="false">Update search query only</option>
-                </select>
-            </div>
-        </div></div>
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Size</div>
@@ -1601,6 +1539,81 @@
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></div>
+    </div>
+
+    <!-- Clipboard -->
+    <div>
+        <div class="heading-container">
+            <div class="heading-container-icon"><span class="icon" data-icon="clipboard"></span></div>
+            <div class="heading-container-left"><h2 id="clipboard"><a href="#!clipboard">Clipboard</a></h2></div>
+            <div class="heading-container-right"><a class="more-toggle more-only heading-link-light" data-parent-distance="3">Info&hellip;</a></div>
+        </div>
+        <div class="heading-description more" hidden>
+            <p>
+                Yomichan can watch the system copy clipboard for Japanese text and automatically search the
+                text on the search page.
+                This can be useful for using Yomichan to scan text from external applications.
+            </p>
+            <p>
+                This feature requires Yomichan to have clipboard reading permissions, and when this option is enabled,
+                the clipboard will be frequently checked for new text.
+            </p>
+            <p>
+                <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+            </p>
+        </div>
+    </div>
+    <div class="settings-group">
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Enable background clipboard text monitoring</div>
+                <div class="settings-item-description">Open the search page in a new window when the clipboard contains Japanese text.</div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" class="clipboard-toggle" data-clipboard-setting="clipboard.enableBackgroundMonitor"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Enable search page clipboard text monitoring</div>
+                <div class="settings-item-description">The query on the search page will be automatically updated with text in the clipboard.</div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" class="clipboard-toggle" data-clipboard-setting="clipboard.enableSearchPageMonitor"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Maximum clipboard text search length</div>
+                <div class="settings-item-description">Limit the number of characters used when searching clipboard text.</div>
+            </div>
+            <div class="settings-item-right">
+                <input type="number" min="0" step="1" data-setting="clipboard.maximumSearchLength">
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Clipboard text search mode</div>
+                <div class="settings-item-description">Change how the search page reacts to new text in the clipboard.</div>
+            </div>
+            <div class="settings-item-right">
+                <select data-setting="clipboard.autoSearchContent"
+                    data-transform='[
+                        {
+                            "step": "pre",
+                            "type": "toBoolean"
+                        },
+                        {
+                            "step": "post",
+                            "type": "toString"
+                        }
+                    ]'
+                >
+                    <option value="true">Search for definitions</option>
+                    <option value="false">Update query only</option>
+                </select>
             </div>
         </div></div>
     </div>

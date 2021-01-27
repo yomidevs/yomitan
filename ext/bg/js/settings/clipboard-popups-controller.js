@@ -15,14 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * ObjectPropertyAccessor
+ */
+
 class ClipboardPopupsController {
     constructor(settingsController) {
         this._settingsController = settingsController;
-        this._checkbox = document.querySelector('#clipboard-enable-background-monitor');
+        this._toggles = null;
     }
 
     async prepare() {
-        this._checkbox.addEventListener('change', this._onEnableBackgroundMonitorChanged.bind(this), false);
+        this._toggles = document.querySelectorAll('.clipboard-toggle');
+
+        for (const toggle of this._toggles) {
+            toggle.addEventListener('change', this._onClipboardToggleChange.bind(this), false);
+        }
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
         const options = await this._settingsController.getOptions();
@@ -32,10 +40,20 @@ class ClipboardPopupsController {
     // Private
 
     _onOptionsChanged({options}) {
-        this._checkbox.checked = options.clipboard.enableBackgroundMonitor;
+        const accessor = new ObjectPropertyAccessor(options);
+        for (const toggle of this._toggles) {
+            const path = ObjectPropertyAccessor.getPathArray(toggle.dataset.clipboardSetting);
+            let value;
+            try {
+                value = accessor.get(path, path.length);
+            } catch (e) {
+                continue;
+            }
+            toggle.checked = !!value;
+        }
     }
 
-    async _onEnableBackgroundMonitorChanged(e) {
+    async _onClipboardToggleChange(e) {
         const checkbox = e.currentTarget;
         let value = checkbox.checked;
 

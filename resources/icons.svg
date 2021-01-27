@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -14,7 +12,7 @@
    inkscape:export-ydpi="192"
    inkscape:export-xdpi="192"
    sodipodi:docname="icons.svg"
-   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15, custom)"
    id="svg8"
    version="1.1"
    viewBox="0 0 16 16"
@@ -27,11 +25,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="45.254834"
-     inkscape:cx="8.4539164"
-     inkscape:cy="8.0625778"
+     inkscape:zoom="32"
+     inkscape:cx="7.2634756"
+     inkscape:cy="9.0903162"
      inkscape:document-units="px"
-     inkscape:current-layer="layer49"
+     inkscape:current-layer="layer50"
      showgrid="true"
      units="px"
      inkscape:snap-center="true"
@@ -48,7 +46,8 @@
      inkscape:snap-intersection-paths="true"
      inkscape:object-paths="true"
      inkscape:snap-others="true"
-     inkscape:snap-nodes="true">
+     inkscape:snap-nodes="true"
+     inkscape:document-rotation="0">
     <inkscape:grid
        type="xygrid"
        id="grid815"
@@ -64,6 +63,40 @@
   </sodipodi:namedview>
   <defs
      id="defs2">
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect1089"
+       is_visible="true"
+       lpeversion="1"
+       satellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,1,1,0,0.5,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,1,1,0,0.5,0,1 @ F,0,0,1,0,0,0,1"
+       unit="px"
+       method="auto"
+       mode="F"
+       radius="0.5"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="true"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect1087"
+       is_visible="false"
+       lpeversion="1"
+       satellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
+       unit="px"
+       method="auto"
+       mode="F"
+       radius="0.5"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="true"
+       hide_knots="false" />
     <linearGradient
        id="linearGradient5225"
        inkscape:collect="always">
@@ -1098,7 +1131,7 @@
      inkscape:groupmode="layer"
      id="layer34"
      inkscape:label="Note Card"
-     style="display:none"
+     style="display:none;opacity:1"
      sodipodi:insensitive="true">
     <path
        inkscape:connector-curvature="0"
@@ -1550,10 +1583,22 @@
   <g
      inkscape:groupmode="layer"
      id="layer49"
-     inkscape:label="Plus Thick">
+     inkscape:label="Plus Thick"
+     style="display:none">
     <path
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
-       d="M 6 2 L 6 6 L 2 6 L 2 10 L 6 10 L 6 14 L 10 14 L 10 10 L 14 10 L 14 6 L 10 6 L 10 2 L 6 2 z "
-       id="rect1068" />
+       d="M 6,2 V 6 H 2 v 4 h 4 v 4 h 4 v -4 h 4 V 6 H 10 V 2 Z"
+       id="rect1068"
+       inkscape:connector-curvature="0" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer50"
+     inkscape:label="Clipboard">
+    <path
+       id="rect1074"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="M 8,0.5 C 7.5857864,0.5 7.25,0.83578644 7.25,1.25 7.25,1.5 7,1.5 6.5,1.5 c -0.554,0 -1,0.446 -1,1 V 3 h 5 V 2.5 c 0,-0.554 -0.446,-1 -1,-1 C 9,1.5 8.75,1.5 8.75,1.25 8.75,0.83578644 8.4142136,0.5 8,0.5 Z M 2.5,2 v 13 h 11 V 2 H 10.90625 C 10.962878,2.1572391 11,2.3243683 11,2.5 V 3 h 1.5 v 11 h -9 V 3 H 5 V 2.5 C 5,2.3243683 5.0371223,2.1572391 5.09375,2 Z m 2,3 v 1 h 7 V 5 Z m 0,2 v 1 h 7 V 7 Z m 0,2 v 1 h 7 V 9 Z m 0,2 v 1 h 5 v -1 z"
+       sodipodi:nodetypes="ssssccsssscccccsccccccscccccccccccccccccccccc" />
   </g>
 </svg>
