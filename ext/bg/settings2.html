@@ -1628,32 +1628,32 @@
             <div class="settings-item-left">
                 <div class="settings-item-label">
                     <p>
-                        Yomichan includes keyboard shortcuts for some common actions that can be configured
-                        using the web browser's settings.
-                        To configure these shortcuts:
+                        Yomichan has two categories of keyboard shortcuts:
                     </p>
-
-                    <ul data-show-for-browser="chrome">
-                        <li>Open <a data-select-on-click="">chrome://extensions/shortcuts</a> in a new tab.</li>
-                        <li>Find the <em>Yomichan</em> section and configure the shortcuts.</li>
-                    </ul>
-
-                    <ul data-show-for-browser="edge">
-                        <li>Open <a data-select-on-click="">edge://extensions/shortcuts</a> in a new tab.</li>
-                        <li>Find the <em>Yomichan</em> section and configure the shortcuts.</li>
-                    </ul>
-
-                    <ul data-show-for-browser="firefox">
-                        <li>Open the extensions page (<a data-select-on-click="">about:addons</a>)</li>
-                        <li>Click the button on the right with the gear icon, then click <em>Manage Extension Shortcuts</em>.</li>
-                        <li>Find the <em>Yomichan</em> section and configure the shortcuts.</li>
+                    <ul>
+                        <li>
+                            <strong>Standard</strong> keyboard shortcuts are controlled by the extension, and can be added, removed,
+                            and configured to work on webpages that Yomichan functions on.
+                        </li>
+                        <li>
+                            <strong>Native</strong> keyboard shortcuts are controlled by the web browser, and function globally
+                            within the web browser<span data-show-for-browser="chrome edge"> or system-wide</span>.
+                        </li>
                     </ul>
                 </div>
             </div>
         </div></div>
         <div class="settings-item settings-item-button" data-modal-action="show,keyboard-shortcuts"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Configure keyboard shortcuts&hellip;</div>
+                <div class="settings-item-label">Configure standard keyboard shortcuts&hellip;</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></div>
+        <div class="settings-item settings-item-button" data-modal-action="show,extension-keyboard-shortcuts"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Configure native keyboard shortcuts&hellip;</div>
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
@@ -2534,7 +2534,7 @@
                 </select>
             </div>
         </div></div>
-        <div class="anki-card-primary-separator"></div>
+        <div class="modal-separator-line"></div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Deck</div>
@@ -3042,6 +3042,55 @@
     </div>
 </div></div>
 
+<div id="extension-keyboard-shortcuts" class="modal-container" tabindex="-1" role="dialog" hidden><div class="modal-content">
+    <div class="modal-header">
+        <div class="modal-title">Native Keyboard Shortcuts</div>
+        <div class="modal-header-button-container">
+            <div class="modal-header-button-group">
+                <button class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                <button class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div>
+            <p data-show-for-browser="chrome edge">
+                The native keyboard shortcuts are listed below,
+                but cannot be configured from within the extension on this browser.
+                To configure these shortcuts:
+            </p>
+
+            <p data-show-for-browser="firefox">
+                The native keyboard shortcuts can be configured below on this browser,
+                or by doing the following:
+            </p>
+
+            <ul data-show-for-browser="chrome">
+                <li>Open <a data-select-on-click="">chrome://extensions/shortcuts</a> in a new tab.</li>
+                <li>Find the <em>Yomichan</em> section and configure the shortcuts.</li>
+            </ul>
+
+            <ul data-show-for-browser="edge">
+                <li>Open <a data-select-on-click="">edge://extensions/shortcuts</a> in a new tab.</li>
+                <li>Find the <em>Yomichan</em> section and configure the shortcuts.</li>
+            </ul>
+
+            <ul data-show-for-browser="firefox">
+                <li>Open the extensions page (<a data-select-on-click="">about:addons</a>)</li>
+                <li>Click the button on the right with the gear icon, then click <em>Manage Extension Shortcuts</em>.</li>
+                <li>Find the <em>Yomichan</em> section and configure the shortcuts.</li>
+            </ul>
+        </div>
+        <div class="modal-separator-line"></div>
+        <div class="modal-settings-group" id="extension-hotkey-list"></div>
+    </div>
+    <div class="modal-footer">
+        <button class="low-emphasis danger" id="extension-hotkey-list-reset-all">Reset All</button>
+        <button class="low-emphasis danger" id="extension-hotkey-list-clear-all">Clear All</button>
+        <button data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
 <!-- Keyboard shortcuts templates -->
 <template id="hotkey-list-item-template"><div class="hotkey-list-item"><div class="hotkey-list-item-grid">
     <div class="hotkey-list-item-index-cell generic-list-index-prefix"></div>
@@ -3101,10 +3150,27 @@
     </div>
 </div></div></template>
 
+<template id="extension-hotkey-list-item-template"><div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+    <div class="settings-item-left">
+        <div class="settings-item-label"></div>
+    </div>
+    <div class="settings-item-right">
+        <div class="flex-row-nowrap">
+            <input type="text">
+            <button class="icon-button extension-hotkey-list-item-button" data-menu="extension-hotkey-list-item-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+        </div>
+    </div>
+</div></div></template>
+
 <template id="hotkey-list-item-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
     <button class="popup-menu-item" data-menu-action="clearInputs">Clear input</button>
     <button class="popup-menu-item" data-menu-action="resetInput">Reset input</button>
     <button class="popup-menu-item" data-menu-action="delete">Delete</button>
+</div></div></div></template>
+
+<template id="extension-hotkey-list-item-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button class="popup-menu-item" data-menu-action="clearInput">Clear input</button>
+    <button class="popup-menu-item" data-menu-action="resetInput">Reset input</button>
 </div></div></div></template>
 
 
@@ -3165,6 +3231,7 @@
 <script src="/bg/js/settings/status-footer.js"></script>
 <script src="/bg/js/settings/storage-controller.js"></script>
 
+<script src="/bg/js/settings2/extension-keyboard-shortcuts-controller.js"></script>
 <script src="/bg/js/settings2/keyboard-shortcuts-controller.js"></script>
 <script src="/bg/js/settings2/nested-popups-controller.js"></script>
 <script src="/bg/js/settings2/popup-window-controller.js"></script>

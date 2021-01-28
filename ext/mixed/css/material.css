@@ -822,7 +822,6 @@ input[type=number][data-invalid=true]+button.input-suffix-button {
 
 /* Material design icon button */
 button.icon-button {
-    display: inline-block;
     vertical-align: middle;
     border: none;
     margin: 0;
@@ -831,6 +830,9 @@ button.icon-button {
     font-size: inherit;
     cursor: pointer;
     background-color: transparent;
+}
+button.icon-button:not([hidden]) {
+    display: inline-block;
 }
 button.icon-button>.icon-button-inner {
     display: block;

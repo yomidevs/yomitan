@@ -24,6 +24,7 @@
  * DictionaryController
  * DictionaryImportController
  * DocumentFocusController
+ * ExtensionKeyboardShortcutController
  * GenericSettingController
  * KeyboardShortcutController
  * ModalController
@@ -132,6 +133,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const keyboardShortcutController = new KeyboardShortcutController(settingsController);
         keyboardShortcutController.prepare();
+
+        const extensionKeyboardShortcutController = new ExtensionKeyboardShortcutController(settingsController);
+        extensionKeyboardShortcutController.prepare();
 
         const popupWindowController = new PopupWindowController();
         popupWindowController.prepare();
