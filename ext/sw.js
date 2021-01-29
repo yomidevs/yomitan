@@ -39,6 +39,7 @@ self.importScripts(
     '/bg/js/profile-conditions.js',
     '/bg/js/request-builder.js',
     '/bg/js/simple-dom-parser.js',
+    '/bg/js/template-patcher.js',
     '/bg/js/text-source-map.js',
     '/bg/js/translator.js',
     '/bg/js/backend.js',

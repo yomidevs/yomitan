@@ -2,26 +2,23 @@
     {{~#unless brief~}}
         {{~#scope~}}
             {{~#set "any" false}}{{/set~}}
-            {{~#if definitionTags~}}{{#each definitionTags~}}
-                {{~#if (op "||" (op "!" ../data.compactTags) (op "!" redundant))~}}
+            {{~#each definitionTags~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
                     {{~#if (get "any")}}, {{else}}<i>({{/if~}}
                     {{name}}
                     {{~#set "any" true}}{{/set~}}
                 {{~/if~}}
             {{~/each~}}
             {{~#if (get "any")}})</i> {{/if~}}
-            {{~/if~}}
         {{~/scope~}}
-        {{~#if only~}}({{#each only}}{{{.}}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
     {{~/unless~}}
-    {{~#if glossary.[1]~}}
-        {{~#if compactGlossaries~}}
-            {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
-        {{~else~}}
-            <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
-        {{~/if~}}
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
     {{~else~}}
-        {{~#multiLine}}{{glossary.[0]}}{{/multiLine~}}
+        <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
     {{~/if~}}
 {{/inline}}
 
@@ -92,33 +89,27 @@
     {{~/if~}}
 {{/inline}}
 
-{{#*inline "glossary"}}
+{{~#*inline "glossary"~}}
     <div style="text-align: left;">
-    {{~#if modeKanji~}}
-        {{~#if definition.glossary.[1]~}}
-            <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
-        {{~else~}}
-            {{definition.glossary.[0]}}
-        {{~/if~}}
-    {{~else~}}
-        {{~#if group~}}
-            {{~#if definition.definitions.[1]~}}
-                <ol>{{#each definition.definitions}}<li>{{> glossary-single brief=../brief compactGlossaries=../compactGlossaries data=../.}}</li>{{/each}}</ol>
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~> glossary-single definition brief=brief ~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                <ol>{{~#each definition.definitions~}}<li>{{~> glossary-single . brief=../brief ~}}</li>{{~/each~}}</ol>
             {{~else~}}
-                {{~> glossary-single definition.definitions.[0] brief=brief compactGlossaries=compactGlossaries data=.~}}
+                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief ~}}{{~/each~}}
             {{~/if~}}
-        {{~else if merge~}}
-            {{~#if definition.definitions.[1]~}}
-                <ol>{{#each definition.definitions}}<li>{{> glossary-single brief=../brief compactGlossaries=../compactGlossaries data=../.}}</li>{{/each}}</ol>
+        {{~else if (op "===" definition.type "kanji")~}}
+            {{~#if (op ">" definition.glossary.length 1)~}}
+                <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
             {{~else~}}
-                {{~> glossary-single definition.definitions.[0] brief=brief compactGlossaries=compactGlossaries data=.~}}
+                {{~#each definition.glossary~}}{{.}}{{~/each~}}
             {{~/if~}}
-        {{~else~}}
-            {{~> glossary-single definition brief=brief compactGlossaries=compactGlossaries data=.~}}
         {{~/if~}}
-    {{~/if~}}
+    {{~/scope~}}
     </div>
-{{/inline}}
+{{~/inline~}}
 
 {{#*inline "glossary-brief"}}
     {{~> glossary brief=true ~}}

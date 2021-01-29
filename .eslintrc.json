@@ -179,6 +179,7 @@
                 "ext/bg/js/profile-conditions.js",
                 "ext/bg/js/request-builder.js",
                 "ext/bg/js/simple-dom-parser.js",
+                "ext/bg/js/template-patcher.js",
                 "ext/bg/js/text-source-map.js",
                 "ext/bg/js/translator.js",
                 "ext/bg/js/backend.js",

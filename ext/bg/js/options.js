@@ -17,11 +17,13 @@
 
 /* global
  * JsonSchemaValidator
+ * TemplatePatcher
  */
 
 class OptionsUtil {
     constructor() {
         this._schemaValidator = new JsonSchemaValidator();
+        this._templatePatcher = null;
         this._optionsSchema = null;
     }
 
@@ -381,32 +383,22 @@ class OptionsUtil {
 
     // Private
 
-    async _addFieldTemplatesToOptions(options, additionSourceUrl) {
-        let addition = null;
+    async _applyAnkiFieldTemplatesPatch(options, modificationsUrl) {
+        let patch = null;
         for (const {options: profileOptions} of options.profiles) {
             const fieldTemplates = profileOptions.anki.fieldTemplates;
-            if (fieldTemplates !== null) {
-                if (addition === null) {
-                    addition = await this._fetchAsset(additionSourceUrl);
-                }
-                profileOptions.anki.fieldTemplates = this._addFieldTemplatesBeforeEnd(fieldTemplates, addition);
-            }
-        }
-    }
+            if (fieldTemplates === null) { continue; }
 
-    _addFieldTemplatesBeforeEnd(fieldTemplates, addition) {
-        const pattern = /[ \t]*\{\{~?>\s*\(\s*lookup\s*\.\s*"marker"\s*\)\s*~?\}\}/g;
-        const newline = '\n';
-        let replaced = false;
-        fieldTemplates = fieldTemplates.replace(pattern, (g0) => {
-            replaced = true;
-            return `${addition}${newline}${g0}`;
-        });
-        if (!replaced) {
-            fieldTemplates += newline;
-            fieldTemplates += addition;
+            if (patch === null) {
+                const content = await this._fetchAsset(modificationsUrl);
+                if (this._templatePatcher === null) {
+                    this._templatePatcher = new TemplatePatcher();
+                }
+                patch = this._templatePatcher.parsePatch(content);
+            }
+
+            profileOptions.anki.fieldTemplates = this._templatePatcher.applyPatch(fieldTemplates, patch);
         }
-        return fieldTemplates;
     }
 
     async _fetchAsset(url, json=false) {
@@ -495,7 +487,7 @@ class OptionsUtil {
     async _updateVersion3(options) {
         // Version 3 changes:
         //  Pitch accent Anki field templates added.
-        await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v2.handlebars');
+        await this._applyAnkiFieldTemplatesPatch(options, '/bg/data/anki-field-templates-upgrade-v2.handlebars');
         return options;
     }
 
@@ -580,7 +572,7 @@ class OptionsUtil {
             });
             profileOptions.scanning.inputs = scanningInputs;
         }
-        await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v4.handlebars');
+        await this._applyAnkiFieldTemplatesPatch(options, '/bg/data/anki-field-templates-upgrade-v4.handlebars');
         return options;
     }
 
@@ -600,7 +592,7 @@ class OptionsUtil {
         //  Added global option useSettingsV2.
         //  Added anki.checkForDuplicates.
         //  Added general.glossaryLayoutMode; removed general.compactGlossaries.
-        await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v6.handlebars');
+        await this._applyAnkiFieldTemplatesPatch(options, '/bg/data/anki-field-templates-upgrade-v6.handlebars');
         options.global.showPopupPreview = false;
         options.global.useSettingsV2 = false;
         for (const profile of options.profiles) {
@@ -673,7 +665,7 @@ class OptionsUtil {
         //  Moved general.enableClipboardMonitor => clipboard.enableSearchPageMonitor. Forced value to false due to a bug which caused its value to not be read.
         //  Moved general.maximumClipboardSearchLength => clipboard.maximumSearchLength.
         //  Added clipboard.autoSearchContent.
-        await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v8.handlebars');
+        await this._applyAnkiFieldTemplatesPatch(options, '/bg/data/anki-field-templates-upgrade-v8.handlebars');
         options.global.useSettingsV2 = true;
         for (const profile of options.profiles) {
             profile.options.translation.textReplacements = {

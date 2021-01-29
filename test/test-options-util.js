@@ -50,6 +50,7 @@ function createVM(extDir) {
         'mixed/js/core.js',
         'mixed/js/cache-map.js',
         'bg/js/json-schema.js',
+        'bg/js/template-patcher.js',
         'bg/js/options.js'
     ]);
 
@@ -610,11 +611,15 @@ async function testDefault(extDir) {
 
 async function testFieldTemplatesUpdate(extDir) {
     const vm = createVM(extDir);
-    const [OptionsUtil] = vm.get(['OptionsUtil']);
+    const [OptionsUtil, TemplatePatcher] = vm.get(['OptionsUtil', 'TemplatePatcher']);
     const optionsUtil = new OptionsUtil();
     await optionsUtil.prepare();
 
-    const loadDataFile = (fileName) => fs.readFileSync(path.join(extDir, fileName), {encoding: 'utf8'});
+    const templatePatcher = new TemplatePatcher();
+    const loadDataFile = (fileName) => {
+        const content = fs.readFileSync(path.join(extDir, fileName), {encoding: 'utf8'});
+        return templatePatcher.parsePatch(content).addition;
+    };
     const update2 = loadDataFile('bg/data/anki-field-templates-upgrade-v2.handlebars');
     const update4 = loadDataFile('bg/data/anki-field-templates-upgrade-v4.handlebars');
     const update6 = loadDataFile('bg/data/anki-field-templates-upgrade-v6.handlebars');
@@ -746,12 +751,143 @@ ${update6}
 ${update8}
 {{~> (lookup . "marker") ~}}
 `.trimStart()
+        },
+        // glossary and glossary-brief update
+        {
+            oldVersion: 7,
+            old: `
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~#set "any" false}}{{/set~}}
+            {{~#if definitionTags~}}{{#each definitionTags~}}
+                {{~#if (op "||" (op "!" ../data.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~#set "any" true}}{{/set~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+            {{~/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{{.}}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+    {{~#if glossary.[1]~}}
+        {{~#if compactGlossaries~}}
+            {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
+        {{~else~}}
+            <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
+        {{~/if~}}
+    {{~else~}}
+        {{~#multiLine}}{{glossary.[0]}}{{/multiLine~}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "character"}}
+    {{~definition.character~}}
+{{/inline}}
+
+{{#*inline "glossary"}}
+    <div style="text-align: left;">
+    {{~#if modeKanji~}}
+        {{~#if definition.glossary.[1]~}}
+            <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
+        {{~else~}}
+            {{definition.glossary.[0]}}
+        {{~/if~}}
+    {{~else~}}
+        {{~#if group~}}
+            {{~#if definition.definitions.[1]~}}
+                <ol>{{#each definition.definitions}}<li>{{> glossary-single brief=../brief compactGlossaries=../compactGlossaries data=../.}}</li>{{/each}}</ol>
+            {{~else~}}
+                {{~> glossary-single definition.definitions.[0] brief=brief compactGlossaries=compactGlossaries data=.~}}
+            {{~/if~}}
+        {{~else if merge~}}
+            {{~#if definition.definitions.[1]~}}
+                <ol>{{#each definition.definitions}}<li>{{> glossary-single brief=../brief compactGlossaries=../compactGlossaries data=../.}}</li>{{/each}}</ol>
+            {{~else~}}
+                {{~> glossary-single definition.definitions.[0] brief=brief compactGlossaries=compactGlossaries data=.~}}
+            {{~/if~}}
+        {{~else~}}
+            {{~> glossary-single definition brief=brief compactGlossaries=compactGlossaries data=.~}}
+        {{~/if~}}
+    {{~/if~}}
+    </div>
+{{/inline}}
+
+{{#*inline "glossary-brief"}}
+    {{~> glossary brief=true ~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+            expected: `
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~#set "any" false}}{{/set~}}
+            {{~#each definitionTags~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~#set "any" true}}{{/set~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
+    {{~else~}}
+        <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "character"}}
+    {{~definition.character~}}
+{{/inline}}
+
+{{~#*inline "glossary"~}}
+    <div style="text-align: left;">
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~> glossary-single definition brief=brief ~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                <ol>{{~#each definition.definitions~}}<li>{{~> glossary-single . brief=../brief ~}}</li>{{~/each~}}</ol>
+            {{~else~}}
+                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief ~}}{{~/each~}}
+            {{~/if~}}
+        {{~else if (op "===" definition.type "kanji")~}}
+            {{~#if (op ">" definition.glossary.length 1)~}}
+                <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
+            {{~else~}}
+                {{~#each definition.glossary~}}{{.}}{{~/each~}}
+            {{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+    </div>
+{{~/inline~}}
+
+{{#*inline "glossary-brief"}}
+    {{~> glossary brief=true ~}}
+{{/inline}}
+
+${update8}
+{{~> (lookup . "marker") ~}}`.trimStart()
         }
     ];
 
-    for (const {old, expected} of data) {
+    for (const {old, expected, oldVersion} of data) {
         const options = createOptionsTestData1();
         options.profiles[0].options.anki.fieldTemplates = old;
+        if (typeof oldVersion === 'number') {
+            options.version = oldVersion;
+        }
+
         const optionsUpdated = clone(await optionsUtil.update(options));
         const fieldTemplatesActual = optionsUpdated.profiles[0].options.anki.fieldTemplates;
         assert.deepStrictEqual(fieldTemplatesActual, expected);
