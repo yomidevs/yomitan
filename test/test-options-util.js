@@ -833,6 +833,13 @@ ${update8}
                     {{~#set "any" true}}{{/set~}}
                 {{~/if~}}
             {{~/each~}}
+            {{~#unless noDictionaryTag~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{dictionary}}
+                    {{~#set "any" true}}{{/set~}}
+                {{~/if~}}
+            {{~/unless~}}
             {{~#if (get "any")}})</i> {{/if~}}
         {{~/scope~}}
         {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
@@ -844,6 +851,7 @@ ${update8}
     {{~else~}}
         <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
     {{~/if~}}
+    {{~#set "previousDictionary" dictionary~}}{{~/set~}}
 {{/inline}}
 
 {{#*inline "character"}}
@@ -854,12 +862,12 @@ ${update8}
     <div style="text-align: left;">
     {{~#scope~}}
         {{~#if (op "===" definition.type "term")~}}
-            {{~> glossary-single definition brief=brief ~}}
+            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
         {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
             {{~#if (op ">" definition.definitions.length 1)~}}
-                <ol>{{~#each definition.definitions~}}<li>{{~> glossary-single . brief=../brief ~}}</li>{{~/each~}}</ol>
+                <ol>{{~#each definition.definitions~}}<li>{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}</li>{{~/each~}}</ol>
             {{~else~}}
-                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief ~}}{{~/each~}}
+                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/each~}}
             {{~/if~}}
         {{~else if (op "===" definition.type "kanji")~}}
             {{~#if (op ">" definition.glossary.length 1)~}}
@@ -871,6 +879,10 @@ ${update8}
     {{~/scope~}}
     </div>
 {{~/inline~}}
+
+{{#*inline "glossary-no-dictionary"}}
+    {{~> glossary noDictionaryTag=true ~}}
+{{/inline}}
 
 {{#*inline "glossary-brief"}}
     {{~> glossary brief=true ~}}

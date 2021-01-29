@@ -133,7 +133,6 @@ class Translator {
         for (const {character, onyomi, kunyomi, tags, glossary, stats, dictionary} of databaseDefinitions) {
             const expandedStats = await this._expandStats(stats, dictionary);
             const expandedTags = await this._expandTags(tags, dictionary);
-            expandedTags.push(this._createDictionaryTag(dictionary));
             this._sortTags(expandedTags);
 
             const definition = this._createKanjiDefinition(character, dictionary, onyomi, kunyomi, glossary, expandedTags, expandedStats);
@@ -541,17 +540,14 @@ class Translator {
     }
 
     _flagRedundantDefinitionTags(definitions) {
-        let lastDictionary = '';
+        let lastDictionary = null;
         let lastPartOfSpeech = '';
         const removeCategoriesSet = new Set();
 
-        for (const {definitionTags} of definitions) {
-            const dictionary = this._createMapKey(this._getTagNamesWithCategory(definitionTags, 'dictionary'));
+        for (const {dictionary, definitionTags} of definitions) {
             const partOfSpeech = this._createMapKey(this._getTagNamesWithCategory(definitionTags, 'partOfSpeech'));
 
-            if (lastDictionary === dictionary) {
-                removeCategoriesSet.add('dictionary');
-            } else {
+            if (lastDictionary !== dictionary) {
                 lastDictionary = dictionary;
                 lastPartOfSpeech = '';
             }
@@ -1054,10 +1050,6 @@ class Translator {
         return JSON.stringify(array);
     }
 
-    _createDictionaryTag(name) {
-        return this._createTag(name, 'dictionary', '', 100, 0, name, false);
-    }
-
     _createTag(name, category, notes, order, score, dictionary, redundant) {
         return {
             name,
@@ -1101,7 +1093,6 @@ class Translator {
         const dictionaryPriority = this._getDictionaryPriority(dictionary, enabledDictionaryMap);
         const termTagsExpanded = await this._expandTags(termTags, dictionary);
         const definitionTagsExpanded = await this._expandTags(definitionTags, dictionary);
-        definitionTagsExpanded.push(this._createDictionaryTag(dictionary));
 
         this._sortTags(definitionTagsExpanded);
         this._sortTags(termTagsExpanded);

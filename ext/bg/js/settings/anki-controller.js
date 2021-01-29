@@ -94,6 +94,7 @@ class AnkiController {
                     'furigana-plain',
                     'glossary',
                     'glossary-brief',
+                    'glossary-no-dictionary',
                     'pitch-accents',
                     'pitch-accent-graphs',
                     'pitch-accent-positions',

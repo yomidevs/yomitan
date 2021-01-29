@@ -80,15 +80,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "stats": {
@@ -200,15 +191,6 @@
                                 "category": "kcategory2",
                                 "notes": "ktag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -404,15 +386,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -564,15 +537,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -750,15 +714,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -918,15 +873,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -1092,15 +1038,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -1263,15 +1200,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -1426,15 +1354,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -1586,15 +1505,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -1804,15 +1714,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -2020,15 +1921,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -2242,15 +2134,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -2461,15 +2344,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -2650,15 +2524,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -2820,15 +2685,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -2996,15 +2852,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -3169,15 +3016,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -3332,15 +3170,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -3492,15 +3321,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -3664,15 +3484,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -3821,15 +3632,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -3996,15 +3798,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -4182,15 +3975,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -4350,15 +4134,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -4536,15 +4311,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -4704,15 +4470,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -4922,15 +4679,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -5141,15 +4889,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -5330,15 +5069,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -5500,15 +5230,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -5718,15 +5439,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -5937,15 +5649,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -6126,15 +5829,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -6299,15 +5993,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -6465,15 +6150,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -6659,15 +6335,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -6813,15 +6480,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -6973,15 +6631,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -7130,15 +6779,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -7270,15 +6910,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -7416,15 +7047,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -7556,15 +7178,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -7702,15 +7315,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -7835,15 +7439,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -7965,15 +7560,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -8354,15 +7940,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": false
                                     }
                                 ],
                                 "termTags": [
@@ -8573,15 +8150,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": true
                                     }
                                 ],
                                 "termTags": [
@@ -8978,15 +8546,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": false
                                     }
                                 ],
                                 "termTags": [
@@ -9197,15 +8756,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": true
                                     }
                                 ],
                                 "termTags": [
@@ -9542,15 +9092,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": false
                                     }
                                 ],
                                 "termTags": [
@@ -9715,15 +9256,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": true
                                     }
                                 ],
                                 "termTags": [
@@ -10028,15 +9560,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": false
                                     }
                                 ],
                                 "termTags": [
@@ -10201,15 +9724,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": true
                                     }
                                 ],
                                 "termTags": [
@@ -10494,15 +10008,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": false
                                     }
                                 ],
                                 "termTags": [
@@ -10784,15 +10289,6 @@
                                         "category": "category2",
                                         "notes": "tag2 notes",
                                         "order": 0,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
@@ -11216,15 +10712,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": false
                                     }
                                 ],
                                 "definitions": [
@@ -11369,15 +10856,6 @@
                                                 "category": "category2",
                                                 "notes": "tag2 notes",
                                                 "order": 0,
-                                                "score": 0,
-                                                "dictionary": "Test Dictionary 2",
-                                                "redundant": false
-                                            },
-                                            {
-                                                "name": "Test Dictionary 2",
-                                                "category": "dictionary",
-                                                "notes": "",
-                                                "order": 100,
                                                 "score": 0,
                                                 "dictionary": "Test Dictionary 2",
                                                 "redundant": false
@@ -11613,15 +11091,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": true
                                     }
                                 ],
                                 "definitions": [
@@ -11766,15 +11235,6 @@
                                                 "category": "category2",
                                                 "notes": "tag2 notes",
                                                 "order": 0,
-                                                "score": 0,
-                                                "dictionary": "Test Dictionary 2",
-                                                "redundant": false
-                                            },
-                                            {
-                                                "name": "Test Dictionary 2",
-                                                "category": "dictionary",
-                                                "notes": "",
-                                                "order": 100,
                                                 "score": 0,
                                                 "dictionary": "Test Dictionary 2",
                                                 "redundant": false
@@ -12010,15 +11470,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": true
                                     }
                                 ],
                                 "definitions": [
@@ -12163,15 +11614,6 @@
                                                 "category": "category2",
                                                 "notes": "tag2 notes",
                                                 "order": 0,
-                                                "score": 0,
-                                                "dictionary": "Test Dictionary 2",
-                                                "redundant": false
-                                            },
-                                            {
-                                                "name": "Test Dictionary 2",
-                                                "category": "dictionary",
-                                                "notes": "",
-                                                "order": 100,
                                                 "score": 0,
                                                 "dictionary": "Test Dictionary 2",
                                                 "redundant": false
@@ -12407,15 +11849,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": true
                                     }
                                 ],
                                 "definitions": [
@@ -12560,15 +11993,6 @@
                                                 "category": "category2",
                                                 "notes": "tag2 notes",
                                                 "order": 0,
-                                                "score": 0,
-                                                "dictionary": "Test Dictionary 2",
-                                                "redundant": false
-                                            },
-                                            {
-                                                "name": "Test Dictionary 2",
-                                                "category": "dictionary",
-                                                "notes": "",
-                                                "order": 100,
                                                 "score": 0,
                                                 "dictionary": "Test Dictionary 2",
                                                 "redundant": false
@@ -12992,15 +12416,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": false
                                     }
                                 ],
                                 "definitions": [
@@ -13115,15 +12530,6 @@
                                                 "category": "category2",
                                                 "notes": "tag2 notes",
                                                 "order": 0,
-                                                "score": 0,
-                                                "dictionary": "Test Dictionary 2",
-                                                "redundant": false
-                                            },
-                                            {
-                                                "name": "Test Dictionary 2",
-                                                "category": "dictionary",
-                                                "notes": "",
-                                                "order": 100,
                                                 "score": 0,
                                                 "dictionary": "Test Dictionary 2",
                                                 "redundant": false
@@ -13303,15 +12709,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": true
                                     }
                                 ],
                                 "definitions": [
@@ -13426,15 +12823,6 @@
                                                 "category": "category2",
                                                 "notes": "tag2 notes",
                                                 "order": 0,
-                                                "score": 0,
-                                                "dictionary": "Test Dictionary 2",
-                                                "redundant": false
-                                            },
-                                            {
-                                                "name": "Test Dictionary 2",
-                                                "category": "dictionary",
-                                                "notes": "",
-                                                "order": 100,
                                                 "score": 0,
                                                 "dictionary": "Test Dictionary 2",
                                                 "redundant": false
@@ -13614,15 +13002,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": true
                                     }
                                 ],
                                 "definitions": [
@@ -13737,15 +13116,6 @@
                                                 "category": "category2",
                                                 "notes": "tag2 notes",
                                                 "order": 0,
-                                                "score": 0,
-                                                "dictionary": "Test Dictionary 2",
-                                                "redundant": false
-                                            },
-                                            {
-                                                "name": "Test Dictionary 2",
-                                                "category": "dictionary",
-                                                "notes": "",
-                                                "order": 100,
                                                 "score": 0,
                                                 "dictionary": "Test Dictionary 2",
                                                 "redundant": false
@@ -13925,15 +13295,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": true
                                     }
                                 ],
                                 "definitions": [
@@ -14048,15 +13409,6 @@
                                                 "category": "category2",
                                                 "notes": "tag2 notes",
                                                 "order": 0,
-                                                "score": 0,
-                                                "dictionary": "Test Dictionary 2",
-                                                "redundant": false
-                                            },
-                                            {
-                                                "name": "Test Dictionary 2",
-                                                "category": "dictionary",
-                                                "notes": "",
-                                                "order": 100,
                                                 "score": 0,
                                                 "dictionary": "Test Dictionary 2",
                                                 "redundant": false
@@ -14344,15 +13696,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": false
                                     }
                                 ],
                                 "definitions": [
@@ -14457,15 +13800,6 @@
                                                 "category": "category2",
                                                 "notes": "tag2 notes",
                                                 "order": 0,
-                                                "score": 0,
-                                                "dictionary": "Test Dictionary 2",
-                                                "redundant": false
-                                            },
-                                            {
-                                                "name": "Test Dictionary 2",
-                                                "category": "dictionary",
-                                                "notes": "",
-                                                "order": 100,
                                                 "score": 0,
                                                 "dictionary": "Test Dictionary 2",
                                                 "redundant": false
@@ -14737,15 +14071,6 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
-                                    },
-                                    {
-                                        "name": "Test Dictionary 2",
-                                        "category": "dictionary",
-                                        "notes": "",
-                                        "order": 100,
-                                        "score": 0,
-                                        "dictionary": "Test Dictionary 2",
-                                        "redundant": false
                                     }
                                 ],
                                 "definitions": [
@@ -14850,15 +14175,6 @@
                                                 "category": "category2",
                                                 "notes": "tag2 notes",
                                                 "order": 0,
-                                                "score": 0,
-                                                "dictionary": "Test Dictionary 2",
-                                                "redundant": false
-                                            },
-                                            {
-                                                "name": "Test Dictionary 2",
-                                                "category": "dictionary",
-                                                "notes": "",
-                                                "order": 100,
                                                 "score": 0,
                                                 "dictionary": "Test Dictionary 2",
                                                 "redundant": false
@@ -15113,15 +14429,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -15333,15 +14640,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -15559,15 +14857,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -15782,15 +15071,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -15971,15 +15251,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -16141,15 +15412,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -16317,15 +15579,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -16490,15 +15743,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -16653,15 +15897,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -16813,15 +16048,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -17046,15 +16272,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -17262,15 +16479,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -17484,15 +16692,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -17703,15 +16902,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -17892,15 +17082,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -18062,15 +17243,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -18238,15 +17410,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -18411,15 +17574,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -18574,15 +17728,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -18734,15 +17879,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -18967,15 +18103,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -19183,15 +18310,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -19405,15 +18523,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -19624,15 +18733,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -19813,15 +18913,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -19983,15 +19074,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
@@ -20159,15 +19241,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -20332,15 +19405,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -20495,15 +19559,6 @@
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
                             }
                         ],
                         "termTags": [
@@ -20655,15 +19710,6 @@
                                 "category": "category2",
                                 "notes": "tag2 notes",
                                 "order": 0,
-                                "score": 0,
-                                "dictionary": "Test Dictionary 2",
-                                "redundant": false
-                            },
-                            {
-                                "name": "Test Dictionary 2",
-                                "category": "dictionary",
-                                "notes": "",
-                                "order": 100,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
                                 "redundant": false

@@ -91,8 +91,27 @@ class DisplayGenerator {
         this._appendMultiple(reasonsContainer, this._createTermReason.bind(this), reasons);
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(pitchesContainer, this._createPitches.bind(this), pitches);
-        this._appendMultiple(definitionsContainer, this._createTermDefinitionItem.bind(this), definitions);
         this._appendMultiple(termTagsContainer, this._createTermTag.bind(this), termTags, expressions.length);
+
+        // Add definitions
+        const dictionaryTag = this._createDictionaryTag(null);
+        for (let i = 0, ii = definitions.length; i < ii; ++i) {
+            const definition = definitions[i];
+            const {dictionary} = definition;
+
+            if (dictionaryTag.dictionary === dictionary) {
+                dictionaryTag.redundant = true;
+            } else {
+                dictionaryTag.redundant = false;
+                dictionaryTag.dictionary = dictionary;
+                dictionaryTag.name = dictionary;
+            }
+
+            const node2 = this._createTermDefinitionItem(definition, dictionaryTag);
+            node2.dataset.index = `${i}`;
+            definitionsContainer.appendChild(node2);
+        }
+        definitionsContainer.dataset.count = `${definitions.length}`;
 
         return node;
     }
@@ -114,8 +133,10 @@ class DisplayGenerator {
         glyphContainer.textContent = details.character;
         const groupedFrequencies = DictionaryDataUtil.groupKanjiFrequencies(details.frequencies);
 
+        const dictionaryTag = this._createDictionaryTag(details.dictionary);
+
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, true);
-        this._appendMultiple(tagContainer, this._createTag.bind(this), details.tags);
+        this._appendMultiple(tagContainer, this._createTag.bind(this), [...details.tags, dictionaryTag]);
         this._appendMultiple(glossaryContainer, this._createKanjiGlossaryItem.bind(this), details.glossary);
         this._appendMultiple(chineseReadingsContainer, this._createKanjiReading.bind(this), details.onyomi);
         this._appendMultiple(japaneseReadingsContainer, this._createKanjiReading.bind(this), details.kunyomi);
@@ -211,17 +232,17 @@ class DisplayGenerator {
         return fragment;
     }
 
-    _createTermDefinitionItem(details) {
+    _createTermDefinitionItem(details, dictionaryTag) {
         const node = this._templates.instantiate('term-definition-item');
 
         const tagListContainer = node.querySelector('.term-definition-tag-list');
         const onlyListContainer = node.querySelector('.term-definition-disambiguation-list');
         const glossaryContainer = node.querySelector('.term-glossary-list');
 
-        const dictionary = details.dictionary;
+        const {dictionary, definitionTags} = details;
         node.dataset.dictionary = dictionary;
 
-        this._appendMultiple(tagListContainer, this._createTag.bind(this), details.definitionTags);
+        this._appendMultiple(tagListContainer, this._createTag.bind(this), [...definitionTags, dictionaryTag]);
         this._appendMultiple(onlyListContainer, this._createTermDisambiguation.bind(this), details.only);
         this._appendMultiple(glossaryContainer, this._createTermGlossaryItem.bind(this), details.glossary, dictionary);
 
@@ -644,5 +665,17 @@ class DisplayGenerator {
             container.appendChild(document.createElement('br'));
             container.appendChild(document.createTextNode(parts[i]));
         }
+    }
+
+    _createDictionaryTag(dictionary) {
+        return {
+            name: dictionary,
+            category: 'dictionary',
+            notes: '',
+            order: 100,
+            score: 0,
+            dictionary,
+            redundant: false
+        };
     }
 }

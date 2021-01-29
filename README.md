@@ -169,6 +169,7 @@ Flashcard fields can be configured with the following steps:
     `{furigana-plain}` | Term expressed as kanji with furigana displayed next to it in brackets (e.g. 日本語[にほんご]).
     `{glossary}` | List of definitions for the term (output format depends on whether running in *grouped* mode).
     `{glossary-brief}` | List of definitions for the term in a more compact format.
+    `{glossary-no-dictionary}` | List of definitions for the term, except the dictionary tag is omitted.
     `{pitch-accents}` | List of pitch accent downstep notations for the term.
     `{pitch-accent-graphs}` | List of pitch accent graphs for the term.
     `{pitch-accent-positions}` | List of accent downstep positions for the term as a number.
