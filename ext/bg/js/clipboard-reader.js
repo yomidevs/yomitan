@@ -58,7 +58,7 @@ class ClipboardReader {
         /*
         Notes:
             document.execCommand('paste') doesn't work on Firefox.
-            This may be a bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
+            See: https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
             Therefore, navigator.clipboard.readText() is used on Firefox.
 
             navigator.clipboard.readText() can't be used in Chrome for two reasons:
@@ -68,7 +68,12 @@ class ClipboardReader {
               non-extension permission for clipboard access.
         */
         if (this._isFirefox()) {
-            return await navigator.clipboard.readText();
+            try {
+                return await navigator.clipboard.readText();
+            } catch (e) {
+                // Error is undefined, due to permissions
+                throw new Error('Cannot read clipboard text; check extension permissions');
+            }
         }
 
         const document = this._document;
@@ -107,7 +112,13 @@ class ClipboardReader {
             typeof navigator.clipboard.read === 'function'
         ) {
             // This function is behind the Firefox flag: dom.events.asyncClipboard.dataTransfer
-            const {files} = await navigator.clipboard.read();
+            let files;
+            try {
+                ({files} = await navigator.clipboard.read());
+            } catch (e) {
+                return null;
+            }
+
             for (const file of files) {
                 if (this._mediaUtility.getFileExtensionFromImageMediaType(file.type) !== null) {
                     return await this._readFileAsDataURL(file);
