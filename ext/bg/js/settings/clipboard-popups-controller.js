@@ -58,9 +58,7 @@ class ClipboardPopupsController {
         let value = checkbox.checked;
 
         if (value) {
-            value = await new Promise((resolve) => {
-                chrome.permissions.request({permissions: ['clipboardRead']}, resolve);
-            });
+            value = await this._settingsController.setPermissionsGranted(['clipboardRead'], true);
             checkbox.checked = value;
         }
 

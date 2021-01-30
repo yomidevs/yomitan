@@ -132,6 +132,39 @@ class SettingsController extends EventDispatcher {
         return optionsFull;
     }
 
+    hasPermissions(permissions) {
+        return new Promise((resolve, reject) => chrome.permissions.contains({permissions}, (result) => {
+            const e = chrome.runtime.lastError;
+            if (e) {
+                reject(new Error(e.message));
+            } else {
+                resolve(result);
+            }
+        }));
+    }
+
+    setPermissionsGranted(permissions, shouldHave) {
+        return (
+            shouldHave ?
+            new Promise((resolve, reject) => chrome.permissions.request({permissions}, (result) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(result);
+                }
+            })) :
+            new Promise((resolve, reject) => chrome.permissions.remove({permissions}, (result) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(!result);
+                }
+            }))
+        );
+    }
+
     // Private
 
     _setProfileIndex(value) {

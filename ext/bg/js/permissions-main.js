@@ -36,19 +36,45 @@ async function isAllowedFileSchemeAccess() {
     return await new Promise((resolve) => chrome.extension.isAllowedFileSchemeAccess(resolve));
 }
 
-async function hasPermissions(permissions) {
-    return await new Promise((resolve) => chrome.permissions.contains({permissions}, resolve));
+function hasPermissions(permissions) {
+    return new Promise((resolve) => chrome.permissions.contains({permissions}, (result) => {
+        const e = chrome.runtime.lastError;
+        resolve(!e && result);
+    }));
 }
 
-async function setPermissionsGranted(permissions, shouldHave) {
-    const has = await hasPermissions(permissions);
-    if (shouldHave === has) { return has; }
-
-    return await (
+function setPermissionsGranted(permissions, shouldHave) {
+    return (
         shouldHave ?
-        new Promise((resolve) => chrome.permissions.request({permissions}, resolve)) :
-        new Promise((resolve) => chrome.permissions.remove({permissions}, (v) => resolve(!v)))
+        new Promise((resolve, reject) => chrome.permissions.request({permissions}, (result) => {
+            const e = chrome.runtime.lastError;
+            if (e) {
+                reject(new Error(e.message));
+            } else {
+                resolve(result);
+            }
+        })) :
+        new Promise((resolve, reject) => chrome.permissions.remove({permissions}, (result) => {
+            const e = chrome.runtime.lastError;
+            if (e) {
+                reject(new Error(e.message));
+            } else {
+                resolve(!result);
+            }
+        }))
     );
+}
+
+function setupPermissionCheckbox(checkbox, permissions) {
+    checkbox.addEventListener('change', (e) => {
+        updatePermissionCheckbox(checkbox, permissions, e.currentTarget.checked);
+    }, false);
+}
+
+async function updatePermissionCheckbox(checkbox, permissions, value) {
+    checkbox.checked = !value;
+    const hasPermission = await setPermissionsGranted(permissions, value);
+    checkbox.checked = hasPermission;
 }
 
 (async () => {
@@ -79,9 +105,7 @@ async function setPermissionsGranted(permissions, shouldHave) {
             permissionsCheckboxes[i].checked = permissions[i];
         }
 
-        permissionsCheckboxes[0].addEventListener('change', (e) => {
-            setPermissionsGranted(['clipboardRead'], e.currentTarget.checked);
-        });
+        setupPermissionCheckbox(permissionsCheckboxes[0], ['clipboardRead']);
 
         await promiseTimeout(100);
 

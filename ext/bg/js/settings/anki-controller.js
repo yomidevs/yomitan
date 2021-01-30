@@ -339,14 +339,7 @@ class AnkiController {
     }
 
     async _requestClipboardReadPermission() {
-        const permissions = ['clipboardRead'];
-
-        if (await new Promise((resolve) => chrome.permissions.contains({permissions}, resolve))) {
-            // Already has permission
-            return;
-        }
-
-        return await new Promise((resolve) => chrome.permissions.request({permissions}, resolve));
+        return await this._settingsController.setPermissionsGranted(['clipboardRead'], true);
     }
 
     _getFieldMarkers(fieldValue) {
