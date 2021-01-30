@@ -1809,7 +1809,7 @@ class Backend {
         switch (mode) {
             case 'existingOrNewTab':
                 if (useSettingsV2) {
-                    const tab = await this._findTab(1000, (url2) => url2.startsWith(url));
+                    const tab = await this._findTab(1000, (url2) => (url2 !== null && url2.startsWith(url)));
                     if (tab !== null) {
                         await this._focusTab(tab);
                     } else {
