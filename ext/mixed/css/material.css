@@ -33,7 +33,8 @@
 
     --input-font-size-no-units: 1;
     --input-font-size: calc(1em * var(--input-font-size-no-units));
-    --input-width: calc(100em / (var(--font-size-no-units) * var(--input-font-size-no-units)));
+    --input-spacing: calc(10em / var(--font-size-no-units));
+    --input-width: calc(100em / (var(--font-size-no-units) * var(--input-font-size-no-units)) - var(--input-spacing) / 2);
     --input-width-large: calc(200em / (var(--font-size-no-units) * var(--input-font-size-no-units)));
     --input-height: calc(32em / (var(--font-size-no-units) * var(--input-font-size-no-units)));
     --input-border-radius: 0.25em;

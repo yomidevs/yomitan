@@ -45,9 +45,8 @@
     --line-height-default: calc(20 / var(--font-size-no-units));
     --outline-item-height: 40px;
     --outline-item-icon-size: 32px;
-    --input-short: 80px;
-    --input-height-short: 24px;
-    --input-half-width: calc(var(--input-width-large) / 2 - var(--padding) / 2);
+    --input-short-width: calc(var(--input-width-large) / 2 - var(--padding) / 2);
+    --input-short-height: 24px;
     --fab-button-size: 56px;
     --fab-button-padding: 16px;
     --modal-width: 600px;
@@ -648,19 +647,14 @@ a.settings-item.settings-item-button {
 input[type=text].short-width,
 input[type=number].short-width,
 select.short-width {
-    width: var(--input-short);
-}
-input[type=text].half-width,
-input[type=number].half-width,
-select.short-width {
-    width: var(--input-half-width);
+    width: var(--input-short-width);
 }
 input[type=text].short-height,
 input[type=number].short-height,
 select.short-height {
-    height: var(--input-height-short);
-    margin-top: calc(var(--settings-group-right-max-height) - var(--input-height-short) - var(--font-size-small));
-    line-height: var(--input-height-short);
+    height: var(--input-short-height);
+    margin-top: calc(var(--settings-group-right-max-height) - var(--input-short-height) - var(--font-size-small));
+    line-height: var(--input-short-height);
 }
 .settings-item-button-group-container {
     max-height: none;
