@@ -46,7 +46,8 @@ class KeyboardMouseInputField extends EventDispatcher {
         this._keySupported = keySupported;
         this.setInput(key, modifiers);
         const events = [
-            [this._inputNode, 'keydown', this._onModifierKeyDown.bind(this), false]
+            [this._inputNode, 'keydown', this._onModifierKeyDown.bind(this), false],
+            [this._inputNode, 'keyup', this._onModifierKeyUp.bind(this), false]
         ];
         if (mouseModifiersSupported && this._mouseButton !== null) {
             events.push(
@@ -150,6 +151,10 @@ class KeyboardMouseInputField extends EventDispatcher {
                     break;
             }
         }
+    }
+
+    _onModifierKeyUp(e) {
+        e.preventDefault();
     }
 
     _onMouseButtonMouseDown(e) {
