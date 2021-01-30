@@ -51,3 +51,8 @@ This page lists several of the browser bugs that have affected Yomichan over the
 * **Browser**: Chrome
 * **Date**: 2020-12-18
 * **Links**: [#455](https://github.com/FooSoft/yomichan/issues/455), [#1247](https://github.com/FooSoft/yomichan/issues/1247), [Report](https://bugs.chromium.org/p/chromium/issues/detail?id=1160302)
+
+## Textareas display incorrectly when they have an animated CSS transform
+* **Browser**: Chrome
+* **Date**: 2021-01-30
+* **Links**: [Demo](https://toasted-nutbread.github.io/chrome-textarea-transform-bug/), [Report](https://bugs.chromium.org/p/chromium/issues/detail?id=1172666)
