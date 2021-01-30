@@ -134,6 +134,9 @@ class ClipboardReader {
         document.execCommand('paste');
         const image = target.querySelector('img[src^="data:"]');
         const result = (image !== null ? image.getAttribute('src') : null);
+        for (const image2 of target.querySelectorAll('img')) {
+            image2.removeAttribute('src');
+        }
         target.textContent = '';
         return result;
     }
