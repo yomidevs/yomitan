@@ -136,9 +136,11 @@
 <template id="tag-template"><span class="tag"><span class="tag-inner"></span></span></template>
 
 <!-- Extra -->
-<template id="footer-notification-template"><div class="footer-notification">
+<template id="footer-notification-template"><div class="footer-notification scrollbar-inverse">
     <div class="footer-notification-body"></div>
-    <button class="footer-notification-close-button"><span class="footer-notification-close-button-icon icon" data-icon="cross"></span></button>
+    <div class="footer-notification-close-button-container">
+        <button class="footer-notification-close-button"><span class="footer-notification-close-button-icon icon" data-icon="cross"></span></button>
+    </div>
 </div></template>
 <template id="footer-notification-tag-details-template" data-remove-whitespace-text="true">
     <div class="tag-details"></div>

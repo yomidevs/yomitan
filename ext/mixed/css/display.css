@@ -129,6 +129,8 @@
 
     --scrollbar-thumb-color: #c1c1c1;
     --scrollbar-track-color: #f1f1f1;
+    --scrollbar-inverse-thumb-color: #444444;
+    --scrollbar-inverse-track-color: #2f2f2f;
 
     --progress-bar-track-color: #cccccc;
     --progress-bar-indicator-color: var(--accent-color);
@@ -188,6 +190,8 @@
 
     --scrollbar-thumb-color: #444444;
     --scrollbar-track-color: #2f2f2f;
+    --scrollbar-inverse-thumb-color: #c1c1c1;
+    --scrollbar-inverse-track-color: #f1f1f1;
 
     --progress-bar-track-color: #3a3a3a;
     --progress-bar-indicator-color: var(--accent-color);
@@ -298,6 +302,27 @@ a {
 :root:not([data-theme=default]) .scrollbar::-webkit-scrollbar-corner {
     background-color: var(--scrollbar-track-color);
 }
+:root .scrollbar-inverse {
+    scrollbar-color: var(--scrollbar-inverse-humb-color) var(--scrollbar-inverse-track-color);
+}
+:root .scrollbar-inverse::-webkit-scrollbar {
+    width: auto;
+}
+:root .scrollbar-inverse::-webkit-scrollbar-button {
+    height: 0;
+}
+:root .scrollbar-inverse::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-inverse-thumb-color);
+}
+:root .scrollbar-inverse::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-inverse-thumb-color);
+}
+:root .scrollbar-inverse::-webkit-scrollbar-track-piece {
+    background-color: var(--scrollbar-inverse-track-color);
+}
+:root .scrollbar-inverse::-webkit-scrollbar-corner {
+    background-color: var(--scrollbar-inverse-track-color);
+}
 .scrollbar-spacer {
     display: inline-block;
     overflow-x: hidden;
@@ -352,6 +377,7 @@ a {
     flex-flow: row nowrap;
     justify-content: center;
     flex: 1 1 auto;
+    max-width: 100%;
 }
 .content-footer {
     width: var(--main-content-size);
@@ -1498,15 +1524,18 @@ button.action-button[data-icon=source-term]::before {
 .footer-notification {
     display: flex;
     flex-flow: row nowrap;
-    align-items: center;
+    align-items: flex-start;
     pointer-events: auto;
     border-radius: 0.25em;
     background-color: var(--notification-background-color);
     box-shadow: 0 0.125em 0.25em 0 var(--notification-shadow-color);
     color: var(--notification-text-color);
     margin: 0.5em;
-    padding: 0.5em 0.75em;
+    padding: 0;
     transition: opacity var(--animation-duration) ease-out;
+    position: relative;
+    overflow: auto;
+    max-height: calc(0.5em * 2 + var(--line-height) * 4 * 1em);
 }
 .footer-notification[hidden] {
     display: flex;
@@ -1515,7 +1544,18 @@ button.action-button[data-icon=source-term]::before {
 }
 .footer-notification-body {
     flex: 1 1 auto;
-    padding-right: 0.5em;
+    padding: 0.5em 0.75em;
+}
+.footer-notification-close-button-container {
+    align-self: stretch;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25em 0.75em 0.25em 0;
+    position: sticky;
+    top: 0;
+    right: 0;
 }
 button.footer-notification-close-button,
 button.footer-notification-close-button:focus,
