@@ -1675,6 +1675,14 @@ button.footer-notification-close-button:active {
 }
 
 
+/* Anki errors */
+.anki-note-error-list {
+    margin: 0;
+    padding-left: 1.5em;
+    list-style: disc;
+}
+
+
 /* Conditional styles */
 :root:not([data-enable-search-tags=true]) .tag[data-category=search] {
     display: none;

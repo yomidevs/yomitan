@@ -162,22 +162,49 @@ class AnkiConnect {
     }
 
     async _invoke(action, params) {
-        const response = await fetch(this._server, {
-            method: 'POST',
-            mode: 'cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer',
-            body: JSON.stringify({action, params, version: this._localVersion})
-        });
-        const result = await response.json();
+        let response;
+        try {
+            response = await fetch(this._server, {
+                method: 'POST',
+                mode: 'cors',
+                cache: 'default',
+                credentials: 'omit',
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+                body: JSON.stringify({action, params, version: this._localVersion})
+            });
+        } catch (e) {
+            const error = new Error('Anki connection failure');
+            error.data = {action, params};
+            throw error;
+        }
+
+        if (!response.ok) {
+            const error = new Error(`Anki connection error: ${response.status}`);
+            error.data = {action, params, status: response.status};
+            throw error;
+        }
+
+        let responseText = null;
+        let result;
+        try {
+            responseText = await response.text();
+            result = JSON.parse(responseText);
+        } catch (e) {
+            const error = new Error('Invalid Anki response');
+            error.data = {action, params, status: response.status, responseText};
+            throw error;
+        }
+
         if (isObject(result)) {
-            const error = result.error;
-            if (typeof error !== 'undefined') {
-                throw new Error(`AnkiConnect error: ${error}`);
+            const apiError = result.error;
+            if (typeof apiError !== 'undefined') {
+                const error = new Error(`Anki error: ${apiError}`);
+                error.data = {action, params, status: response.status, apiError};
+                throw error;
             }
         }
+
         return result;
     }
 

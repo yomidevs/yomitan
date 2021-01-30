@@ -73,7 +73,7 @@ class ClipboardReader {
 
         const document = this._document;
         if (document === null) {
-            throw new Error('Not supported');
+            throw new Error('Clipboard reading not supported in this context');
         }
 
         let target = this._pasteTarget;
@@ -118,7 +118,7 @@ class ClipboardReader {
 
         const document = this._document;
         if (document === null) {
-            throw new Error('Not supported');
+            throw new Error('Clipboard reading not supported in this context');
         }
 
         let target = this._imagePasteTarget;

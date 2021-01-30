@@ -192,6 +192,23 @@ class DisplayGenerator {
         return node;
     }
 
+    createAnkiNoteErrorsNotificationContent(errors) {
+        const content = this._templates.instantiate('footer-notification-anki-errors-content');
+
+        const header = content.querySelector('.anki-note-error-header');
+        header.textContent = (errors.length === 1 ? 'An error occurred:' : `${errors.length} errors occurred:`);
+
+        const list = content.querySelector('.anki-note-error-list');
+        for (const error of errors) {
+            const div = document.createElement('li');
+            div.className = 'anki-note-error-message';
+            div.textContent = isObject(error) && typeof error.message === 'string' ? error.message : `${error}`;
+            list.appendChild(div);
+        }
+
+        return content;
+    }
+
     createProfileListItem() {
         return this._templates.instantiate('profile-list-item');
     }

@@ -117,7 +117,11 @@ class AnkiNoteBuilder {
             try {
                 return await this._renderTemplate(templates, data, marker);
             } catch (e) {
-                if (errors) { errors.push(e); }
+                if (errors) {
+                    const error = new Error(`Template render error for {${marker}}`);
+                    error.data = {error: e};
+                    errors.push(error);
+                }
                 return `{${marker}-render-error}`;
             }
         });

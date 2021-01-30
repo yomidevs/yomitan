@@ -110,8 +110,10 @@ class Display extends EventDispatcher {
         this._frameResizeStartOffset = null;
         this._frameResizeEventListeners = new EventListenerCollection();
         this._tagNotification = null;
-        this._tagNotificationContainer = document.querySelector('#content-footer');
+        this._footerNotificationContainer = document.querySelector('#content-footer');
         this._displayAudio = new DisplayAudio(this);
+        this._ankiNoteNotification = null;
+        this._ankiNoteNotificationEventListeners = null;
 
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
@@ -525,6 +527,7 @@ class Display extends EventDispatcher {
             this._mediaLoader.unloadAll();
             this._displayAudio.cleanupEntries();
             this._hideTagNotification(false);
+            this._hideAnkiNoteErrors(false);
             this._definitions = [];
             this._definitionNodes = [];
 
@@ -791,7 +794,7 @@ class Display extends EventDispatcher {
         if (this._tagNotification === null) {
             const node = this._displayGenerator.createEmptyFooterNotification();
             node.classList.add('click-scannable');
-            this._tagNotification = new DisplayNotification(this._tagNotificationContainer, node);
+            this._tagNotification = new DisplayNotification(this._footerNotificationContainer, node);
         }
 
         const content = this._displayGenerator.createTagFooterNotificationDetails(tagNode);
@@ -1170,38 +1173,85 @@ class Display extends EventDispatcher {
     }
 
     async _addAnkiNote(definitionIndex, mode) {
-        if (definitionIndex < 0 || definitionIndex >= this._definitions.length) { return false; }
+        if (definitionIndex < 0 || definitionIndex >= this._definitions.length) { return; }
         const definition = this._definitions[definitionIndex];
 
         const button = this._adderButtonFind(definitionIndex, mode);
-        if (button === null || button.disabled) { return false; }
+        if (button === null || button.disabled) { return; }
 
+        this._hideAnkiNoteErrors(true);
+
+        const errors = [];
         const overrideToken = this._progressIndicatorVisible.setOverride(true);
         try {
             const {anki: {suspendNewCards}} = this._options;
             const noteContext = this._getNoteContext();
-            const note = await this._createNote(definition, mode, noteContext, true);
-            const noteId = await api.addAnkiNote(note);
-            if (noteId) {
-                if (suspendNewCards) {
-                    try {
-                        await api.suspendAnkiCardsForNote(noteId);
-                    } catch (e) {
-                        // NOP
+            const note = await this._createNote(definition, mode, noteContext, true, errors);
+
+            let noteId = null;
+            let addNoteOkay = false;
+            try {
+                noteId = await api.addAnkiNote(note);
+                addNoteOkay = true;
+            } catch (e) {
+                errors.length = 0;
+                errors.push(e);
+            }
+
+            if (addNoteOkay) {
+                if (noteId === null) {
+                    errors.push(new Error('Note could not be added'));
+                } else {
+                    if (suspendNewCards) {
+                        try {
+                            await api.suspendAnkiCardsForNote(noteId);
+                        } catch (e) {
+                            errors.push(e);
+                        }
                     }
+                    button.disabled = true;
+                    this._viewerButtonShow(definitionIndex, noteId);
                 }
-                button.disabled = true;
-                this._viewerButtonShow(definitionIndex, noteId);
-            } else {
-                throw new Error('Note could not be added');
             }
         } catch (e) {
-            this.onError(e);
-            return false;
+            errors.push(e);
         } finally {
             this._progressIndicatorVisible.clearOverride(overrideToken);
         }
-        return true;
+
+        if (errors.length > 0) {
+            this._showAnkiNoteErrors(errors);
+        } else {
+            this._hideAnkiNoteErrors(true);
+        }
+    }
+
+    _showAnkiNoteErrors(errors) {
+        if (this._ankiNoteNotificationEventListeners !== null) {
+            this._ankiNoteNotificationEventListeners.removeAllEventListeners();
+        }
+
+        if (this._ankiNoteNotification === null) {
+            const node = this._displayGenerator.createEmptyFooterNotification();
+            this._ankiNoteNotification = new DisplayNotification(this._footerNotificationContainer, node);
+            this._ankiNoteNotificationEventListeners = new EventListenerCollection();
+        }
+
+        const content = this._displayGenerator.createAnkiNoteErrorsNotificationContent(errors);
+        for (const node of content.querySelectorAll('.anki-note-error-log-link')) {
+            this._ankiNoteNotificationEventListeners.addEventListener(node, 'click', () => {
+                console.log({ankiNoteErrors: errors});
+            }, false);
+        }
+
+        this._ankiNoteNotification.setContent(content);
+        this._ankiNoteNotification.open();
+    }
+
+    _hideAnkiNoteErrors(animate) {
+        if (this._ankiNoteNotification === null) { return; }
+        this._ankiNoteNotification.close(animate);
+        this._ankiNoteNotificationEventListeners.removeAllEventListeners();
     }
 
     async _playAudioCurrent() {
@@ -1372,7 +1422,7 @@ class Display extends EventDispatcher {
         const notePromises = [];
         for (const definition of definitions) {
             for (const mode of modes) {
-                const notePromise = this._createNote(definition, mode, context, false);
+                const notePromise = this._createNote(definition, mode, context, false, null);
                 notePromises.push(notePromise);
             }
         }
@@ -1400,7 +1450,7 @@ class Display extends EventDispatcher {
         return results;
     }
 
-    async _createNote(definition, mode, context, injectMedia) {
+    async _createNote(definition, mode, context, injectMedia, errors) {
         const options = this._options;
         const templates = this._ankiFieldTemplates;
         const {
@@ -1412,7 +1462,16 @@ class Display extends EventDispatcher {
         const {deck: deckName, model: modelName} = modeOptions;
         const fields = Object.entries(modeOptions.fields);
 
-        const injectedMedia = (injectMedia ? await this._injectAnkiNoteMedia(definition, mode, options, fields) : null);
+        let injectedMedia = null;
+        if (injectMedia) {
+            let errors2;
+            ({result: injectedMedia, errors: errors2} = await this._injectAnkiNoteMedia(definition, mode, options, fields));
+            if (Array.isArray(errors)) {
+                for (const error of errors2) {
+                    errors.push(deserializeError(error));
+                }
+            }
+        }
 
         return await this._ankiNoteBuilder.createNote({
             definition,
@@ -1428,7 +1487,8 @@ class Display extends EventDispatcher {
             resultOutputMode,
             glossaryLayoutMode,
             compactTags,
-            injectedMedia
+            injectedMedia,
+            errors
         });
     }
 

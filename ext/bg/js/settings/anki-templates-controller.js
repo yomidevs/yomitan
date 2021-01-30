@@ -165,7 +165,7 @@ class AnkiTemplatesController {
 
     async _validate(infoNode, field, mode, showSuccessResult, invalidateInput) {
         const text = this._renderTextInput.value || '';
-        const exceptions = [];
+        const errors = [];
         let result = `No definition found for ${text}`;
         try {
             const optionsContext = this._settingsController.getOptionsContext();
@@ -193,20 +193,36 @@ class AnkiTemplatesController {
                     resultOutputMode,
                     glossaryLayoutMode,
                     compactTags,
-                    errors: exceptions
+                    errors
                 });
                 result = note.fields.field;
             }
         } catch (e) {
-            exceptions.push(e);
+            errors.push(e);
         }
 
-        const hasException = exceptions.length > 0;
-        infoNode.hidden = !(showSuccessResult || hasException);
-        infoNode.textContent = hasException ? exceptions.map((e) => `${e}`).join('\n') : (showSuccessResult ? result : '');
-        infoNode.classList.toggle('text-danger', hasException);
+        const errorToMessageString = (e) => {
+            if (isObject(e)) {
+                let v = e.data;
+                if (isObject(v)) {
+                    v = v.error;
+                    if (isObject(v)) {
+                        e = v;
+                    }
+                }
+
+                v = e.message;
+                if (typeof v === 'string') { return v; }
+            }
+            return `${e}`;
+        };
+
+        const hasError = errors.length > 0;
+        infoNode.hidden = !(showSuccessResult || hasError);
+        infoNode.textContent = hasError ? errors.map(errorToMessageString).join('\n') : (showSuccessResult ? result : '');
+        infoNode.classList.toggle('text-danger', hasError);
         if (invalidateInput) {
-            this._fieldTemplatesTextarea.dataset.invalid = `${hasException}`;
+            this._fieldTemplatesTextarea.dataset.invalid = `${hasError}`;
         }
     }
 }

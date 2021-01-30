@@ -1539,13 +1539,14 @@ class Backend {
         let clipboardImageFileName = null;
         let clipboardText = null;
         let audioFileName = null;
+        const errors = [];
 
         try {
             if (screenshotDetails !== null) {
                 screenshotFileName = await this._injectAnkNoteScreenshot(ankiConnect, timestamp, definitionDetails, screenshotDetails);
             }
         } catch (e) {
-            // NOP
+            errors.push(serializeError(e));
         }
 
         try {
@@ -1553,7 +1554,7 @@ class Backend {
                 clipboardImageFileName = await this._injectAnkNoteClipboardImage(ankiConnect, timestamp, definitionDetails);
             }
         } catch (e) {
-            // NOP
+            errors.push(serializeError(e));
         }
 
         try {
@@ -1561,7 +1562,7 @@ class Backend {
                 clipboardText = await this._clipboardReader.getText();
             }
         } catch (e) {
-            // NOP
+            errors.push(serializeError(e));
         }
 
         try {
@@ -1569,34 +1570,50 @@ class Backend {
                 audioFileName = await this._injectAnkNoteAudio(ankiConnect, timestamp, definitionDetails, audioDetails);
             }
         } catch (e) {
-            // NOP
+            errors.push(serializeError(e));
         }
 
-        return {screenshotFileName, clipboardImageFileName, clipboardText, audioFileName};
+        return {
+            result: {
+                screenshotFileName,
+                clipboardImageFileName,
+                clipboardText,
+                audioFileName
+            },
+            errors
+        };
     }
 
     async _injectAnkNoteAudio(ankiConnect, timestamp, definitionDetails, details) {
         const {type, expression, reading} = definitionDetails;
-        if (type === 'kanji') {
-            throw new Error('Cannot inject audio for kanji');
-        }
-        if (!reading && !expression) {
-            throw new Error('Invalid reading and expression');
+        if (
+            type === 'kanji' ||
+            typeof expression !== 'string' ||
+            typeof reading !== 'string' ||
+            (expression.length === 0 && reading.length === 0)
+        ) {
+            return null;
         }
 
         const {sources, customSourceUrl, customSourceType} = details;
-        const data = await this._downloadDefinitionAudio(
-            sources,
-            expression,
-            reading,
-            {
-                textToSpeechVoice: null,
-                customSourceUrl,
-                customSourceType,
-                binary: true,
-                disableCache: true
-            }
-        );
+        let data;
+        try {
+            data = await this._downloadDefinitionAudio(
+                sources,
+                expression,
+                reading,
+                {
+                    textToSpeechVoice: null,
+                    customSourceUrl,
+                    customSourceType,
+                    binary: true,
+                    disableCache: true
+                }
+            );
+        } catch (e) {
+            // No audio
+            return null;
+        }
 
         let fileName = this._generateAnkiNoteMediaFileName('yomichan_audio', '.mp3', timestamp, definitionDetails);
         fileName = fileName.replace(/\]/g, '');
@@ -1611,7 +1628,9 @@ class Backend {
 
         const {mediaType, data} = this._getDataUrlInfo(dataUrl);
         const extension = this._mediaUtility.getFileExtensionFromImageMediaType(mediaType);
-        if (extension === null) { throw new Error('Unknown image media type'); }
+        if (extension === null) {
+            throw new Error('Unknown media type for screenshot image');
+        }
 
         const fileName = this._generateAnkiNoteMediaFileName('yomichan_browser_screenshot', extension, timestamp, definitionDetails);
         await ankiConnect.storeMediaFile(fileName, data);
@@ -1622,12 +1641,14 @@ class Backend {
     async _injectAnkNoteClipboardImage(ankiConnect, timestamp, definitionDetails) {
         const dataUrl = await this._clipboardReader.getImage();
         if (dataUrl === null) {
-            throw new Error('No clipboard image');
+            return null;
         }
 
         const {mediaType, data} = this._getDataUrlInfo(dataUrl);
         const extension = this._mediaUtility.getFileExtensionFromImageMediaType(mediaType);
-        if (extension === null) { throw new Error('Unknown image media type'); }
+        if (extension === null) {
+            throw new Error('Unknown media type for clipboard image');
+        }
 
         const fileName = this._generateAnkiNoteMediaFileName('yomichan_clipboard_image', extension, timestamp, definitionDetails);
         await ankiConnect.storeMediaFile(fileName, data);
