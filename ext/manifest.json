@@ -64,7 +64,7 @@
     ],
     "minimum_chrome_version": "57.0.0.0",
     "options_ui": {
-        "page": "bg/settings.html",
+        "page": "bg/settings2.html",
         "open_in_tab": true
     },
     "sandbox": {
