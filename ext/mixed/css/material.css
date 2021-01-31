@@ -794,6 +794,9 @@ button.input-suffix-button {
     box-sizing: border-box;
     padding: 0 0.5em;
     border-color: transparent;
+    transition:
+        background-color var(--animation-duration) ease-in,
+        box-shadow var(--animation-duration) ease-in;
 }
 button.input-suffix-button.input-suffix-icon-button {
     width: 2.125em;

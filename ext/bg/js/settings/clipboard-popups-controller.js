@@ -32,6 +32,7 @@ class ClipboardPopupsController {
             toggle.addEventListener('change', this._onClipboardToggleChange.bind(this), false);
         }
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+        this._settingsController.on('permissionsChanged', this._onPermissionsChanged.bind(this));
 
         const options = await this._settingsController.getOptions();
         this._onOptionsChanged({options});
@@ -51,17 +52,40 @@ class ClipboardPopupsController {
             }
             toggle.checked = !!value;
         }
+        this._updateValidity();
     }
 
     async _onClipboardToggleChange(e) {
-        const checkbox = e.currentTarget;
-        let value = checkbox.checked;
+        const toggle = e.currentTarget;
+        let value = toggle.checked;
 
         if (value) {
+            toggle.checked = false;
             value = await this._settingsController.setPermissionsGranted(['clipboardRead'], true);
-            checkbox.checked = value;
+            toggle.checked = value;
         }
 
+        this._setToggleValid(toggle, true);
+
         await this._settingsController.setProfileSetting('clipboard.enableBackgroundMonitor', value);
+    }
+
+    _onPermissionsChanged({permissions: {permissions}}) {
+        const permissionsSet = new Set(permissions);
+        for (const toggle of this._toggles) {
+            const valid = !toggle.checked || permissionsSet.has('clipboardRead');
+            this._setToggleValid(toggle, valid);
+        }
+    }
+
+    _setToggleValid(toggle, valid) {
+        const relative = toggle.closest('.settings-item');
+        if (relative === null) { return; }
+        relative.dataset.invalid = `${!valid}`;
+    }
+
+    async _updateValidity() {
+        const permissions = await this._settingsController.getAllPermissions();
+        this._onPermissionsChanged({permissions});
     }
 }

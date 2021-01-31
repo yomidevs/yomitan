@@ -539,6 +539,7 @@ a.heading-link-light {
     padding: var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding-half) var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding);
     flex: 1 1 auto;
     align-self: center;
+    position: relative;
 }
 .settings-item-left:last-child {
     padding-right: var(--settings-group-inner-horizontal-padding);
@@ -625,6 +626,18 @@ a.settings-item.settings-item-button {
 .settings-item.settings-item-button:hover .icon-button>.icon-button-inner>.icon,
 .settings-item.settings-item-button:active .icon-button>.icon-button-inner>.icon {
     background-color: var(--accent-color);
+}
+.settings-item-invalid-indicator {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0.5em;
+    background-color: var(--danger-color);
+}
+.settings-item[data-invalid=true] .settings-item-invalid-indicator {
+    display: block;
 }
 
 

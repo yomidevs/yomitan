@@ -152,18 +152,14 @@ class AnkiController {
         return await this._ankiConnect.getModelFieldNames(model);
     }
 
-    validateFieldPermissions(fieldValue) {
-        let requireClipboard = false;
+    getRequiredPermissions(fieldValue) {
         const markers = this._getFieldMarkers(fieldValue);
         for (const marker of markers) {
             if (this._fieldMarkersRequiringClipboardPermission.has(marker)) {
-                requireClipboard = true;
+                return ['clipboardRead'];
             }
         }
-
-        if (requireClipboard) {
-            this._requestClipboardReadPermission();
-        }
+        return [];
     }
 
     containsAnyMarker(field) {
@@ -338,10 +334,6 @@ class AnkiController {
         this._ankiErrorMessageDetailsToggle.hidden = false;
     }
 
-    async _requestClipboardReadPermission() {
-        return await this._settingsController.setPermissionsGranted(['clipboardRead'], true);
-    }
-
     _getFieldMarkers(fieldValue) {
         const pattern = /\{([\w-]+)\}/g;
         const markers = [];
@@ -375,6 +367,7 @@ class AnkiCardController {
         this._ankiCardModelSelect = null;
         this._ankiCardFieldsContainer = null;
         this._cleaned = false;
+        this._fieldEntries = [];
     }
 
     async prepare() {
@@ -398,12 +391,14 @@ class AnkiCardController {
 
         this._eventListeners.addEventListener(this._ankiCardDeckSelect, 'change', this._onCardDeckChange.bind(this), false);
         this._eventListeners.addEventListener(this._ankiCardModelSelect, 'change', this._onCardModelChange.bind(this), false);
+        this._eventListeners.on(this._settingsController, 'permissionsChanged', this._onPermissionsChanged.bind(this));
 
         await this.updateAnkiState();
     }
 
     cleanup() {
         this._cleaned = true;
+        this._fieldEntries = [];
         this._eventListeners.removeAllEventListeners();
     }
 
@@ -430,13 +425,18 @@ class AnkiCardController {
 
     _onFieldChange(index, e) {
         const node = e.currentTarget;
-        this._ankiController.validateFieldPermissions(node.value);
+        this._validateFieldPermissions(node, index, true);
         this._validateField(node, index);
     }
 
     _onFieldInput(index, e) {
         const node = e.currentTarget;
         this._validateField(node, index);
+    }
+
+    _onFieldSettingChanged(index, e) {
+        const node = e.currentTarget;
+        this._validateFieldPermissions(node, index, false);
     }
 
     _onFieldMenuClose({currentTarget: button, detail: {action, item}}) {
@@ -454,10 +454,11 @@ class AnkiCardController {
     }
 
     _validateField(node, index) {
-        if (index === 0) {
-            const containsAnyMarker = this._ankiController.containsAnyMarker(node.value);
-            node.dataset.invalid = `${!containsAnyMarker}`;
+        let valid = (node.dataset.hasPermissions !== 'false');
+        if (valid && index === 0 && !this._ankiController.containsAnyMarker(node.value)) {
+            valid = false;
         }
+        node.dataset.invalid = `${!valid}`;
     }
 
     _setFieldMarker(element, marker) {
@@ -504,7 +505,7 @@ class AnkiCardController {
 
         const markers = this._ankiController.getFieldMarkers(this._cardType);
         const totalFragment = document.createDocumentFragment();
-        const fieldMap = new Map();
+        this._fieldEntries = [];
         let index = 0;
         for (const [fieldName, fieldValue] of Object.entries(this._fields)) {
             const content = this._settingsController.instantiateTemplateFragment('anki-card-field');
@@ -513,7 +514,6 @@ class AnkiCardController {
             fieldNameContainerNode.dataset.index = `${index}`;
             const fieldNameNode = content.querySelector('.anki-card-field-name');
             fieldNameNode.textContent = fieldName;
-            fieldMap.set(fieldName, {fieldNameContainerNode});
 
             const valueContainer = content.querySelector('.anki-card-field-value-container');
             valueContainer.dataset.index = `${index}`;
@@ -521,8 +521,11 @@ class AnkiCardController {
             const inputField = content.querySelector('.anki-card-field-value');
             inputField.value = fieldValue;
             inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._cardType, 'fields', fieldName]);
+            this._validateFieldPermissions(inputField, index, false);
+
             this._fieldEventListeners.addEventListener(inputField, 'change', this._onFieldChange.bind(this, index), false);
             this._fieldEventListeners.addEventListener(inputField, 'input', this._onFieldInput.bind(this, index), false);
+            this._fieldEventListeners.addEventListener(inputField, 'settingChanged', this._onFieldSettingChanged.bind(this, index), false);
             this._validateField(inputField, index);
 
             const markerList = content.querySelector('.anki-card-field-marker-list');
@@ -545,6 +548,7 @@ class AnkiCardController {
             }
 
             totalFragment.appendChild(content);
+            this._fieldEntries.push({fieldName, inputField, fieldNameContainerNode});
 
             ++index;
         }
@@ -557,10 +561,10 @@ class AnkiCardController {
         }
         container.appendChild(totalFragment);
 
-        this._validateFields(fieldMap);
+        this._validateFields();
     }
 
-    async _validateFields(fieldMap) {
+    async _validateFields() {
         const token = {};
         this._validateFieldsToken = token;
 
@@ -575,7 +579,7 @@ class AnkiCardController {
 
         const fieldNamesSet = new Set(fieldNames);
         let index = 0;
-        for (const [fieldName, {fieldNameContainerNode}] of fieldMap.entries()) {
+        for (const {fieldName, fieldNameContainerNode} of this._fieldEntries) {
             fieldNameContainerNode.dataset.invalid = `${!fieldNamesSet.has(fieldName)}`;
             fieldNameContainerNode.dataset.orderMatches = `${index < fieldNames.length && fieldName === fieldNames[index]}`;
             ++index;
@@ -637,5 +641,53 @@ class AnkiCardController {
         await this._settingsController.modifyProfileSettings(targets);
 
         this._setupFields();
+    }
+
+    async _requestPermissions(permissions) {
+        try {
+            await this._settingsController.setPermissionsGranted(permissions, true);
+        } catch (e) {
+            yomichan.logError(e);
+        }
+    }
+
+    async _validateFieldPermissions(node, index, request) {
+        const fieldValue = node.value;
+        const permissions = this._ankiController.getRequiredPermissions(fieldValue);
+        if (permissions.length > 0) {
+            node.dataset.requiredPermission = permissions.join(' ');
+            const hasPermissions = await (
+                request ?
+                this._settingsController.setPermissionsGranted(permissions, true) :
+                this._settingsController.hasPermissions(permissions)
+            );
+            node.dataset.hasPermissions = `${hasPermissions}`;
+        } else {
+            delete node.dataset.requiredPermission;
+            delete node.dataset.hasPermissions;
+        }
+
+        this._validateField(node, index);
+    }
+
+    _onPermissionsChanged({permissions: {permissions}}) {
+        const permissionsSet = new Set(permissions);
+        for (let i = 0, ii = this._fieldEntries.length; i < ii; ++i) {
+            const {inputField} = this._fieldEntries[i];
+            let {requiredPermission} = inputField.dataset;
+            if (typeof requiredPermission !== 'string') { continue; }
+            requiredPermission = (requiredPermission.length === 0 ? [] : requiredPermission.split(' '));
+
+            let hasPermissions = true;
+            for (const permission of requiredPermission) {
+                if (!permissionsSet.has(permission)) {
+                    hasPermissions = false;
+                    break;
+                }
+            }
+
+            inputField.dataset.hasPermissions = `${hasPermissions}`;
+            this._validateField(inputField, i);
+        }
     }
 }
