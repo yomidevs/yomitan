@@ -26,17 +26,25 @@ class ModalController {
     }
 
     prepare() {
-        for (const node of document.querySelectorAll('.modal,.modal-container')) {
-            const {id} = node;
+        const idSuffix = '-modal';
+        for (const node of document.querySelectorAll('.modal')) {
+            let {id} = node;
+            if (typeof id !== 'string') { continue; }
+
+            if (id.endsWith(idSuffix)) {
+                id = id.substring(0, id.length - idSuffix.length);
+            }
+
             const modal = new Modal(node);
             modal.prepare();
             this._modalMap.set(id, modal);
+            this._modalMap.set(node, modal);
             this._modals.push(modal);
         }
     }
 
-    getModal(name) {
-        const modal = this._modalMap.get(name);
+    getModal(nameOrNode) {
+        const modal = this._modalMap.get(nameOrNode);
         return (typeof modal !== 'undefined' ? modal : null);
     }
 

@@ -677,7 +677,7 @@ select.short-height {
 
 
 /* Modal */
-.modal-container {
+.modal {
     position: fixed;
     left: 0;
     top: 0;
@@ -697,14 +697,14 @@ select.short-height {
         opacity var(--animation-duration2) ease-out,
         visibility 0s linear;
 }
-.modal-container[hidden] {
+.modal[hidden] {
     opacity: 0;
     visibility: hidden;
     transition:
         opacity var(--animation-duration2) ease-in,
         visibility 0s linear var(--animation-duration2);
 }
-.modal-container[hidden]:not(.hidden-animating) {
+.modal[hidden]:not(.hidden-animating) {
     display: none;
 }
 .modal-content {
@@ -726,7 +726,7 @@ select.short-height {
     flex-flow: column nowrap;
     overflow: hidden;
 }
-.modal-container[hidden] .modal-content {
+.modal[hidden] .modal-content {
     pointer-events: none;
 }
 .modal-content.modal-content-small {
@@ -741,7 +741,7 @@ select.short-height {
     transform: translate(0, 0);
     border-radius: 0;
 }
-.modal-container[hidden] .modal-content {
+.modal[hidden] .modal-content {
     transform: translate(0, var(--modal-transition-offset));
     transition:
         transform 0s linear var(--animation-duration2),
@@ -811,7 +811,7 @@ select.short-height {
     padding-bottom: var(--settings-group-inner-horizontal-padding-fourth);
 }
 
-.modal-container.modal-container-left {
+.modal.modal-left {
     display: flex;
     flex-flow: row nowrap;
     width: 100%;
@@ -819,7 +819,7 @@ select.short-height {
     background-color: transparent;
     pointer-events: none;
 }
-.modal-container.modal-container-left::after {
+.modal.modal-left::after {
     content: '';
     display: block;
     overflow-y: scroll;

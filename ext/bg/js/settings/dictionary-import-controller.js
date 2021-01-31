@@ -128,7 +128,7 @@ class DictionaryImportController {
         const progressSelector = '.dictionary-import-progress';
         const progressContainers = [
             ...document.querySelectorAll('#dictionary-import-progress-container'),
-            ...document.querySelectorAll(`#dictionaries ${progressSelector}`)
+            ...document.querySelectorAll(`#dictionaries-modal ${progressSelector}`)
         ];
         const progressBars = [
             ...document.querySelectorAll('#dictionary-import-progress-container .progress-bar'),

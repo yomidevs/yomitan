@@ -443,7 +443,7 @@ class DictionaryController {
         const progressSelector = '.dictionary-delete-progress';
         const progressContainers = [
             ...node.querySelectorAll('.progress-container'),
-            ...document.querySelectorAll(`#dictionaries ${progressSelector}`)
+            ...document.querySelectorAll(`#dictionaries-modal ${progressSelector}`)
         ];
         const progressBars = [
             ...node.querySelectorAll('.progress-bar'),

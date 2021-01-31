@@ -162,13 +162,13 @@ class SettingsDisplayController {
 
         let [action, target] = modalAction.split(',');
         if (typeof target === 'undefined') {
-            const currentModal = node.closest('.modal-container');
+            const currentModal = node.closest('.modal');
             if (currentModal === null) { return; }
-            target = currentModal.id;
+            target = currentModal;
         }
 
         const modal = this._modalController.getModal(target);
-        if (typeof modal === 'undefined') { return; }
+        if (modal === null) { return; }
 
         switch (action) {
             case 'show':
