@@ -79,3 +79,4 @@ run by `npm test` and the continuous integration process.
 
 * [.eslintrc.json](.eslintrc.json) rules are used for JavaScript files.
 * [.stylelintrc.json](.stylelintrc.json) rules are used for CSS files.
+* [.htmlvalidate.json](.htmlvalidate.json) rules are used for HTML files.
