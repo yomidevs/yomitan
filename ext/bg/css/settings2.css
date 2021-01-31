@@ -150,6 +150,10 @@ code {
 label {
     cursor: pointer;
 }
+pre {
+    white-space: pre-wrap;
+    margin: 0;
+}
 
 
 /* Text styles */
@@ -1462,15 +1466,8 @@ button.anki-card-field-value-menu-button {
     border-collapse: collapse;
     border-spacing: 0;
 }
-.anki-field-marker-info-table>thead {
+.anki-field-marker-info-table tr.anki-field-marker-info-table-heading {
     font-weight: bold;
-}
-code.anki-field-marker {
-    white-space: nowrap;
-    font-size: 0.85em;
-    font-weight: bold;
-}
-.anki-field-marker-info-table thead tr {
     background-color: var(--input-background-color);
 }
 .anki-field-marker-info-table td {
@@ -1484,6 +1481,11 @@ code.anki-field-marker {
 }
 .anki-field-marker-info-table td:nth-last-child(n+2) {
     border-right: none;
+}
+code.anki-field-marker {
+    white-space: nowrap;
+    font-size: 0.85em;
+    font-weight: bold;
 }
 
 .anki-card-templates-layout {
@@ -1946,6 +1948,13 @@ input.sentence-termination-character-input2 {
 }
 .hotkey-scope-checkbox-container>span {
     padding-left: 0.375em;
+}
+
+.inline-icon {
+    position: relative;
+    width: calc(1em * (16 / var(--font-size-no-units)));
+    height: calc(1em * (16 / var(--font-size-no-units)));
+    top: calc(1em * (3 / var(--font-size-no-units)));
 }
 
 

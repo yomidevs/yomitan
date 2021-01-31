@@ -82,7 +82,9 @@ async function updatePermissionCheckbox(checkbox, permissions, value) {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 
-        document.querySelector('#extension-id-example').textContent = chrome.runtime.getURL('/');
+        for (const node of document.querySelectorAll('.extension-id-example')) {
+            node.textContent = chrome.runtime.getURL('/');
+        }
 
         api.forwardLogsToBackend();
         await yomichan.prepare();

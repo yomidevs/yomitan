@@ -2185,9 +2185,9 @@
         </div>
         <div class="modal-body custom-popup-css-container">
             <div class="custom-popup-css-header">Popup CSS</div>
-            <textarea autocomplete="off" spellcheck="false" wrap="off" id="custom-popup-css" data-setting="general.customPopupCss" data-tab-action="indent,4"></textarea>
+            <textarea autocomplete="off" spellcheck="false" id="custom-popup-css" data-setting="general.customPopupCss" data-tab-action="indent,4"></textarea>
             <div class="custom-popup-css-header margin-above">Popup outer CSS</div>
-            <textarea autocomplete="off" spellcheck="false" wrap="off" id="custom-popup-outer-css" data-setting="general.customPopupOuterCss" data-tab-action="indent,4"></textarea>
+            <textarea autocomplete="off" spellcheck="false" id="custom-popup-outer-css" data-setting="general.customPopupOuterCss" data-tab-action="indent,4"></textarea>
         </div>
         <div class="modal-footer">
             <button data-modal-action="hide">Close</button>
@@ -2275,7 +2275,7 @@
                     </li>
                 </ul>
                 <p>
-                    Example URL: <a data-select-on-click="">http://localhost/audio.mp3?expression={expression}&reading={reading}</a>
+                    Example URL: <a data-select-on-click="">http://localhost/audio.mp3?expression={expression}&amp;reading={reading}</a>
                 </p>
                 <p>
                     <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -2585,13 +2585,12 @@
             or <code class="anki-field-marker">{character}</code> for kanji cards.
         </p>
         <table class="anki-field-marker-info-table margin-above">
-            <thead>
-                <tr>
+            <tbody>
+                <tr class="anki-field-marker-info-table-heading">
                     <td>Marker (for terms)</td>
                     <td>Description</td>
                 </tr>
-            </thead>
-            <tbody>
+
                 <tr>
                     <td><code class="anki-field-marker">{audio}</code></td>
                     <td>Audio sample of a native speaker's pronunciation in MP3 format, if available.</td>
@@ -2650,14 +2649,12 @@
                     <td><code class="anki-field-marker">{tags}</code></td>
                     <td>Grammar and usage tags providing information about the term.</td>
                 </tr>
-            </tbody>
-            <thead>
-                <tr>
+
+                <tr class="anki-field-marker-info-table-heading">
                     <td>Marker (for kanji)</td>
                     <td>Description</td>
                 </tr>
-            </thead>
-            <tbody>
+
                 <tr>
                     <td><code class="anki-field-marker">{character}</code></td>
                     <td>Unicode glyph representing the current kanji.</td>
@@ -2678,14 +2675,12 @@
                     <td><code class="anki-field-marker">{stroke-count}</code></td>
                     <td>Number of strokes that the kanji character has.</td>
                 </tr>
-            </tbody>
-            <thead>
-                <tr>
+
+                <tr class="anki-field-marker-info-table-heading">
                     <td>Marker (for both)</td>
                     <td>Description</td>
                 </tr>
-            </thead>
-            <tbody>
+
                 <tr>
                     <td><code class="anki-field-marker">{clipboard-image}</code></td>
                     <td>An image which is stored in the system clipboard, if available.</td>
@@ -2763,7 +2758,7 @@
                 Consider copy-pasting the source into a code editor that supports syntax highlighting for easier editing.
             </p>
         </div>
-        <textarea autocomplete="off" spellcheck="false" wrap="off" id="anki-card-templates-textarea" class="margin-above" data-tab-action="indent,4"></textarea>
+        <textarea autocomplete="off" spellcheck="false" id="anki-card-templates-textarea" class="margin-above" data-tab-action="indent,4"></textarea>
         <div id="anki-card-templates-compile-result" class="danger-text margin-above" hidden></div>
         <div class="anki-card-templates-test-container margin-above">
             <p>

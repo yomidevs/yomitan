@@ -1,0 +1,18 @@
+{
+    "root": true,
+    "extends": [
+        "html-validate:recommended"
+    ],
+    "rules": {
+        "element-required-attributes": "off",
+        "element-permitted-content": "off",
+        "text-content": "off",
+        "void-style": ["error", {"style": "omit"}],
+        "empty-heading": "off",
+        "wcag/h30": "off",
+        "no-inline-style": "off"
+    },
+    "elements": [
+        "html5"
+    ]
+}

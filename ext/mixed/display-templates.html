@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head></head><body>
+<!DOCTYPE html><html><head><title>Display Templates</title></head><body>
 
 <!-- Term entry templates -->
 <template id="term-entry-template" data-remove-whitespace-text="true"><div class="entry" data-type="term">
@@ -51,7 +51,7 @@
 <template id="term-definition-item-template"><li class="term-definition-item"><div class="term-definition-tag-list tag-list"></div><div class="term-definition-disambiguation-list"></div><ul class="term-glossary-list"></ul></li></template>
 <template id="term-definition-disambiguation-template"><span class="term-definition-disambiguation"></span></template>
 <template id="term-glossary-item-template"><li class="term-glossary-item click-scannable"><span class="term-glossary-separator"> </span><span class="term-glossary"></span></li></template>
-<template id="term-glossary-item-image-template"><li class="term-glossary-item click-scannable" data-has-image="true"><span class="term-glossary-separator"> </span><span class="term-glossary"><a class="term-glossary-image-link" target="_blank" rel="noreferrer noopener"><span class="term-glossary-image-container"><span class="term-glossary-image-aspect-ratio-sizer"></span><img class="term-glossary-image" alt="" /><span class="term-glossary-image-container-overlay"></span></span><span class="term-glossary-image-link-text">Image</span></a> <span class="term-glossary-image-description"></span></span></li></template>
+<template id="term-glossary-item-image-template"><li class="term-glossary-item click-scannable" data-has-image="true"><span class="term-glossary-separator"> </span><span class="term-glossary"><a class="term-glossary-image-link" target="_blank" rel="noreferrer noopener"><span class="term-glossary-image-container"><span class="term-glossary-image-aspect-ratio-sizer"></span><img class="term-glossary-image" alt=""><span class="term-glossary-image-container-overlay"></span></span><span class="term-glossary-image-link-text">Image</span></a> <span class="term-glossary-image-description"></span></span></li></template>
 <template id="term-reason-template"><span class="term-reason"></span><span class="term-reason-separator"> </span></template>
 
 <!-- Frequency templates -->
@@ -70,7 +70,7 @@
 </li></template>
 
 <!-- Pitch accent templates -->
-<template id="term-pitch-accent-static-template"><svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+<template id="term-pitch-accent-static-template"><svg xmlns="http://www.w3.org/2000/svg" style="display: none;" focusable="false">
     <defs>
         <g id="term-pitch-accent-graph-dot"><circle cx="0" cy="0" r="15" /></g>
         <g id="term-pitch-accent-graph-dot-downstep"><circle cx="0" cy="0" r="15" /><circle cx="0" cy="0" r="5" /></g>
@@ -79,7 +79,7 @@
 </svg></template>
 <template id="term-pitch-accent-group-template"><li class="term-pitch-accent-group"><span class="term-pitch-accent-group-tag-list tag-list"></span><ul class="term-pitch-accent-list"></ul></li></template>
 <template id="term-pitch-accent-disambiguation-template"><span class="term-pitch-accent-disambiguation"></span></template>
-<template id="term-pitch-accent-template"><li class="term-pitch-accent"><span class="term-pitch-accent-tag-list tag-list"></span><span class="term-pitch-accent-disambiguation-list"></span><span class="term-pitch-accent-characters"></span><span class="term-pitch-accent-position"></span><span class="term-pitch-accent-details"><svg class="term-pitch-accent-graph" xmlns="http://www.w3.org/2000/svg"><path class="term-pitch-accent-graph-line" /><path class="term-pitch-accent-graph-line-tail" /></svg></span></li></template>
+<template id="term-pitch-accent-template"><li class="term-pitch-accent"><span class="term-pitch-accent-tag-list tag-list"></span><span class="term-pitch-accent-disambiguation-list"></span><span class="term-pitch-accent-characters"></span><span class="term-pitch-accent-position"></span><span class="term-pitch-accent-details"><svg class="term-pitch-accent-graph" xmlns="http://www.w3.org/2000/svg" focusable="false"><path class="term-pitch-accent-graph-line" /><path class="term-pitch-accent-graph-line-tail" /></svg></span></li></template>
 <template id="term-pitch-accent-character-template"><span class="term-pitch-accent-character"><span class="term-pitch-accent-character-inner"></span></span></template>
 
 <!-- Kanji entry templates -->
@@ -128,7 +128,7 @@
 </div></template>
 <template id="kanji-info-table-template"><table class="kanji-info-table"><tbody class="kanji-info-table-body"></tbody></table></template>
 <template id="kanji-info-table-item-template"><tr class="kanji-info-table-item"><th class="kanji-info-table-item-header"></th><td class="kanji-info-table-item-value"></td></tr></template>
-<template id="kanji-info-table-empty-template"><tr class="kanji-info-table-item kanji-info-table-item-empty"><td class="kanji-info-table-item-value-empty">No data found</td></tr class="kanji-info-table-item"></template>
+<template id="kanji-info-table-empty-template"><tr class="kanji-info-table-item kanji-info-table-item-empty"><td class="kanji-info-table-item-value-empty">No data found</td></tr></template>
 <template id="kanji-glossary-item-template"><li class="kanji-glossary-item"><span class="kanji-glossary"></span></li></template>
 <template id="kanji-reading-template"><dd class="kanji-reading"></dd></template>
 
