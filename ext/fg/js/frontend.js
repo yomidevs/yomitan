@@ -32,6 +32,7 @@ class Frontend {
         parentPopupId,
         parentFrameId,
         useProxyPopup,
+        canUseWindowPopup=true,
         allowRootFramePopupProxy,
         childrenSupported=true,
         hotkeyHandler
@@ -43,6 +44,7 @@ class Frontend {
         this._parentPopupId = parentPopupId;
         this._parentFrameId = parentFrameId;
         this._useProxyPopup = useProxyPopup;
+        this._canUseWindowPopup = canUseWindowPopup;
         this._allowRootFramePopupProxy = allowRootFramePopupProxy;
         this._childrenSupported = childrenSupported;
         this._hotkeyHandler = hotkeyHandler;
@@ -371,7 +373,7 @@ class Frontend {
         const currentPopup = this._popup;
 
         let popupPromise;
-        if (usePopupWindow) {
+        if (usePopupWindow && this._canUseWindowPopup) {
             popupPromise = this._popupCache.get('window');
             if (typeof popupPromise === 'undefined') {
                 popupPromise = this._getPopupWindow();

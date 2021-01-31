@@ -73,6 +73,7 @@ class PopupPreviewFrame {
             parentPopupId: null,
             parentFrameId: null,
             useProxyPopup: false,
+            canUseWindowPopup: false,
             pageType: 'web',
             allowRootFramePopupProxy: false,
             childrenSupported: false,
