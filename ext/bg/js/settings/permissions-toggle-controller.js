@@ -19,17 +19,17 @@
  * ObjectPropertyAccessor
  */
 
-class ClipboardPopupsController {
+class PermissionsToggleController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._toggles = null;
     }
 
     async prepare() {
-        this._toggles = document.querySelectorAll('.clipboard-toggle');
+        this._toggles = document.querySelectorAll('.permissions-toggle');
 
         for (const toggle of this._toggles) {
-            toggle.addEventListener('change', this._onClipboardToggleChange.bind(this), false);
+            toggle.addEventListener('change', this._onPermissionsToggleChange.bind(this), false);
         }
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._settingsController.on('permissionsChanged', this._onPermissionsChanged.bind(this));
@@ -43,7 +43,7 @@ class ClipboardPopupsController {
     _onOptionsChanged({options}) {
         const accessor = new ObjectPropertyAccessor(options);
         for (const toggle of this._toggles) {
-            const path = ObjectPropertyAccessor.getPathArray(toggle.dataset.clipboardSetting);
+            const path = ObjectPropertyAccessor.getPathArray(toggle.dataset.permissionsSetting);
             let value;
             try {
                 value = accessor.get(path, path.length);
@@ -55,25 +55,25 @@ class ClipboardPopupsController {
         this._updateValidity();
     }
 
-    async _onClipboardToggleChange(e) {
+    async _onPermissionsToggleChange(e) {
         const toggle = e.currentTarget;
         let value = toggle.checked;
 
         if (value) {
             toggle.checked = false;
-            value = await this._settingsController.setPermissionsGranted(['clipboardRead'], true);
+            value = await this._settingsController.setPermissionsGranted(this._getRequiredPermissions(toggle), true);
             toggle.checked = value;
         }
 
         this._setToggleValid(toggle, true);
 
-        await this._settingsController.setProfileSetting(toggle.dataset.clipboardSetting, value);
+        await this._settingsController.setProfileSetting(toggle.dataset.permissionsSetting, value);
     }
 
     _onPermissionsChanged({permissions: {permissions}}) {
         const permissionsSet = new Set(permissions);
         for (const toggle of this._toggles) {
-            const valid = !toggle.checked || permissionsSet.has('clipboardRead');
+            const valid = !toggle.checked || this._hasAll(permissionsSet, this._getRequiredPermissions(toggle));
             this._setToggleValid(toggle, valid);
         }
     }
@@ -87,5 +87,17 @@ class ClipboardPopupsController {
     async _updateValidity() {
         const permissions = await this._settingsController.getAllPermissions();
         this._onPermissionsChanged({permissions});
+    }
+
+    _hasAll(set, values) {
+        for (const value of values) {
+            if (!set.has(value)) { return false; }
+        }
+        return true;
+    }
+
+    _getRequiredPermissions(toggle) {
+        const requiredPermissions = toggle.dataset.requiredPermissions;
+        return (typeof requiredPermissions === 'string' && requiredPermissions.length > 0 ? requiredPermissions.split(' ') : []);
     }
 }
