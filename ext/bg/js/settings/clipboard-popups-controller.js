@@ -67,7 +67,7 @@ class ClipboardPopupsController {
 
         this._setToggleValid(toggle, true);
 
-        await this._settingsController.setProfileSetting('clipboard.enableBackgroundMonitor', value);
+        await this._settingsController.setProfileSetting(toggle.dataset.clipboardSetting, value);
     }
 
     _onPermissionsChanged({permissions: {permissions}}) {
