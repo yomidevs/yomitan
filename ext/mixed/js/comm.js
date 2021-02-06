@@ -248,6 +248,12 @@ class CrossFrameAPI {
         }
     }
 
+    unregisterHandler(key) {
+        return this._messageHandlers.delete(key);
+    }
+
+    // Private
+
     _onConnect(port) {
         try {
             let details;
