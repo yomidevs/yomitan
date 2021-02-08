@@ -23,6 +23,7 @@
  * This class is used to return the ancestor frame IDs for the current frame.
  * This is a workaround to using the `webNavigation.getAllFrames` API, which
  * would require an additional permission that is otherwise unnecessary.
+ * It is also used to track the correlation between child frame elements and their IDs.
  */
 class FrameAncestryHandler {
     /**
@@ -55,6 +56,14 @@ class FrameAncestryHandler {
     }
 
     /**
+     * Returns whether or not this frame is the root frame in the tab.
+     * @returns `true` if it is the root, otherwise `false`.
+     */
+    isRootFrame() {
+        return (window === window.parent);
+    }
+
+    /**
      * Gets the frame ancestry information for the current frame. If the frame is the
      * root frame, an empty array is returned. Otherwise, an array of frame IDs is returned,
      * starting from the nearest ancestor.
@@ -66,6 +75,26 @@ class FrameAncestryHandler {
             this._getFrameAncestryInfoPromise = this._getFrameAncestryInfo(5000);
         }
         return await this._getFrameAncestryInfoPromise;
+    }
+
+    /**
+     * Gets the frame element of a child frame given a frame ID.
+     * For this function to work, the `getFrameAncestryInfo` function needs to have
+     * been invoked previously.
+     * @param frameId The frame ID of the child frame to get.
+     * @returns The element corresponding to the frame with ID `frameId`, otherwise `null`.
+     */
+    getChildFrameElement(frameId) {
+        const frameInfo = this._childFrameMap.get(frameId);
+        if (typeof frameInfo === 'undefined') { return null; }
+
+        let {frameElement} = frameInfo;
+        if (typeof frameElement === 'undefined') {
+            frameElement = this._findFrameElementWithContentWindow(frameInfo.window);
+            frameInfo.frameElement = frameElement;
+        }
+
+        return frameElement;
     }
 
     // Private
@@ -166,7 +195,7 @@ class FrameAncestryHandler {
             }
 
             if (!this._childFrameMap.has(childFrameId)) {
-                this._childFrameMap.set(childFrameId, {window: source});
+                this._childFrameMap.set(childFrameId, {window: source, frameElement: void 0});
             }
 
             if (more) {
@@ -191,5 +220,50 @@ class FrameAncestryHandler {
             value >= 0 &&
             Math.floor(value) === value
         );
+    }
+
+    _findFrameElementWithContentWindow(contentWindow) {
+        // Check frameElement, for non-null same-origin frames
+        try {
+            const {frameElement} = contentWindow;
+            if (frameElement !== null) { return frameElement; }
+        } catch (e) {
+            // NOP
+        }
+
+        // Check frames
+        const frameTypes = ['iframe', 'frame', 'embed'];
+        for (const frameType of frameTypes) {
+            for (const frame of document.getElementsByTagName(frameType)) {
+                if (frame.contentWindow === contentWindow) {
+                    return frame;
+                }
+            }
+        }
+
+        // Check for shadow roots
+        const rootElements = [document.documentElement];
+        while (rootElements.length > 0) {
+            const rootElement = rootElements.shift();
+            const walker = document.createTreeWalker(rootElement, NodeFilter.SHOW_ELEMENT);
+            while (walker.nextNode()) {
+                const element = walker.currentNode;
+
+                if (element.contentWindow === contentWindow) {
+                    return element;
+                }
+
+                const shadowRoot = (
+                    element.shadowRoot ||
+                    element.openOrClosedShadowRoot // Available to Firefox 63+ for WebExtensions
+                );
+                if (shadowRoot) {
+                    rootElements.push(shadowRoot);
+                }
+            }
+        }
+
+        // Not found
+        return null;
     }
 }
