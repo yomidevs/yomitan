@@ -88,9 +88,39 @@ class DisplayController {
     }
 
     async _setupEnvironment() {
-        // Firefox mobile opens this page as a full webpage.
-        const {browser} = await api.getEnvironmentInfo();
-        document.documentElement.dataset.mode = (browser === 'firefox-mobile' ? 'full' : 'mini');
+        const urlSearchParams = new URLSearchParams(location.search);
+        let mode = urlSearchParams.get('mode');
+        switch (mode) {
+            case 'full':
+            case 'mini':
+                break;
+            default:
+                {
+                    let tab;
+                    try {
+                        tab = await this._getCurrentTab();
+                    } catch (e) {
+                        // NOP
+                    }
+                    mode = (tab ? 'full' : 'mini');
+                }
+                break;
+        }
+
+        document.documentElement.dataset.mode = mode;
+    }
+
+    _getCurrentTab() {
+        return new Promise((resolve, reject) => {
+            chrome.tabs.getCurrent((result) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(result);
+                }
+            });
+        });
     }
 
     _setupOptions({options}) {
