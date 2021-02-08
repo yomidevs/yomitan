@@ -877,11 +877,7 @@ class Backend {
         this._anki.server = options.anki.server;
         this._anki.enabled = options.anki.enable;
 
-        if (options.parsing.enableMecabParser) {
-            this._mecab.startListener();
-        } else {
-            this._mecab.stopListener();
-        }
+        this._mecab.setEnabled(options.parsing.enableMecabParser);
 
         if (options.clipboard.enableBackgroundMonitor) {
             this._clipboardMonitor.start();
@@ -988,12 +984,19 @@ class Backend {
     async _textParseMecab(text, options) {
         const jp = this._japaneseUtil;
         const {parsing: {readingMode}} = options;
+
+        let parseTextResults;
+        try {
+            parseTextResults = await this._mecab.parseText(text);
+        } catch (e) {
+            return [];
+        }
+
         const results = [];
-        const rawResults = await this._mecab.parseText(text);
-        for (const [mecabName, parsedLines] of Object.entries(rawResults)) {
+        for (const {name, lines} of parseTextResults) {
             const result = [];
-            for (const parsedLine of parsedLines) {
-                for (const {expression, reading, source} of parsedLine) {
+            for (const line of lines) {
+                for (const {expression, reading, source} of line) {
                     const term = [];
                     for (const {text: text2, furigana} of jp.distributeFuriganaInflected(
                         expression.length > 0 ? expression : source,
@@ -1007,7 +1010,7 @@ class Backend {
                 }
                 result.push([{text: '\n', reading: ''}]);
             }
-            results.push([mecabName, result]);
+            results.push([name, result]);
         }
         return results;
     }
