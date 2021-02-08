@@ -65,7 +65,6 @@ body {
 }
 .top-options-left {
     flex: 1 1 auto;
-    overflow-x: hidden;
 }
 .top-options-right {
     flex: 0 0 auto;
