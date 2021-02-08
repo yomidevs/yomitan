@@ -86,17 +86,6 @@
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label"><code>nativeMessaging</code></div>
-                <div class="settings-item-description">
-                    Yomichan has the ability to communicate with an optional native messaging component in order to support
-                    parsing large blocks of Japanese text using
-                    <a href="https://en.wikipedia.org/wiki/MeCab" target="_blank" rel="noopener noreferrer">MeCab</a>.
-                    The installation of this component is optional and is not included by default.
-                </div>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
                 <div class="settings-item-label"><code>clipboardWrite</code></div>
                 <div class="settings-item-description">
                     Yomichan supports simulating the <code>Ctrl+C</code> (copy to clipboard) keyboard shortcut
@@ -115,7 +104,21 @@
                 </div>
             </div>
             <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" id="permission-checkbox-clipboard-read"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                <label class="toggle"><input type="checkbox" class="permissions-toggle" data-required-permissions="clipboardRead"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label"><code>nativeMessaging</code> <span class="light" data-show-for-browser="chrome edge">(optional)</span></div>
+                <div class="settings-item-description">
+                    Yomichan has the ability to communicate with an optional native messaging component in order to support
+                    parsing large blocks of Japanese text using
+                    <a href="https://en.wikipedia.org/wiki/MeCab" target="_blank" rel="noopener noreferrer">MeCab</a>.
+                    The installation of this component is optional and is not included by default.
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" class="permissions-toggle" data-required-permissions="nativeMessaging"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">
@@ -164,6 +167,10 @@
 <script src="/mixed/js/api.js"></script>
 
 <script src="/mixed/js/document-focus-controller.js"></script>
+<script src="/mixed/js/html-template-collection.js"></script>
+
+<script src="/bg/js/settings/permissions-toggle-controller.js"></script>
+<script src="/bg/js/settings/settings-controller.js"></script>
 
 <script src="/bg/js/permissions-main.js"></script>
 

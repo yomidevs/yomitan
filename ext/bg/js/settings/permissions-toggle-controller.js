@@ -41,9 +41,16 @@ class PermissionsToggleController {
     // Private
 
     _onOptionsChanged({options}) {
-        const accessor = new ObjectPropertyAccessor(options);
+        let accessor = null;
         for (const toggle of this._toggles) {
-            const path = ObjectPropertyAccessor.getPathArray(toggle.dataset.permissionsSetting);
+            const {permissionsSetting} = toggle.dataset;
+            if (typeof permissionsSetting !== 'string') { continue; }
+
+            if (accessor === null) {
+                accessor = new ObjectPropertyAccessor(options);
+            }
+
+            const path = ObjectPropertyAccessor.getPathArray(permissionsSetting);
             let value;
             try {
                 value = accessor.get(path, path.length);
@@ -58,23 +65,38 @@ class PermissionsToggleController {
     async _onPermissionsToggleChange(e) {
         const toggle = e.currentTarget;
         let value = toggle.checked;
+        const valuePre = !value;
+        const {permissionsSetting} = toggle.dataset;
+        const hasPermissionsSetting = typeof permissionsSetting === 'string';
 
-        if (value) {
-            toggle.checked = false;
-            value = await this._settingsController.setPermissionsGranted(this._getRequiredPermissions(toggle), true);
+        if (value || !hasPermissionsSetting) {
+            toggle.checked = valuePre;
+            try {
+                value = await this._settingsController.setPermissionsGranted(this._getRequiredPermissions(toggle), value);
+            } catch (error) {
+                value = valuePre;
+            }
             toggle.checked = value;
         }
 
-        this._setToggleValid(toggle, true);
-
-        await this._settingsController.setProfileSetting(toggle.dataset.permissionsSetting, value);
+        if (hasPermissionsSetting) {
+            this._setToggleValid(toggle, true);
+            await this._settingsController.setProfileSetting(permissionsSetting, value);
+        }
     }
 
     _onPermissionsChanged({permissions: {permissions}}) {
         const permissionsSet = new Set(permissions);
         for (const toggle of this._toggles) {
-            const valid = !toggle.checked || this._hasAll(permissionsSet, this._getRequiredPermissions(toggle));
-            this._setToggleValid(toggle, valid);
+            const {permissionsSetting} = toggle.dataset;
+            const hasPermissions = this._hasAll(permissionsSet, this._getRequiredPermissions(toggle));
+
+            if (typeof permissionsSetting === 'string') {
+                const valid = !toggle.checked || hasPermissions;
+                this._setToggleValid(toggle, valid);
+            } else {
+                toggle.checked = hasPermissions;
+            }
         }
     }
 

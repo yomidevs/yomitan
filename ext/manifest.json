@@ -78,12 +78,12 @@
         "storage",
         "clipboardWrite",
         "unlimitedStorage",
-        "nativeMessaging",
         "webRequest",
         "webRequestBlocking"
     ],
     "optional_permissions": [
-        "clipboardRead"
+        "clipboardRead",
+        "nativeMessaging"
     ],
     "commands": {
         "toggleTextScanning": {

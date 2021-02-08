@@ -79,12 +79,12 @@
             "storage",
             "clipboardWrite",
             "unlimitedStorage",
-            "nativeMessaging",
             "webRequest",
             "webRequestBlocking"
         ],
         "optional_permissions": [
-            "clipboardRead"
+            "clipboardRead",
+            "nativeMessaging"
         ],
         "commands": {
             "toggleTextScanning": {
@@ -204,6 +204,16 @@
                             "strict_min_version": "57.0"
                         }
                     }
+                },
+                {
+                    "action": "remove",
+                    "path": ["optional_permissions"],
+                    "item": "nativeMessaging"
+                },
+                {
+                    "action": "add",
+                    "path": ["permissions"],
+                    "items": ["nativeMessaging"]
                 }
             ],
             "excludeFiles": [
