@@ -101,16 +101,8 @@ const api = (() => {
             return this._invoke('getExpressionAudioInfoList', {source, expression, reading, details});
         }
 
-        downloadDefinitionAudio(sources, expression, reading, details) {
-            return this._invoke('downloadDefinitionAudio', {sources, expression, reading, details});
-        }
-
         commandExec(command, params) {
             return this._invoke('commandExec', {command, params});
-        }
-
-        screenshotGet(options) {
-            return this._invoke('screenshotGet', {options});
         }
 
         sendMessageToFrame(frameId, action, params) {
@@ -139,10 +131,6 @@ const api = (() => {
 
         clipboardGet() {
             return this._invoke('clipboardGet');
-        }
-
-        clipboardGetImage() {
-            return this._invoke('clipboardGetImage');
         }
 
         getDisplayTemplatesHtml() {
