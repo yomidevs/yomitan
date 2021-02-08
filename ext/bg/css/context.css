@@ -15,6 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+:root {
+    --badge-size: 16px;
+
+    --warning-color: #96751c;
+    --warning-color-light: #edc75e;
+}
+
 body {
     padding: 10px;
     margin: 0;
@@ -50,8 +57,34 @@ label {
 }
 
 
+/* Icons */
+.icon {
+    --icon-image: none;
+    --icon-size: contain;
+
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center center;
+    -webkit-mask-mode: alpha;
+    -webkit-mask-size: var(--icon-size);
+    -webkit-mask-image: var(--icon-image);
+    mask-repeat: no-repeat;
+    mask-position: center center;
+    mask-mode: alpha;
+    mask-size: var(--icon-size);
+    mask-image: var(--icon-image);
+}
+.icon[data-icon=profile]                 { --icon-image: url(/mixed/img/profile.svg); }
+.icon[data-icon=cog]                     { --icon-image: url(/mixed/img/cog.svg); }
+.icon[data-icon=magnifying-glass]        { --icon-image: url(/mixed/img/magnifying-glass.svg); }
+.icon[data-icon=exclamation-point-short] { --icon-image: url(/mixed/img/exclamation-point-short.svg); }
+.icon[data-icon=question-mark-circle]    { --icon-image: url(/mixed/img/question-mark-circle.svg); }
+
+
+/* Page-specific styles */
 .link-group {
-    display: block;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
     line-height: 1.5em;
     margin: 0 -10px;
     padding: 0.5em 10px;
@@ -101,6 +134,9 @@ label {
 }
 .link-group-label {
     vertical-align: middle;
+}
+.link-group-badge {
+    margin-left: 0.5em;
 }
 
 /* Toggle */
@@ -235,6 +271,7 @@ body[data-loaded=true] .toggle-group {
     margin: 0;
     padding: 2px 3px;
     cursor: pointer;
+    position: relative;
 }
 .nav-button+.nav-button {
     margin-left: -1px;
@@ -336,4 +373,70 @@ select.profile-select {
     font-weight: normal;
     font-style: normal;
     background-color: initial;
+}
+
+.nav-button-warning-badge {
+    pointer-events: none;
+    width: 12px;
+    height: 6px;
+    position: absolute;
+    right: calc(50% - 6px);
+    top: -8px;
+    z-index: 1;
+}
+.nav-button-warning-badge-inner,
+.nav-button-warning-badge-outer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #edc75e;
+
+    --icon-image: url(/mixed/img/material-down-arrow.svg);
+    --icon-size: contain;
+
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center center;
+    -webkit-mask-mode: alpha;
+    -webkit-mask-size: var(--icon-size);
+    -webkit-mask-image: var(--icon-image);
+    mask-repeat: no-repeat;
+    mask-position: center center;
+    mask-mode: alpha;
+    mask-size: var(--icon-size);
+    mask-image: var(--icon-image);
+}
+.nav-button-warning-badge-inner {
+    margin: 1px 2px;
+}
+.nav-button-warning-badge-outer {
+    animation: nav-button-warning-badge-animation ease-in-out 2s alternate infinite;
+}
+@keyframes nav-button-warning-badge-animation {
+    0% { opacity: 1; background-color: #edc75e; }
+    100% { opacity: 1; background-color: #333333; }
+}
+
+.warning-badge {
+    position: relative;
+    width: var(--badge-size);
+    height: var(--badge-size);
+    margin: 0;
+    padding: 0;
+    background-color: var(--warning-color-light);
+    border-radius: 50%;
+    box-shadow: var(--shadow-vertical);
+}
+.warning-badge:not([hidden]) {
+    display: block;
+}
+.warning-badge>.icon {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--warning-color);
 }

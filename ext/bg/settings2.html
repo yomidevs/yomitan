@@ -22,7 +22,7 @@
     <div class="sidebar"><div class="sidebar-inner">
         <div class="sidebar-body">
             <a href="#!profile"          class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="profile"></span></span><span class="outline-item-label">Profile</span></a>
-            <a href="#!dictionaries"     class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="book"></span><span class="outline-item-left-warning-badge no-dictionaries-enabled-warning" hidden><span class="icon" data-icon="exclamation-point-short"></span></span></span><span class="outline-item-label">Dictionaries</span></a>
+            <a href="#!dictionaries"     class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="book"></span><span class="outline-item-left-warning-badge no-dictionaries-enabled-warning" hidden><div class="warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div></span></span><span class="outline-item-label">Dictionaries</span></a>
             <a href="#!general"          class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="cog"></span></span><span class="outline-item-label">General</span></a>
             <a href="#!scanning"         class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="scanning"></span></span><span class="outline-item-label">Scanning</span></a>
             <a href="#!popup"            class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup"></span></span><span class="outline-item-label">Popup</span></a>
@@ -125,7 +125,12 @@
     <div class="settings-group">
         <div class="settings-item settings-item-button" data-modal-action="show,dictionaries"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Configure installed and enabled dictionaries&hellip;</div>
+                <div class="settings-item-label">
+                    <div class="flex-row-nowrap">
+                        <div>Configure installed and enabled dictionaries&hellip;</div>
+                        <div class="flex-margin-left warning-badge no-dictionaries-enabled-warning" hidden><span class="icon" data-icon="exclamation-point-short"></span></div>
+                    </div>
+                </div>
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>

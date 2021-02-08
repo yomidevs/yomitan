@@ -100,6 +100,7 @@ class DisplayController {
             toggle.checked = extensionEnabled;
             toggle.addEventListener('change', onToggleChanged, false);
         }
+        this._updateDictionariesEnabledWarnings(options);
     }
 
     async _setupHotkeys() {
@@ -149,6 +150,26 @@ class DisplayController {
                 scope: 'global'
             }]
         );
+    }
+
+    async _updateDictionariesEnabledWarnings(options) {
+        const noDictionariesEnabledWarnings = document.querySelectorAll('.no-dictionaries-enabled-warning');
+        const dictionaries = await api.getDictionaryInfo();
+
+        let enabledCount = 0;
+        for (const {title} of dictionaries) {
+            if (
+                Object.prototype.hasOwnProperty.call(options.dictionaries, title) &&
+                options.dictionaries[title].enabled
+            ) {
+                ++enabledCount;
+            }
+        }
+
+        const hasEnabledDictionary = (enabledCount > 0);
+        for (const node of noDictionariesEnabledWarnings) {
+            node.hidden = hasEnabledDictionary;
+        }
     }
 }
 

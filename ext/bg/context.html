@@ -30,7 +30,12 @@
                 <optgroup label="Primary Profile" id="profile-select-option-group"></optgroup>
             </select></span>
         </button>
-        <a class="nav-button action-open-settings" data-icon="cog" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'></a>
+        <a class="nav-button action-open-settings" data-icon="cog" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'>
+            <div class="nav-button-warning-badge no-dictionaries-enabled-warning" hidden>
+                <div class="nav-button-warning-badge-outer"></div>
+                <div class="nav-button-warning-badge-inner"></div>
+            </div>
+        </a>
         <a class="nav-button action-open-search" data-icon="magnifying-glass" title="Search" data-hotkey='["global:openSearchPage","title","Search ({0})"]'></a>
         <a class="nav-button action-open-info" data-icon="question-mark" title="Information" data-hotkey='["global:openInfoPage","title","Information ({0})"]'></a>
     </div>
@@ -42,7 +47,11 @@
         <span class="link-group-icon"><input type="checkbox" id="enable-search2"></span><span class="link-group-label">Enable content scanning</span>
     </label>
     <a class="link-group action-open-settings">
-        <span class="link-group-icon" data-icon="chevron"></span><span class="link-group-label">Settings</span>
+        <span class="link-group-icon" data-icon="chevron"></span>
+        <span class="link-group-label">Settings</span>
+        <span class="link-group-badge">
+            <div class="flex-margin-left warning-badge no-dictionaries-enabled-warning" hidden><span class="icon" data-icon="exclamation-point-short"></span></div>
+        </span>
     </a>
     <a class="link-group action-open-search">
         <span class="link-group-icon" data-icon="chevron"></span><span class="link-group-label">Search</span>

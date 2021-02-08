@@ -54,6 +54,7 @@
     --modal-width-small: 400px;
     --modal-height-small: 200px;
     --modal-transition-offset: -64px;
+    --badge-size: 16px;
 
     --link-color: var(--accent-color);
     --link-color-hover: var(--accent-color-dark);
@@ -62,7 +63,7 @@
     --outline-item-background-color: rgba(13, 13, 13, 0);
     --outline-item-background-color-hover: rgba(13, 13, 13, 0.15);
     --warning-color: #96751c;
-    --warning-color-light: hsl(44, 80%, 65%);
+    --warning-color-light: #edc75e;
     --dim-background-color: rgba(0, 0, 0, 0.5);
     --content-dimmer-color: rgba(0, 0, 0, 0.1);
 
@@ -421,25 +422,9 @@ a.heading-link-light {
     position: absolute;
     right: calc(var(--outline-item-icon-size) * -0.125);
     top: calc(var(--outline-item-icon-size) * -0.125);
-    width: calc(var(--outline-item-icon-size) * 0.5);
-    height: calc(var(--outline-item-icon-size) * 0.5);
-    margin: 0;
-    padding: 0;
-    background-color: var(--warning-color-light);
-    border-radius: calc(var(--outline-item-icon-size) * 0.5);
-    box-shadow: var(--shadow-vertical);
 }
 .outline-item-left-warning-badge:not([hidden]) {
     display: block;
-}
-.outline-item-left-warning-badge>.icon {
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--warning-color);
 }
 .outline-item-label {
     white-space: nowrap;
@@ -1970,6 +1955,29 @@ input.sentence-termination-character-input2 {
     top: calc(1em * (3 / var(--font-size-no-units)));
 }
 
+.warning-badge {
+    position: relative;
+    width: var(--badge-size);
+    height: var(--badge-size);
+    margin: 0;
+    padding: 0;
+    background-color: var(--warning-color-light);
+    border-radius: 50%;
+    box-shadow: var(--shadow-vertical);
+}
+.warning-badge:not([hidden]) {
+    display: block;
+}
+.warning-badge>.icon {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--warning-color);
+}
+
 
 /* Generic layouts */
 .margin-above {
@@ -2015,6 +2023,9 @@ input.sentence-termination-character-input2 {
     display: flex;
     flex-flow: row wrap;
     align-items: center;
+}
+.flex-margin-left {
+    margin-left: 0.5em;
 }
 
 .flex-column-nowrap {
