@@ -844,6 +844,38 @@ function testDeinflections() {
                 {term: 'くる', source: 'くさせない',     rule: 'vk'},
                 {term: 'くる', source: 'くさせられない', rule: 'vk'}
             ]
+        },
+        {
+            valid: true,
+            tests: [
+                // -e
+                {term: 'すごい',     source: 'すげえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'やばい',     source: 'やべえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'うるさい',   source: 'うるせえ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'ひどい',     source: 'ひでえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'ない',       source: 'ねえ',       rule: 'adj-i', reasons: ['-e']},
+                {term: 'できる',     source: 'できねえ',   rule: 'v1',    reasons: ['negative', '-e']},
+                {term: 'しんじる',   source: 'しんじねえ', rule: 'v1',    reasons: ['negative', '-e']},
+                {term: 'さむい',     source: 'さめえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'さむい',     source: 'さみい',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'あつい',     source: 'あちぇえ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'あつい',     source: 'あちい',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'やすい',     source: 'やせえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'たかい',     source: 'たけえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'かわいい',   source: 'かわええ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'つよい',     source: 'ついぇえ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'こわい',     source: 'こうぇえ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'みじかい',   source: 'みじけえ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'ながい',     source: 'なげえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'くさい',     source: 'くせえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'うまい',     source: 'うめえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'でかい',     source: 'でけえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'まずい',     source: 'まっぜえ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'ちっちゃい', source: 'ちっちぇえ', rule: 'adj-i', reasons: ['-e']},
+                {term: 'あかい',     source: 'あけえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'こわい',     source: 'こええ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'つよい',     source: 'つええ',     rule: 'adj-i', reasons: ['-e']}
+            ]
         }
     ];
 

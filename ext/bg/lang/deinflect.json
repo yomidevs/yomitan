@@ -586,5 +586,31 @@
     ],
     "-ki": [
         {"kanaIn": "き", "kanaOut": "い", "rulesIn": [], "rulesOut": ["adj-i"]}
+    ],
+    "-e": [
+        {"kanaIn": "ねえ", "kanaOut": "ない", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "めえ", "kanaOut": "むい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "みい", "kanaOut": "むい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "ちぇえ", "kanaOut": "つい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "ちい", "kanaOut": "つい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "せえ", "kanaOut": "すい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "ええ", "kanaOut": "いい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "ええ", "kanaOut": "わい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "ええ", "kanaOut": "よい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "いぇえ", "kanaOut": "よい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "うぇえ", "kanaOut": "わい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "けえ", "kanaOut": "かい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "げえ", "kanaOut": "がい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "げえ", "kanaOut": "ごい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "せえ", "kanaOut": "さい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "めえ", "kanaOut": "まい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "ぜえ", "kanaOut": "ずい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "っぜえ", "kanaOut": "ずい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "れえ", "kanaOut": "らい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "れえ", "kanaOut": "らい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "ちぇえ", "kanaOut": "ちゃい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "でえ", "kanaOut": "どい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "れえ", "kanaOut": "れい", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "べえ", "kanaOut": "ばい", "rulesIn": [], "rulesOut": ["adj-i"]}
     ]
 }
