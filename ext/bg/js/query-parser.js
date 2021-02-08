@@ -53,7 +53,9 @@ class QueryParser extends EventDispatcher {
     }
 
     setOptions({selectedParser, termSpacing, scanning}) {
+        let selectedParserChanged = false;
         if (selectedParser === null || typeof selectedParser === 'string') {
+            selectedParserChanged = (this._selectedParser !== selectedParser);
             this._selectedParser = selectedParser;
         }
         if (typeof termSpacing === 'boolean') {
@@ -63,6 +65,9 @@ class QueryParser extends EventDispatcher {
             this._textScanner.setOptions(scanning);
         }
         this._textScanner.setEnabled(true);
+        if (selectedParserChanged && this._parseResults.length > 0) {
+            this._renderParseResult();
+        }
     }
 
     async setText(text) {
