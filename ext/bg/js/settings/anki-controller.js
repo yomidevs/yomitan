@@ -52,6 +52,10 @@ class AnkiController {
         this._validateFieldsToken = null;
     }
 
+    get settingsController() {
+        return this._settingsController;
+    }
+
     async prepare() {
         this._ankiErrorContainer = document.querySelector('#anki-error');
         this._ankiErrorMessageNode = document.querySelector('#anki-error-message');
@@ -606,9 +610,11 @@ class AnkiCardController {
         if (this._model === value) { return; }
 
         let fieldNames;
+        let options;
         try {
             this._modelChangingTo = value;
             fieldNames = await this._ankiController.getModelFieldNames(value);
+            options = await this._ankiController.settingsController.getOptions();
         } catch (e) {
             // Revert
             this._ankiCardModelSelect.value = this._model;
@@ -617,9 +623,14 @@ class AnkiCardController {
             this._modelChangingTo = null;
         }
 
+        const cardType = this._cardType;
+        const cardOptions = this._getCardOptions(options.anki, cardType);
+        const oldFields = cardOptions !== null ? cardOptions.fields : null;
+
         const fields = {};
-        for (const fieldName of fieldNames) {
-            fields[fieldName] = '';
+        for (let i = 0, ii = fieldNames.length; i < ii; ++i) {
+            const fieldName = fieldNames[i];
+            fields[fieldName] = this._getDefaultFieldValue(fieldName, i, cardType, oldFields);
         }
 
         const targets = [
@@ -689,5 +700,50 @@ class AnkiCardController {
             inputField.dataset.hasPermissions = `${hasPermissions}`;
             this._validateField(inputField, i);
         }
+    }
+
+    _getDefaultFieldValue(fieldName, index, cardType, oldFields) {
+        if (
+            typeof oldFields === 'object' &&
+            oldFields !== null &&
+            Object.prototype.hasOwnProperty.call(oldFields, fieldName)
+        ) {
+            return oldFields[fieldName];
+        }
+
+        if (index === 0) {
+            return (cardType === 'kanji' ? '{character}' : '{expression}');
+        }
+
+        const markers = this._ankiController.getFieldMarkers(cardType);
+        const markerAliases = new Map([
+            ['glossary', ['definition', 'meaning']],
+            ['audio', ['sound']],
+            ['dictionary', ['dict']]
+        ]);
+
+        const hyphenPattern = /-/g;
+        for (const marker of markers) {
+            const names = [marker];
+            const aliases = markerAliases.get(marker);
+            if (typeof aliases !== 'undefined') {
+                names.push(...aliases);
+            }
+
+            let pattern = '^(?:';
+            for (let i = 0, ii = names.length; i < ii; ++i) {
+                const name = names[i];
+                if (i > 0) { pattern += '|'; }
+                pattern += name.replace(hyphenPattern, '[-_ ]*');
+            }
+            pattern += ')$';
+            pattern = new RegExp(pattern, 'i');
+
+            if (pattern.test(fieldName)) {
+                return `{${marker}}`;
+            }
+        }
+
+        return '';
     }
 }
