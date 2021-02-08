@@ -130,7 +130,7 @@ class DisplayGenerator {
         const codepointsContainer = node.querySelector('.kanji-codepoints');
         const dictionaryIndicesContainer = node.querySelector('.kanji-dictionary-indices');
 
-        glyphContainer.textContent = details.character;
+        this._setTextContent(glyphContainer, details.character, 'ja');
         const groupedFrequencies = DictionaryDataUtil.groupKanjiFrequencies(details.frequencies);
 
         const dictionaryTag = this._createDictionaryTag(details.dictionary);
@@ -157,7 +157,7 @@ class DisplayGenerator {
         const node = this._templates.instantiateFragment('footer-notification-tag-details');
 
         const details = tagNode.dataset.details;
-        node.querySelector('.tag-details').textContent = details;
+        this._setTextContent(node.querySelector('.tag-details'), details);
 
         let disambiguation = null;
         try {
@@ -182,6 +182,7 @@ class DisplayGenerator {
                 const segments = this._japaneseUtil.distributeFurigana(expression, reading);
                 const disambiguationItem = document.createElement('span');
                 disambiguationItem.className = 'tag-details-disambiguation';
+                disambiguationItem.lang = 'ja';
                 this._appendFurigana(disambiguationItem, segments, (container, text) => {
                     container.appendChild(document.createTextNode(text));
                 });
@@ -196,13 +197,13 @@ class DisplayGenerator {
         const content = this._templates.instantiate('footer-notification-anki-errors-content');
 
         const header = content.querySelector('.anki-note-error-header');
-        header.textContent = (errors.length === 1 ? 'An error occurred:' : `${errors.length} errors occurred:`);
+        this._setTextContent(header, (errors.length === 1 ? 'An error occurred:' : `${errors.length} errors occurred:`), 'en');
 
         const list = content.querySelector('.anki-note-error-list');
         for (const error of errors) {
             const div = document.createElement('li');
             div.className = 'anki-note-error-message';
-            div.textContent = isObject(error) && typeof error.message === 'string' ? error.message : `${error}`;
+            this._setTextContent(div, isObject(error) && typeof error.message === 'string' ? error.message : `${error}`);
             list.appendChild(div);
         }
 
@@ -234,6 +235,8 @@ class DisplayGenerator {
         node.dataset.readingIsSame = `${!reading || reading === expression}`;
         node.dataset.frequency = termFrequency;
 
+        expressionContainer.lang = 'ja';
+
         this._appendFurigana(expressionContainer, furiganaSegments, this._appendKanjiLinks.bind(this));
         this._appendMultiple(tagContainer, this._createTag.bind(this), termTags);
         this._appendMultiple(tagContainer, this._createSearchTag.bind(this), searchQueries);
@@ -244,7 +247,7 @@ class DisplayGenerator {
     _createTermReason(reason) {
         const fragment = this._templates.instantiateFragment('term-reason');
         const node = fragment.querySelector('.term-reason');
-        node.textContent = reason;
+        this._setTextContent(node, reason);
         node.dataset.reason = reason;
         return fragment;
     }
@@ -282,7 +285,7 @@ class DisplayGenerator {
     _createTermGlossaryItemText(glossary) {
         const node = this._templates.instantiate('term-glossary-item');
         const container = node.querySelector('.term-glossary');
-        this._appendMultilineText(container, glossary);
+        this._setTextContent(container, glossary);
         return node;
     }
 
@@ -330,7 +333,7 @@ class DisplayGenerator {
 
         if (typeof description === 'string') {
             const container = node.querySelector('.term-glossary-image-description');
-            this._appendMultilineText(container, description);
+            this._setTextContent(container, description);
         }
 
         return node;
@@ -351,27 +354,27 @@ class DisplayGenerator {
     _createTermDisambiguation(disambiguation) {
         const node = this._templates.instantiate('term-definition-disambiguation');
         node.dataset.term = disambiguation;
-        node.textContent = disambiguation;
+        this._setTextContent(node, disambiguation, 'ja');
         return node;
     }
 
     _createKanjiLink(character) {
         const node = document.createElement('a');
         node.className = 'kanji-link';
-        node.textContent = character;
+        this._setTextContent(node, character, 'ja');
         return node;
     }
 
     _createKanjiGlossaryItem(glossary) {
         const node = this._templates.instantiate('kanji-glossary-item');
         const container = node.querySelector('.kanji-glossary');
-        this._appendMultilineText(container, glossary);
+        this._setTextContent(container, glossary);
         return node;
     }
 
     _createKanjiReading(reading) {
         const node = this._templates.instantiate('kanji-reading');
-        node.textContent = reading;
+        this._setTextContent(node, reading, 'ja');
         return node;
     }
 
@@ -392,8 +395,8 @@ class DisplayGenerator {
         const node = this._templates.instantiate('kanji-info-table-item');
         const nameNode = node.querySelector('.kanji-info-table-item-header');
         const valueNode = node.querySelector('.kanji-info-table-item-value');
-        nameNode.textContent = details.notes || details.name;
-        valueNode.textContent = details.value;
+        this._setTextContent(nameNode, details.notes || details.name);
+        this._setTextContent(valueNode, details.value);
         return node;
     }
 
@@ -407,7 +410,7 @@ class DisplayGenerator {
         const inner = node.querySelector('.tag-inner');
 
         node.title = details.notes;
-        inner.textContent = details.name;
+        this._setTextContent(inner, details.name);
         node.dataset.details = details.notes || details.name;
         node.dataset.category = details.category;
         if (details.redundant) { node.dataset.redundant = 'true'; }
@@ -473,7 +476,7 @@ class DisplayGenerator {
         node.dataset.tagCount = `${tags.length}`;
 
         let n = node.querySelector('.term-pitch-accent-position');
-        n.textContent = `${position}`;
+        this._setTextContent(n, `${position}`, '');
 
         n = node.querySelector('.term-pitch-accent-tag-list');
         this._appendMultiple(n, this._createTag.bind(this), tags);
@@ -493,7 +496,7 @@ class DisplayGenerator {
             n1.dataset.position = `${i}`;
             n1.dataset.pitch = highPitch ? 'high' : 'low';
             n1.dataset.pitchNext = highPitchNext ? 'high' : 'low';
-            n2.textContent = mora;
+            this._setTextContent(n2, mora, 'ja');
 
             n.appendChild(n1);
         }
@@ -510,14 +513,14 @@ class DisplayGenerator {
         for (const exclusiveExpression of exclusiveExpressions) {
             const node = this._templates.instantiate(templateName);
             node.dataset.type = 'expression';
-            node.textContent = exclusiveExpression;
+            this._setTextContent(node, exclusiveExpression, 'ja');
             container.appendChild(node);
         }
 
         for (const exclusiveReading of exclusiveReadings) {
             const node = this._templates.instantiate(templateName);
             node.dataset.type = 'reading';
-            node.textContent = exclusiveReading;
+            this._setTextContent(node, exclusiveReading, 'ja');
             container.appendChild(node);
         }
 
@@ -590,9 +593,9 @@ class DisplayGenerator {
 
         const frequency = frequencies.join(', ');
 
-        node.querySelector('.frequency-disambiguation-expression').textContent = expression;
-        node.querySelector('.frequency-disambiguation-reading').textContent = (reading !== null ? reading : '');
-        node.querySelector('.frequency-value').textContent = frequency;
+        this._setTextContent(node.querySelector('.frequency-disambiguation-expression'), expression, 'ja');
+        this._setTextContent(node.querySelector('.frequency-disambiguation-reading'), (reading !== null ? reading : ''), 'ja');
+        this._setTextContent(node.querySelector('.frequency-value'), frequency, 'ja');
 
         node.dataset.expression = expression;
         node.dataset.reading = reading;
@@ -610,7 +613,7 @@ class DisplayGenerator {
 
         const frequency = frequencies.join(', ');
 
-        node.querySelector('.frequency-value').textContent = frequency;
+        this._setTextContent(node.querySelector('.frequency-value'), frequency, 'ja');
 
         node.dataset.character = character;
         node.dataset.dictionary = dictionary;
@@ -620,6 +623,7 @@ class DisplayGenerator {
     }
 
     _appendKanjiLinks(container, text) {
+        container.lang = 'ja';
         const jp = this._japaneseUtil;
         let part = '';
         for (const c of text) {
@@ -675,15 +679,6 @@ class DisplayGenerator {
         }
     }
 
-    _appendMultilineText(container, text) {
-        const parts = text.split('\n');
-        container.appendChild(document.createTextNode(parts[0]));
-        for (let i = 1, ii = parts.length; i < ii; ++i) {
-            container.appendChild(document.createElement('br'));
-            container.appendChild(document.createTextNode(parts[i]));
-        }
-    }
-
     _createDictionaryTag(dictionary) {
         return {
             name: dictionary,
@@ -694,5 +689,14 @@ class DisplayGenerator {
             dictionary,
             redundant: false
         };
+    }
+
+    _setTextContent(node, value, language) {
+        node.textContent = value;
+        if (typeof language === 'string') {
+            node.lang = language;
+        } else if (this._japaneseUtil.isStringPartiallyJapanese(value)) {
+            node.lang = 'ja';
+        }
     }
 }

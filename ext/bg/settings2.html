@@ -1179,7 +1179,7 @@
                 <div class="settings-item-description">Change what type of furigana is displayed for parsed text.</div>
             </div>
             <div class="settings-item-right">
-                <select data-setting="parsing.readingMode">
+                <select data-setting="parsing.readingMode" lang="ja">
                     <option value="none">None</option>
                     <option value="hiragana">ひらがな</option>
                     <option value="katakana">カタカナ</option>
@@ -1281,7 +1281,7 @@
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Convert half width characters to full width</div>
-                <div class="settings-item-description">ﾖﾐﾁｬﾝ&#x3000;&rarr;&#x3000;ヨミチャン</div>
+                <div class="settings-item-description" lang="ja">ﾖﾐﾁｬﾝ&#x3000;&rarr;&#x3000;ヨミチャン</div>
             </div>
             <div class="settings-item-right">
                 <select data-setting="translation.convertHalfWidthCharacters">
@@ -1294,7 +1294,7 @@
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Convert numeric characters to full width</div>
-                <div class="settings-item-description">1234&#x3000;&rarr;&#x3000;１２３４</div>
+                <div class="settings-item-description" lang="ja">1234&#x3000;&rarr;&#x3000;１２３４</div>
             </div>
             <div class="settings-item-right">
                 <select data-setting="translation.convertNumericCharacters">
@@ -1307,7 +1307,7 @@
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Convert alphabetic characters to hiragana</div>
-                <div class="settings-item-description">yomichan&#x3000;&rarr;&#x3000;よみちゃん</div>
+                <div class="settings-item-description" lang="ja">yomichan&#x3000;&rarr;&#x3000;よみちゃん</div>
             </div>
             <div class="settings-item-right">
                 <select data-setting="translation.convertAlphabeticCharacters">
@@ -1320,7 +1320,7 @@
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Convert hiragana to katakana</div>
-                <div class="settings-item-description">よみちゃん&#x3000;&rarr;&#x3000;ヨミチャン</div>
+                <div class="settings-item-description" lang="ja">よみちゃん&#x3000;&rarr;&#x3000;ヨミチャン</div>
             </div>
             <div class="settings-item-right">
                 <select data-setting="translation.convertHiraganaToKatakana">
@@ -1333,7 +1333,7 @@
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Convert katakana to hiragana</div>
-                <div class="settings-item-description">ヨミチャン&#x3000;&rarr;&#x3000;よみちゃん</div>
+                <div class="settings-item-description" lang="ja">ヨミチャン&#x3000;&rarr;&#x3000;よみちゃん</div>
             </div>
             <div class="settings-item-right">
                 <select data-setting="translation.convertKatakanaToHiragana">
@@ -1346,7 +1346,7 @@
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Collapse emphatic character sequences</div>
-                <div class="settings-item-description">すっっごーーい&#x3000;&rarr;&#x3000;すっごーい / すごい</div>
+                <div class="settings-item-description" lang="ja">すっっごーーい&#x3000;&rarr;&#x3000;すっごーい / すごい</div>
             </div>
             <div class="settings-item-right">
                 <select data-setting="translation.collapseEmphaticSequences">
@@ -2228,7 +2228,7 @@
                     Change which voice is used for text-to-speech audio playback.
                 </p>
                 <div class="horizontal-flex">
-                    <input type="text" value="よみちゃん" id="text-to-speech-voice-test-text" autocomplete="off">
+                    <input type="text" value="よみちゃん" id="text-to-speech-voice-test-text" autocomplete="off" lang="ja">
                     <button id="text-to-speech-voice-test">Test</button>
                     <a class="more-toggle" data-parent-distance="3">Hide&hellip;</a>
                 </div>
@@ -2770,7 +2770,7 @@
                 <div class="anki-card-templates-test-table-header">Scanned text</div>
                 <div class="anki-card-templates-test-table-header">Card field</div>
                 <div></div>
-                <input type="text" id="anki-card-templates-test-text-input" class="form-control" value="読め" placeholder="Preview text" autocomplete="off">
+                <input type="text" id="anki-card-templates-test-text-input" class="form-control" value="読め" placeholder="Preview text" autocomplete="off" lang="ja">
                 <div class="anki-card-templates-test-input-container">
                     <input type="text" class="input-with-suffix-button" id="anki-card-templates-test-field-input" value="{expression}" placeholder="{marker}" autocomplete="off" spellcheck="false">
                     <button class="input-suffix-button input-suffix-icon-button" id="anki-card-templates-test-field-menu-button" data-menu="anki-card-all-field-menu" data-menu-position="below left"><span class="icon icon-button-icon-light" data-icon="material-down-arrow"></span></button>
@@ -2926,9 +2926,9 @@
 
     <div class="translation-text-replacement-test-label translation-text-replacement-test-node">Test Input:</div>
     <div class="translation-text-replacement-test-container translation-text-replacement-test-node">
-        <input type="text" class="translation-text-replacement-test-input">
+        <input type="text" class="translation-text-replacement-test-input" lang="ja">
         <div class="translation-text-replacement-test-label-inner">Output:</div>
-        <input type="text" class="translation-text-replacement-test-output" readonly>
+        <input type="text" class="translation-text-replacement-test-output" lang="ja" readonly>
     </div>
 </div></template>
 
@@ -2991,10 +2991,10 @@
         </select>
     </td>
     <td>
-        <input type="text" class="sentence-termination-character-input1" maxlength="1">
+        <input type="text" class="sentence-termination-character-input1" maxlength="1" lang="ja">
     </td>
     <td>
-        <input type="text" class="sentence-termination-character-input2" maxlength="1">
+        <input type="text" class="sentence-termination-character-input2" maxlength="1" lang="ja">
         <div class="sentence-termination-character-input2-alt">&mdash;</div>
     </td>
     <td>

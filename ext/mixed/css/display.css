@@ -1000,6 +1000,9 @@ button.action-button[data-icon=source-term]::before {
 .term-glossary-item::marker {
     color: var(--text-color-light3);
 }
+.term-glossary {
+    white-space: pre-line;
+}
 .term-definition-disambiguation-list {
     color: var(--text-color-light3);
 }
@@ -1337,6 +1340,9 @@ button.action-button[data-icon=source-term]::before {
 .term-glossary-image-link-text::after {
     content: ']';
 }
+.term-glossary-image-description {
+    white-space: pre-line;
+}
 
 
 /* Kanji */
@@ -1397,6 +1403,9 @@ button.action-button[data-icon=source-term]::before {
 }
 .kanji-glossary-item::marker {
     color: var(--text-color-light3);
+}
+.kanji-glossary {
+    white-space: pre-line;
 }
 
 
