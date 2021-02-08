@@ -54,6 +54,14 @@ class SettingsDisplayController {
             node.addEventListener('keydown', onInputTabActionKeyDown, false);
         }
 
+        const onSpecialUrlLinkClick = this._onSpecialUrlLinkClick.bind(this);
+        const onSpecialUrlLinkMouseDown = this._onSpecialUrlLinkMouseDown.bind(this);
+        for (const node of document.querySelectorAll('[data-special-url]')) {
+            node.addEventListener('click', onSpecialUrlLinkClick, false);
+            node.addEventListener('auxclick', onSpecialUrlLinkClick, false);
+            node.addEventListener('mousedown', onSpecialUrlLinkMouseDown, false);
+        }
+
         for (const node of document.querySelectorAll('.defer-load-iframe')) {
             this._setupDeferLoadIframe(node);
         }
@@ -218,6 +226,57 @@ class SettingsDisplayController {
                 this._indentInput(e, node, args);
                 break;
         }
+    }
+
+    _onSpecialUrlLinkClick(e) {
+        switch (e.button) {
+            case 0:
+            case 1:
+                e.preventDefault();
+                this._createTab(e.currentTarget.dataset.specialUrl, true);
+                break;
+        }
+    }
+
+    _onSpecialUrlLinkMouseDown(e) {
+        switch (e.button) {
+            case 0:
+            case 1:
+                e.preventDefault();
+                break;
+        }
+    }
+
+    async _createTab(url, useOpener) {
+        let openerTabId;
+        if (useOpener) {
+            try {
+                const tab = await new Promise((resolve, reject) => {
+                    chrome.tabs.getCurrent((result) => {
+                        const e = chrome.runtime.lastError;
+                        if (e) {
+                            reject(new Error(e.message));
+                        } else {
+                            resolve(result);
+                        }
+                    });
+                });
+                openerTabId = tab.id;
+            } catch (e) {
+                // NOP
+            }
+        }
+
+        return await new Promise((resolve, reject) => {
+            chrome.tabs.create({url, openerTabId}, (tab2) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(tab2);
+                }
+            });
+        });
     }
 
     _updateScrollTarget() {
