@@ -71,10 +71,16 @@ class PermissionsToggleController {
 
         if (value || !hasPermissionsSetting) {
             toggle.checked = valuePre;
+            const requiredPermissions = this._getRequiredPermissions(toggle);
             try {
-                value = await this._settingsController.setPermissionsGranted(this._getRequiredPermissions(toggle), value);
+                value = await this._settingsController.setPermissionsGranted(requiredPermissions, value);
             } catch (error) {
                 value = valuePre;
+                try {
+                    value = await this._settingsController.hasPermissions(requiredPermissions);
+                } catch (error2) {
+                    // NOP
+                }
             }
             toggle.checked = value;
         }
