@@ -1166,7 +1166,11 @@
                     In order for Yomichan to use it, both MeCab and a native messaging component must be installed.
                     A setup guide can be found <a href="https://github.com/siikamiika/yomichan-mecab-installer/blob/master/README.md" target="_blank" rel="noopener noreferrer">here</a>.
                 </p>
-                <p>
+                <div class="margin-above flex-row-nowrap">
+                    <button id="test-mecab-button">Test</button>
+                    <div id="test-mecab-results" class="flex-margin-left" hidden></div>
+                </div>
+                <p class="margin-above">
                     <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
                 </p>
             </div>
@@ -3241,6 +3245,7 @@
 
 <script src="/bg/js/settings2/extension-keyboard-shortcuts-controller.js"></script>
 <script src="/bg/js/settings2/keyboard-shortcuts-controller.js"></script>
+<script src="/bg/js/settings2/mecab-controller.js"></script>
 <script src="/bg/js/settings2/nested-popups-controller.js"></script>
 <script src="/bg/js/settings2/popup-window-controller.js"></script>
 <script src="/bg/js/settings2/secondary-search-dictionary-controller.js"></script>

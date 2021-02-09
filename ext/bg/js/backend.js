@@ -122,7 +122,8 @@ class Backend {
             ['setAllSettings',               {async: true,  contentScript: false, handler: this._onApiSetAllSettings.bind(this)}],
             ['getOrCreateSearchPopup',       {async: true,  contentScript: true,  handler: this._onApiGetOrCreateSearchPopup.bind(this)}],
             ['isTabSearchPopup',             {async: true,  contentScript: true,  handler: this._onApiIsTabSearchPopup.bind(this)}],
-            ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}]
+            ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}],
+            ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -674,6 +675,42 @@ class Backend {
 
     _onApiTriggerDatabaseUpdated({type, cause}) {
         this._triggerDatabaseUpdated(type, cause);
+    }
+
+    async _onApiTestMecab() {
+        if (!this._mecab.isEnabled()) {
+            throw new Error('MeCab not enabled');
+        }
+
+        let permissionsOkay = false;
+        try {
+            permissionsOkay = await this._hasPermissions({permissions: ['nativeMessaging']});
+        } catch (e) {
+            // NOP
+        }
+        if (!permissionsOkay) {
+            throw new Error('Insufficient permissions');
+        }
+
+        const disconnect = !this._mecab.isConnected();
+        try {
+            const version = await this._mecab.getVersion();
+            if (version === null) {
+                throw new Error('Could not connect to native MeCab component');
+            }
+
+            const localVersion = this._mecab.getLocalVersion();
+            if (version !== localVersion) {
+                throw new Error(`MeCab component version not supported: ${version}`);
+            }
+        } finally {
+            // Disconnect if the connection was previously disconnected
+            if (disconnect && this._mecab.isEnabled() && this._mecab.isActive()) {
+                this._mecab.disconnect();
+            }
+        }
+
+        return true;
     }
 
     // Command handlers
@@ -1903,5 +1940,16 @@ class Backend {
                 }
             });
         });
+    }
+
+    _hasPermissions(permissions) {
+        return new Promise((resolve, reject) => chrome.permissions.contains(permissions, (result) => {
+            const e = chrome.runtime.lastError;
+            if (e) {
+                reject(new Error(e.message));
+            } else {
+                resolve(result);
+            }
+        }));
     }
 }

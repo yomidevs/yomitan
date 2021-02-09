@@ -54,6 +54,39 @@ class Mecab {
     }
 
     /**
+     * Disconnects the current port, but does not disable future connections.
+     */
+    disconnect() {
+        if (this._port !== null) {
+            this._clearPort();
+        }
+    }
+
+    /**
+     * Returns whether or not the connection to the native application is active.
+     * @returns `true` if the connection is active, `false` otherwise.
+     */
+    isConnected() {
+        return (this._port !== null);
+    }
+
+    /**
+     * Returns whether or not any invocation is currently active.
+     * @returns `true` if an invocation is active, `false` otherwise.
+     */
+    isActive() {
+        return (this._invocations.size > 0);
+    }
+
+    /**
+     * Gets the local API version being used.
+     * @returns An integer representing the API version that Yomichan uses.
+     */
+    getLocalVersion() {
+        return this._version;
+    }
+
+    /**
      * Gets the version of the MeCab component.
      * @returns The version of the MeCab component, or `null` if the component was not found.
      */

@@ -193,6 +193,10 @@ const api = (() => {
             return this._invoke('triggerDatabaseUpdated', {type, cause});
         }
 
+        testMecab() {
+            return this._invoke('testMecab', {});
+        }
+
         // Utilities
 
         _createActionPort(timeout=5000) {

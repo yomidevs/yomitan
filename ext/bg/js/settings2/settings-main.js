@@ -26,6 +26,7 @@
  * ExtensionKeyboardShortcutController
  * GenericSettingController
  * KeyboardShortcutController
+ * MecabController
  * ModalController
  * NestedPopupsController
  * PermissionsToggleController
@@ -139,6 +140,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const popupWindowController = new PopupWindowController();
         popupWindowController.prepare();
+
+        const mecabController = new MecabController();
+        mecabController.prepare();
 
         await Promise.all(preparePromises);
 
