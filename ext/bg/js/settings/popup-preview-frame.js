@@ -23,7 +23,8 @@
  */
 
 class PopupPreviewFrame {
-    constructor(frameId, popupFactory, hotkeyHandler) {
+    constructor(tabId, frameId, popupFactory, hotkeyHandler) {
+        this._tabId = tabId;
         this._frameId = frameId;
         this._popupFactory = popupFactory;
         this._hotkeyHandler = hotkeyHandler;
@@ -67,6 +68,7 @@ class PopupPreviewFrame {
 
         // Overwrite frontend
         this._frontend = new Frontend({
+            tabId: this._tabId,
             frameId: this._frameId,
             popupFactory: this._popupFactory,
             depth: 0,

@@ -26,7 +26,7 @@
     try {
         api.forwardLogsToBackend();
 
-        const {frameId} = await api.frameInformationGet();
+        const {tabId, frameId} = await api.frameInformationGet();
 
         const hotkeyHandler = new HotkeyHandler();
         hotkeyHandler.prepare();
@@ -34,7 +34,7 @@
         const popupFactory = new PopupFactory(frameId);
         popupFactory.prepare();
 
-        const preview = new PopupPreviewFrame(frameId, popupFactory, hotkeyHandler);
+        const preview = new PopupPreviewFrame(tabId, frameId, popupFactory, hotkeyHandler);
         await preview.prepare();
 
         document.documentElement.dataset.loaded = 'true';

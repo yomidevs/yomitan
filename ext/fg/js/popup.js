@@ -27,14 +27,12 @@ class Popup extends EventDispatcher {
         id,
         depth,
         frameId,
-        ownerFrameId,
         childrenSupported
     }) {
         super();
         this._id = id;
         this._depth = depth;
         this._frameId = frameId;
-        this._ownerFrameId = ownerFrameId;
         this._childrenSupported = childrenSupported;
         this._parent = null;
         this._child = null;
@@ -275,7 +273,6 @@ class Popup extends EventDispatcher {
             depth: this._depth,
             parentPopupId: this._id,
             parentFrameId: this._frameId,
-            ownerFrameId: this._ownerFrameId,
             childrenSupported: this._childrenSupported,
             scale: this._contentScale,
             optionsContext: this._optionsContext

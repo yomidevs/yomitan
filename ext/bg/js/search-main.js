@@ -32,12 +32,14 @@
         api.forwardLogsToBackend();
         await yomichan.backendReady();
 
+        const {tabId, frameId} = await api.frameInformationGet();
+
         const japaneseUtil = new JapaneseUtil(wanakana);
 
         const hotkeyHandler = new HotkeyHandler();
         hotkeyHandler.prepare();
 
-        const displaySearch = new DisplaySearch(japaneseUtil, documentFocusController, hotkeyHandler);
+        const displaySearch = new DisplaySearch(tabId, frameId, japaneseUtil, documentFocusController, hotkeyHandler);
         await displaySearch.prepare();
 
         document.documentElement.dataset.loaded = 'true';

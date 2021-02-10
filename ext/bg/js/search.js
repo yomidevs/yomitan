@@ -23,8 +23,8 @@
  */
 
 class DisplaySearch extends Display {
-    constructor(japaneseUtil, documentFocusController, hotkeyHandler) {
-        super('search', japaneseUtil, documentFocusController, hotkeyHandler);
+    constructor(tabId, frameId, japaneseUtil, documentFocusController, hotkeyHandler) {
+        super('search', tabId, frameId, japaneseUtil, documentFocusController, hotkeyHandler);
         this._searchButton = document.querySelector('#search-button');
         this._queryInput = document.querySelector('#search-textbox');
         this._introElement = document.querySelector('#intro');
@@ -353,7 +353,11 @@ class DisplaySearch extends Display {
             },
             content: {
                 definitions: null,
-                animate
+                animate,
+                contentOrigin: {
+                    tabId: this.tabId,
+                    frameId: this.frameId
+                }
             }
         };
         if (!lookup) { details.params.lookup = 'false'; }

@@ -28,6 +28,7 @@ class Frontend {
         pageType,
         popupFactory,
         depth,
+        tabId,
         frameId,
         parentPopupId,
         parentFrameId,
@@ -40,6 +41,7 @@ class Frontend {
         this._pageType = pageType;
         this._popupFactory = popupFactory;
         this._depth = depth;
+        this._tabId = tabId;
         this._frameId = frameId;
         this._parentPopupId = parentPopupId;
         this._parentFrameId = parentFrameId;
@@ -437,7 +439,6 @@ class Frontend {
 
         return await this._popupFactory.getOrCreatePopup({
             frameId: this._frameId,
-            ownerFrameId: this._frameId,
             depth: this._depth,
             childrenSupported: this._childrenSupported
         });
@@ -446,7 +447,6 @@ class Frontend {
     async _getProxyPopup() {
         return await this._popupFactory.getOrCreatePopup({
             frameId: this._parentFrameId,
-            ownerFrameId: this._frameId,
             depth: this._depth,
             parentPopupId: this._parentPopupId,
             childrenSupported: this._childrenSupported
@@ -469,7 +469,6 @@ class Frontend {
 
         const popup = await this._popupFactory.getOrCreatePopup({
             frameId: targetFrameId,
-            ownerFrameId: this._frameId,
             id: popupId,
             childrenSupported: this._childrenSupported
         });
@@ -482,7 +481,6 @@ class Frontend {
 
     async _getPopupWindow() {
         return await this._popupFactory.getOrCreatePopup({
-            ownerFrameId: this._frameId,
             depth: this._depth,
             popupWindow: true,
             childrenSupported: this._childrenSupported
@@ -537,7 +535,11 @@ class Frontend {
                 documentTitle
             },
             content: {
-                definitions
+                definitions,
+                contentOrigin: {
+                    tabId: this._tabId,
+                    frameId: this._frameId
+                }
             }
         };
         if (textSource instanceof TextSourceElement && textSource.fullContent !== query) {

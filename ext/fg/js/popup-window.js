@@ -23,14 +23,12 @@ class PopupWindow extends EventDispatcher {
     constructor({
         id,
         depth,
-        frameId,
-        ownerFrameId
+        frameId
     }) {
         super();
         this._id = id;
         this._depth = depth;
         this._frameId = frameId;
-        this._ownerFrameId = ownerFrameId;
         this._popupTabId = null;
     }
 

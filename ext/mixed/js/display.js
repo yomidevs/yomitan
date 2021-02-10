@@ -36,8 +36,10 @@
  */
 
 class Display extends EventDispatcher {
-    constructor(pageType, japaneseUtil, documentFocusController, hotkeyHandler) {
+    constructor(tabId, frameId, pageType, japaneseUtil, documentFocusController, hotkeyHandler) {
         super();
+        this._tabId = tabId;
+        this._frameId = frameId;
         this._pageType = pageType;
         this._japaneseUtil = japaneseUtil;
         this._documentFocusController = documentFocusController;
@@ -98,7 +100,8 @@ class Display extends EventDispatcher {
         this._depth = 0;
         this._parentPopupId = null;
         this._parentFrameId = null;
-        this._ownerFrameId = null;
+        this._contentOriginTabId = tabId;
+        this._contentOriginFrameId = frameId;
         this._childrenSupported = true;
         this._frameEndpoint = (pageType === 'popup' ? new FrameEndpoint() : null);
         this._browser = null;
@@ -199,6 +202,14 @@ class Display extends EventDispatcher {
         return this._progressIndicatorVisible;
     }
 
+    get tabId() {
+        return this._tabId;
+    }
+
+    get frameId() {
+        return this._frameId;
+    }
+
     async prepare() {
         // State setup
         const {documentElement} = document;
@@ -244,6 +255,13 @@ class Display extends EventDispatcher {
         if (this._frameResizeHandle !== null) {
             this._frameResizeHandle.addEventListener('mousedown', this._onFrameResizerMouseDown.bind(this), false);
         }
+    }
+
+    getContentOrigin() {
+        return {
+            tabId: this._contentOriginTabId,
+            frameId: this._contentOriginFrameId
+        };
     }
 
     initializeState() {
@@ -394,7 +412,7 @@ class Display extends EventDispatcher {
     close() {
         switch (this._pageType) {
             case 'popup':
-                this._invokeOwner('closePopup');
+                this._invokeContentOrigin('closePopup');
                 break;
             case 'search':
                 this._closeTab();
@@ -427,7 +445,8 @@ class Display extends EventDispatcher {
             params: this._createSearchParams(type, query, false),
             state,
             content: {
-                definitions: null
+                definitions: null,
+                contentOrigin: this.getContentOrigin()
             }
         };
         this.setContent(details);
@@ -494,14 +513,10 @@ class Display extends EventDispatcher {
         this._setContentScale(scale);
     }
 
-    async _onMessageConfigure({depth, parentPopupId, parentFrameId, ownerFrameId, childrenSupported, scale, optionsContext}) {
+    async _onMessageConfigure({depth, parentPopupId, parentFrameId, childrenSupported, scale, optionsContext}) {
         this._depth = depth;
         this._parentPopupId = parentPopupId;
         this._parentFrameId = parentFrameId;
-        this._ownerFrameId = ownerFrameId;
-        if (this._pageType === 'popup') {
-            this._hotkeyHandler.forwardFrameId = ownerFrameId;
-        }
         this._childrenSupported = childrenSupported;
         this._setContentScale(scale);
         await this.setOptionsContext(optionsContext);
@@ -615,7 +630,8 @@ class Display extends EventDispatcher {
                 cause: 'queryParser'
             },
             content: {
-                definitions
+                definitions,
+                contentOrigin: this.getContentOrigin()
             }
         };
         this.setContent(details);
@@ -629,7 +645,12 @@ class Display extends EventDispatcher {
             history: false,
             params: {type},
             state: {},
-            content: {}
+            content: {
+                contentOrigin: {
+                    tabId: this._tabId,
+                    frameId: this._frameId
+                }
+            }
         };
         this.setContent(details);
     }
@@ -691,7 +712,8 @@ class Display extends EventDispatcher {
                     documentTitle
                 },
                 content: {
-                    definitions
+                    definitions,
+                    contentOrigin: this.getContentOrigin()
                 }
             };
             this.setContent(details);
@@ -883,6 +905,24 @@ class Display extends EventDispatcher {
             definitions = lookup ? await this._findDefinitions(isTerms, query, wildcardsEnabled, optionsContext) : [];
             if (this._setContentToken !== token) { return; }
             content.definitions = definitions;
+            changeHistory = true;
+        }
+
+        let contentOriginValid = false;
+        const {contentOrigin} = content;
+        if (typeof contentOrigin === 'object' && contentOrigin !== null) {
+            const {tabId, frameId} = contentOrigin;
+            if (typeof tabId === 'number' && typeof frameId === 'number') {
+                this._contentOriginTabId = tabId;
+                this._contentOriginFrameId = frameId;
+                if (this._pageType === 'popup') {
+                    this._hotkeyHandler.forwardFrameId = (tabId === this._tabId ? frameId : null);
+                }
+                contentOriginValid = true;
+            }
+        }
+        if (!contentOriginValid) {
+            content.contentOrigin = this.getContentOrigin();
             changeHistory = true;
         }
 
@@ -1499,10 +1539,10 @@ class Display extends EventDispatcher {
         } = options;
 
         const timestamp = Date.now();
-        const ownerFrameId = this._ownerFrameId;
+        const screenshotFrameId = this._contentOriginFrameId;
         const definitionDetails = this._getDefinitionDetailsForNote(definition);
         const audioDetails = (mode !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio') ? {sources, customSourceUrl, customSourceType} : null);
-        const screenshotDetails = (this._ankiNoteBuilder.containsMarker(fields, 'screenshot') ? {ownerFrameId, format, quality} : null);
+        const screenshotDetails = (this._ankiNoteBuilder.containsMarker(fields, 'screenshot') ? {frameId: screenshotFrameId, format, quality} : null);
         const clipboardDetails = {
             image: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-image'),
             text: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-text')
@@ -1583,8 +1623,6 @@ class Display extends EventDispatcher {
             parentFrameId: this._parentFrameId
         };
 
-        const {frameId} = await api.frameInformationGet();
-
         await dynamicLoader.loadScripts([
             '/mixed/js/text-scanner.js',
             '/mixed/js/frame-client.js',
@@ -1597,12 +1635,13 @@ class Display extends EventDispatcher {
             '/fg/js/frontend.js'
         ]);
 
-        const popupFactory = new PopupFactory(frameId);
+        const popupFactory = new PopupFactory(this._frameId);
         popupFactory.prepare();
 
         Object.assign(setupNestedPopupsOptions, {
             depth: this._depth + 1,
-            frameId,
+            tabId: this._tabId,
+            frameId: this._frameId,
             popupFactory,
             pageType: this._pageType,
             allowRootFramePopupProxy: true,
@@ -1615,15 +1654,15 @@ class Display extends EventDispatcher {
         await frontend.prepare();
     }
 
-    async _invokeOwner(action, params={}) {
-        if (this._ownerFrameId === null) {
-            throw new Error('No owner frame');
+    async _invokeContentOrigin(action, params={}) {
+        if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
+            throw new Error('Content origin is same page');
         }
-        return await api.crossFrame.invoke(this._ownerFrameId, action, params);
+        return await api.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
     }
 
     _copyHostSelection() {
-        if (this._ownerFrameId === null || window.getSelection().toString()) { return false; }
+        if (this._contentOriginFrameId === null || window.getSelection().toString()) { return false; }
         this._copyHostSelectionInner();
         return true;
     }
@@ -1635,7 +1674,7 @@ class Display extends EventDispatcher {
                 {
                     let text;
                     try {
-                        text = await this._invokeOwner('getSelectionText');
+                        text = await this._invokeContentOrigin('getSelectionText');
                     } catch (e) {
                         break;
                     }
@@ -1643,7 +1682,7 @@ class Display extends EventDispatcher {
                 }
                 break;
             default:
-                await this._invokeOwner('copySelection');
+                await this._invokeContentOrigin('copySelection');
                 break;
         }
     }
@@ -1760,7 +1799,8 @@ class Display extends EventDispatcher {
                 documentTitle
             },
             content: {
-                definitions
+                definitions,
+                contentOrigin: this.getContentOrigin()
             }
         };
         this._definitionTextScanner.clearSelection(true);
@@ -1816,7 +1856,7 @@ class Display extends EventDispatcher {
     }
 
     async _initializeFrameResize(token) {
-        const size = await this._invokeOwner('getFrameSize');
+        const size = await this._invokeContentOrigin('getFrameSize');
         if (this._frameResizeToken !== token) { return; }
         this._frameResizeStartSize = size;
     }
@@ -1842,7 +1882,7 @@ class Display extends EventDispatcher {
         height += y - this._frameResizeStartOffset.y;
         width = Math.max(Math.max(0, handleSize.width), width);
         height = Math.max(Math.max(0, handleSize.height), height);
-        await this._invokeOwner('setFrameSize', {width, height});
+        await this._invokeContentOrigin('setFrameSize', {width, height});
     }
 
     _updateHotkeys(options) {

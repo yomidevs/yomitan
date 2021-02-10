@@ -27,7 +27,7 @@
         api.forwardLogsToBackend();
         await yomichan.backendReady();
 
-        const {frameId} = await api.frameInformationGet();
+        const {tabId, frameId} = await api.frameInformationGet();
         if (typeof frameId !== 'number') {
             throw new Error('Failed to get frameId');
         }
@@ -39,6 +39,7 @@
         popupFactory.prepare();
 
         const frontend = new Frontend({
+            tabId,
             frameId,
             popupFactory,
             depth: 0,

@@ -56,7 +56,6 @@ class PopupFactory {
 
     async getOrCreatePopup({
         frameId=null,
-        ownerFrameId=null,
         id=null,
         parentPopupId=null,
         depth=null,
@@ -103,8 +102,7 @@ class PopupFactory {
             const popup = new PopupWindow({
                 id,
                 depth,
-                frameId: this._frameId,
-                ownerFrameId
+                frameId: this._frameId
             });
             this._popups.set(id, popup);
             return popup;
@@ -117,7 +115,6 @@ class PopupFactory {
                 id,
                 depth,
                 frameId: this._frameId,
-                ownerFrameId,
                 childrenSupported
             });
             if (parent !== null) {
@@ -139,14 +136,12 @@ class PopupFactory {
                 id,
                 parentPopupId,
                 frameId,
-                ownerFrameId,
                 childrenSupported
             }));
             const popup = new PopupProxy({
                 id,
                 depth,
                 frameId,
-                ownerFrameId,
                 frameOffsetForwarder: useFrameOffsetForwarder ? this._frameOffsetForwarder : null
             });
             this._popups.set(id, popup);

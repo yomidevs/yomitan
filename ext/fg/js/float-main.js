@@ -32,12 +32,14 @@
         api.forwardLogsToBackend();
         await yomichan.backendReady();
 
+        const {tabId, frameId} = await api.frameInformationGet();
+
         const japaneseUtil = new JapaneseUtil(null);
 
         const hotkeyHandler = new HotkeyHandler();
         hotkeyHandler.prepare();
 
-        const display = new Display('popup', japaneseUtil, documentFocusController, hotkeyHandler);
+        const display = new Display(tabId, frameId, 'popup', japaneseUtil, documentFocusController, hotkeyHandler);
         await display.prepare();
         const displayProfileSelection = new DisplayProfileSelection(display);
         displayProfileSelection.prepare();

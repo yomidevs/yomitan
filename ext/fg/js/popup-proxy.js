@@ -24,14 +24,12 @@ class PopupProxy extends EventDispatcher {
         id,
         depth,
         frameId,
-        ownerFrameId,
         frameOffsetForwarder
     }) {
         super();
         this._id = id;
         this._depth = depth;
         this._frameId = frameId;
-        this._ownerFrameId = ownerFrameId;
         this._frameOffsetForwarder = frameOffsetForwarder;
 
         this._frameOffset = [0, 0];
