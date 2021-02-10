@@ -465,11 +465,7 @@ class Backend {
         return results;
     }
 
-    async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails}, sender) {
-        if (isObject(screenshotDetails)) {
-            const {id: tabId, windowId} = (sender && sender.tab ? sender.tab : {});
-            screenshotDetails = Object.assign({}, screenshotDetails, {tabId, windowId});
-        }
+    async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails}) {
         return await this._injectAnkNoteMedia(
             this._anki,
             timestamp,
@@ -1494,23 +1490,21 @@ class Backend {
     }
 
     async _checkTabUrl(tabId, urlPredicate) {
-        const tab = await new Promise((resolve) => {
-            chrome.tabs.get(
-                tabId,
-                (result) => { resolve(chrome.runtime.lastError ? null : result); }
-            );
-        });
-        if (tab === null) { return null; }
+        let tab;
+        try {
+            tab = await this._getTabById(tabId);
+        } catch (e) {
+            return null;
+        }
 
         const url = await this._getTabUrl(tabId);
         const isValidTab = urlPredicate(url);
         return isValidTab ? tab : null;
     }
 
-    async _getScreenshot(windowId, tabId, frameId, format, quality) {
-        if (typeof windowId !== 'number') {
-            throw new Error('Invalid window ID');
-        }
+    async _getScreenshot(tabId, frameId, format, quality) {
+        const tab = await this._getTabById(tabId);
+        const {windowId} = tab;
 
         let token = null;
         try {
@@ -1636,8 +1630,8 @@ class Backend {
     }
 
     async _injectAnkNoteScreenshot(ankiConnect, timestamp, definitionDetails, details) {
-        const {windowId, tabId, frameId, format, quality} = details;
-        const dataUrl = await this._getScreenshot(windowId, tabId, frameId, format, quality);
+        const {tabId, frameId, format, quality} = details;
+        const dataUrl = await this._getScreenshot(tabId, frameId, format, quality);
 
         const {mediaType, data} = this._getDataUrlInfo(dataUrl);
         const extension = this._mediaUtility.getFileExtensionFromImageMediaType(mediaType);
@@ -1953,5 +1947,21 @@ class Backend {
                 resolve(result);
             }
         }));
+    }
+
+    _getTabById(tabId) {
+        return new Promise((resolve, reject) => {
+            chrome.tabs.get(
+                tabId,
+                (result) => {
+                    const e = chrome.runtime.lastError;
+                    if (e) {
+                        reject(new Error(e.message));
+                    } else {
+                        resolve(result);
+                    }
+                }
+            );
+        });
     }
 }

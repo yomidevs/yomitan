@@ -85,7 +85,7 @@ class PopupWindow extends EventDispatcher {
         return (this._popupTabId !== null && await api.isTabSearchPopup(this._popupTabId));
     }
 
-    setVisibleOverride(_value, _priority) {
+    async setVisibleOverride(_value, _priority) {
         return null;
     }
 
