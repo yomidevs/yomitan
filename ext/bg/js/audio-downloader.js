@@ -252,7 +252,9 @@ class AudioDownloader {
             throw new Error('Could not retrieve audio');
         }
 
-        return this._arrayBufferToBase64(arrayBuffer);
+        const data = this._arrayBufferToBase64(arrayBuffer);
+        const contentType = response.headers.get('Content-Type');
+        return {data, contentType};
     }
 
     async _isAudioBinaryValid(arrayBuffer, source) {

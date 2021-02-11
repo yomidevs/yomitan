@@ -98,4 +98,35 @@ class MediaUtility {
                 return null;
         }
     }
+
+    /**
+     * Gets the file extension for a corresponding media type.
+     * @param mediaType The media type to use.
+     * @returns A file extension including the dot for the media type,
+     *   otherwise null.
+     */
+    getFileExtensionFromAudioMediaType(mediaType) {
+        switch (mediaType) {
+            case 'audio/mpeg':
+            case 'audio/mp3':
+                return '.mp3';
+            case 'audio/mp4':
+                return '.mp4';
+            case 'audio/ogg':
+            case 'audio/vorbis':
+                return '.ogg';
+            case 'audio/vnd.wav':
+            case 'audio/wave':
+            case 'audio/wav':
+            case 'audio/x-wav':
+            case 'audio/x-pn-wav':
+                return '.wav';
+            case 'audio/flac':
+                return '.flac';
+            case 'audio/webm':
+                return '.webm';
+            default:
+                return null;
+        }
+    }
 }

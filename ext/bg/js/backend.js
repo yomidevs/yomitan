@@ -1604,8 +1604,9 @@ class Backend {
 
         const {sources, customSourceUrl, customSourceType} = details;
         let data;
+        let contentType;
         try {
-            data = await this._downloadDefinitionAudio(
+            ({data, contentType} = await this._downloadDefinitionAudio(
                 sources,
                 expression,
                 reading,
@@ -1616,13 +1617,15 @@ class Backend {
                     binary: true,
                     disableCache: true
                 }
-            );
+            ));
         } catch (e) {
             // No audio
             return null;
         }
 
-        let fileName = this._generateAnkiNoteMediaFileName('yomichan_audio', '.mp3', timestamp, definitionDetails);
+        let extension = this._mediaUtility.getFileExtensionFromAudioMediaType(contentType);
+        if (extension === null) { extension = '.mp3'; }
+        let fileName = this._generateAnkiNoteMediaFileName('yomichan_audio', extension, timestamp, definitionDetails);
         fileName = fileName.replace(/\]/g, '');
         await ankiConnect.storeMediaFile(fileName, data);
 
