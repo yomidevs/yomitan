@@ -25,11 +25,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="32"
-     inkscape:cx="7.2634756"
-     inkscape:cy="9.0903162"
+     inkscape:zoom="22.627417"
+     inkscape:cx="8.8042238"
+     inkscape:cy="5.555245"
      inkscape:document-units="px"
-     inkscape:current-layer="layer50"
+     inkscape:current-layer="layer51"
      showgrid="true"
      units="px"
      inkscape:snap-center="true"
@@ -1594,11 +1594,22 @@
   <g
      inkscape:groupmode="layer"
      id="layer50"
-     inkscape:label="Clipboard">
+     inkscape:label="Clipboard"
+     style="display:none">
     <path
        id="rect1074"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        d="M 8,0.5 C 7.5857864,0.5 7.25,0.83578644 7.25,1.25 7.25,1.5 7,1.5 6.5,1.5 c -0.554,0 -1,0.446 -1,1 V 3 h 5 V 2.5 c 0,-0.554 -0.446,-1 -1,-1 C 9,1.5 8.75,1.5 8.75,1.25 8.75,0.83578644 8.4142136,0.5 8,0.5 Z M 2.5,2 v 13 h 11 V 2 H 10.90625 C 10.962878,2.1572391 11,2.3243683 11,2.5 V 3 h 1.5 v 11 h -9 V 3 H 5 V 2.5 C 5,2.3243683 5.0371223,2.1572391 5.09375,2 Z m 2,3 v 1 h 7 V 5 Z m 0,2 v 1 h 7 V 7 Z m 0,2 v 1 h 7 V 9 Z m 0,2 v 1 h 5 v -1 z"
        sodipodi:nodetypes="ssssccsssscccccsccccccscccccccccccccccccccccc" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer51"
+     inkscape:label="Key">
+    <path
+       id="path1091"
+       style="fill:#000000;stroke-linecap:round;stroke-linejoin:round"
+       d="M 10.662109,1 C 8.349293,1.0478398 6.4995053,2.9366893 6.5,5.25 6.5002349,5.62267 6.5494854,5.9936904 6.6464844,6.3535156 L 0.75,12.25 V 13.5 L 2,15 H 4 L 4.5,14.5 V 13 H 6 V 11.5 H 7.5 V 10 H 9 L 9.6464844,9.3535156 C 10.00631,9.4505146 10.37733,9.4997651 10.75,9.5 13.09721,9.5 15,7.5972102 15,5.25 15,2.9027898 13.09721,1 10.75,1 10.7207,0.99969706 10.6914,0.99969706 10.66211,1 Z M 11.5,3 C 12.328427,3 13,3.6715729 13,4.5 13,5.3284271 12.328427,6 11.5,6 10.671573,6 10,5.3284271 10,4.5 10,3.6715729 10.671573,3 11.5,3 Z M 6.75,7.75 7.5,8.5 2.75,13.25 2,12.5 Z"
+       sodipodi:nodetypes="scccccccccccccccsccscssscccccc" />
   </g>
 </svg>

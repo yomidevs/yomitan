@@ -25,19 +25,32 @@
         </div>
     </label>
     <div class="nav-button-container">
-        <button class="nav-button action-select-profile" data-icon="profile" title="Change primary profile" hidden>
+        <button class="nav-button action-select-profile" title="Change primary profile" hidden>
+            <span class="icon" data-icon="profile"></span>
             <span class="profile-select-container"><select class="profile-select" id="profile-select">
                 <optgroup label="Primary Profile" id="profile-select-option-group"></optgroup>
             </select></span>
         </button>
-        <a class="nav-button action-open-settings" data-icon="cog" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'>
+        <a class="nav-button action-open-settings" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'>
+            <span class="icon" data-icon="cog"></span>
             <div class="nav-button-warning-badge no-dictionaries-enabled-warning" hidden>
                 <div class="nav-button-warning-badge-outer"></div>
                 <div class="nav-button-warning-badge-inner"></div>
             </div>
         </a>
-        <a class="nav-button action-open-search" data-icon="magnifying-glass" title="Search" data-hotkey='["global:openSearchPage","title","Search ({0})"]'></a>
-        <a class="nav-button action-open-info" data-icon="question-mark" title="Information" data-hotkey='["global:openInfoPage","title","Information ({0})"]'></a>
+        <a class="nav-button action-open-permissions" title="Permissions" hidden>
+            <span class="icon" data-icon="key"></span>
+            <div class="nav-button-warning-badge permissions-required-warning" hidden>
+                <div class="nav-button-warning-badge-outer"></div>
+                <div class="nav-button-warning-badge-inner"></div>
+            </div>
+        </a>
+        <a class="nav-button action-open-search" title="Search" data-hotkey='["global:openSearchPage","title","Search ({0})"]'>
+            <span class="icon" data-icon="magnifying-glass"></span>
+        </a>
+        <a class="nav-button action-open-info" title="Information" data-hotkey='["global:openInfoPage","title","Information ({0})"]'>
+            <span class="icon" data-icon="question-mark-circle"></span>
+        </a>
     </div>
 </div>
 
@@ -51,6 +64,13 @@
         <span class="link-group-label">Settings</span>
         <span class="link-group-badge">
             <div class="flex-margin-left warning-badge no-dictionaries-enabled-warning" hidden><span class="icon" data-icon="exclamation-point-short"></span></div>
+        </span>
+    </a>
+    <a class="link-group action-open-permissions" hidden>
+        <span class="link-group-icon" data-icon="chevron"></span>
+        <span class="link-group-label">Permissions</span>
+        <span class="link-group-badge">
+            <div class="flex-margin-left warning-badge permissions-required-warning" hidden><span class="icon" data-icon="exclamation-point-short"></span></div>
         </span>
     </a>
     <a class="link-group action-open-search">
@@ -68,6 +88,8 @@
 
 <script src="/mixed/js/hotkey-help-controller.js"></script>
 <script src="/mixed/js/hotkey-util.js"></script>
+
+<script src="/bg/js/permissions-util.js"></script>
 
 <script src="/bg/js/context-main.js"></script>
 

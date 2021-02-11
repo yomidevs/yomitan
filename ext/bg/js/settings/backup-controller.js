@@ -87,7 +87,7 @@ class BackupController {
         const optionsFull = await this._settingsController.getOptionsFull();
         const environment = await api.getEnvironmentInfo();
         const fieldTemplatesDefault = await api.getDefaultAnkiFieldTemplates();
-        const permissions = await this._settingsController.getAllPermissions();
+        const permissions = await this._settingsController.permissionsUtil.getAllPermissions();
 
         // Format options
         for (const {options} of optionsFull.profiles) {

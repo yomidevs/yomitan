@@ -216,6 +216,7 @@
 .icon[data-icon=right-chevron]           { --icon-image: url(/mixed/img/right-chevron.svg); }
 .icon[data-icon=plus-thick]              { --icon-image: url(/mixed/img/plus-thick.svg); }
 .icon[data-icon=clipboard]               { --icon-image: url(/mixed/img/clipboard.svg); }
+.icon[data-icon=key]                     { --icon-image: url(/mixed/img/key.svg); }
 .icon[data-icon=material-down-arrow] {
     --icon-image: url(/mixed/img/material-down-arrow.svg);
     --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1);

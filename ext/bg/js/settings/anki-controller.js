@@ -34,10 +34,6 @@ class AnkiController {
             onRemoved: this._removeCardController.bind(this),
             isStale: this._isCardControllerStale.bind(this)
         });
-        this._fieldMarkersRequiringClipboardPermission = new Set([
-            'clipboard-image',
-            'clipboard-text'
-        ]);
         this._stringComparer = new Intl.Collator(); // Locale does not matter
         this._getAnkiDataPromise = null;
         this._ankiErrorContainer = null;
@@ -157,13 +153,7 @@ class AnkiController {
     }
 
     getRequiredPermissions(fieldValue) {
-        const markers = this._getFieldMarkers(fieldValue);
-        for (const marker of markers) {
-            if (this._fieldMarkersRequiringClipboardPermission.has(marker)) {
-                return ['clipboardRead'];
-            }
-        }
-        return [];
+        return this._settingsController.permissionsUtil.getRequiredPermissionsForAnkiFieldValue(fieldValue);
     }
 
     containsAnyMarker(field) {
@@ -336,16 +326,6 @@ class AnkiController {
         this._ankiErrorMessageDetailsContainer.hidden = true;
         this._ankiErrorInvalidResponseInfo.hidden = (errorString.indexOf('Invalid response') < 0);
         this._ankiErrorMessageDetailsToggle.hidden = false;
-    }
-
-    _getFieldMarkers(fieldValue) {
-        const pattern = /\{([\w-]+)\}/g;
-        const markers = [];
-        let match;
-        while ((match = pattern.exec(fieldValue)) !== null) {
-            markers.push(match[1]);
-        }
-        return markers;
     }
 
     _sortStringArray(array) {
@@ -656,7 +636,7 @@ class AnkiCardController {
 
     async _requestPermissions(permissions) {
         try {
-            await this._settingsController.setPermissionsGranted(permissions, true);
+            await this._settingsController.permissionsUtil.setPermissionsGranted({permissions}, true);
         } catch (e) {
             yomichan.logError(e);
         }
@@ -669,8 +649,8 @@ class AnkiCardController {
             node.dataset.requiredPermission = permissions.join(' ');
             const hasPermissions = await (
                 request ?
-                this._settingsController.setPermissionsGranted(permissions, true) :
-                this._settingsController.hasPermissions(permissions)
+                this._settingsController.permissionsUtil.setPermissionsGranted({permissions}, true) :
+                this._settingsController.permissionsUtil.hasPermissions({permissions})
             );
             node.dataset.hasPermissions = `${hasPermissions}`;
         } else {

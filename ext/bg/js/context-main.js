@@ -17,12 +17,14 @@
 
 /* global
  * HotkeyHelpController
+ * PermissionsUtil
  * api
  */
 
 class DisplayController {
     constructor() {
         this._optionsFull = null;
+        this._permissionsUtil = new PermissionsUtil();
     }
 
     async prepare() {
@@ -40,6 +42,7 @@ class DisplayController {
 
         const optionsPageUrl = optionsFull.global.useSettingsV2 ? '/bg/settings2.html' : manifest.options_ui.page;
         this._setupButtonEvents('.action-open-settings', 'openSettingsPage', chrome.runtime.getURL(optionsPageUrl));
+        this._setupButtonEvents('.action-open-permissions', null, chrome.runtime.getURL('/bg/permissions.html'));
 
         const {profiles, profileCurrent} = optionsFull;
         const primaryProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
@@ -68,16 +71,18 @@ class DisplayController {
     _setupButtonEvents(selector, command, url) {
         const nodes = document.querySelectorAll(selector);
         for (const node of nodes) {
-            node.addEventListener('click', (e) => {
-                if (e.button !== 0) { return; }
-                api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
-                e.preventDefault();
-            }, false);
-            node.addEventListener('auxclick', (e) => {
-                if (e.button !== 1) { return; }
-                api.commandExec(command, {mode: 'newTab'});
-                e.preventDefault();
-            }, false);
+            if (typeof command === 'string') {
+                node.addEventListener('click', (e) => {
+                    if (e.button !== 0) { return; }
+                    api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
+                    e.preventDefault();
+                }, false);
+                node.addEventListener('auxclick', (e) => {
+                    if (e.button !== 1) { return; }
+                    api.commandExec(command, {mode: 'newTab'});
+                    e.preventDefault();
+                }, false);
+            }
 
             if (typeof url === 'string') {
                 node.href = url;
@@ -131,6 +136,7 @@ class DisplayController {
             toggle.addEventListener('change', onToggleChanged, false);
         }
         this._updateDictionariesEnabledWarnings(options);
+        this._updatePermissionsWarnings(options);
     }
 
     async _setupHotkeys() {
@@ -199,6 +205,17 @@ class DisplayController {
         const hasEnabledDictionary = (enabledCount > 0);
         for (const node of noDictionariesEnabledWarnings) {
             node.hidden = hasEnabledDictionary;
+        }
+    }
+
+    async _updatePermissionsWarnings(options) {
+        const permissions = await this._permissionsUtil.getAllPermissions();
+        if (this._permissionsUtil.hasRequiredPermissionsForOptions(permissions, options)) { return; }
+
+        const warnings = document.querySelectorAll('.action-open-permissions,.permissions-required-warning');
+        for (const node of warnings) {
+            console.log(node);
+            node.hidden = false;
         }
     }
 }

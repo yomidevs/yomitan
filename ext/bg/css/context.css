@@ -75,6 +75,7 @@ label {
 }
 .icon[data-icon=profile]                 { --icon-image: url(/mixed/img/profile.svg); }
 .icon[data-icon=cog]                     { --icon-image: url(/mixed/img/cog.svg); }
+.icon[data-icon=key]                     { --icon-image: url(/mixed/img/key.svg); }
 .icon[data-icon=magnifying-glass]        { --icon-image: url(/mixed/img/magnifying-glass.svg); }
 .icon[data-icon=exclamation-point-short] { --icon-image: url(/mixed/img/exclamation-point-short.svg); }
 .icon[data-icon=question-mark-circle]    { --icon-image: url(/mixed/img/question-mark-circle.svg); }
@@ -82,7 +83,6 @@ label {
 
 /* Page-specific styles */
 .link-group {
-    display: flex;
     flex-flow: row nowrap;
     align-items: center;
     line-height: 1.5em;
@@ -94,6 +94,9 @@ label {
     background-color: transparent;
     transition: background-color 0.125s linear 0s;
     max-width: none;
+}
+.link-group:not([hidden]) {
+    display: flex;
 }
 .link-group:hover,
 .link-group:active {
@@ -276,23 +279,6 @@ body[data-loaded=true] .toggle-group {
 .nav-button+.nav-button {
     margin-left: -1px;
 }
-.nav-button::after {
-    content: '';
-    display: block;
-    width: 16px;
-    height: 16px;
-    box-sizing: content-box;
-    background-color: #333333;
-    mask-repeat: no-repeat;
-    mask-position: center center;
-    mask-mode: alpha;
-    mask-size: 16px 16px;
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center center;
-    -webkit-mask-mode: alpha;
-    -webkit-mask-size: 16px 16px;
-    pointer-events: none;
-}
 .nav-button:hover {
     z-index: 1;
     border-color: #aaaaaa;
@@ -308,21 +294,13 @@ body[data-loaded=true] .toggle-group {
 .nav-button:focus {
     outline: none;
 }
-.nav-button[data-icon=magnifying-glass]::after {
-    mask-image: url(/mixed/img/magnifying-glass.svg);
-    -webkit-mask-image: url(/mixed/img/magnifying-glass.svg);
-}
-.nav-button[data-icon=cog]::after {
-    mask-image: url(/mixed/img/cog.svg);
-    -webkit-mask-image: url(/mixed/img/cog.svg);
-}
-.nav-button[data-icon=question-mark]::after {
-    mask-image: url(/mixed/img/question-mark-circle.svg);
-    -webkit-mask-image: url(/mixed/img/question-mark-circle.svg);
-}
-.nav-button[data-icon=profile]::after {
-    mask-image: url(/mixed/img/profile.svg);
-    -webkit-mask-image: url(/mixed/img/profile.svg);
+.nav-button>.icon {
+    --icon-size: 16px 16px;
+    display: block;
+    width: 16px;
+    height: 16px;
+    box-sizing: content-box;
+    background-color: #333333;
 }
 .nav-button:first-child,
 .nav-button:first-child[hidden]+.nav-button {
