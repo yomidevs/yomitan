@@ -16,10 +16,11 @@
  */
 
 /* global
- * DisplaySearch
+ * Display
  * DocumentFocusController
  * HotkeyHandler
  * JapaneseUtil
+ * SearchDisplayController
  * api
  * wanakana
  */
@@ -39,10 +40,16 @@
         const hotkeyHandler = new HotkeyHandler();
         hotkeyHandler.prepare();
 
-        const displaySearch = new DisplaySearch(tabId, frameId, japaneseUtil, documentFocusController, hotkeyHandler);
-        await displaySearch.prepare();
+        const display = new Display(tabId, frameId, 'search', japaneseUtil, documentFocusController, hotkeyHandler);
+        await display.prepare();
+
+        const searchDisplayController = new SearchDisplayController(tabId, frameId, display, japaneseUtil);
+        await searchDisplayController.prepare();
+
+        display.initializeState();
 
         document.documentElement.dataset.loaded = 'true';
+
         yomichan.ready();
     } catch (e) {
         yomichan.logError(e);

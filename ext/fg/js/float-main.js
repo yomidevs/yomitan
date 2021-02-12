@@ -41,9 +41,13 @@
 
         const display = new Display(tabId, frameId, 'popup', japaneseUtil, documentFocusController, hotkeyHandler);
         await display.prepare();
+
         const displayProfileSelection = new DisplayProfileSelection(display);
         displayProfileSelection.prepare();
+
         display.initializeState();
+
+        document.documentElement.dataset.loaded = 'true';
 
         yomichan.ready();
     } catch (e) {
