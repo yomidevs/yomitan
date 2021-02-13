@@ -320,8 +320,8 @@ class Backend {
             }
             if (details.name !== 'background-cross-frame-communication-port') { return; }
 
-            const tabId = (port.sender && port.sender.tab ? port.sender.tab.id : null);
-            if (typeof tabId !== 'number') {
+            const senderTabId = (port.sender && port.sender.tab ? port.sender.tab.id : null);
+            if (typeof senderTabId !== 'number') {
                 throw new Error('Port does not have an associated tab ID');
             }
             const senderFrameId = port.sender.frameId;
@@ -330,11 +330,12 @@ class Backend {
             }
             let {targetTabId, targetFrameId} = details;
             if (typeof targetTabId !== 'number') {
-                targetTabId = tabId;
+                targetTabId = senderTabId;
             }
 
             const details2 = {
                 name: 'cross-frame-communication-port',
+                sourceTabId: senderTabId,
                 sourceFrameId: senderFrameId
             };
             let forwardPort = chrome.tabs.connect(targetTabId, {frameId: targetFrameId, name: JSON.stringify(details2)});
