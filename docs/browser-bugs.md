@@ -56,3 +56,13 @@ This page lists several of the browser bugs that have affected Yomichan over the
 * **Browser**: Chrome
 * **Date**: 2021-01-30
 * **Links**: [Demo](https://toasted-nutbread.github.io/chrome-textarea-transform-bug/), [Report](https://bugs.chromium.org/p/chromium/issues/detail?id=1172666)
+
+## Chrome extensions using port connections can crash the browser using manifest version 3
+* **Browser**: Chrome
+* **Date**: 2021-02-13
+* **Links**: [Demo](https://github.com/toasted-nutbread/chrome-extension-port-connect-crash), [Report](https://bugs.chromium.org/p/chromium/issues/detail?id=1178179)
+
+## Chrome extension Port.onDisconnect event does not always fire in content scripts
+* **Browser**: Chrome
+* **Date**: 2021-02-13
+* **Links**: [Demo](https://github.com/toasted-nutbread/chrome-extension-port-disconnect-bug), [Report 1](https://bugs.chromium.org/p/chromium/issues/detail?id=1178188) (MV2), [Report 2](https://bugs.chromium.org/p/chromium/issues/detail?id=1178189) (MV3)
