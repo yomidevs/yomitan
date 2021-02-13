@@ -84,14 +84,14 @@ primary language is not English, you may consider also importing the English ver
 
 ## Basic Usage ##
 
-1.  Click the <img src="ext/mixed/img/yomichan-icon.svg" alt="" width="16" height="16"> _Yomichan_ button in the browser bar to open the quick-actions popup.
+1.  Click the <img src="ext/images/yomichan-icon.svg" alt="" width="16" height="16"> _Yomichan_ button in the browser bar to open the quick-actions popup.
 
     <a href="resources/images/browser-action-popup1.png"><img src="resources/images/browser-action-popup1.png" width="103" height="100"></a>
 
-    *   The <img src="ext/mixed/img/cog.svg" alt="" width="16" height="16"> _cog_ button will open the Settings page.
-    *   The <img src="ext/mixed/img/magnifying-glass.svg" alt="" width="16" height="16"> _magnifying glass_ button will open the Search page.
-    *   The <img src="ext/mixed/img/question-mark-circle.svg" alt="" width="16" height="16"> _question mark_ button will open the Information page.
-    *   The <img src="ext/mixed/img/profile.svg" alt="" width="16" height="16"> _profile_ button will appear when multiple profiles exist, allowing the current profile to be quickly changed.
+    *   The <img src="ext/images/cog.svg" alt="" width="16" height="16"> _cog_ button will open the Settings page.
+    *   The <img src="ext/images/magnifying-glass.svg" alt="" width="16" height="16"> _magnifying glass_ button will open the Search page.
+    *   The <img src="ext/images/question-mark-circle.svg" alt="" width="16" height="16"> _question mark_ button will open the Information page.
+    *   The <img src="ext/images/profile.svg" alt="" width="16" height="16"> _profile_ button will appear when multiple profiles exist, allowing the current profile to be quickly changed.
 
 2.  Import the dictionaries you wish to use for term and kanji searches. If you do not have any dictionaries installed
     or enabled, Yomichan will warn you that it is not ready for use by displaying an orange exclamation mark over its
@@ -105,7 +105,7 @@ primary language is not English, you may consider also importing the English ver
 
     <a href="resources/images/search-popup-terms.png"><img src="resources/images/search-popup-terms-thumb.png" width="128" height="95"></a>
 
-4.  Click on the <img src="ext/mixed/img/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is
+4.  Click on the <img src="ext/images/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is
     not available, you will hear a short click instead. You can configure the sources used to retrieve audio samples in
     the options page.
 

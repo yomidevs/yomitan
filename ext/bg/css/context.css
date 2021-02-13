@@ -73,12 +73,12 @@ label {
     mask-size: var(--icon-size);
     mask-image: var(--icon-image);
 }
-.icon[data-icon=profile]                 { --icon-image: url(/mixed/img/profile.svg); }
-.icon[data-icon=cog]                     { --icon-image: url(/mixed/img/cog.svg); }
-.icon[data-icon=key]                     { --icon-image: url(/mixed/img/key.svg); }
-.icon[data-icon=magnifying-glass]        { --icon-image: url(/mixed/img/magnifying-glass.svg); }
-.icon[data-icon=exclamation-point-short] { --icon-image: url(/mixed/img/exclamation-point-short.svg); }
-.icon[data-icon=question-mark-circle]    { --icon-image: url(/mixed/img/question-mark-circle.svg); }
+.icon[data-icon=profile]                 { --icon-image: url(/images/profile.svg); }
+.icon[data-icon=cog]                     { --icon-image: url(/images/cog.svg); }
+.icon[data-icon=key]                     { --icon-image: url(/images/key.svg); }
+.icon[data-icon=magnifying-glass]        { --icon-image: url(/images/magnifying-glass.svg); }
+.icon[data-icon=exclamation-point-short] { --icon-image: url(/images/exclamation-point-short.svg); }
+.icon[data-icon=question-mark-circle]    { --icon-image: url(/images/question-mark-circle.svg); }
 
 
 /* Page-specific styles */
@@ -130,7 +130,7 @@ label {
     display: block;
     width: 100%;
     height: 100%;
-    background-image: url(/mixed/img/right-chevron.svg);
+    background-image: url(/images/right-chevron.svg);
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
@@ -371,7 +371,7 @@ select.profile-select {
     bottom: 0;
     background-color: #edc75e;
 
-    --icon-image: url(/mixed/img/material-down-arrow.svg);
+    --icon-image: url(/images/material-down-arrow.svg);
     --icon-size: contain;
 
     -webkit-mask-repeat: no-repeat;

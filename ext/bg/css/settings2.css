@@ -382,7 +382,7 @@ a.heading-link-light {
     background-size: 12px 12px;
     width: 12px;
     height: 12px;
-    background-image: url(/mixed/img/up-arrow.svg);
+    background-image: url(/images/up-arrow.svg);
     margin-right: calc(var(--padding) * 0.5);
 }
 .sidebar-body {

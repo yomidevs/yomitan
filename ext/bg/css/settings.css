@@ -58,7 +58,7 @@ html:root:not([data-options-general-result-output-mode=merge]) #dictionary-main-
     width: 20px;
     height: 20px;
     display: block;
-    background: url(/mixed/img/mouse.svg) no-repeat center center;
+    background: url(/images/mouse.svg) no-repeat center center;
     background-size: 20px 20px;
 }
 

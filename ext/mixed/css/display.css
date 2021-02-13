@@ -625,19 +625,19 @@ button.action-button::before {
     background-size: contain;
 }
 button.action-button[data-icon=view-note]::before {
-    background-image: url('/mixed/img/view-note.svg');
+    background-image: url('/images/view-note.svg');
 }
 button.action-button[data-icon=add-term-kanji]::before {
-    background-image: url('/mixed/img/add-term-kanji.svg');
+    background-image: url('/images/add-term-kanji.svg');
 }
 button.action-button[data-icon=add-term-kana]::before {
-    background-image: url('/mixed/img/add-term-kana.svg');
+    background-image: url('/images/add-term-kana.svg');
 }
 button.action-button[data-icon=play-audio]::before {
-    background-image: url('/mixed/img/play-audio.svg');
+    background-image: url('/images/play-audio.svg');
 }
 button.action-button[data-icon=source-term]::before {
-    background-image: url('/mixed/img/source-term.svg');
+    background-image: url('/images/source-term.svg');
 }
 .entry[data-type=term][data-expression-multi=true] .actions>button.action-button.action-play-audio {
     display: none;
@@ -903,12 +903,12 @@ button.action-button[data-icon=source-term]::before {
     mask-position: center center;
     mask-mode: alpha;
     mask-size: contain;
-    mask-image: url(/mixed/img/material-right-arrow.svg);
+    mask-image: url(/images/material-right-arrow.svg);
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-position: center center;
     -webkit-mask-mode: alpha;
     -webkit-mask-size: contain;
-    -webkit-mask-image: url(/mixed/img/material-right-arrow.svg);
+    -webkit-mask-image: url(/images/material-right-arrow.svg);
 }
 .term-expression:not(:first-of-type) .term-expression-current-indicator,
 :root:not([data-popup-current-indicator-mode=triangle]) .term-expression-current-indicator {
@@ -935,7 +935,7 @@ button.action-button[data-icon=source-term]::before {
     background-color: transparent;
     background-repeat: no-repeat;
     background-size: contain;
-    background-image: url('/mixed/img/entry-current.svg');
+    background-image: url('/images/entry-current.svg');
 }
 
 

@@ -183,46 +183,46 @@
     mask-image: var(--icon-image);
 }
 .icon[data-icon=none]                    { --icon-image: linear-gradient(transparent, transparent); }
-.icon[data-icon=profile]                 { --icon-image: url(/mixed/img/profile.svg); }
-.icon[data-icon=cog]                     { --icon-image: url(/mixed/img/cog.svg); }
-.icon[data-icon=palette]                 { --icon-image: url(/mixed/img/palette.svg); }
-.icon[data-icon=popup]                   { --icon-image: url(/mixed/img/popup.svg); }
-.icon[data-icon=speaker]                 { --icon-image: url(/mixed/img/speaker.svg); }
-.icon[data-icon=scanning]                { --icon-image: url(/mixed/img/scanning.svg); }
-.icon[data-icon=text-parsing]            { --icon-image: url(/mixed/img/text-parsing.svg); }
-.icon[data-icon=translation]             { --icon-image: url(/mixed/img/translation.svg); }
-.icon[data-icon=book]                    { --icon-image: url(/mixed/img/book.svg); }
-.icon[data-icon=note-card]               { --icon-image: url(/mixed/img/note-card.svg); }
-.icon[data-icon=keyboard]                { --icon-image: url(/mixed/img/keyboard.svg); }
-.icon[data-icon=backup]                  { --icon-image: url(/mixed/img/backup.svg); }
-.icon[data-icon=lock]                    { --icon-image: url(/mixed/img/lock.svg); }
-.icon[data-icon=question-mark]           { --icon-image: url(/mixed/img/question-mark.svg); }
-.icon[data-icon=popup-size]              { --icon-image: url(/mixed/img/popup-size.svg); }
-.icon[data-icon=hamburger-menu]          { --icon-image: url(/mixed/img/hamburger-menu.svg); }
-.icon[data-icon=kebab-menu]              { --icon-image: url(/mixed/img/kebab-menu.svg); }
-.icon[data-icon=mouse]                   { --icon-image: url(/mixed/img/mouse.svg); }
-.icon[data-icon=exclamation-point-short] { --icon-image: url(/mixed/img/exclamation-point-short.svg); }
-.icon[data-icon=magnifying-glass]        { --icon-image: url(/mixed/img/magnifying-glass.svg); }
-.icon[data-icon=collapse]                { --icon-image: url(/mixed/img/collapse.svg); }
-.icon[data-icon=expand]                  { --icon-image: url(/mixed/img/expand.svg); }
-.icon[data-icon=window]                  { --icon-image: url(/mixed/img/window.svg); }
-.icon[data-icon=cross]                   { --icon-image: url(/mixed/img/cross.svg); }
-.icon[data-icon=checkmark]               { --icon-image: url(/mixed/img/checkmark.svg); }
-.icon[data-icon=sentence-parsing]        { --icon-image: url(/mixed/img/sentence-parsing.svg); }
-.icon[data-icon=question-mark]           { --icon-image: url(/mixed/img/question-mark.svg); }
-.icon[data-icon=question-mark-circle]    { --icon-image: url(/mixed/img/question-mark-circle.svg); }
-.icon[data-icon=question-mark-thick]     { --icon-image: url(/mixed/img/question-mark-thick.svg); }
-.icon[data-icon=left-chevron]            { --icon-image: url(/mixed/img/left-chevron.svg); }
-.icon[data-icon=right-chevron]           { --icon-image: url(/mixed/img/right-chevron.svg); }
-.icon[data-icon=plus-thick]              { --icon-image: url(/mixed/img/plus-thick.svg); }
-.icon[data-icon=clipboard]               { --icon-image: url(/mixed/img/clipboard.svg); }
-.icon[data-icon=key]                     { --icon-image: url(/mixed/img/key.svg); }
+.icon[data-icon=profile]                 { --icon-image: url(/images/profile.svg); }
+.icon[data-icon=cog]                     { --icon-image: url(/images/cog.svg); }
+.icon[data-icon=palette]                 { --icon-image: url(/images/palette.svg); }
+.icon[data-icon=popup]                   { --icon-image: url(/images/popup.svg); }
+.icon[data-icon=speaker]                 { --icon-image: url(/images/speaker.svg); }
+.icon[data-icon=scanning]                { --icon-image: url(/images/scanning.svg); }
+.icon[data-icon=text-parsing]            { --icon-image: url(/images/text-parsing.svg); }
+.icon[data-icon=translation]             { --icon-image: url(/images/translation.svg); }
+.icon[data-icon=book]                    { --icon-image: url(/images/book.svg); }
+.icon[data-icon=note-card]               { --icon-image: url(/images/note-card.svg); }
+.icon[data-icon=keyboard]                { --icon-image: url(/images/keyboard.svg); }
+.icon[data-icon=backup]                  { --icon-image: url(/images/backup.svg); }
+.icon[data-icon=lock]                    { --icon-image: url(/images/lock.svg); }
+.icon[data-icon=question-mark]           { --icon-image: url(/images/question-mark.svg); }
+.icon[data-icon=popup-size]              { --icon-image: url(/images/popup-size.svg); }
+.icon[data-icon=hamburger-menu]          { --icon-image: url(/images/hamburger-menu.svg); }
+.icon[data-icon=kebab-menu]              { --icon-image: url(/images/kebab-menu.svg); }
+.icon[data-icon=mouse]                   { --icon-image: url(/images/mouse.svg); }
+.icon[data-icon=exclamation-point-short] { --icon-image: url(/images/exclamation-point-short.svg); }
+.icon[data-icon=magnifying-glass]        { --icon-image: url(/images/magnifying-glass.svg); }
+.icon[data-icon=collapse]                { --icon-image: url(/images/collapse.svg); }
+.icon[data-icon=expand]                  { --icon-image: url(/images/expand.svg); }
+.icon[data-icon=window]                  { --icon-image: url(/images/window.svg); }
+.icon[data-icon=cross]                   { --icon-image: url(/images/cross.svg); }
+.icon[data-icon=checkmark]               { --icon-image: url(/images/checkmark.svg); }
+.icon[data-icon=sentence-parsing]        { --icon-image: url(/images/sentence-parsing.svg); }
+.icon[data-icon=question-mark]           { --icon-image: url(/images/question-mark.svg); }
+.icon[data-icon=question-mark-circle]    { --icon-image: url(/images/question-mark-circle.svg); }
+.icon[data-icon=question-mark-thick]     { --icon-image: url(/images/question-mark-thick.svg); }
+.icon[data-icon=left-chevron]            { --icon-image: url(/images/left-chevron.svg); }
+.icon[data-icon=right-chevron]           { --icon-image: url(/images/right-chevron.svg); }
+.icon[data-icon=plus-thick]              { --icon-image: url(/images/plus-thick.svg); }
+.icon[data-icon=clipboard]               { --icon-image: url(/images/clipboard.svg); }
+.icon[data-icon=key]                     { --icon-image: url(/images/key.svg); }
 .icon[data-icon=material-down-arrow] {
-    --icon-image: url(/mixed/img/material-down-arrow.svg);
+    --icon-image: url(/images/material-down-arrow.svg);
     --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1);
 }
 .icon[data-icon=material-right-arrow] {
-    --icon-image: url(/mixed/img/material-right-arrow.svg);
+    --icon-image: url(/images/material-right-arrow.svg);
     --icon-size: var(--material-arrow-dimension1) var(--material-arrow-dimension2);
 }
 
@@ -277,20 +277,20 @@ label.checkbox {
     transition: opacity var(--animation-duration) linear, background-color var(--animation-duration) linear;
 }
 .checkbox-fill {
-    mask-image: url(/mixed/img/checkbox-fill.svg);
-    -webkit-mask-image: url(/mixed/img/checkbox-fill.svg);
+    mask-image: url(/images/checkbox-fill.svg);
+    -webkit-mask-image: url(/images/checkbox-fill.svg);
     background-color: var(--checkbox-unchecked-color);
     opacity: 0;
 }
 .checkbox-border {
-    mask-image: url(/mixed/img/checkbox-border.svg);
-    -webkit-mask-image: url(/mixed/img/checkbox-border.svg);
+    mask-image: url(/images/checkbox-border.svg);
+    -webkit-mask-image: url(/images/checkbox-border.svg);
     background-color: var(--checkbox-unchecked-color);
     opacity: 1;
 }
 .checkbox-check {
-    mask-image: url(/mixed/img/checkbox-check.svg);
-    -webkit-mask-image: url(/mixed/img/checkbox-check.svg);
+    mask-image: url(/images/checkbox-check.svg);
+    -webkit-mask-image: url(/images/checkbox-check.svg);
     background-color: var(--checkbox-check-color);
     opacity: 0;
 }
@@ -482,12 +482,12 @@ label.radio {
     -webkit-mask-size: var(--radio-size) var(--radio-size);
 }
 .radio-border {
-    mask-image: url(/mixed/img/radio-button.svg);
-    -webkit-mask-image: url(/mixed/img/radio-button.svg);
+    mask-image: url(/images/radio-button.svg);
+    -webkit-mask-image: url(/images/radio-button.svg);
 }
 .radio-dot {
-    mask-image: url(/mixed/img/radio-button-dot.svg);
-    -webkit-mask-image: url(/mixed/img/radio-button-dot.svg);
+    mask-image: url(/images/radio-button-dot.svg);
+    -webkit-mask-image: url(/images/radio-button-dot.svg);
     opacity: 1;
     transform: none;
     transition:
@@ -571,7 +571,7 @@ select {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
-    background-image: url(/mixed/img/material-down-arrow.svg);
+    background-image: url(/images/material-down-arrow.svg);
     background-repeat: no-repeat;
     background-position: right calc(10em / var(--font-size-no-units)) center;
     background-color: var(--input-background-color);
