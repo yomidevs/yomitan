@@ -38,7 +38,7 @@ class DisplayController {
 
         this._setupHotkeys();
 
-        const optionsPageUrl = optionsFull.global.useSettingsV2 ? '/bg/settings2.html' : manifest.options_ui.page;
+        const optionsPageUrl = optionsFull.global.useSettingsV2 ? manifest.options_ui.page : '/bg/settings.html';
         this._setupButtonEvents('.action-open-settings', 'openSettingsPage', chrome.runtime.getURL(optionsPageUrl));
 
         const {profiles, profileCurrent} = optionsFull;
