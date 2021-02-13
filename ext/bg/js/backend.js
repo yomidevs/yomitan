@@ -211,7 +211,7 @@ class Backend {
             this._translator.prepare(deinflectionReasions);
 
             await this._optionsUtil.prepare();
-            this._defaultAnkiFieldTemplates = (await this._fetchAsset('/bg/data/default-anki-field-templates.handlebars')).trim();
+            this._defaultAnkiFieldTemplates = (await this._fetchAsset('/data/templates/default-anki-field-templates.handlebars')).trim();
             this._options = await this._optionsUtil.load();
 
             this._applyOptions('background');

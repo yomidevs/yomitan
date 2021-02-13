@@ -28,7 +28,7 @@ class OptionsUtil {
     }
 
     async prepare() {
-        this._optionsSchema = await this._fetchAsset('/bg/data/options-schema.json', true);
+        this._optionsSchema = await this._fetchAsset('/data/schemas/options-schema.json', true);
     }
 
     async update(options) {
@@ -487,7 +487,7 @@ class OptionsUtil {
     async _updateVersion3(options) {
         // Version 3 changes:
         //  Pitch accent Anki field templates added.
-        await this._applyAnkiFieldTemplatesPatch(options, '/bg/data/anki-field-templates-upgrade-v2.handlebars');
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v2.handlebars');
         return options;
     }
 
@@ -572,7 +572,7 @@ class OptionsUtil {
             });
             profileOptions.scanning.inputs = scanningInputs;
         }
-        await this._applyAnkiFieldTemplatesPatch(options, '/bg/data/anki-field-templates-upgrade-v4.handlebars');
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v4.handlebars');
         return options;
     }
 
@@ -592,7 +592,7 @@ class OptionsUtil {
         //  Added global option useSettingsV2.
         //  Added anki.checkForDuplicates.
         //  Added general.glossaryLayoutMode; removed general.compactGlossaries.
-        await this._applyAnkiFieldTemplatesPatch(options, '/bg/data/anki-field-templates-upgrade-v6.handlebars');
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v6.handlebars');
         options.global.showPopupPreview = false;
         options.global.useSettingsV2 = false;
         for (const profile of options.profiles) {
@@ -665,7 +665,7 @@ class OptionsUtil {
         //  Moved general.enableClipboardMonitor => clipboard.enableSearchPageMonitor. Forced value to false due to a bug which caused its value to not be read.
         //  Moved general.maximumClipboardSearchLength => clipboard.maximumSearchLength.
         //  Added clipboard.autoSearchContent.
-        await this._applyAnkiFieldTemplatesPatch(options, '/bg/data/anki-field-templates-upgrade-v8.handlebars');
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v8.handlebars');
         options.global.useSettingsV2 = true;
         for (const profile of options.profiles) {
             profile.options.translation.textReplacements = {

@@ -71,14 +71,14 @@ async function validateDictionary(archive, schemas) {
 
 function getSchemas() {
     return {
-        index: readSchema('../ext/bg/data/dictionary-index-schema.json'),
-        kanjiBankV1: readSchema('../ext/bg/data/dictionary-kanji-bank-v1-schema.json'),
-        kanjiBankV3: readSchema('../ext/bg/data/dictionary-kanji-bank-v3-schema.json'),
-        kanjiMetaBankV3: readSchema('../ext/bg/data/dictionary-kanji-meta-bank-v3-schema.json'),
-        tagBankV3: readSchema('../ext/bg/data/dictionary-tag-bank-v3-schema.json'),
-        termBankV1: readSchema('../ext/bg/data/dictionary-term-bank-v1-schema.json'),
-        termBankV3: readSchema('../ext/bg/data/dictionary-term-bank-v3-schema.json'),
-        termMetaBankV3: readSchema('../ext/bg/data/dictionary-term-meta-bank-v3-schema.json')
+        index: readSchema('../ext/data/schemas/dictionary-index-schema.json'),
+        kanjiBankV1: readSchema('../ext/data/schemas/dictionary-kanji-bank-v1-schema.json'),
+        kanjiBankV3: readSchema('../ext/data/schemas/dictionary-kanji-bank-v3-schema.json'),
+        kanjiMetaBankV3: readSchema('../ext/data/schemas/dictionary-kanji-meta-bank-v3-schema.json'),
+        tagBankV3: readSchema('../ext/data/schemas/dictionary-tag-bank-v3-schema.json'),
+        termBankV1: readSchema('../ext/data/schemas/dictionary-term-bank-v1-schema.json'),
+        termBankV3: readSchema('../ext/data/schemas/dictionary-term-bank-v3-schema.json'),
+        termMetaBankV3: readSchema('../ext/data/schemas/dictionary-term-meta-bank-v3-schema.json')
     };
 }
 

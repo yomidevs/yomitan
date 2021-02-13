@@ -300,7 +300,7 @@ class AudioDownloader {
     async _getCustomAudioListSchema() {
         let schema = this._customAudioListSchema;
         if (schema === null) {
-            const url = chrome.runtime.getURL('/bg/data/custom-audio-list-schema.json');
+            const url = chrome.runtime.getURL('/data/schemas/custom-audio-list-schema.json');
             const response = await fetch(url, {
                 method: 'GET',
                 mode: 'no-cors',

@@ -620,10 +620,10 @@ async function testFieldTemplatesUpdate(extDir) {
         const content = fs.readFileSync(path.join(extDir, fileName), {encoding: 'utf8'});
         return templatePatcher.parsePatch(content).addition;
     };
-    const update2 = loadDataFile('bg/data/anki-field-templates-upgrade-v2.handlebars');
-    const update4 = loadDataFile('bg/data/anki-field-templates-upgrade-v4.handlebars');
-    const update6 = loadDataFile('bg/data/anki-field-templates-upgrade-v6.handlebars');
-    const update8 = loadDataFile('bg/data/anki-field-templates-upgrade-v8.handlebars');
+    const update2 = loadDataFile('data/templates/anki-field-templates-upgrade-v2.handlebars');
+    const update4 = loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars');
+    const update6 = loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars');
+    const update8 = loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars');
 
     const data = [
         // Standard format

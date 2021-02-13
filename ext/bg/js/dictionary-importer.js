@@ -50,7 +50,7 @@ class DictionaryImporter {
 
         const index = JSON.parse(await indexFile.async('string'));
 
-        const indexSchema = await this._getSchema('/bg/data/dictionary-index-schema.json');
+        const indexSchema = await this._getSchema('/data/schemas/dictionary-index-schema.json');
         this._validateJsonSchema(index, indexSchema, indexFileName);
 
         const dictionaryTitle = index.title;
@@ -280,17 +280,17 @@ class DictionaryImporter {
     _getDataBankSchemaPaths(version) {
         const termBank = (
             version === 1 ?
-            '/bg/data/dictionary-term-bank-v1-schema.json' :
-            '/bg/data/dictionary-term-bank-v3-schema.json'
+            '/data/schemas/dictionary-term-bank-v1-schema.json' :
+            '/data/schemas/dictionary-term-bank-v3-schema.json'
         );
-        const termMetaBank = '/bg/data/dictionary-term-meta-bank-v3-schema.json';
+        const termMetaBank = '/data/schemas/dictionary-term-meta-bank-v3-schema.json';
         const kanjiBank = (
             version === 1 ?
-            '/bg/data/dictionary-kanji-bank-v1-schema.json' :
-            '/bg/data/dictionary-kanji-bank-v3-schema.json'
+            '/data/schemas/dictionary-kanji-bank-v1-schema.json' :
+            '/data/schemas/dictionary-kanji-bank-v3-schema.json'
         );
-        const kanjiMetaBank = '/bg/data/dictionary-kanji-meta-bank-v3-schema.json';
-        const tagBank = '/bg/data/dictionary-tag-bank-v3-schema.json';
+        const kanjiMetaBank = '/data/schemas/dictionary-kanji-meta-bank-v3-schema.json';
+        const tagBank = '/data/schemas/dictionary-tag-bank-v3-schema.json';
 
         return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
     }
