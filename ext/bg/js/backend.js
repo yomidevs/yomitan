@@ -737,7 +737,7 @@ class Backend {
             url += `?${queryString}`;
         }
 
-        const isTabMatch = (url2) => {
+        const predicate = ({url: url2}) => {
             if (url2 === null || !url2.startsWith(baseUrl)) { return false; }
             const parsedUrl = new URL(url2);
             const baseUrl2 = `${parsedUrl.origin}${parsedUrl.pathname}`;
@@ -746,7 +746,7 @@ class Backend {
         };
 
         const openInTab = async () => {
-            const tab = await this._findTab(1000, isTabMatch);
+            const tab = await this._findTabs(1000, false, predicate, false);
             if (tab !== null) {
                 await this._focusTab(tab);
                 if (queryParams.query) {
@@ -821,14 +821,23 @@ class Backend {
     }
 
     async _getOrCreateSearchPopup2() {
-        // Reuse same tab
+        // Use existing tab
         const baseUrl = chrome.runtime.getURL('/search.html');
+        const urlPredicate = (url) => url !== null && url.startsWith(baseUrl);
         if (this._searchPopupTabId !== null) {
-            const tab = await this._checkTabUrl(this._searchPopupTabId, (url) => url.startsWith(baseUrl));
+            const tab = await this._checkTabUrl(this._searchPopupTabId, urlPredicate);
             if (tab !== null) {
                 return {tab, created: false};
             }
             this._searchPopupTabId = null;
+        }
+
+        // Find existing tab
+        const existingTabInfo = await this._findSearchPopupTab(urlPredicate);
+        if (existingTabInfo !== null) {
+            const existingTab = existingTabInfo.tab;
+            this._searchPopupTabId = existingTab.id;
+            return {tab: existingTab, created: false};
         }
 
         // chrome.windows not supported (e.g. on Firefox mobile)
@@ -861,6 +870,23 @@ class Backend {
 
         this._searchPopupTabId = tab.id;
         return {tab, created: true};
+    }
+
+    async _findSearchPopupTab(urlPredicate) {
+        const predicate = async ({url, tab}) => {
+            if (!urlPredicate(url)) { return false; }
+            try {
+                const mode = await this._sendMessageTabPromise(
+                    tab.id,
+                    {action: 'getMode', params: {}},
+                    {frameId: 0}
+                );
+                return mode === 'popup';
+            } catch (e) {
+                return false;
+            }
+        };
+        return await this._findTabs(1000, false, predicate, true);
     }
 
     _getSearchPopupWindowCreateData(url, options) {
@@ -1333,33 +1359,74 @@ class Backend {
         return null;
     }
 
-    async _findTab(timeout, checkUrl) {
-        // This function works around the need to have the "tabs" permission to access tab.url.
-        const tabs = await new Promise((resolve) => chrome.tabs.query({}, resolve));
-        const {promise: matchPromise, resolve: matchPromiseResolve} = deferPromise();
+    _getAllTabs() {
+        return new Promise((resolve, reject) => {
+            chrome.tabs.query({}, (tabs) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(tabs);
+                }
+            });
+        });
+    }
 
-        const checkTabUrl = ({tab, url}) => {
-            if (checkUrl(url, tab)) {
-                matchPromiseResolve(tab);
+    async _findTabs(timeout, multiple, predicate, predicateIsAsync) {
+        // This function works around the need to have the "tabs" permission to access tab.url.
+        const tabs = await this._getAllTabs();
+
+        let done = false;
+        const checkTab = async (tab, add) => {
+            const url = await this._getTabUrl(tab.id);
+
+            if (done) { return; }
+
+            let okay = false;
+            const item = {tab, url};
+            try {
+                okay = predicate(item);
+                if (predicateIsAsync) { okay = await okay; }
+            } catch (e) {
+                // NOP
+            }
+
+            if (okay && !done) {
+                if (add(item)) {
+                    done = true;
+                }
             }
         };
 
-        const promises = [];
-        for (const tab of tabs) {
-            const promise = this._getTabUrl(tab.id);
-            promise.then((url) => checkTabUrl({url, tab}));
-            promises.push(promise);
+        if (multiple) {
+            const results = [];
+            const add = (value) => {
+                results.push(value);
+                return false;
+            };
+            const checkTabPromises = tabs.map((tab) => checkTab(tab, add));
+            await Promise.race([
+                Promise.all(checkTabPromises),
+                promiseTimeout(timeout)
+            ]);
+            return results;
+        } else {
+            const {promise, resolve} = deferPromise();
+            let result = null;
+            const add = (value) => {
+                result = value;
+                resolve();
+                return true;
+            };
+            const checkTabPromises = tabs.map((tab) => checkTab(tab, add));
+            await Promise.race([
+                promise,
+                Promise.all(checkTabPromises),
+                promiseTimeout(timeout)
+            ]);
+            resolve();
+            return result;
         }
-
-        const racePromises = [
-            matchPromise,
-            Promise.all(promises).then(() => null)
-        ];
-        if (typeof timeout === 'number') {
-            racePromises.push(new Promise((resolve) => setTimeout(() => resolve(null), timeout)));
-        }
-
-        return await Promise.race(racePromises);
     }
 
     async _focusTab(tab) {
@@ -1835,7 +1902,8 @@ class Backend {
         switch (mode) {
             case 'existingOrNewTab':
                 if (useSettingsV2) {
-                    const tab = await this._findTab(1000, (url2) => (url2 !== null && url2.startsWith(url)));
+                    const predicate = ({url: url2}) => (url2 !== null && url2.startsWith(url));
+                    const tab = await this._findTabs(1000, false, predicate, false);
                     if (tab !== null) {
                         await this._focusTab(tab);
                     } else {

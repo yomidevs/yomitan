@@ -139,7 +139,8 @@ class Display extends EventDispatcher {
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
         ]);
         this.registerMessageHandlers([
-            ['setMode', {async: false, handler: this._onMessageSetMode.bind(this)}]
+            ['setMode', {async: false, handler: this._onMessageSetMode.bind(this)}],
+            ['getMode', {async: false, handler: this._onMessageGetMode.bind(this)}]
         ]);
         this.registerDirectMessageHandlers([
             ['setOptionsContext',  {async: false, handler: this._onMessageSetOptionsContext.bind(this)}],
@@ -491,6 +492,10 @@ class Display extends EventDispatcher {
 
     _onMessageSetMode({mode}) {
         this._setMode(mode, true);
+    }
+
+    _onMessageGetMode() {
+        return this._mode;
     }
 
     _onMessageSetOptionsContext({optionsContext}) {
