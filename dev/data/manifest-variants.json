@@ -25,7 +25,7 @@
                 "128": "images/icon128.png"
             },
             "default_title": "Yomichan",
-            "default_popup": "context.html"
+            "default_popup": "action-popup.html"
         },
         "background": {
             "page": "background.html",
@@ -111,7 +111,7 @@
             }
         },
         "web_accessible_resources": [
-            "float.html",
+            "popup.html",
             "template-renderer.html"
         ],
         "content_security_policy": "default-src 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
