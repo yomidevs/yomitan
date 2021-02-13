@@ -342,7 +342,7 @@ class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        await dynamicLoader.loadStyle('yomichan-popup-outer-stylesheet', fileType, '/mixed/css/popup-outer.css', useWebExtensionApi, parentNode);
+        await dynamicLoader.loadStyle('yomichan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
     }
 
     _observeFullscreen(observe) {
