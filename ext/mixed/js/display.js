@@ -84,7 +84,6 @@ class Display extends EventDispatcher {
             getSearchContext: this._getSearchContext.bind(this),
             documentUtil: this._documentUtil
         });
-        this._mode = null;
         this._ankiFieldTemplates = null;
         this._ankiFieldTemplatesDefault = null;
         this._ankiNoteBuilder = new AnkiNoteBuilder(true);
@@ -138,10 +137,6 @@ class Display extends EventDispatcher {
             ['nextEntryDifferentDictionary',     () => { this._focusEntryWithDifferentDictionary(1, true); }],
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
         ]);
-        this.registerMessageHandlers([
-            ['setMode', {async: false, handler: this._onMessageSetMode.bind(this)}],
-            ['getMode', {async: false, handler: this._onMessageGetMode.bind(this)}]
-        ]);
         this.registerDirectMessageHandlers([
             ['setOptionsContext',  {async: false, handler: this._onMessageSetOptionsContext.bind(this)}],
             ['setContent',         {async: false, handler: this._onMessageSetContent.bind(this)}],
@@ -174,10 +169,6 @@ class Display extends EventDispatcher {
     set queryParserVisible(value) {
         this._queryParserVisible = value;
         this._updateQueryParser();
-    }
-
-    get mode() {
-        return this._mode;
     }
 
     get japaneseUtil() {
@@ -215,7 +206,6 @@ class Display extends EventDispatcher {
     async prepare() {
         // State setup
         const {documentElement} = document;
-        this._updateMode();
         const {browser} = await api.getEnvironmentInfo();
         this._browser = browser;
 
@@ -231,7 +221,6 @@ class Display extends EventDispatcher {
         this._queryParser.on('searched', this._onQueryParserSearch.bind(this));
         this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
         yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
-        chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
         api.crossFrame.registerHandlers([
             ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
         ]);
@@ -379,12 +368,6 @@ class Display extends EventDispatcher {
         }
     }
 
-    registerMessageHandlers(handlers) {
-        for (const [name, handlerInfo] of handlers) {
-            this._messageHandlers.set(name, handlerInfo);
-        }
-    }
-
     registerDirectMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {
             this._directMessageHandlers.set(name, handlerInfo);
@@ -456,12 +439,6 @@ class Display extends EventDispatcher {
 
     // Message handlers
 
-    _onMessage({action, params}, sender, callback) {
-        const messageHandler = this._messageHandlers.get(action);
-        if (typeof messageHandler === 'undefined') { return false; }
-        return yomichan.invokeMessageHandler(messageHandler, params, callback, sender);
-    }
-
     _onDirectMessage(data) {
         data = this.authenticateMessageData(data);
         const {action, params} = data;
@@ -488,14 +465,6 @@ class Display extends EventDispatcher {
 
         const callback = () => {}; // NOP
         yomichan.invokeMessageHandler(messageHandler, params, callback);
-    }
-
-    _onMessageSetMode({mode}) {
-        this._setMode(mode, true);
-    }
-
-    _onMessageGetMode() {
-        return this._mode;
     }
 
     _onMessageSetOptionsContext({optionsContext}) {
@@ -1422,33 +1391,6 @@ class Display extends EventDispatcher {
 
     _closePopups() {
         yomichan.trigger('closePopups');
-    }
-
-    _updateMode() {
-        let mode = null;
-        try {
-            mode = sessionStorage.getItem('mode');
-        } catch (e) {
-            // Browsers can throw a SecurityError when cookie blocking is enabled.
-        }
-        this._setMode(mode, false);
-    }
-
-    _setMode(mode, save) {
-        if (mode === this._mode) { return; }
-        if (save) {
-            try {
-                if (mode === null) {
-                    sessionStorage.removeItem('mode');
-                } else {
-                    sessionStorage.setItem('mode', mode);
-                }
-            } catch (e) {
-                // Browsers can throw a SecurityError when cookie blocking is enabled.
-            }
-        }
-        this._mode = mode;
-        this.trigger('modeChange', {mode});
     }
 
     async _getAnkiFieldTemplates(options) {

@@ -43,21 +43,27 @@ class SearchDisplayController {
                 getText: async () => (await api.clipboardGet())
             }
         });
+        this._messageHandlers = new Map();
+        this._mode = null;
     }
 
     async prepare() {
+        this._updateMode();
+
         await this._display.updateOptions();
 
+        chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
         yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
 
         this._display.on('optionsUpdated', this._onDisplayOptionsUpdated.bind(this));
         this._display.on('contentUpdating', this._onContentUpdating.bind(this));
-        this._display.on('modeChange', this._onModeChange.bind(this));
 
         this._display.hotkeyHandler.registerActions([
             ['focusSearchBox', this._onActionFocusSearchBox.bind(this)]
         ]);
-        this._display.registerMessageHandlers([
+        this._registerMessageHandlers([
+            ['getMode', {async: false, handler: this._onMessageGetMode.bind(this)}],
+            ['setMode', {async: false, handler: this._onMessageSetMode.bind(this)}],
             ['updateSearchQuery', {async: false, handler: this._onExternalSearchUpdate.bind(this)}]
         ]);
 
@@ -73,7 +79,6 @@ class SearchDisplayController {
         this._clipboardMonitorEnableCheckbox.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
         this._display.hotkeyHandler.on('keydownNonHotkey', this._onKeyDown.bind(this));
 
-        this._onModeChange();
         this._onDisplayOptionsUpdated({options: this._display.getOptions()});
     }
 
@@ -85,7 +90,23 @@ class SearchDisplayController {
         this._queryInput.select();
     }
 
+    // Messages
+
+    _onMessageSetMode({mode}) {
+        this._setMode(mode, true);
+    }
+
+    _onMessageGetMode() {
+        return this._mode;
+    }
+
     // Private
+
+    _onMessage({action, params}, sender, callback) {
+        const messageHandler = this._messageHandlers.get(action);
+        if (typeof messageHandler === 'undefined') { return false; }
+        return yomichan.invokeMessageHandler(messageHandler, params, callback, sender);
+    }
 
     _onKeyDown(e) {
         if (
@@ -194,13 +215,6 @@ class SearchDisplayController {
         this._setClipboardMonitorEnabled(enabled);
     }
 
-    _onModeChange() {
-        let mode = this._display.mode;
-        if (mode === null) { mode = ''; }
-        document.documentElement.dataset.searchMode = mode;
-        this._updateClipboardMonitorEnabled();
-    }
-
     _setWanakanaEnabled(enabled) {
         if (this._queryInputEventsSetup && this._wanakanaEnabled === enabled) { return; }
 
@@ -297,10 +311,9 @@ class SearchDisplayController {
     }
 
     _updateClipboardMonitorEnabled() {
-        const mode = this._display.mode;
         const enabled = this._clipboardMonitorEnabled;
         this._clipboardMonitorEnableCheckbox.checked = enabled;
-        if (enabled && mode !== 'popup') {
+        if (enabled && this._mode !== 'popup') {
             this._clipboardMonitor.start();
         } else {
             this._clipboardMonitor.stop();
@@ -371,5 +384,39 @@ class SearchDisplayController {
             }
         }
         return query;
+    }
+
+    _registerMessageHandlers(handlers) {
+        for (const [name, handlerInfo] of handlers) {
+            this._messageHandlers.set(name, handlerInfo);
+        }
+    }
+
+    _updateMode() {
+        let mode = null;
+        try {
+            mode = sessionStorage.getItem('mode');
+        } catch (e) {
+            // Browsers can throw a SecurityError when cookie blocking is enabled.
+        }
+        this._setMode(mode, false);
+    }
+
+    _setMode(mode, save) {
+        if (mode === this._mode) { return; }
+        if (save) {
+            try {
+                if (mode === null) {
+                    sessionStorage.removeItem('mode');
+                } else {
+                    sessionStorage.setItem('mode', mode);
+                }
+            } catch (e) {
+                // Browsers can throw a SecurityError when cookie blocking is enabled.
+            }
+        }
+        this._mode = mode;
+        document.documentElement.dataset.searchMode = (mode !== null ? mode : '');
+        this._updateClipboardMonitorEnabled();
     }
 }
