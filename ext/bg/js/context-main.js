@@ -40,7 +40,7 @@ class DisplayController {
 
         this._setupHotkeys();
 
-        const optionsPageUrl = optionsFull.global.useSettingsV2 ? '/settings.html' : manifest.options_ui.page;
+        const optionsPageUrl = optionsFull.global.useSettingsV2 ? manifest.options_ui.page : '/settings-old.html';
         this._setupButtonEvents('.action-open-settings', 'openSettingsPage', chrome.runtime.getURL(optionsPageUrl));
         this._setupButtonEvents('.action-open-permissions', null, chrome.runtime.getURL('/permissions.html'));
 
