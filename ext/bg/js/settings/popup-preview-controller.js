@@ -80,7 +80,7 @@ class PopupPreviewController {
         customOuterCss.addEventListener('input', this._onCustomOuterCssChange.bind(this), false);
         this._settingsController.on('optionsContextChanged', this._onOptionsContextChange.bind(this));
 
-        frame.src = '/bg/popup-preview.html';
+        frame.src = '/popup-preview.html';
         frame.id = 'settings-popup-preview-frame';
 
         container.appendChild(frame);

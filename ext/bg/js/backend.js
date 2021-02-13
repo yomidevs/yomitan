@@ -559,7 +559,7 @@ class Backend {
     }
 
     async _onApiGetDisplayTemplatesHtml() {
-        return await this._fetchAsset('/mixed/display-templates.html');
+        return await this._fetchAsset('/display-templates.html');
     }
 
     _onApiGetZoom(params, sender) {
@@ -678,7 +678,7 @@ class Backend {
     }
 
     async _onApiIsTabSearchPopup({tabId}) {
-        const baseUrl = chrome.runtime.getURL('/bg/search.html');
+        const baseUrl = chrome.runtime.getURL('/search.html');
         const tab = typeof tabId === 'number' ? await this._checkTabUrl(tabId, (url) => url.startsWith(baseUrl)) : null;
         return (tab !== null);
     }
@@ -728,7 +728,7 @@ class Backend {
     async _onCommandOpenSearchPage(params) {
         const {mode='existingOrNewTab', query} = params || {};
 
-        const baseUrl = chrome.runtime.getURL('/bg/search.html');
+        const baseUrl = chrome.runtime.getURL('/search.html');
         const queryParams = {};
         if (query && query.length > 0) { queryParams.query = query; }
         const queryString = new URLSearchParams(queryParams).toString();
@@ -822,7 +822,7 @@ class Backend {
 
     async _getOrCreateSearchPopup2() {
         // Reuse same tab
-        const baseUrl = chrome.runtime.getURL('/bg/search.html');
+        const baseUrl = chrome.runtime.getURL('/search.html');
         if (this._searchPopupTabId !== null) {
             const tab = await this._checkTabUrl(this._searchPopupTabId, (url) => url.startsWith(baseUrl));
             if (tab !== null) {
@@ -1821,17 +1821,17 @@ class Backend {
     }
 
     async _openWelcomeGuidePage() {
-        await this._createTab(chrome.runtime.getURL('/bg/welcome.html'));
+        await this._createTab(chrome.runtime.getURL('/welcome.html'));
     }
 
     async _openInfoPage() {
-        await this._createTab(chrome.runtime.getURL('/bg/info.html'));
+        await this._createTab(chrome.runtime.getURL('/info.html'));
     }
 
     async _openSettingsPage(mode) {
         const {useSettingsV2} = this._options.global;
         const manifest = chrome.runtime.getManifest();
-        const url = chrome.runtime.getURL(useSettingsV2 ? '/bg/settings2.html' : manifest.options_ui.page);
+        const url = chrome.runtime.getURL(useSettingsV2 ? '/settings.html' : manifest.options_ui.page);
         switch (mode) {
             case 'existingOrNewTab':
                 if (useSettingsV2) {

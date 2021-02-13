@@ -24,10 +24,10 @@
             "128": "images/icon128.png"
         },
         "default_title": "Yomichan",
-        "default_popup": "bg/context.html"
+        "default_popup": "context.html"
     },
     "background": {
-        "page": "bg/background.html",
+        "page": "background.html",
         "persistent": true
     },
     "content_scripts": [
@@ -65,12 +65,12 @@
     ],
     "minimum_chrome_version": "57.0.0.0",
     "options_ui": {
-        "page": "bg/settings2.html",
+        "page": "settings.html",
         "open_in_tab": true
     },
     "sandbox": {
         "pages": [
-            "bg/template-renderer.html"
+            "template-renderer.html"
         ],
         "content_security_policy": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-eval'"
     },
@@ -110,8 +110,8 @@
         }
     },
     "web_accessible_resources": [
-        "fg/float.html",
-        "bg/template-renderer.html"
+        "float.html",
+        "template-renderer.html"
     ],
     "content_security_policy": "default-src 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
 }

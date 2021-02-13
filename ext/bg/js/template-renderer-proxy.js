@@ -21,7 +21,7 @@ class TemplateRendererProxy {
         this._frameNeedsLoad = true;
         this._frameLoading = false;
         this._frameLoadPromise = null;
-        this._frameUrl = chrome.runtime.getURL('/bg/template-renderer.html');
+        this._frameUrl = chrome.runtime.getURL('/template-renderer.html');
         this._invocations = new Set();
     }
 

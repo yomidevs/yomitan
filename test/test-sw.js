@@ -50,7 +50,7 @@ function main() {
         const extDirName = 'ext';
         const extDir = path.join(rootDir, extDirName);
 
-        const scripts = getAllHtmlScriptPaths(path.join(extDir, 'bg', 'background.html'));
+        const scripts = getAllHtmlScriptPaths(path.join(extDir, 'background.html'));
         convertBackgroundScriptsToServiceWorkerScripts(scripts);
         const importedScripts = [];
 

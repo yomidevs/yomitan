@@ -256,7 +256,7 @@ class Popup extends EventDispatcher {
             frame.removeAttribute('srcdoc');
             this._observeFullscreen(true);
             this._onFullscreenChanged();
-            const url = chrome.runtime.getURL('/fg/float.html');
+            const url = chrome.runtime.getURL('/float.html');
             if (useSecurePopupFrameUrl) {
                 frame.contentDocument.location.href = url;
             } else {
