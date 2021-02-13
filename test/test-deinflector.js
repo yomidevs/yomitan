@@ -695,6 +695,7 @@ function testDeinflections() {
                 {term: '論ずる', source: '論じました',       rule: 'vz', reasons: ['polite past']},
                 {term: '論ずる', source: '論じて',           rule: 'vz', reasons: ['-te']},
                 {term: '論ずる', source: '論ぜられる',       rule: 'vz', reasons: ['potential or passive']},
+                {term: '論ずる', source: '論ざれる',         rule: 'vz', reasons: ['potential or passive']},
                 {term: '論ずる', source: '論じされる',       rule: 'vz', reasons: ['passive']},
                 {term: '論ずる', source: '論ぜされる',       rule: 'vz', reasons: ['passive']},
                 {term: '論ずる', source: '論じさせる',       rule: 'vz', reasons: ['causative']},

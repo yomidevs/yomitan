@@ -521,6 +521,7 @@
     ],
     "potential or passive": [
         {"kanaIn": "られる", "kanaOut": "る", "rulesIn": ["v1"], "rulesOut": ["v1"]},
+        {"kanaIn": "ざれる", "kanaOut": "ずる", "rulesIn": ["v1"], "rulesOut": ["vz"]},
         {"kanaIn": "ぜられる", "kanaOut": "ずる", "rulesIn": ["v1"], "rulesOut": ["vz"]},
         {"kanaIn": "せられる", "kanaOut": "する", "rulesIn": ["v1"], "rulesOut": ["vs"]},
         {"kanaIn": "為られる", "kanaOut": "為る", "rulesIn": ["v1"], "rulesOut": ["vs"]},
