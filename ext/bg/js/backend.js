@@ -207,7 +207,7 @@ class Backend {
                 yomichan.logError(e);
             }
 
-            const deinflectionReasions = await this._fetchAsset('/bg/lang/deinflect.json', true);
+            const deinflectionReasions = await this._fetchAsset('/data/deinflect.json', true);
             this._translator.prepare(deinflectionReasions);
 
             await this._optionsUtil.prepare();

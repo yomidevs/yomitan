@@ -35,7 +35,7 @@ class AudioSystem {
 
     getFallbackAudio() {
         if (this._fallbackAudio === null) {
-            this._fallbackAudio = new Audio('/mixed/mp3/button.mp3');
+            this._fallbackAudio = new Audio('/data/audio/button.mp3');
         }
         return this._fallbackAudio;
     }

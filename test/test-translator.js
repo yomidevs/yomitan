@@ -81,7 +81,7 @@ async function createVM() {
     // Setup translator
     const japaneseUtil = new JapaneseUtil(null);
     const translator = new Translator({japaneseUtil, database: dictionaryDatabase});
-    const deinflectionReasions = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'bg/lang/deinflect.json')));
+    const deinflectionReasions = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect.json')));
     translator.prepare(deinflectionReasions);
 
     // Done

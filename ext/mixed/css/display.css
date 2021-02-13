@@ -208,7 +208,7 @@
 /* Fonts */
 @font-face {
     font-family: kanji-stroke-orders;
-    src: url('/mixed/ttf/kanji-stroke-orders.ttf');
+    src: url('/data/fonts/kanji-stroke-orders.ttf');
 }
 
 
