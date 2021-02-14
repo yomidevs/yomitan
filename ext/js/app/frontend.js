@@ -276,7 +276,7 @@ class Frontend {
                     this._showExtensionUnloaded(textSource);
                 }
             } else {
-                yomichan.logError(error);
+                log.error(error);
             }
         } if (type !== null) {
             this._stopClearSelectionDelayed();
@@ -563,7 +563,7 @@ class Frontend {
         );
         this._lastShowPromise.catch((error) => {
             if (yomichan.isExtensionUnloaded) { return; }
-            yomichan.logError(error);
+            log.error(error);
         });
         return this._lastShowPromise;
     }

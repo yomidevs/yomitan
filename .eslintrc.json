@@ -111,9 +111,11 @@
                 "deepEqual": "readonly",
                 "generateId": "readonly",
                 "promiseAnimationFrame": "readonly",
+                "log": "readonly",
                 "DynamicProperty": "readonly",
                 "EventDispatcher": "readonly",
-                "EventListenerCollection": "readonly"
+                "EventListenerCollection": "readonly",
+                "Logger": "readonly"
             }
         },
         {

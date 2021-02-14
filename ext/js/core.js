@@ -607,3 +607,111 @@ class DynamicProperty extends EventDispatcher {
         this.trigger('change', {value});
     }
 }
+
+/**
+ * This class handles logging of messages to the console and triggering
+ * an event for log calls.
+ */
+class Logger extends EventDispatcher {
+    /**
+     * Creates a new instance.
+     */
+    constructor() {
+        super();
+        this._extensionName = 'Yomichan';
+        try {
+            const {name, version} = chrome.runtime.getManifest();
+            this._extensionName = `${name} ${version}`;
+        } catch (e) {
+            // NOP
+        }
+    }
+
+    /**
+     * Logs a generic error. This will trigger the 'log' event with the same arguments as the function invocation.
+     * @param error The error to log. This is typically an `Error` or `Error`-like object.
+     * @param level The level to log at. Values include `'info'`, `'debug'`, `'warn'`, and `'error'`.
+     *   Other values will be logged at a non-error level.
+     * @param context An optional context object for the error which should typically include a `url` field.
+     */
+    log(error, level, context=null) {
+        if (!isObject(context)) {
+            context = {url: location.href};
+        }
+
+        let errorString;
+        try {
+            if (typeof error === 'string') {
+                errorString = error;
+            } else {
+                errorString = error.toString();
+                if (/^\[object \w+\]$/.test(errorString)) {
+                    errorString = JSON.stringify(error);
+                }
+            }
+        } catch (e) {
+            errorString = `${error}`;
+        }
+
+        let errorStack;
+        try {
+            errorStack = (typeof error.stack === 'string' ? error.stack.trimRight() : '');
+        } catch (e) {
+            errorStack = '';
+        }
+
+        let errorData;
+        try {
+            errorData = error.data;
+        } catch (e) {
+            // NOP
+        }
+
+        if (errorStack.startsWith(errorString)) {
+            errorString = errorStack;
+        } else if (errorStack.length > 0) {
+            errorString += `\n${errorStack}`;
+        }
+
+        let message = `${this._extensionName} has encountered a problem.`;
+        message += `\nOriginating URL: ${context.url}\n`;
+        message += errorString;
+        if (typeof errorData !== 'undefined') {
+            message += `\nData: ${JSON.stringify(errorData, null, 4)}`;
+        }
+        message += '\n\nIssues can be reported at https://github.com/FooSoft/yomichan/issues';
+
+        switch (level) {
+            case 'info': console.info(message); break;
+            case 'debug': console.debug(message); break;
+            case 'warn': console.warn(message); break;
+            case 'error': console.error(message); break;
+            default: console.log(message); break;
+        }
+
+        this.trigger('log', {error, level, context});
+    }
+
+    /**
+     * Logs a warning. This function invokes `log` internally.
+     * @param error The error to log. This is typically an `Error` or `Error`-like object.
+     * @param context An optional context object for the error which should typically include a `url` field.
+     */
+    warn(error, context=null) {
+        this.log(error, 'warn', context);
+    }
+
+    /**
+     * Logs an error. This function invokes `log` internally.
+     * @param error The error to log. This is typically an `Error` or `Error`-like object.
+     * @param context An optional context object for the error which should typically include a `url` field.
+     */
+    error(error, context=null) {
+        this.log(error, 'error', context);
+    }
+}
+
+/**
+ * This object is the default logger used by the runtime.
+ */
+const log = new Logger();

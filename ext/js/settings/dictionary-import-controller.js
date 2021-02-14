@@ -253,7 +253,7 @@ class DictionaryImportController {
     _showErrors(errors) {
         const uniqueErrors = new Map();
         for (const error of errors) {
-            yomichan.logError(error);
+            log.error(error);
             const errorString = this._errorToString(error);
             let count = uniqueErrors.get(errorString);
             if (typeof count === 'undefined') {

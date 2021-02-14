@@ -104,6 +104,6 @@ async function setupEnvironmentInfo() {
 
         yomichan.ready();
     } catch (e) {
-        yomichan.logError(e);
+        log.error(e);
     }
 })();

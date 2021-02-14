@@ -830,7 +830,7 @@ class TextScanner extends EventDispatcher {
                 }
             }
         } catch (e) {
-            yomichan.logError(e);
+            log.error(e);
         } finally {
             this._pendingLookup = false;
         }

@@ -89,7 +89,7 @@ class QueryParser extends EventDispatcher {
     _onSearched(e) {
         const {error} = e;
         if (error !== null) {
-            yomichan.logError(error);
+            log.error(error);
             return;
         }
         if (e.type === null) { return; }

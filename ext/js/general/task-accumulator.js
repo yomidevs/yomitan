@@ -69,7 +69,7 @@ class TaskAccumulator {
             ];
             await this._runTasks(allTasks);
         } catch (e) {
-            yomichan.logError(e);
+            log.error(e);
         }
     }
 

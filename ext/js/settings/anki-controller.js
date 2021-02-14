@@ -638,7 +638,7 @@ class AnkiCardController {
         try {
             await this._settingsController.permissionsUtil.setPermissionsGranted({permissions}, true);
         } catch (e) {
-            yomichan.logError(e);
+            log.error(e);
         }
     }
 

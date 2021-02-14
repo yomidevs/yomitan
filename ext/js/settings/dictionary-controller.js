@@ -476,7 +476,7 @@ class DictionaryController {
             await this._deleteDictionaryInternal(dictionaryTitle, onProgress);
             await this._deleteDictionarySettings(dictionaryTitle);
         } catch (e) {
-            yomichan.logError(e);
+            log.error(e);
         } finally {
             prevention.end();
             for (const progress of progressContainers) { progress.hidden = true; }

@@ -272,7 +272,7 @@ class Display extends EventDispatcher {
 
     onError(error) {
         if (yomichan.isExtensionUnloaded) { return; }
-        yomichan.logError(error);
+        log.error(error);
     }
 
     getOptions() {
@@ -1552,7 +1552,7 @@ class Display extends EventDispatcher {
                 }
                 await this._frontendSetupPromise;
             } catch (e) {
-                yomichan.logError(e);
+                log.error(e);
                 return;
             } finally {
                 this._frontendSetupPromise = null;
@@ -1721,7 +1721,7 @@ class Display extends EventDispatcher {
 
     _onDefinitionTextScannerSearched({type, definitions, sentence, textSource, optionsContext, error}) {
         if (error !== null && !yomichan.isExtensionUnloaded) {
-            yomichan.logError(error);
+            log.error(error);
         }
 
         if (type === null) { return; }

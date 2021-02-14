@@ -38,6 +38,6 @@
 
         document.documentElement.dataset.loaded = 'true';
     } catch (e) {
-        yomichan.logError(e);
+        log.error(e);
     }
 })();

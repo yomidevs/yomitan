@@ -173,7 +173,7 @@ class BackupController {
     }
 
     _showSettingsImportError(error) {
-        yomichan.logError(error);
+        log.error(error);
         document.querySelector('#settings-import-error-message').textContent = `${error}`;
         this._settingsImportErrorModal.setVisible(true);
     }
@@ -412,7 +412,7 @@ class BackupController {
         try {
             await this._settingsImportSetOptionsFull(optionsFull);
         } catch (e) {
-            yomichan.logError(e);
+            log.error(e);
         }
     }
 }

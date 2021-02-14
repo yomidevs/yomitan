@@ -111,7 +111,7 @@ class CrossFrameAPIPort extends EventDispatcher {
     _onAck(id) {
         const invocation = this._activeInvocations.get(id);
         if (typeof invocation === 'undefined') {
-            yomichan.logWarning(new Error(`Request ${id} not found for acknowledgement`));
+            log.warn(new Error(`Request ${id} not found for acknowledgement`));
             return;
         }
 
@@ -140,7 +140,7 @@ class CrossFrameAPIPort extends EventDispatcher {
     _onResult(id, data) {
         const invocation = this._activeInvocations.get(id);
         if (typeof invocation === 'undefined') {
-            yomichan.logWarning(new Error(`Request ${id} not found`));
+            log.warn(new Error(`Request ${id} not found`));
             return;
         }
 
@@ -269,7 +269,7 @@ class CrossFrameAPI {
             this._setupCommPort(otherTabId, otherFrameId, port);
         } catch (e) {
             port.disconnect();
-            yomichan.logError(e);
+            log.error(e);
         }
     }
 

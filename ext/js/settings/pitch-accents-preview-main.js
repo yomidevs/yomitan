@@ -30,6 +30,6 @@
         await displayGenerator.prepare();
         displayGenerator.preparePitchAccents();
     } catch (e) {
-        yomichan.logError(e);
+        log.error(e);
     }
 })();

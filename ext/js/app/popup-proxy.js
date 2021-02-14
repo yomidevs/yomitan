@@ -201,7 +201,7 @@ class PopupProxy extends EventDispatcher {
             }
             this._frameOffsetUpdatedAt = now;
         } catch (e) {
-            yomichan.logError(e);
+            log.error(e);
         } finally {
             this._frameOffsetPromise = null;
         }

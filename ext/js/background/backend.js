@@ -204,7 +204,7 @@ class Backend {
             try {
                 await this._dictionaryDatabase.prepare();
             } catch (e) {
-                yomichan.logError(e);
+                log.error(e);
             }
 
             const deinflectionReasions = await this._fetchAsset('/data/deinflect.json', true);
@@ -226,7 +226,7 @@ class Backend {
             this._sendMessageAllTabsIgnoreResponse('backendReady', {});
             this._sendMessageIgnoreResponse({action: 'backendReady', params: {}});
         } catch (e) {
-            yomichan.logError(e);
+            log.error(e);
             throw e;
         } finally {
             if (this._badgePrepareDelayTimer !== null) {
@@ -358,7 +358,7 @@ class Backend {
             forwardPort.onDisconnect.addListener(cleanup);
         } catch (e) {
             port.disconnect();
-            yomichan.logError(e);
+            log.error(e);
         }
     }
 
@@ -612,7 +612,7 @@ class Backend {
     }
 
     _onApiLog({error, level, context}) {
-        yomichan.log(deserializeError(error), level, context);
+        log.log(deserializeError(error), level, context);
     }
 
     _onApiLogIndicatorClear() {

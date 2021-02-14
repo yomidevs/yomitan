@@ -122,7 +122,7 @@ class DictionaryDatabase {
             await Database.deleteDatabase(this._dbName);
             result = true;
         } catch (e) {
-            yomichan.logError(e);
+            log.error(e);
         }
         await this.prepare();
         return result;
