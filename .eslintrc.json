@@ -12,8 +12,7 @@
     },
     "plugins": ["no-unsanitized"],
     "ignorePatterns": [
-        "/ext/lib/",
-        "/ext/bg/js/templates.js"
+        "/ext/lib/"
     ],
     "rules": {
         "arrow-parens": ["error", "always"],
@@ -134,7 +133,7 @@
             }
         },
         {
-            "files": ["ext/js/settings/*.js"],
+            "files": ["ext/js/settings/modal-jquery.js"],
             "env": {
                 "jquery": true
             }

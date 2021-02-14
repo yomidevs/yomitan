@@ -20,7 +20,7 @@ const path = require('path');
 const browserify = require('browserify');
 
 async function main() {
-    const extLibPath = path.join(__dirname, '..', 'ext', 'mixed', 'lib');
+    const extLibPath = path.join(__dirname, '..', 'ext', 'lib');
     const parse5Path = require.resolve('parse5');
 
     const content = await new Promise((resolve, reject) => {
