@@ -1573,13 +1573,13 @@ class Display extends EventDispatcher {
         await dynamicLoader.loadScripts([
             '/js/language/text-scanner.js',
             '/js/comm/frame-client.js',
-            '/fg/js/popup.js',
-            '/fg/js/popup-proxy.js',
-            '/fg/js/popup-window.js',
-            '/fg/js/popup-factory.js',
-            '/fg/js/frame-ancestry-handler.js',
-            '/fg/js/frame-offset-forwarder.js',
-            '/fg/js/frontend.js'
+            '/js/app/popup.js',
+            '/js/app/popup-proxy.js',
+            '/js/app/popup-window.js',
+            '/js/app/popup-factory.js',
+            '/js/comm/frame-ancestry-handler.js',
+            '/js/comm/frame-offset-forwarder.js',
+            '/js/app/frontend.js'
         ]);
 
         const popupFactory = new PopupFactory(this._frameId);

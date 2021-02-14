@@ -94,9 +94,9 @@ async function testDocument1() {
 
     const vm = new VM({document, window, Range, Node});
     vm.execute([
-        'fg/js/dom-text-scanner.js',
-        'fg/js/text-source-range.js',
-        'fg/js/text-source-element.js',
+        'js/dom/dom-text-scanner.js',
+        'js/dom/text-source-range.js',
+        'js/dom/text-source-element.js',
         'js/dom/document-util.js'
     ]);
     const [DOMTextScanner, TextSourceRange, TextSourceElement, DocumentUtil] = vm.get([
