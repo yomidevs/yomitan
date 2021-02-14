@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class WindowScroll {
+class ScrollElement {
     constructor(node) {
         this._node = node;
         this._animationRequestId = null;
