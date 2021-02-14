@@ -20,6 +20,8 @@
  */
 
 (() => {
+    yomichan.prepare(true);
+
     const backend = new Backend();
     backend.prepare();
 })();

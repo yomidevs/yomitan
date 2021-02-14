@@ -221,8 +221,8 @@ class DisplayController {
 }
 
 (async () => {
-    api.forwardLogsToBackend();
-    await yomichan.backendReady();
+    api.prepare();
+    await yomichan.prepare();
 
     api.logIndicatorClear();
 

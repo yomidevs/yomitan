@@ -24,8 +24,8 @@
 
 (async () => {
     try {
-        api.forwardLogsToBackend();
-        await yomichan.backendReady();
+        api.prepare();
+        await yomichan.prepare();
 
         const {tabId, frameId} = await api.frameInformationGet();
         if (typeof frameId !== 'number') {

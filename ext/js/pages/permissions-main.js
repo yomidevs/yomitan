@@ -69,7 +69,7 @@ function setupPermissionsToggles() {
             node.textContent = chrome.runtime.getURL('/');
         }
 
-        api.forwardLogsToBackend();
+        api.prepare();
         await yomichan.prepare();
 
         setupEnvironmentInfo();

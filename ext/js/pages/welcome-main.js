@@ -49,7 +49,7 @@ async function setupGenericSettingsController(genericSettingController) {
         const statusFooter = new StatusFooter(document.querySelector('.status-footer-container'));
         statusFooter.prepare();
 
-        api.forwardLogsToBackend();
+        api.prepare();
         await yomichan.prepare();
 
         setupEnvironmentInfo();

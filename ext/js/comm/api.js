@@ -22,8 +22,8 @@
 const api = (() => {
     class API {
         constructor() {
-            this._forwardLogsToBackendEnabled = false;
-            this._crossFrame = new CrossFrameAPI();
+            this._prepared = false;
+            this._crossFrame = null;
         }
 
         get crossFrame() {
@@ -31,20 +31,11 @@ const api = (() => {
         }
 
         prepare() {
+            if (this._prepared) { return; }
+            this._crossFrame = new CrossFrameAPI();
             this._crossFrame.prepare();
-        }
-
-        forwardLogsToBackend() {
-            if (this._forwardLogsToBackendEnabled) { return; }
-            this._forwardLogsToBackendEnabled = true;
-
-            yomichan.on('log', async ({error, level, context}) => {
-                try {
-                    await this.log(serializeError(error), level, context);
-                } catch (e) {
-                    // NOP
-                }
-            });
+            yomichan.on('log', this._onLog.bind(this));
+            this._prepared = true;
         }
 
         // Invoke functions
@@ -159,10 +150,6 @@ const api = (() => {
 
         getMedia(targets) {
             return this._invoke('getMedia', {targets});
-        }
-
-        log(error, level, context) {
-            return this._invoke('log', {error, level, context});
         }
 
         logIndicatorClear() {
@@ -331,10 +318,16 @@ const api = (() => {
         _checkLastError() {
             // NOP
         }
+
+        async _onLog({error, level, context}) {
+            try {
+                error = serializeError(error);
+                await this._invoke('log', {error, level, context});
+            } catch (e) {
+                // NOP
+            }
+        }
     }
 
-    // eslint-disable-next-line no-shadow
-    const api = new API();
-    api.prepare();
-    return api;
+    return new API();
 })();

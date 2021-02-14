@@ -24,7 +24,8 @@
 
 (async () => {
     try {
-        api.forwardLogsToBackend();
+        api.prepare();
+        await yomichan.prepare();
 
         const {tabId, frameId} = await api.frameInformationGet();
 

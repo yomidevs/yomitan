@@ -71,13 +71,13 @@ const yomichan = (() => {
             return this._isExtensionUnloaded;
         }
 
-        prepare() {
+        async prepare(isBackground=false) {
             chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-        }
 
-        backendReady() {
-            this.sendMessage({action: 'requestBackendReadySignal'});
-            return this._isBackendReadyPromise;
+            if (!isBackground) {
+                this.sendMessage({action: 'requestBackendReadySignal'});
+                await this._isBackendReadyPromise;
+            }
         }
 
         ready() {
@@ -302,5 +302,3 @@ const yomichan = (() => {
 
     return new Yomichan();
 })();
-
-yomichan.prepare();

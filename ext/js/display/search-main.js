@@ -30,8 +30,8 @@
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 
-        api.forwardLogsToBackend();
-        await yomichan.backendReady();
+        api.prepare();
+        await yomichan.prepare();
 
         const {tabId, frameId} = await api.frameInformationGet();
 

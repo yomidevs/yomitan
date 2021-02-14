@@ -54,7 +54,7 @@ function getOperatingSystemDisplayName(os) {
         const manifest = chrome.runtime.getManifest();
         const language = chrome.i18n.getUILanguage();
 
-        api.forwardLogsToBackend();
+        api.prepare();
         await yomichan.prepare();
 
         const {userAgent} = navigator;

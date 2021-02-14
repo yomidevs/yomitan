@@ -17,10 +17,14 @@
 
 /* global
  * DisplayGenerator
+ * api
  */
 
 (async () => {
     try {
+        api.prepare();
+        await yomichan.prepare();
+
         const displayGenerator = new DisplayGenerator({
             japaneseUtil: null,
             mediaLoader: null
