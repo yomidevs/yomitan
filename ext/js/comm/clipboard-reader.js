@@ -25,14 +25,14 @@ class ClipboardReader {
      * @param pasteTargetSelector The selector for the paste target element.
      * @param imagePasteTargetSelector The selector for the image paste target element.
      */
-    constructor({document=null, pasteTargetSelector=null, imagePasteTargetSelector=null, mediaUtility=null}) {
+    constructor({document=null, pasteTargetSelector=null, imagePasteTargetSelector=null, mediaUtil=null}) {
         this._document = document;
         this._browser = null;
         this._pasteTarget = null;
         this._pasteTargetSelector = pasteTargetSelector;
         this._imagePasteTarget = null;
         this._imagePasteTargetSelector = imagePasteTargetSelector;
-        this._mediaUtility = mediaUtility;
+        this._mediaUtil = mediaUtil;
     }
 
     /**
@@ -107,7 +107,7 @@ class ClipboardReader {
         // See browser-specific notes in getText
         if (
             this._isFirefox() &&
-            this._mediaUtility !== null &&
+            this._mediaUtil !== null &&
             typeof navigator.clipboard !== 'undefined' &&
             typeof navigator.clipboard.read === 'function'
         ) {
@@ -120,7 +120,7 @@ class ClipboardReader {
             }
 
             for (const file of files) {
-                if (this._mediaUtility.getFileExtensionFromImageMediaType(file.type) !== null) {
+                if (this._mediaUtil.getFileExtensionFromImageMediaType(file.type) !== null) {
                     return await this._readFileAsDataURL(file);
                 }
             }

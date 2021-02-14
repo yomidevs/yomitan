@@ -18,7 +18,7 @@
 /**
  * Utility class to help processing profile conditions.
  */
-class ProfileConditions {
+class ProfileConditionsUtil {
     /**
      * Creates a new instance.
      */

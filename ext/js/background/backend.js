@@ -25,11 +25,11 @@
  * JapaneseUtil
  * JsonSchemaValidator
  * Mecab
- * MediaUtility
+ * MediaUtil
  * ObjectPropertyAccessor
  * OptionsUtil
  * PermissionsUtil
- * ProfileConditions
+ * ProfileConditionsUtil
  * RequestBuilder
  * Translator
  * wanakana
@@ -46,13 +46,13 @@ class Backend {
         });
         this._anki = new AnkiConnect();
         this._mecab = new Mecab();
-        this._mediaUtility = new MediaUtility();
+        this._mediaUtil = new MediaUtil();
         this._clipboardReader = new ClipboardReader({
             // eslint-disable-next-line no-undef
             document: (typeof document === 'object' && document !== null ? document : null),
             pasteTargetSelector: '#clipboard-paste-target',
             imagePasteTargetSelector: '#clipboard-image-paste-target',
-            mediaUtility: this._mediaUtility
+            mediaUtil: this._mediaUtil
         });
         this._clipboardMonitor = new ClipboardMonitor({
             japaneseUtil: this._japaneseUtil,
@@ -61,7 +61,7 @@ class Backend {
         this._options = null;
         this._profileConditionsSchemaValidator = new JsonSchemaValidator();
         this._profileConditionsSchemaCache = [];
-        this._profileConditionsUtil = new ProfileConditions();
+        this._profileConditionsUtil = new ProfileConditionsUtil();
         this._defaultAnkiFieldTemplates = null;
         this._requestBuilder = new RequestBuilder();
         this._audioDownloader = new AudioDownloader({
@@ -1707,7 +1707,7 @@ class Backend {
             return null;
         }
 
-        let extension = this._mediaUtility.getFileExtensionFromAudioMediaType(contentType);
+        let extension = this._mediaUtil.getFileExtensionFromAudioMediaType(contentType);
         if (extension === null) { extension = '.mp3'; }
         let fileName = this._generateAnkiNoteMediaFileName('yomichan_audio', extension, timestamp, definitionDetails);
         fileName = fileName.replace(/\]/g, '');
@@ -1721,7 +1721,7 @@ class Backend {
         const dataUrl = await this._getScreenshot(tabId, frameId, format, quality);
 
         const {mediaType, data} = this._getDataUrlInfo(dataUrl);
-        const extension = this._mediaUtility.getFileExtensionFromImageMediaType(mediaType);
+        const extension = this._mediaUtil.getFileExtensionFromImageMediaType(mediaType);
         if (extension === null) {
             throw new Error('Unknown media type for screenshot image');
         }
@@ -1739,7 +1739,7 @@ class Backend {
         }
 
         const {mediaType, data} = this._getDataUrlInfo(dataUrl);
-        const extension = this._mediaUtility.getFileExtensionFromImageMediaType(mediaType);
+        const extension = this._mediaUtil.getFileExtensionFromImageMediaType(mediaType);
         if (extension === null) {
             throw new Error('Unknown media type for clipboard image');
         }
