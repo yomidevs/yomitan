@@ -12,7 +12,7 @@
     },
     "plugins": ["no-unsanitized"],
     "ignorePatterns": [
-        "/ext/mixed/lib/",
+        "/ext/lib/",
         "/ext/bg/js/templates.js"
     ],
     "rules": {

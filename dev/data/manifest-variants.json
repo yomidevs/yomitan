@@ -123,7 +123,7 @@
             "excludeFiles": [
                 "sw.js",
                 "bg/js/simple-dom-parser.js",
-                "mixed/lib/parse5.js"
+                "lib/parse5.js"
             ]
         },
         {
@@ -148,7 +148,7 @@
             "excludeFiles": [
                 "sw.js",
                 "bg/js/simple-dom-parser.js",
-                "mixed/lib/parse5.js"
+                "lib/parse5.js"
             ]
         },
         {
@@ -220,7 +220,7 @@
             "excludeFiles": [
                 "sw.js",
                 "bg/js/simple-dom-parser.js",
-                "mixed/lib/parse5.js"
+                "lib/parse5.js"
             ]
         },
         {
@@ -256,7 +256,7 @@
             "excludeFiles": [
                 "sw.js",
                 "bg/js/simple-dom-parser.js",
-                "mixed/lib/parse5.js"
+                "lib/parse5.js"
             ]
         }
     ]

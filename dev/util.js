@@ -25,7 +25,7 @@ let JSZip = null;
 function getJSZip() {
     if (JSZip === null) {
         process.noDeprecation = true; // Suppress a warning about JSZip
-        JSZip = require(path.join(__dirname, '../ext/mixed/lib/jszip.min.js'));
+        JSZip = require(path.join(__dirname, '../ext/lib/jszip.min.js'));
         process.noDeprecation = false;
     }
     return JSZip;

@@ -16,8 +16,8 @@
  */
 
 self.importScripts(
-    '/mixed/lib/parse5.js',
-    '/mixed/lib/wanakana.min.js',
+    '/lib/parse5.js',
+    '/lib/wanakana.min.js',
     '/mixed/js/core.js',
     '/mixed/js/yomichan.js',
     '/mixed/js/environment.js',

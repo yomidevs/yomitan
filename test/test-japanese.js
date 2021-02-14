@@ -21,7 +21,7 @@ const {VM} = require('../dev/vm');
 
 const vm = new VM();
 vm.execute([
-    'mixed/lib/wanakana.min.js',
+    'lib/wanakana.min.js',
     'mixed/js/japanese.js',
     'bg/js/text-source-map.js'
 ]);

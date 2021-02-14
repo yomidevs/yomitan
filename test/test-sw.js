@@ -37,7 +37,7 @@ function getAllHtmlScriptPaths(fileName) {
 
 function convertBackgroundScriptsToServiceWorkerScripts(scripts) {
     // Use parse5-based SimpleDOMParser
-    scripts.splice(0, 0, '/mixed/lib/parse5.js');
+    scripts.splice(0, 0, '/lib/parse5.js');
     const index = scripts.indexOf('/bg/js/native-simple-dom-parser.js');
     assert.ok(index >= 0);
     scripts[index] = '/bg/js/simple-dom-parser.js';
@@ -65,7 +65,7 @@ function main() {
         vm.assert.deepStrictEqual(scripts, importedScripts);
 
         // Verify that eslint config lists files correctly
-        const expectedSwRulesFiles = scripts.filter((src) => !src.startsWith('/mixed/lib/')).map((src) => `${extDirName}${src}`);
+        const expectedSwRulesFiles = scripts.filter((src) => !src.startsWith('/lib/')).map((src) => `${extDirName}${src}`);
         const eslintConfig = JSON.parse(fs.readFileSync(path.join(rootDir, '.eslintrc.json'), {encoding: 'utf8'}));
         const swRules = eslintConfig.overrides.find((item) => (
             typeof item.env === 'object' &&

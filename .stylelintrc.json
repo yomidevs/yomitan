@@ -1,7 +1,7 @@
 {
     "extends": "stylelint-config-recommended",
     "ignoreFiles": [
-        "ext/mixed/lib/**/*.css"
+        "ext/lib/**/*.css"
     ],
     "rules": {
         "font-family-name-quotes": "always-where-recommended",
