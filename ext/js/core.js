@@ -342,6 +342,42 @@ function promiseAnimationFrame(timeout=null) {
 }
 
 /**
+ * Invokes a standard message handler. This function is used to react and respond
+ * to communication messages within the extension.
+ * @param handler A handler function which is passed `params` and `...extraArgs` as arguments.
+ * @param async Whether or not the handler is async or not. Values include `false`, `true`, or `'dynamic'`.
+ *   When the value is `'dynamic'`, the handler should return an object of the format `{async: boolean, result: any}`.
+ * @param params Information which was passed with the original message.
+ * @param callback A callback function which is invoked after the handler has completed. The value passed
+ *   to the function is in the format:
+ *   * `{result: any}` if the handler invoked successfully.
+ *   * `{error: object}` if the handler thew an error. The error is serialized.
+ * @param extraArgs Additional arguments which are passed to the `handler` function.
+ * @returns `true` if the function is invoked asynchronously, `false` otherwise.
+ */
+function invokeMessageHandler({handler, async}, params, callback, ...extraArgs) {
+    try {
+        let promiseOrResult = handler(params, ...extraArgs);
+        if (async === 'dynamic') {
+            ({async, result: promiseOrResult} = promiseOrResult);
+        }
+        if (async) {
+            promiseOrResult.then(
+                (result) => { callback({result}); },
+                (error) => { callback({error: serializeError(error)}); }
+            );
+            return true;
+        } else {
+            callback({result: promiseOrResult});
+            return false;
+        }
+    } catch (error) {
+        callback({error: serializeError(error)});
+        return false;
+    }
+}
+
+/**
  * Base class controls basic event dispatching.
  */
 class EventDispatcher {

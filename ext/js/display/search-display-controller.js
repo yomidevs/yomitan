@@ -104,7 +104,7 @@ class SearchDisplayController {
     _onMessage({action, params}, sender, callback) {
         const messageHandler = this._messageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return false; }
-        return yomichan.invokeMessageHandler(messageHandler, params, callback, sender);
+        return invokeMessageHandler(messageHandler, params, callback, sender);
     }
 
     _onKeyDown(e) {

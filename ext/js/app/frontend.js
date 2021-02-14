@@ -238,7 +238,7 @@ class Frontend {
     _onRuntimeMessage({action, params}, sender, callback) {
         const messageHandler = this._runtimeMessageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return false; }
-        return yomichan.invokeMessageHandler(messageHandler, params, callback, sender);
+        return invokeMessageHandler(messageHandler, params, callback, sender);
     }
 
     _onZoomChanged({newZoomFactor}) {
@@ -455,7 +455,7 @@ class Frontend {
     async _getIframeProxyPopup() {
         const targetFrameId = 0; // Root frameId
         try {
-            await this._waitForFrontendReady(targetFrameId);
+            await this._waitForFrontendReady(targetFrameId, 10000);
         } catch (e) {
             // Root frame not available
             return await this._getDefaultPopup();
@@ -613,21 +613,40 @@ class Frontend {
         }
     }
 
-    async _waitForFrontendReady(frameId) {
-        const promise = yomichan.getTemporaryListenerResult(
-            chrome.runtime.onMessage,
-            ({action, params}, {resolve}) => {
-                if (
-                    action === 'frontendReady' &&
-                    params.frameId === frameId
-                ) {
-                    resolve();
+    async _waitForFrontendReady(frameId, timeout) {
+        return new Promise((resolve, reject) => {
+            let timeoutId = null;
+
+            const cleanup = () => {
+                if (timeoutId !== null) {
+                    clearTimeout(timeoutId);
+                    timeoutId = null;
                 }
-            },
-            10000
-        );
-        yomichan.api.broadcastTab('requestFrontendReadyBroadcast', {frameId: this._frameId});
-        await promise;
+                chrome.runtime.onMessage.removeListener(onMessage);
+            };
+            const onMessage = (message, sender, sendResponse) => {
+                try {
+                    const {action, params} = message;
+                    if (action === 'frontendReady' && params.frameId === frameId) {
+                        cleanup();
+                        resolve();
+                        sendResponse();
+                    }
+                } catch (e) {
+                    // NOP
+                }
+            };
+
+            if (timeout !== null) {
+                timeoutId = setTimeout(() => {
+                    timeoutId = null;
+                    cleanup();
+                    reject(new Error(`Wait for frontend ready timed out after ${timeout}ms`));
+                }, timeout);
+            }
+
+            chrome.runtime.onMessage.addListener(onMessage);
+        });
     }
 
     _getPreventMiddleMouseValueForPageType(preventMiddleMouseOptions) {

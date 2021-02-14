@@ -111,6 +111,7 @@
                 "deepEqual": "readonly",
                 "generateId": "readonly",
                 "promiseAnimationFrame": "readonly",
+                "invokeMessageHandler": "readonly",
                 "log": "readonly",
                 "DynamicProperty": "readonly",
                 "EventDispatcher": "readonly",

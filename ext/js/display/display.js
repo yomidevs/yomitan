@@ -463,7 +463,7 @@ class Display extends EventDispatcher {
         if (typeof messageHandler === 'undefined') { return; }
 
         const callback = () => {}; // NOP
-        yomichan.invokeMessageHandler(messageHandler, params, callback);
+        invokeMessageHandler(messageHandler, params, callback);
     }
 
     _onMessageSetOptionsContext({optionsContext}) {

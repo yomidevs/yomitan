@@ -307,7 +307,7 @@ class Backend {
             }
         }
 
-        return yomichan.invokeMessageHandler(messageHandler, params, callback, sender);
+        return invokeMessageHandler(messageHandler, params, callback, sender);
     }
 
     _onConnect(port) {
@@ -1563,7 +1563,7 @@ class Backend {
         return new Promise((resolve, reject) => {
             const callback = (response) => {
                 try {
-                    resolve(yomichan.getMessageResponseResult(response));
+                    resolve(this._getMessageResponseResult(response));
                 } catch (error) {
                     reject(error);
                 }
@@ -1571,6 +1571,21 @@ class Backend {
 
             chrome.tabs.sendMessage(...args, callback);
         });
+    }
+
+    _getMessageResponseResult(response) {
+        let error = chrome.runtime.lastError;
+        if (error) {
+            throw new Error(error.message);
+        }
+        if (!isObject(response)) {
+            throw new Error('Tab did not respond');
+        }
+        error = response.error;
+        if (error) {
+            throw deserializeError(error);
+        }
+        return response.result;
     }
 
     async _checkTabUrl(tabId, urlPredicate) {

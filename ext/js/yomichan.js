@@ -120,42 +120,6 @@ class Yomichan extends EventDispatcher {
         }
     }
 
-    getTemporaryListenerResult(eventHandler, userCallback, timeout=null) {
-        if (!(
-            typeof eventHandler.addListener === 'function' &&
-            typeof eventHandler.removeListener === 'function'
-        )) {
-            throw new Error('Event handler type not supported');
-        }
-
-        return new Promise((resolve, reject) => {
-            const runtimeMessageCallback = ({action, params}, sender, sendResponse) => {
-                let timeoutId = null;
-                if (timeout !== null) {
-                    timeoutId = setTimeout(() => {
-                        timeoutId = null;
-                        eventHandler.removeListener(runtimeMessageCallback);
-                        reject(new Error(`Listener timed out in ${timeout} ms`));
-                    }, timeout);
-                }
-
-                const cleanupResolve = (value) => {
-                    if (timeoutId !== null) {
-                        clearTimeout(timeoutId);
-                        timeoutId = null;
-                    }
-                    eventHandler.removeListener(runtimeMessageCallback);
-                    sendResponse();
-                    resolve(value);
-                };
-
-                userCallback({action, params}, {resolve: cleanupResolve, sender});
-            };
-
-            eventHandler.addListener(runtimeMessageCallback);
-        });
-    }
-
     sendMessage(...args) {
         try {
             return chrome.runtime.sendMessage(...args);
@@ -171,43 +135,6 @@ class Yomichan extends EventDispatcher {
         } catch (e) {
             this.triggerExtensionUnloaded();
             throw e;
-        }
-    }
-
-    getMessageResponseResult(response) {
-        let error = chrome.runtime.lastError;
-        if (error) {
-            throw new Error(error.message);
-        }
-        if (!isObject(response)) {
-            throw new Error('Tab did not respond');
-        }
-        error = response.error;
-        if (error) {
-            throw deserializeError(error);
-        }
-        return response.result;
-    }
-
-    invokeMessageHandler({handler, async}, params, callback, ...extraArgs) {
-        try {
-            let promiseOrResult = handler(params, ...extraArgs);
-            if (async === 'dynamic') {
-                ({async, result: promiseOrResult} = promiseOrResult);
-            }
-            if (async) {
-                promiseOrResult.then(
-                    (result) => { callback({result}); },
-                    (error) => { callback({error: serializeError(error)}); }
-                );
-                return true;
-            } else {
-                callback({result: promiseOrResult});
-                return false;
-            }
-        } catch (error) {
-            callback({error: serializeError(error)});
-            return false;
         }
     }
 
@@ -235,7 +162,7 @@ class Yomichan extends EventDispatcher {
     _onMessage({action, params}, sender, callback) {
         const messageHandler = this._messageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return false; }
-        return this.invokeMessageHandler(messageHandler, params, callback, sender);
+        return invokeMessageHandler(messageHandler, params, callback, sender);
     }
 
     _onMessageIsReady() {
