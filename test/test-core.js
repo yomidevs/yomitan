@@ -30,7 +30,7 @@ const vm = new VM({
     }
 });
 vm.execute([
-    'mixed/js/core.js'
+    'js/core.js'
 ]);
 const [DynamicProperty, deepEqual] = vm.get(['DynamicProperty', 'deepEqual']);
 

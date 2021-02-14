@@ -20,8 +20,8 @@ const {VM} = require('./vm');
 
 const vm = new VM();
 vm.execute([
-    'mixed/js/core.js',
-    'mixed/js/cache-map.js',
+    'js/core.js',
+    'js/general/cache-map.js',
     'bg/js/json-schema.js'
 ]);
 const JsonSchemaValidator = vm.get('JsonSchemaValidator');

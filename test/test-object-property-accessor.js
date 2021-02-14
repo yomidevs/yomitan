@@ -20,7 +20,7 @@ const {testMain} = require('../dev/util');
 const {VM} = require('../dev/vm');
 
 const vm = new VM({});
-vm.execute('mixed/js/object-property-accessor.js');
+vm.execute('js/general/object-property-accessor.js');
 const ObjectPropertyAccessor = vm.get('ObjectPropertyAccessor');
 
 

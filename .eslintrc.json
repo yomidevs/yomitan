@@ -84,9 +84,9 @@
     "overrides": [
         {
             "files": [
-                "ext/mixed/js/core.js",
+                "ext/js/core.js",
                 "ext/bg/js/template-renderer.js",
-                "ext/mixed/js/dictionary-data-util.js"
+                "ext/js/language/dictionary-data-util.js"
             ],
             "env": {
                 "webextensions": false
@@ -95,10 +95,10 @@
         {
             "files": ["ext/**/*.js"],
             "excludedFiles": [
-                "ext/mixed/js/core.js",
+                "ext/js/core.js",
                 "ext/bg/js/template-renderer.js",
                 "ext/bg/js/anki-note-data.js",
-                "ext/mixed/js/dictionary-data-util.js"
+                "ext/js/language/dictionary-data-util.js"
             ],
             "globals": {
                 "serializeError": "readonly",
@@ -120,15 +120,15 @@
         {
             "files": ["ext/**/*.js"],
             "excludedFiles": [
-                "ext/mixed/js/core.js",
-                "ext/mixed/js/yomichan.js"
+                "ext/js/core.js",
+                "ext/js/yomichan.js"
             ],
             "globals": {
                 "yomichan": "readonly"
             }
         },
         {
-            "files": ["ext/mixed/js/yomichan.js"],
+            "files": ["ext/js/yomichan.js"],
             "globals": {
                 "chrome": "writable"
             }
@@ -158,13 +158,13 @@
         },
         {
             "files": [
-                "ext/mixed/js/core.js",
-                "ext/mixed/js/yomichan.js",
-                "ext/mixed/js/environment.js",
-                "ext/mixed/js/japanese.js",
-                "ext/mixed/js/cache-map.js",
-                "ext/mixed/js/dictionary-data-util.js",
-                "ext/mixed/js/object-property-accessor.js",
+                "ext/js/core.js",
+                "ext/js/yomichan.js",
+                "ext/js/background/environment.js",
+                "ext/js/language/japanese-util.js",
+                "ext/js/general/cache-map.js",
+                "ext/js/language/dictionary-data-util.js",
+                "ext/js/general/object-property-accessor.js",
                 "ext/bg/js/anki.js",
                 "ext/bg/js/audio-downloader.js",
                 "ext/bg/js/clipboard-monitor.js",

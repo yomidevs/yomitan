@@ -26,7 +26,7 @@ function clone(value) {
 
 function createHotkeyUtil() {
     const vm = new VM();
-    vm.execute(['mixed/js/hotkey-util.js']);
+    vm.execute(['js/input/hotkey-util.js']);
     const [HotkeyUtil] = vm.get(['HotkeyUtil']);
     return new HotkeyUtil();
 }

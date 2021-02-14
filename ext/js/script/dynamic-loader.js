@@ -150,7 +150,7 @@ const dynamicLoader = (() => {
 
         try {
             script.async = false;
-            script.src = '/mixed/js/dynamic-loader-sentinel.js';
+            script.src = '/js/script/dynamic-loader-sentinel.js';
             parent.appendChild(script);
         } catch (e) {
             yomichan.off(sentinelEventName, sentinelEventCallback);

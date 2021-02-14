@@ -21,7 +21,7 @@ const {VM} = require('../dev/vm');
 
 const vm = new VM({console});
 vm.execute([
-    'mixed/js/cache-map.js'
+    'js/general/cache-map.js'
 ]);
 const CacheMap = vm.get('CacheMap');
 
