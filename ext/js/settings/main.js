@@ -31,7 +31,6 @@
  * ScanInputsSimpleController
  * SettingsController
  * StorageController
- * api
  */
 
 function showExtensionInformation() {
@@ -43,7 +42,7 @@ function showExtensionInformation() {
 }
 
 async function setupEnvironmentInfo() {
-    const {browser, platform} = await api.getEnvironmentInfo();
+    const {browser, platform} = await yomichan.api.getEnvironmentInfo();
     document.documentElement.dataset.browser = browser;
     document.documentElement.dataset.operatingSystem = platform.os;
 }
@@ -51,13 +50,12 @@ async function setupEnvironmentInfo() {
 
 (async () => {
     try {
-        api.prepare();
         await yomichan.prepare();
 
         setupEnvironmentInfo();
         showExtensionInformation();
 
-        const optionsFull = await api.optionsGetFull();
+        const optionsFull = await yomichan.api.optionsGetFull();
 
         const modalController = new ModalController();
         modalController.prepare();

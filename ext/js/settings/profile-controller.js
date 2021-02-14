@@ -17,7 +17,6 @@
 
 /* global
  * ProfileConditionsUI
- * api
  */
 
 class ProfileController {
@@ -58,7 +57,7 @@ class ProfileController {
     }
 
     async prepare() {
-        const {platform: {os}} = await api.getEnvironmentInfo();
+        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
         this._profileConditionsUI.os = os;
 
         this._profileActiveSelect = document.querySelector('#profile-active-select');

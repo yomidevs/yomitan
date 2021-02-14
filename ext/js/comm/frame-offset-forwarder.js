@@ -17,7 +17,6 @@
 
 /* global
  * FrameAncestryHandler
- * api
  */
 
 class FrameOffsetForwarder {
@@ -28,7 +27,7 @@ class FrameOffsetForwarder {
 
     prepare() {
         this._frameAncestryHandler.prepare();
-        api.crossFrame.registerHandlers([
+        yomichan.crossFrame.registerHandlers([
             ['FrameOffsetForwarder.getChildFrameRect', {async: false, handler: this._onMessageGetChildFrameRect.bind(this)}]
         ]);
     }
@@ -43,7 +42,7 @@ class FrameOffsetForwarder {
         let childFrameId = this._frameId;
         const promises = [];
         for (const frameId of ancestorFrameIds) {
-            promises.push(api.crossFrame.invoke(frameId, 'FrameOffsetForwarder.getChildFrameRect', {frameId: childFrameId}));
+            promises.push(yomichan.crossFrame.invoke(frameId, 'FrameOffsetForwarder.getChildFrameRect', {frameId: childFrameId}));
             childFrameId = frameId;
         }
 

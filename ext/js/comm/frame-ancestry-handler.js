@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * api
- */
-
 /**
  * This class is used to return the ancestor frame IDs for the current frame.
  * This is a workaround to using the `webNavigation.getAllFrames` API, which
@@ -118,7 +114,7 @@ class FrameAncestryHandler {
                     clearTimeout(timer);
                     timer = null;
                 }
-                api.crossFrame.unregisterHandler(responseMessageId);
+                yomichan.crossFrame.unregisterHandler(responseMessageId);
             };
             const onMessage = (params) => {
                 if (params.nonce !== nonce) { return null; }
@@ -148,7 +144,7 @@ class FrameAncestryHandler {
             };
 
             // Start
-            api.crossFrame.registerHandlers([[responseMessageId, {async: false, handler: onMessage}]]);
+            yomichan.crossFrame.registerHandlers([[responseMessageId, {async: false, handler: onMessage}]]);
             resetTimeout();
             const frameId = this._frameId;
             this._requestFrameInfo(targetWindow, frameId, frameId, uniqueId, nonce);
@@ -187,7 +183,7 @@ class FrameAncestryHandler {
             const responseMessageId = `${this._responseMessageIdBase}${uniqueId}`;
 
             try {
-                const response = await api.crossFrame.invoke(originFrameId, responseMessageId, responseParams);
+                const response = await yomichan.crossFrame.invoke(originFrameId, responseMessageId, responseParams);
                 if (response === null) { return; }
                 nonce = response.nonce;
             } catch (e) {

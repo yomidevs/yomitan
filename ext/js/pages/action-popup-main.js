@@ -18,7 +18,6 @@
 /* global
  * HotkeyHelpController
  * PermissionsUtil
- * api
  */
 
 class DisplayController {
@@ -35,7 +34,7 @@ class DisplayController {
         this._setupButtonEvents('.action-open-search', 'openSearchPage', chrome.runtime.getURL('/search.html'));
         this._setupButtonEvents('.action-open-info', 'openInfoPage', chrome.runtime.getURL('/info.html'));
 
-        const optionsFull = await api.optionsGetFull();
+        const optionsFull = await yomichan.api.optionsGetFull();
         this._optionsFull = optionsFull;
 
         this._setupHotkeys();
@@ -74,12 +73,12 @@ class DisplayController {
             if (typeof command === 'string') {
                 node.addEventListener('click', (e) => {
                     if (e.button !== 0) { return; }
-                    api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
+                    yomichan.api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
                     e.preventDefault();
                 }, false);
                 node.addEventListener('auxclick', (e) => {
                     if (e.button !== 1) { return; }
-                    api.commandExec(command, {mode: 'newTab'});
+                    yomichan.api.commandExec(command, {mode: 'newTab'});
                     e.preventDefault();
                 }, false);
             }
@@ -130,7 +129,7 @@ class DisplayController {
 
     _setupOptions({options}) {
         const extensionEnabled = options.general.enable;
-        const onToggleChanged = () => api.commandExec('toggleTextScanning');
+        const onToggleChanged = () => yomichan.api.commandExec('toggleTextScanning');
         for (const toggle of document.querySelectorAll('#enable-search,#enable-search2')) {
             toggle.checked = extensionEnabled;
             toggle.addEventListener('change', onToggleChanged, false);
@@ -178,7 +177,7 @@ class DisplayController {
     }
 
     async _setPrimaryProfileIndex(value) {
-        return await api.modifySettings(
+        return await yomichan.api.modifySettings(
             [{
                 action: 'set',
                 path: 'profileCurrent',
@@ -190,7 +189,7 @@ class DisplayController {
 
     async _updateDictionariesEnabledWarnings(options) {
         const noDictionariesEnabledWarnings = document.querySelectorAll('.no-dictionaries-enabled-warning');
-        const dictionaries = await api.getDictionaryInfo();
+        const dictionaries = await yomichan.api.getDictionaryInfo();
 
         let enabledCount = 0;
         for (const {title} of dictionaries) {
@@ -221,10 +220,9 @@ class DisplayController {
 }
 
 (async () => {
-    api.prepare();
     await yomichan.prepare();
 
-    api.logIndicatorClear();
+    yomichan.api.logIndicatorClear();
 
     const displayController = new DisplayController();
     displayController.prepare();

@@ -17,7 +17,6 @@
 
 /* global
  * KeyboardMouseInputField
- * api
  */
 
 class KeyboardShortcutController {
@@ -38,7 +37,7 @@ class KeyboardShortcutController {
     }
 
     async prepare() {
-        const {platform: {os}} = await api.getEnvironmentInfo();
+        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
         this._os = os;
 
         this._addButton = document.querySelector('#hotkey-list-add');

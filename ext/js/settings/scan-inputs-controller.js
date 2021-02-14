@@ -17,7 +17,6 @@
 
 /* global
  * KeyboardMouseInputField
- * api
  */
 
 class ScanInputsController {
@@ -31,7 +30,7 @@ class ScanInputsController {
     }
 
     async prepare() {
-        const {platform: {os}} = await api.getEnvironmentInfo();
+        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
         this._os = os;
 
         this._container = document.querySelector('#scan-input-list');

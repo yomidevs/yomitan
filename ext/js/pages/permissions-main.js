@@ -19,12 +19,11 @@
  * DocumentFocusController
  * PermissionsToggleController
  * SettingsController
- * api
  */
 
 async function setupEnvironmentInfo() {
     const {manifest_version: manifestVersion} = chrome.runtime.getManifest();
-    const {browser, platform} = await api.getEnvironmentInfo();
+    const {browser, platform} = await yomichan.api.getEnvironmentInfo();
     document.documentElement.dataset.browser = browser;
     document.documentElement.dataset.os = platform.os;
     document.documentElement.dataset.manifestVersion = `${manifestVersion}`;
@@ -69,7 +68,6 @@ function setupPermissionsToggles() {
             node.textContent = chrome.runtime.getURL('/');
         }
 
-        api.prepare();
         await yomichan.prepare();
 
         setupEnvironmentInfo();

@@ -31,7 +31,6 @@
  * QueryParser
  * ScrollElement
  * TextScanner
- * api
  * dynamicLoader
  */
 
@@ -206,7 +205,7 @@ class Display extends EventDispatcher {
     async prepare() {
         // State setup
         const {documentElement} = document;
-        const {browser} = await api.getEnvironmentInfo();
+        const {browser} = await yomichan.api.getEnvironmentInfo();
         this._browser = browser;
 
         // Prepare
@@ -221,7 +220,7 @@ class Display extends EventDispatcher {
         this._queryParser.on('searched', this._onQueryParserSearch.bind(this));
         this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
         yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
-        api.crossFrame.registerHandlers([
+        yomichan.crossFrame.registerHandlers([
             ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
@@ -290,7 +289,7 @@ class Display extends EventDispatcher {
     }
 
     async updateOptions() {
-        const options = await api.optionsGet(this.getOptionsContext());
+        const options = await yomichan.api.optionsGet(this.getOptionsContext());
         const templates = await this._getAnkiFieldTemplates(options);
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
@@ -674,7 +673,7 @@ class Display extends EventDispatcher {
             if (typeof documentTitle !== 'string') { documentTitle = document.title; }
             const optionsContext = this.getOptionsContext();
             const query = e.currentTarget.textContent;
-            const definitions = await api.kanjiFind(query, optionsContext);
+            const definitions = await yomichan.api.kanjiFind(query, optionsContext);
             const details = {
                 focus: false,
                 history: true,
@@ -707,7 +706,7 @@ class Display extends EventDispatcher {
     _onNoteView(e) {
         e.preventDefault();
         const link = e.currentTarget;
-        api.noteView(link.dataset.noteId);
+        yomichan.api.noteView(link.dataset.noteId);
     }
 
     _onWheel(e) {
@@ -839,10 +838,10 @@ class Display extends EventDispatcher {
                 }
             }
 
-            const {definitions} = await api.termsFind(source, findDetails, optionsContext);
+            const {definitions} = await yomichan.api.termsFind(source, findDetails, optionsContext);
             return definitions;
         } else {
-            const definitions = await api.kanjiFind(source, optionsContext);
+            const definitions = await yomichan.api.kanjiFind(source, optionsContext);
             return definitions;
         }
     }
@@ -1059,7 +1058,7 @@ class Display extends EventDispatcher {
                     const noteContext = this._getNoteContext();
                     states = await this._areDefinitionsAddable(definitions, modes, noteContext);
                 } else {
-                    if (!await api.isAnkiConnected()) {
+                    if (!await yomichan.api.isAnkiConnected()) {
                         throw new Error('Anki not connected');
                     }
                     states = this._areDefinitionsAddableForcedValue(definitions, modes, true);
@@ -1183,7 +1182,7 @@ class Display extends EventDispatcher {
     _tryViewAnkiNoteForSelectedDefinition() {
         const button = this._viewerButtonFind(this._index);
         if (button !== null && !button.disabled) {
-            api.noteView(button.dataset.noteId);
+            yomichan.api.noteView(button.dataset.noteId);
         }
     }
 
@@ -1206,7 +1205,7 @@ class Display extends EventDispatcher {
             let noteId = null;
             let addNoteOkay = false;
             try {
-                noteId = await api.addAnkiNote(note);
+                noteId = await yomichan.api.addAnkiNote(note);
                 addNoteOkay = true;
             } catch (e) {
                 errors.length = 0;
@@ -1219,7 +1218,7 @@ class Display extends EventDispatcher {
                 } else {
                     if (suspendNewCards) {
                         try {
-                            await api.suspendAnkiCardsForNote(noteId);
+                            await yomichan.api.suspendAnkiCardsForNote(noteId);
                         } catch (e) {
                             errors.push(e);
                         }
@@ -1400,7 +1399,7 @@ class Display extends EventDispatcher {
         templates = this._ankiFieldTemplatesDefault;
         if (typeof templates === 'string') { return templates; }
 
-        templates = await api.getDefaultAnkiFieldTemplates();
+        templates = await yomichan.api.getDefaultAnkiFieldTemplates();
         this._ankiFieldTemplatesDefault = templates;
         return templates;
     }
@@ -1416,7 +1415,7 @@ class Display extends EventDispatcher {
         }
         const notes = await Promise.all(notePromises);
 
-        const infos = await api.getAnkiNoteInfo(notes);
+        const infos = await yomichan.api.getAnkiNoteInfo(notes);
         const results = [];
         for (let i = 0, ii = infos.length; i < ii; i += modeCount) {
             results.push(infos.slice(i, i + modeCount));
@@ -1494,7 +1493,7 @@ class Display extends EventDispatcher {
             image: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-image'),
             text: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-text')
         };
-        return await api.injectAnkiNoteMedia(
+        return await yomichan.api.injectAnkiNoteMedia(
             timestamp,
             definitionDetails,
             audioDetails,
@@ -1605,7 +1604,7 @@ class Display extends EventDispatcher {
         if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
             throw new Error('Content origin is same page');
         }
-        return await api.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
+        return await yomichan.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
     }
 
     _copyHostSelection() {

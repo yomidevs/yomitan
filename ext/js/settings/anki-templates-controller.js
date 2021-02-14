@@ -17,7 +17,6 @@
 
 /* global
  * AnkiNoteBuilder
- * api
  */
 
 class AnkiTemplatesController {
@@ -37,7 +36,7 @@ class AnkiTemplatesController {
     }
 
     async prepare() {
-        this._defaultFieldTemplates = await api.getDefaultAnkiFieldTemplates();
+        this._defaultFieldTemplates = await yomichan.api.getDefaultAnkiFieldTemplates();
 
         this._fieldTemplatesTextarea = document.querySelector('#anki-card-templates-textarea');
         this._compileResultInfo = document.querySelector('#anki-card-templates-compile-result');
@@ -154,7 +153,7 @@ class AnkiTemplatesController {
 
     async _getDefinition(text, optionsContext) {
         if (this._cachedDefinitionText !== text) {
-            const {definitions} = await api.termsFind(text, {}, optionsContext);
+            const {definitions} = await yomichan.api.termsFind(text, {}, optionsContext);
             if (definitions.length === 0) { return null; }
 
             this._cachedDefinitionValue = definitions[0];

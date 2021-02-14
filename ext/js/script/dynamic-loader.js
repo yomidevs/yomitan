@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * api
- */
-
 const dynamicLoader = (() => {
     const injectedStylesheets = new Map();
     const injectedStylesheetsWithParent = new WeakMap();
@@ -61,7 +57,7 @@ const dynamicLoader = (() => {
         }
 
         if (type === 'file-content') {
-            value = await api.getStylesheetContent(value);
+            value = await yomichan.api.getStylesheetContent(value);
             type = 'code';
             useWebExtensionApi = false;
         }
@@ -73,7 +69,7 @@ const dynamicLoader = (() => {
             }
 
             setInjectedStylesheet(id, parentNode, null);
-            await api.injectStylesheet(type, value);
+            await yomichan.api.injectStylesheet(type, value);
             return null;
         }
 

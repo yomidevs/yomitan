@@ -17,7 +17,6 @@
 
 /* global
  * DocumentUtil
- * api
  */
 
 class TextScanner extends EventDispatcher {
@@ -762,7 +761,7 @@ class TextScanner extends EventDispatcher {
         const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
-        const {definitions, length} = await api.termsFind(searchText, {}, optionsContext);
+        const {definitions, length} = await yomichan.api.termsFind(searchText, {}, optionsContext);
         if (definitions.length === 0) { return null; }
 
         textSource.setEndOffset(length, layoutAwareScan);
@@ -787,7 +786,7 @@ class TextScanner extends EventDispatcher {
         const searchText = this.getTextSourceContent(textSource, 1, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
-        const definitions = await api.kanjiFind(searchText, optionsContext);
+        const definitions = await yomichan.api.kanjiFind(searchText, optionsContext);
         if (definitions.length === 0) { return null; }
 
         textSource.setEndOffset(1, layoutAwareScan);

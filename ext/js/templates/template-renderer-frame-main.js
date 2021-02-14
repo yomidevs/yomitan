@@ -28,6 +28,6 @@
     templateRenderer.registerDataType('ankiNote', {
         modifier: ({data, marker}) => new AnkiNoteData(data, marker).createPublic()
     });
-    const api = new TemplateRendererFrameApi(templateRenderer);
-    api.prepare();
+    const templateRendererFrameApi = new TemplateRendererFrameApi(templateRenderer);
+    templateRendererFrameApi.prepare();
 })();

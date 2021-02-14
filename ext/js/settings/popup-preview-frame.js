@@ -18,7 +18,6 @@
 /* global
  * Frontend
  * TextSourceRange
- * api
  * wanakana
  */
 
@@ -63,8 +62,8 @@ class PopupPreviewFrame {
         this._exampleTextInput.addEventListener('input', this._onExampleTextInputInput.bind(this), false);
 
         // Overwrite API functions
-        this._apiOptionsGetOld = api.optionsGet.bind(api);
-        api.optionsGet = this._apiOptionsGet.bind(this);
+        this._apiOptionsGetOld = yomichan.api.optionsGet.bind(yomichan.api);
+        yomichan.api.optionsGet = this._apiOptionsGet.bind(this);
 
         // Overwrite frontend
         this._frontend = new Frontend({

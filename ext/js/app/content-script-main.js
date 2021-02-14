@@ -19,15 +19,13 @@
  * Frontend
  * HotkeyHandler
  * PopupFactory
- * api
  */
 
 (async () => {
     try {
-        api.prepare();
         await yomichan.prepare();
 
-        const {tabId, frameId} = await api.frameInformationGet();
+        const {tabId, frameId} = await yomichan.api.frameInformationGet();
         if (typeof frameId !== 'number') {
             throw new Error('Failed to get frameId');
         }

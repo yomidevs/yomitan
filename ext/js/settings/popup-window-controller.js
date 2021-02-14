@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * api
- */
-
 class PopupWindowController {
     prepare() {
         const testLink = document.querySelector('#test-window-open-link');
@@ -33,6 +29,6 @@ class PopupWindowController {
     }
 
     async _testWindowOpen() {
-        await api.getOrCreateSearchPopup({focus: true});
+        await yomichan.api.getOrCreateSearchPopup({focus: true});
     }
 }

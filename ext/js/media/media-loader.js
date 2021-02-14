@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * api
- */
-
 class MediaLoader {
     constructor() {
         this._token = {};
@@ -84,7 +80,7 @@ class MediaLoader {
 
     async _getMediaData(path, dictionaryName, cachedData) {
         const token = this._token;
-        const data = (await api.getMedia([{path, dictionaryName}]))[0];
+        const data = (await yomichan.api.getMedia([{path, dictionaryName}]))[0];
         if (token === this._token && data !== null) {
             const contentArrayBuffer = this._base64ToArrayBuffer(data.content);
             const blob = new Blob([contentArrayBuffer], {type: data.mediaType});

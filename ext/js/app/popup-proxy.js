@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * api
- */
-
 class PopupProxy extends EventDispatcher {
     constructor({
         id,
@@ -158,7 +154,7 @@ class PopupProxy extends EventDispatcher {
     // Private
 
     _invoke(action, params={}) {
-        return api.crossFrame.invoke(this._frameId, action, params);
+        return yomichan.crossFrame.invoke(this._frameId, action, params);
     }
 
     async _invokeSafe(action, params={}, defaultReturnValue) {

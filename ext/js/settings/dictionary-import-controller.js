@@ -19,7 +19,6 @@
  * DictionaryDatabase
  * DictionaryImporter
  * ObjectPropertyAccessor
- * api
  */
 
 class DictionaryImportController {
@@ -102,7 +101,7 @@ class DictionaryImportController {
             this._setSpinnerVisible(true);
             if (purgeNotification !== null) { purgeNotification.hidden = false; }
 
-            await api.purgeDatabase();
+            await yomichan.api.purgeDatabase();
             const errors = await this._clearDictionarySettings();
 
             if (errors.length > 0) {
@@ -197,7 +196,7 @@ class DictionaryImportController {
             const dictionaryImporter = new DictionaryImporter();
             const archiveContent = await this._readFile(file);
             const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, importDetails, onProgress);
-            api.triggerDatabaseUpdated('dictionary', 'import');
+            yomichan.api.triggerDatabaseUpdated('dictionary', 'import');
             const errors2 = await this._addDictionarySettings(result.sequenced, result.title);
 
             if (errors.length > 0) {

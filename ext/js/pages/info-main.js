@@ -19,7 +19,6 @@
  * BackupController
  * DocumentFocusController
  * SettingsController
- * api
  */
 
 function getBrowserDisplayName(browser) {
@@ -54,12 +53,11 @@ function getOperatingSystemDisplayName(os) {
         const manifest = chrome.runtime.getManifest();
         const language = chrome.i18n.getUILanguage();
 
-        api.prepare();
         await yomichan.prepare();
 
         const {userAgent} = navigator;
         const {name, version} = manifest;
-        const {browser, platform: {os}} = await api.getEnvironmentInfo();
+        const {browser, platform: {os}} = await yomichan.api.getEnvironmentInfo();
 
         const thisVersionLink = document.querySelector('#release-notes-this-version-link');
         thisVersionLink.href = thisVersionLink.dataset.hrefFormat.replace(/\{version\}/g, version);
@@ -73,7 +71,7 @@ function getOperatingSystemDisplayName(os) {
         (async () => {
             let ankiConnectVersion = null;
             try {
-                ankiConnectVersion = await api.getAnkiConnectVersion();
+                ankiConnectVersion = await yomichan.api.getAnkiConnectVersion();
             } catch (e) {
                 // NOP
             }
@@ -86,7 +84,7 @@ function getOperatingSystemDisplayName(os) {
         (async () => {
             let dictionaryInfos;
             try {
-                dictionaryInfos = await api.getDictionaryInfo();
+                dictionaryInfos = await yomichan.api.getDictionaryInfo();
             } catch (e) {
                 return;
             }

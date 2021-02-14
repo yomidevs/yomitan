@@ -20,7 +20,6 @@
  * TextScanner
  * TextSourceElement
  * TextSourceRange
- * api
  */
 
 class Frontend {
@@ -99,7 +98,7 @@ class Frontend {
     async prepare() {
         await this.updateOptions();
         try {
-            const {zoomFactor} = await api.getZoom();
+            const {zoomFactor} = await yomichan.api.getZoom();
             this._pageZoomFactor = zoomFactor;
         } catch (e) {
             // Ignore exceptions which may occur due to being on an unsupported page (e.g. about:blank)
@@ -124,7 +123,7 @@ class Frontend {
         this._textScanner.on('clearSelection', this._onClearSelection.bind(this));
         this._textScanner.on('searched', this._onSearched.bind(this));
 
-        api.crossFrame.registerHandlers([
+        yomichan.crossFrame.registerHandlers([
             ['closePopup',              {async: false, handler: this._onApiClosePopup.bind(this)}],
             ['copySelection',           {async: false, handler: this._onApiCopySelection.bind(this)}],
             ['getSelectionText',        {async: false, handler: this._onApiGetSelectionText.bind(this)}],
@@ -332,7 +331,7 @@ class Frontend {
 
     async _updateOptionsInternal() {
         const optionsContext = await this._getOptionsContext();
-        const options = await api.optionsGet(optionsContext);
+        const options = await yomichan.api.optionsGet(optionsContext);
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
 
@@ -462,7 +461,7 @@ class Frontend {
             return await this._getDefaultPopup();
         }
 
-        const {popupId} = await api.crossFrame.invoke(targetFrameId, 'getPopupInfo');
+        const {popupId} = await yomichan.crossFrame.invoke(targetFrameId, 'getPopupInfo');
         if (popupId === null) {
             return null;
         }
@@ -608,9 +607,9 @@ class Frontend {
     _signalFrontendReady(targetFrameId=null) {
         const params = {frameId: this._frameId};
         if (targetFrameId === null) {
-            api.broadcastTab('frontendReady', params);
+            yomichan.api.broadcastTab('frontendReady', params);
         } else {
-            api.sendMessageToFrame(targetFrameId, 'frontendReady', params);
+            yomichan.api.sendMessageToFrame(targetFrameId, 'frontendReady', params);
         }
     }
 
@@ -627,7 +626,7 @@ class Frontend {
             },
             10000
         );
-        api.broadcastTab('requestFrontendReadyBroadcast', {frameId: this._frameId});
+        yomichan.api.broadcastTab('requestFrontendReadyBroadcast', {frameId: this._frameId});
         await promise;
     }
 
@@ -653,7 +652,7 @@ class Frontend {
         let documentTitle = document.title;
         if (this._useProxyPopup) {
             try {
-                ({url, documentTitle} = await api.crossFrame.invoke(this._parentFrameId, 'getPageInfo', {}));
+                ({url, documentTitle} = await yomichan.crossFrame.invoke(this._parentFrameId, 'getPageInfo', {}));
             } catch (e) {
                 // NOP
             }

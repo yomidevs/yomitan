@@ -18,7 +18,6 @@
 /* global
  * DictionaryDataUtil
  * HtmlTemplateCollection
- * api
  */
 
 class DisplayGenerator {
@@ -31,7 +30,7 @@ class DisplayGenerator {
     }
 
     async prepare() {
-        const html = await api.getDisplayTemplatesHtml();
+        const html = await yomichan.api.getDisplayTemplatesHtml();
         this._templates = new HtmlTemplateCollection(html);
         this.updateHotkeys();
     }

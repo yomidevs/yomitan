@@ -20,7 +20,6 @@
  * Popup
  * PopupProxy
  * PopupWindow
- * api
  */
 
 class PopupFactory {
@@ -35,7 +34,7 @@ class PopupFactory {
 
     prepare() {
         this._frameOffsetForwarder.prepare();
-        api.crossFrame.registerHandlers([
+        yomichan.crossFrame.registerHandlers([
             ['getOrCreatePopup',     {async: true,  handler: this._onApiGetOrCreatePopup.bind(this)}],
             ['setOptionsContext',    {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
             ['hide',                 {async: false, handler: this._onApiHide.bind(this)}],
@@ -132,7 +131,7 @@ class PopupFactory {
                 throw new Error('Invalid frameId');
             }
             const useFrameOffsetForwarder = (parentPopupId === null);
-            ({id, depth, frameId} = await api.crossFrame.invoke(frameId, 'getOrCreatePopup', {
+            ({id, depth, frameId} = await yomichan.crossFrame.invoke(frameId, 'getOrCreatePopup', {
                 id,
                 parentPopupId,
                 frameId,

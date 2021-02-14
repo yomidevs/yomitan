@@ -18,7 +18,6 @@
 /* global
  * DictionaryDatabase
  * ObjectPropertyAccessor
- * api
  */
 
 class DictionaryEntry {
@@ -362,7 +361,7 @@ class DictionaryController {
 
             const token = this._databaseStateToken;
             const dictionaryTitles = this._dictionaries.map(({title}) => title);
-            const {counts, total} = await api.getDictionaryCounts(dictionaryTitles, true);
+            const {counts, total} = await yomichan.api.getDictionaryCounts(dictionaryTitles, true);
             if (this._databaseStateToken !== token) { return; }
 
             for (let i = 0, ii = Math.min(counts.length, this._dictionaryEntries.length); i < ii; ++i) {
@@ -499,7 +498,7 @@ class DictionaryController {
         const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
         try {
             await dictionaryDatabase.deleteDictionary(dictionaryTitle, {rate: 1000}, onProgress);
-            api.triggerDatabaseUpdated('dictionary', 'delete');
+            yomichan.api.triggerDatabaseUpdated('dictionary', 'delete');
         } finally {
             dictionaryDatabase.close();
         }

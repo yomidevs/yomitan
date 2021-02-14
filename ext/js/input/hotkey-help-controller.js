@@ -17,7 +17,6 @@
 
 /* global
  * HotkeyUtil
- * api
  */
 
 class HotkeyHelpController {
@@ -29,7 +28,7 @@ class HotkeyHelpController {
     }
 
     async prepare() {
-        const {platform: {os}} = await api.getEnvironmentInfo();
+        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
         this._hotkeyUtil.os = os;
         await this._setupGlobalCommands(this._globalActionHotkeys);
     }

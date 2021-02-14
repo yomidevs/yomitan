@@ -18,7 +18,6 @@
 /* global
  * HotkeyUtil
  * ScanInputsController
- * api
  */
 
 class ScanInputsSimpleController {
@@ -34,7 +33,7 @@ class ScanInputsSimpleController {
         this._middleMouseButtonScan = document.querySelector('#middle-mouse-button-scan');
         this._mainScanModifierKeyInput = document.querySelector('#main-scan-modifier-key');
 
-        const {platform: {os}} = await api.getEnvironmentInfo();
+        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
         this._hotkeyUtil.os = os;
 
         this._mainScanModifierKeyInputHasOther = false;

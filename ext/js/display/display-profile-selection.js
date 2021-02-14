@@ -17,7 +17,6 @@
 
 /* global
  * PanelElement
- * api
  */
 
 class DisplayProfileSelection {
@@ -67,7 +66,7 @@ class DisplayProfileSelection {
 
     async _updateProfileList() {
         this._profileListNeedsUpdate = false;
-        const options = await api.optionsGetFull();
+        const options = await yomichan.api.optionsGetFull();
 
         this._eventListeners.removeAllEventListeners();
         const displayGenerator = this._display.displayGenerator;
@@ -95,7 +94,7 @@ class DisplayProfileSelection {
     }
 
     async _setProfileCurrent(index) {
-        await api.modifySettings([{
+        await yomichan.api.modifySettings([{
             action: 'set',
             path: 'profileCurrent',
             value: index,

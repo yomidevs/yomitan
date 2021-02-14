@@ -18,7 +18,6 @@
 /* global
  * HotkeyUtil
  * KeyboardMouseInputField
- * api
  */
 
 class ExtensionKeyboardShortcutController {
@@ -53,7 +52,7 @@ class ExtensionKeyboardShortcutController {
             this._clearButton.addEventListener('click', this._onClearClick.bind(this));
         }
 
-        const {platform: {os}} = await api.getEnvironmentInfo();
+        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
         this._os = os;
         this._hotkeyUtil.os = os;
 

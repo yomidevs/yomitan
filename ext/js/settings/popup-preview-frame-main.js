@@ -19,15 +19,13 @@
  * HotkeyHandler
  * PopupFactory
  * PopupPreviewFrame
- * api
  */
 
 (async () => {
     try {
-        api.prepare();
         await yomichan.prepare();
 
-        const {tabId, frameId} = await api.frameInformationGet();
+        const {tabId, frameId} = await yomichan.api.frameInformationGet();
 
         const hotkeyHandler = new HotkeyHandler();
         hotkeyHandler.prepare();

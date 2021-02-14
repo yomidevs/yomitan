@@ -17,7 +17,6 @@
 
 /* global
  * ClipboardMonitor
- * api
  * wanakana
  */
 
@@ -40,7 +39,7 @@ class SearchDisplayController {
         this._clipboardMonitor = new ClipboardMonitor({
             japaneseUtil,
             clipboardReader: {
-                getText: async () => (await api.clipboardGet())
+                getText: async () => (await yomichan.api.clipboardGet())
             }
         });
         this._messageHandlers = new Map();
@@ -201,7 +200,7 @@ class SearchDisplayController {
     _onWanakanaEnableChange(e) {
         const value = e.target.checked;
         this._setWanakanaEnabled(value);
-        api.modifySettings([{
+        yomichan.api.modifySettings([{
             action: 'set',
             path: 'general.enableWanakana',
             value,
@@ -301,7 +300,7 @@ class SearchDisplayController {
 
         if (!modify) { return; }
 
-        await api.modifySettings([{
+        await yomichan.api.modifySettings([{
             action: 'set',
             path: 'clipboard.enableSearchPageMonitor',
             value,

@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * api
- */
-
 class MecabController {
     constructor(settingsController) {
         this._settingsController = settingsController;
@@ -49,7 +45,7 @@ class MecabController {
             this._testButton.disabled = true;
             this._resultsContainer.textContent = '';
             this._resultsContainer.hidden = true;
-            await api.testMecab();
+            await yomichan.api.testMecab();
             this._setStatus('Connection was successful', false);
         } catch (e) {
             this._setStatus(e.message, true);

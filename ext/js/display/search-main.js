@@ -21,7 +21,6 @@
  * HotkeyHandler
  * JapaneseUtil
  * SearchDisplayController
- * api
  * wanakana
  */
 
@@ -30,10 +29,9 @@
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 
-        api.prepare();
         await yomichan.prepare();
 
-        const {tabId, frameId} = await api.frameInformationGet();
+        const {tabId, frameId} = await yomichan.api.frameInformationGet();
 
         const japaneseUtil = new JapaneseUtil(wanakana);
 

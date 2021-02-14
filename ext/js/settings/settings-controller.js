@@ -19,7 +19,6 @@
  * HtmlTemplateCollection
  * OptionsUtil
  * PermissionsUtil
- * api
  */
 
 class SettingsController extends EventDispatcher {
@@ -62,16 +61,16 @@ class SettingsController extends EventDispatcher {
 
     async getOptions() {
         const optionsContext = this.getOptionsContext();
-        return await api.optionsGet(optionsContext);
+        return await yomichan.api.optionsGet(optionsContext);
     }
 
     async getOptionsFull() {
-        return await api.optionsGetFull();
+        return await yomichan.api.optionsGetFull();
     }
 
     async setAllSettings(value) {
         const profileIndex = value.profileCurrent;
-        await api.setAllSettings(value, this._source);
+        await yomichan.api.setAllSettings(value, this._source);
         this._setProfileIndex(profileIndex);
     }
 
@@ -108,7 +107,7 @@ class SettingsController extends EventDispatcher {
     }
 
     async getDictionaryInfo() {
-        return await api.getDictionaryInfo();
+        return await yomichan.api.getDictionaryInfo();
     }
 
     getOptionsContext() {
@@ -171,12 +170,12 @@ class SettingsController extends EventDispatcher {
 
     async _getSettings(targets, extraFields) {
         targets = this._setupTargets(targets, extraFields);
-        return await api.getSettings(targets);
+        return await yomichan.api.getSettings(targets);
     }
 
     async _modifySettings(targets, extraFields) {
         targets = this._setupTargets(targets, extraFields);
-        return await api.modifySettings(targets, this._source);
+        return await yomichan.api.modifySettings(targets, this._source);
     }
 
     _onBeforeUnload(e) {

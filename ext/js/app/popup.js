@@ -18,7 +18,6 @@
 /* global
  * DocumentUtil
  * FrameClient
- * api
  * dynamicLoader
  */
 
@@ -460,7 +459,7 @@ class Popup extends EventDispatcher {
         if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
 
         const message = this._frameClient.createMessage({action, params});
-        return await api.crossFrame.invoke(this._frameClient.frameId, 'popupMessage', message);
+        return await yomichan.crossFrame.invoke(this._frameClient.frameId, 'popupMessage', message);
     }
 
     async _invokeSafe(action, params={}, defaultReturnValue) {
@@ -676,7 +675,7 @@ class Popup extends EventDispatcher {
 
     async _setOptionsContext(optionsContext) {
         this._optionsContext = optionsContext;
-        this._options = await api.optionsGet(optionsContext);
+        this._options = await yomichan.api.optionsGet(optionsContext);
         this.updateTheme();
     }
 

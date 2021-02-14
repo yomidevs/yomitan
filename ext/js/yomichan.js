@@ -15,6 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * API
+ * CrossFrameAPI
+ */
+
 // Set up chrome alias if it's not available (Edge Legacy)
 if ((() => {
     let hasChrome = false;
@@ -34,271 +39,300 @@ if ((() => {
     chrome = browser;
 }
 
-const yomichan = (() => {
-    class Yomichan extends EventDispatcher {
-        constructor() {
-            super();
+class Yomichan extends EventDispatcher {
+    constructor() {
+        super();
 
-            this._extensionName = 'Yomichan';
-            try {
-                const manifest = chrome.runtime.getManifest();
-                this._extensionName = `${manifest.name} v${manifest.version}`;
-            } catch (e) {
-                // NOP
-            }
-
-            this._isExtensionUnloaded = false;
-            this._isTriggeringExtensionUnloaded = false;
-            this._isReady = false;
-
-            const {promise, resolve} = deferPromise();
-            this._isBackendReadyPromise = promise;
-            this._isBackendReadyPromiseResolve = resolve;
-
-            this._messageHandlers = new Map([
-                ['isReady',         {async: false, handler: this._onMessageIsReady.bind(this)}],
-                ['backendReady',    {async: false, handler: this._onMessageBackendReady.bind(this)}],
-                ['getUrl',          {async: false, handler: this._onMessageGetUrl.bind(this)}],
-                ['optionsUpdated',  {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
-                ['databaseUpdated', {async: false, handler: this._onMessageDatabaseUpdated.bind(this)}],
-                ['zoomChanged',     {async: false, handler: this._onMessageZoomChanged.bind(this)}]
-            ]);
+        this._extensionName = 'Yomichan';
+        try {
+            const manifest = chrome.runtime.getManifest();
+            this._extensionName = `${manifest.name} v${manifest.version}`;
+        } catch (e) {
+            // NOP
         }
 
-        // Public
+        this._isBackground = null;
+        this._api = null;
+        this._crossFrame = null;
+        this._isExtensionUnloaded = false;
+        this._isTriggeringExtensionUnloaded = false;
+        this._isReady = false;
 
-        get isExtensionUnloaded() {
-            return this._isExtensionUnloaded;
-        }
+        const {promise, resolve} = deferPromise();
+        this._isBackendReadyPromise = promise;
+        this._isBackendReadyPromiseResolve = resolve;
 
-        async prepare(isBackground=false) {
-            chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
+        this._messageHandlers = new Map([
+            ['isReady',         {async: false, handler: this._onMessageIsReady.bind(this)}],
+            ['backendReady',    {async: false, handler: this._onMessageBackendReady.bind(this)}],
+            ['getUrl',          {async: false, handler: this._onMessageGetUrl.bind(this)}],
+            ['optionsUpdated',  {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
+            ['databaseUpdated', {async: false, handler: this._onMessageDatabaseUpdated.bind(this)}],
+            ['zoomChanged',     {async: false, handler: this._onMessageZoomChanged.bind(this)}]
+        ]);
+    }
 
-            if (!isBackground) {
-                this.sendMessage({action: 'requestBackendReadySignal'});
-                await this._isBackendReadyPromise;
-            }
-        }
+    // Public
 
-        ready() {
-            this._isReady = true;
-            this.sendMessage({action: 'yomichanReady'});
-        }
+    get isBackground() {
+        return this._isBackground;
+    }
 
-        isExtensionUrl(url) {
-            try {
-                return url.startsWith(chrome.runtime.getURL('/'));
-            } catch (e) {
-                return false;
-            }
-        }
+    get isExtensionUnloaded() {
+        return this._isExtensionUnloaded;
+    }
 
-        getTemporaryListenerResult(eventHandler, userCallback, timeout=null) {
-            if (!(
-                typeof eventHandler.addListener === 'function' &&
-                typeof eventHandler.removeListener === 'function'
-            )) {
-                throw new Error('Event handler type not supported');
-            }
+    get api() {
+        return this._api;
+    }
 
-            return new Promise((resolve, reject) => {
-                const runtimeMessageCallback = ({action, params}, sender, sendResponse) => {
-                    let timeoutId = null;
-                    if (timeout !== null) {
-                        timeoutId = setTimeout(() => {
-                            timeoutId = null;
-                            eventHandler.removeListener(runtimeMessageCallback);
-                            reject(new Error(`Listener timed out in ${timeout} ms`));
-                        }, timeout);
-                    }
+    get crossFrame() {
+        return this._crossFrame;
+    }
 
-                    const cleanupResolve = (value) => {
-                        if (timeoutId !== null) {
-                            clearTimeout(timeoutId);
-                            timeoutId = null;
-                        }
-                        eventHandler.removeListener(runtimeMessageCallback);
-                        sendResponse();
-                        resolve(value);
-                    };
+    async prepare(isBackground=false) {
+        this._isBackground = isBackground;
+        chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
 
-                    userCallback({action, params}, {resolve: cleanupResolve, sender});
-                };
+        if (!isBackground) {
+            this._api = new API(this);
 
-                eventHandler.addListener(runtimeMessageCallback);
-            });
-        }
+            this._crossFrame = new CrossFrameAPI();
+            this._crossFrame.prepare();
 
-        logWarning(error) {
-            this.log(error, 'warn');
-        }
+            this.sendMessage({action: 'requestBackendReadySignal'});
+            await this._isBackendReadyPromise;
 
-        logError(error) {
-            this.log(error, 'error');
-        }
-
-        log(error, level, context=null) {
-            if (!isObject(context)) {
-                context = this._getLogContext();
-            }
-
-            let errorString;
-            try {
-                errorString = error.toString();
-                if (/^\[object \w+\]$/.test(errorString)) {
-                    errorString = JSON.stringify(error);
-                }
-            } catch (e) {
-                errorString = `${error}`;
-            }
-
-            let errorStack;
-            try {
-                errorStack = (typeof error.stack === 'string' ? error.stack.trimRight() : '');
-            } catch (e) {
-                errorStack = '';
-            }
-
-            let errorData;
-            try {
-                errorData = error.data;
-            } catch (e) {
-                // NOP
-            }
-
-            if (errorStack.startsWith(errorString)) {
-                errorString = errorStack;
-            } else if (errorStack.length > 0) {
-                errorString += `\n${errorStack}`;
-            }
-
-            let message = `${this._extensionName} has encountered a problem.`;
-            message += `\nOriginating URL: ${context.url}\n`;
-            message += errorString;
-            if (typeof errorData !== 'undefined') {
-                message += `\nData: ${JSON.stringify(errorData, null, 4)}`;
-            }
-            message += '\n\nIssues can be reported at https://github.com/FooSoft/yomichan/issues';
-
-            switch (level) {
-                case 'info': console.info(message); break;
-                case 'debug': console.debug(message); break;
-                case 'warn': console.warn(message); break;
-                case 'error': console.error(message); break;
-                default: console.log(message); break;
-            }
-
-            this.trigger('log', {error, level, context});
-        }
-
-        sendMessage(...args) {
-            try {
-                return chrome.runtime.sendMessage(...args);
-            } catch (e) {
-                this.triggerExtensionUnloaded();
-                throw e;
-            }
-        }
-
-        connect(...args) {
-            try {
-                return chrome.runtime.connect(...args);
-            } catch (e) {
-                this.triggerExtensionUnloaded();
-                throw e;
-            }
-        }
-
-        getMessageResponseResult(response) {
-            let error = chrome.runtime.lastError;
-            if (error) {
-                throw new Error(error.message);
-            }
-            if (!isObject(response)) {
-                throw new Error('Tab did not respond');
-            }
-            error = response.error;
-            if (error) {
-                throw deserializeError(error);
-            }
-            return response.result;
-        }
-
-        invokeMessageHandler({handler, async}, params, callback, ...extraArgs) {
-            try {
-                let promiseOrResult = handler(params, ...extraArgs);
-                if (async === 'dynamic') {
-                    ({async, result: promiseOrResult} = promiseOrResult);
-                }
-                if (async) {
-                    promiseOrResult.then(
-                        (result) => { callback({result}); },
-                        (error) => { callback({error: serializeError(error)}); }
-                    );
-                    return true;
-                } else {
-                    callback({result: promiseOrResult});
-                    return false;
-                }
-            } catch (error) {
-                callback({error: serializeError(error)});
-                return false;
-            }
-        }
-
-        triggerExtensionUnloaded() {
-            this._isExtensionUnloaded = true;
-            if (this._isTriggeringExtensionUnloaded) { return; }
-            try {
-                this._isTriggeringExtensionUnloaded = true;
-                this.trigger('extensionUnloaded');
-            } finally {
-                this._isTriggeringExtensionUnloaded = false;
-            }
-        }
-
-        // Private
-
-        _getUrl() {
-            return location.href;
-        }
-
-        _getLogContext() {
-            return {url: this._getUrl()};
-        }
-
-        _onMessage({action, params}, sender, callback) {
-            const messageHandler = this._messageHandlers.get(action);
-            if (typeof messageHandler === 'undefined') { return false; }
-            return this.invokeMessageHandler(messageHandler, params, callback, sender);
-        }
-
-        _onMessageIsReady() {
-            return this._isReady;
-        }
-
-        _onMessageBackendReady() {
-            if (this._isBackendReadyPromiseResolve === null) { return; }
-            this._isBackendReadyPromiseResolve();
-            this._isBackendReadyPromiseResolve = null;
-        }
-
-        _onMessageGetUrl() {
-            return {url: this._getUrl()};
-        }
-
-        _onMessageOptionsUpdated({source}) {
-            this.trigger('optionsUpdated', {source});
-        }
-
-        _onMessageDatabaseUpdated({type, cause}) {
-            this.trigger('databaseUpdated', {type, cause});
-        }
-
-        _onMessageZoomChanged({oldZoomFactor, newZoomFactor}) {
-            this.trigger('zoomChanged', {oldZoomFactor, newZoomFactor});
+            this.on('log', this._onForwardLog.bind(this));
         }
     }
 
-    return new Yomichan();
-})();
+    ready() {
+        this._isReady = true;
+        this.sendMessage({action: 'yomichanReady'});
+    }
+
+    isExtensionUrl(url) {
+        try {
+            return url.startsWith(chrome.runtime.getURL('/'));
+        } catch (e) {
+            return false;
+        }
+    }
+
+    getTemporaryListenerResult(eventHandler, userCallback, timeout=null) {
+        if (!(
+            typeof eventHandler.addListener === 'function' &&
+            typeof eventHandler.removeListener === 'function'
+        )) {
+            throw new Error('Event handler type not supported');
+        }
+
+        return new Promise((resolve, reject) => {
+            const runtimeMessageCallback = ({action, params}, sender, sendResponse) => {
+                let timeoutId = null;
+                if (timeout !== null) {
+                    timeoutId = setTimeout(() => {
+                        timeoutId = null;
+                        eventHandler.removeListener(runtimeMessageCallback);
+                        reject(new Error(`Listener timed out in ${timeout} ms`));
+                    }, timeout);
+                }
+
+                const cleanupResolve = (value) => {
+                    if (timeoutId !== null) {
+                        clearTimeout(timeoutId);
+                        timeoutId = null;
+                    }
+                    eventHandler.removeListener(runtimeMessageCallback);
+                    sendResponse();
+                    resolve(value);
+                };
+
+                userCallback({action, params}, {resolve: cleanupResolve, sender});
+            };
+
+            eventHandler.addListener(runtimeMessageCallback);
+        });
+    }
+
+    logWarning(error) {
+        this.log(error, 'warn');
+    }
+
+    logError(error) {
+        this.log(error, 'error');
+    }
+
+    log(error, level, context=null) {
+        if (!isObject(context)) {
+            context = this._getLogContext();
+        }
+
+        let errorString;
+        try {
+            errorString = error.toString();
+            if (/^\[object \w+\]$/.test(errorString)) {
+                errorString = JSON.stringify(error);
+            }
+        } catch (e) {
+            errorString = `${error}`;
+        }
+
+        let errorStack;
+        try {
+            errorStack = (typeof error.stack === 'string' ? error.stack.trimRight() : '');
+        } catch (e) {
+            errorStack = '';
+        }
+
+        let errorData;
+        try {
+            errorData = error.data;
+        } catch (e) {
+            // NOP
+        }
+
+        if (errorStack.startsWith(errorString)) {
+            errorString = errorStack;
+        } else if (errorStack.length > 0) {
+            errorString += `\n${errorStack}`;
+        }
+
+        let message = `${this._extensionName} has encountered a problem.`;
+        message += `\nOriginating URL: ${context.url}\n`;
+        message += errorString;
+        if (typeof errorData !== 'undefined') {
+            message += `\nData: ${JSON.stringify(errorData, null, 4)}`;
+        }
+        message += '\n\nIssues can be reported at https://github.com/FooSoft/yomichan/issues';
+
+        switch (level) {
+            case 'info': console.info(message); break;
+            case 'debug': console.debug(message); break;
+            case 'warn': console.warn(message); break;
+            case 'error': console.error(message); break;
+            default: console.log(message); break;
+        }
+
+        this.trigger('log', {error, level, context});
+    }
+
+    sendMessage(...args) {
+        try {
+            return chrome.runtime.sendMessage(...args);
+        } catch (e) {
+            this.triggerExtensionUnloaded();
+            throw e;
+        }
+    }
+
+    connect(...args) {
+        try {
+            return chrome.runtime.connect(...args);
+        } catch (e) {
+            this.triggerExtensionUnloaded();
+            throw e;
+        }
+    }
+
+    getMessageResponseResult(response) {
+        let error = chrome.runtime.lastError;
+        if (error) {
+            throw new Error(error.message);
+        }
+        if (!isObject(response)) {
+            throw new Error('Tab did not respond');
+        }
+        error = response.error;
+        if (error) {
+            throw deserializeError(error);
+        }
+        return response.result;
+    }
+
+    invokeMessageHandler({handler, async}, params, callback, ...extraArgs) {
+        try {
+            let promiseOrResult = handler(params, ...extraArgs);
+            if (async === 'dynamic') {
+                ({async, result: promiseOrResult} = promiseOrResult);
+            }
+            if (async) {
+                promiseOrResult.then(
+                    (result) => { callback({result}); },
+                    (error) => { callback({error: serializeError(error)}); }
+                );
+                return true;
+            } else {
+                callback({result: promiseOrResult});
+                return false;
+            }
+        } catch (error) {
+            callback({error: serializeError(error)});
+            return false;
+        }
+    }
+
+    triggerExtensionUnloaded() {
+        this._isExtensionUnloaded = true;
+        if (this._isTriggeringExtensionUnloaded) { return; }
+        try {
+            this._isTriggeringExtensionUnloaded = true;
+            this.trigger('extensionUnloaded');
+        } finally {
+            this._isTriggeringExtensionUnloaded = false;
+        }
+    }
+
+    // Private
+
+    _getUrl() {
+        return location.href;
+    }
+
+    _getLogContext() {
+        return {url: this._getUrl()};
+    }
+
+    _onMessage({action, params}, sender, callback) {
+        const messageHandler = this._messageHandlers.get(action);
+        if (typeof messageHandler === 'undefined') { return false; }
+        return this.invokeMessageHandler(messageHandler, params, callback, sender);
+    }
+
+    _onMessageIsReady() {
+        return this._isReady;
+    }
+
+    _onMessageBackendReady() {
+        if (this._isBackendReadyPromiseResolve === null) { return; }
+        this._isBackendReadyPromiseResolve();
+        this._isBackendReadyPromiseResolve = null;
+    }
+
+    _onMessageGetUrl() {
+        return {url: this._getUrl()};
+    }
+
+    _onMessageOptionsUpdated({source}) {
+        this.trigger('optionsUpdated', {source});
+    }
+
+    _onMessageDatabaseUpdated({type, cause}) {
+        this.trigger('databaseUpdated', {type, cause});
+    }
+
+    _onMessageZoomChanged({oldZoomFactor, newZoomFactor}) {
+        this.trigger('zoomChanged', {oldZoomFactor, newZoomFactor});
+    }
+
+    async _onForwardLog({error, level, context}) {
+        try {
+            await this._api.log(serializeError(error), level, context);
+        } catch (e) {
+            // NOP
+        }
+    }
+}
+
+const yomichan = new Yomichan();

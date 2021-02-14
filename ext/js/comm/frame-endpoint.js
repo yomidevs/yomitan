@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * api
- */
-
 class FrameEndpoint {
     constructor() {
         this._secret = generateId(16);
@@ -32,7 +28,7 @@ class FrameEndpoint {
             this._eventListeners.addEventListener(window, 'message', this._onMessage.bind(this), false);
             this._eventListenersSetup = true;
         }
-        api.broadcastTab('frameEndpointReady', {secret: this._secret});
+        yomichan.api.broadcastTab('frameEndpointReady', {secret: this._secret});
     }
 
     authenticate(message) {
@@ -60,6 +56,6 @@ class FrameEndpoint {
         this._token = token;
 
         this._eventListeners.removeAllEventListeners();
-        api.sendMessageToFrame(hostFrameId, 'frameEndpointConnected', {secret, token});
+        yomichan.api.sendMessageToFrame(hostFrameId, 'frameEndpointConnected', {secret, token});
     }
 }

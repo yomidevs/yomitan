@@ -18,7 +18,6 @@
 /* global
  * DictionaryController
  * OptionsUtil
- * api
  */
 
 class BackupController {
@@ -85,8 +84,8 @@ class BackupController {
 
     async _getSettingsExportData(date) {
         const optionsFull = await this._settingsController.getOptionsFull();
-        const environment = await api.getEnvironmentInfo();
-        const fieldTemplatesDefault = await api.getDefaultAnkiFieldTemplates();
+        const environment = await yomichan.api.getEnvironmentInfo();
+        const fieldTemplatesDefault = await yomichan.api.getDefaultAnkiFieldTemplates();
         const permissions = await this._settingsController.permissionsUtil.getAllPermissions();
 
         // Format options

@@ -17,7 +17,6 @@
 
 /* global
  * DocumentUtil
- * api
  */
 
 /**
@@ -59,7 +58,7 @@ class HotkeyHandler extends EventDispatcher {
     prepare() {
         this._isPrepared = true;
         this._updateEventHandlers();
-        api.crossFrame.registerHandlers([
+        yomichan.crossFrame.registerHandlers([
             ['hotkeyHandler.forwardHotkey', {async: false, handler: this._onMessageForwardHotkey.bind(this)}]
         ]);
     }
@@ -259,7 +258,7 @@ class HotkeyHandler extends EventDispatcher {
         const frameId = this._forwardFrameId;
         if (frameId === null) { throw new Error('No forwarding target'); }
         try {
-            await api.crossFrame.invoke(frameId, 'hotkeyHandler.forwardHotkey', {key, modifiers});
+            await yomichan.crossFrame.invoke(frameId, 'hotkeyHandler.forwardHotkey', {key, modifiers});
         } catch (e) {
             // NOP
         }

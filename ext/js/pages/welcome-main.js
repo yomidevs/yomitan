@@ -25,12 +25,11 @@
  * SettingsController
  * SettingsDisplayController
  * StatusFooter
- * api
  */
 
 async function setupEnvironmentInfo() {
     const {manifest_version: manifestVersion} = chrome.runtime.getManifest();
-    const {browser, platform} = await api.getEnvironmentInfo();
+    const {browser, platform} = await yomichan.api.getEnvironmentInfo();
     document.documentElement.dataset.browser = browser;
     document.documentElement.dataset.os = platform.os;
     document.documentElement.dataset.manifestVersion = `${manifestVersion}`;
@@ -49,12 +48,11 @@ async function setupGenericSettingsController(genericSettingController) {
         const statusFooter = new StatusFooter(document.querySelector('.status-footer-container'));
         statusFooter.prepare();
 
-        api.prepare();
         await yomichan.prepare();
 
         setupEnvironmentInfo();
 
-        const optionsFull = await api.optionsGetFull();
+        const optionsFull = await yomichan.api.optionsGetFull();
 
         const preparePromises = [];
 
