@@ -84,8 +84,9 @@
         {
             "files": [
                 "ext/js/core.js",
-                "ext/js/templates/template-renderer.js",
-                "ext/js/language/dictionary-data-util.js"
+                "ext/js/data/anki-note-data.js",
+                "ext/js/language/dictionary-data-util.js",
+                "ext/js/templates/template-renderer.js"
             ],
             "env": {
                 "webextensions": false
@@ -95,9 +96,9 @@
             "files": ["ext/**/*.js"],
             "excludedFiles": [
                 "ext/js/core.js",
-                "ext/js/templates/template-renderer.js",
                 "ext/js/data/anki-note-data.js",
-                "ext/js/language/dictionary-data-util.js"
+                "ext/js/language/dictionary-data-util.js",
+                "ext/js/templates/template-renderer.js"
             ],
             "globals": {
                 "serializeError": "readonly",
@@ -123,7 +124,10 @@
             "files": ["ext/**/*.js"],
             "excludedFiles": [
                 "ext/js/core.js",
-                "ext/js/yomichan.js"
+                "ext/js/yomichan.js",
+                "ext/js/data/anki-note-data.js",
+                "ext/js/language/dictionary-data-util.js",
+                "ext/js/templates/template-renderer.js"
             ],
             "globals": {
                 "yomichan": "readonly"
