@@ -39,14 +39,14 @@ async function createVM() {
         'js/core.js',
         'js/general/cache-map.js',
         'js/language/japanese-util.js',
-        'bg/js/json-schema.js',
-        'bg/js/media-utility.js',
-        'bg/js/dictionary-importer.js',
-        'bg/js/database.js',
-        'bg/js/dictionary-database.js',
-        'bg/js/text-source-map.js',
-        'bg/js/deinflector.js',
-        'bg/js/translator.js'
+        'js/data/json-schema.js',
+        'js/media/media-utility.js',
+        'js/language/dictionary-importer.js',
+        'js/data/database.js',
+        'js/language/dictionary-database.js',
+        'js/general/text-source-map.js',
+        'js/language/deinflector.js',
+        'js/language/translator.js'
     ]);
     const [
         DictionaryImporter,

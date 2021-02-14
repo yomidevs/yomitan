@@ -20,7 +20,7 @@ const {testMain} = require('../dev/util');
 const {VM} = require('../dev/vm');
 
 const vm = new VM();
-vm.execute(['bg/js/text-source-map.js']);
+vm.execute(['js/general/text-source-map.js']);
 const TextSourceMap = vm.get('TextSourceMap');
 
 

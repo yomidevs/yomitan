@@ -881,7 +881,7 @@ function testDeinflections() {
     ];
 
     const vm = new VM();
-    vm.execute(['bg/js/deinflector.js']);
+    vm.execute(['js/language/deinflector.js']);
     const [Deinflector] = vm.get(['Deinflector']);
 
     const deinflectionReasions = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect.json')));

@@ -85,7 +85,7 @@
         {
             "files": [
                 "ext/js/core.js",
-                "ext/bg/js/template-renderer.js",
+                "ext/js/templates/template-renderer.js",
                 "ext/js/language/dictionary-data-util.js"
             ],
             "env": {
@@ -96,8 +96,8 @@
             "files": ["ext/**/*.js"],
             "excludedFiles": [
                 "ext/js/core.js",
-                "ext/bg/js/template-renderer.js",
-                "ext/bg/js/anki-note-data.js",
+                "ext/js/templates/template-renderer.js",
+                "ext/js/data/anki-note-data.js",
                 "ext/js/language/dictionary-data-util.js"
             ],
             "globals": {
@@ -165,26 +165,26 @@
                 "ext/js/general/cache-map.js",
                 "ext/js/language/dictionary-data-util.js",
                 "ext/js/general/object-property-accessor.js",
-                "ext/bg/js/anki.js",
-                "ext/bg/js/audio-downloader.js",
-                "ext/bg/js/clipboard-monitor.js",
-                "ext/bg/js/clipboard-reader.js",
-                "ext/bg/js/database.js",
-                "ext/bg/js/deinflector.js",
-                "ext/bg/js/dictionary-database.js",
-                "ext/bg/js/json-schema.js",
-                "ext/bg/js/mecab.js",
-                "ext/bg/js/media-utility.js",
-                "ext/bg/js/options.js",
-                "ext/bg/js/permissions-util.js",
-                "ext/bg/js/profile-conditions.js",
-                "ext/bg/js/request-builder.js",
-                "ext/bg/js/simple-dom-parser.js",
-                "ext/bg/js/template-patcher.js",
-                "ext/bg/js/text-source-map.js",
-                "ext/bg/js/translator.js",
-                "ext/bg/js/backend.js",
-                "ext/bg/js/background-main.js"
+                "ext/js/comm/anki.js",
+                "ext/js/media/audio-downloader.js",
+                "ext/js/comm/clipboard-monitor.js",
+                "ext/js/comm/clipboard-reader.js",
+                "ext/js/data/database.js",
+                "ext/js/language/deinflector.js",
+                "ext/js/language/dictionary-database.js",
+                "ext/js/data/json-schema.js",
+                "ext/js/comm/mecab.js",
+                "ext/js/media/media-utility.js",
+                "ext/js/data/options-util.js",
+                "ext/js/data/permissions-util.js",
+                "ext/js/background/profile-conditions.js",
+                "ext/js/background/request-builder.js",
+                "ext/js/dom/simple-dom-parser.js",
+                "ext/js/templates/template-patcher.js",
+                "ext/js/general/text-source-map.js",
+                "ext/js/language/translator.js",
+                "ext/js/background/backend.js",
+                "ext/js/background/background-main.js"
             ],
             "env": {
                 "browser": false,

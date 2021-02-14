@@ -23,7 +23,7 @@ const vm = new VM();
 vm.execute([
     'lib/wanakana.min.js',
     'js/language/japanese-util.js',
-    'bg/js/text-source-map.js'
+    'js/general/text-source-map.js'
 ]);
 const [JapaneseUtil, TextSourceMap, wanakana] = vm.get(['JapaneseUtil', 'TextSourceMap', 'wanakana']);
 const jp = new JapaneseUtil(wanakana);

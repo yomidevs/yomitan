@@ -38,9 +38,9 @@ function getAllHtmlScriptPaths(fileName) {
 function convertBackgroundScriptsToServiceWorkerScripts(scripts) {
     // Use parse5-based SimpleDOMParser
     scripts.splice(0, 0, '/lib/parse5.js');
-    const index = scripts.indexOf('/bg/js/native-simple-dom-parser.js');
+    const index = scripts.indexOf('/js/dom/native-simple-dom-parser.js');
     assert.ok(index >= 0);
-    scripts[index] = '/bg/js/simple-dom-parser.js';
+    scripts[index] = '/js/dom/simple-dom-parser.js';
 }
 
 function main() {
