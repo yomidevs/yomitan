@@ -134,7 +134,7 @@
             }
         },
         {
-            "files": ["ext/bg/js/settings/*.js"],
+            "files": ["ext/js/settings/*.js"],
             "env": {
                 "jquery": true
             }
