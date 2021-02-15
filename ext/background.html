@@ -1,59 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>Background</title>
-        <link rel="icon" type="image/png" href="/images/icon16.png" sizes="16x16">
-        <link rel="icon" type="image/png" href="/images/icon19.png" sizes="19x19">
-        <link rel="icon" type="image/png" href="/images/icon32.png" sizes="32x32">
-        <link rel="icon" type="image/png" href="/images/icon38.png" sizes="38x38">
-        <link rel="icon" type="image/png" href="/images/icon48.png" sizes="48x48">
-        <link rel="icon" type="image/png" href="/images/icon64.png" sizes="64x64">
-        <link rel="icon" type="image/png" href="/images/icon128.png" sizes="128x128">
-    </head>
-    <body>
-        <textarea id="clipboard-paste-target"></textarea>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Background</title>
+    <link rel="icon" type="image/png" href="/images/icon16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/images/icon19.png" sizes="19x19">
+    <link rel="icon" type="image/png" href="/images/icon32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/icon38.png" sizes="38x38">
+    <link rel="icon" type="image/png" href="/images/icon48.png" sizes="48x48">
+    <link rel="icon" type="image/png" href="/images/icon64.png" sizes="64x64">
+    <link rel="icon" type="image/png" href="/images/icon128.png" sizes="128x128">
+</head>
+<body>
 
-        <script src="/lib/wanakana.min.js"></script>
+<textarea id="clipboard-paste-target"></textarea>
 
-        <script src="/js/core.js"></script>
+<!-- Scripts -->
+<script src="/lib/wanakana.min.js"></script>
 
-        <script src="/js/yomichan.js"></script>
+<script src="/js/core.js"></script>
 
-        <script src="/js/background/backend.js"></script>
-        <script src="/js/background/environment.js"></script>
-        <script src="/js/background/profile-conditions-util.js"></script>
-        <script src="/js/background/request-builder.js"></script>
-        <script src="/js/comm/anki.js"></script>
-        <script src="/js/comm/clipboard-monitor.js"></script>
-        <script src="/js/comm/clipboard-reader.js"></script>
-        <script src="/js/comm/mecab.js"></script>
-        <script src="/js/data/database.js"></script>
-        <script src="/js/data/json-schema.js"></script>
-        <script src="/js/data/options-util.js"></script>
-        <script src="/js/data/permissions-util.js"></script>
-        <script src="/js/dom/native-simple-dom-parser.js"></script>
-        <script src="/js/general/cache-map.js"></script>
-        <script src="/js/general/object-property-accessor.js"></script>
-        <script src="/js/general/text-source-map.js"></script>
-        <script src="/js/language/deinflector.js"></script>
-        <script src="/js/language/dictionary-data-util.js"></script>
-        <script src="/js/language/dictionary-database.js"></script>
-        <script src="/js/language/japanese-util.js"></script>
-        <script src="/js/language/translator.js"></script>
-        <script src="/js/media/audio-downloader.js"></script>
-        <script src="/js/media/media-util.js"></script>
-        <script src="/js/templates/template-patcher.js"></script>
+<script src="/js/yomichan.js"></script>
 
-        <script src="/js/background/background-main.js"></script>
+<script src="/js/background/backend.js"></script>
+<script src="/js/background/environment.js"></script>
+<script src="/js/background/profile-conditions-util.js"></script>
+<script src="/js/background/request-builder.js"></script>
+<script src="/js/comm/anki.js"></script>
+<script src="/js/comm/clipboard-monitor.js"></script>
+<script src="/js/comm/clipboard-reader.js"></script>
+<script src="/js/comm/mecab.js"></script>
+<script src="/js/data/database.js"></script>
+<script src="/js/data/json-schema.js"></script>
+<script src="/js/data/options-util.js"></script>
+<script src="/js/data/permissions-util.js"></script>
+<script src="/js/dom/native-simple-dom-parser.js"></script>
+<script src="/js/general/cache-map.js"></script>
+<script src="/js/general/object-property-accessor.js"></script>
+<script src="/js/general/text-source-map.js"></script>
+<script src="/js/language/deinflector.js"></script>
+<script src="/js/language/dictionary-data-util.js"></script>
+<script src="/js/language/dictionary-database.js"></script>
+<script src="/js/language/japanese-util.js"></script>
+<script src="/js/language/translator.js"></script>
+<script src="/js/media/audio-downloader.js"></script>
+<script src="/js/media/media-util.js"></script>
+<script src="/js/templates/template-patcher.js"></script>
 
-        <!--
-            Due to a Firefox bug, this next element is purposefully terminated incorrectly.
-            This element must appear directly inside the <body> element, and it must not be closed properly.
-            https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
-        -->
-        <!-- [html-validate-disable close-order] -->
-        <div id="clipboard-image-paste-target" contenteditable="true">
-    </body>
+<script src="/js/background/background-main.js"></script>
+
+<!--
+    Due to a Firefox bug, this next element is purposefully terminated incorrectly.
+    This element must appear directly inside the <body> element, and it must not be closed properly.
+    https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
+-->
+<!-- [html-validate-disable close-order] -->
+<div id="clipboard-image-paste-target" contenteditable="true">
+
+</body>
 </html>
