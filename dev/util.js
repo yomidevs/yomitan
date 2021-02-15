@@ -76,7 +76,7 @@ function getArgs(args, argMap) {
     return argMap;
 }
 
-function getAllFiles(baseDirectory, relativeTo=null, predicate=null) {
+function getAllFiles(baseDirectory, predicate=null) {
     const results = [];
     const directories = [baseDirectory];
     while (directories.length > 0) {
@@ -84,10 +84,10 @@ function getAllFiles(baseDirectory, relativeTo=null, predicate=null) {
         const fileNames = fs.readdirSync(directory);
         for (const fileName of fileNames) {
             const fullFileName = path.join(directory, fileName);
-            const relativeFileName = (relativeTo !== null ? path.relative(relativeTo, fullFileName) : fullFileName);
+            const relativeFileName = path.relative(baseDirectory, fullFileName);
             const stats = fs.lstatSync(fullFileName);
             if (stats.isFile()) {
-                if (typeof predicate !== 'function' || predicate(fullFileName, directory, baseDirectory)) {
+                if (typeof predicate !== 'function' || predicate(relativeFileName)) {
                     results.push(relativeFileName);
                 }
             } else if (stats.isDirectory()) {

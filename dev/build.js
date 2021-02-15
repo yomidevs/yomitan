@@ -62,7 +62,7 @@ async function createZip(directory, excludeFiles, outputFileName, sevenZipExes, 
 
 async function createJSZip(directory, excludeFiles, outputFileName, onUpdate, dryRun) {
     const JSZip = util.JSZip;
-    const files = getAllFiles(directory, directory);
+    const files = getAllFiles(directory);
     removeItemsFromArray(files, excludeFiles);
     const zip = new JSZip();
     for (const fileName of files) {

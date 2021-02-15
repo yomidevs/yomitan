@@ -117,10 +117,10 @@ function main() {
     const fix = (process.argv.length >= 2 && process.argv[2] === '--fix');
     const directory = path.resolve(__dirname, '..', '..', 'ext');
     const pattern = /\.js$/;
-    const ignorePattern = /[\\/]ext[\\/]lib[\\/]/;
-    const fileNames = getAllFiles(directory, null, (f) => pattern.test(f) && !ignorePattern.test(f));
+    const ignorePattern = /^lib[\\/]/;
+    const fileNames = getAllFiles(directory, (f) => pattern.test(f) && !ignorePattern.test(f));
     for (const fileName of fileNames) {
-        if (!validateGlobals(fileName, fix)) {
+        if (!validateGlobals(path.join(directory, fileName), fix)) {
             process.exit(-1);
             return;
         }

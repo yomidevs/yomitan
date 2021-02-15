@@ -41,18 +41,110 @@ function validatePath(src, fileName, extDir) {
     assert.ok(stats.isFile(), `<script> src file invalid in ${fileName} (src=${JSON.stringify(src)})`);
 }
 
+function getSubstringCount(string, pattern) {
+    let count = 0;
+    while (true) {
+        const match = pattern.exec(string);
+        if (match === null) { break; }
+        ++count;
+    }
+    return count;
+}
+
+function getSortedScriptPaths(scriptPaths) {
+    // Sort file names without the extension
+    const extensionPattern = /\.[^.]*$/;
+    scriptPaths = scriptPaths.map((value) => {
+        const match = extensionPattern.exec(value);
+        let ext = '';
+        if (match !== null) {
+            ext = match[0];
+            value = value.substring(0, value.length - ext.length);
+        }
+        return {value, ext};
+    });
+
+    const stringComparer = new Intl.Collator('en-US'); // Invariant locale
+    scriptPaths.sort((a, b) => stringComparer.compare(a.value, b.value));
+
+    scriptPaths = scriptPaths.map(({value, ext}) => `${value}${ext}`);
+    return scriptPaths;
+}
+
+function validateScriptOrder(fileName, window) {
+    const {document, Node: {ELEMENT_NODE, TEXT_NODE}, NodeFilter} = window;
+
+    const scriptElements = document.querySelectorAll('script');
+    if (scriptElements.length === 0) { return; }
+
+    // Assert all scripts are siblings
+    const scriptContainerElement = scriptElements[0].parentNode;
+    for (const element of scriptElements) {
+        if (element.parentNode !== scriptContainerElement) {
+            assert.fail('All script nodes are not contained within the same element');
+        }
+    }
+
+    // Get script groupings and order
+    const scriptGroups = [];
+    const newlinePattern = /\n/g;
+    let separatingText = '';
+    const walker = document.createTreeWalker(scriptContainerElement, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+    walker.firstChild();
+    for (let node = walker.currentNode; node !== null; node = walker.nextSibling()) {
+        switch (node.nodeType) {
+            case ELEMENT_NODE:
+                if (node.tagName.toLowerCase() === 'script') {
+                    let scriptGroup;
+                    if (scriptGroups.length === 0 || getSubstringCount(separatingText, newlinePattern) >= 2) {
+                        scriptGroup = [];
+                        scriptGroups.push(scriptGroup);
+                    } else {
+                        scriptGroup = scriptGroups[scriptGroups.length - 1];
+                    }
+                    scriptGroup.push(node.src);
+                    separatingText = '';
+                }
+                break;
+            case TEXT_NODE:
+                separatingText += node.nodeValue;
+                break;
+        }
+    }
+
+    // Ensure core.js is first (if it is present)
+    const ignorePattern = /^\/lib\//;
+    const index = scriptGroups.flat()
+        .filter((value) => !ignorePattern.test(value))
+        .findIndex((value) => (value === '/js/core.js'));
+    assert.ok(index <= 0, 'core.js is not the first included script');
+
+    // Check script order
+    for (let i = 0, ii = scriptGroups.length; i < ii; ++i) {
+        const scriptGroup = scriptGroups[i];
+        try {
+            assert.deepStrictEqual(scriptGroup, getSortedScriptPaths(scriptGroup));
+        } catch (e) {
+            console.error(`Script order for group ${i + 1} in file ${fileName} is not correct:`);
+            throw e;
+        }
+    }
+}
+
 function validateHtmlScripts(fileName, extDir) {
-    const domSource = fs.readFileSync(fileName, {encoding: 'utf8'});
+    const fullFileName = path.join(extDir, fileName);
+    const domSource = fs.readFileSync(fullFileName, {encoding: 'utf8'});
     const dom = new JSDOM(domSource);
     const {window} = dom;
     const {document} = window;
     try {
         for (const {src} of document.querySelectorAll('script')) {
-            validatePath(src, fileName, extDir);
+            validatePath(src, fullFileName, extDir);
         }
         for (const {href} of document.querySelectorAll('link')) {
-            validatePath(href, fileName, extDir);
+            validatePath(href, fullFileName, extDir);
         }
+        validateScriptOrder(fileName, window);
     } finally {
         window.close();
     }
@@ -63,8 +155,8 @@ function main() {
     try {
         const extDir = path.resolve(__dirname, '..', '..', 'ext');
         const pattern = /\.html$/;
-        const ignorePattern = /[\\/]ext[\\/]lib[\\/]/;
-        const fileNames = getAllFiles(extDir, null, (f) => pattern.test(f) && !ignorePattern.test(f));
+        const ignorePattern = /^lib[\\/]/;
+        const fileNames = getAllFiles(extDir, (f) => pattern.test(f) && !ignorePattern.test(f));
         for (const fileName of fileNames) {
             validateHtmlScripts(fileName, extDir);
         }
