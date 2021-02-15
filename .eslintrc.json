@@ -3,7 +3,11 @@
     "extends": "eslint:recommended",
     "parserOptions": {
         "ecmaVersion": 8,
-        "sourceType": "script"
+        "sourceType": "script",
+        "ecmaFeatures": {
+            "globalReturn": false,
+            "impliedStrict": true
+        }
     },
     "env": {
         "browser": true,
@@ -202,6 +206,18 @@
                 "FileReader": "readonly",
                 "Intl": "readonly",
                 "crypto": "readonly"
+            }
+        },
+        {
+            "files": [
+                "ext/js/**/*.js"
+            ],
+            "excludedFiles": [
+                "ext/js/core.js",
+                "ext/js/**/*main.js"
+            ],
+            "rules": {
+                "no-implicit-globals": "error"
             }
         }
     ]
