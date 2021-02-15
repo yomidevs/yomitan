@@ -140,7 +140,7 @@
             }
         },
         {
-            "files": ["ext/js/settings/modal-jquery.js"],
+            "files": ["ext/js/pages/settings/modal-jquery.js"],
             "env": {
                 "jquery": true
             }
