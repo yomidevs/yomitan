@@ -994,3 +994,8 @@ button.popup-menu-item:disabled {
     padding: 0.5em 0.75em;
     font-size: var(--font-size-small);
 }
+.popup-menu-item-group {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+}

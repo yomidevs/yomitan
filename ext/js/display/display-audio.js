@@ -189,7 +189,10 @@ class DisplayAudio {
         switch (action) {
             case 'playAudioFromSource':
                 {
-                    const {source, index} = item.dataset;
+                    const group = item.closest('.popup-menu-item-group');
+                    if (group === null) { break; }
+
+                    const {source, index} = group.dataset;
                     let sourceDetailsMap = null;
                     if (typeof index !== 'undefined') {
                         const index2 = Number.parseInt(index, 10);
@@ -405,139 +408,120 @@ class DisplayAudio {
         popupMenu.prepare();
     }
 
-    _createMenu(button, expression, reading) {
-        // Options
-        const {sources, textToSpeechVoice, customSourceUrl} = this._getAudioOptions();
+    _getAudioSources(audioOptions) {
+        const {sources, textToSpeechVoice, customSourceUrl} = audioOptions;
+        const ttsSupported = (textToSpeechVoice.length > 0);
+        const customSupported = (customSourceUrl.length > 0);
+
         const sourceIndexMap = new Map();
-        for (let i = 0, ii = sources.length; i < ii; ++i) {
+        const optionsSourcesCount = sources.length;
+        for (let i = 0; i < optionsSourcesCount; ++i) {
             sourceIndexMap.set(sources[i], i);
         }
 
-        // Create menu
-        const menuNode = this._display.displayGenerator.createPopupMenu('audio-button');
+        const rawSources = [
+            ['jpod101', 'JapanesePod101', true],
+            ['jpod101-alternate', 'JapanesePod101 (Alternate)', true],
+            ['jisho', 'Jisho.org', true],
+            ['text-to-speech', 'Text-to-speech', ttsSupported],
+            ['text-to-speech-reading', 'Text-to-speech (Kana reading)', ttsSupported],
+            ['custom', 'Custom', customSupported]
+        ];
 
-        // Create menu item metadata
-        const menuItems = [];
-        const menuItemNodes = menuNode.querySelectorAll('.popup-menu-item');
-        for (let i = 0, ii = menuItemNodes.length; i < ii; ++i) {
-            const node = menuItemNodes[i];
-            const {source} = node.dataset;
+        const results = [];
+        for (const [source, displayName, supported] of rawSources) {
+            if (!supported) { continue; }
             let optionsIndex = sourceIndexMap.get(source);
-            if (typeof optionsIndex === 'undefined') { optionsIndex = null; }
-            menuItems.push({node, source, index: i, optionsIndex});
+            const isInOptions = typeof optionsIndex !== 'undefined';
+            if (!isInOptions) {
+                optionsIndex = optionsSourcesCount;
+            }
+            results.push({
+                source,
+                displayName,
+                index: results.length,
+                optionsIndex,
+                isInOptions
+            });
         }
 
         // Sort according to source order in options
-        menuItems.sort((a, b) => {
-            const ai = a.optionsIndex;
-            const bi = b.optionsIndex;
-            if (ai !== null) {
-                if (bi !== null) {
-                    const i = ai - bi;
-                    if (i !== 0) { return i; }
-                } else {
-                    return -1;
-                }
-            } else {
-                if (bi !== null) {
-                    return 1;
-                }
-            }
-            return a.index - b.index;
+        results.sort((a, b) => {
+            const i = a.optionsIndex - b.optionsIndex;
+            return i !== 0 ? i : a.index - b.index;
         });
 
-        // Set up items based on cache data
-        const sourceMap = this._cache.get(this._getExpressionReadingKey(expression, reading));
-        const menuEntryMap = new Map();
+        return results;
+    }
+
+    _createMenu(sourceButton, expression, reading) {
+        // Options
+        const sources = this._getAudioSources(this._getAudioOptions());
+
+        // Create menu
+        const {displayGenerator} = this._display;
+        const menuNode = displayGenerator.instantiateTemplate('audio-button-popup-menu');
+        const menuBody = menuNode.querySelector('.popup-menu-body');
+
+        // Set up items based on options and cache data
         let showIcons = false;
-        for (let i = 0, ii = menuItems.length; i < ii; ++i) {
-            const {node, source, optionsIndex} = menuItems[i];
-            const entries = this._getMenuItemEntries(node, sourceMap, source);
-            menuEntryMap.set(source, entries);
-            for (const {node: node2, valid, index} of entries) {
+        for (const {source, displayName, isInOptions} of sources) {
+            const entries = this._getMenuItemEntries(source, expression, reading);
+            for (let i = 0, ii = entries.length; i < ii; ++i) {
+                const {valid, index, name} = entries[i];
+                const node = displayGenerator.instantiateTemplate('audio-button-popup-menu-item');
+
+                const labelNode = node.querySelector('.popup-menu-item-label');
+                let label = displayName;
+                if (ii > 1) { label = `${label} ${i + 1}`; }
+                if (typeof name === 'string' && name.length > 0) { label += `: ${name}`; }
+                labelNode.textContent = label;
+
                 if (valid !== null) {
-                    const icon = node2.querySelector('.popup-menu-item-icon');
+                    const icon = node.querySelector('.popup-menu-item-icon');
                     icon.dataset.icon = valid ? 'checkmark' : 'cross';
                     showIcons = true;
                 }
+                node.dataset.source = source;
                 if (index !== null) {
-                    node2.dataset.index = `${index}`;
+                    node.dataset.index = `${index}`;
                 }
-                node2.dataset.valid = `${valid}`;
-                node2.dataset.sourceInOptions = `${optionsIndex !== null}`;
-                node2.style.order = `${i}`;
+                node.dataset.valid = `${valid}`;
+                node.dataset.sourceInOptions = `${isInOptions}`;
+
+                menuBody.appendChild(node);
             }
         }
         menuNode.dataset.showIcons = `${showIcons}`;
 
-        // Hide options
-        if (textToSpeechVoice.length === 0) {
-            this._setMenuItemEntriesHidden(menuEntryMap, 'text-to-speech', true);
-            this._setMenuItemEntriesHidden(menuEntryMap, 'text-to-speech-reading', true);
-        }
-        if (customSourceUrl.length === 0) {
-            this._setMenuItemEntriesHidden(menuEntryMap, 'custom', true);
-        }
-
         // Create popup menu
         this._menuContainer.appendChild(menuNode);
-        return new PopupMenu(button, menuNode);
+        return new PopupMenu(sourceButton, menuNode);
     }
 
-    _getMenuItemEntries(node, sourceMap, source) {
-        const entries = [{node, valid: null, index: null}];
+    _getMenuItemEntries(source, expression, reading) {
+        const sourceMap = this._cache.get(this._getExpressionReadingKey(expression, reading));
+        if (typeof sourceMap !== 'undefined') {
+            const sourceInfo = sourceMap.get(source);
+            if (typeof sourceInfo !== 'undefined') {
+                const {infoList} = sourceInfo;
+                if (infoList !== null) {
+                    const ii = infoList.length;
+                    if (ii === 0) {
+                        return [{valid: false, index: null, name: null}];
+                    }
 
-        const nextNode = node.nextSibling;
-
-        if (typeof sourceMap === 'undefined') { return entries; }
-
-        const sourceInfo = sourceMap.get(source);
-        if (typeof sourceInfo === 'undefined') { return entries; }
-
-        const {infoList} = sourceInfo;
-        if (infoList === null) { return entries; }
-
-        if (infoList.length === 0) {
-            entries[0].valid = false;
-            return entries;
-        }
-
-        const defaultLabel = node.querySelector('.popup-menu-item-label').textContent;
-
-        for (let i = 0, ii = infoList.length; i < ii; ++i) {
-            // Get/create entry
-            let entry;
-            if (i < entries.length) {
-                entry = entries[i];
-            } else {
-                const node2 = node.cloneNode(true);
-                nextNode.parentNode.insertBefore(node2, nextNode);
-                entry = {node: node2, valid: null, index: null};
-                entries.push(entry);
+                    const results = [];
+                    for (let i = 0; i < ii; ++i) {
+                        const {audio, audioResolved, info: {name}} = infoList[i];
+                        const valid = audioResolved ? (audio !== null) : null;
+                        const entry = {valid, index: i, name};
+                        results.push(entry);
+                    }
+                    return results;
+                }
             }
-
-            // Entry info
-            entry.index = i;
-
-            const {audio, audioResolved, info: {name}} = infoList[i];
-            if (audioResolved) { entry.valid = (audio !== null); }
-
-            const labelNode = entry.node.querySelector('.popup-menu-item-label');
-            let label = defaultLabel;
-            if (ii > 1) { label = `${label} ${i + 1}`; }
-            if (typeof name === 'string' && name.length > 0) { label += `: ${name}`; }
-            labelNode.textContent = label;
         }
-
-        return entries;
-    }
-
-    _setMenuItemEntriesHidden(menuEntryMap, source, hidden) {
-        const entries = menuEntryMap.get(source);
-        if (typeof entries === 'undefined') { return; }
-
-        for (const {node} of entries) {
-            node.hidden = hidden;
-        }
+        return [{valid: null, index: null, name: null}];
     }
 }

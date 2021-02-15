@@ -213,8 +213,8 @@ class DisplayGenerator {
         return this._templates.instantiate('profile-list-item');
     }
 
-    createPopupMenu(name) {
-        return this._templates.instantiate(`${name}-popup-menu`);
+    instantiateTemplate(name) {
+        return this._templates.instantiate(name);
     }
 
     // Private

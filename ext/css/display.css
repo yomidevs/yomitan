@@ -1673,13 +1673,13 @@ button.footer-notification-close-button:active {
 .audio-button-popup-menu[data-show-icons=false] .popup-menu-item-icon {
     display: none;
 }
-.popup-menu-item-icon[data-icon=checkmark] {
+.audio-button-popup-menu .popup-menu-item-icon[data-icon=checkmark] {
     background-color: var(--success-color);
 }
-.popup-menu-item-icon[data-icon=cross] {
+.audio-button-popup-menu .popup-menu-item-icon[data-icon=cross] {
     background-color: var(--danger-color);
 }
-.popup-menu-item[data-source-in-options=false][data-valid=null] {
+.audio-button-popup-menu .popup-menu-item-group[data-source-in-options=false][data-valid=null] .popup-menu-item {
     color: var(--text-color-light1);
 }
 
