@@ -30,6 +30,7 @@ class DisplayAudio {
         this._eventListeners = new EventListenerCollection();
         this._cache = new Map();
         this._menuContainer = document.querySelector('#popup-menus');
+        this._entriesToken = {};
     }
 
     get autoPlayAudioDelay() {
@@ -50,6 +51,7 @@ class DisplayAudio {
     }
 
     cleanupEntries() {
+        this._entriesToken = {};
         this._cache.clear();
         this.clearAutoPlayTimer();
         this._eventListeners.removeAllEventListeners();
@@ -105,7 +107,9 @@ class DisplayAudio {
         this.clearAutoPlayTimer();
 
         const expressionReading = this._getExpressionAndReading(definitionIndex, expressionIndex);
-        if (expressionReading === null) { return; }
+        if (expressionReading === null) {
+            return {audio: null, source: null, valid: false};
+        }
 
         const buttons = this._getAudioPlayButtons(definitionIndex, expressionIndex);
 
@@ -125,9 +129,10 @@ class DisplayAudio {
             // Create audio
             let audio;
             let title;
+            let source = null;
             const info = await this._createExpressionAudio(sources, sourceDetailsMap, expression, reading, {textToSpeechVoice, customSourceUrl, customSourceType});
-            if (info !== null) {
-                let source;
+            const valid = (info !== null);
+            if (valid) {
                 ({audio, source} = info);
                 const sourceIndex = sources.indexOf(source);
                 title = `From source ${1 + sourceIndex}: ${source}`;
@@ -161,6 +166,8 @@ class DisplayAudio {
                     // NOP
                 }
             }
+
+            return {audio, source, valid};
         } finally {
             progressIndicatorVisible.clearOverride(overrideToken);
         }
@@ -194,7 +201,7 @@ class DisplayAudio {
         const {detail: {action, item, menu}} = e;
         switch (action) {
             case 'playAudioFromSource':
-                this._playAudioFromSource(definitionIndex, expressionIndex, item, menu);
+                this._playAudioFromSource(definitionIndex, expressionIndex, item);
                 break;
             case 'setPrimaryAudio':
                 e.preventDefault();
@@ -231,16 +238,22 @@ class DisplayAudio {
         return {source, index, hasIndex};
     }
 
-    _playAudioFromSource(definitionIndex, expressionIndex, item, menu) {
+    async _playAudioFromSource(definitionIndex, expressionIndex, item) {
         const sourceInfo = this._getMenuItemSourceInfo(item);
         if (sourceInfo === null) { return; }
 
         const {source, index, hasIndex} = sourceInfo;
         const sourceDetailsMap = hasIndex ? new Map([[source, {start: index, end: index + 1}]]) : null;
 
-        this._setPrimaryAudio(definitionIndex, expressionIndex, item, menu, false);
-
-        this.playAudio(definitionIndex, expressionIndex, [source], sourceDetailsMap);
+        try {
+            const token = this._entriesToken;
+            const {valid} = await this.playAudio(definitionIndex, expressionIndex, [source], sourceDetailsMap);
+            if (valid && token === this._entriesToken) {
+                this._setPrimaryAudio(definitionIndex, expressionIndex, item, null, false);
+            }
+        } catch (e) {
+            // NOP
+        }
     }
 
     _setPrimaryAudio(definitionIndex, expressionIndex, item, menu, canToggleOff) {
@@ -260,7 +273,9 @@ class DisplayAudio {
         primaryCardAudio = (!canToggleOff || primaryCardAudio === null || primaryCardAudio.source !== source || primaryCardAudio.index !== index) ? {source, index} : null;
         cacheEntry.primaryCardAudio = primaryCardAudio;
 
-        this._updateMenuPrimaryCardAudio(menu.bodyNode, expression, reading);
+        if (menu !== null) {
+            this._updateMenuPrimaryCardAudio(menu.bodyNode, expression, reading);
+        }
     }
 
     _getAudioPlayButtonExpressionIndex(button) {
