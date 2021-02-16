@@ -158,6 +158,9 @@
 
 <!-- Popup menu -->
 <template id="audio-button-popup-menu-template"><div class="popup-menu-container scan-disable audio-button-popup-menu" tabindex="-1" role="dialog"><div class="popup-menu popup-menu-auto-size"><div class="popup-menu-body"></div></div></div></template>
-<template id="audio-button-popup-menu-item-template"><div class="popup-menu-item-group"><button class="popup-menu-item" data-menu-action="playAudioFromSource"><div class="popup-menu-item-icon icon" data-icon="none"></div><span class="popup-menu-item-label"></span></button></div></template>
+<template id="audio-button-popup-menu-item-template"><div class="popup-menu-item-group">
+    <button class="popup-menu-item popup-menu-item-audio-button" data-menu-action="playAudioFromSource"><div class="popup-menu-item-icon icon" data-icon="none"></div><span class="popup-menu-item-label"></span></button>
+    <button class="popup-menu-item popup-menu-item-set-primary-audio-button" data-menu-action="setPrimaryAudio" title="Use as audio for Anki card"><div class="popup-menu-item-icon icon" data-icon="note-card"></div></button>
+</div></template>
 
 </body></html>

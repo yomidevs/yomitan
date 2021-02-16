@@ -1452,7 +1452,7 @@ class Display extends EventDispatcher {
         let injectedMedia = null;
         if (injectMedia) {
             let errors2;
-            ({result: injectedMedia, errors: errors2} = await this._injectAnkiNoteMedia(definition, mode, options, fields));
+            ({result: injectedMedia, errors: errors2} = await this._injectAnkiNoteMedia(definition, options, fields));
             if (Array.isArray(errors)) {
                 for (const error of errors2) {
                     errors.push(deserializeError(error));
@@ -1479,20 +1479,35 @@ class Display extends EventDispatcher {
         });
     }
 
-    async _injectAnkiNoteMedia(definition, mode, options, fields) {
+    async _injectAnkiNoteMedia(definition, options, fields) {
         const {
             anki: {screenshot: {format, quality}},
             audio: {sources, customSourceUrl, customSourceType}
         } = options;
 
         const timestamp = Date.now();
+
         const definitionDetails = this._getDefinitionDetailsForNote(definition);
-        const audioDetails = (mode !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio') ? {sources, preferredAudioIndex: null, customSourceUrl, customSourceType} : null);
+
+        let audioDetails = null;
+        if (definitionDetails.type !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio')) {
+            const primaryCardAudio = this._displayAudio.getPrimaryCardAudio(definitionDetails.expression, definitionDetails.reading);
+            let preferredAudioIndex = null;
+            let sources2 = sources;
+            if (primaryCardAudio !== null) {
+                sources2 = [primaryCardAudio.source];
+                preferredAudioIndex = primaryCardAudio.index;
+            }
+            audioDetails = {sources: sources2, preferredAudioIndex, customSourceUrl, customSourceType};
+        }
+
         const screenshotDetails = (this._ankiNoteBuilder.containsMarker(fields, 'screenshot') ? {tabId: this._contentOriginTabId, frameId: this._contentOriginFrameId, format, quality} : null);
+
         const clipboardDetails = {
             image: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-image'),
             text: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-text')
         };
+
         return await yomichan.api.injectAnkiNoteMedia(
             timestamp,
             definitionDetails,

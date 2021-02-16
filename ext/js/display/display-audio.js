@@ -166,6 +166,12 @@ class DisplayAudio {
         }
     }
 
+    getPrimaryCardAudio(expression, reading) {
+        const cacheEntry = this._getCacheItem(expression, reading, false);
+        const primaryCardAudio = typeof cacheEntry !== 'undefined' ? cacheEntry.primaryCardAudio : null;
+        return primaryCardAudio;
+    }
+
     // Private
 
     _onAudioPlayButtonClick(definitionIndex, expressionIndex, e) {
@@ -185,25 +191,76 @@ class DisplayAudio {
     }
 
     _onAudioPlayMenuCloseClick(definitionIndex, expressionIndex, e) {
-        const {detail: {action, item}} = e;
+        const {detail: {action, item, menu}} = e;
         switch (action) {
             case 'playAudioFromSource':
-                {
-                    const group = item.closest('.popup-menu-item-group');
-                    if (group === null) { break; }
-
-                    const {source, index} = group.dataset;
-                    let sourceDetailsMap = null;
-                    if (typeof index !== 'undefined') {
-                        const index2 = Number.parseInt(index, 10);
-                        sourceDetailsMap = new Map([
-                            [source, {start: index2, end: index2 + 1}]
-                        ]);
-                    }
-                    this.playAudio(definitionIndex, expressionIndex, [source], sourceDetailsMap);
-                }
+                this._playAudioFromSource(definitionIndex, expressionIndex, item, menu);
+                break;
+            case 'setPrimaryAudio':
+                e.preventDefault();
+                this._setPrimaryAudio(definitionIndex, expressionIndex, item, menu, true);
                 break;
         }
+    }
+
+    _getCacheItem(expression, reading, create) {
+        const key = this._getExpressionReadingKey(expression, reading);
+        let cacheEntry = this._cache.get(key);
+        if (typeof cacheEntry === 'undefined' && create) {
+            cacheEntry = {
+                sourceMap: new Map(),
+                primaryCardAudio: null
+            };
+            this._cache.set(key, cacheEntry);
+        }
+        return cacheEntry;
+    }
+
+    _getMenuItemSourceInfo(item) {
+        const group = item.closest('.popup-menu-item-group');
+        if (group === null) { return null; }
+
+        let {source, index} = group.dataset;
+        if (typeof index !== 'undefined') {
+            index = Number.parseInt(index, 10);
+        }
+        const hasIndex = (Number.isFinite(index) && Math.floor(index) === index);
+        if (!hasIndex) {
+            index = 0;
+        }
+        return {source, index, hasIndex};
+    }
+
+    _playAudioFromSource(definitionIndex, expressionIndex, item, menu) {
+        const sourceInfo = this._getMenuItemSourceInfo(item);
+        if (sourceInfo === null) { return; }
+
+        const {source, index, hasIndex} = sourceInfo;
+        const sourceDetailsMap = hasIndex ? new Map([[source, {start: index, end: index + 1}]]) : null;
+
+        this._setPrimaryAudio(definitionIndex, expressionIndex, item, menu, false);
+
+        this.playAudio(definitionIndex, expressionIndex, [source], sourceDetailsMap);
+    }
+
+    _setPrimaryAudio(definitionIndex, expressionIndex, item, menu, canToggleOff) {
+        const sourceInfo = this._getMenuItemSourceInfo(item);
+        if (sourceInfo === null) { return; }
+
+        const {source, index} = sourceInfo;
+        if (!this._sourceIsDownloadable(source)) { return; }
+
+        const expressionReading = this._getExpressionAndReading(definitionIndex, expressionIndex);
+        if (expressionReading === null) { return; }
+
+        const {expression, reading} = expressionReading;
+        const cacheEntry = this._getCacheItem(expression, reading, true);
+
+        let {primaryCardAudio} = cacheEntry;
+        primaryCardAudio = (!canToggleOff || primaryCardAudio === null || primaryCardAudio.source !== source || primaryCardAudio.index !== index) ? {source, index} : null;
+        cacheEntry.primaryCardAudio = primaryCardAudio;
+
+        this._updateMenuPrimaryCardAudio(menu.bodyNode, expression, reading);
     }
 
     _getAudioPlayButtonExpressionIndex(button) {
@@ -229,13 +286,7 @@ class DisplayAudio {
     }
 
     async _createExpressionAudio(sources, sourceDetailsMap, expression, reading, details) {
-        const key = this._getExpressionReadingKey(expression, reading);
-
-        let sourceMap = this._cache.get(key);
-        if (typeof sourceMap === 'undefined') {
-            sourceMap = new Map();
-            this._cache.set(key, sourceMap);
-        }
+        const {sourceMap} = this._getCacheItem(expression, reading, true);
 
         for (let i = 0, ii = sources.length; i < ii; ++i) {
             const source = sources[i];
@@ -383,10 +434,10 @@ class DisplayAudio {
     }
 
     _getPotentialAvailableAudioCount(expression, reading) {
-        const key = this._getExpressionReadingKey(expression, reading);
-        const sourceMap = this._cache.get(key);
-        if (typeof sourceMap === 'undefined') { return null; }
+        const cacheEntry = this._getCacheItem(expression, reading, false);
+        if (typeof cacheEntry === 'undefined') { return null; }
 
+        const {sourceMap} = cacheEntry;
         let count = 0;
         for (const {infoList} of sourceMap.values()) {
             if (infoList === null) { continue; }
@@ -406,6 +457,16 @@ class DisplayAudio {
         const {expression, reading} = expressionReading;
         const popupMenu = this._createMenu(button, expression, reading);
         popupMenu.prepare();
+    }
+
+    _sourceIsDownloadable(source) {
+        switch (source) {
+            case 'text-to-speech':
+            case 'text-to-speech-reading':
+                return false;
+            default:
+                return true;
+        }
     }
 
     _getAudioSources(audioOptions) {
@@ -431,6 +492,7 @@ class DisplayAudio {
         const results = [];
         for (const [source, displayName, supported] of rawSources) {
             if (!supported) { continue; }
+            const downloadable = this._sourceIsDownloadable(source);
             let optionsIndex = sourceIndexMap.get(source);
             const isInOptions = typeof optionsIndex !== 'undefined';
             if (!isInOptions) {
@@ -441,7 +503,8 @@ class DisplayAudio {
                 displayName,
                 index: results.length,
                 optionsIndex,
-                isInOptions
+                isInOptions,
+                downloadable
             });
         }
 
@@ -461,24 +524,27 @@ class DisplayAudio {
         // Create menu
         const {displayGenerator} = this._display;
         const menuNode = displayGenerator.instantiateTemplate('audio-button-popup-menu');
-        const menuBody = menuNode.querySelector('.popup-menu-body');
+        const menuBodyNode = menuNode.querySelector('.popup-menu-body');
 
         // Set up items based on options and cache data
         let showIcons = false;
-        for (const {source, displayName, isInOptions} of sources) {
+        for (const {source, displayName, isInOptions, downloadable} of sources) {
             const entries = this._getMenuItemEntries(source, expression, reading);
             for (let i = 0, ii = entries.length; i < ii; ++i) {
                 const {valid, index, name} = entries[i];
                 const node = displayGenerator.instantiateTemplate('audio-button-popup-menu-item');
 
-                const labelNode = node.querySelector('.popup-menu-item-label');
+                const labelNode = node.querySelector('.popup-menu-item-audio-button .popup-menu-item-label');
                 let label = displayName;
                 if (ii > 1) { label = `${label} ${i + 1}`; }
                 if (typeof name === 'string' && name.length > 0) { label += `: ${name}`; }
                 labelNode.textContent = label;
 
+                const cardButton = node.querySelector('.popup-menu-item-set-primary-audio-button');
+                cardButton.hidden = !downloadable;
+
                 if (valid !== null) {
-                    const icon = node.querySelector('.popup-menu-item-icon');
+                    const icon = node.querySelector('.popup-menu-item-audio-button .popup-menu-item-icon');
                     icon.dataset.icon = valid ? 'checkmark' : 'cross';
                     showIcons = true;
                 }
@@ -488,11 +554,15 @@ class DisplayAudio {
                 }
                 node.dataset.valid = `${valid}`;
                 node.dataset.sourceInOptions = `${isInOptions}`;
+                node.dataset.downloadable = `${downloadable}`;
 
-                menuBody.appendChild(node);
+                menuBodyNode.appendChild(node);
             }
         }
         menuNode.dataset.showIcons = `${showIcons}`;
+
+        // Update primary card audio display
+        this._updateMenuPrimaryCardAudio(menuBodyNode, expression, reading);
 
         // Create popup menu
         this._menuContainer.appendChild(menuNode);
@@ -500,8 +570,9 @@ class DisplayAudio {
     }
 
     _getMenuItemEntries(source, expression, reading) {
-        const sourceMap = this._cache.get(this._getExpressionReadingKey(expression, reading));
-        if (typeof sourceMap !== 'undefined') {
+        const cacheEntry = this._getCacheItem(expression, reading, false);
+        if (typeof cacheEntry !== 'undefined') {
+            const {sourceMap} = cacheEntry;
             const sourceInfo = sourceMap.get(source);
             if (typeof sourceInfo !== 'undefined') {
                 const {infoList} = sourceInfo;
@@ -523,5 +594,26 @@ class DisplayAudio {
             }
         }
         return [{valid: null, index: null, name: null}];
+    }
+
+    _updateMenuPrimaryCardAudio(menuBodyNode, expression, reading) {
+        const primaryCardAudio = this.getPrimaryCardAudio(expression, reading);
+        const {source: primaryCardAudioSource, index: primaryCardAudioIndex} = (primaryCardAudio !== null ? primaryCardAudio : {source: null, index: -1});
+
+        const itemGroups = menuBodyNode.querySelectorAll('.popup-menu-item-group');
+        let sourceIndex = 0;
+        let sourcePre = null;
+        for (const node of itemGroups) {
+            const {source} = node.dataset;
+            if (source !== sourcePre) {
+                sourcePre = source;
+                sourceIndex = 0;
+            } else {
+                ++sourceIndex;
+            }
+
+            const isPrimaryCardAudio = (source === primaryCardAudioSource && sourceIndex === primaryCardAudioIndex);
+            node.dataset.isPrimaryCardAudio = `${isPrimaryCardAudio}`;
+        }
     }
 }

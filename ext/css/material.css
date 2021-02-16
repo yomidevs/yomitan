@@ -947,11 +947,11 @@ button.icon-button:active {
 }
 button.popup-menu-item {
     padding: 0.625em 1.5em;
+    flex: 1 1 auto;
     border-radius: 0;
     background-color: transparent;
     color: var(--text-color);
     border: none;
-    width: 100%;
     text-align: left;
     font-size: 1em;
     font-weight: normal;
@@ -977,11 +977,13 @@ button.popup-menu-item:disabled {
     width: calc(16em / 14);
     height: calc(16em / 14);
     background-color: var(--text-color);
-    margin-right: 0.5em;
     flex: 0 0 auto;
 }
 .popup-menu-item-icon:not([hidden]) {
     display: block;
+}
+.popup-menu-item-icon+.popup-menu-item-label {
+    margin-left: 0.5em;
 }
 :root[data-page-type=popup] .popup-menu.popup-menu-auto-size,
 .popup-menu.popup-menu-small {
@@ -995,6 +997,7 @@ button.popup-menu-item:disabled {
     font-size: var(--font-size-small);
 }
 .popup-menu-item-group {
+    position: relative;
     display: flex;
     flex-flow: row nowrap;
     align-items: stretch;
