@@ -1487,7 +1487,7 @@ class Display extends EventDispatcher {
 
         const timestamp = Date.now();
         const definitionDetails = this._getDefinitionDetailsForNote(definition);
-        const audioDetails = (mode !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio') ? {sources, customSourceUrl, customSourceType} : null);
+        const audioDetails = (mode !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio') ? {sources, preferredAudioIndex: null, customSourceUrl, customSourceType} : null);
         const screenshotDetails = (this._ankiNoteBuilder.containsMarker(fields, 'screenshot') ? {tabId: this._contentOriginTabId, frameId: this._contentOriginFrameId, format, quality} : null);
         const clipboardDetails = {
             image: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-image'),

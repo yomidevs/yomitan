@@ -49,9 +49,12 @@ class AudioDownloader {
         return [];
     }
 
-    async downloadExpressionAudio(sources, expression, reading, details) {
+    async downloadExpressionAudio(sources, preferredAudioIndex, expression, reading, details) {
         for (const source of sources) {
-            const infoList = await this.getExpressionAudioInfoList(source, expression, reading, details);
+            let infoList = await this.getExpressionAudioInfoList(source, expression, reading, details);
+            if (typeof preferredAudioIndex === 'number') {
+                infoList = (preferredAudioIndex >= 0 && preferredAudioIndex < infoList.length ? [infoList[preferredAudioIndex]] : []);
+            }
             for (const info of infoList) {
                 switch (info.type) {
                     case 'url':

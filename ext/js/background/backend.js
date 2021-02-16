@@ -1636,10 +1636,6 @@ class Backend {
         }
     }
 
-    async _downloadDefinitionAudio(sources, expression, reading, details) {
-        return await this._audioDownloader.downloadExpressionAudio(sources, expression, reading, details);
-    }
-
     async _injectAnkNoteMedia(ankiConnect, timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails) {
         let screenshotFileName = null;
         let clipboardImageFileName = null;
@@ -1701,12 +1697,13 @@ class Backend {
             return null;
         }
 
-        const {sources, customSourceUrl, customSourceType} = details;
+        const {sources, preferredAudioIndex, customSourceUrl, customSourceType} = details;
         let data;
         let contentType;
         try {
-            ({data, contentType} = await this._downloadDefinitionAudio(
+            ({data, contentType} = await this._audioDownloader.downloadExpressionAudio(
                 sources,
+                preferredAudioIndex,
                 expression,
                 reading,
                 {
