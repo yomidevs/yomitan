@@ -1025,18 +1025,9 @@ button.action-button[data-icon=source-term]::before {
     opacity: 0;
     white-space: pre-wrap;
 }
-.entry-body {
-    margin-top: -0.5em;
-}
-.entry-body-section {
-    margin-top: 0.5em;
-}
 .entry[data-definition-count='0'] .entry-body-section[data-section-type=definitions],
 .entry[data-frequency-count='0'] .entry-body-section[data-section-type=frequencies],
 .entry[data-pitch-accent-count='0'] .entry-body-section[data-section-type=pitch-accents] {
-    display: none;
-}
-.entry[data-pitch-accent-count='0'][data-frequency-count='0'] .entry-body-section[data-section-type=definitions]>h5 {
     display: none;
 }
 
@@ -1723,15 +1714,6 @@ button.footer-notification-close-button:active {
     color: var(--text-color-light3);
 }
 
-:root[data-glossary-layout-mode=compact] .entry-body-section>h5 {
-    display: none;
-}
-:root[data-glossary-layout-mode=compact] .entry-body {
-    margin-top: 0;
-}
-:root[data-glossary-layout-mode=compact] .entry-body-section {
-    margin-top: 0;
-}
 :root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation-list[data-expression-count='0'],
 :root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation[data-type=reading] {
     display: none;
