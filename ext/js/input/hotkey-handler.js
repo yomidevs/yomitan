@@ -173,8 +173,7 @@ class HotkeyHandler extends EventDispatcher {
         const hotkeyInfo = this._hotkeys.get(key);
         if (typeof hotkeyInfo !== 'undefined') {
             const eventModifiers = DocumentUtil.getActiveModifiers(e);
-            const canForward = (this._forwardFrameId !== null);
-            if (this._invokeHandlers(key, eventModifiers, hotkeyInfo, canForward)) {
+            if (this._invokeHandlers(key, eventModifiers, hotkeyInfo, false)) {
                 e.preventDefault();
                 return;
             }
