@@ -973,6 +973,9 @@ button.action-button[data-icon=source-term]::before {
     bottom: -0.5em;
     white-space: nowrap;
 }
+.entry[data-type=term][data-expression-multi=true] .term-tags>.tag[data-category=search] {
+    display: none;
+}
 
 
 /* Definitions */

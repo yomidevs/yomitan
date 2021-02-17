@@ -71,7 +71,8 @@ class DisplayGenerator {
 
         const uniqueExpressions = new Set();
         const uniqueReadings = new Set();
-        for (const {expression, reading} of expressions) {
+        for (let {expression, reading} of expressions) {
+            if (reading.length === 0) { reading = expression; }
             uniqueExpressions.add(expression);
             uniqueReadings.add(reading);
         }
@@ -92,6 +93,14 @@ class DisplayGenerator {
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(pitchesContainer, this._createPitches.bind(this), pitches);
         this._appendMultiple(termTagsContainer, this._createTermTag.bind(this), termTags, expressions.length);
+
+        for (const expression of uniqueExpressions) {
+            termTagsContainer.appendChild(this._createSearchTag(expression));
+        }
+        for (const reading of uniqueReadings) {
+            if (uniqueExpressions.has(reading)) { continue; }
+            termTagsContainer.appendChild(this._createSearchTag(reading));
+        }
 
         // Add definitions
         const dictionaryTag = this._createDictionaryTag(null);
