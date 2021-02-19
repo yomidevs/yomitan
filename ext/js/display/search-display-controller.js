@@ -33,6 +33,7 @@ class SearchDisplayController {
         this._queryInputEvents = new EventListenerCollection();
         this._queryInputEventsSetup = false;
         this._wanakanaEnabled = false;
+        this._wanakanaBound = false;
         this._introVisible = true;
         this._introAnimationTimer = null;
         this._clipboardMonitorEnabled = false;
@@ -223,9 +224,15 @@ class SearchDisplayController {
 
         this._wanakanaEnabled = enabled;
         if (enabled) {
-            wanakana.bind(input);
+            if (!this._wanakanaBound) {
+                wanakana.bind(input);
+                this._wanakanaBound = true;
+            }
         } else {
-            wanakana.unbind(input);
+            if (this._wanakanaBound) {
+                wanakana.unbind(input);
+                this._wanakanaBound = true;
+            }
         }
 
         this._queryInputEvents.addEventListener(input, 'input', this._onSearchInput.bind(this), false);
