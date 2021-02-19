@@ -9,5 +9,7 @@
     ["打ち込む", "うちこむ", "tag1 tag2", "v5", 1, ["definition15", "definition16"], 4, "tag5 tag6 tag7"],
     ["打ち込む", "ぶちこむ", "tag1 tag2", "v5", 10, ["definition17", "definition18"], 4, "tag3 tag4 tag5"],
     ["打ち込む", "ぶちこむ", "tag1 tag2", "v5", 1, ["definition19", "definition20"], 4, "tag3 tag4 tag5"],
-    ["画像", "がぞう", "tag1 tag2", "", 1, ["definition21", {"type": "image", "path": "image.gif", "width": 350, "height": 350, "description": "An image", "pixelated": true}], 5, "tag3 tag4 tag5"]
+    ["画像", "がぞう", "tag1 tag2", "", 1, ["definition21", {"type": "image", "path": "image.gif", "width": 350, "height": 350, "description": "An image", "pixelated": true}], 5, "tag3 tag4 tag5"],
+    ["読む", "よむ", "popular", "v5", 100, ["to read"], 6, "vt"],
+    ["強み", "つよみ", "popular", "n", 90, ["strong point"], 7, ""]
 ]

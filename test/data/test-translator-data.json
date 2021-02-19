@@ -18803,7 +18803,7 @@
                         "type": "term",
                         "id": 3,
                         "source": "打ち",
-                        "rawSource": "(打)(ち)(込)",
+                        "rawSource": "(打)(ち)",
                         "sourceTerm": "打つ",
                         "reasons": [
                             "masu stem"
@@ -18967,7 +18967,7 @@
                         "type": "term",
                         "id": 5,
                         "source": "打ち",
-                        "rawSource": "(打)(ち)(込)",
+                        "rawSource": "(打)(ち)",
                         "sourceTerm": "打つ",
                         "reasons": [
                             "masu stem"
@@ -19131,7 +19131,7 @@
                         "type": "term",
                         "id": 4,
                         "source": "打ち",
-                        "rawSource": "(打)(ち)(込)",
+                        "rawSource": "(打)(ち)",
                         "sourceTerm": "打つ",
                         "reasons": [
                             "masu stem"
@@ -19295,7 +19295,7 @@
                         "type": "term",
                         "id": 6,
                         "source": "打ち",
-                        "rawSource": "(打)(ち)(込)",
+                        "rawSource": "(打)(ち)",
                         "sourceTerm": "打つ",
                         "reasons": [
                             "masu stem"
@@ -19459,7 +19459,7 @@
                         "type": "term",
                         "id": 1,
                         "source": "打",
-                        "rawSource": "(打)(ち)",
+                        "rawSource": "(打)",
                         "sourceTerm": "打",
                         "reasons": [],
                         "score": 1,
@@ -19613,7 +19613,7 @@
                         "type": "term",
                         "id": 2,
                         "source": "打",
-                        "rawSource": "(打)(ち)",
+                        "rawSource": "(打)",
                         "sourceTerm": "打",
                         "reasons": [],
                         "score": 1,
@@ -19762,6 +19762,329 @@
                         ],
                         "pitches": [],
                         "sourceTermExactMatchCount": 1
+                    }
+                ]
+            }
+        },
+        {
+            "comment": "Test non-empty replacement",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "test",
+            "options": [
+                "default",
+                {
+                    "alphanumeric": true,
+                    "textReplacements": [
+                        null,
+                        [
+                            {
+                                "pattern": "test",
+                                "flags": "g",
+                                "replacement": "よみ"
+                            }
+                        ]
+                    ]
+                }
+            ],
+            "expected": {
+                "length": 4,
+                "definitions": [
+                    {
+                        "type": "term",
+                        "id": 12,
+                        "source": "よみ",
+                        "rawSource": "test",
+                        "sourceTerm": "よむ",
+                        "reasons": [
+                            "masu stem"
+                        ],
+                        "score": 100,
+                        "sequence": 6,
+                        "dictionary": "Test Dictionary 2",
+                        "dictionaryPriority": 0,
+                        "dictionaryNames": [
+                            "Test Dictionary 2"
+                        ],
+                        "expression": "読む",
+                        "reading": "よむ",
+                        "expressions": [
+                            {
+                                "sourceTerm": "よむ",
+                                "expression": "読む",
+                                "reading": "よむ",
+                                "furiganaSegments": [
+                                    {
+                                        "text": "読",
+                                        "furigana": "よ"
+                                    },
+                                    {
+                                        "text": "む",
+                                        "furigana": ""
+                                    }
+                                ],
+                                "termTags": [
+                                    {
+                                        "name": "vt",
+                                        "category": "partOfSpeech",
+                                        "notes": "transitive verb",
+                                        "order": 0,
+                                        "score": 0,
+                                        "dictionary": "Test Dictionary 2",
+                                        "redundant": false
+                                    }
+                                ],
+                                "termFrequency": "normal",
+                                "frequencies": [],
+                                "pitches": []
+                            }
+                        ],
+                        "furiganaSegments": [
+                            {
+                                "text": "読",
+                                "furigana": "よ"
+                            },
+                            {
+                                "text": "む",
+                                "furigana": ""
+                            }
+                        ],
+                        "glossary": [
+                            "to read"
+                        ],
+                        "definitionTags": [
+                            {
+                                "name": "popular",
+                                "category": "popular",
+                                "notes": "popular term",
+                                "order": 0,
+                                "score": 0,
+                                "dictionary": "Test Dictionary 2",
+                                "redundant": false
+                            }
+                        ],
+                        "termTags": [
+                            {
+                                "name": "vt",
+                                "category": "partOfSpeech",
+                                "notes": "transitive verb",
+                                "order": 0,
+                                "score": 0,
+                                "dictionary": "Test Dictionary 2",
+                                "redundant": false
+                            }
+                        ],
+                        "frequencies": [],
+                        "pitches": [],
+                        "sourceTermExactMatchCount": 0
+                    }
+                ]
+            }
+        },
+        {
+            "comment": "Test non-empty replacement at end",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "つtest",
+            "options": [
+                "default",
+                {
+                    "alphanumeric": true,
+                    "textReplacements": [
+                        null,
+                        [
+                            {
+                                "pattern": "test",
+                                "flags": "g",
+                                "replacement": "よみ"
+                            }
+                        ]
+                    ]
+                }
+            ],
+            "expected": {
+                "length": 5,
+                "definitions": [
+                    {
+                        "type": "term",
+                        "id": 13,
+                        "source": "つよみ",
+                        "rawSource": "つtest",
+                        "sourceTerm": "つよみ",
+                        "reasons": [],
+                        "score": 90,
+                        "sequence": 7,
+                        "dictionary": "Test Dictionary 2",
+                        "dictionaryPriority": 0,
+                        "dictionaryNames": [
+                            "Test Dictionary 2"
+                        ],
+                        "expression": "強み",
+                        "reading": "つよみ",
+                        "expressions": [
+                            {
+                                "sourceTerm": "つよみ",
+                                "expression": "強み",
+                                "reading": "つよみ",
+                                "furiganaSegments": [
+                                    {
+                                        "text": "強",
+                                        "furigana": "つよ"
+                                    },
+                                    {
+                                        "text": "み",
+                                        "furigana": ""
+                                    }
+                                ],
+                                "termTags": [],
+                                "termFrequency": "normal",
+                                "frequencies": [],
+                                "pitches": []
+                            }
+                        ],
+                        "furiganaSegments": [
+                            {
+                                "text": "強",
+                                "furigana": "つよ"
+                            },
+                            {
+                                "text": "み",
+                                "furigana": ""
+                            }
+                        ],
+                        "glossary": [
+                            "strong point"
+                        ],
+                        "definitionTags": [
+                            {
+                                "name": "popular",
+                                "category": "popular",
+                                "notes": "popular term",
+                                "order": 0,
+                                "score": 0,
+                                "dictionary": "Test Dictionary 2",
+                                "redundant": false
+                            }
+                        ],
+                        "termTags": [],
+                        "frequencies": [],
+                        "pitches": [],
+                        "sourceTermExactMatchCount": 0
+                    }
+                ]
+            }
+        },
+        {
+            "comment": "Test non-empty replacement at start",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "testました",
+            "options": [
+                "default",
+                {
+                    "alphanumeric": true,
+                    "textReplacements": [
+                        null,
+                        [
+                            {
+                                "pattern": "test",
+                                "flags": "g",
+                                "replacement": "よみ"
+                            }
+                        ]
+                    ]
+                }
+            ],
+            "expected": {
+                "length": 7,
+                "definitions": [
+                    {
+                        "type": "term",
+                        "id": 12,
+                        "source": "よみました",
+                        "rawSource": "testました",
+                        "sourceTerm": "よむ",
+                        "reasons": [
+                            "polite past"
+                        ],
+                        "score": 100,
+                        "sequence": 6,
+                        "dictionary": "Test Dictionary 2",
+                        "dictionaryPriority": 0,
+                        "dictionaryNames": [
+                            "Test Dictionary 2"
+                        ],
+                        "expression": "読む",
+                        "reading": "よむ",
+                        "expressions": [
+                            {
+                                "sourceTerm": "よむ",
+                                "expression": "読む",
+                                "reading": "よむ",
+                                "furiganaSegments": [
+                                    {
+                                        "text": "読",
+                                        "furigana": "よ"
+                                    },
+                                    {
+                                        "text": "む",
+                                        "furigana": ""
+                                    }
+                                ],
+                                "termTags": [
+                                    {
+                                        "name": "vt",
+                                        "category": "partOfSpeech",
+                                        "notes": "transitive verb",
+                                        "order": 0,
+                                        "score": 0,
+                                        "dictionary": "Test Dictionary 2",
+                                        "redundant": false
+                                    }
+                                ],
+                                "termFrequency": "normal",
+                                "frequencies": [],
+                                "pitches": []
+                            }
+                        ],
+                        "furiganaSegments": [
+                            {
+                                "text": "読",
+                                "furigana": "よ"
+                            },
+                            {
+                                "text": "む",
+                                "furigana": ""
+                            }
+                        ],
+                        "glossary": [
+                            "to read"
+                        ],
+                        "definitionTags": [
+                            {
+                                "name": "popular",
+                                "category": "popular",
+                                "notes": "popular term",
+                                "order": 0,
+                                "score": 0,
+                                "dictionary": "Test Dictionary 2",
+                                "redundant": false
+                            }
+                        ],
+                        "termTags": [
+                            {
+                                "name": "vt",
+                                "category": "partOfSpeech",
+                                "notes": "transitive verb",
+                                "order": 0,
+                                "score": 0,
+                                "dictionary": "Test Dictionary 2",
+                                "redundant": false
+                            }
+                        ],
+                        "frequencies": [],
+                        "pitches": [],
+                        "sourceTermExactMatchCount": 0
                     }
                 ]
             }

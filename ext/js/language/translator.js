@@ -1361,8 +1361,8 @@ class Translator {
             pattern.lastIndex += delta;
 
             if (actualReplacementLength > 0) {
-                sourceMap.combine(Math.max(0, index - 1), matchText.length);
                 sourceMap.insert(index, ...(new Array(actualReplacementLength).fill(0)));
+                sourceMap.combine(index - 1 + actualReplacementLength, matchText.length);
             } else {
                 sourceMap.combine(index, matchText.length);
             }

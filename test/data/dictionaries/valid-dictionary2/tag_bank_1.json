@@ -3,5 +3,7 @@
     ["tag2", "category2", 0, "tag2 notes", 0],
     ["tag3", "category3", 0, "tag3 notes", 0],
     ["tag4", "category4", 0, "tag4 notes", 0],
-    ["tag5", "category5", 0, "tag5 notes", 0]
+    ["tag5", "category5", 0, "tag5 notes", 0],
+    ["popular", "popular", 0, "popular term", 0],
+    ["vt", "partOfSpeech", 0, "transitive verb", 0]
 ]
