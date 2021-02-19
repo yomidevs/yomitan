@@ -1914,7 +1914,7 @@ class Backend {
         const url = chrome.runtime.getURL(useSettingsV2 ? manifest.options_ui.page : '/settings-old.html');
         switch (mode) {
             case 'existingOrNewTab':
-                if (useSettingsV2) {
+                if (!useSettingsV2) {
                     const predicate = ({url: url2}) => (url2 !== null && url2.startsWith(url));
                     const tab = await this._findTabs(1000, false, predicate, false);
                     if (tab !== null) {
