@@ -498,22 +498,26 @@ button.sidebar-button:active,
 button.sidebar-button:focus {
     box-shadow: none;
 }
-button.sidebar-button:hover:not(:disabled),
-button.sidebar-button:focus:not(:disabled) {
+button.sidebar-button:hover,
+button.sidebar-button:focus {
     background-color: var(--sidebar-button-background-color-hover);
 }
-button.sidebar-button:active:not(:disabled) {
+button.sidebar-button:active {
     background-color: var(--sidebar-button-background-color-active);
 }
 button.sidebar-button.danger {
     background-color: var(--sidebar-button-danger-background-color);
 }
-button.sidebar-button.danger:hover:not(:disabled),
-button.sidebar-button.danger:focus:not(:disabled) {
+button.sidebar-button.danger:hover,
+button.sidebar-button.danger:focus {
     background-color: var(--sidebar-button-danger-background-color-hover);
 }
-button.sidebar-button.danger:active:not(:disabled) {
+button.sidebar-button.danger:active {
     background-color: var(--sidebar-button-danger-background-color-active);
+}
+button.sidebar-button:disabled,
+button.sidebar-button.danger:disabled {
+    background-color: var(--sidebar-button-background-color);
 }
 .sidebar-button-icon {
     --icon-size: var(--sidebar-button-icon-size) var(--sidebar-button-icon-size);
@@ -524,7 +528,8 @@ button.sidebar-button.danger:active:not(:disabled) {
     background-color: var(--sidebar-button-icon-color);
     transition: background-color 0.125s ease-in-out;
 }
-button.sidebar-button:disabled .sidebar-button-icon {
+button.sidebar-button:disabled .sidebar-button-icon,
+button.sidebar-button.danger:disabled .sidebar-button-icon {
     background-color: var(--sidebar-button-disabled-icon-color);
 }
 button.sidebar-button.danger:hover .sidebar-button-icon,

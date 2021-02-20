@@ -51,6 +51,17 @@
     --menu-border-radius: 0.3em;
     --menu-shadow: 0 1px 3px 1px var(--shadow-color), 0 2px 4px 3px var(--shadow-color);
 
+    --selectable-indicator-transition1:
+        transform 0s ease-in-out var(--animation-duration2),
+        background-color var(--animation-duration2) ease-in-out,
+        opacity var(--animation-duration2) ease-in-out,
+        visibility 0s ease-in-out var(--animation-duration2);
+    --selectable-indicator-transition2:
+        transform var(--animation-duration2) ease-in-out,
+        background-color var(--animation-duration2) ease-in-out,
+        opacity var(--animation-duration2) ease-in-out,
+        visibility var(--animation-duration2) ease-in-out;
+
     --text-color: #222222;
     --text-color-light1: #555555;
     --text-color-light2: #666666;
@@ -316,6 +327,43 @@ label.checkbox {
 .checkbox>input[type=checkbox]:disabled+.checkbox-body>.checkbox-check {
     background-color: var(--checkbox-disabled-color);
 }
+.checkbox-body::after {
+    position: absolute;
+    display: block;
+    content: '';
+    left: -0.75em;
+    top: -0.75em;
+    right: -0.75em;
+    bottom: -0.75em;
+    border-radius: 2.5em;
+    background-color: var(--selectable-indicator-color);
+    pointer-events: none;
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--selectable-indicator-transition1);
+}
+.checkbox>input[type=checkbox]:focus+.checkbox-body::after,
+.checkbox>input[type=checkbox]:active+.checkbox-body::after,
+.checkbox:active>input[type=checkbox]+.checkbox-body::after {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+    transition: var(--selectable-indicator-transition2);
+}
+.checkbox>input[type=checkbox]:focus+.checkbox-body::after {
+    opacity: 0.5;
+}
+.checkbox>input[type=checkbox]:active:focus+.checkbox-body::after,
+.checkbox:active>input[type=checkbox]:focus+.checkbox-body::after {
+    opacity: 1;
+}
+.checkbox>input[type=checkbox]:disabled+.checkbox-body::after {
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--selectable-indicator-transition1);
+}
 
 
 /* Toggle switch */
@@ -386,40 +434,35 @@ label.toggle {
     transform: scale(0);
     opacity: 0;
     visibility: hidden;
-    transition:
-        transform 0s ease-in-out var(--animation-duration2),
-        background-color var(--animation-duration2) ease-in-out,
-        opacity var(--animation-duration2) ease-in-out,
-        visibility 0s ease-in-out var(--animation-duration2);
+    transition: var(--selectable-indicator-transition1);
 }
-.toggle>input[type=checkbox]:focus:not(:disabled)+.toggle-body>.toggle-knob::after,
-.toggle:active>input[type=checkbox]:not(:disabled)+.toggle-body>.toggle-knob::after {
+.toggle>input[type=checkbox]:focus+.toggle-body>.toggle-knob::after,
+.toggle>input[type=checkbox]:active+.toggle-body>.toggle-knob::after,
+.toggle:active>input[type=checkbox]+.toggle-body>.toggle-knob::after {
     transform: scale(1);
     opacity: 1;
     visibility: visible;
-    transition:
-        transform var(--animation-duration2) ease-in-out,
-        background-color var(--animation-duration2) ease-in-out,
-        opacity var(--animation-duration2) ease-in-out,
-        visibility var(--animation-duration2) ease-in-out;
+    transition: var(--selectable-indicator-transition2);
 }
 .toggle>input[type=checkbox]:focus+.toggle-body>.toggle-knob::after {
     opacity: 0.5;
 }
+.toggle>input[type=checkbox]:active:focus+.toggle-body>.toggle-knob::after,
 .toggle:active>input[type=checkbox]:focus+.toggle-body>.toggle-knob::after {
     opacity: 1;
 }
 .toggle>input[type=checkbox]:checked+.toggle-body>.toggle-knob {
     transform: translateX(1em);
 }
-.toggle>input[type=checkbox]:checked:not(:disabled)+.toggle-body>.toggle-track {
+.toggle>input[type=checkbox]:checked+.toggle-body>.toggle-track {
     background-color: var(--accent-color-lighter);
 }
-.toggle>input[type=checkbox]:checked:not(:disabled)+.toggle-body>.toggle-knob {
+.toggle>input[type=checkbox]:checked+.toggle-body>.toggle-knob {
     background-color: var(--accent-color);
 }
-.toggle>input[type=checkbox]:focus:checked:not(:disabled)+.toggle-body>.toggle-knob::after,
-.toggle:active>input[type=checkbox]:checked:not(:disabled)+.toggle-body>.toggle-knob::after {
+.toggle>input[type=checkbox]:focus:checked+.toggle-body>.toggle-knob::after,
+.toggle>input[type=checkbox]:active:checked+.toggle-body>.toggle-knob::after,
+.toggle:active>input[type=checkbox]:checked+.toggle-body>.toggle-knob::after {
     background-color: var(--accent-color-transparent25);
 }
 .toggle>input[type=checkbox]:disabled+.toggle-body {
@@ -430,6 +473,12 @@ label.toggle {
 }
 .toggle>input[type=checkbox]:disabled+.toggle-body>.toggle-knob {
     background-color: var(--disabled-color-lighter);
+}
+.toggle>input[type=checkbox]:disabled+.toggle-body>.toggle-knob::after {
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--selectable-indicator-transition1);
 }
 
 
@@ -449,19 +498,19 @@ label.radio {
     margin: 0;
     padding: 0;
     border: none;
-    cursor: default;
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
 }
-.radio>input[type=radio]:not(:disabled)+.radio-body {
-    cursor: pointer;
-}
 .radio-body {
+    cursor: pointer;
     display: block;
     position: relative;
     width: var(--radio-size);
     height: var(--radio-size);
+}
+.radio>input[type=radio]:disabled+.radio-body {
+    cursor: default;
 }
 .radio-border,
 .radio-dot {
@@ -521,28 +570,28 @@ label.radio {
     transform: scale(0);
     opacity: 0;
     visibility: hidden;
-    transition:
-        transform 0s ease-in-out var(--animation-duration2),
-        background-color var(--animation-duration2) ease-in-out,
-        opacity var(--animation-duration2) ease-in-out,
-        visibility 0s ease-in-out var(--animation-duration2);
+    transition: var(--selectable-indicator-transition1);
 }
-.radio>input[type=radio]:focus:not(:disabled)+.radio-body::after,
-.radio:active>input[type=radio]:not(:disabled)+.radio-body::after {
+.radio>input[type=radio]:focus+.radio-body::after,
+.radio>input[type=radio]:active+.radio-body::after,
+.radio:active>input[type=radio]+.radio-body::after {
     transform: scale(1);
     opacity: 1;
     visibility: visible;
-    transition:
-        transform var(--animation-duration2) ease-in-out,
-        background-color var(--animation-duration2) ease-in-out,
-        opacity var(--animation-duration2) ease-in-out,
-        visibility var(--animation-duration2) ease-in-out;
+    transition: var(--selectable-indicator-transition2);
 }
 .radio>input[type=radio]:focus+.radio-body::after {
     opacity: 0.5;
 }
+.radio>input[type=radio]:active:focus+.radio-body::after,
 .radio:active>input[type=radio]:focus+.radio-body::after {
     opacity: 1;
+}
+.radio>input[type=radio]:disabled+.radio-body::after {
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--selectable-indicator-transition1);
 }
 .radio-label {
     cursor: pointer;
@@ -692,93 +741,95 @@ button:focus {
 button:hover {
     transition: background-color var(--animation-duration) ease-out, box-shadow var(--animation-duration) ease-out, border-color var(--animation-duration) ease-out;
 }
-button:hover:not(:disabled) {
+button:hover {
     box-shadow: var(--button-shadow-params) var(--shadow-color-light);
 }
-button:active:not(:disabled) {
+button:active {
     box-shadow: var(--button-shadow-params) var(--shadow-color);
 }
 
 /* Standard button */
-button:not(:disabled) {
+button {
     color: var(--button-text-color);
     border-color: var(--accent-color);
     background-color: var(--accent-color);
 }
-button:hover:not(:disabled) {
+button:hover {
     background-color: var(--accent-color-light);
     border-color: var(--accent-color-light);
 }
-button:focus:not(:disabled) {
+button:focus {
     background-color: var(--accent-color-light);
 }
-button:active:not(:disabled) {
+button:active {
     border-color: var(--accent-color-lighter);
     background-color: var(--accent-color-lighter);
 }
 
 /* Standard danger button */
-button.danger:not(:disabled) {
+button.danger {
     color: var(--button-text-color);
     border-color: var(--danger-color);
     background-color: var(--danger-color);
 }
-button.danger:hover:not(:disabled) {
+button.danger:hover {
     background-color: var(--danger-color-light);
     border-color: var(--danger-color-light);
 }
-button.danger:focus:not(:disabled) {
+button.danger:focus {
     background-color: var(--danger-color-light);
 }
-button.danger:active:not(:disabled) {
+button.danger:active {
     border-color: var(--danger-color-lighter);
     background-color: var(--danger-color-lighter);
 }
 
 /* Low emphasis button */
-button.low-emphasis:not(:disabled) {
+button.low-emphasis {
     color: var(--accent-color);
     border-color: var(--button-border-color);
     background-color: var(--accent-color-transparent0);
 }
-button.low-emphasis:hover:not(:disabled) {
+button.low-emphasis:hover {
     background-color: var(--accent-color-transparent5);
     border-color: var(--accent-color-light);
 }
-button.low-emphasis:focus:not(:disabled) {
+button.low-emphasis:focus {
     border-color: var(--accent-color);
 }
-button.low-emphasis:active:not(:disabled) {
+button.low-emphasis:active {
     border-color: var(--accent-color);
     background-color: var(--accent-color-transparent25);
 }
 
 /* Low emphasis danger button */
-button.low-emphasis.danger:not(:disabled) {
+button.low-emphasis.danger {
     color: var(--danger-color);
     border-color: var(--button-border-color);
     background-color: var(--danger-color-transparent0);
 }
-button.low-emphasis.danger:hover:not(:disabled) {
+button.low-emphasis.danger:hover {
     border-color: var(--danger-color-light);
     background-color: var(--danger-color-transparent5);
 }
-button.low-emphasis.danger:focus:not(:disabled) {
+button.low-emphasis.danger:focus {
     border-color: var(--danger-color);
 }
-button.low-emphasis.danger:active:not(:disabled) {
+button.low-emphasis.danger:active {
     border-color: var(--danger-color);
     background-color: var(--danger-color-transparent25);
 }
 
 /* Disabled buttons */
-button:disabled {
+button:disabled,
+button.danger:disabled {
     color: var(--button-text-color);
     border-color: var(--disabled-color);
     background-color: var(--disabled-color);
     cursor: default;
 }
-button.low-emphasis:disabled {
+button.low-emphasis:disabled,
+button.low-emphasis.danger:disabled {
     color: var(--disabled-color);
     border-color: var(--disabled-color);
     background-color: transparent;
@@ -869,21 +920,13 @@ button.icon-button:active {
     transform: scale(0);
     opacity: 0;
     visibility: hidden;
-    transition:
-        transform 0s ease-in-out var(--animation-duration2),
-        background-color var(--animation-duration2) ease-in-out,
-        opacity var(--animation-duration2) ease-in-out,
-        visibility 0s ease-in-out var(--animation-duration2);
+    transition: var(--selectable-indicator-transition1);
 }
 .icon-button:focus>.icon-button-inner::after {
     transform: scale(1);
     opacity: 1;
     visibility: visible;
-    transition:
-        transform var(--animation-duration2) ease-in-out,
-        background-color var(--animation-duration2) ease-in-out,
-        opacity var(--animation-duration2) ease-in-out,
-        visibility var(--animation-duration2) ease-in-out;
+    transition: var(--selectable-indicator-transition2);
 }
 .icon-button>.icon-button-inner>.icon {
     display: block;
@@ -961,17 +1004,19 @@ button.popup-menu-item {
 button.popup-menu-item:not([hidden]) {
     display: flex;
 }
-button.popup-menu-item:hover:not(:disabled),
-button.popup-menu-item:focus:not(:disabled) {
+button.popup-menu-item:hover,
+button.popup-menu-item:focus {
     background-color: var(--menu-item-hover-color);
     box-shadow: none;
 }
-button.popup-menu-item:active:not(:disabled) {
+button.popup-menu-item:active {
     background-color: var(--menu-item-active-color);
     box-shadow: none;
 }
 button.popup-menu-item:disabled {
     color: var(--text-color-light2);
+    background-color: transparent;
+    box-shadow: none;
 }
 .popup-menu-item-icon {
     width: calc(16em / 14);
