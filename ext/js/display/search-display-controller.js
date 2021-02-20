@@ -109,12 +109,15 @@ class SearchDisplayController {
     }
 
     _onKeyDown(e) {
+        const {activeElement} = document;
         if (
-            document.activeElement !== this._queryInput &&
+            activeElement !== this._queryInput &&
+            !this._isElementInput(activeElement) &&
             !e.ctrlKey &&
             !e.metaKey &&
             !e.altKey &&
-            e.key.length === 1
+            e.key.length === 1 &&
+            e.key !== ' '
         ) {
             this._queryInput.focus({preventScroll: true});
         }
@@ -424,5 +427,18 @@ class SearchDisplayController {
         this._mode = mode;
         document.documentElement.dataset.searchMode = (mode !== null ? mode : '');
         this._updateClipboardMonitorEnabled();
+    }
+
+    _isElementInput(element) {
+        if (element === null) { return false; }
+        switch (element.tagName.toLowerCase()) {
+            case 'input':
+            case 'textarea':
+            case 'button':
+            case 'select':
+                return true;
+        }
+        if (element.contentEditable) { return true; }
+        return false;
     }
 }
