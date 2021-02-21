@@ -413,15 +413,16 @@ class DisplayGenerator {
     }
 
     _createTag(details) {
+        const {notes, name, category, redundant} = details;
         const node = this._templates.instantiate('tag');
 
-        const inner = node.querySelector('.tag-inner');
+        const inner = node.querySelector('.tag-label-content');
 
-        node.title = details.notes;
-        this._setTextContent(inner, details.name);
-        node.dataset.details = details.notes || details.name;
-        node.dataset.category = details.category;
-        if (details.redundant) { node.dataset.redundant = 'true'; }
+        node.title = notes;
+        this._setTextContent(inner, name);
+        node.dataset.details = notes || name;
+        node.dataset.category = category;
+        if (redundant) { node.dataset.redundant = 'true'; }
 
         return node;
     }

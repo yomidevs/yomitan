@@ -674,73 +674,87 @@ button.action-button[data-icon=source-term]::before {
 
 /* Tags */
 .tag {
-    display: inline-block;
-    padding: 0.2em 0.6em 0.3em;
-    font-size: var(--tag-font-size);
-    font-weight: var(--tag-font-weight);
-    line-height: 1.25;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: baseline;
+    --tag-color: var(--tag-default-background-color);
+
+    display: inline-flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    border: none;
+    border-right: none;
+    font-size: 1em;
+    margin: calc(1em / var(--font-size-no-units)) 0.375em calc(1em / var(--font-size-no-units)) 0;
+}
+.tag-label {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    background-color: var(--tag-color);
     border-radius: 0.25em;
+    padding: calc(2.5em / var(--font-size-no-units)) 0.375em calc(2.5em / var(--font-size-no-units)) 0.375em;
     color: var(--tag-text-color);
-    background-color: var(--tag-default-background-color);
-    border: var(--tag-border-size) var(--tag-border-style) var(--tag-border-color);
-    margin-right: 0.375em;
     cursor: pointer;
 }
-.tag[data-category=name] {
-    background-color: var(--tag-name-background-color);
+.tag-label-content {
+    font-size: var(--tag-font-size);
+    font-weight: var(--tag-font-weight);
 }
-.tag[data-category=expression] {
-    background-color: var(--tag-expression-background-color);
+.tag-body {
+    position: relative;
+    padding: 0 0.375em 0 0.375em;
 }
-.tag[data-category=popular] {
-    background-color: var(--tag-popular-background-color);
-}
-.tag[data-category=frequent] {
-    background-color: var(--tag-frequent-background-color);
-}
-.tag[data-category=archaism] {
-    background-color: var(--tag-archaism-background-color);
-}
-.tag[data-category=dictionary] {
-    background-color: var(--tag-dictionary-background-color);
-}
-.tag[data-category=frequency] {
-    background-color: var(--tag-frequency-background-color);
-}
-.tag[data-category=partOfSpeech] {
-    background-color: var(--tag-part-of-speech-background-color);
-}
-.tag[data-category=search] {
-    background-color: var(--tag-search-background-color);
-}
-.tag[data-category=pitch-accent-dictionary] {
-    background-color: var(--tag-pitch-accent-dictionary-background-color);
-}
-.tag-inner {
+.tag-body::before {
+    content: '';
     display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    border-radius: 0.25em;
+    border: var(--tag-border-size) var(--tag-border-style) var(--tag-color);
+    border-left: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
-.tag-details-disambiguation-list::before {
-    content: 'Only: ';
+.tag-body-content {
+    position: relative;
 }
-.tag-details-disambiguation-list ruby>rt {
-    display: inline;
-    font-size: 1em;
-}
-.tag-details-disambiguation-list ruby>rt::before {
-    content: '(';
-}
-.tag-details-disambiguation-list ruby>rt::after {
-    content: ')';
-}
-.tag-details-disambiguation-list[data-unmatched-expression-count='0'],
-.tag-details-disambiguation-list:not([data-unmatched-expression-count]) {
+.tag:not(.tag-has-body)>.tag-body {
     display: none;
 }
-.tag-details-disambiguation:not(:last-child)::after {
-    content: ', ';
+.tag.tag-has-body>.tag-label {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.tag[data-category=name] {
+    --tag-color: var(--tag-name-background-color);
+}
+.tag[data-category=expression] {
+    --tag-color: var(--tag-expression-background-color);
+}
+.tag[data-category=popular] {
+    --tag-color: var(--tag-popular-background-color);
+}
+.tag[data-category=frequent] {
+    --tag-color: var(--tag-frequent-background-color);
+}
+.tag[data-category=archaism] {
+    --tag-color: var(--tag-archaism-background-color);
+}
+.tag[data-category=dictionary] {
+    --tag-color: var(--tag-dictionary-background-color);
+}
+.tag[data-category=frequency] {
+    --tag-color: var(--tag-frequency-background-color);
+}
+.tag[data-category=partOfSpeech] {
+    --tag-color: var(--tag-part-of-speech-background-color);
+}
+.tag[data-category=search] {
+    --tag-color: var(--tag-search-background-color);
+}
+.tag[data-category=pitch-accent-dictionary] {
+    --tag-color: var(--tag-pitch-accent-dictionary-background-color);
 }
 
 

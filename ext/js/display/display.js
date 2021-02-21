@@ -787,6 +787,9 @@ class Display extends EventDispatcher {
     }
 
     _showTagNotification(tagNode) {
+        tagNode = tagNode.parentNode;
+        if (tagNode === null) { return; }
+
         if (this._tagNotification === null) {
             const node = this._displayGenerator.createEmptyFooterNotification();
             node.classList.add('click-scannable');
@@ -1677,7 +1680,7 @@ class Display extends EventDispatcher {
         this._addMultipleEventListeners(entry, '.action-view-note', 'click', this._onNoteView.bind(this));
         this._addMultipleEventListeners(entry, '.kanji-link', 'click', this._onKanjiLookup.bind(this));
         this._addMultipleEventListeners(entry, '.debug-log-link', 'click', this._onDebugLogClick.bind(this));
-        this._addMultipleEventListeners(entry, '.tag', 'click', this._onTagClick.bind(this));
+        this._addMultipleEventListeners(entry, '.tag-label', 'click', this._onTagClick.bind(this));
     }
 
     _updateDefinitionTextScanner(options) {
