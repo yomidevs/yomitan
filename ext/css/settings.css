@@ -213,7 +213,7 @@ h3 {
 }
 .heading-container-icon>.icon {
     display: block;
-    background-color: var(--button-icon-color);
+    background-color: var(--button-default-icon-color);
     width: var(--outline-item-icon-size);
     height: var(--outline-item-icon-size);
 }
@@ -392,6 +392,22 @@ a.heading-link-light {
     padding-bottom: 2em;
 }
 .outline-item {
+    --button-content-color: var(--text-color);
+    --button-border-color: transparent;
+    --button-background-color: var(--outline-item-background-color);
+    --button-shadow: none;
+
+    --button-hover-border-color: transparent;
+    --button-hover-background-color: var(--outline-item-background-color-hover);
+    --button-hover-shadow: none;
+
+    --button-active-border-color: transparent;
+    --button-active-background-color: var(--outline-item-background-color-hover);
+    --button-active-shadow: none;
+
+    font-weight: normal;
+    border-style: none;
+    border-width: 0;
     display: flex;
     align-items: center;
     width: 100%;
@@ -399,24 +415,11 @@ a.heading-link-light {
     line-height: var(--outline-item-height);
     padding: 0 1.5em;
     cursor: pointer;
-    background-color: var(--outline-item-background-color);
     transition: background-color var(--animation-duration) ease-in-out;
 }
 .outline-item,
 .outline-item:hover {
     text-decoration: none;
-    color: var(--text-color);
-}
-.outline-item:hover,
-.outline-item:focus {
-    outline: none;
-    background-color: var(--outline-item-background-color-hover);
-}
-.outline-item:focus:not(:focus-visible) {
-    background-color: var(--outline-item-background-color);
-}
-.outline-item:focus-visible {
-    background-color: var(--outline-item-background-color-hover);
 }
 .outline-item-left {
     display: inline-block;
@@ -440,7 +443,7 @@ a.heading-link-light {
 }
 .outline-item-icon {
     display: block;
-    background-color: var(--button-icon-color);
+    background-color: var(--button-default-icon-color);
     width: 100%;
     height: 100%;
 }
@@ -890,13 +893,13 @@ select.short-height {
     right: 0;
     bottom: 0;
 }
-button.icon-button.modal-header-button>.icon-button-inner>.icon {
-    background-color: var(--button-icon-color-light);
-    transition: background-color var(--animation-duration) ease-in-out;
+button.icon-button.modal-header-button {
+    --button-content-color: var(--button-default-icon-color-light);
+    --button-hover-content-color: var(--button-default-icon-color);
+    --button-active-content-color: var(--button-default-icon-color);
 }
-button.icon-button.modal-header-button:hover>.icon-button-inner>.icon,
-button.icon-button.modal-header-button:active>.icon-button-inner>.icon {
-    background-color: var(--button-icon-color);
+button.icon-button.modal-header-button>.icon-button-inner>.icon {
+    transition: background-color var(--animation-duration) ease-in-out;
 }
 .modal-header-button[data-modal-action=expand],
 .modal-header-button[data-modal-action=collapse] {
@@ -1064,6 +1067,19 @@ button.icon-button.modal-header-button:active>.icon-button-inner>.icon {
     padding-bottom: var(--fab-button-padding);
 }
 button.fab-button {
+    --button-content-color: var(--button-default-text-color);
+    --button-border-color: transparent;
+    --button-background-color: transparent;
+    --button-shadow: none;
+
+    --button-hover-border-color: transparent;
+    --button-hover-background-color: transparent;
+    --button-hover-shadow: none;
+
+    --button-active-border-color: transparent;
+    --button-active-background-color: transparent;
+    --button-active-shadow: none;
+
     display: block;
     padding: 0;
     margin: 0;
@@ -1072,13 +1088,6 @@ button.fab-button {
 button.fab-button>.icon-button-inner {
     width: var(--fab-button-size);
     height: var(--fab-button-size);
-}
-button.fab-button,
-button.fab-button:hover,
-button.fab-button:focus,
-button.fab-button:active {
-    background-color: transparent;
-    box-shadow: none;
 }
 .fab-button-background {
     position: absolute;
@@ -1093,7 +1102,7 @@ button.fab-button:active {
     box-shadow: var(--shadow-vertical);
 }
 button.fab-button>.icon-button-inner>.icon {
-    background-color: #ffffff;
+    background-color: var(--button-content-color);
 }
 .fab-container-item.fab-container-item-popup-preview {
     display: none;
@@ -1450,16 +1459,6 @@ input.anki-card-field-value {
     flex: 1 1 auto;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-}
-button.anki-card-field-value-menu-button {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border: none;
-    height: var(--input-height);
-    line-height: var(--input-height);
-    background-color: var(--input-background-color);
-    box-sizing: border-box;
-    padding: 0 0.5em;
 }
 #anki-error-message-details {
     margin-top: 0.25em;

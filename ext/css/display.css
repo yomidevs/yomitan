@@ -477,65 +477,57 @@ a {
 
 /* Sidebar buttons */
 button.sidebar-button {
+    --button-content-color: var(--sidebar-button-icon-color);
+    --button-border-color: transparent;
+    --button-background-color: var(--sidebar-button-background-color);
+    --button-shadow: none;
+
+    --button-hover-border-color: transparent;
+    --button-hover-background-color: var(--sidebar-button-background-color-hover);
+    --button-hover-shadow: none;
+
+    --button-active-border-color: transparent;
+    --button-active-background-color: var(--sidebar-button-background-color-active);
+    --button-active-shadow: none;
+
+    --button-disabled-content-color: var(--sidebar-button-disabled-icon-color);
+    --button-disabled-border-color: transparent;
+    --button-disabled-background-color: var(--sidebar-button-background-color);
+    --button-disabled-shadow: none;
+
     width: 100%;
     height: var(--sidebar-button-height);
-    background-color: var(--sidebar-button-background-color);
     margin: 0;
     padding: 0;
-    border: 0;
+    border-style: none;
+    border-width: 0;
     cursor: pointer;
     display: block;
     transition: background-color 0.125s ease-in-out;
     outline: none;
     font-size: inherit;
     border-radius: 0;
-    box-shadow: none;
 }
 :root[data-popup-action-bar-location=top] button.sidebar-button,
 :root[data-popup-action-bar-location=bottom] button.sidebar-button {
     width: var(--sidebar-width);
     height: 100%;
 }
-button.sidebar-button:disabled {
-    cursor: default;
-}
-button.sidebar-button:hover,
-button.sidebar-button:active,
-button.sidebar-button:focus {
-    box-shadow: none;
-}
-button.sidebar-button:hover,
-button.sidebar-button:focus {
-    background-color: var(--sidebar-button-background-color-hover);
-}
-button.sidebar-button:focus:not(:focus-visible):not(:hover) {
-    background-color: var(--sidebar-button-background-color);
-}
-button.sidebar-button:focus-visible {
-    background-color: var(--sidebar-button-background-color-hover);
-}
-button.sidebar-button:active {
-    background-color: var(--sidebar-button-background-color-active);
-}
 button.sidebar-button.danger {
-    background-color: var(--sidebar-button-danger-background-color);
-}
-button.sidebar-button.danger:hover,
-button.sidebar-button.danger:focus {
-    background-color: var(--sidebar-button-danger-background-color-hover);
-}
-button.sidebar-button.danger:focus:not(:focus-visible):not(:hover) {
-    background-color: var(--sidebar-button-danger-background-color);
-}
-button.sidebar-button.danger:focus-visible {
-    background-color: var(--sidebar-button-danger-background-color-hover);
-}
-button.sidebar-button.danger:active {
-    background-color: var(--sidebar-button-danger-background-color-active);
-}
-button.sidebar-button:disabled,
-button.sidebar-button.danger:disabled {
-    background-color: var(--sidebar-button-background-color);
+    --button-content-color: var(--sidebar-button-icon-color);
+    --button-border-color: transparent;
+    --button-background-color: var(--sidebar-button-danger-background-color);
+    --button-shadow: none;
+
+    --button-hover-content-color: var(--sidebar-button-danger-icon-color);
+    --button-hover-border-color: transparent;
+    --button-hover-background-color: var(--sidebar-button-danger-background-color-hover);
+    --button-hover-shadow: none;
+
+    --button-active-content-color: var(--sidebar-button-danger-icon-color);
+    --button-active-border-color: transparent;
+    --button-active-background-color: var(--sidebar-button-danger-background-color-active);
+    --button-active-shadow: none;
 }
 .sidebar-button-icon {
     --icon-size: var(--sidebar-button-icon-size) var(--sidebar-button-icon-size);
@@ -543,25 +535,13 @@ button.sidebar-button.danger:disabled {
     display: block;
     width: 100%;
     height: 100%;
-    background-color: var(--sidebar-button-icon-color);
+    background-color: var(--button-current-content-color);
     transition: background-color 0.125s ease-in-out;
 }
-button.sidebar-button:disabled .sidebar-button-icon,
-button.sidebar-button.danger:disabled .sidebar-button-icon {
-    background-color: var(--sidebar-button-disabled-icon-color);
-}
-button.sidebar-button.danger:hover .sidebar-button-icon,
-button.sidebar-button.danger:focus .sidebar-button-icon {
-    background-color: var(--sidebar-button-danger-icon-color);
-}
-button.sidebar-button.danger:focus:not(:focus-visible):not(:hover) .sidebar-button-icon {
-    background-color: var(--sidebar-button-icon-color);
-}
-button.sidebar-button.danger:focus-visible .sidebar-button-icon {
-    background-color: var(--sidebar-button-danger-icon-color);
-}
-button.sidebar-button.sidebar-button-highlight>.sidebar-button-icon {
-    background-color: var(--accent-color);
+button.sidebar-button.sidebar-button-highlight {
+    --button-content-color: var(--accent-color);
+    --button-hover-content-color: var(--accent-color);
+    --button-active-content-color: var(--accent-color);
 }
 
 
@@ -1593,31 +1573,37 @@ button.action-button[data-icon=source-term]::before {
     top: 0;
     right: 0;
 }
-button.footer-notification-close-button,
-button.footer-notification-close-button:focus,
-button.footer-notification-close-button:hover,
-button.footer-notification-close-button:active {
+button.footer-notification-close-button {
+    --button-content-color: var(--notification-text-color);
+    --button-border-color: transparent;
+    --button-background-color: transparent;
+    --button-shadow: none;
+
+    --button-hover-border-color: transparent;
+    --button-hover-background-color: transparent;
+    --button-hover-shadow: none;
+
+    --button-active-border-color: transparent;
+    --button-active-background-color: transparent;
+    --button-active-shadow: none;
+
+    --button-focus-visible-border-color: transparent;
+    --button-focus-visible-background-color: var(--notification-background-color-light);
+    --button-focus-visible-shadow: none;
+
     flex: 0 0 auto;
-    background-color: transparent;
     margin: -0.25em;
     padding: 0.5em;
-    border: none;
-    outline: none;
+    border-style: none;
+    border-width: 0;
     cursor: pointer;
     font-size: inherit;
-    box-shadow: none;
-}
-button.footer-notification-close-button:focus-visible {
-    background-color: var(--notification-background-color-light);
-}
-button.footer-notification-close-button:focus-visible:active {
-    background-color: var(--notification-background-color-lighter);
 }
 .footer-notification-close-button-icon {
     display: block;
     width: calc(16em / var(--font-size-no-units));
     height: calc(16em / var(--font-size-no-units));
-    background-color: var(--notification-text-color);
+    background-color: var(--button-content-color);
 }
 
 

@@ -121,7 +121,7 @@ h1 {
     top: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--button-icon-color);
+    background-color: var(--button-default-icon-color);
     --icon-size: 16px 16px;
 }
 

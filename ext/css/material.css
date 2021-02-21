@@ -44,7 +44,7 @@
     --material-arrow-dimension1: calc(5em / var(--font-size-no-units));
     --material-arrow-dimension2: calc(10em / var(--font-size-no-units));
 
-    --button-shadow-params: 0 0.0625em 0.125em 0;
+    --button-default-shadow-params: 0 0.0625em 0.125em 0;
 
     --thin-border-size: calc(1em / var(--font-size-no-units));
 
@@ -102,10 +102,10 @@
     --input-background-color-darker: #cccccc;
     --input-outline-color: var(--text-color);
 
-    --button-text-color: #ffffff;
-    --button-border-color: #cccccc;
-    --button-icon-color: #333333;
-    --button-icon-color-light: #666666;
+    --button-default-text-color: #ffffff;
+    --button-default-border-color: #cccccc;
+    --button-default-icon-color: #333333;
+    --button-default-icon-color-light: #666666;
 
     --checkbox-checked-color: var(--accent-color);
     --checkbox-unchecked-color: #666666;
@@ -160,10 +160,10 @@
     --input-background-color-darker: #484848;
     --input-outline-color: var(--text-color);
 
-    --button-text-color: #000000;
-    --button-border-color: #333333;
-    --button-icon-color: #cccccc;
-    --button-icon-color-light: #999999;
+    --button-default-text-color: #000000;
+    --button-default-border-color: #333333;
+    --button-default-icon-color: #cccccc;
+    --button-default-icon-color-light: #999999;
 
     --checkbox-unchecked-color: #999999;
 
@@ -761,207 +761,250 @@ input[type=number].code {
 
 
 /* Material design button */
-button {
-    border: var(--thin-border-size) solid transparent;
+button,
+.button {
+    --button-content-color: var(--button-default-text-color);
+    --button-border-color: var(--accent-color);
+    --button-background-color: var(--accent-color);
+    --button-shadow: none;
+
+    --button-hover-content-color: var(--button-content-color);
+    --button-hover-border-color: var(--button-hover-background-color);
+    --button-hover-background-color: var(--accent-color-light);
+    --button-hover-shadow: var(--button-default-shadow-params) var(--shadow-color-light);
+
+    --button-focus-content-color: var(--button-hover-content-color);
+    --button-focus-border-color: var(--button-hover-border-color);
+    --button-focus-background-color: var(--button-hover-background-color);
+    --button-focus-shadow: var(--button-hover-shadow);
+
+    --button-focus-visible-content-color: var(--button-focus-content-color);
+    --button-focus-visible-border-color: var(--button-focus-border-color);
+    --button-focus-visible-background-color: var(--button-focus-background-color);
+    --button-focus-visible-shadow: var(--button-focus-shadow);
+
+    --button-active-content-color: var(--button-content-color);
+    --button-active-border-color: var(--button-active-background-color);
+    --button-active-background-color: var(--accent-color-lighter);
+    --button-active-shadow: var(--button-default-shadow-params) var(--shadow-color);
+
+    --button-disabled-content-color: var(--button-default-text-color);
+    --button-disabled-border-color: var(--disabled-color);
+    --button-disabled-background-color: var(--disabled-color);
+    --button-disabled-shadow: none;
+
+    --button-current-content-color: var(--button-content-color);
+    --button-current-border-color: var(--button-border-color);
+    --button-current-background-color: var(--button-background-color);
+    --button-current-shadow: var(--button-shadow);
+
+    border-width: var(--thin-border-size);
+    border-style: solid;
     border-radius: 0.3em;
     padding: 0.5em 1em;
     font-weight: bold;
     font-size: inherit;
     font-family: inherit;
     cursor: pointer;
-    background-color: transparent;
-    box-shadow: var(--button-shadow-params) var(--shadow-color-off);
     transition:
-        background-color var(--animation-duration) ease-in,
-        box-shadow var(--animation-duration) ease-in,
-        border-color var(--animation-duration) ease-in;
+        background-color var(--animation-duration) ease-in-out,
+        box-shadow var(--animation-duration) ease-in-out,
+        border-color var(--animation-duration) ease-in-out;
     -webkit-tap-highlight-color: transparent;
-}
-button:focus {
-    outline: none;
-}
-button:hover {
-    transition:
-        background-color var(--animation-duration) ease-out,
-        box-shadow var(--animation-duration) ease-out,
-        border-color var(--animation-duration) ease-out;
-}
-button:hover {
-    box-shadow: var(--button-shadow-params) var(--shadow-color-light);
-}
-button:active {
-    box-shadow: var(--button-shadow-params) var(--shadow-color);
-}
 
-/* Standard button */
-button {
-    color: var(--button-text-color);
-    border-color: var(--accent-color);
-    background-color: var(--accent-color);
+    color: var(--button-current-content-color);
+    border-color: var(--button-current-border-color);
+    background-color: var(--button-current-background-color);
+    box-shadow: var(--button-current-shadow);
 }
 button:hover,
-button:focus {
-    background-color: var(--accent-color-light);
-    border-color: var(--accent-color-light);
+.button:hover {
+    --button-current-content-color: var(--button-hover-content-color);
+    --button-current-border-color: var(--button-hover-border-color);
+    --button-current-background-color: var(--button-hover-background-color);
+    --button-current-shadow: var(--button-hover-shadow);
 }
-button:focus:not(:focus-visible):not(:hover):not(:active) {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
-}
-button:focus-visible {
-    background-color: var(--accent-color-light);
-    border-color: var(--accent-color-light);
+button:focus,
+.button:focus {
+    --button-current-content-color: var(--button-focus-content-color);
+    --button-current-border-color: var(--button-focus-border-color);
+    --button-current-background-color: var(--button-focus-background-color);
+    --button-current-shadow: var(--button-focus-shadow);
+
+    outline: none;
 }
 button:active,
-button:active:focus {
-    border-color: var(--accent-color-lighter);
-    background-color: var(--accent-color-lighter);
+.button:active {
+    --button-current-content-color: var(--button-active-content-color);
+    --button-current-border-color: var(--button-active-border-color);
+    --button-current-background-color: var(--button-active-background-color);
+    --button-current-shadow: var(--button-active-shadow);
+}
+button:focus:not(:focus-visible),
+.button:focus:not(:focus-visible) {
+    --button-current-content-color: var(--button-content-color);
+    --button-current-border-color: var(--button-border-color);
+    --button-current-background-color: var(--button-background-color);
+    --button-current-shadow: var(--button-shadow);
+}
+button:focus-visible,
+.button:focus-visible {
+    --button-current-content-color: var(--button-focus-visible-content-color);
+    --button-current-border-color: var(--button-focus-visible-border-color);
+    --button-current-background-color: var(--button-focus-visible-background-color);
+    --button-current-shadow: var(--button-focus-visible-shadow);
+}
+button:hover:focus-visible,
+button:hover:not(:focus-visible),
+.button:hover:focus-visible,
+.button:hover:not(:focus-visible) {
+    --button-current-content-color: var(--button-hover-content-color);
+    --button-current-border-color: var(--button-hover-border-color);
+    --button-current-background-color: var(--button-hover-background-color);
+    --button-current-shadow: var(--button-hover-shadow);
+}
+button:focus:focus-visible,
+.button:focus:focus-visible {
+    --button-current-content-color: var(--button-focus-visible-content-color);
+    --button-current-border-color: var(--button-focus-visible-border-color);
+    --button-current-background-color: var(--button-focus-visible-background-color);
+    --button-current-shadow: var(--button-focus-visible-shadow);
+}
+button:active:focus-visible,
+button:active:not(:focus-visible),
+.button:active:focus-visible,
+.button:active:not(:focus-visible) {
+    --button-current-content-color: var(--button-active-content-color);
+    --button-current-border-color: var(--button-active-border-color);
+    --button-current-background-color: var(--button-active-background-color);
+    --button-current-shadow: var(--button-active-shadow);
+}
+button:disabled,
+.button:disabled {
+    cursor: default;
+}
+button:disabled,
+button:disabled:focus,
+button:disabled:hover,
+button:disabled:active,
+.button:disabled,
+.button:disabled:focus,
+.button:disabled:hover,
+.button:disabled:active {
+    --button-current-content-color: var(--button-disabled-content-color);
+    --button-current-border-color: var(--button-disabled-border-color);
+    --button-current-background-color: var(--button-disabled-background-color);
+    --button-current-shadow: var(--button-disabled-shadow);
+}
+button:disabled:focus-visible,
+.button:disabled:focus-visible {
+    --button-current-content-color: var(--button-disabled-content-color);
+    --button-current-border-color: var(--button-disabled-border-color);
+    --button-current-background-color: var(--button-disabled-background-color);
+    --button-current-shadow: var(--button-disabled-shadow);
 }
 
 /* Standard danger button */
 button.danger {
-    color: var(--button-text-color);
-    border-color: var(--danger-color);
-    background-color: var(--danger-color);
-}
-button.danger:hover,
-button.danger:focus {
-    background-color: var(--danger-color-light);
-    border-color: var(--danger-color-light);
-}
-button.danger:focus:not(:focus-visible):not(:hover):not(:active) {
-    background-color: var(--danger-color);
-    border-color: var(--danger-color);
-}
-button.danger:focus-visible {
-    background-color: var(--danger-color-light);
-    border-color: var(--danger-color-light);
-}
-button.danger:active,
-button.danger:active:focus {
-    border-color: var(--danger-color-lighter);
-    background-color: var(--danger-color-lighter);
+    --button-border-color: var(--danger-color);
+    --button-background-color: var(--danger-color);
+    --button-hover-background-color: var(--danger-color-light);
+    --button-active-background-color: var(--danger-color-lighter);
 }
 
 /* Low emphasis button */
 button.low-emphasis {
-    color: var(--accent-color);
-    border-color: var(--button-border-color);
-    background-color: var(--accent-color-transparent0);
-}
-button.low-emphasis:hover,
-button.low-emphasis:focus {
-    border-color: var(--accent-color);
-    background-color: var(--accent-color-transparent5);
-}
-button.low-emphasis:focus:not(:focus-visible):not(:hover):not(:active) {
-    border-color: var(--button-border-color);
-    background-color: var(--accent-color-transparent0);
-}
-button.low-emphasis:focus-visible {
-    border-color: var(--accent-color);
-    background-color: var(--accent-color-transparent5);
-}
-button.low-emphasis:active,
-button.low-emphasis:active:focus {
-    border-color: var(--accent-color);
-    background-color: var(--accent-color-transparent25);
+    --button-content-color: var(--accent-color);
+    --button-border-color: var(--button-default-border-color);
+    --button-background-color: var(--accent-color-transparent0);
+    --button-hover-border-color: var(--accent-color);
+    --button-hover-background-color: var(--accent-color-transparent5);
+    --button-active-border-color: var(--accent-color);
+    --button-active-background-color: var(--accent-color-transparent25);
+    --button-disabled-content-color: var(--disabled-color);
+    --button-disabled-border-color: var(--disabled-color);
+    --button-disabled-background-color: var(--accent-color-transparent0);
 }
 
 /* Low emphasis danger button */
 button.low-emphasis.danger {
-    color: var(--danger-color);
-    border-color: var(--button-border-color);
-    background-color: var(--danger-color-transparent0);
-}
-button.low-emphasis.danger:hover,
-button.low-emphasis.danger:focus {
-    border-color: var(--danger-color);
-    background-color: var(--danger-color-transparent5);
-}
-button.low-emphasis.danger:focus:not(:focus-visible):not(:hover):not(:active) {
-    border-color: var(--button-border-color);
-    background-color: var(--danger-color-transparent0);
-}
-button.low-emphasis.danger:focus-visible {
-    border-color: var(--danger-color);
-    background-color: var(--danger-color-transparent5);
-}
-button.low-emphasis.danger:active,
-button.low-emphasis.danger:active:focus {
-    border-color: var(--danger-color);
-    background-color: var(--danger-color-transparent25);
-}
-
-/* Disabled buttons */
-button:disabled,
-button:disabled:focus,
-button:disabled:hover,
-button:disabled:active {
-    color: var(--button-text-color);
-    border-color: var(--disabled-color);
-    background-color: var(--disabled-color);
-    cursor: default;
-}
-button.low-emphasis:disabled,
-button.low-emphasis:disabled:focus,
-button.low-emphasis:disabled:hover,
-button.low-emphasis:disabled:active {
-    color: var(--disabled-color);
-    border-color: var(--disabled-color);
-    background-color: transparent;
+    --button-content-color: var(--danger-color);
+    --button-border-color: var(--button-default-border-color);
+    --button-background-color: var(--danger-color-transparent0);
+    --button-hover-border-color: var(--danger-color);
+    --button-hover-background-color: var(--danger-color-transparent5);
+    --button-active-border-color: var(--danger-color);
+    --button-active-background-color: var(--danger-color-transparent25);
+    --button-disabled-content-color: var(--disabled-color);
+    --button-disabled-border-color: var(--disabled-color);
+    --button-disabled-background-color: var(--danger-color-transparent0);
 }
 
 /* Input suffix button */
 button.input-suffix-button {
+    --button-content-color: var(--button-default-icon-color);
+    --button-border-color: var(--input-background-color);
+    --button-background-color: var(--input-background-color);
+    --button-hover-background-color: var(--input-background-color-dark);
+    --button-active-background-color: var(--input-background-color-darker);
+
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    border: none;
+    border-style: none;
+    border-width: 0;
     height: var(--input-height);
     line-height: var(--input-height);
-    background-color: var(--input-background-color);
     box-sizing: border-box;
     padding: 0 0.5em;
-    border-color: transparent;
-    transition:
-        background-color var(--animation-duration) ease-in,
-        box-shadow var(--animation-duration) ease-in;
+    position: relative;
+}
+button.input-suffix-button.light-icon {
+    --button-content-color: var(--button-default-icon-color-light);
 }
 button.input-suffix-button.input-suffix-icon-button {
     width: 2.125em;
-    position: relative;
-}
-button.input-suffix-button.input-suffix-icon-button:hover,
-button.input-suffix-button.input-suffix-icon-button:focus {
-    background-color: var(--input-background-color-dark);
-}
-button.input-suffix-button.input-suffix-icon-button:focus:not(:focus-visible):not(:hover):not(:active) {
-    background-color: var(--input-background-color);
-}
-button.input-suffix-button.input-suffix-icon-button:focus-visible {
-    background-color: var(--input-background-color-dark);
-}
-button.input-suffix-button.input-suffix-icon-button:active,
-button.input-suffix-button.input-suffix-icon-button:active:focus {
-    background-color: var(--input-background-color-darker);
 }
 button.input-suffix-button.input-suffix-icon-button>.icon {
     display: block;
     width: 100%;
     height: 100%;
-    background-color: var(--button-icon-color);
+    background-color: var(--button-current-content-color);
 }
 input[type=text]:invalid+button.input-suffix-button,
 input[type=number]:invalid+button.input-suffix-button,
 input[type=text][data-invalid=true]+button.input-suffix-button,
 input[type=number][data-invalid=true]+button.input-suffix-button {
-    border: var(--thin-border-size) solid var(--danger-color);
+    --button-border-color: var(--danger-color);
+    --button-hover-border-color: var(--danger-color);
+    --button-active-border-color: var(--danger-color);
+    --button-disabled-border-color: var(--danger-color);
+
+    border-width: var(--thin-border-size);
+    border-style: solid;
     border-left-style: none;
 }
 
 
 /* Material design icon button */
 button.icon-button {
+    --button-content-color: var(--button-default-icon-color);
+    --button-border-color: transparent;
+    --button-background-color: transparent;
+    --button-shadow: none;
+
+    --button-hover-border-color: transparent;
+    --button-hover-background-color: transparent;
+    --button-hover-shadow: none;
+
+    --button-active-border-color: transparent;
+    --button-active-background-color: transparent;
+    --button-active-shadow: none;
+
+    --button-disabled-content-color: var(--button-default-icon-color);
+    --button-disabled-border-color: transparent;
+    --button-disabled-background-color: transparent;
+    --button-disabled-shadow: none;
+
     vertical-align: middle;
     border: none;
     margin: 0;
@@ -969,7 +1012,10 @@ button.icon-button {
     box-sizing: content-box;
     font-size: inherit;
     cursor: pointer;
-    background-color: transparent;
+}
+button.icon-button.light-icon {
+    --button-content-color: var(--button-default-icon-color-light);
+    --button-disabled-content-color: var(--button-default-icon-color-light);
 }
 button.icon-button:not([hidden]) {
     display: inline-block;
@@ -979,22 +1025,6 @@ button.icon-button>.icon-button-inner {
     width: var(--icon-button-size);
     height: var(--icon-button-size);
     position: relative;
-}
-button.icon-button:focus {
-    outline: none;
-}
-button.icon-button,
-button.icon-button:hover,
-button.icon-button:focus,
-button.icon-button:active {
-    background-color: transparent;
-    box-shadow: none;
-}
-button.icon-button:focus:not(:focus-visible),
-button.icon-button:focus:hover:not(:focus-visible),
-button.icon-button:focus:active:not(:focus-visible) {
-    background-color: transparent;
-    box-shadow: none;
 }
 .icon-button>.icon-button-inner::after {
     position: absolute;
@@ -1041,11 +1071,8 @@ button.icon-button:focus:active:not(:focus-visible) {
     top: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--button-icon-color);
+    background-color: var(--button-current-content-color);
     --icon-size: calc(16em / var(--font-size-no-units)) calc(16em / var(--font-size-no-units));
-}
-.icon-button>.icon-button-inner>.icon.icon-button-icon-light {
-    background-color: var(--button-icon-color-light);
 }
 .icon-button>.icon-button-inner>.icon[data-icon=material-right-arrow] { --icon-size: var(--material-arrow-dimension1) var(--material-arrow-dimension2); }
 .icon-button>.icon-button-inner>.icon[data-icon=material-down-arrow] { --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1); }
@@ -1095,12 +1122,29 @@ button.icon-button:focus:active:not(:focus-visible) {
     white-space: nowrap;
 }
 button.popup-menu-item {
+    --button-content-color: var(--text-color);
+    --button-border-color: transparent;
+    --button-background-color: transparent;
+    --button-shadow: none;
+
+    --button-hover-border-color: transparent;
+    --button-hover-background-color: var(--menu-item-hover-color);
+    --button-hover-shadow: none;
+
+    --button-active-border-color: transparent;
+    --button-active-background-color: var(--menu-item-active-color);
+    --button-active-shadow: none;
+
+    --button-disabled-content-color: var(--text-color-light2);
+    --button-disabled-border-color: transparent;
+    --button-disabled-background-color: transparent;
+    --button-disabled-shadow: none;
+
     padding: 0.625em 1.5em;
     flex: 1 1 auto;
     border-radius: 0;
-    background-color: transparent;
-    color: var(--text-color);
-    border: none;
+    border-style: none;
+    border-width: 0;
     text-align: left;
     font-size: 1em;
     font-weight: normal;
@@ -1110,30 +1154,10 @@ button.popup-menu-item {
 button.popup-menu-item:not([hidden]) {
     display: flex;
 }
-button.popup-menu-item:hover,
-button.popup-menu-item:focus {
-    background-color: var(--menu-item-hover-color);
-    box-shadow: none;
-}
-button.popup-menu-item:focus:not(:focus-visible):not(:hover):not(:disabled) {
-    background-color: transparent;
-}
-button.popup-menu-item:focus-visible:not(:disabled) {
-    background-color: var(--menu-item-hover-color);
-}
-button.popup-menu-item:active:not(:disabled) {
-    background-color: var(--menu-item-active-color);
-    box-shadow: none;
-}
-button.popup-menu-item:disabled {
-    color: var(--text-color-light2);
-    background-color: transparent;
-    box-shadow: none;
-}
 .popup-menu-item-icon {
     width: calc(16em / 14);
     height: calc(16em / 14);
-    background-color: var(--text-color);
+    background-color: var(--button-current-content-color);
     flex: 0 0 auto;
 }
 .popup-menu-item-icon:not([hidden]) {
