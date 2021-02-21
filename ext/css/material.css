@@ -351,6 +351,21 @@ label.checkbox {
     visibility: visible;
     transition: var(--selectable-indicator-transition2);
 }
+.checkbox>input[type=checkbox]:focus:not(:focus-visible)+.checkbox-body::after {
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--selectable-indicator-transition1);
+}
+.checkbox>input[type=checkbox]:focus-visible+.checkbox-body::after,
+.checkbox>input[type=checkbox]:focus-visible:focus+.checkbox-body::after,
+.checkbox>input[type=checkbox]:focus-visible:active+.checkbox-body::after,
+.checkbox:active>input[type=checkbox]:focus-visible+.checkbox-body::after {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+    transition: var(--selectable-indicator-transition2);
+}
 .checkbox>input[type=checkbox]:focus+.checkbox-body::after {
     opacity: 0.5;
 }
@@ -444,12 +459,24 @@ label.toggle {
     visibility: visible;
     transition: var(--selectable-indicator-transition2);
 }
-.toggle>input[type=checkbox]:focus+.toggle-body>.toggle-knob::after {
+.toggle>input[type=checkbox]+.toggle-body>.toggle-knob::after {
     opacity: 0.5;
 }
-.toggle>input[type=checkbox]:active:focus+.toggle-body>.toggle-knob::after,
-.toggle:active>input[type=checkbox]:focus+.toggle-body>.toggle-knob::after {
+.toggle>input[type=checkbox]:active+.toggle-body>.toggle-knob::after,
+.toggle:active>input[type=checkbox]+.toggle-body>.toggle-knob::after {
     opacity: 1;
+}
+.toggle>input[type=checkbox]:focus:not(:focus-visible)+.toggle-body>.toggle-knob::after {
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--selectable-indicator-transition1);
+}
+.toggle>input[type=checkbox]:focus-visible+.toggle-body>.toggle-knob::after {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+    transition: var(--selectable-indicator-transition2);
 }
 .toggle>input[type=checkbox]:checked+.toggle-body>.toggle-knob {
     transform: translateX(1em);
@@ -575,6 +602,18 @@ label.radio {
 .radio>input[type=radio]:focus+.radio-body::after,
 .radio>input[type=radio]:active+.radio-body::after,
 .radio:active>input[type=radio]+.radio-body::after {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+    transition: var(--selectable-indicator-transition2);
+}
+.radio>input[type=radio]:focus:not(:focus-visible)+.radio-body::after {
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--selectable-indicator-transition1);
+}
+.radio>input[type=radio]:focus-visible+.radio-body::after {
     transform: scale(1);
     opacity: 1;
     visibility: visible;
@@ -732,14 +771,20 @@ button {
     cursor: pointer;
     background-color: transparent;
     box-shadow: var(--button-shadow-params) var(--shadow-color-off);
-    transition: background-color var(--animation-duration) ease-in, box-shadow var(--animation-duration) ease-in, border-color var(--animation-duration) ease-in;
+    transition:
+        background-color var(--animation-duration) ease-in,
+        box-shadow var(--animation-duration) ease-in,
+        border-color var(--animation-duration) ease-in;
     -webkit-tap-highlight-color: transparent;
 }
 button:focus {
     outline: none;
 }
 button:hover {
-    transition: background-color var(--animation-duration) ease-out, box-shadow var(--animation-duration) ease-out, border-color var(--animation-duration) ease-out;
+    transition:
+        background-color var(--animation-duration) ease-out,
+        box-shadow var(--animation-duration) ease-out,
+        border-color var(--animation-duration) ease-out;
 }
 button:hover {
     box-shadow: var(--button-shadow-params) var(--shadow-color-light);
@@ -754,14 +799,21 @@ button {
     border-color: var(--accent-color);
     background-color: var(--accent-color);
 }
-button:hover {
+button:hover,
+button:focus {
     background-color: var(--accent-color-light);
     border-color: var(--accent-color-light);
 }
-button:focus {
-    background-color: var(--accent-color-light);
+button:focus:not(:focus-visible):not(:hover):not(:active) {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
 }
-button:active {
+button:focus-visible {
+    background-color: var(--accent-color-light);
+    border-color: var(--accent-color-light);
+}
+button:active,
+button:active:focus {
     border-color: var(--accent-color-lighter);
     background-color: var(--accent-color-lighter);
 }
@@ -772,14 +824,21 @@ button.danger {
     border-color: var(--danger-color);
     background-color: var(--danger-color);
 }
-button.danger:hover {
+button.danger:hover,
+button.danger:focus {
     background-color: var(--danger-color-light);
     border-color: var(--danger-color-light);
 }
-button.danger:focus {
-    background-color: var(--danger-color-light);
+button.danger:focus:not(:focus-visible):not(:hover):not(:active) {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
 }
-button.danger:active {
+button.danger:focus-visible {
+    background-color: var(--danger-color-light);
+    border-color: var(--danger-color-light);
+}
+button.danger:active,
+button.danger:active:focus {
     border-color: var(--danger-color-lighter);
     background-color: var(--danger-color-lighter);
 }
@@ -790,14 +849,21 @@ button.low-emphasis {
     border-color: var(--button-border-color);
     background-color: var(--accent-color-transparent0);
 }
-button.low-emphasis:hover {
-    background-color: var(--accent-color-transparent5);
-    border-color: var(--accent-color-light);
-}
+button.low-emphasis:hover,
 button.low-emphasis:focus {
     border-color: var(--accent-color);
+    background-color: var(--accent-color-transparent5);
 }
-button.low-emphasis:active {
+button.low-emphasis:focus:not(:focus-visible):not(:hover):not(:active) {
+    border-color: var(--button-border-color);
+    background-color: var(--accent-color-transparent0);
+}
+button.low-emphasis:focus-visible {
+    border-color: var(--accent-color);
+    background-color: var(--accent-color-transparent5);
+}
+button.low-emphasis:active,
+button.low-emphasis:active:focus {
     border-color: var(--accent-color);
     background-color: var(--accent-color-transparent25);
 }
@@ -808,28 +874,39 @@ button.low-emphasis.danger {
     border-color: var(--button-border-color);
     background-color: var(--danger-color-transparent0);
 }
-button.low-emphasis.danger:hover {
-    border-color: var(--danger-color-light);
-    background-color: var(--danger-color-transparent5);
-}
+button.low-emphasis.danger:hover,
 button.low-emphasis.danger:focus {
     border-color: var(--danger-color);
+    background-color: var(--danger-color-transparent5);
 }
-button.low-emphasis.danger:active {
+button.low-emphasis.danger:focus:not(:focus-visible):not(:hover):not(:active) {
+    border-color: var(--button-border-color);
+    background-color: var(--danger-color-transparent0);
+}
+button.low-emphasis.danger:focus-visible {
+    border-color: var(--danger-color);
+    background-color: var(--danger-color-transparent5);
+}
+button.low-emphasis.danger:active,
+button.low-emphasis.danger:active:focus {
     border-color: var(--danger-color);
     background-color: var(--danger-color-transparent25);
 }
 
 /* Disabled buttons */
 button:disabled,
-button.danger:disabled {
+button:disabled:focus,
+button:disabled:hover,
+button:disabled:active {
     color: var(--button-text-color);
     border-color: var(--disabled-color);
     background-color: var(--disabled-color);
     cursor: default;
 }
 button.low-emphasis:disabled,
-button.low-emphasis.danger:disabled {
+button.low-emphasis:disabled:focus,
+button.low-emphasis:disabled:hover,
+button.low-emphasis:disabled:active {
     color: var(--disabled-color);
     border-color: var(--disabled-color);
     background-color: transparent;
@@ -858,7 +935,14 @@ button.input-suffix-button.input-suffix-icon-button:hover,
 button.input-suffix-button.input-suffix-icon-button:focus {
     background-color: var(--input-background-color-dark);
 }
-button.input-suffix-button.input-suffix-icon-button:active {
+button.input-suffix-button.input-suffix-icon-button:focus:not(:focus-visible):not(:hover):not(:active) {
+    background-color: var(--input-background-color);
+}
+button.input-suffix-button.input-suffix-icon-button:focus-visible {
+    background-color: var(--input-background-color-dark);
+}
+button.input-suffix-button.input-suffix-icon-button:active,
+button.input-suffix-button.input-suffix-icon-button:active:focus {
     background-color: var(--input-background-color-darker);
 }
 button.input-suffix-button.input-suffix-icon-button>.icon {
@@ -906,6 +990,12 @@ button.icon-button:active {
     background-color: transparent;
     box-shadow: none;
 }
+button.icon-button:focus:not(:focus-visible),
+button.icon-button:focus:hover:not(:focus-visible),
+button.icon-button:focus:active:not(:focus-visible) {
+    background-color: transparent;
+    box-shadow: none;
+}
 .icon-button>.icon-button-inner::after {
     position: absolute;
     display: block;
@@ -922,7 +1012,23 @@ button.icon-button:active {
     visibility: hidden;
     transition: var(--selectable-indicator-transition1);
 }
-.icon-button:focus>.icon-button-inner::after {
+.icon-button:focus>.icon-button-inner::after,
+.icon-button:active>.icon-button-inner::after {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+    transition: var(--selectable-indicator-transition2);
+}
+.icon-button:focus:not(:focus-visible)>.icon-button-inner::after {
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--selectable-indicator-transition1);
+}
+.icon-button:focus-visible>.icon-button-inner::after,
+.icon-button:focus-visible:active>.icon-button-inner::after,
+.icon-button:focus>.icon-button-inner::after,
+.icon-button:focus:active>.icon-button-inner::after {
     transform: scale(1);
     opacity: 1;
     visibility: visible;
@@ -1009,7 +1115,13 @@ button.popup-menu-item:focus {
     background-color: var(--menu-item-hover-color);
     box-shadow: none;
 }
-button.popup-menu-item:active {
+button.popup-menu-item:focus:not(:focus-visible):not(:hover):not(:disabled) {
+    background-color: transparent;
+}
+button.popup-menu-item:focus-visible:not(:disabled) {
+    background-color: var(--menu-item-hover-color);
+}
+button.popup-menu-item:active:not(:disabled) {
     background-color: var(--menu-item-active-color);
     box-shadow: none;
 }

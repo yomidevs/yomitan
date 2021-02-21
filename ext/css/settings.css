@@ -407,7 +407,15 @@ a.heading-link-light {
     text-decoration: none;
     color: var(--text-color);
 }
-.outline-item:hover {
+.outline-item:hover,
+.outline-item:focus {
+    outline: none;
+    background-color: var(--outline-item-background-color-hover);
+}
+.outline-item:focus:not(:focus-visible) {
+    background-color: var(--outline-item-background-color);
+}
+.outline-item:focus-visible {
     background-color: var(--outline-item-background-color-hover);
 }
 .outline-item-left {

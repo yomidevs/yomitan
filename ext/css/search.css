@@ -103,7 +103,14 @@ h1 {
 #search-button:focus {
     background-color: var(--input-background-color-dark);
 }
-#search-button:active {
+#search-button:focus:not(:focus-visible):not(:hover) {
+    background-color: var(--input-background-color);
+}
+#search-button:focus-visible {
+    background-color: var(--input-background-color-dark);
+}
+#search-button:active,
+#search-button:active:focus {
     background-color: var(--input-background-color-darker);
 }
 

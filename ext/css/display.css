@@ -138,9 +138,12 @@
 
     --notification-text-color: #ffffff;
     --notification-background-color: #333333;
+    --notification-background-color-light: #555555;
+    --notification-background-color-lighter: #666666;
     --notification-shadow-color: rgba(0, 0, 0, 0.5);
 
-    --action-button-active-color: var(--scrollbar-thumb-color);
+    --action-button-hover-color: #dddddd;
+    --action-button-active-color: #c1c1c1;
 }
 :root[data-theme=dark] {
     /* Colors */
@@ -199,9 +202,12 @@
 
     --notification-text-color: #2f2f2f;
     --notification-background-color: #e1e1e1;
+    --notification-background-color-light: #bbbbbb;
+    --notification-background-color-lighter: #aaaaaa;
     --notification-shadow-color: rgba(255, 255, 255, 0.25);
 
-    --action-button-active-color: var(--scrollbar-thumb-color);
+    --action-button-hover-color: #282828;
+    --action-button-active-color: #444444;
 }
 
 
@@ -502,6 +508,12 @@ button.sidebar-button:hover,
 button.sidebar-button:focus {
     background-color: var(--sidebar-button-background-color-hover);
 }
+button.sidebar-button:focus:not(:focus-visible):not(:hover) {
+    background-color: var(--sidebar-button-background-color);
+}
+button.sidebar-button:focus-visible {
+    background-color: var(--sidebar-button-background-color-hover);
+}
 button.sidebar-button:active {
     background-color: var(--sidebar-button-background-color-active);
 }
@@ -510,6 +522,12 @@ button.sidebar-button.danger {
 }
 button.sidebar-button.danger:hover,
 button.sidebar-button.danger:focus {
+    background-color: var(--sidebar-button-danger-background-color-hover);
+}
+button.sidebar-button.danger:focus:not(:focus-visible):not(:hover) {
+    background-color: var(--sidebar-button-danger-background-color);
+}
+button.sidebar-button.danger:focus-visible {
     background-color: var(--sidebar-button-danger-background-color-hover);
 }
 button.sidebar-button.danger:active {
@@ -534,6 +552,12 @@ button.sidebar-button.danger:disabled .sidebar-button-icon {
 }
 button.sidebar-button.danger:hover .sidebar-button-icon,
 button.sidebar-button.danger:focus .sidebar-button-icon {
+    background-color: var(--sidebar-button-danger-icon-color);
+}
+button.sidebar-button.danger:focus:not(:focus-visible):not(:hover) .sidebar-button-icon {
+    background-color: var(--sidebar-button-icon-color);
+}
+button.sidebar-button.danger:focus-visible .sidebar-button-icon {
     background-color: var(--sidebar-button-danger-icon-color);
 }
 button.sidebar-button.sidebar-button-highlight>.sidebar-button-icon {
@@ -614,6 +638,10 @@ button.action-button:disabled:not([hidden]) {
 button.action-button:hover,
 button.action-button:focus {
     background-color: transparent;
+    box-shadow: none;
+}
+button.action-button:focus-visible {
+    background-color: var(--action-button-hover-color);
     box-shadow: none;
 }
 button.action-button:active {
@@ -1579,6 +1607,12 @@ button.footer-notification-close-button:active {
     font-size: inherit;
     box-shadow: none;
 }
+button.footer-notification-close-button:focus-visible {
+    background-color: var(--notification-background-color-light);
+}
+button.footer-notification-close-button:focus-visible:active {
+    background-color: var(--notification-background-color-lighter);
+}
 .footer-notification-close-button-icon {
     display: block;
     width: calc(16em / var(--font-size-no-units));
@@ -1709,9 +1743,14 @@ button.footer-notification-close-button:active {
 .popup-menu-item-group .popup-menu-item-set-primary-audio-button:focus .popup-menu-item-icon {
     opacity: 0.375;
 }
-.popup-menu-item-group[data-is-primary-card-audio=true] .popup-menu-item-set-primary-audio-button .popup-menu-item-icon {
-    opacity: 1;
+.popup-menu-item-group .popup-menu-item-set-primary-audio-button:focus:not(:focus-visible) .popup-menu-item-icon {
+    opacity: 0;
 }
+.popup-menu-item-group .popup-menu-item-set-primary-audio-button:hover:not(:focus-visible) .popup-menu-item-icon,
+.popup-menu-item-group .popup-menu-item-set-primary-audio-button:active:not(:focus-visible) .popup-menu-item-icon {
+    opacity: 0.375;
+}
+.popup-menu-item-group[data-is-primary-card-audio=true] .popup-menu-item-set-primary-audio-button .popup-menu-item-icon,
 .popup-menu-item-group[data-is-primary-card-audio=true] .popup-menu-item-set-primary-audio-button:hover .popup-menu-item-icon,
 .popup-menu-item-group[data-is-primary-card-audio=true] .popup-menu-item-set-primary-audio-button:active .popup-menu-item-icon,
 .popup-menu-item-group[data-is-primary-card-audio=true] .popup-menu-item-set-primary-audio-button:focus .popup-menu-item-icon {
