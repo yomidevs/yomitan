@@ -65,9 +65,9 @@
 
     --tag-font-size-no-units: 11;
     --tag-font-size: calc(1em * var(--tag-font-size-no-units) / var(--font-size-no-units));
-    --tag-border-size-no-units: 0;
-    --tag-border-size: calc(1em * (var(--tag-border-size-no-units) / var(--tag-font-size-no-units)));
-    --tag-border-style: none;
+    --tag-border-size-no-units: 1;
+    --tag-border-size: calc(1em * (var(--tag-border-size-no-units) / var(--font-size-no-units)));
+    --tag-border-style: solid;
     --tag-font-weight: bold;
 
     --compact-list-separator: ' | ';
@@ -682,6 +682,7 @@ button.action-button[data-icon=source-term]::before {
     border: none;
     border-right: none;
     font-size: 1em;
+    vertical-align: middle;
     margin: calc(1em / var(--font-size-no-units)) 0.375em calc(1em / var(--font-size-no-units)) 0;
 }
 .tag-label {
@@ -695,10 +696,12 @@ button.action-button[data-icon=source-term]::before {
     cursor: pointer;
 }
 .tag-label-content {
+    display: block;
     font-size: var(--tag-font-size);
     font-weight: var(--tag-font-weight);
 }
 .tag-body {
+    display: block;
     position: relative;
     padding: 0 0.375em 0 0.375em;
 }
@@ -715,8 +718,10 @@ button.action-button[data-icon=source-term]::before {
     border-left: none;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+    pointer-events: none;
 }
 .tag-body-content {
+    display: block;
     position: relative;
 }
 .tag:not(.tag-has-body)>.tag-body {
