@@ -1089,6 +1089,7 @@ button.action-button[data-icon=source-term]::before {
 }
 .frequency-disambiguation {
     color: var(--text-color-light3);
+    padding-right: 0.25em;
 }
 .frequency-separator::before {
     content: '';
@@ -1100,7 +1101,7 @@ button.action-button[data-icon=source-term]::before {
     content: '(';
 }
 .frequency-disambiguation::after {
-    content: ' only) ';
+    content: ' only)';
 }
 .frequency-disambiguation-reading {
     display: inline;
