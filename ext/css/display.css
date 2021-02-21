@@ -63,10 +63,10 @@
 
     --expression-space-size: 0.5em;
 
-    --tag-font-size-no-units: calc(11 / 14);
-    --tag-font-size: calc(1em * var(--tag-font-size-no-units));
+    --tag-font-size-no-units: 11;
+    --tag-font-size: calc(1em * var(--tag-font-size-no-units) / var(--font-size-no-units));
     --tag-border-size-no-units: 0;
-    --tag-border-size: calc(1em * (var(--tag-border-size-no-units) / (var(--font-size-no-units) * var(--tag-font-size-no-units))));
+    --tag-border-size: calc(1em * (var(--tag-border-size-no-units) / var(--tag-font-size-no-units)));
     --tag-border-style: none;
     --tag-font-weight: bold;
 
@@ -256,7 +256,7 @@ h3 {
     padding: 0;
 }
 h5 {
-    font-size: calc(12em / 14);
+    font-size: calc(12em / var(--font-size-no-units));
     margin: 0;
     padding: 0;
     font-weight: normal;

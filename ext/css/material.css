@@ -1155,8 +1155,8 @@ button.popup-menu-item:not([hidden]) {
     display: flex;
 }
 .popup-menu-item-icon {
-    width: calc(16em / 14);
-    height: calc(16em / 14);
+    width: calc(16em / var(--font-size-no-units));
+    height: calc(16em / var(--font-size-no-units));
     background-color: var(--button-current-content-color);
     flex: 0 0 auto;
 }

@@ -16,6 +16,12 @@
  */
 
 :root {
+    --font-size-no-units: 14;
+    --font-size: calc(1px * var(--font-size-no-units));
+
+    --line-height-no-units: 20;
+    --line-height: calc(var(--line-height-no-units) / var(--font-size-no-units));
+
     --badge-size: 16px;
 
     --warning-color: #96751c;
@@ -26,7 +32,7 @@ body {
     padding: 10px;
     margin: 0;
     font-family: 'Segoe UI', Tahoma, sans-serif;
-    font-size: 14px;
+    font-size: var(--font-size);
 }
 
 h3 {
@@ -183,9 +189,9 @@ body[data-loaded=true] .toggle-group {
 .toggle-handle {
     display: block;
     padding: 6px 12px;
-    font-size: 14px;
+    font-size: var(--font-size);
     font-weight: normal;
-    line-height: calc(20 / 14);
+    line-height: var(--line-height);
     text-align: center;
     white-space: nowrap;
     cursor: pointer;
@@ -376,7 +382,7 @@ select.profile-select {
     opacity: 0;
     outline: none;
     cursor: pointer;
-    font-size: 14px;
+    font-size: var(--font-size);
 }
 .profile-select optgroup {
     color: #666666;

@@ -16,6 +16,12 @@
  */
 
 :root {
+    --font-size-no-units: 14;
+    --font-size: calc(1px * var(--font-size-no-units));
+
+    --line-height-no-units: 20;
+    --line-height: calc(var(--line-height-no-units) / var(--font-size-no-units));
+
     --animation-duration: 0s;
 }
 :root[data-loaded=true] {
@@ -40,7 +46,8 @@ body {
     width: 100%;
     height: 100%;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 14px;
+    font-size: var(--font-size);
+    line-height: var(--line-height);
 }
 
 .content {
