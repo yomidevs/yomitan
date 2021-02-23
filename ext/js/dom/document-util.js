@@ -479,21 +479,87 @@ class DocumentUtil {
             return null;
         }
 
-        const range = document.createRange();
-        const offset = (node.nodeType === Node.TEXT_NODE ? position.offset : 0);
+        let offset = 0;
+        const {nodeType} = node;
+        switch (nodeType) {
+            case Node.TEXT_NODE:
+                offset = position.offset;
+                break;
+            case Node.ELEMENT_NODE:
+                // Elements with user-select: all will return the element
+                // instead of a text point inside the element.
+                if (this._isElementUserSelectAll(node)) {
+                    return this._caretPositionFromPointNormalizeStyles(x, y, node);
+                }
+                break;
+        }
+
         try {
+            const range = document.createRange();
             range.setStart(node, offset);
             range.setEnd(node, offset);
+            return range;
         } catch (e) {
             // Firefox throws new DOMException("The operation is insecure.")
             // when trying to select a node from within a ShadowRoot.
             return null;
         }
-        return range;
+    }
+
+    _caretPositionFromPointNormalizeStyles(x, y, nextElement) {
+        const previousStyles = new Map();
+        try {
+            while (true) {
+                this._recordPreviousStyle(previousStyles, nextElement);
+                nextElement.style.setProperty('user-select', 'text', 'important');
+
+                const position = document.caretPositionFromPoint(x, y);
+                if (position === null) {
+                    return null;
+                }
+                const node = position.offsetNode;
+                if (node === null) {
+                    return null;
+                }
+
+                let offset = 0;
+                const {nodeType} = node;
+                switch (nodeType) {
+                    case Node.TEXT_NODE:
+                        offset = position.offset;
+                        break;
+                    case Node.ELEMENT_NODE:
+                        // Elements with user-select: all will return the element
+                        // instead of a text point inside the element.
+                        if (this._isElementUserSelectAll(node)) {
+                            if (previousStyles.has(node)) {
+                                // Recursive
+                                return null;
+                            }
+                            nextElement = node;
+                            continue;
+                        }
+                        break;
+                }
+
+                try {
+                    const range = document.createRange();
+                    range.setStart(node, offset);
+                    range.setEnd(node, offset);
+                    return range;
+                } catch (e) {
+                    // Firefox throws new DOMException("The operation is insecure.")
+                    // when trying to select a node from within a ShadowRoot.
+                    return null;
+                }
+            }
+        } finally {
+            this._revertStyles(previousStyles);
+        }
     }
 
     _caretRangeFromPointExt(x, y, elements) {
-        const modifications = [];
+        let previousStyles = null;
         try {
             let i = 0;
             let startContinerPre = null;
@@ -511,19 +577,20 @@ class DocumentUtil {
                     startContinerPre = startContainer;
                 }
 
-                i = this._disableTransparentElement(elements, i, modifications);
+                previousStyles = new Map();
+                i = this._disableTransparentElement(elements, i, previousStyles);
                 if (i < 0) {
                     return null;
                 }
             }
         } finally {
-            if (modifications.length > 0) {
-                this._restoreElementStyleModifications(modifications);
+            if (previousStyles !== null && previousStyles.size > 0) {
+                this._revertStyles(previousStyles);
             }
         }
     }
 
-    _disableTransparentElement(elements, i, modifications) {
+    _disableTransparentElement(elements, i, previousStyles) {
         while (true) {
             if (i >= elements.length) {
                 return -1;
@@ -531,16 +598,21 @@ class DocumentUtil {
 
             const element = elements[i++];
             if (this._isElementTransparent(element)) {
-                const style = element.hasAttribute('style') ? element.getAttribute('style') : null;
-                modifications.push({element, style});
+                this._recordPreviousStyle(previousStyles, element);
                 element.style.setProperty('pointer-events', 'none', 'important');
                 return i;
             }
         }
     }
 
-    _restoreElementStyleModifications(modifications) {
-        for (const {element, style} of modifications) {
+    _recordPreviousStyle(previousStyles, element) {
+        if (previousStyles.has(element)) { return; }
+        const style = element.hasAttribute('style') ? element.getAttribute('style') : null;
+        previousStyles.set(element, style);
+    }
+
+    _revertStyles(previousStyles) {
+        for (const [element, style] of previousStyles.entries()) {
             if (style === null) {
                 element.removeAttribute('style');
             } else {
@@ -566,5 +638,9 @@ class DocumentUtil {
 
     _isColorTransparent(cssColor) {
         return this._transparentColorPattern.test(cssColor);
+    }
+
+    _isElementUserSelectAll(element) {
+        return getComputedStyle(element).userSelect === 'all';
     }
 }
