@@ -69,6 +69,7 @@
     --tag-border-size: calc(1em * (var(--tag-border-size-no-units) / var(--font-size-no-units)));
     --tag-border-style: solid;
     --tag-font-weight: bold;
+    --tag-border-radius: 0.25em;
 
     --compact-list-separator: ' | ';
     --list-padding1: 1.4em;
@@ -690,7 +691,7 @@ button.action-button[data-icon=source-term]::before {
     flex-flow: row nowrap;
     align-items: center;
     background-color: var(--tag-color);
-    border-radius: 0.25em;
+    border-radius: var(--tag-border-radius);
     padding: calc(2.5em / var(--font-size-no-units)) 0.375em calc(2.5em / var(--font-size-no-units)) 0.375em;
     color: var(--tag-text-color);
     cursor: pointer;
@@ -713,7 +714,7 @@ button.action-button[data-icon=source-term]::before {
     top: 0;
     bottom: 0;
     right: 0;
-    border-radius: 0.25em;
+    border-radius: var(--tag-border-radius);
     border: var(--tag-border-size) var(--tag-border-style) var(--tag-color);
     border-left: none;
     border-top-left-radius: 0;
