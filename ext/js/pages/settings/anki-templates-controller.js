@@ -32,7 +32,7 @@ class AnkiTemplatesController {
         this._renderFieldInput = null;
         this._renderResult = null;
         this._fieldTemplateResetModal = null;
-        this._ankiNoteBuilder = new AnkiNoteBuilder(true);
+        this._ankiNoteBuilder = new AnkiNoteBuilder();
     }
 
     async prepare() {

@@ -28,6 +28,7 @@ self.importScripts(
     '/js/comm/clipboard-monitor.js',
     '/js/comm/clipboard-reader.js',
     '/js/comm/mecab.js',
+    '/js/data/anki-util.js',
     '/js/data/database.js',
     '/js/data/json-schema.js',
     '/js/data/options-util.js',

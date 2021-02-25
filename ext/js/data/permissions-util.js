@@ -15,13 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * AnkiUtil
+ */
+
 class PermissionsUtil {
     constructor() {
         this._ankiFieldMarkersRequiringClipboardPermission = new Set([
             'clipboard-image',
             'clipboard-text'
         ]);
-        this._ankiMarkerPattern = /\{([\w-]+)\}/g;
     }
 
     hasPermissions(permissions) {
@@ -69,7 +72,7 @@ class PermissionsUtil {
     }
 
     getRequiredPermissionsForAnkiFieldValue(fieldValue) {
-        const markers = this._getAnkiFieldMarkers(fieldValue);
+        const markers = AnkiUtil.getFieldMarkers(fieldValue);
         const markerPermissions = this._ankiFieldMarkersRequiringClipboardPermission;
         for (const marker of markers) {
             if (markerPermissions.has(marker)) {
@@ -99,7 +102,7 @@ class PermissionsUtil {
             ];
             for (const fields of fieldsList) {
                 for (const fieldValue of Object.values(fields)) {
-                    const markers = this._getAnkiFieldMarkers(fieldValue);
+                    const markers = AnkiUtil.getFieldMarkers(fieldValue);
                     for (const marker of markers) {
                         if (fieldMarkersRequiringClipboardPermission.has(marker)) {
                             return false;
@@ -110,17 +113,5 @@ class PermissionsUtil {
         }
 
         return true;
-    }
-
-    // Private
-
-    _getAnkiFieldMarkers(fieldValue) {
-        const pattern = this._ankiMarkerPattern;
-        const markers = [];
-        let match;
-        while ((match = pattern.exec(fieldValue)) !== null) {
-            markers.push(match[1]);
-        }
-        return markers;
     }
 }

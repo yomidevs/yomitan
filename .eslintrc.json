@@ -178,6 +178,7 @@
                 "ext/js/comm/clipboard-monitor.js",
                 "ext/js/comm/clipboard-reader.js",
                 "ext/js/comm/mecab.js",
+                "ext/js/data/anki-util.js",
                 "ext/js/data/database.js",
                 "ext/js/data/json-schema.js",
                 "ext/js/data/options-util.js",

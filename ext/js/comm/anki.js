@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * AnkiUtil
+ */
+
 class AnkiConnect {
     constructor() {
         this._enabled = false;
@@ -113,7 +117,7 @@ class AnkiConnect {
                     query = `"deck:${this._escapeQuery(note.deckName)}" `;
                     break;
                 case 'deck-root':
-                    query = `"deck:${this._escapeQuery(this.getRootDeckName(note.deckName))}" `;
+                    query = `"deck:${this._escapeQuery(AnkiUtil.getRootDeckName(note.deckName))}" `;
                     break;
             }
             query += this._fieldsToQuery(note.fields);
@@ -136,11 +140,6 @@ class AnkiConnect {
 
     async findCardsForNote(noteId) {
         return await this.findCards(`nid:${noteId}`);
-    }
-
-    getRootDeckName(deckName) {
-        const index = deckName.indexOf('::');
-        return index >= 0 ? deckName.substring(0, index) : deckName;
     }
 
     // Private

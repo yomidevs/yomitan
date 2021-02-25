@@ -17,6 +17,7 @@
 
 /* global
  * AnkiNoteBuilder
+ * AnkiUtil
  * DisplayAudio
  * DisplayGenerator
  * DisplayHistory
@@ -85,7 +86,7 @@ class Display extends EventDispatcher {
         });
         this._ankiFieldTemplates = null;
         this._ankiFieldTemplatesDefault = null;
-        this._ankiNoteBuilder = new AnkiNoteBuilder(true);
+        this._ankiNoteBuilder = new AnkiNoteBuilder();
         this._updateAdderButtonsPromise = Promise.resolve();
         this._contentScrollElement = document.querySelector('#content-scroll');
         this._contentScrollBodyElement = document.querySelector('#content-body');
@@ -1493,7 +1494,7 @@ class Display extends EventDispatcher {
         const definitionDetails = this._getDefinitionDetailsForNote(definition);
 
         let audioDetails = null;
-        if (definitionDetails.type !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio')) {
+        if (definitionDetails.type !== 'kanji' && AnkiUtil.fieldsObjectContainsMarker(fields, 'audio')) {
             const primaryCardAudio = this._displayAudio.getPrimaryCardAudio(definitionDetails.expression, definitionDetails.reading);
             let preferredAudioIndex = null;
             let sources2 = sources;
@@ -1504,11 +1505,11 @@ class Display extends EventDispatcher {
             audioDetails = {sources: sources2, preferredAudioIndex, customSourceUrl, customSourceType};
         }
 
-        const screenshotDetails = (this._ankiNoteBuilder.containsMarker(fields, 'screenshot') ? {tabId: this._contentOriginTabId, frameId: this._contentOriginFrameId, format, quality} : null);
+        const screenshotDetails = (AnkiUtil.fieldsObjectContainsMarker(fields, 'screenshot') ? {tabId: this._contentOriginTabId, frameId: this._contentOriginFrameId, format, quality} : null);
 
         const clipboardDetails = {
-            image: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-image'),
-            text: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-text')
+            image: AnkiUtil.fieldsObjectContainsMarker(fields, 'clipboard-image'),
+            text: AnkiUtil.fieldsObjectContainsMarker(fields, 'clipboard-text')
         };
 
         return await yomichan.api.injectAnkiNoteMedia(

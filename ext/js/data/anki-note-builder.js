@@ -16,13 +16,14 @@
  */
 
 /* global
+ * AnkiUtil
  * TemplateRendererProxy
  */
 
 class AnkiNoteBuilder {
-    constructor(enabled) {
-        this._markerPattern = /\{([\w-]+)\}/g;
-        this._templateRenderer = enabled ? new TemplateRendererProxy() : null;
+    constructor() {
+        this._markerPattern = AnkiUtil.cloneFieldMarkerPattern(true);
+        this._templateRenderer = new TemplateRendererProxy();
     }
 
     async createNote({
@@ -46,7 +47,7 @@ class AnkiNoteBuilder {
         let duplicateScopeCheckChildren = false;
         if (duplicateScope === 'deck-root') {
             duplicateScope = 'deck';
-            duplicateScopeDeckName = this.getRootDeckName(deckName);
+            duplicateScopeDeckName = AnkiUtil.getRootDeckName(deckName);
             duplicateScopeCheckChildren = true;
         }
 
@@ -87,27 +88,6 @@ class AnkiNoteBuilder {
                 }
             }
         };
-    }
-
-    containsMarker(fields, marker) {
-        marker = `{${marker}}`;
-        for (const [, fieldValue] of fields) {
-            if (fieldValue.includes(marker)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    containsAnyMarker(field) {
-        const result = this._markerPattern.test(field);
-        this._markerPattern.lastIndex = 0;
-        return result;
-    }
-
-    getRootDeckName(deckName) {
-        const index = deckName.indexOf('::');
-        return index >= 0 ? deckName.substring(0, index) : deckName;
     }
 
     // Private
