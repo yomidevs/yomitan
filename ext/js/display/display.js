@@ -1058,15 +1058,9 @@ class Display extends EventDispatcher {
             const modes = isTerms ? ['term-kanji', 'term-kana'] : ['kanji'];
             let states;
             try {
-                if (this._options.anki.checkForDuplicates) {
-                    const noteContext = this._getNoteContext();
-                    states = await this._areDefinitionsAddable(definitions, modes, noteContext);
-                } else {
-                    if (!await yomichan.api.isAnkiConnected()) {
-                        throw new Error('Anki not connected');
-                    }
-                    states = this._areDefinitionsAddableForcedValue(definitions, modes, true);
-                }
+                const noteContext = this._getNoteContext();
+                const {checkForDuplicates} = this._options.anki;
+                states = await this._areDefinitionsAddable(definitions, modes, noteContext, checkForDuplicates ? null : true);
             } catch (e) {
                 return;
             }
@@ -1408,7 +1402,7 @@ class Display extends EventDispatcher {
         return templates;
     }
 
-    async _areDefinitionsAddable(definitions, modes, context) {
+    async _areDefinitionsAddable(definitions, modes, context, forceCanAddValue) {
         const modeCount = modes.length;
         const notePromises = [];
         for (const definition of definitions) {
@@ -1419,7 +1413,16 @@ class Display extends EventDispatcher {
         }
         const notes = await Promise.all(notePromises);
 
-        const infos = await yomichan.api.getAnkiNoteInfo(notes);
+        let infos;
+        if (forceCanAddValue !== null) {
+            if (!await yomichan.api.isAnkiConnected()) {
+                throw new Error('Anki not connected');
+            }
+            infos = this._getAnkiNoteInfoForceValue(notes, forceCanAddValue);
+        } else {
+            infos = await yomichan.api.getAnkiNoteInfo(notes);
+        }
+
         const results = [];
         for (let i = 0, ii = infos.length; i < ii; i += modeCount) {
             results.push(infos.slice(i, i + modeCount));
@@ -1427,16 +1430,11 @@ class Display extends EventDispatcher {
         return results;
     }
 
-    _areDefinitionsAddableForcedValue(definitions, modes, canAdd) {
+    _getAnkiNoteInfoForceValue(notes, canAdd) {
         const results = [];
-        const definitionCount = definitions.length;
-        const modeCount = modes.length;
-        for (let i = 0; i < definitionCount; ++i) {
-            const modeArray = [];
-            for (let j = 0; j < modeCount; ++j) {
-                modeArray.push({canAdd, noteIds: null});
-            }
-            results.push(modeArray);
+        for (const note of notes) {
+            const valid = AnkiUtil.isNoteDataValid(note);
+            results.push({canAdd, valid, noteIds: null});
         }
         return results;
     }

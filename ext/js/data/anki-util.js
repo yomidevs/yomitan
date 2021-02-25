@@ -81,6 +81,21 @@ class AnkiUtil {
     static cloneFieldMarkerPattern(global) {
         return new RegExp(this._markerPattern.source, global ? 'g' : '');
     }
+
+    /**
+     * Checks whether or not a note object is valid.
+     * @param note A note object to check.
+     * @return `true` if the note is valid, `false` otherwise.
+     */
+    static isNoteDataValid(note) {
+        if (!isObject(note)) { return false; }
+        const {fields, deckName, modelName} = note;
+        return (
+            typeof deckName === 'string' &&
+            typeof modelName === 'string' &&
+            Object.entries(fields).length > 0
+        );
+    }
 }
 
 // eslint-disable-next-line no-underscore-dangle
