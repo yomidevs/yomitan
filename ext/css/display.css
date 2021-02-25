@@ -17,6 +17,14 @@
 
 /* Variables */
 :root {
+    /* Strings */
+    --compact-list-separator: ' | ';
+
+    --disambiguation-prefix: '(';
+    --disambiguation-suffix: ' only)';
+    --disambiguation-separator: ', ';
+    --disambiguation-reading-separator: ':';
+
     /* Layout */
     --font-size-no-units: 14;
     --font-size: calc(1px * var(--font-size-no-units));
@@ -71,7 +79,6 @@
     --tag-font-weight: bold;
     --tag-border-radius: 0.25em;
 
-    --compact-list-separator: ' | ';
     --list-padding1: 1.4em;
     --list-padding2: var(--list-padding1);
 
@@ -79,6 +86,8 @@
     --entry-current-indicator-triangle-size: calc(1em * (var(--entry-current-indicator-triangle-size-no-units) / var(--font-size-no-units)));
 
     --overlay-panel-translate-distance: 4em;
+
+    --disambiguation-space: 0.25em;
 
     --animation-duration: 0.125s;
     --animation-duration2: calc(2 * var(--animation-duration));
@@ -1045,18 +1054,19 @@ button.action-button[data-icon=source-term]::before {
 }
 .term-definition-disambiguation-list {
     color: var(--text-color-light3);
+    padding-right: var(--disambiguation-space);
 }
 .term-definition-disambiguation-list[data-count='0'] {
     display: none;
 }
 .term-definition-disambiguation-list::before {
-    content: '(';
+    content: var(--disambiguation-prefix);
 }
 .term-definition-disambiguation-list::after {
-    content: ' only) ';
+    content: var(--disambiguation-suffix);
 }
 .term-definition-disambiguation+.term-definition-disambiguation::before {
-    content: ', ';
+    content: var(--disambiguation-separator);
 }
 .term-glossary-separator,
 .term-reason-separator {
@@ -1081,16 +1091,16 @@ button.action-button[data-icon=source-term]::before {
 }
 .frequency-disambiguation {
     color: var(--text-color-light3);
-    padding-right: 0.25em;
+    padding-right: var(--disambiguation-space);
 }
 .frequency-disambiguation-separator::before {
-    content: ':';
+    content: var(--disambiguation-reading-separator);
 }
 .frequency-disambiguation::before {
-    content: '(';
+    content: var(--disambiguation-prefix);
 }
 .frequency-disambiguation::after {
-    content: ' only)';
+    content: var(--disambiguation-suffix);
 }
 .frequency-disambiguation-reading {
     display: inline;
@@ -1305,17 +1315,17 @@ button.action-button[data-icon=source-term]::before {
     margin-right: 0.375em;
 }
 .term-pitch-accent-disambiguation-list {
-    padding-right: 0.25em;
     color: var(--text-color-light3);
+    padding-right: var(--disambiguation-space);
 }
 .term-pitch-accent-disambiguation-list::before {
-    content: '(';
+    content: var(--disambiguation-prefix);
 }
 .term-pitch-accent-disambiguation-list::after {
-    content: ' only)';
+    content: var(--disambiguation-suffix);
 }
 .term-pitch-accent-disambiguation+.term-pitch-accent-disambiguation::before {
-    content: ', ';
+    content: var(--disambiguation-separator);
 }
 .term-pitch-accent-disambiguation-list[data-count='0'] {
     display: none;
