@@ -294,7 +294,8 @@ function createProfileOptionsUpdatedTestData1() {
             usePopupWindow: false,
             popupCurrentIndicatorMode: 'triangle',
             popupActionBarVisibility: 'auto',
-            popupActionBarLocation: 'top'
+            popupActionBarLocation: 'top',
+            frequencyDisplayMode: 'split-tags-grouped'
         },
         audio: {
             enabled: true,
@@ -559,7 +560,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 8,
+        version: 9,
         global: {
             database: {
                 prefixWildcardsSupported: false

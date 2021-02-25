@@ -683,7 +683,6 @@ button.action-button[data-icon=source-term]::before {
     border: none;
     border-right: none;
     font-size: 1em;
-    vertical-align: middle;
     margin: calc(1em / var(--font-size-no-units)) 0.375em calc(1em / var(--font-size-no-units)) 0;
 }
 .tag-label {
@@ -702,9 +701,14 @@ button.action-button[data-icon=source-term]::before {
     font-weight: var(--tag-font-weight);
 }
 .tag-body {
-    display: block;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
     position: relative;
     padding: 0 0.375em 0 0.375em;
+    border-radius: var(--tag-border-radius);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 .tag-body::before {
     content: '';
@@ -715,10 +719,10 @@ button.action-button[data-icon=source-term]::before {
     bottom: 0;
     right: 0;
     border-radius: var(--tag-border-radius);
-    border: var(--tag-border-size) var(--tag-border-style) var(--tag-color);
-    border-left: none;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+    border: var(--tag-border-size) var(--tag-border-style) var(--tag-color);
+    border-left: none;
     pointer-events: none;
 }
 .tag-body-content {
@@ -1069,36 +1073,15 @@ button.action-button[data-icon=source-term]::before {
 
 
 /* Frequencies */
-.frequency-group-list {
-    margin: 0;
-    padding: 0 0 0 var(--list-padding1);
-    list-style-type: decimal;
+.frequency-group-item {
+    display: inline;
 }
-.frequency-group-list[data-count='0'],
-.frequency-group-list[data-count='1'] {
-    padding-left: 0;
-    list-style-type: none;
-}
-.frequency-list {
-    margin: 0;
-    padding: 0 0 0 var(--list-padding2);
-    list-style-type: circle;
-}
-.frequency-list[data-count='0'],
-.frequency-list[data-count='1'] {
-    padding-left: 0;
-    list-style-type: none;
-}
-.frequency-group-item::marker,
-.frequency-item::marker {
-    color: var(--text-color-light3);
+.frequency-item {
+    display: inline;
 }
 .frequency-disambiguation {
     color: var(--text-color-light3);
     padding-right: 0.25em;
-}
-.frequency-separator::before {
-    content: '';
 }
 .frequency-disambiguation-separator::before {
     content: ':';
@@ -1113,6 +1096,11 @@ button.action-button[data-icon=source-term]::before {
     display: inline;
     font-size: 1em;
 }
+.frequency-body::after {
+    white-space: pre-wrap;
+    display: inline;
+    color: var(--text-color-light3);
+}
 .entry[data-unique-expression-count='1'] .frequency-item[data-has-reading=false] .frequency-disambiguation,
 .entry[data-unique-reading-count='1'][data-unique-expression-count='1'] .frequency-disambiguation,
 .frequency-item[data-reading-is-same=true] .frequency-disambiguation-separator,
@@ -1125,33 +1113,155 @@ button.action-button[data-icon=source-term]::before {
 .entry[data-unique-reading-count='1'] .frequency-disambiguation-reading {
     display: none;
 }
-:root[data-glossary-layout-mode=compact] .frequency-group-list,
-:root[data-glossary-layout-mode=compact] .frequency-list,
-.frequency-list[data-count='1'] {
+:root[data-frequency-display-mode=tags] .frequency-group-tag,
+:root[data-frequency-display-mode=split-tags] .frequency-group-tag {
+    margin: 0;
     display: inline;
-    list-style: none;
+}
+:root[data-frequency-display-mode=tags] .frequency-group-tag>.tag-label,
+:root[data-frequency-display-mode=split-tags] .frequency-group-tag>.tag-label {
+    display: none;
+}
+:root[data-frequency-display-mode=tags] .frequency-group-tag>.tag-body,
+:root[data-frequency-display-mode=split-tags] .frequency-group-tag>.tag-body {
+    display: inline;
+    padding: 0;
+}
+:root[data-frequency-display-mode=tags] .frequency-group-tag>.tag-body::before,
+:root[data-frequency-display-mode=split-tags] .frequency-group-tag>.tag-body::before {
+    display: none;
+}
+:root[data-frequency-display-mode=tags] .frequency-list,
+:root[data-frequency-display-mode=split-tags] .frequency-list {
+    display: inline;
+}
+:root[data-frequency-display-mode=list] .frequency-tag,
+:root[data-frequency-display-mode=inline-list] .frequency-tag,
+:root[data-frequency-display-mode=tags-grouped] .frequency-tag,
+:root[data-frequency-display-mode=split-tags-grouped] .frequency-tag {
+    margin: 0;
+    display: inline;
+}
+:root[data-frequency-display-mode=list] .frequency-tag>.tag-label,
+:root[data-frequency-display-mode=inline-list] .frequency-tag>.tag-label,
+:root[data-frequency-display-mode=tags-grouped] .frequency-tag>.tag-label,
+:root[data-frequency-display-mode=split-tags-grouped] .frequency-tag>.tag-label {
+    display: none;
+}
+:root[data-frequency-display-mode=list] .frequency-tag>.tag-body,
+:root[data-frequency-display-mode=inline-list] .frequency-tag>.tag-body,
+:root[data-frequency-display-mode=tags-grouped] .frequency-tag>.tag-body,
+:root[data-frequency-display-mode=split-tags-grouped] .frequency-tag>.tag-body {
+    display: inline;
+    padding: 0;
+}
+:root[data-frequency-display-mode=list] .frequency-tag>.tag-body::before,
+:root[data-frequency-display-mode=inline-list] .frequency-tag>.tag-body::before,
+:root[data-frequency-display-mode=tags-grouped] .frequency-tag>.tag-body::before,
+:root[data-frequency-display-mode=split-tags-grouped] .frequency-tag>.tag-body::before {
+    display: none;
+}
+:root[data-frequency-display-mode=list] .frequency-body,
+:root[data-frequency-display-mode=inline-list] .frequency-body,
+:root[data-frequency-display-mode=tags-grouped] .frequency-body,
+:root[data-frequency-display-mode=split-tags-grouped] .frequency-body {
+    display: inline-block;
+}
+:root[data-frequency-display-mode=inline-list] .frequency-item:not(:last-child)>.frequency-tag>.tag-body>.frequency-body::after,
+:root[data-frequency-display-mode=tags-grouped] .frequency-item:not(:last-child)>.frequency-tag>.tag-body>.frequency-body::after,
+:root[data-frequency-display-mode=split-tags-grouped] .frequency-item:not(:last-child)>.frequency-tag>.tag-body>.frequency-body::after {
+    content: var(--compact-list-separator);
+}
+:root[data-frequency-display-mode=list] .frequency-group-tag>.tag-body::before,
+:root[data-frequency-display-mode=inline-list] .frequency-group-tag>.tag-body::before {
+    display: none;
+}
+:root[data-frequency-display-mode=list] .frequency-group-tag.tag.tag-has-body>.tag-label,
+:root[data-frequency-display-mode=inline-list] .frequency-group-tag.tag.tag-has-body>.tag-label {
+    border-radius: var(--tag-border-radius);
+}
+:root[data-frequency-display-mode=tags] .frequency-tag>.tag-body::before {
+    display: none;
+}
+:root[data-frequency-display-mode=tags] .frequency-tag>.tag-body {
+    background-color: var(--tag-color);
     padding-left: 0;
 }
-:root[data-glossary-layout-mode=compact] .frequency-group-item {
-    display: inline-block;
-    margin-right: 1em;
+:root[data-frequency-display-mode=tags] .frequency-body {
+    font-size: var(--tag-font-size);
+    font-weight: var(--tag-font-weight);
+    color: var(--tag-text-color);
 }
-:root[data-glossary-layout-mode=compact] .entry-body-section[data-section-type=frequencies] {
-    margin-right: -1em;
+:root[data-frequency-display-mode=tags] .frequency-tag>.tag-label>.tag-label-content::after {
+    content: ':';
 }
-:root[data-glossary-layout-mode=compact] .frequency-item,
-.frequency-list[data-count='1'] .frequency-item {
-    display: inline-block;
+:root[data-frequency-display-mode=tags-grouped] .frequency-group-tag>.tag-body::before {
+    display: none;
 }
-:root[data-glossary-layout-mode=compact] .frequency-item:not(:first-child)::before,
-.frequency-list[data-count='1'] .frequency-item:not(:first-child)::before {
-    white-space: pre-wrap;
-    content: var(--compact-list-separator);
-    display: inline;
+:root[data-frequency-display-mode=tags-grouped] .frequency-group-tag>.tag-body {
+    background-color: var(--tag-color);
+    padding-left: 0;
+}
+:root[data-frequency-display-mode=tags-grouped] .frequency-list {
+    font-size: var(--tag-font-size);
+    font-weight: var(--tag-font-weight);
+    color: var(--tag-text-color);
+}
+:root[data-frequency-display-mode=tags-grouped] .frequency-group-tag>.tag-label>.tag-label-content::after {
+    content: ':';
+}
+:root[data-frequency-display-mode=tags] .frequency-disambiguation,
+:root[data-frequency-display-mode=tags-grouped] .frequency-disambiguation,
+:root[data-frequency-display-mode=tags] .frequency-body::after,
+:root[data-frequency-display-mode=tags-grouped] .frequency-body::after {
+    color: inherit;
+    font-weight: normal;
+    opacity: 0.75;
+}
+:root[data-frequency-display-mode=list] .frequency-group-list {
+    list-style-type: decimal;
+    padding: 0 0 0 var(--list-padding1);
+}
+:root[data-frequency-display-mode=list] .frequency-group-item {
+    display: list-item;
+}
+:root[data-frequency-display-mode=list] .frequency-group-item::marker {
     color: var(--text-color-light3);
 }
-:root[data-glossary-layout-mode=compact] .frequency-tag-list,
-.frequency-group-item[data-count='1'] .frequency-tag-list {
+:root[data-frequency-display-mode=list] .frequency-group-tag {
+    display: block;
+}
+:root[data-frequency-display-mode=list] .frequency-group-tag>.tag-label {
+    display: inline-flex;
+}
+:root[data-frequency-display-mode=list] .frequency-list {
+    list-style-type: circle;
+    padding: 0 0 0 var(--list-padding2);
+}
+:root[data-frequency-display-mode=list] .frequency-item {
+    display: list-item;
+}
+:root[data-frequency-display-mode=list] .frequency-item::marker {
+    color: var(--text-color-light3);
+}
+:root[data-frequency-display-mode=list] .frequency-group-list[data-count='1'] {
+    list-style-type: none;
+    padding-left: 0;
+}
+:root[data-frequency-display-mode=list] .frequency-group-list[data-count='1']>.frequency-group-item {
+    display: inline;
+}
+:root[data-frequency-display-mode=list] .frequency-group-item[data-count='1']>.frequency-group-tag>.tag-body {
+    display: inline-flex;
+}
+:root[data-frequency-display-mode=list] .frequency-group-item[data-count='1']>.frequency-group-tag>.tag-body>.frequency-body {
+    display: inline;
+}
+:root[data-frequency-display-mode=list] .frequency-group-item[data-count='1'] .frequency-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+:root[data-frequency-display-mode=list] .frequency-group-item[data-count='1'] .frequency-item {
     display: inline;
 }
 

@@ -457,7 +457,8 @@ class OptionsUtil {
             {async: false, update: this._updateVersion5.bind(this)},
             {async: true,  update: this._updateVersion6.bind(this)},
             {async: false, update: this._updateVersion7.bind(this)},
-            {async: true,  update: this._updateVersion8.bind(this)}
+            {async: true,  update: this._updateVersion8.bind(this)},
+            {async: false, update: this._updateVersion9.bind(this)}
         ];
     }
 
@@ -733,6 +734,15 @@ class OptionsUtil {
             delete profile.options.general.enableClipboardPopups;
             delete profile.options.general.enableClipboardMonitor;
             delete profile.options.general.maximumClipboardSearchLength;
+        }
+        return options;
+    }
+
+    _updateVersion9(options) {
+        // Version 9 changes:
+        //  Added general.frequencyDisplayMode.
+        for (const profile of options.profiles) {
+            profile.options.general.frequencyDisplayMode = 'split-tags-grouped';
         }
         return options;
     }

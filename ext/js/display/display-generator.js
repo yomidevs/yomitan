@@ -581,16 +581,21 @@ class DisplayGenerator {
 
     _createFrequencyGroup(details, kanji) {
         const {dictionary, frequencyData} = details;
+
         const node = this._templates.instantiate('frequency-group-item');
+        const body = node.querySelector('.tag-body-content');
 
-        const tagList = node.querySelector('.frequency-tag-list');
-        const tag = this._createTag({notes: '', name: dictionary, category: 'frequency'});
-        tagList.appendChild(tag);
+        this._setTextContent(node.querySelector('.tag-label-content'), dictionary);
+        node.dataset.details = dictionary;
 
-        const frequencyListContainer = node.querySelector('.frequency-list');
-        const createItem = (kanji ? this._createKanjiFrequency.bind(this) : this._createTermFrequency.bind(this));
-        this._appendMultiple(frequencyListContainer, createItem, frequencyData, dictionary);
+        for (let i = 0, ii = frequencyData.length; i < ii; ++i) {
+            const item = frequencyData[i];
+            const itemNode = (kanji ? this._createKanjiFrequency(item, dictionary) : this._createTermFrequency(item, dictionary));
+            itemNode.dataset.index = `${i}`;
+            body.appendChild(itemNode);
+        }
 
+        body.dataset.count = `${frequencyData.length}`;
         node.dataset.count = `${frequencyData.length}`;
 
         return node;
@@ -599,6 +604,8 @@ class DisplayGenerator {
     _createTermFrequency(details, dictionary) {
         const {expression, reading, frequencies} = details;
         const node = this._templates.instantiate('term-frequency-item');
+
+        this._setTextContent(node.querySelector('.tag-label-content'), dictionary);
 
         const frequency = frequencies.join(', ');
 
@@ -622,6 +629,7 @@ class DisplayGenerator {
 
         const frequency = frequencies.join(', ');
 
+        this._setTextContent(node.querySelector('.tag-label-content'), dictionary);
         this._setTextContent(node.querySelector('.frequency-value'), frequency, 'ja');
 
         node.dataset.character = character;

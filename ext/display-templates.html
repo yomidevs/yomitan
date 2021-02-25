@@ -23,7 +23,7 @@
     </div>
     <div class="entry-body">
         <div class="entry-body-section" data-section-type="frequencies">
-            <ol class="entry-body-section-content frequency-group-list"></ol>
+            <div class="entry-body-section-content frequency-group-list"></div>
         </div>
         <div class="entry-body-section" data-section-type="pitch-accents">
             <ol class="entry-body-section-content term-pitch-accent-group-list"></ol>
@@ -52,19 +52,25 @@
 <template id="term-reason-template"><span class="term-reason"></span><span class="term-reason-separator"> </span></template>
 
 <!-- Frequency templates -->
-<template id="frequency-group-item-template"><li class="frequency-group-item"><div class="frequency-tag-list tag-list"></div><ul class="frequency-list"></ul></li></template>
-<template id="term-frequency-item-template" data-remove-whitespace-text="true"><li class="frequency-item" data-frequency-type="term">
-    <ruby class="frequency-disambiguation">
-        <span class="frequency-disambiguation-expression"></span>
-        <span class="frequency-disambiguation-separator"></span>
-        <rt class="frequency-disambiguation-reading"></rt>
-    </ruby>
-    <span class="frequency-separator"></span>
-    <span class="frequency-value"></span>
-</li></template>
-<template id="kanji-frequency-item-template" data-remove-whitespace-text="true"><li class="frequency-item" data-frequency-type="kanji">
-    <span class="frequency-value"></span>
-</li></template>
+<template id="frequency-group-item-template"><span class="frequency-group-item"><span class="tag tag-has-body frequency-group-tag" data-category="frequency"><span class="tag-label"><span class="tag-label-content"></span></span><span class="tag-body"><span class="tag-body-content frequency-list"></span></span></span></span></template>
+<template id="term-frequency-item-template" data-remove-whitespace-text="true"><span class="frequency-item"><span class="tag tag-has-body frequency-tag" data-category="frequency" data-frequency-type="term">
+    <span class="tag-label"><span class="tag-label-content"></span></span>
+    <span class="tag-body"><span class="tag-body-content frequency-body">
+        <ruby class="frequency-disambiguation">
+            <span class="frequency-disambiguation-expression"></span>
+            <span class="frequency-disambiguation-separator"></span>
+            <rt class="frequency-disambiguation-reading"></rt>
+        </ruby>
+        <span class="frequency-separator"></span>
+        <span class="frequency-value"></span>
+    </span></span>
+</span></span></template>
+<template id="kanji-frequency-item-template" data-remove-whitespace-text="true"><span class="frequency-item"><span class="tag tag-has-body frequency-tag" data-category="frequency" data-frequency-type="kanji">
+    <span class="tag-label"><span class="tag-label-content"></span></span>
+    <span class="tag-body"><span class="tag-body-content frequency-body">
+        <span class="frequency-value"></span>
+    </span></span>
+</span></span></template>
 
 <!-- Pitch accent templates -->
 <template id="term-pitch-accent-static-template"><svg xmlns="http://www.w3.org/2000/svg" style="display: none;" focusable="false">
@@ -100,7 +106,7 @@
     <div class="tags tag-list"></div>
     <div class="entry-body">
         <div class="entry-body-section" data-section-type="frequencies">
-            <ol class="entry-body-section-content frequency-group-list"></ol>
+            <div class="entry-body-section-content frequency-group-list"></div>
         </div>
     </div>
     <table class="kanji-glyph-data"><tbody>
