@@ -922,11 +922,11 @@ button.icon-button.modal-header-button>.icon-button-inner>.icon {
 }
 
 .modal-separator-line {
-    border-bottom: var(--thin-border-size) solid var(--separator-color1);
+    border-top: var(--thin-border-size) solid var(--separator-color1);
     margin: 0 calc(var(--modal-padding-horizontal) * -1);
 }
 .modal-separator-line-light {
-    border-bottom: var(--thin-border-size) solid var(--separator-color2);
+    border-top: var(--thin-border-size) solid var(--separator-color2);
     margin: 0 calc(var(--modal-padding-horizontal) * -1);
 }
 
@@ -1135,6 +1135,125 @@ button.fab-button>.icon-button-inner>.icon {
 }
 .progress-bar.danger {
     background-color: var(--danger-color);
+}
+
+
+/* Tabs */
+.tabs-container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    margin-left: calc(-1 * var(--modal-padding-horizontal));
+    margin-right: calc(-1 * var(--modal-padding-horizontal));
+    position: relative;
+}
+.tabs {
+    flex: 1 1 auto;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: stretch;
+    height: 2.75em;
+    overflow: hidden;
+}
+.tab {
+    cursor: pointer;
+    flex: 1 1 auto;
+}
+.tab>input[type='radio'] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: none;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+}
+/* TODO : Need focus/hover styles */
+.tab-inner {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 100%;
+    padding: 0 1em;
+}
+.tab-inner::before {
+    content: '';
+    display: block;
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--text-color-light3);
+    opacity: 0;
+    transition:
+        background-color var(--animation-duration) ease-in-out,
+        opacity var(--animation-duration) ease-in-out;
+}
+.tab>input[type='radio']:checked~.tab-inner::before {
+    background-color: var(--accent-color);
+}
+.tab>input[type='radio']:hover~.tab-inner::before,
+.tab>input[type='radio']:focus~.tab-inner::before {
+    opacity: 0.125;
+}
+.tab>input[type='radio']:active~.tab-inner::before {
+    opacity: 0.25;
+}
+.tab>input[type='radio']:focus:not(:focus-visible)~.tab-inner::before {
+    opacity: 0;
+}
+.tab>input[type='radio']:focus-visible~.tab-inner::before,
+.tab>input[type='radio']:hover:focus-visible~.tab-inner::before,
+.tab>input[type='radio']:hover:not(:focus-visible)~.tab-inner::before {
+    opacity: 0.125;
+}
+.tab>input[type='radio']:active:focus-visible~.tab-inner::before,
+.tab>input[type='radio']:active:not(:focus-visible)~.tab-inner::before {
+    opacity: 0.25;
+}
+.tab-inner::after {
+    content: '';
+    display: block;
+    position: absolute;
+    pointer-events: none;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0em;
+    background-color: var(--accent-color);
+    transition: height var(--animation-duration) ease-in-out;
+}
+.tab>input[type='radio']:checked~.tab-inner::after {
+    height: 0.2em;
+}
+.tab-label {
+    position: relative;
+    display: block;
+    font-weight: bold;
+    font-size: calc(12em / var(--font-size-no-units));
+    color: var(--text-color-light3);
+    transition: color var(--animation-duration) ease-in-out;
+}
+.tab>input[type='radio']:checked~.tab-inner>.tab-label {
+    color: var(--accent-color);
+}
+.tabs-right {
+    flex: 0 0 auto;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--modal-padding-horizontal);
+    height: 2.75em;
+}
+.tabs-right:not([hidden]) {
+    display: flex;
 }
 
 

@@ -43,7 +43,6 @@ class AnkiController {
         this._ankiErrorMessageDetailsToggle = null;
         this._ankiErrorInvalidResponseInfo = null;
         this._ankiCardPrimary = null;
-        this._ankiCardPrimaryType = null;
         this._validateFieldsToken = null;
     }
 
@@ -61,13 +60,19 @@ class AnkiController {
         this._ankiErrorInvalidResponseInfo = document.querySelector('#anki-error-invalid-response-info');
         this._ankiEnableCheckbox = document.querySelector('[data-setting="anki.enable"]');
         this._ankiCardPrimary = document.querySelector('#anki-card-primary');
-        this._ankiCardPrimaryType = document.querySelector('#anki-card-primary-type');
+        const ankiCardPrimaryTypeSelect = document.querySelector('#anki-card-primary-type');
+        const ankiCardPrimaryTypeRadios = document.querySelectorAll('input[type=radio][name=anki-card-primary-type]');
 
         this._setupFieldMenus();
 
         this._ankiErrorMessageDetailsToggle.addEventListener('click', this._onAnkiErrorMessageDetailsToggleClick.bind(this), false);
         if (this._ankiEnableCheckbox !== null) { this._ankiEnableCheckbox.addEventListener('settingChanged', this._onAnkiEnableChanged.bind(this), false); }
-        if (this._ankiCardPrimaryType !== null) { this._ankiCardPrimaryType.addEventListener('change', this._onAnkiCardPrimaryTypeChange.bind(this), false); }
+        if (ankiCardPrimaryTypeSelect !== null) {
+            ankiCardPrimaryTypeSelect.addEventListener('change', this._onAnkiCardPrimaryTypeSelectChange.bind(this), false);
+        }
+        for (const input of ankiCardPrimaryTypeRadios) {
+            input.addEventListener('change', this._onAnkiCardPrimaryTypeRadioChange.bind(this), false);
+        }
 
         const options = await this._settingsController.getOptions();
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
@@ -179,8 +184,7 @@ class AnkiController {
         }
     }
 
-    _onAnkiCardPrimaryTypeChange(e) {
-        if (this._ankiCardPrimary === null) { return; }
+    _onAnkiCardPrimaryTypeSelectChange(e) {
         const node = e.currentTarget;
         let ankiCardMenu;
         if (node.selectedIndex >= 0) {
@@ -188,7 +192,19 @@ class AnkiController {
             ankiCardMenu = option.dataset.ankiCardMenu;
         }
 
-        this._ankiCardPrimary.dataset.ankiCardType = node.value;
+        this._setAnkiCardPrimaryType(node.value, ankiCardMenu);
+    }
+
+    _onAnkiCardPrimaryTypeRadioChange(e) {
+        const node = e.currentTarget;
+        if (!node.checked) { return; }
+
+        this._setAnkiCardPrimaryType(node.dataset.value, node.dataset.ankiCardMenu);
+    }
+
+    _setAnkiCardPrimaryType(ankiCardType, ankiCardMenu) {
+        if (this._ankiCardPrimary === null) { return; }
+        this._ankiCardPrimary.dataset.ankiCardType = ankiCardType;
         if (typeof ankiCardMenu !== 'undefined') {
             this._ankiCardPrimary.dataset.ankiCardMenu = ankiCardMenu;
         } else {

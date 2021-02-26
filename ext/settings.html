@@ -2549,20 +2549,25 @@
             </div>
         </div>
     </div>
-    <div class="modal-body anki-card" id="anki-card-primary" data-anki-card-type="terms" data-anki-card-menu="anki-card-terms-field-menu">
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Card type</div>
-                <div class="settings-item-description">Different types of definition can have separate settings.</div>
+    <div>
+        <div class="tabs-container">
+            <div class="tabs">
+                <label class="tab">
+                    <input type="radio" name="anki-card-primary-type" data-value="terms" data-anki-card-menu="anki-card-terms-field-menu" checked>
+                    <div class="tab-inner"><span class="tab-label">Terms</span></div>
+                </label>
+                <label class="tab">
+                    <input type="radio" name="anki-card-primary-type" data-value="kanji" data-anki-card-menu="anki-card-kanji-field-menu">
+                    <div class="tab-inner"><span class="tab-label">Kanji</span></div>
+                </label>
             </div>
-            <div class="settings-item-right">
-                <select id="anki-card-primary-type">
-                    <option value="terms" data-anki-card-menu="anki-card-terms-field-menu" selected>Terms</option>
-                    <option value="kanji" data-anki-card-menu="anki-card-kanji-field-menu">Kanji</option>
-                </select>
+            <div class="tabs-right" hidden>
+                <button class="icon-button" data-menu-position="below left" id="anki-card-primary-type-menu-button"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
             </div>
-        </div></div>
+        </div>
         <div class="modal-separator-line"></div>
+    </div>
+    <div class="modal-body anki-card" id="anki-card-primary" data-anki-card-type="terms" data-anki-card-menu="anki-card-terms-field-menu">
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Deck</div>
