@@ -646,6 +646,7 @@ class Frontend {
             }
 
             chrome.runtime.onMessage.addListener(onMessage);
+            yomichan.api.broadcastTab('requestFrontendReadyBroadcast', {frameId: this._frameId});
         });
     }
 
