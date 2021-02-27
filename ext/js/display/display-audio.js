@@ -279,7 +279,7 @@ class DisplayAudio {
     }
 
     _getAudioPlayButtonExpressionIndex(button) {
-        const expressionNode = button.closest('.term-expression');
+        const expressionNode = button.closest('.expression');
         if (expressionNode !== null) {
             const expressionIndex = parseInt(expressionNode.dataset.index, 10);
             if (Number.isFinite(expressionIndex)) { return expressionIndex; }
@@ -293,7 +293,7 @@ class DisplayAudio {
         if (definitionIndex >= 0 && definitionIndex < definitionNodes.length) {
             const node = definitionNodes[definitionIndex];
             const button1 = (expressionIndex === 0 ? node.querySelector('.action-play-audio') : null);
-            const button2 = node.querySelector(`.term-expression:nth-of-type(${expressionIndex + 1}) .action-play-audio`);
+            const button2 = node.querySelector(`.expression:nth-of-type(${expressionIndex + 1}) .action-play-audio`);
             if (button1 !== null) { results.push(button1); }
             if (button2 !== null) { results.push(button2); }
         }

@@ -795,47 +795,47 @@ button.action-button[data-icon=source-term]::before {
     text-decoration: none;
     cursor: pointer;
 }
-.term-expression-text-container {
+.expression-text-container {
     display: inline-block;
     margin-left: calc(-1 * var(--expression-reading-space));
 }
-.term-expression-text-outer {
+.expression-text-outer {
     display: inline-block;
     position: relative;
     margin-left: var(--expression-reading-space);
 }
-.term-expression-reading-outer {
+.expression-reading-outer {
     display: none;
     position: relative;
     margin-left: var(--expression-reading-space);
 }
-.term-expression-text {
+.expression-text {
     color: var(--expression-text-color);
     font-size: var(--expression-font-size);
 }
-.term-expression-reading {
+.expression-reading {
     color: var(--expression-text-color);
     font-size: var(--expression-reading-font-size);
 }
-.term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text-container>.term-expression-text-outer::after {
+.expression-list>.expression:not(:last-of-type)>.expression-text-container>.expression-text-outer::after {
     content: var(--expression-separator);
     font-size: var(--expression-font-size);
 }
-.term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text-container>.term-expression-reading-outer::after {
+.expression-list>.expression:not(:last-of-type)>.expression-text-container>.expression-reading-outer::after {
     content: var(--expression-separator);
     font-size: var(--expression-reading-font-size);
 }
-.entry[data-expression-multi=true] .term-expression[data-frequency=popular] .term-expression-text,
-.entry[data-expression-multi=true] .term-expression[data-frequency=popular] .term-expression-reading,
-.entry[data-expression-multi=true] .term-expression[data-frequency=popular] .kanji-link {
+.entry[data-expression-multi=true] .expression[data-frequency=popular] .expression-text,
+.entry[data-expression-multi=true] .expression[data-frequency=popular] .expression-reading,
+.entry[data-expression-multi=true] .expression[data-frequency=popular] .kanji-link {
     color: var(--expression-text-color-popular);
 }
-.entry[data-expression-multi=true] .term-expression[data-frequency=rare] .term-expression-text,
-.entry[data-expression-multi=true] .term-expression[data-frequency=rare] .term-expression-reading,
-.entry[data-expression-multi=true] .term-expression[data-frequency=rare] .kanji-link {
+.entry[data-expression-multi=true] .expression[data-frequency=rare] .expression-text,
+.entry[data-expression-multi=true] .expression[data-frequency=rare] .expression-reading,
+.entry[data-expression-multi=true] .expression[data-frequency=rare] .kanji-link {
     color: var(--expression-text-color-rare);
 }
-.term-expression-text>ruby>rt {
+.expression-text>ruby>rt {
     color: var(--expression-furigana-text-color);
 }
 .entry-header2,
@@ -845,60 +845,60 @@ button.action-button[data-icon=source-term]::before {
 .entry+.entry {
     border-top: var(--thin-border-size) solid var(--light-border-color);
 }
-.term-reasons {
+.inflection-list {
     display: inline-block;
     color: var(--reason-text-color);
 }
-.term-reasons:empty {
+.inflection-list:empty {
     display: none;
 }
-.term-reasons>.term-reason+.term-reason-separator+.term-reason::before {
+.inflection-list>.inflection+.inflection-separator+.inflection::before {
     content: ' \00AB  '; /* The two spaces is not a typo */
     white-space: pre-wrap;
     display: inline;
 }
-.term-expression-list {
+.expression-list {
     display: inline;
     margin-right: var(--expression-list-end-space);
 }
-.term-expression {
+.expression {
     display: inline-block;
 }
-.term-expression-details {
+.expression-details {
     display: inline;
 }
-.term-expression-details>.tags {
+.expression-tag-list {
     display: none;
 }
-.term-expression-details>.frequencies {
+.expression-details>.frequencies {
     display: none;
 }
-.term-details {
+.expression-list-details {
     display: inline;
 }
-.term-tags {
+.expression-list-tag-list {
     display: inline;
 }
-.entry[data-expression-multi=true] .term-details {
+.entry[data-expression-multi=true] .expression-list-details {
     display: block;
 }
-:root[data-term-display-mode=ruby-and-reading] .term-expression-text-outer::after,
-:root[data-term-display-mode=term-and-reading] .term-expression-text-outer::after {
+:root[data-term-display-mode=ruby-and-reading] .expression-text-outer::after,
+:root[data-term-display-mode=term-and-reading] .expression-text-outer::after {
     display: none;
 }
-:root[data-term-display-mode=ruby-and-reading] .term-expression-reading-outer,
-:root[data-term-display-mode=term-and-reading] .term-expression-reading-outer {
+:root[data-term-display-mode=ruby-and-reading] .expression-reading-outer,
+:root[data-term-display-mode=term-and-reading] .expression-reading-outer {
     display: inline-block;
 }
-:root[data-term-display-mode=ruby-and-reading] .term-expression[data-reading-is-same=true] .term-expression-text-outer::after,
-:root[data-term-display-mode=term-and-reading] .term-expression[data-reading-is-same=true] .term-expression-text-outer::after {
+:root[data-term-display-mode=ruby-and-reading] .expression[data-reading-is-same=true] .expression-text-outer::after,
+:root[data-term-display-mode=term-and-reading] .expression[data-reading-is-same=true] .expression-text-outer::after {
     display: inline-block;
 }
-:root[data-term-display-mode=ruby-and-reading] .term-expression[data-reading-is-same=true] .term-expression-reading-outer,
-:root[data-term-display-mode=term-and-reading] .term-expression[data-reading-is-same=true] .term-expression-reading-outer {
+:root[data-term-display-mode=ruby-and-reading] .expression[data-reading-is-same=true] .expression-reading-outer,
+:root[data-term-display-mode=term-and-reading] .expression[data-reading-is-same=true] .expression-reading-outer {
     display: none;
 }
-:root[data-term-display-mode=term-and-reading] .term-expression-text>ruby>rt {
+:root[data-term-display-mode=term-and-reading] .expression-text>ruby>rt {
     display: none;
 }
 
@@ -961,7 +961,7 @@ button.action-button[data-icon=source-term]::before {
 
 
 /* Triangle entry indicator */
-.term-expression-current-indicator {
+.expression-current-indicator {
     pointer-events: none;
     position: absolute;
     left: calc(-1 * var(--main-content-horizontal-padding));
@@ -973,17 +973,17 @@ button.action-button[data-icon=source-term]::before {
         opacity var(--entry-current-indicator-transition-duration) linear,
         visibility 0s linear var(--entry-current-indicator-transition-duration);
 }
-.term-expression-text .term-expression-current-indicator {
+.expression-text .expression-current-indicator {
     font-size: calc(1em / var(--expression-font-size-no-units));
 }
-.entry.entry-current .term-expression-current-indicator {
+.entry.entry-current .expression-current-indicator {
     opacity: 1;
     visibility: visible;
     transition:
         opacity var(--entry-current-indicator-transition-duration) linear,
         visibility 0s linear 0s;
 }
-.term-expression-current-indicator::after {
+.expression-current-indicator::after {
     content: '';
     display: block;
     position: absolute;
@@ -1003,8 +1003,8 @@ button.action-button[data-icon=source-term]::before {
     -webkit-mask-size: contain;
     -webkit-mask-image: url(/images/material-right-arrow.svg);
 }
-.term-expression:not(:first-of-type) .term-expression-current-indicator,
-:root:not([data-popup-current-indicator-mode=triangle]) .term-expression-current-indicator {
+.expression:not(:first-of-type) .expression-current-indicator,
+:root:not([data-popup-current-indicator-mode=triangle]) .expression-current-indicator {
     display: none;
     transition: none;
 }
@@ -1033,7 +1033,7 @@ button.action-button[data-icon=source-term]::before {
 
 
 /* Merged term styles */
-.entry[data-expression-multi=true] .term-expression-list .term-expression-details {
+.entry[data-expression-multi=true] .expression-list .expression-details {
     display: inline-block;
     position: relative;
     width: 0;
@@ -1041,78 +1041,78 @@ button.action-button[data-icon=source-term]::before {
     visibility: hidden;
     z-index: 1;
 }
-.entry[data-expression-multi=true] .term-expression-list>.term-expression:not(:last-of-type) .term-expression-details {
+.entry[data-expression-multi=true] .expression-list>.expression:not(:last-of-type) .expression-details {
     left: calc(-1 * var(--expression-font-size));
 }
-.entry[data-expression-multi=true] .term-expression:hover .term-expression-details {
+.entry[data-expression-multi=true] .expression:hover .expression-details {
     visibility: visible;
 }
-.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.action-play-audio {
+.entry[data-expression-multi=true] .expression-list .expression-details>.action-play-audio {
     position: absolute;
     left: 0;
     bottom: 0.5em;
 }
-.entry:not([data-expression-multi=true]) .term-expression-list .term-expression-details>.action-play-audio {
+.entry:not([data-expression-multi=true]) .expression-list .expression-details>.action-play-audio {
     display: none;
 }
-.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.tags {
+.entry[data-expression-multi=true] .expression-list .expression-tag-list {
     display: block;
     position: absolute;
     left: 0;
     bottom: -0.5em;
     white-space: nowrap;
 }
-.entry[data-type=term][data-expression-multi=true] .term-tags>.tag[data-category=search] {
+.entry[data-type=term][data-expression-multi=true] .expression-list-tag-list>.tag[data-category=search] {
     display: none;
 }
 
 
 /* Definitions */
-.term-definition-list {
+.definition-list {
     margin: 0;
     padding: 0 0 0 var(--list-padding1);
     list-style-type: decimal;
 }
-.term-definition-list[data-count='0'],
-.term-definition-list[data-count='1'] {
+.definition-list[data-count='0'],
+.definition-list[data-count='1'] {
     padding-left: 0;
     list-style-type: none;
 }
-.term-glossary-list {
+.glossary-list {
     margin: 0;
     padding: 0 0 0 var(--list-padding2);
     list-style-type: circle;
 }
-.term-glossary-list[data-count='0'],
-.term-glossary-list[data-count='1'] {
+.glossary-list[data-count='0'],
+.glossary-list[data-count='1'] {
     padding-left: 0;
     list-style-type: none;
 }
-.term-definition-item::marker,
-.term-glossary-item::marker {
+.definition-item::marker,
+.glossary-item::marker {
     color: var(--text-color-light3);
 }
-.term-glossary {
+.glossary {
     white-space: pre-line;
 }
-.term-definition-disambiguation-list {
+.definition-disambiguation-list {
     color: var(--text-color-light3);
     padding-right: var(--disambiguation-space);
 }
-.term-definition-disambiguation-list[data-count='0'] {
+.definition-disambiguation-list[data-count='0'] {
     display: none;
 }
-.term-definition-disambiguation-list::before {
+.definition-disambiguation-list::before {
     content: var(--disambiguation-prefix);
 }
-.term-definition-disambiguation-list::after {
+.definition-disambiguation-list::after {
     content: var(--disambiguation-suffix);
 }
-.term-definition-disambiguation+.term-definition-disambiguation::before {
+.definition-disambiguation+.definition-disambiguation::before {
     content: var(--disambiguation-separator);
 }
-.term-glossary-separator,
-.term-reason-separator {
+.glossary-separator,
+.inflection-separator {
     display: inline;
     font-size: 0;
     opacity: 0;
@@ -1320,70 +1320,70 @@ button.action-button[data-icon=source-term]::before {
 
 
 /* Pitch accent styles */
-.term-pitch-accent-group-list {
+.pitch-accent-group-list {
     margin: 0;
     padding: 0 0 0 var(--list-padding1);
     list-style-type: decimal;
 }
-.term-pitch-accent-group-list[data-count='0'],
-.term-pitch-accent-group-list[data-count='1'] {
+.pitch-accent-group-list[data-count='0'],
+.pitch-accent-group-list[data-count='1'] {
     padding-left: 0;
     list-style-type: none;
 }
-.term-pitch-accent-list {
+.pitch-accent-list {
     margin: 0;
     padding: 0 0 0 var(--list-padding2);
     list-style-type: circle;
     display: block;
 }
-.term-pitch-accent-list[data-count='0'],
-.term-pitch-accent-list[data-count='1'] {
+.pitch-accent-list[data-count='0'],
+.pitch-accent-list[data-count='1'] {
     padding-left: 0;
     list-style-type: none;
     display: inline;
 }
-.term-pitch-accent-group::marker,
-.term-pitch-accent::marker {
+.pitch-accent-group::marker,
+.pitch-accent::marker {
     color: var(--text-color-light3);
 }
-.term-pitch-accent {
+.pitch-accent {
     display: list-item;
     line-height: 1.5;
 }
-.term-pitch-accent-list[data-count='0'] .term-pitch-accent,
-.term-pitch-accent-list[data-count='1'] .term-pitch-accent {
+.pitch-accent-list[data-count='0'] .pitch-accent,
+.pitch-accent-list[data-count='1'] .pitch-accent {
     display: inline;
 }
-.term-pitch-accent-group-tag-list {
+.pitch-accent-group-tag-list {
     margin-right: 0.375em;
 }
-.term-pitch-accent-disambiguation-list {
+.pitch-accent-disambiguation-list {
     color: var(--text-color-light3);
     padding-right: var(--disambiguation-space);
 }
-.term-pitch-accent-disambiguation-list::before {
+.pitch-accent-disambiguation-list::before {
     content: var(--disambiguation-prefix);
 }
-.term-pitch-accent-disambiguation-list::after {
+.pitch-accent-disambiguation-list::after {
     content: var(--disambiguation-suffix);
 }
-.term-pitch-accent-disambiguation+.term-pitch-accent-disambiguation::before {
+.pitch-accent-disambiguation+.pitch-accent-disambiguation::before {
     content: var(--disambiguation-separator);
 }
-.term-pitch-accent-disambiguation-list[data-count='0'] {
+.pitch-accent-disambiguation-list[data-count='0'] {
     display: none;
 }
-.term-pitch-accent-tag-list:not([data-count='0']) {
+.pitch-accent-tag-list:not([data-count='0']) {
     margin-right: 0.375em;
 }
-.term-pitch-accent-character {
+.pitch-accent-character {
     display: inline-block;
     position: relative;
 }
-.term-pitch-accent-character::before {
+.pitch-accent-character::before {
     border-color: var(--pitch-accent-annotation-color);
 }
-.term-pitch-accent-character[data-pitch='high']::before {
+.pitch-accent-character[data-pitch='high']::before {
     content: '';
     display: block;
     user-select: none;
@@ -1396,23 +1396,23 @@ button.action-button[data-icon=source-term]::before {
     border-top-width: 0.1em;
     border-top-style: solid;
 }
-.term-pitch-accent-character[data-pitch='high'][data-pitch-next='low']::before {
+.pitch-accent-character[data-pitch='high'][data-pitch-next='low']::before {
     right: -0.1em;
     height: 0.4em;
     border-right-width: 0.1em;
     border-right-style: solid;
 }
-.term-pitch-accent-character[data-pitch='high'][data-pitch-next='low'] {
+.pitch-accent-character[data-pitch='high'][data-pitch-next='low'] {
     padding-right: 0.1em;
     margin-right: 0.1em;
 }
-.term-pitch-accent-position::before {
+.pitch-accent-position::before {
     content: ' [';
 }
-.term-pitch-accent-position::after {
+.pitch-accent-position::after {
     content: ']';
 }
-.term-pitch-accent-details {
+.pitch-accent-details {
     display: inline-block;
     height: 0;
     padding: 0 0.25em;
@@ -1421,34 +1421,34 @@ button.action-button[data-icon=source-term]::before {
 
 
 /* Pitch accent graph styles */
-.term-pitch-accent-graph {
+.pitch-accent-graph {
     display: block;
     height: 1.5em;
     transform: translateY(-0.875em);
 }
-.term-pitch-accent-graph-line,
-.term-pitch-accent-graph-line-tail {
+.pitch-accent-graph-line,
+.pitch-accent-graph-line-tail {
     fill: none;
     stroke: var(--pitch-accent-annotation-color);
     stroke-width: 5;
 }
-.term-pitch-accent-graph-line-tail {
+.pitch-accent-graph-line-tail {
     stroke-dasharray: 5 5;
 }
-#term-pitch-accent-graph-dot {
+#pitch-accent-graph-dot {
     fill: var(--pitch-accent-annotation-color);
     stroke: var(--pitch-accent-annotation-color);
     stroke-width: 5;
 }
-#term-pitch-accent-graph-dot-downstep {
+#pitch-accent-graph-dot-downstep {
     fill: none;
     stroke: var(--pitch-accent-annotation-color);
     stroke-width: 5;
 }
-#term-pitch-accent-graph-dot-downstep>circle:last-of-type {
+#pitch-accent-graph-dot-downstep>circle:last-of-type {
     fill: var(--pitch-accent-annotation-color);
 }
-#term-pitch-accent-graph-triangle {
+#pitch-accent-graph-triangle {
     fill: none;
     stroke: var(--pitch-accent-annotation-color);
     stroke-width: 5;
@@ -1456,7 +1456,7 @@ button.action-button[data-icon=source-term]::before {
 
 
 /* Glossary images */
-.term-glossary-image-container {
+.glossary-image-container {
     display: inline-block;
     white-space: nowrap;
     max-width: 100%;
@@ -1467,14 +1467,14 @@ button.action-button[data-icon=source-term]::before {
     overflow: hidden;
     background-color: var(--glossary-image-background-color);
 }
-.term-glossary-image-link {
+.glossary-image-link {
     cursor: inherit;
     color: inherit;
 }
-.term-glossary-image-link[href]:hover {
+.glossary-image-link[href]:hover {
     cursor: pointer;
 }
-.term-glossary-image-container-overlay {
+.glossary-image-container-overlay {
     position: absolute;
     left: 0;
     top: 0;
@@ -1487,7 +1487,7 @@ button.action-button[data-icon=source-term]::before {
     white-space: normal;
     color: var(--text-color-light3);
 }
-.term-glossary-item[data-has-image=true][data-image-load-state=load-error] .term-glossary-image-container-overlay::after {
+.glossary-item[data-has-image=true][data-image-load-state=load-error] .glossary-image-container-overlay::after {
     content: 'Image failed to load';
     display: table-cell;
     width: 100%;
@@ -1496,7 +1496,7 @@ button.action-button[data-icon=source-term]::before {
     text-align: center;
     padding: 0.25em;
 }
-.term-glossary-image {
+.glossary-image {
     display: inline-block;
     position: absolute;
     left: 0;
@@ -1508,30 +1508,30 @@ button.action-button[data-icon=source-term]::before {
     border: none;
     outline: none;
 }
-.term-glossary-image:not([src]) {
+.glossary-image:not([src]) {
     display: none;
 }
-.term-glossary-image[data-pixelated=true] {
+.glossary-image[data-pixelated=true] {
     image-rendering: auto;
     image-rendering: -moz-crisp-edges;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
 }
-.term-glossary-image-aspect-ratio-sizer {
+.glossary-image-aspect-ratio-sizer {
     content: '';
     display: inline-block;
     width: 0;
     vertical-align: top;
     font-size: 0;
 }
-.term-glossary-image-link-text::before {
+.glossary-image-link-text::before {
     content: '[';
 }
-.term-glossary-image-link-text::after {
+.glossary-image-link-text::after {
     content: ']';
 }
-.term-glossary-image-description {
+.glossary-image-description {
     white-space: pre-line;
 }
 
@@ -1954,77 +1954,77 @@ button.footer-notification-close-button {
 :root[data-audio-enabled=false] .action-play-audio {
     display: none;
 }
-:root[data-glossary-layout-mode=compact] .term-definition-tag-list,
-:root[data-glossary-layout-mode=compact] .term-definition-disambiguation-list:not([data-count='0']) {
+:root[data-glossary-layout-mode=compact] .definition-tag-list,
+:root[data-glossary-layout-mode=compact] .definition-disambiguation-list:not([data-count='0']) {
     display: inline;
 }
-:root[data-glossary-layout-mode=compact] .term-glossary-list {
+:root[data-glossary-layout-mode=compact] .glossary-list {
     display: inline;
     list-style: none;
     padding-left: 0;
 }
-:root[data-glossary-layout-mode=compact] .term-glossary-item {
+:root[data-glossary-layout-mode=compact] .glossary-item {
     display: inline;
 }
-:root[data-glossary-layout-mode=compact] .term-glossary-item:not(:first-child)::before {
+:root[data-glossary-layout-mode=compact] .glossary-item:not(:first-child)::before {
     white-space: pre-wrap;
     content: var(--compact-list-separator);
     display: inline;
     color: var(--text-color-light3);
 }
 
-:root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation-list[data-expression-count='0'],
-:root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation[data-type=reading] {
+:root[data-show-pitch-accent-downstep-notation=true] .pitch-accent-disambiguation-list[data-expression-count='0'],
+:root[data-show-pitch-accent-downstep-notation=true] .pitch-accent-disambiguation[data-type=reading] {
     display: none;
 }
-:root[data-show-pitch-accent-downstep-notation=false] .term-pitch-accent-characters {
+:root[data-show-pitch-accent-downstep-notation=false] .pitch-accent-characters {
     display: none;
 }
-:root[data-show-pitch-accent-position-notation=false] .term-pitch-accent-position {
+:root[data-show-pitch-accent-position-notation=false] .pitch-accent-position {
     display: none;
 }
-:root[data-show-pitch-accent-graph=false] .term-pitch-accent-details {
+:root[data-show-pitch-accent-graph=false] .pitch-accent-details {
     display: none;
 }
 
-:root[data-glossary-layout-mode=compact][data-show-pitch-accent-graph=false] .term-pitch-accent-list:not([data-has-tags=true]) {
+:root[data-glossary-layout-mode=compact][data-show-pitch-accent-graph=false] .pitch-accent-list:not([data-has-tags=true]) {
     display: inline;
     list-style: none;
     padding-left: 0;
 }
-:root[data-glossary-layout-mode=compact][data-show-pitch-accent-graph=false] .term-pitch-accent-list:not([data-has-tags=true]) .term-pitch-accent {
+:root[data-glossary-layout-mode=compact][data-show-pitch-accent-graph=false] .pitch-accent-list:not([data-has-tags=true]) .pitch-accent {
     display: inline;
 }
-:root[data-glossary-layout-mode=compact][data-show-pitch-accent-graph=false] .term-pitch-accent-list:not([data-has-tags=true]) .term-pitch-accent:not(:first-child)::before {
+:root[data-glossary-layout-mode=compact][data-show-pitch-accent-graph=false] .pitch-accent-list:not([data-has-tags=true]) .pitch-accent:not(:first-child)::before {
     white-space: pre-wrap;
     content: var(--compact-list-separator);
     display: inline;
     color: var(--text-color-light3);
 }
 
-:root[data-glossary-layout-mode=compact] .term-glossary-image-container {
+:root[data-glossary-layout-mode=compact] .glossary-image-container {
     display: none;
     position: absolute;
     left: 0;
     top: 100%;
     z-index: 1;
 }
-:root[data-glossary-layout-mode=compact] .entry:nth-last-of-type(1):not(:nth-of-type(1)) .term-glossary-image-container {
+:root[data-glossary-layout-mode=compact] .entry:nth-last-of-type(1):not(:nth-of-type(1)) .glossary-image-container {
     bottom: 100%;
     top: auto;
 }
-:root[data-glossary-layout-mode=compact] .term-glossary-image-link {
+:root[data-glossary-layout-mode=compact] .glossary-image-link {
     position: relative;
     display: inline-block;
 }
-:root[data-glossary-layout-mode=compact] .term-glossary-image-link:hover .term-glossary-image-container,
-:root[data-glossary-layout-mode=compact] .term-glossary-image-link:focus .term-glossary-image-container {
+:root[data-glossary-layout-mode=compact] .glossary-image-link:hover .glossary-image-container,
+:root[data-glossary-layout-mode=compact] .glossary-image-link:focus .glossary-image-container {
     display: block;
 }
-:root:not([data-glossary-layout-mode=compact]) .term-glossary-image-link-text {
+:root:not([data-glossary-layout-mode=compact]) .glossary-image-link-text {
     display: none;
 }
-:root:not([data-glossary-layout-mode=compact]) .term-glossary-image-description {
+:root:not([data-glossary-layout-mode=compact]) .glossary-image-description {
     display: block;
 }
 

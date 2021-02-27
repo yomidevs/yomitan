@@ -46,19 +46,19 @@ class DisplayGenerator {
     preparePitchAccents() {
         if (this._termPitchAccentStaticTemplateIsSetup) { return; }
         this._termPitchAccentStaticTemplateIsSetup = true;
-        const t = this._templates.instantiate('term-pitch-accent-static');
+        const t = this._templates.instantiate('pitch-accent-static');
         document.head.appendChild(t);
     }
 
     createTermEntry(details) {
         const node = this._templates.instantiate('term-entry');
 
-        const expressionsContainer = node.querySelector('.term-expression-list');
-        const reasonsContainer = node.querySelector('.term-reasons');
-        const pitchesContainer = node.querySelector('.term-pitch-accent-group-list');
+        const expressionsContainer = node.querySelector('.expression-list');
+        const reasonsContainer = node.querySelector('.inflection-list');
+        const pitchesContainer = node.querySelector('.pitch-accent-group-list');
         const frequencyGroupListContainer = node.querySelector('.frequency-group-list');
-        const definitionsContainer = node.querySelector('.term-definition-list');
-        const termTagsContainer = node.querySelector('.term-tags');
+        const definitionsContainer = node.querySelector('.definition-list');
+        const termTagsContainer = node.querySelector('.expression-list-tag-list');
 
         const {expressions, type, reasons, frequencies} = details;
         const definitions = (type === 'term' ? [details] : details.definitions);
@@ -129,7 +129,7 @@ class DisplayGenerator {
 
         const glyphContainer = node.querySelector('.kanji-glyph');
         const frequencyGroupListContainer = node.querySelector('.frequency-group-list');
-        const tagContainer = node.querySelector('.tags');
+        const tagContainer = node.querySelector('.kanji-tag-list');
         const glossaryContainer = node.querySelector('.kanji-glossary-list');
         const chineseReadingsContainer = node.querySelector('.kanji-readings-chinese');
         const japaneseReadingsContainer = node.querySelector('.kanji-readings-japanese');
@@ -235,15 +235,15 @@ class DisplayGenerator {
         if (expression) { searchQueries.push(expression); }
         if (reading) { searchQueries.push(reading); }
 
-        const node = this._templates.instantiate('term-expression');
+        const node = this._templates.instantiate('expression');
 
-        const expressionContainer = node.querySelector('.term-expression-text');
-        const tagContainer = node.querySelector('.tags');
+        const expressionContainer = node.querySelector('.expression-text');
+        const tagContainer = node.querySelector('.expression-tag-list');
 
         node.dataset.readingIsSame = `${!reading || reading === expression}`;
         node.dataset.frequency = termFrequency;
 
-        this._setTextContent(node.querySelector('.term-expression-reading'), reading.length > 0 ? reading : expression);
+        this._setTextContent(node.querySelector('.expression-reading'), reading.length > 0 ? reading : expression);
 
         this._appendFurigana(expressionContainer, furiganaSegments, this._appendKanjiLinks.bind(this));
         this._appendMultiple(tagContainer, this._createTag.bind(this), termTags);
@@ -253,19 +253,19 @@ class DisplayGenerator {
     }
 
     _createTermReason(reason) {
-        const fragment = this._templates.instantiateFragment('term-reason');
-        const node = fragment.querySelector('.term-reason');
+        const fragment = this._templates.instantiateFragment('inflection');
+        const node = fragment.querySelector('.inflection');
         this._setTextContent(node, reason);
         node.dataset.reason = reason;
         return fragment;
     }
 
     _createTermDefinitionItem(details, dictionaryTag) {
-        const node = this._templates.instantiate('term-definition-item');
+        const node = this._templates.instantiate('definition-item');
 
-        const tagListContainer = node.querySelector('.term-definition-tag-list');
-        const onlyListContainer = node.querySelector('.term-definition-disambiguation-list');
-        const glossaryContainer = node.querySelector('.term-glossary-list');
+        const tagListContainer = node.querySelector('.definition-tag-list');
+        const onlyListContainer = node.querySelector('.definition-disambiguation-list');
+        const glossaryContainer = node.querySelector('.glossary-list');
 
         const {dictionary, definitionTags} = details;
         node.dataset.dictionary = dictionary;
@@ -291,8 +291,8 @@ class DisplayGenerator {
     }
 
     _createTermGlossaryItemText(glossary) {
-        const node = this._templates.instantiate('term-glossary-item');
-        const container = node.querySelector('.term-glossary');
+        const node = this._templates.instantiate('glossary-item');
+        const container = node.querySelector('.glossary');
         this._setTextContent(container, glossary);
         return node;
     }
@@ -312,22 +312,22 @@ class DisplayGenerator {
             width / height
         );
 
-        const node = this._templates.instantiate('term-glossary-item-image');
+        const node = this._templates.instantiate('glossary-item-image');
         node.dataset.path = path;
         node.dataset.dictionary = dictionary;
         node.dataset.imageLoadState = 'not-loaded';
 
-        const imageContainer = node.querySelector('.term-glossary-image-container');
+        const imageContainer = node.querySelector('.glossary-image-container');
         imageContainer.style.width = `${usedWidth}em`;
         if (typeof title === 'string') {
             imageContainer.title = title;
         }
 
-        const aspectRatioSizer = node.querySelector('.term-glossary-image-aspect-ratio-sizer');
+        const aspectRatioSizer = node.querySelector('.glossary-image-aspect-ratio-sizer');
         aspectRatioSizer.style.paddingTop = `${aspectRatio * 100.0}%`;
 
-        const image = node.querySelector('img.term-glossary-image');
-        const imageLink = node.querySelector('.term-glossary-image-link');
+        const image = node.querySelector('img.glossary-image');
+        const imageLink = node.querySelector('.glossary-image-link');
         image.dataset.pixelated = `${pixelated === true}`;
 
         if (this._mediaLoader !== null) {
@@ -340,7 +340,7 @@ class DisplayGenerator {
         }
 
         if (typeof description === 'string') {
-            const container = node.querySelector('.term-glossary-image-description');
+            const container = node.querySelector('.glossary-image-description');
             this._setTextContent(container, description);
         }
 
@@ -360,7 +360,7 @@ class DisplayGenerator {
     }
 
     _createTermDisambiguation(disambiguation) {
-        const node = this._templates.instantiate('term-definition-disambiguation');
+        const node = this._templates.instantiate('definition-disambiguation');
         node.dataset.term = disambiguation;
         this._setTextContent(node, disambiguation, 'ja');
         return node;
@@ -451,13 +451,13 @@ class DisplayGenerator {
 
         const {dictionary, pitches} = details;
 
-        const node = this._templates.instantiate('term-pitch-accent-group');
+        const node = this._templates.instantiate('pitch-accent-group');
         node.dataset.dictionary = dictionary;
         node.dataset.pitchesMulti = 'true';
         node.dataset.pitchesCount = `${pitches.length}`;
 
         const tag = this._createTag({notes: '', name: dictionary, category: 'pitch-accent-dictionary'});
-        node.querySelector('.term-pitch-accent-group-tag-list').appendChild(tag);
+        node.querySelector('.pitch-accent-group-tag-list').appendChild(tag);
 
         let hasTags = false;
         for (const {tags} of pitches) {
@@ -467,7 +467,7 @@ class DisplayGenerator {
             }
         }
 
-        const n = node.querySelector('.term-pitch-accent-list');
+        const n = node.querySelector('.pitch-accent-list');
         n.dataset.hasTags = `${hasTags}`;
         this._appendMultiple(n, this._createPitch.bind(this), pitches);
 
@@ -479,28 +479,28 @@ class DisplayGenerator {
         const {reading, position, tags, exclusiveExpressions, exclusiveReadings} = details;
         const morae = jp.getKanaMorae(reading);
 
-        const node = this._templates.instantiate('term-pitch-accent');
+        const node = this._templates.instantiate('pitch-accent');
 
         node.dataset.pitchAccentPosition = `${position}`;
         node.dataset.tagCount = `${tags.length}`;
 
-        let n = node.querySelector('.term-pitch-accent-position');
+        let n = node.querySelector('.pitch-accent-position');
         this._setTextContent(n, `${position}`, '');
 
-        n = node.querySelector('.term-pitch-accent-tag-list');
+        n = node.querySelector('.pitch-accent-tag-list');
         this._appendMultiple(n, this._createTag.bind(this), tags);
 
-        n = node.querySelector('.term-pitch-accent-disambiguation-list');
+        n = node.querySelector('.pitch-accent-disambiguation-list');
         this._createPitchAccentDisambiguations(n, exclusiveExpressions, exclusiveReadings);
 
-        n = node.querySelector('.term-pitch-accent-characters');
+        n = node.querySelector('.pitch-accent-characters');
         for (let i = 0, ii = morae.length; i < ii; ++i) {
             const mora = morae[i];
             const highPitch = jp.isMoraPitchHigh(i, position);
             const highPitchNext = jp.isMoraPitchHigh(i + 1, position);
 
-            const n1 = this._templates.instantiate('term-pitch-accent-character');
-            const n2 = n1.querySelector('.term-pitch-accent-character-inner');
+            const n1 = this._templates.instantiate('pitch-accent-character');
+            const n2 = n1.querySelector('.pitch-accent-character-inner');
 
             n1.dataset.position = `${i}`;
             n1.dataset.pitch = highPitch ? 'high' : 'low';
@@ -511,14 +511,14 @@ class DisplayGenerator {
         }
 
         if (morae.length > 0) {
-            this._populatePitchGraph(node.querySelector('.term-pitch-accent-graph'), position, morae);
+            this._populatePitchGraph(node.querySelector('.pitch-accent-graph'), position, morae);
         }
 
         return node;
     }
 
     _createPitchAccentDisambiguations(container, exclusiveExpressions, exclusiveReadings) {
-        const templateName = 'term-pitch-accent-disambiguation';
+        const templateName = 'pitch-accent-disambiguation';
         for (const exclusiveExpression of exclusiveExpressions) {
             const node = this._templates.instantiate(templateName);
             node.dataset.type = 'expression';
@@ -548,7 +548,7 @@ class DisplayGenerator {
         for (let i = 0; i < ii; ++i) {
             const highPitch = jp.isMoraPitchHigh(i, position);
             const highPitchNext = jp.isMoraPitchHigh(i + 1, position);
-            const graphic = (highPitch && !highPitchNext ? '#term-pitch-accent-graph-dot-downstep' : '#term-pitch-accent-graph-dot');
+            const graphic = (highPitch && !highPitchNext ? '#pitch-accent-graph-dot-downstep' : '#pitch-accent-graph-dot');
             const x = `${i * 50 + 25}`;
             const y = highPitch ? '25' : '75';
             const use = document.createElementNS(svgns, 'use');
@@ -559,7 +559,7 @@ class DisplayGenerator {
             pathPoints.push(`${x} ${y}`);
         }
 
-        let path = svg.querySelector('.term-pitch-accent-graph-line');
+        let path = svg.querySelector('.pitch-accent-graph-line');
         path.setAttribute('d', `M${pathPoints.join(' L')}`);
 
         pathPoints.splice(0, ii - 1);
@@ -568,14 +568,14 @@ class DisplayGenerator {
             const x = `${ii * 50 + 25}`;
             const y = highPitch ? '25' : '75';
             const use = document.createElementNS(svgns, 'use');
-            use.setAttribute('href', '#term-pitch-accent-graph-triangle');
+            use.setAttribute('href', '#pitch-accent-graph-triangle');
             use.setAttribute('x', x);
             use.setAttribute('y', y);
             svg.appendChild(use);
             pathPoints.push(`${x} ${y}`);
         }
 
-        path = svg.querySelector('.term-pitch-accent-graph-line-tail');
+        path = svg.querySelector('.pitch-accent-graph-line-tail');
         path.setAttribute('d', `M${pathPoints.join(' L')}`);
     }
 

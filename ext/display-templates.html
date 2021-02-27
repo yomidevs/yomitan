@@ -13,11 +13,11 @@
                     <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover"><div class="action-button-badge icon" hidden></div></button>
                     <span class="entry-current-indicator-icon" title="Current entry"></span>
                 </div>
-                <div class="term-expression-list"></div>
+                <div class="expression-list"></div>
             </div>
-            <div class="term-details">
-                <div class="term-tags tag-list"></div>
-                <div class="term-reasons"></div>
+            <div class="expression-list-details">
+                <div class="expression-list-tag-list tag-list"></div>
+                <div class="inflection-list"></div>
             </div>
         </div>
     </div>
@@ -26,34 +26,34 @@
             <div class="entry-body-section-content frequency-group-list"></div>
         </div>
         <div class="entry-body-section" data-section-type="pitch-accents">
-            <ol class="entry-body-section-content term-pitch-accent-group-list"></ol>
+            <ol class="entry-body-section-content pitch-accent-group-list"></ol>
         </div>
         <div class="entry-body-section" data-section-type="definitions">
-            <ol class="entry-body-section-content term-definition-list"></ol>
+            <ol class="entry-body-section-content definition-list"></ol>
         </div>
     </div>
     <div class="debug-info"><a class="debug-log-link">Log debug info to console</a></div>
 </div></template>
-<template id="term-expression-template" data-remove-whitespace-text="true"><div class="term-expression">
-    <div class="term-expression-text-container" lang="ja">
-        <span class="term-expression-text-outer source-text">
-            <span class="term-expression-current-indicator"></span>
-            <span class="term-expression-text"></span>
+<template id="expression-template" data-remove-whitespace-text="true"><div class="expression">
+    <div class="expression-text-container" lang="ja">
+        <span class="expression-text-outer source-text">
+            <span class="expression-current-indicator"></span>
+            <span class="expression-text"></span>
         </span>
-        <span class="term-expression-reading-outer">
-            <span class="term-expression-reading"></span>
+        <span class="expression-reading-outer">
+            <span class="expression-reading"></span>
         </span>
     </div>
-    <div class="term-expression-details">
+    <div class="expression-details">
         <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="right below h-cover v-cover"><div class="action-button-badge icon" hidden></div></button>
-        <div class="tags tag-list"></div>
+        <div class="expression-tag-list tag-list"></div>
     </div>
 </div></template>
-<template id="term-definition-item-template"><li class="term-definition-item"><div class="term-definition-tag-list tag-list"></div><div class="term-definition-disambiguation-list"></div><ul class="term-glossary-list"></ul></li></template>
-<template id="term-definition-disambiguation-template"><span class="term-definition-disambiguation"></span></template>
-<template id="term-glossary-item-template"><li class="term-glossary-item click-scannable"><span class="term-glossary-separator"> </span><span class="term-glossary"></span></li></template>
-<template id="term-glossary-item-image-template"><li class="term-glossary-item click-scannable" data-has-image="true"><span class="term-glossary-separator"> </span><span class="term-glossary"><a class="term-glossary-image-link" target="_blank" rel="noreferrer noopener"><span class="term-glossary-image-container"><span class="term-glossary-image-aspect-ratio-sizer"></span><img class="term-glossary-image" alt=""><span class="term-glossary-image-container-overlay"></span></span><span class="term-glossary-image-link-text">Image</span></a> <span class="term-glossary-image-description"></span></span></li></template>
-<template id="term-reason-template"><span class="term-reason"></span><span class="term-reason-separator"> </span></template>
+<template id="definition-item-template"><li class="definition-item"><div class="definition-tag-list tag-list"></div><div class="definition-disambiguation-list"></div><ul class="glossary-list"></ul></li></template>
+<template id="definition-disambiguation-template"><span class="definition-disambiguation"></span></template>
+<template id="glossary-item-template"><li class="glossary-item click-scannable"><span class="glossary-separator"> </span><span class="glossary"></span></li></template>
+<template id="glossary-item-image-template"><li class="glossary-item click-scannable" data-has-image="true"><span class="glossary-separator"> </span><span class="glossary"><a class="glossary-image-link" target="_blank" rel="noreferrer noopener"><span class="glossary-image-container"><span class="glossary-image-aspect-ratio-sizer"></span><img class="glossary-image" alt=""><span class="glossary-image-container-overlay"></span></span><span class="glossary-image-link-text">Image</span></a> <span class="glossary-image-description"></span></span></li></template>
+<template id="inflection-template"><span class="inflection"></span><span class="inflection-separator"> </span></template>
 
 <!-- Frequency templates -->
 <template id="frequency-group-item-template"><span class="frequency-group-item"><span class="tag tag-has-body frequency-group-tag" data-category="frequency"><span class="tag-label"><span class="tag-label-content"></span></span><span class="tag-body"><span class="tag-body-content frequency-list"></span></span></span></span></template>
@@ -77,17 +77,17 @@
 </span></span></template>
 
 <!-- Pitch accent templates -->
-<template id="term-pitch-accent-static-template"><svg xmlns="http://www.w3.org/2000/svg" style="display: none;" focusable="false">
+<template id="pitch-accent-static-template"><svg xmlns="http://www.w3.org/2000/svg" style="display: none;" focusable="false">
     <defs>
-        <g id="term-pitch-accent-graph-dot"><circle cx="0" cy="0" r="15" /></g>
-        <g id="term-pitch-accent-graph-dot-downstep"><circle cx="0" cy="0" r="15" /><circle cx="0" cy="0" r="5" /></g>
-        <g id="term-pitch-accent-graph-triangle"><path d="M0 13 L15 -13 L-15 -13 Z" /></g>
+        <g id="pitch-accent-graph-dot"><circle cx="0" cy="0" r="15" /></g>
+        <g id="pitch-accent-graph-dot-downstep"><circle cx="0" cy="0" r="15" /><circle cx="0" cy="0" r="5" /></g>
+        <g id="pitch-accent-graph-triangle"><path d="M0 13 L15 -13 L-15 -13 Z" /></g>
     </defs>
 </svg></template>
-<template id="term-pitch-accent-group-template"><li class="term-pitch-accent-group"><span class="term-pitch-accent-group-tag-list tag-list"></span><ul class="term-pitch-accent-list"></ul></li></template>
-<template id="term-pitch-accent-disambiguation-template"><span class="term-pitch-accent-disambiguation"></span></template>
-<template id="term-pitch-accent-template"><li class="term-pitch-accent"><span class="term-pitch-accent-tag-list tag-list"></span><span class="term-pitch-accent-disambiguation-list"></span><span class="term-pitch-accent-characters"></span><span class="term-pitch-accent-position"></span><span class="term-pitch-accent-details"><svg class="term-pitch-accent-graph" xmlns="http://www.w3.org/2000/svg" focusable="false"><path class="term-pitch-accent-graph-line" /><path class="term-pitch-accent-graph-line-tail" /></svg></span></li></template>
-<template id="term-pitch-accent-character-template"><span class="term-pitch-accent-character"><span class="term-pitch-accent-character-inner"></span></span></template>
+<template id="pitch-accent-group-template"><li class="pitch-accent-group"><span class="pitch-accent-group-tag-list tag-list"></span><ul class="pitch-accent-list"></ul></li></template>
+<template id="pitch-accent-disambiguation-template"><span class="pitch-accent-disambiguation"></span></template>
+<template id="pitch-accent-template"><li class="pitch-accent"><span class="pitch-accent-tag-list tag-list"></span><span class="pitch-accent-disambiguation-list"></span><span class="pitch-accent-characters"></span><span class="pitch-accent-position"></span><span class="pitch-accent-details"><svg class="pitch-accent-graph" xmlns="http://www.w3.org/2000/svg" focusable="false"><path class="pitch-accent-graph-line" /><path class="pitch-accent-graph-line-tail" /></svg></span></li></template>
+<template id="pitch-accent-character-template"><span class="pitch-accent-character"><span class="pitch-accent-character-inner"></span></span></template>
 
 <!-- Kanji entry templates -->
 <template id="kanji-entry-template" data-remove-whitespace-text="true"><div class="entry" data-type="kanji">
@@ -101,13 +101,13 @@
                     <span class="entry-current-indicator-icon" title="Current entry"></span>
                 </div>
                 <div class="kanji-glyph-container">
-                    <span class="term-expression-current-indicator"></span>
+                    <span class="expression-current-indicator"></span>
                     <div class="kanji-glyph source-text"></div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="tags tag-list"></div>
+    <div class="kanji-tag-list tag-list"></div>
     <div class="entry-body">
         <div class="entry-body-section" data-section-type="frequencies">
             <div class="entry-body-section-content frequency-group-list"></div>
