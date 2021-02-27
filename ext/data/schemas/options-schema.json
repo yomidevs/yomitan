@@ -276,6 +276,11 @@
                                         "type": "string",
                                         "enum": ["tags", "tags-grouped", "split-tags", "split-tags-grouped", "inline-list", "list"],
                                         "default": "split-tags-grouped"
+                                    },
+                                    "termDisplayMode": {
+                                        "type": "string",
+                                        "enum": ["ruby", "ruby-and-reading", "term-and-reading"],
+                                        "default": "ruby"
                                     }
                                 }
                             },

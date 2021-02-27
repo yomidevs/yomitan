@@ -25,6 +25,8 @@
     --disambiguation-separator: ', ';
     --disambiguation-reading-separator: ':';
 
+    --expression-separator: '\3001';
+
     /* Layout */
     --font-size-no-units: 14;
     --font-size: calc(1px * var(--font-size-no-units));
@@ -32,6 +34,9 @@
     --query-parser-font-size: calc(1em * var(--query-parser-font-size-no-units));
     --expression-font-size-no-units: 2;
     --expression-font-size: calc(1em * var(--expression-font-size-no-units));
+    --expression-reading-font-size-scale: 0.75;
+    --expression-reading-font-size: calc(var(--expression-reading-font-size-scale) * var(--expression-font-size));
+    --expression-reading-space: 0.5em;
     --h2-font-size-no-units: 1.25;
     --h2-font-size: calc(1em * var(--h2-font-size-no-units));
 
@@ -790,18 +795,41 @@ button.action-button[data-icon=source-term]::before {
 }
 .term-expression-text-container {
     display: inline-block;
+    margin-left: calc(-1 * var(--expression-reading-space));
+}
+.term-expression-text-outer {
+    display: inline-block;
+    position: relative;
+    margin-left: var(--expression-reading-space);
+}
+.term-expression-reading-outer {
+    display: none;
+    position: relative;
+    margin-left: var(--expression-reading-space);
 }
 .term-expression-text {
     color: var(--kanji-text-color);
     font-size: var(--expression-font-size);
-    display: inline-block;
-    position: relative;
+}
+.term-expression-reading {
+    color: var(--kanji-text-color);
+    font-size: var(--expression-reading-font-size);
+}
+.term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text-container>.term-expression-text-outer::after {
+    content: var(--expression-separator);
+    font-size: var(--expression-font-size);
+}
+.term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text-container>.term-expression-reading-outer::after {
+    content: var(--expression-separator);
+    font-size: var(--expression-reading-font-size);
 }
 .entry[data-expression-multi=true] .term-expression[data-frequency=popular] .term-expression-text,
+.entry[data-expression-multi=true] .term-expression[data-frequency=popular] .term-expression-reading,
 .entry[data-expression-multi=true] .term-expression[data-frequency=popular] .kanji-link {
     color: var(--kanji-popular-text-color);
 }
 .entry[data-expression-multi=true] .term-expression[data-frequency=rare] .term-expression-text,
+.entry[data-expression-multi=true] .term-expression[data-frequency=rare] .term-expression-reading,
 .entry[data-expression-multi=true] .term-expression[data-frequency=rare] .kanji-link {
     color: var(--kanji-rare-text-color);
 }
@@ -842,9 +870,6 @@ button.action-button[data-icon=source-term]::before {
 .term-expression-details>.frequencies {
     display: none;
 }
-.term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text-container>.term-expression-text::after {
-    content: '\3001';
-}
 .term-details {
     display: inline;
 }
@@ -853,6 +878,25 @@ button.action-button[data-icon=source-term]::before {
 }
 .entry[data-expression-multi=true] .term-details {
     display: block;
+}
+:root[data-term-display-mode=ruby-and-reading] .term-expression-text-outer::after,
+:root[data-term-display-mode=term-and-reading] .term-expression-text-outer::after {
+    display: none;
+}
+:root[data-term-display-mode=ruby-and-reading] .term-expression-reading-outer,
+:root[data-term-display-mode=term-and-reading] .term-expression-reading-outer {
+    display: inline-block;
+}
+:root[data-term-display-mode=ruby-and-reading] .term-expression[data-reading-is-same=true] .term-expression-text-outer::after,
+:root[data-term-display-mode=term-and-reading] .term-expression[data-reading-is-same=true] .term-expression-text-outer::after {
+    display: inline-block;
+}
+:root[data-term-display-mode=ruby-and-reading] .term-expression[data-reading-is-same=true] .term-expression-reading-outer,
+:root[data-term-display-mode=term-and-reading] .term-expression[data-reading-is-same=true] .term-expression-reading-outer {
+    display: none;
+}
+:root[data-term-display-mode=term-and-reading] .term-expression-text>ruby>rt {
+    display: none;
 }
 
 

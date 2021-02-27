@@ -741,8 +741,10 @@ class OptionsUtil {
     _updateVersion9(options) {
         // Version 9 changes:
         //  Added general.frequencyDisplayMode.
+        //  Added general.termDisplayMode.
         for (const profile of options.profiles) {
             profile.options.general.frequencyDisplayMode = 'split-tags-grouped';
+            profile.options.general.termDisplayMode = 'ruby';
         }
         return options;
     }

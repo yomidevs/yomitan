@@ -243,7 +243,7 @@ class DisplayGenerator {
         node.dataset.readingIsSame = `${!reading || reading === expression}`;
         node.dataset.frequency = termFrequency;
 
-        expressionContainer.lang = 'ja';
+        this._setTextContent(node.querySelector('.term-expression-reading'), reading.length > 0 ? reading : expression);
 
         this._appendFurigana(expressionContainer, furiganaSegments, this._appendKanjiLinks.bind(this));
         this._appendMultiple(tagContainer, this._createTag.bind(this), termTags);

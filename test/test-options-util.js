@@ -295,7 +295,8 @@ function createProfileOptionsUpdatedTestData1() {
             popupCurrentIndicatorMode: 'triangle',
             popupActionBarVisibility: 'auto',
             popupActionBarLocation: 'top',
-            frequencyDisplayMode: 'split-tags-grouped'
+            frequencyDisplayMode: 'split-tags-grouped',
+            termDisplayMode: 'ruby'
         },
         audio: {
             enabled: true,
