@@ -368,7 +368,7 @@ class DisplayGenerator {
 
     _createKanjiLink(character) {
         const node = document.createElement('a');
-        node.className = 'kanji-link';
+        node.className = 'expression-kanji-link';
         this._setTextContent(node, character, 'ja');
         return node;
     }

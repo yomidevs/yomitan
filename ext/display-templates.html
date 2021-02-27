@@ -3,22 +3,18 @@
 <!-- Term entry templates -->
 <template id="term-entry-template" data-remove-whitespace-text="true"><div class="entry" data-type="term">
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
-    <div class="entry-header1">
-        <div class="entry-header2">
-            <div class="entry-header3">
-                <div class="actions">
-                    <button class="action-button action-view-note" hidden disabled data-icon="view-note" title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]'></button>
-                    <button class="action-button action-add-note" hidden disabled data-icon="add-term-kanji" data-mode="term-kanji" title="Add expression" data-hotkey='["addNoteTermKanji","title","Add expression ({0})"]'></button>
-                    <button class="action-button action-add-note" hidden disabled data-icon="add-term-kana" data-mode="term-kana" title="Add reading" data-hotkey='["addNoteTermKana","title","Add reading ({0})"]'></button>
-                    <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover"><div class="action-button-badge icon" hidden></div></button>
-                    <span class="entry-current-indicator-icon" title="Current entry"></span>
-                </div>
-                <div class="expression-list"></div>
-            </div>
-            <div class="expression-list-details">
-                <div class="expression-list-tag-list tag-list"></div>
-                <div class="inflection-list"></div>
-            </div>
+    <div class="entry-header">
+        <div class="actions">
+            <button class="action-button action-view-note" hidden disabled data-icon="view-note" title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]'></button>
+            <button class="action-button action-add-note" hidden disabled data-icon="add-term-kanji" data-mode="term-kanji" title="Add expression" data-hotkey='["addNoteTermKanji","title","Add expression ({0})"]'></button>
+            <button class="action-button action-add-note" hidden disabled data-icon="add-term-kana" data-mode="term-kana" title="Add reading" data-hotkey='["addNoteTermKana","title","Add reading ({0})"]'></button>
+            <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover"><div class="action-button-badge icon" hidden></div></button>
+            <span class="entry-current-indicator-icon" title="Current entry"></span>
+        </div>
+        <div class="expression-list"></div>
+        <div class="expression-list-details">
+            <div class="expression-list-tag-list tag-list"></div>
+            <div class="inflection-list"></div>
         </div>
     </div>
     <div class="entry-body">
@@ -92,22 +88,18 @@
 <!-- Kanji entry templates -->
 <template id="kanji-entry-template" data-remove-whitespace-text="true"><div class="entry" data-type="kanji">
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
-    <div class="entry-header1">
-        <div class="entry-header2">
-            <div class="entry-header3">
-                <div class="actions">
-                    <button class="action-button action-view-note" hidden disabled data-icon="view-note" title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]'></button>
-                    <button class="action-button action-add-note" hidden disabled data-icon="add-term-kanji" data-mode="kanji" title="Add kanji" data-hotkey='["addNoteKanji","title","Add kanji ({0})"]'></button>
-                    <span class="entry-current-indicator-icon" title="Current entry"></span>
-                </div>
-                <div class="kanji-glyph-container">
-                    <span class="expression-current-indicator"></span>
-                    <div class="kanji-glyph source-text"></div>
-                </div>
-            </div>
+    <div class="entry-header">
+        <div class="actions">
+            <button class="action-button action-view-note" hidden disabled data-icon="view-note" title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]'></button>
+            <button class="action-button action-add-note" hidden disabled data-icon="add-term-kanji" data-mode="kanji" title="Add kanji" data-hotkey='["addNoteKanji","title","Add kanji ({0})"]'></button>
+            <span class="entry-current-indicator-icon" title="Current entry"></span>
         </div>
+        <div class="kanji-glyph-container">
+            <span class="expression-current-indicator"></span>
+            <div class="kanji-glyph source-text"></div>
+        </div>
+        <div class="kanji-tag-list tag-list"></div>
     </div>
-    <div class="kanji-tag-list tag-list"></div>
     <div class="entry-body">
         <div class="entry-body-section" data-section-type="frequencies">
             <div class="entry-body-section-content frequency-group-list"></div>

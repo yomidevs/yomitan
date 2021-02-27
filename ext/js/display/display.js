@@ -1679,7 +1679,7 @@ class Display extends EventDispatcher {
         this._eventListeners.addEventListener(entry, 'click', this._onEntryClick.bind(this));
         this._addMultipleEventListeners(entry, '.action-add-note', 'click', this._onNoteAdd.bind(this));
         this._addMultipleEventListeners(entry, '.action-view-note', 'click', this._onNoteView.bind(this));
-        this._addMultipleEventListeners(entry, '.kanji-link', 'click', this._onKanjiLookup.bind(this));
+        this._addMultipleEventListeners(entry, '.expression-kanji-link', 'click', this._onKanjiLookup.bind(this));
         this._addMultipleEventListeners(entry, '.debug-log-link', 'click', this._onDebugLogClick.bind(this));
         this._addMultipleEventListeners(entry, '.tag-label', 'click', this._onTagClick.bind(this));
     }

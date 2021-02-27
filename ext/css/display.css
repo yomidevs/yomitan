@@ -789,11 +789,62 @@ button.action-button[data-icon=source-term]::before {
     padding: var(--entry-vertical-padding) var(--entry-horizontal-padding);
     position: relative;
 }
-.kanji-link {
+.entry+.entry {
+    border-top: var(--thin-border-size) solid var(--light-border-color);
+}
+.entry-body {
+    clear: both;
+}
+.entry[data-definition-count='0'] .entry-body-section[data-section-type=definitions],
+.entry[data-frequency-count='0'] .entry-body-section[data-section-type=frequencies],
+.entry[data-pitch-accent-count='0'] .entry-body-section[data-section-type=pitch-accents] {
+    display: none;
+}
+
+
+/* Inflections */
+.inflection-list {
+    display: inline-block;
+    color: var(--reason-text-color);
+}
+.inflection-list:empty {
+    display: none;
+}
+.inflection-list>.inflection+.inflection-separator+.inflection::before {
+    content: ' \00AB  '; /* The two spaces is not a typo */
+    white-space: pre-wrap;
+    display: inline;
+}
+
+
+/* Expressions */
+.expression-kanji-link {
     border-bottom: var(--expression-thin-border-size) dashed var(--expression-kanji-border-color);
     color: var(--expression-text-color);
     text-decoration: none;
     cursor: pointer;
+}
+.expression-list {
+    display: inline;
+    margin-right: var(--expression-list-end-space);
+}
+.expression {
+    display: inline-block;
+}
+.expression-details {
+    display: inline;
+}
+.expression-tag-list {
+    display: none;
+}
+.expression-details>.frequencies {
+    display: none;
+}
+.expression-list-details {
+    display: inline;
+}
+.expression-list-tag-list {
+    display: inline;
 }
 .expression-text-container {
     display: inline-block;
@@ -825,59 +876,18 @@ button.action-button[data-icon=source-term]::before {
     content: var(--expression-separator);
     font-size: var(--expression-reading-font-size);
 }
+.expression-text>ruby>rt {
+    color: var(--expression-furigana-text-color);
+}
 .entry[data-expression-multi=true] .expression[data-frequency=popular] .expression-text,
 .entry[data-expression-multi=true] .expression[data-frequency=popular] .expression-reading,
-.entry[data-expression-multi=true] .expression[data-frequency=popular] .kanji-link {
+.entry[data-expression-multi=true] .expression[data-frequency=popular] .expression-kanji-link {
     color: var(--expression-text-color-popular);
 }
 .entry[data-expression-multi=true] .expression[data-frequency=rare] .expression-text,
 .entry[data-expression-multi=true] .expression[data-frequency=rare] .expression-reading,
-.entry[data-expression-multi=true] .expression[data-frequency=rare] .kanji-link {
+.entry[data-expression-multi=true] .expression[data-frequency=rare] .expression-kanji-link {
     color: var(--expression-text-color-rare);
-}
-.expression-text>ruby>rt {
-    color: var(--expression-furigana-text-color);
-}
-.entry-header2,
-.entry-header3 {
-    display: inline;
-}
-.entry+.entry {
-    border-top: var(--thin-border-size) solid var(--light-border-color);
-}
-.inflection-list {
-    display: inline-block;
-    color: var(--reason-text-color);
-}
-.inflection-list:empty {
-    display: none;
-}
-.inflection-list>.inflection+.inflection-separator+.inflection::before {
-    content: ' \00AB  '; /* The two spaces is not a typo */
-    white-space: pre-wrap;
-    display: inline;
-}
-.expression-list {
-    display: inline;
-    margin-right: var(--expression-list-end-space);
-}
-.expression {
-    display: inline-block;
-}
-.expression-details {
-    display: inline;
-}
-.expression-tag-list {
-    display: none;
-}
-.expression-details>.frequencies {
-    display: none;
-}
-.expression-list-details {
-    display: inline;
-}
-.expression-list-tag-list {
-    display: inline;
 }
 .entry[data-expression-multi=true] .expression-list-details {
     display: block;
@@ -1117,11 +1127,6 @@ button.action-button[data-icon=source-term]::before {
     font-size: 0;
     opacity: 0;
     white-space: pre-wrap;
-}
-.entry[data-definition-count='0'] .entry-body-section[data-section-type=definitions],
-.entry[data-frequency-count='0'] .entry-body-section[data-section-type=frequencies],
-.entry[data-pitch-accent-count='0'] .entry-body-section[data-section-type=pitch-accents] {
-    display: none;
 }
 
 
