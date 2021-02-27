@@ -27,6 +27,8 @@
 
     --expression-separator: '\3001';
 
+    --inflection-separator: '\00AB';
+
     /* Layout */
     --font-size-no-units: 14;
     --font-size: calc(1px * var(--font-size-no-units));
@@ -821,9 +823,8 @@ button.action-button[data-icon=source-term]::before {
     display: none;
 }
 .inflection-list>.inflection+.inflection-separator+.inflection::before {
-    content: ' \00AB  '; /* The two spaces is not a typo */
-    white-space: pre-wrap;
-    display: inline;
+    content: var(--inflection-separator);
+    padding: 0 0.25em;
 }
 
 
@@ -857,9 +858,6 @@ button.action-button[data-icon=source-term]::before {
     display: inline;
 }
 .expression-tag-list {
-    display: none;
-}
-.expression-details>.frequencies {
     display: none;
 }
 .expression-list-details {
