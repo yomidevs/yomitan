@@ -32,19 +32,21 @@
     --font-size: calc(1px * var(--font-size-no-units));
     --query-parser-font-size-no-units: 2;
     --query-parser-font-size: calc(1em * var(--query-parser-font-size-no-units));
-    --expression-font-size-no-units: 2;
-    --expression-font-size: calc(1em * var(--expression-font-size-no-units));
-    --expression-reading-font-size-scale: 0.75;
-    --expression-reading-font-size: calc(var(--expression-reading-font-size-scale) * var(--expression-font-size));
-    --expression-reading-space: 0.5em;
     --h2-font-size-no-units: 1.25;
     --h2-font-size: calc(1em * var(--h2-font-size-no-units));
+
+    --expression-font-size-no-units: 2;
+    --expression-font-size: calc(1em * var(--expression-font-size-no-units));
+    --expression-reading-font-size-no-units: 0.75;
+    --expression-reading-font-size: calc(var(--expression-reading-font-size-no-units) * var(--expression-font-size));
+    --expression-reading-space: 0.5em;
+    --expression-list-end-space: 0.5em;
+    --expression-thin-border-size: calc(1em / (var(--expression-font-size-no-units) * var(--font-size-no-units)));
 
     --line-height-no-units: 20;
     --line-height: calc(var(--line-height-no-units) / var(--font-size-no-units));
 
     --thin-border-size: calc(1em / var(--font-size-no-units));
-    --expression-thin-border-size: calc(1em / (var(--expression-font-size-no-units) * var(--font-size-no-units)));
 
     --action-button-size-no-units: 16;
     --action-button-size: calc(1em * (var(--action-button-size-no-units) / var(--font-size-no-units)));
@@ -74,8 +76,6 @@
     --entry-current-indicator-width: calc(1em * var(--entry-current-indicator-width-no-units) / var(--font-size-no-units));
     --entry-current-indicator-transition-duration: 0.125s;
 
-    --expression-space-size: 0.5em;
-
     --tag-font-size-no-units: 11;
     --tag-font-size: calc(1em * var(--tag-font-size-no-units) / var(--font-size-no-units));
     --tag-border-size-no-units: 1;
@@ -103,16 +103,17 @@
     --link-color: var(--accent-color);
 
     --text-color: #000000;
-    --kanji-text-color: var(--text-color);
-    --kanji-popular-text-color: var(--accent-color);
-    --kanji-rare-text-color: var(--text-color-light4);
-    --kanji-furigana-text-color: inherit;
     --reason-text-color: var(--text-color-light3);
+
+    --expression-text-color: var(--text-color);
+    --expression-text-color-popular: var(--accent-color);
+    --expression-text-color-rare: var(--text-color-light4);
+    --expression-furigana-text-color: inherit;
+    --expression-kanji-border-color: var(--dark-border-color);
 
     --light-border-color: #eeeeee;
     --medium-border-color: #dddddd;
     --dark-border-color: #777777;
-    --kanji-border-color: var(--dark-border-color);
 
     --pitch-accent-annotation-color: #000000;
 
@@ -167,16 +168,17 @@
     --link-color: var(--accent-color);
 
     --text-color: #d4d4d4;
-    --kanji-text-color: var(--text-color);
-    --kanji-popular-text-color: var(--accent-color);
-    --kanji-rare-text-color: var(--text-color-light4);
-    --kanji-furigana-text-color: inherit;
     --reason-text-color: var(--text-color-light3);
+
+    --expression-text-color: var(--text-color);
+    --expression-text-color-popular: var(--accent-color);
+    --expression-text-color-rare: var(--text-color-light4);
+    --expression-furigana-text-color: inherit;
+    --expression-kanji-border-color: var(--dark-border-color);
 
     --light-border-color: #2f2f2f;
     --medium-border-color: #3f3f3f;
     --dark-border-color: #888888;
-    --kanji-border-color: var(--dark-border-color);
 
     --pitch-accent-annotation-color: #ffffff;
 
@@ -788,8 +790,8 @@ button.action-button[data-icon=source-term]::before {
     position: relative;
 }
 .kanji-link {
-    border-bottom: var(--expression-thin-border-size) dashed var(--kanji-border-color);
-    color: var(--kanji-text-color);
+    border-bottom: var(--expression-thin-border-size) dashed var(--expression-kanji-border-color);
+    color: var(--expression-text-color);
     text-decoration: none;
     cursor: pointer;
 }
@@ -808,11 +810,11 @@ button.action-button[data-icon=source-term]::before {
     margin-left: var(--expression-reading-space);
 }
 .term-expression-text {
-    color: var(--kanji-text-color);
+    color: var(--expression-text-color);
     font-size: var(--expression-font-size);
 }
 .term-expression-reading {
-    color: var(--kanji-text-color);
+    color: var(--expression-text-color);
     font-size: var(--expression-reading-font-size);
 }
 .term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text-container>.term-expression-text-outer::after {
@@ -826,15 +828,15 @@ button.action-button[data-icon=source-term]::before {
 .entry[data-expression-multi=true] .term-expression[data-frequency=popular] .term-expression-text,
 .entry[data-expression-multi=true] .term-expression[data-frequency=popular] .term-expression-reading,
 .entry[data-expression-multi=true] .term-expression[data-frequency=popular] .kanji-link {
-    color: var(--kanji-popular-text-color);
+    color: var(--expression-text-color-popular);
 }
 .entry[data-expression-multi=true] .term-expression[data-frequency=rare] .term-expression-text,
 .entry[data-expression-multi=true] .term-expression[data-frequency=rare] .term-expression-reading,
 .entry[data-expression-multi=true] .term-expression[data-frequency=rare] .kanji-link {
-    color: var(--kanji-rare-text-color);
+    color: var(--expression-text-color-rare);
 }
 .term-expression-text>ruby>rt {
-    color: var(--kanji-furigana-text-color);
+    color: var(--expression-furigana-text-color);
 }
 .entry-header2,
 .entry-header3 {
@@ -857,6 +859,7 @@ button.action-button[data-icon=source-term]::before {
 }
 .term-expression-list {
     display: inline;
+    margin-right: var(--expression-list-end-space);
 }
 .term-expression {
     display: inline-block;
@@ -1030,10 +1033,6 @@ button.action-button[data-icon=source-term]::before {
 
 
 /* Merged term styles */
-.entry[data-expression-multi=true] .term-expression-list,
-.entry:not([data-expression-multi=true]) .term-expression-text-container {
-    margin-right: var(--expression-space-size);
-}
 .entry[data-expression-multi=true] .term-expression-list .term-expression-details {
     display: inline-block;
     position: relative;
