@@ -402,7 +402,8 @@ function testDistributeFurigana() {
         [
             ['スズメの涙', 'すずめのなみだ'],
             [
-                {text: 'スズメの', furigana: 'すずめの'},
+                {text: 'スズメ', furigana: 'すずめ'},
+                {text: 'の', furigana: ''},
                 {text: '涙', furigana: 'なみだ'}
             ]
         ],
@@ -464,14 +465,16 @@ function testDistributeFurigana() {
         [
             ['くノ一', 'くのいち'],
             [
-                {text: 'くノ', furigana: 'くの'},
+                {text: 'く', furigana: ''},
+                {text: 'ノ', furigana: 'の'},
                 {text: '一', furigana: 'いち'}
             ]
         ],
         [
             ['くノ一', 'くのいち'],
             [
-                {text: 'くノ', furigana: 'くの'},
+                {text: 'く', furigana: ''},
+                {text: 'ノ', furigana: 'の'},
                 {text: '一', furigana: 'いち'}
             ]
         ],
@@ -691,8 +694,18 @@ function testDistributeFurigana() {
         [
             ['ページ違反', 'ぺーじいはん'],
             [
-                {text: 'ページ', furigana: 'ぺーじ'},
+                {text: 'ペ', furigana: 'ぺ'},
+                {text: 'ー', furigana: ''},
+                {text: 'ジ', furigana: 'じ'},
                 {text: '違反', furigana: 'いはん'}
+            ]
+        ],
+        // Mismatched kana
+        [
+            ['サボる', 'サボル'],
+            [
+                {text: 'サボ', furigana: ''},
+                {text: 'る', furigana: 'ル'}
             ]
         ]
     ];

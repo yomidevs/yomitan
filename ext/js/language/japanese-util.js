@@ -521,8 +521,11 @@ const JapaneseUtil = (() => {
                         groupsStart + 1
                     );
                     if (segments !== null) {
-                        const furigana = reading.startsWith(text) ? '' : reading.substring(0, textLength);
-                        segments.unshift(this._createFuriganaSegment(text, furigana));
+                        if (reading.startsWith(text)) {
+                            segments.unshift(this._createFuriganaSegment(text, ''));
+                        } else {
+                            segments.unshift(...this._getFuriganaKanaSegments(text, reading));
+                        }
                         return segments;
                     }
                 }
@@ -552,6 +555,22 @@ const JapaneseUtil = (() => {
                 }
                 return result;
             }
+        }
+
+        _getFuriganaKanaSegments(text, reading) {
+            const textLength = text.length;
+            const newSegments = [];
+            let start = 0;
+            let state = (reading[0] === text[0]);
+            for (let i = 1; i < textLength; ++i) {
+                const newState = (reading[i] === text[i]);
+                if (state === newState) { continue; }
+                newSegments.push(this._createFuriganaSegment(text.substring(start, i), state ? '' : reading.substring(start, i)));
+                state = newState;
+                start = i;
+            }
+            newSegments.push(this._createFuriganaSegment(text.substring(start, textLength), state ? '' : reading.substring(start, textLength)));
+            return newSegments;
         }
 
         _getWanakana() {
