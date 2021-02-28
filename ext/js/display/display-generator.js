@@ -724,15 +724,15 @@ class DisplayGenerator {
 
     _getPitchAccentCategories(pitches) {
         if (pitches.length === 0) { return null; }
-        const categories = [];
+        const categories = new Set();
         for (const {reading, pitches: pitches2} of pitches) {
             for (const {position} of pitches2) {
                 const category = this._japaneseUtil.getPitchCategory(reading, position, false);
                 if (category !== null) {
-                    categories.push(category);
+                    categories.add(category);
                 }
             }
         }
-        return categories.length > 0 ? categories.join(' ') : null;
+        return categories.size > 0 ? [...categories].join(' ') : null;
     }
 }
