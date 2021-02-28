@@ -108,6 +108,7 @@ class Display extends EventDispatcher {
         this._definitionTextScanner = null;
         this._frameResizeToken = null;
         this._frameResizeHandle = document.querySelector('#frame-resizer-handle');
+        this._frameResizeTouchIdentifier = null;
         this._frameResizeStartSize = null;
         this._frameResizeStartOffset = null;
         this._frameResizeEventListeners = new EventListenerCollection();
@@ -245,6 +246,7 @@ class Display extends EventDispatcher {
 
         if (this._frameResizeHandle !== null) {
             this._frameResizeHandle.addEventListener('mousedown', this._onFrameResizerMouseDown.bind(this), false);
+            this._frameResizeHandle.addEventListener('touchstart', this._onFrameResizerTouchStart.bind(this), false);
         }
     }
 
@@ -1784,6 +1786,11 @@ class Display extends EventDispatcher {
         this._startFrameResize(e);
     }
 
+    _onFrameResizerTouchStart(e) {
+        e.preventDefault();
+        this._startFrameResizeTouch(e);
+    }
+
     _onFrameResizerMouseUp() {
         this._stopFrameResize();
     }
@@ -1800,6 +1807,24 @@ class Display extends EventDispatcher {
             const {clientX: x, clientY: y} = e;
             this._updateFrameSize(x, y);
         }
+    }
+
+    _onFrameResizerTouchEnd(e) {
+        if (this._getTouch(e.changedTouches, this._frameResizeTouchIdentifier) === null) { return; }
+        this._stopFrameResize();
+    }
+
+    _onFrameResizerTouchCancel(e) {
+        if (this._getTouch(e.changedTouches, this._frameResizeTouchIdentifier) === null) { return; }
+        this._stopFrameResize();
+    }
+
+    _onFrameResizerTouchMove(e) {
+        if (this._frameResizeStartSize === null) { return; }
+        const primaryTouch = this._getTouch(e.changedTouches, this._frameResizeTouchIdentifier);
+        if (primaryTouch === null) { return; }
+        const {clientX: x, clientY: y} = primaryTouch;
+        this._updateFrameSize(x, y);
     }
 
     _getSearchContext() {
@@ -1825,6 +1850,27 @@ class Display extends EventDispatcher {
         this._initializeFrameResize(token);
     }
 
+    _startFrameResizeTouch(e) {
+        if (this._frameResizeToken !== null) { return; }
+
+        const {clientX: x, clientY: y, identifier} = e.changedTouches[0];
+        const token = {};
+        this._frameResizeToken = token;
+        this._frameResizeStartOffset = {x, y};
+        this._frameResizeTouchIdentifier = identifier;
+        this._frameResizeEventListeners.addEventListener(window, 'touchend', this._onFrameResizerTouchEnd.bind(this), false);
+        this._frameResizeEventListeners.addEventListener(window, 'touchcancel', this._onFrameResizerTouchCancel.bind(this), false);
+        this._frameResizeEventListeners.addEventListener(window, 'blur', this._onFrameResizerWindowBlur.bind(this), false);
+        this._frameResizeEventListeners.addEventListener(window, 'touchmove', this._onFrameResizerTouchMove.bind(this), false);
+
+        const {documentElement} = document;
+        if (documentElement !== null) {
+            documentElement.dataset.isResizing = 'true';
+        }
+
+        this._initializeFrameResize(token);
+    }
+
     async _initializeFrameResize(token) {
         const size = await this._invokeContentOrigin('getFrameSize');
         if (this._frameResizeToken !== token) { return; }
@@ -1837,6 +1883,7 @@ class Display extends EventDispatcher {
         this._frameResizeEventListeners.removeAllEventListeners();
         this._frameResizeStartSize = null;
         this._frameResizeStartOffset = null;
+        this._frameResizeTouchIdentifier = null;
         this._frameResizeToken = null;
 
         const {documentElement} = document;
@@ -1853,6 +1900,15 @@ class Display extends EventDispatcher {
         width = Math.max(Math.max(0, handleSize.width), width);
         height = Math.max(Math.max(0, handleSize.height), height);
         await this._invokeContentOrigin('setFrameSize', {width, height});
+    }
+
+    _getTouch(touchList, identifier) {
+        for (const touch of touchList) {
+            if (touch.identifier === identifier) {
+                return touch;
+            }
+        }
+        return null;
     }
 
     _updateHotkeys(options) {
