@@ -543,7 +543,7 @@ class Display extends EventDispatcher {
                 case 'kanji':
                     {
                         let query = urlSearchParams.get('query');
-                        if (!query) { break; }
+                        if (query === null) { break; }
 
                         this._query = query;
                         clear = false;
@@ -882,7 +882,7 @@ class Display extends EventDispatcher {
 
         let {definitions} = content;
         if (!Array.isArray(definitions)) {
-            definitions = lookup ? await this._findDefinitions(isTerms, query, wildcardsEnabled, optionsContext) : [];
+            definitions = lookup && query.length > 0 ? await this._findDefinitions(isTerms, query, wildcardsEnabled, optionsContext) : [];
             if (this._setContentToken !== token) { return; }
             content.definitions = definitions;
             changeHistory = true;

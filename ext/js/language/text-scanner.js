@@ -17,6 +17,7 @@
 
 /* global
  * DocumentUtil
+ * TextSourceElement
  */
 
 class TextScanner extends EventDispatcher {
@@ -319,6 +320,12 @@ class TextScanner extends EventDispatcher {
             const result = await this._findDefinitions(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({definitions, sentence, type} = result);
+                this._inputInfoCurrent = inputInfo;
+                this.setCurrentTextSource(textSource);
+            } else if (textSource instanceof TextSourceElement && await this._hasJapanese(textSource.fullContent)) {
+                definitions = [];
+                sentence = {sentence: '', offset: 0};
+                type = 'terms';
                 this._inputInfoCurrent = inputInfo;
                 this.setCurrentTextSource(textSource);
             }
@@ -976,6 +983,14 @@ class TextScanner extends EventDispatcher {
             } else {
                 break;
             }
+        }
+    }
+
+    async _hasJapanese(text) {
+        try {
+            return await yomichan.api.textHasJapaneseCharacters(text);
+        } catch (e) {
+            return false;
         }
     }
 }

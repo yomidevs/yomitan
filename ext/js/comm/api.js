@@ -168,6 +168,10 @@ class API {
         return this._invoke('testMecab', {});
     }
 
+    textHasJapaneseCharacters(text) {
+        return this._invoke('textHasJapaneseCharacters', {text});
+    }
+
     // Utilities
 
     _createActionPort(timeout=5000) {

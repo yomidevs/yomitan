@@ -127,7 +127,8 @@ class Backend {
             ['getOrCreateSearchPopup',       {async: true,  contentScript: true,  handler: this._onApiGetOrCreateSearchPopup.bind(this)}],
             ['isTabSearchPopup',             {async: true,  contentScript: true,  handler: this._onApiIsTabSearchPopup.bind(this)}],
             ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}],
-            ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}]
+            ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}],
+            ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -725,6 +726,10 @@ class Backend {
         }
 
         return true;
+    }
+
+    _onApiTextHasJapaneseCharacters({text}) {
+        return this._japaneseUtil.isStringPartiallyJapanese(text);
     }
 
     // Command handlers
