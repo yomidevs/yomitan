@@ -36,6 +36,7 @@ class DocumentUtil {
             switch (element.nodeName.toUpperCase()) {
                 case 'IMG':
                 case 'BUTTON':
+                case 'SELECT':
                     return new TextSourceElement(element);
                 case 'INPUT':
                     imposterSourceElement = element;

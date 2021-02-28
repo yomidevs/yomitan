@@ -126,6 +126,13 @@ class TextSourceElement {
             case 'IMG':
                 content = element.getAttribute('alt') || '';
                 break;
+            case 'SELECT':
+                {
+                    const {selectedIndex, options} = element;
+                    const option = (selectedIndex >= 0 && selectedIndex < options.length ? options[selectedIndex] : null);
+                    content = (option !== null ? option.textContent : '');
+                }
+                break;
             default:
                 content = `${element.value}`;
                 break;
