@@ -895,9 +895,6 @@ class Display extends EventDispatcher {
             if (typeof tabId === 'number' && typeof frameId === 'number') {
                 this._contentOriginTabId = tabId;
                 this._contentOriginFrameId = frameId;
-                if (this._pageType === 'popup') {
-                    this._hotkeyHandler.forwardFrameId = (tabId === this._tabId ? frameId : null);
-                }
                 contentOriginValid = true;
             }
         }

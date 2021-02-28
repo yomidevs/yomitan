@@ -34,22 +34,6 @@ class HotkeyHandler extends EventDispatcher {
         this._eventListeners = new EventListenerCollection();
         this._isPrepared = false;
         this._hasEventListeners = false;
-        this._forwardFrameId = null;
-    }
-
-    /**
-     * Gets the frame ID used for forwarding hotkeys.
-     */
-    get forwardFrameId() {
-        return this._forwardFrameId;
-    }
-
-    /**
-     * Sets the frame ID used for forwarding hotkeys.
-     */
-    set forwardFrameId(value) {
-        this._forwardFrameId = value;
-        this._updateHotkeyRegistrations();
     }
 
     /**
@@ -156,7 +140,7 @@ class HotkeyHandler extends EventDispatcher {
         const hotkeyInfo = this._hotkeys.get(key);
         return (
             typeof hotkeyInfo !== 'undefined' &&
-            this._invokeHandlers(key, modifiers, hotkeyInfo, false)
+            this._invokeHandlers(modifiers, hotkeyInfo)
         );
     }
 
@@ -173,7 +157,7 @@ class HotkeyHandler extends EventDispatcher {
         const hotkeyInfo = this._hotkeys.get(key);
         if (typeof hotkeyInfo !== 'undefined') {
             const eventModifiers = DocumentUtil.getActiveModifiers(e);
-            if (this._invokeHandlers(key, eventModifiers, hotkeyInfo, false)) {
+            if (this._invokeHandlers(eventModifiers, hotkeyInfo)) {
                 e.preventDefault();
                 return;
             }
@@ -181,7 +165,7 @@ class HotkeyHandler extends EventDispatcher {
         this.trigger('keydownNonHotkey', e);
     }
 
-    _invokeHandlers(key, modifiers, hotkeyInfo, canForward) {
+    _invokeHandlers(modifiers, hotkeyInfo) {
         for (const {modifiers: handlerModifiers, action} of hotkeyInfo.handlers) {
             if (!this._areSame(handlerModifiers, modifiers)) { continue; }
 
@@ -192,11 +176,6 @@ class HotkeyHandler extends EventDispatcher {
                     return true;
                 }
             }
-        }
-
-        if (canForward && hotkeyInfo.forward) {
-            this._forwardHotkey(key, modifiers);
-            return true;
         }
 
         return false;
@@ -215,26 +194,18 @@ class HotkeyHandler extends EventDispatcher {
     _updateHotkeyRegistrations() {
         if (this._hotkeys.size === 0 && this._hotkeyRegistrations.size === 0) { return; }
 
-        const canForward = (this._forwardFrameId !== null);
         this._hotkeys.clear();
         for (const [scope, registrations] of this._hotkeyRegistrations.entries()) {
             for (const {action, key, modifiers, scopes, enabled} of registrations) {
-                if (!(enabled && key !== null && action !== '')) { continue; }
-
-                const correctScope = scopes.includes(scope);
-                if (!correctScope && !canForward) { continue; }
+                if (!(enabled && key !== null && action !== '' && scopes.includes(scope))) { continue; }
 
                 let hotkeyInfo = this._hotkeys.get(key);
                 if (typeof hotkeyInfo === 'undefined') {
-                    hotkeyInfo = {handlers: [], forward: false};
+                    hotkeyInfo = {handlers: []};
                     this._hotkeys.set(key, hotkeyInfo);
                 }
 
-                if (correctScope) {
-                    hotkeyInfo.handlers.push({modifiers: new Set(modifiers), action});
-                } else {
-                    hotkeyInfo.forward = true;
-                }
+                hotkeyInfo.handlers.push({modifiers: new Set(modifiers), action});
             }
         }
         this._updateEventHandlers();
@@ -250,16 +221,6 @@ class HotkeyHandler extends EventDispatcher {
             this._eventListeners.addEventListener(document, 'keydown', this._onKeyDown.bind(this), false);
         } else {
             this._eventListeners.removeAllEventListeners();
-        }
-    }
-
-    async _forwardHotkey(key, modifiers) {
-        const frameId = this._forwardFrameId;
-        if (frameId === null) { throw new Error('No forwarding target'); }
-        try {
-            await yomichan.crossFrame.invoke(frameId, 'hotkeyHandler.forwardHotkey', {key, modifiers});
-        } catch (e) {
-            // NOP
         }
     }
 }
