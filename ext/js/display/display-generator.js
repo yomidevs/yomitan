@@ -229,7 +229,7 @@ class DisplayGenerator {
     // Private
 
     _createTermExpression(details) {
-        const {termFrequency, furiganaSegments, expression, reading, termTags} = details;
+        const {termFrequency, furiganaSegments, expression, reading, termTags, pitches} = details;
 
         const searchQueries = [];
         if (expression) { searchQueries.push(expression); }
@@ -242,6 +242,11 @@ class DisplayGenerator {
 
         node.dataset.readingIsSame = `${!reading || reading === expression}`;
         node.dataset.frequency = termFrequency;
+
+        const pitchAccentCategories = this._getPitchAccentCategories(pitches);
+        if (pitchAccentCategories !== null) {
+            node.dataset.pitchAccentCategories = pitchAccentCategories;
+        }
 
         this._setTextContent(node.querySelector('.expression-reading'), reading.length > 0 ? reading : expression);
 
@@ -715,5 +720,19 @@ class DisplayGenerator {
         } else if (this._japaneseUtil.isStringPartiallyJapanese(value)) {
             node.lang = 'ja';
         }
+    }
+
+    _getPitchAccentCategories(pitches) {
+        if (pitches.length === 0) { return null; }
+        const categories = [];
+        for (const {reading, pitches: pitches2} of pitches) {
+            for (const {position} of pitches2) {
+                const category = this._japaneseUtil.getPitchCategory(reading, position, false);
+                if (category !== null) {
+                    categories.push(category);
+                }
+            }
+        }
+        return categories.length > 0 ? categories.join(' ') : null;
     }
 }

@@ -232,6 +232,22 @@ const JapaneseUtil = (() => {
             }
         }
 
+        getPitchCategory(text, pitchAccentPosition, isVerbOrAdjective) {
+            if (pitchAccentPosition === 0) {
+                return 'heiban';
+            }
+            if (isVerbOrAdjective) {
+                return pitchAccentPosition > 0 ? 'kifuku' : null;
+            }
+            if (pitchAccentPosition === 1) {
+                return 'atamadaka';
+            }
+            if (pitchAccentPosition > 1) {
+                return pitchAccentPosition >= this.getKanaMoraCount(text) ? 'odaka' : 'nakadaka';
+            }
+            return null;
+        }
+
         getKanaMorae(text) {
             const morae = [];
             let i;
@@ -243,6 +259,16 @@ const JapaneseUtil = (() => {
                 }
             }
             return morae;
+        }
+
+        getKanaMoraCount(text) {
+            let moraCount = 0;
+            for (const c of text) {
+                if (!(SMALL_KANA_SET.has(c) && moraCount > 0)) {
+                    ++moraCount;
+                }
+            }
+            return moraCount;
         }
 
         // Conversion functions
