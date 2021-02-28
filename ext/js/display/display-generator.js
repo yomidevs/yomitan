@@ -164,7 +164,11 @@ class DisplayGenerator {
     createTagFooterNotificationDetails(tagNode) {
         const node = this._templates.instantiateFragment('footer-notification-tag-details');
 
-        const details = tagNode.dataset.details;
+        let details = tagNode.dataset.details;
+        if (typeof details !== 'string') {
+            const label = tagNode.querySelector('.tag-label-content');
+            details = label !== null ? label.textContent : '';
+        }
         this._setTextContent(node.querySelector('.tag-details'), details);
 
         let disambiguation = null;
@@ -602,6 +606,7 @@ class DisplayGenerator {
 
         body.dataset.count = `${frequencyData.length}`;
         node.dataset.count = `${frequencyData.length}`;
+        node.dataset.details = dictionary;
 
         return node;
     }
@@ -624,6 +629,7 @@ class DisplayGenerator {
         node.dataset.readingIsSame = `${reading === expression}`;
         node.dataset.dictionary = dictionary;
         node.dataset.frequency = `${frequency}`;
+        node.dataset.details = dictionary;
 
         return node;
     }
@@ -640,6 +646,7 @@ class DisplayGenerator {
         node.dataset.character = character;
         node.dataset.dictionary = dictionary;
         node.dataset.frequency = `${frequency}`;
+        node.dataset.details = dictionary;
 
         return node;
     }
