@@ -66,6 +66,7 @@ function testDeinflections() {
                 {term: '愛しい', source: '愛しくありません',       rule: 'adj-i', reasons: ['polite negative']},
                 {term: '愛しい', source: '愛しくありませんでした', rule: 'adj-i', reasons: ['polite past negative']},
                 {term: '愛しい', source: '愛しき',                 rule: 'adj-i', reasons: ['-ki']},
+                {term: '愛しい', source: '愛しげ',                 rule: 'adj-i', reasons: ['-ge']},
 
                 // Common verbs
                 {term: '食べる', source: '食べる',           rule: 'v1', reasons: []},
@@ -843,7 +844,10 @@ function testDeinflections() {
                 {term: 'くる', source: 'くられない',     rule: 'vk'},
                 {term: 'くる', source: 'くられない',     rule: 'vk'},
                 {term: 'くる', source: 'くさせない',     rule: 'vk'},
-                {term: 'くる', source: 'くさせられない', rule: 'vk'}
+                {term: 'くる', source: 'くさせられない', rule: 'vk'},
+
+                {term: 'かわいい', source: 'かわいげ',   rule: 'adj-i', reasons: ['-ge']},
+                {term: '可愛い',   source: 'かわいげ',   rule: 'adj-i', reasons: ['-ge']}
             ]
         },
         {

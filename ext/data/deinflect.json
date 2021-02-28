@@ -588,6 +588,9 @@
     "-ki": [
         {"kanaIn": "き", "kanaOut": "い", "rulesIn": [], "rulesOut": ["adj-i"]}
     ],
+    "-ge": [
+        {"kanaIn": "しげ", "kanaOut": "しい", "rulesIn": [], "rulesOut": ["adj-i"]}
+    ],
     "-e": [
         {"kanaIn": "ねえ", "kanaOut": "ない", "rulesIn": [], "rulesOut": ["adj-i"]},
         {"kanaIn": "めえ", "kanaOut": "むい", "rulesIn": [], "rulesOut": ["adj-i"]},
