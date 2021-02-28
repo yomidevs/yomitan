@@ -132,7 +132,8 @@ class QueryParser extends EventDispatcher {
     _setPreview(text) {
         const terms = [[{text, reading: ''}]];
         this._queryParser.textContent = '';
-        this._queryParser.appendChild(this._createParseResult(terms, true));
+        this._queryParser.dataset.parsed = 'false';
+        this._queryParser.appendChild(this._createParseResult(terms));
     }
 
     _renderParserSelect() {
@@ -146,6 +147,7 @@ class QueryParser extends EventDispatcher {
     _renderParseResult() {
         const parseResult = this._getParseResult();
         this._queryParser.textContent = '';
+        this._queryParser.dataset.parsed = 'true';
         if (!parseResult) { return; }
         this._queryParser.appendChild(this._createParseResult(parseResult.content, false));
     }
@@ -182,13 +184,11 @@ class QueryParser extends EventDispatcher {
         select.selectedIndex = selectedIndex;
     }
 
-    _createParseResult(terms, preview) {
-        const type = preview ? 'preview' : 'normal';
+    _createParseResult(terms) {
         const fragment = document.createDocumentFragment();
         for (const term of terms) {
             const termNode = document.createElement('span');
             termNode.className = 'query-parser-term';
-            termNode.dataset.type = type;
             for (const segment of term) {
                 if (segment.reading.trim().length === 0) {
                     this._addSegmentText(segment.text, termNode);
@@ -221,11 +221,6 @@ class QueryParser extends EventDispatcher {
     }
 
     _addSegmentText(text, container) {
-        for (const character of text) {
-            const node = document.createElement('span');
-            node.className = 'query-parser-char';
-            node.textContent = character;
-            container.appendChild(node);
-        }
+        container.textContent = text;
     }
 }

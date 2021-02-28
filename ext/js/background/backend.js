@@ -1038,31 +1038,41 @@ class Backend {
         const {scanning: {length: scanningLength}, parsing: {readingMode}} = options;
         const findTermsOptions = this._getTranslatorFindTermsOptions({wildcard: null}, options);
         const results = [];
-        while (text.length > 0) {
-            const term = [];
+        let previousUngroupedSegment = null;
+        let i = 0;
+        const ii = text.length;
+        while (i < ii) {
             const [definitions, sourceLength] = await this._translator.findTerms(
                 'simple',
-                text.substring(0, scanningLength),
+                text.substring(i, i + scanningLength),
                 findTermsOptions
             );
+            const codePoint = text.codePointAt(i);
+            const character = String.fromCodePoint(codePoint);
             if (
                 definitions.length > 0 &&
                 sourceLength > 0 &&
-                (sourceLength !== 1 || this._japaneseUtil.isCodePointJapanese(text[0]))
+                (sourceLength !== character.length || this._japaneseUtil.isCodePointJapanese(codePoint))
             ) {
+                previousUngroupedSegment = null;
                 const {expression, reading} = definitions[0];
-                const source = text.substring(0, sourceLength);
+                const source = text.substring(i, i + sourceLength);
+                const term = [];
                 for (const {text: text2, furigana} of jp.distributeFuriganaInflected(expression, reading, source)) {
                     const reading2 = jp.convertReading(text2, furigana, readingMode);
                     term.push({text: text2, reading: reading2});
                 }
-                text = text.substring(source.length);
+                results.push(term);
+                i += sourceLength;
             } else {
-                const reading = jp.convertReading(text[0], '', readingMode);
-                term.push({text: text[0], reading});
-                text = text.substring(1);
+                if (previousUngroupedSegment === null) {
+                    previousUngroupedSegment = {text: character, reading: ''};
+                    results.push([previousUngroupedSegment]);
+                } else {
+                    previousUngroupedSegment.text += character;
+                }
+                i += character.length;
             }
-            results.push(term);
         }
         return results;
     }
