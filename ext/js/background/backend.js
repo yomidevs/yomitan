@@ -1045,7 +1045,11 @@ class Backend {
                 text.substring(0, scanningLength),
                 findTermsOptions
             );
-            if (definitions.length > 0 && sourceLength > 0) {
+            if (
+                definitions.length > 0 &&
+                sourceLength > 0 &&
+                (sourceLength !== 1 || this._japaneseUtil.isCodePointJapanese(text[0]))
+            ) {
                 const {expression, reading} = definitions[0];
                 const source = text.substring(0, sourceLength);
                 for (const {text: text2, furigana} of jp.distributeFuriganaInflected(expression, reading, source)) {
