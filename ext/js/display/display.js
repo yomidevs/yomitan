@@ -1625,8 +1625,16 @@ class Display extends EventDispatcher {
 
     _copyHostSelection() {
         if (this._contentOriginFrameId === null || window.getSelection().toString()) { return false; }
-        this._copyHostSelectionInner();
+        this._copyHostSelectionSafe();
         return true;
+    }
+
+    async _copyHostSelectionSafe() {
+        try {
+            await this._copyHostSelectionInner();
+        } catch (e) {
+            // NOP
+        }
     }
 
     async _copyHostSelectionInner() {
