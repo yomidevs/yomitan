@@ -655,69 +655,71 @@ class Translator {
     // Metadata building
 
     async _buildTermMeta(definitions, enabledDictionaryMap) {
-        const addMetadataTargetInfo = (targetMap1, target, parents) => {
-            let {expression, reading} = target;
-            if (!reading) { reading = expression; }
+        const allDefinitions = this._getAllDefinitions(definitions);
+        const expressionMap = new Map();
+        const expressionValues = [];
+        const expressionKeys = [];
 
-            let targetMap2 = targetMap1.get(expression);
-            if (typeof targetMap2 === 'undefined') {
-                targetMap2 = new Map();
-                targetMap1.set(expression, targetMap2);
-            }
-
-            let targets = targetMap2.get(reading);
-            if (typeof targets === 'undefined') {
-                targets = new Set([target, ...parents]);
-                targetMap2.set(reading, targets);
-            } else {
-                targets.add(target);
-                for (const parent of parents) {
-                    targets.add(parent);
+        for (const {expressions, frequencies: frequencies1, pitches: pitches1} of allDefinitions) {
+            for (let i = 0, ii = expressions.length; i < ii; ++i) {
+                const {expression, reading, frequencies: frequencies2, pitches: pitches2} = expressions[i];
+                let readingMap = expressionMap.get(expression);
+                if (typeof readingMap === 'undefined') {
+                    readingMap = new Map();
+                    expressionMap.set(expression, readingMap);
+                    expressionValues.push(readingMap);
+                    expressionKeys.push(expression);
                 }
-            }
-        };
-
-        const targetMap = new Map();
-        const definitionsQueue = definitions.map((definition) => ({definition, parents: []}));
-        while (definitionsQueue.length > 0) {
-            const {definition, parents} = definitionsQueue.shift();
-            const childDefinitions = definition.definitions;
-            if (Array.isArray(childDefinitions)) {
-                for (const definition2 of childDefinitions) {
-                    definitionsQueue.push({definition: definition2, parents: [...parents, definition]});
+                let targets = readingMap.get(reading);
+                if (typeof targets === 'undefined') {
+                    targets = [];
+                    readingMap.set(reading, targets);
                 }
-            } else {
-                addMetadataTargetInfo(targetMap, definition, parents);
-            }
-
-            for (const target of definition.expressions) {
-                addMetadataTargetInfo(targetMap, target, []);
+                targets.push(
+                    {frequencies: frequencies1, pitches: pitches1, index: i},
+                    {frequencies: frequencies2, pitches: pitches2, index: i}
+                );
             }
         }
-        const targetMapEntries = [...targetMap.entries()];
-        const uniqueExpressions = targetMapEntries.map(([expression]) => expression);
 
-        const metas = await this._database.findTermMetaBulk(uniqueExpressions, enabledDictionaryMap);
+        const metas = await this._database.findTermMetaBulk(expressionKeys, enabledDictionaryMap);
         for (const {expression, mode, data, dictionary, index} of metas) {
-            const targetMap2 = targetMapEntries[index][1];
-            for (const [reading, targets] of targetMap2) {
+            const dictionaryPriority = this._getDictionaryPriority(dictionary, enabledDictionaryMap);
+            const map2 = expressionValues[index];
+            for (const [reading, targets] of map2.entries()) {
                 switch (mode) {
                     case 'freq':
                         {
-                            const frequencyData = this._getTermFrequencyData(expression, reading, dictionary, data);
-                            if (frequencyData === null) { continue; }
-                            for (const {frequencies} of targets) { frequencies.push(frequencyData); }
+                            let frequency = data;
+                            const hasReading = (data !== null && typeof data === 'object');
+                            if (hasReading) {
+                                if (data.reading !== reading) { continue; }
+                                frequency = data.frequency;
+                            }
+                            for (const {frequencies, index: expressionIndex} of targets) {
+                                frequencies.push({index: frequencies.length, expressionIndex, dictionary, dictionaryPriority, expression, reading, hasReading, frequency});
+                            }
                         }
                         break;
                     case 'pitch':
                         {
-                            const pitchData = await this._getPitchData(expression, reading, dictionary, data);
-                            if (pitchData === null) { continue; }
-                            for (const {pitches} of targets) { pitches.push(pitchData); }
+                            if (data.reading !== reading) { continue; }
+                            const pitches2 = [];
+                            for (let {position, tags} of data.pitches) {
+                                tags = Array.isArray(tags) ? await this._expandTags(tags, dictionary) : [];
+                                pitches2.push({position, tags});
+                            }
+                            for (const {pitches, index: expressionIndex} of targets) {
+                                pitches.push({index: pitches.length, expressionIndex, dictionary, dictionaryPriority, expression, reading, pitches: pitches2});
+                            }
                         }
                         break;
                 }
             }
+        }
+
+        for (const definition of allDefinitions) {
+            this._sortTermDefinitionMeta(definition);
         }
     }
 
@@ -729,14 +731,19 @@ class Translator {
 
         const metas = await this._database.findKanjiMetaBulk(kanjiList, enabledDictionaryMap);
         for (const {character, mode, data, dictionary, index} of metas) {
+            const dictionaryPriority = this._getDictionaryPriority(dictionary, enabledDictionaryMap);
             switch (mode) {
                 case 'freq':
                     {
-                        const frequencyData = this._getKanjiFrequencyData(character, dictionary, data);
-                        definitions[index].frequencies.push(frequencyData);
+                        const {frequencies} = definitions[index];
+                        frequencies.push({index: frequencies.length, dictionary, dictionaryPriority, character, frequency: data});
                     }
                     break;
             }
+        }
+
+        for (const definition of definitions) {
+            this._sortKanjiDefinitionMeta(definition);
         }
     }
 
@@ -804,32 +811,6 @@ class Translator {
         }
 
         return tagMetaList;
-    }
-
-    _getTermFrequencyData(expression, reading, dictionary, data) {
-        let frequency = data;
-        const hasReading = (data !== null && typeof data === 'object');
-        if (hasReading) {
-            if (data.reading !== reading) { return null; }
-            frequency = data.frequency;
-        }
-        return {dictionary, expression, reading, hasReading, frequency};
-    }
-
-    _getKanjiFrequencyData(character, dictionary, data) {
-        return {dictionary, character, frequency: data};
-    }
-
-    async _getPitchData(expression, reading, dictionary, data) {
-        if (data.reading !== reading) { return null; }
-
-        const pitches = [];
-        for (let {position, tags} of data.pitches) {
-            tags = Array.isArray(tags) ? await this._expandTags(tags, dictionary) : [];
-            pitches.push({position, tags});
-        }
-
-        return {expression, reading, dictionary, pitches};
     }
 
     // Simple helpers
@@ -998,6 +979,17 @@ class Translator {
             }
         }
         return result;
+    }
+
+    _getAllDefinitions(definitions) {
+        definitions = [...definitions];
+        for (let i = 0; i < definitions.length; ++i) {
+            const childDefinitions = definitions[i].definitions;
+            if (Array.isArray(childDefinitions)) {
+                definitions.push(...childDefinitions);
+            }
+        }
+        return definitions;
     }
 
     // Reduction functions
@@ -1332,6 +1324,45 @@ class Translator {
 
             return stringComparer.compare(v1.notes, v2.notes);
         });
+    }
+
+    _sortTermDefinitionMeta(definition) {
+        const compareFunction = (v1, v2) => {
+            // Sort by dictionary
+            let i = v2.dictionaryPriority - v1.dictionaryPriority;
+            if (i !== 0) { return i; }
+
+            // Sory by expression order
+            i = v1.expressionIndex - v2.expressionIndex;
+            if (i !== 0) { return i; }
+
+            // Default order
+            i = v1.index - v2.index;
+            return i;
+        };
+
+        const {expressions, frequencies: frequencies1, pitches: pitches1} = definition;
+        frequencies1.sort(compareFunction);
+        pitches1.sort(compareFunction);
+        for (const {frequencies: frequencies2, pitches: pitches2} of expressions) {
+            frequencies2.sort(compareFunction);
+            pitches2.sort(compareFunction);
+        }
+    }
+
+    _sortKanjiDefinitionMeta(definition) {
+        const compareFunction = (v1, v2) => {
+            // Sort by dictionary
+            let i = v2.dictionaryPriority - v1.dictionaryPriority;
+            if (i !== 0) { return i; }
+
+            // Default order
+            i = v1.index - v2.index;
+            return i;
+        };
+
+        const {frequencies} = definition;
+        frequencies.sort(compareFunction);
     }
 
     // Regex functions
