@@ -1872,10 +1872,29 @@ class Backend {
     }
 
     _getTranslatorEnabledDictionaryMap(options) {
+        const dictionaries = [];
+        const {dictionaries: optionsDictionaries} = options;
+        for (const title in optionsDictionaries) {
+            if (!Object.prototype.hasOwnProperty.call(optionsDictionaries, title)) { continue; }
+            const dictionary = optionsDictionaries[title];
+            if (!dictionary.enabled) { continue; }
+            dictionaries.push({
+                title,
+                index: dictionaries.length,
+                priority: dictionary.priority,
+                allowSecondarySearches: dictionary.allowSecondarySearches
+            });
+        }
+
+        dictionaries.sort((v1, v2) => {
+            const i = v2.priority - v1.priority;
+            return i !== 0 ? i : v1.index - v2.index;
+        });
+
         const enabledDictionaryMap = new Map();
-        for (const [title, {enabled, priority, allowSecondarySearches}] of Object.entries(options.dictionaries)) {
-            if (!enabled) { continue; }
-            enabledDictionaryMap.set(title, {priority, allowSecondarySearches});
+        for (let i = 0, ii = dictionaries.length; i < ii; ++i) {
+            const {title, allowSecondarySearches} = dictionaries[i];
+            enabledDictionaryMap.set(title, {order: i, allowSecondarySearches});
         }
         return enabledDictionaryMap;
     }

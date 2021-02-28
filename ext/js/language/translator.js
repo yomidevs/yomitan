@@ -78,7 +78,7 @@ class Translator {
      *     enabledDictionaryMap: (Map of [
      *       (string),
      *       {
-     *         priority: (number),
+     *         order: (number),
      *         allowSecondarySearches: (boolean)
      *       }
      *     ])
@@ -111,7 +111,7 @@ class Translator {
      *     enabledDictionaryMap: (Map of [
      *       (string),
      *       {
-     *         priority: (number)
+     *         order: (number)
      *       }
      *     ])
      *   }
@@ -684,7 +684,7 @@ class Translator {
 
         const metas = await this._database.findTermMetaBulk(expressionKeys, enabledDictionaryMap);
         for (const {expression, mode, data, dictionary, index} of metas) {
-            const dictionaryPriority = this._getDictionaryPriority(dictionary, enabledDictionaryMap);
+            const dictionaryOrder = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
             const map2 = expressionValues[index];
             for (const [reading, targets] of map2.entries()) {
                 switch (mode) {
@@ -697,7 +697,7 @@ class Translator {
                                 frequency = data.frequency;
                             }
                             for (const {frequencies, index: expressionIndex} of targets) {
-                                frequencies.push({index: frequencies.length, expressionIndex, dictionary, dictionaryPriority, expression, reading, hasReading, frequency});
+                                frequencies.push({index: frequencies.length, expressionIndex, dictionary, dictionaryOrder, expression, reading, hasReading, frequency});
                             }
                         }
                         break;
@@ -710,7 +710,7 @@ class Translator {
                                 pitches2.push({position, tags});
                             }
                             for (const {pitches, index: expressionIndex} of targets) {
-                                pitches.push({index: pitches.length, expressionIndex, dictionary, dictionaryPriority, expression, reading, pitches: pitches2});
+                                pitches.push({index: pitches.length, expressionIndex, dictionary, dictionaryOrder, expression, reading, pitches: pitches2});
                             }
                         }
                         break;
@@ -731,12 +731,12 @@ class Translator {
 
         const metas = await this._database.findKanjiMetaBulk(kanjiList, enabledDictionaryMap);
         for (const {character, mode, data, dictionary, index} of metas) {
-            const dictionaryPriority = this._getDictionaryPriority(dictionary, enabledDictionaryMap);
+            const dictionaryOrder = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
             switch (mode) {
                 case 'freq':
                     {
                         const {frequencies} = definitions[index];
-                        frequencies.push({index: frequencies.length, dictionary, dictionaryPriority, character, frequency: data});
+                        frequencies.push({index: frequencies.length, dictionary, dictionaryOrder, character, frequency: data});
                     }
                     break;
             }
@@ -880,9 +880,9 @@ class Translator {
         return secondarySearchDictionaryMap;
     }
 
-    _getDictionaryPriority(dictionary, enabledDictionaryMap) {
+    _getDictionaryOrder(dictionary, enabledDictionaryMap) {
         const info = enabledDictionaryMap.get(dictionary);
-        return typeof info !== 'undefined' ? info.priority : 0;
+        return typeof info !== 'undefined' ? info.order : 0;
     }
 
     _getTagNamesWithCategory(tags, category) {
@@ -1018,10 +1018,10 @@ class Translator {
         return result;
     }
 
-    _getMaxDictionaryPriority(definitions) {
-        let result = Number.MIN_SAFE_INTEGER;
-        for (const {dictionaryPriority} of definitions) {
-            if (dictionaryPriority > result) { result = dictionaryPriority; }
+    _getMinDictionaryOrder(definitions) {
+        let result = Number.MAX_SAFE_INTEGER;
+        for (const {dictionaryOrder} of definitions) {
+            if (dictionaryOrder < result) { result = dictionaryOrder; }
         }
         return result;
     }
@@ -1082,7 +1082,7 @@ class Translator {
 
     async _createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, sourceTerm, reasons, enabledDictionaryMap) {
         const {expression, reading, definitionTags, termTags, glossary, score, dictionary, id, sequence} = databaseDefinition;
-        const dictionaryPriority = this._getDictionaryPriority(dictionary, enabledDictionaryMap);
+        const dictionaryOrder = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const termTagsExpanded = await this._expandTags(termTags, dictionary);
         const definitionTagsExpanded = await this._expandTags(definitionTags, dictionary);
 
@@ -1103,7 +1103,7 @@ class Translator {
             score,
             sequence,
             dictionary,
-            dictionaryPriority,
+            dictionaryOrder,
             dictionaryNames: [dictionary],
             expression,
             reading,
@@ -1123,7 +1123,7 @@ class Translator {
     _createGroupedTermDefinition(definitions) {
         const {expression, reading, furiganaSegments, reasons, source, rawSource, sourceTerm} = definitions[0];
         const score = this._getMaxDefinitionScore(definitions);
-        const dictionaryPriority = this._getMaxDictionaryPriority(definitions);
+        const dictionaryOrder = this._getMinDictionaryOrder(definitions);
         const dictionaryNames = this._getUniqueDictionaryNames(definitions);
         const termTags = this._getUniqueTermTags(definitions);
         const termDetailsList = [this._createTermDetails(sourceTerm, expression, reading, furiganaSegments, termTags)];
@@ -1138,7 +1138,7 @@ class Translator {
             score,
             // sequence
             dictionary: dictionaryNames[0],
-            dictionaryPriority,
+            dictionaryOrder,
             dictionaryNames,
             expression,
             reading,
@@ -1156,7 +1156,7 @@ class Translator {
     }
 
     _createMergedTermDefinition(source, rawSource, definitions, expressions, readings, termDetailsList, reasons, score) {
-        const dictionaryPriority = this._getMaxDictionaryPriority(definitions);
+        const dictionaryOrder = this._getMinDictionaryOrder(definitions);
         const sourceTermExactMatchCount = this._getSourceTermMatchCountSum(definitions);
         const dictionaryNames = this._getUniqueDictionaryNames(definitions);
         return {
@@ -1169,7 +1169,7 @@ class Translator {
             score,
             // sequence
             dictionary: dictionaryNames[0],
-            dictionaryPriority,
+            dictionaryOrder,
             dictionaryNames,
             expression: expressions,
             reading: readings,
@@ -1207,7 +1207,7 @@ class Translator {
 
         const {glossary} = definitions[0];
         const score = this._getMaxDefinitionScore(definitions);
-        const dictionaryPriority = this._getMaxDictionaryPriority(definitions);
+        const dictionaryOrder = this._getMinDictionaryOrder(definitions);
         return {
             type: 'termMergedByGlossary',
             // id
@@ -1218,7 +1218,7 @@ class Translator {
             score,
             // sequence
             dictionary: dictionaryNames[0],
-            dictionaryPriority,
+            dictionaryOrder,
             dictionaryNames,
             expression: [...expressions],
             reading: [...readings],
@@ -1278,7 +1278,7 @@ class Translator {
         if (definitions.length <= 1) { return; }
         const stringComparer = this._stringComparer;
         const compareFunction = (v1, v2) => {
-            let i = v2.dictionaryPriority - v1.dictionaryPriority;
+            let i = v1.dictionaryOrder - v2.dictionaryOrder;
             if (i !== 0) { return i; }
 
             i = v2.source.length - v1.source.length;
@@ -1329,7 +1329,7 @@ class Translator {
     _sortTermDefinitionMeta(definition) {
         const compareFunction = (v1, v2) => {
             // Sort by dictionary
-            let i = v2.dictionaryPriority - v1.dictionaryPriority;
+            let i = v1.dictionaryOrder - v2.dictionaryOrder;
             if (i !== 0) { return i; }
 
             // Sory by expression order
@@ -1353,7 +1353,7 @@ class Translator {
     _sortKanjiDefinitionMeta(definition) {
         const compareFunction = (v1, v2) => {
             // Sort by dictionary
-            let i = v2.dictionaryPriority - v1.dictionaryPriority;
+            let i = v1.dictionaryOrder - v2.dictionaryOrder;
             if (i !== 0) { return i; }
 
             // Default order
