@@ -462,7 +462,8 @@ class DOMTextScanner {
                 return preserveWhitespace ? 2 : 1;
             case 0x0a: // Line feed ('\n')
                 return preserveNewlines ? 3 : 1;
-            case 0x200c: // Zero-width non-joiner ('\u200c')
+            case 0x200b: // Zero-width space
+            case 0x200c: // Zero-width non-joiner
                 return 0;
             default: // Other
                 return 2;
