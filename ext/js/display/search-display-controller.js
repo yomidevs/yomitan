@@ -171,6 +171,7 @@ class SearchDisplayController {
     }
 
     _onSearchKeydown(e) {
+        if (e.isComposing) { return; }
         const {code} = e;
         if (!((code === 'Enter' || code === 'NumpadEnter') && !e.shiftKey)) { return; }
 
