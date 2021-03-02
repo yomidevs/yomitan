@@ -244,7 +244,7 @@ class Translator {
             if (databaseDefinitions.length === 0) { continue; }
             maxLength = Math.max(maxLength, rawSource.length);
             for (const databaseDefinition of databaseDefinitions) {
-                const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, term, reasons, enabledDictionaryMap);
+                const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, term, reasons, true, enabledDictionaryMap);
                 definitions.push(definition);
             }
         }
@@ -358,6 +358,11 @@ class Translator {
         return deinflections;
     }
 
+    /**
+     * @param definitions An array of 'term' definitions.
+     * @param mainDictionary The name of the main dictionary.
+     * @param enabledDictionaryMap The map of enabled dictionaries and their settings.
+     */
     async _getSequencedDefinitions(definitions, mainDictionary, enabledDictionaryMap) {
         const sequenceList = [];
         const sequencedDefinitionMap = new Map();
@@ -393,7 +398,7 @@ class Translator {
                 if (relatedDefinitionIds.has(id)) { continue; }
 
                 const {source, rawSource, sourceTerm} = relatedDefinitions[0];
-                const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, sourceTerm, [], enabledDictionaryMap);
+                const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, sourceTerm, [], false, enabledDictionaryMap);
                 relatedDefinitions.push(definition);
             }
         }
@@ -425,7 +430,7 @@ class Translator {
         const definitions = [];
         for (const databaseDefinition of databaseDefinitions) {
             const source = expressionList[databaseDefinition.index];
-            const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, source, source, [], secondarySearchDictionaryMap);
+            const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, source, source, [], false, secondarySearchDictionaryMap);
             definitions.push(definition);
         }
 
@@ -565,10 +570,16 @@ class Translator {
         }
     }
 
+    /**
+     * Groups definitions with the same [source, expression, reading, reasons].
+     * @param definitions An array of 'term' definitions.
+     * @returns An array of 'termGrouped' definitions.
+     */
     _groupTerms(definitions) {
         const groups = new Map();
         for (const definition of definitions) {
-            const key = this._createMapKey([definition.source, definition.expression, definition.reading, ...definition.reasons]);
+            const {source, reasons, expressions: [{expression, reading}]} = definition;
+            const key = this._createMapKey([source, expression, reading, ...reasons]);
             let groupDefinitions = groups.get(key);
             if (typeof groupDefinitions === 'undefined') {
                 groupDefinitions = [];
@@ -1080,7 +1091,7 @@ class Translator {
         };
     }
 
-    async _createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, sourceTerm, reasons, enabledDictionaryMap) {
+    async _createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, sourceTerm, reasons, isPrimary, enabledDictionaryMap) {
         const {expression, reading, definitionTags, termTags, glossary, score, dictionary, id, sequence} = databaseDefinition;
         const dictionaryOrder = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const termTagsExpanded = await this._expandTags(termTags, dictionary);
@@ -1101,6 +1112,7 @@ class Translator {
             sourceTerm,
             reasons,
             score,
+            isPrimary,
             sequence,
             dictionary,
             dictionaryOrder,
@@ -1136,6 +1148,7 @@ class Translator {
             sourceTerm,
             reasons: [...reasons],
             score,
+            // isPrimary
             // sequence
             dictionary: dictionaryNames[0],
             dictionaryOrder,
@@ -1167,6 +1180,7 @@ class Translator {
             // sourceTerm
             reasons,
             score,
+            // isPrimary
             // sequence
             dictionary: dictionaryNames[0],
             dictionaryOrder,
@@ -1216,6 +1230,7 @@ class Translator {
             // sourceTerm
             reasons: [],
             score,
+            // isPrimary
             // sequence
             dictionary: dictionaryNames[0],
             dictionaryOrder,
