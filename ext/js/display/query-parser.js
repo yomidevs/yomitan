@@ -149,7 +149,7 @@ class QueryParser extends EventDispatcher {
         this._queryParser.textContent = '';
         this._queryParser.dataset.parsed = 'true';
         if (!parseResult) { return; }
-        this._queryParser.appendChild(this._createParseResult(parseResult.content, false));
+        this._queryParser.appendChild(this._createParseResult(parseResult.content));
     }
 
     _updateParserModeSelect(select, parseResults, selectedParser) {
@@ -191,7 +191,7 @@ class QueryParser extends EventDispatcher {
             termNode.className = 'query-parser-term';
             for (const segment of term) {
                 if (segment.reading.trim().length === 0) {
-                    this._addSegmentText(segment.text, termNode);
+                    termNode.appendChild(document.createTextNode(segment.text));
                 } else {
                     termNode.appendChild(this._createSegment(segment));
                 }
@@ -214,13 +214,9 @@ class QueryParser extends EventDispatcher {
         segmentNode.appendChild(textNode);
         segmentNode.appendChild(readingNode);
 
-        this._addSegmentText(segment.text, textNode);
+        textNode.textContent = segment.text;
         readingNode.textContent = segment.reading;
 
         return segmentNode;
-    }
-
-    _addSegmentText(text, container) {
-        container.textContent = text;
     }
 }
