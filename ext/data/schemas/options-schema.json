@@ -113,7 +113,9 @@
                                     "usePopupWindow",
                                     "popupCurrentIndicatorMode",
                                     "popupActionBarVisibility",
-                                    "popupActionBarLocation"
+                                    "popupActionBarLocation",
+                                    "frequencyDisplayMode",
+                                    "termDisplayMode"
                                 ],
                                 "properties": {
                                     "enable": {
