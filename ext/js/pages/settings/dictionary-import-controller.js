@@ -22,10 +22,9 @@
  */
 
 class DictionaryImportController {
-    constructor(settingsController, modalController, storageController, statusFooter) {
+    constructor(settingsController, modalController, statusFooter) {
         this._settingsController = settingsController;
         this._modalController = modalController;
-        this._storageController = storageController;
         this._statusFooter = statusFooter;
         this._modifying = false;
         this._purgeButton = null;
@@ -92,7 +91,6 @@ class DictionaryImportController {
         if (this._modifying) { return; }
 
         const purgeNotification = this._purgeNotification;
-        const storageController = this._storageController;
         const prevention = this._preventPageExit();
 
         try {
@@ -114,7 +112,7 @@ class DictionaryImportController {
             if (purgeNotification !== null) { purgeNotification.hidden = true; }
             this._setSpinnerVisible(false);
             this._setModifying(false);
-            if (storageController !== null) { storageController.updateStats(); }
+            this._triggerStorageChanged();
         }
     }
 
@@ -122,7 +120,6 @@ class DictionaryImportController {
         if (this._modifying) { return; }
 
         const statusFooter = this._statusFooter;
-        const storageController = this._storageController;
         const importInfo = document.querySelector('#dictionary-import-info');
         const progressSelector = '.dictionary-import-progress';
         const progressContainers = [
@@ -156,7 +153,7 @@ class DictionaryImportController {
                 const statusString = `${percent.toFixed(0)}%`;
                 for (const progressBar of progressBars) { progressBar.style.width = cssString; }
                 for (const label of statusLabels) { label.textContent = statusString; }
-                if (storageController !== null) { storageController.updateStats(); }
+                this._triggerStorageChanged();
             };
 
             const fileCount = files.length;
@@ -186,7 +183,7 @@ class DictionaryImportController {
             }
             this._setSpinnerVisible(false);
             this._setModifying(false);
-            if (storageController !== null) { storageController.updateStats(); }
+            this._triggerStorageChanged();
         }
     }
 
@@ -341,5 +338,9 @@ class DictionaryImportController {
             }
         }
         return errors;
+    }
+
+    _triggerStorageChanged() {
+        yomichan.trigger('storageChanged');
     }
 }

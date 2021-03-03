@@ -62,10 +62,10 @@ async function setupGenericSettingsController(genericSettingController) {
         const settingsController = new SettingsController(optionsFull.profileCurrent);
         settingsController.prepare();
 
-        const dictionaryController = new DictionaryController(settingsController, modalController, null, statusFooter);
+        const dictionaryController = new DictionaryController(settingsController, modalController, statusFooter);
         dictionaryController.prepare();
 
-        const dictionaryImportController = new DictionaryImportController(settingsController, modalController, null, statusFooter);
+        const dictionaryImportController = new DictionaryImportController(settingsController, modalController, statusFooter);
         dictionaryImportController.prepare();
 
         const genericSettingController = new GenericSettingController(settingsController);

@@ -190,10 +190,9 @@ class DictionaryEntry {
 }
 
 class DictionaryController {
-    constructor(settingsController, modalController, storageController, statusFooter) {
+    constructor(settingsController, modalController, statusFooter) {
         this._settingsController = settingsController;
         this._modalController = modalController;
-        this._storageController = storageController;
         this._statusFooter = statusFooter;
         this._dictionaries = null;
         this._dictionaryEntries = [];
@@ -436,7 +435,6 @@ class DictionaryController {
         const index = this._dictionaryEntries.findIndex((entry) => entry.dictionaryTitle === dictionaryTitle);
         if (index < 0) { return; }
 
-        const storageController = this._storageController;
         const statusFooter = this._statusFooter;
         const {node} = this._dictionaryEntries[index];
         const progressSelector = '.dictionary-delete-progress';
@@ -483,7 +481,7 @@ class DictionaryController {
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
             this._setButtonsEnabled(true);
             this._isDeleting = false;
-            if (storageController !== null) { storageController.updateStats(); }
+            this._triggerStorageChanged();
         }
     }
 
@@ -545,6 +543,10 @@ class DictionaryController {
         if (targets.length > 0) {
             await this._settingsController.modifyGlobalSettings(targets);
         }
+    }
+
+    _triggerStorageChanged() {
+        yomichan.trigger('storageChanged');
     }
 
     static createDefaultDictionarySettings() {
