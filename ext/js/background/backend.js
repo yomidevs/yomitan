@@ -183,6 +183,8 @@ class Backend {
         const onPermissionsChanged = this._onWebExtensionEventWrapper(this._onPermissionsChanged.bind(this));
         chrome.permissions.onAdded.addListener(onPermissionsChanged);
         chrome.permissions.onRemoved.addListener(onPermissionsChanged);
+
+        chrome.runtime.onInstalled.addListener(this._onInstalled.bind(this));
     }
 
     async _prepareInternal() {
@@ -370,6 +372,11 @@ class Backend {
 
     _onPermissionsChanged() {
         this._checkPermissions();
+    }
+
+    _onInstalled({reason}) {
+        if (reason !== 'install') { return; }
+        this._requestPersistentStorage();
     }
 
     // Message handlers
@@ -2102,5 +2109,26 @@ class Backend {
 
     _hasRequiredPermissionsForSettings(options) {
         return this._permissions === null || this._permissionsUtil.hasRequiredPermissionsForOptions(this._permissions, options);
+    }
+
+    async _requestPersistentStorage() {
+        try {
+            if (await navigator.storage.persisted()) { return; }
+
+            // Only request this permission for Firefox versions >= 77.
+            // https://bugzilla.mozilla.org/show_bug.cgi?id=1630413
+            const {vendor, version} = await browser.runtime.getBrowserInfo();
+            if (vendor !== 'Mozilla') { return; }
+
+            const match = /^\d+/.exec(version);
+            if (match === null) { return; }
+
+            const versionNumber = Number.parseInt(match[0]);
+            if (!(Number.isFinite(versionNumber) && versionNumber >= 77)) { return; }
+
+            await navigator.storage.persist();
+        } catch (e) {
+            // NOP
+        }
     }
 }
