@@ -18,6 +18,7 @@
 /* global
  * DocumentFocusController
  * PermissionsToggleController
+ * PersistentStorageController
  * SettingsController
  */
 
@@ -91,6 +92,9 @@ function setupPermissionsToggles() {
 
         const permissionsToggleController = new PermissionsToggleController(settingsController);
         permissionsToggleController.prepare();
+
+        const persistentStorageController = new PersistentStorageController();
+        persistentStorageController.prepare();
 
         await promiseTimeout(100);
 

@@ -153,6 +153,28 @@
                 <label class="toggle"><input type="checkbox" id="permission-checkbox-allow-file-url-access" disabled><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Persistent storage</div>
+                <div class="settings-item-description">
+                    <p>
+                        Web browsers will sometimes clear stored data if the device is running low on storage space,
+                        which can result in the imported dictionaries being deleted unexpectedly.
+                        The persistent storage permission tells the browser that the data should not be deleted in those circumstances.
+                    </p>
+                    <p data-show-for-browser="firefox-mobile">
+                        It may not be possible to enable this permission on Firefox for Android.
+                    </p>
+                    <p data-show-for-browser="chrome edge">
+                        Chromium-based browsers should not need to enable this setting since the Yomichan extension has
+                        the <code>unlimitedStorage</code> permission, which should prevent data deletion.<sup><a href="https://bugs.chromium.org/p/chromium/issues/detail?id=680392#c15" target="_blank" rel="noopener">[1]</a></sup>
+                    </p>
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" id="storage-persistent-checkbox"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
     </div>
 
     <div class="footer-padding"></div>
@@ -172,6 +194,7 @@
 <script src="/js/dom/document-focus-controller.js"></script>
 <script src="/js/dom/html-template-collection.js"></script>
 <script src="/js/pages/settings/permissions-toggle-controller.js"></script>
+<script src="/js/pages/settings/persistent-storage-controller.js"></script>
 <script src="/js/pages/settings/settings-controller.js"></script>
 
 <script src="/js/pages/permissions-main.js"></script>
