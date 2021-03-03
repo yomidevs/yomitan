@@ -20,6 +20,7 @@
  * PermissionsToggleController
  * PersistentStorageController
  * SettingsController
+ * SettingsDisplayController
  */
 
 async function setupEnvironmentInfo() {
@@ -69,6 +70,13 @@ function setupPermissionsToggles() {
             node.textContent = chrome.runtime.getURL('/');
         }
 
+        const extensionId = chrome.runtime.id;
+        const idPattern = /\{id\}/g;
+        for (const node of document.querySelectorAll('.extension-settings-link[data-special-url]')) {
+            const {specialUrl} = node.dataset;
+            node.dataset.specialUrl = `${specialUrl}`.replace(idPattern, extensionId);
+        }
+
         await yomichan.prepare();
 
         setupEnvironmentInfo();
@@ -99,6 +107,9 @@ function setupPermissionsToggles() {
         await promiseTimeout(100);
 
         document.documentElement.dataset.loaded = 'true';
+
+        const settingsDisplayController = new SettingsDisplayController(settingsController, null);
+        settingsDisplayController.prepare();
     } catch (e) {
         log.error(e);
     }
