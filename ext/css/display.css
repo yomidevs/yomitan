@@ -78,6 +78,8 @@
     --entry-current-indicator-width: calc(1em * var(--entry-current-indicator-width-no-units) / var(--font-size-no-units));
     --entry-current-indicator-transition-duration: 0.125s;
 
+    --tag-height-no-units: 20;
+    --tag-height: calc(1em * var(--tag-height-no-units) / var(--font-size-no-units));
     --tag-font-size-no-units: 11;
     --tag-font-size: calc(1em * var(--tag-font-size-no-units) / var(--font-size-no-units));
     --tag-border-size-no-units: 1;
@@ -716,6 +718,7 @@ button.action-button[data-icon=source-term]::before {
     border: none;
     border-right: none;
     font-size: 1em;
+    height: var(--tag-height);
     margin: calc(1em / var(--font-size-no-units)) 0.375em calc(1em / var(--font-size-no-units)) 0;
 }
 .tag-label {
