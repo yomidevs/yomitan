@@ -430,7 +430,7 @@ const JapaneseUtil = (() => {
         // Furigana distribution
 
         distributeFurigana(expression, reading) {
-            if (!reading || reading === expression) {
+            if (reading === expression) {
                 // Same
                 return [this._createFuriganaSegment(expression, '')];
             }

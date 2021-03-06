@@ -131,7 +131,7 @@ class AudioDownloader {
                 if (htmlReadings.length === 0) { continue; }
 
                 const htmlReading = dom.getTextContent(htmlReadings[0]);
-                if (htmlReading && (!reading || reading === htmlReading)) {
+                if (htmlReading && (reading === expression || reading === htmlReading)) {
                     url = this._normalizeUrl(url, response.url);
                     return [{type: 'url', url}];
                 }

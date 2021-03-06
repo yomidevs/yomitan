@@ -648,8 +648,7 @@ class Translator {
 
         for (const {expressions, frequencies: frequencies1, pitches: pitches1} of allDefinitions) {
             for (let i = 0, ii = expressions.length; i < ii; ++i) {
-                let {expression, reading, frequencies: frequencies2, pitches: pitches2} = expressions[i];
-                if (reading.length === 0) { reading = expression; }
+                const {expression, reading, frequencies: frequencies2, pitches: pitches2} = expressions[i];
                 let readingMap = expressionMap.get(expression);
                 if (typeof readingMap === 'undefined') {
                     readingMap = new Map();
@@ -1079,7 +1078,8 @@ class Translator {
     }
 
     async _createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, sourceTerm, reasons, isPrimary, enabledDictionaryMap) {
-        const {expression, reading, definitionTags, termTags, glossary, score, dictionary, id, sequence} = databaseDefinition;
+        const {expression, reading: rawReading, definitionTags, termTags, glossary, score, dictionary, id, sequence} = databaseDefinition;
+        const reading = (rawReading.length > 0 ? rawReading : expression);
         const dictionaryOrder = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const termTagsExpanded = await this._expandTags(termTags, dictionary);
         const definitionTagsExpanded = await this._expandTags(definitionTags, dictionary);

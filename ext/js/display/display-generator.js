@@ -70,8 +70,7 @@ class DisplayGenerator {
 
         const uniqueExpressions = new Set();
         const uniqueReadings = new Set();
-        for (let {expression, reading} of expressions) {
-            if (reading.length === 0) { reading = expression; }
+        for (const {expression, reading} of expressions) {
             uniqueExpressions.add(expression);
             uniqueReadings.add(reading);
         }
@@ -244,7 +243,7 @@ class DisplayGenerator {
         const expressionContainer = node.querySelector('.expression-text');
         const tagContainer = node.querySelector('.expression-tag-list');
 
-        node.dataset.readingIsSame = `${!reading || reading === expression}`;
+        node.dataset.readingIsSame = `${reading === expression}`;
         node.dataset.frequency = termFrequency;
 
         const pitchAccentCategories = this._getPitchAccentCategories(pitches);
@@ -252,7 +251,7 @@ class DisplayGenerator {
             node.dataset.pitchAccentCategories = pitchAccentCategories;
         }
 
-        this._setTextContent(node.querySelector('.expression-reading'), reading.length > 0 ? reading : expression);
+        this._setTextContent(node.querySelector('.expression-reading'), reading);
 
         this._appendFurigana(expressionContainer, furiganaSegments, this._appendKanjiLinks.bind(this));
         this._appendMultiple(tagContainer, this._createTag.bind(this), termTags);
