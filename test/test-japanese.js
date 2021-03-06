@@ -707,6 +707,13 @@ function testDistributeFurigana() {
                 {text: 'サボ', furigana: ''},
                 {text: 'る', furigana: 'ル'}
             ]
+        ],
+        // Reading starts with expression, but has remainder characters
+        [
+            ['シック', 'シック・ビルしょうこうぐん'],
+            [
+                {text: 'シック', furigana: 'シック・ビルしょうこうぐん'}
+            ]
         ]
     ];
 

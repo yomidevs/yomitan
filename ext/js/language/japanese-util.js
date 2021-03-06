@@ -531,7 +531,7 @@ const JapaneseUtil = (() => {
         _segmentizeFurigana(reading, readingNormalized, groups, groupsStart) {
             const groupCount = groups.length - groupsStart;
             if (groupCount <= 0) {
-                return [];
+                return reading.length === 0 ? [] : null;
             }
 
             const group = groups[groupsStart];
