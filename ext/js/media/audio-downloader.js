@@ -78,29 +78,31 @@ class AudioDownloader {
     }
 
     async _getInfoJpod101(expression, reading) {
-        let kana = reading;
-        let kanji = expression;
-
-        if (!kana && this._japaneseUtil.isStringEntirelyKana(kanji)) {
-            kana = kanji;
-            kanji = null;
+        if (reading === expression && this._japaneseUtil.isStringEntirelyKana(expression)) {
+            reading = expression;
+            expression = null;
         }
 
-        const params = [];
-        if (kanji) {
-            params.push(`kanji=${encodeURIComponent(kanji)}`);
+        const params = new URLSearchParams();
+        if (expression) {
+            params.set('kanji', expression);
         }
-        if (kana) {
-            params.push(`kana=${encodeURIComponent(kana)}`);
+        if (reading) {
+            params.set('kana', reading);
         }
 
-        const url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
+        const url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.toString()}`;
         return [{type: 'url', url}];
     }
 
     async _getInfoJpod101Alternate(expression, reading) {
         const fetchUrl = 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post';
-        const data = `post=dictionary_reference&match_type=exact&search_query=${encodeURIComponent(expression)}&vulgar=true`;
+        const data = new URLSearchParams({
+            post: 'dictionary_reference',
+            match_type: 'exact',
+            search_query: expression,
+            vulgar: 'true'
+        });
         const response = await this._requestBuilder.fetchAnonymous(fetchUrl, {
             method: 'POST',
             mode: 'cors',
