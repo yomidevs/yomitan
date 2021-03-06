@@ -1284,12 +1284,8 @@ class Translator {
         if (definitions.length <= 1) { return; }
         const stringComparer = this._stringComparer;
         const compareFunction = (v1, v2) => {
-            // Sort by dictionary priority
-            let i = v2.dictionaryOrder.priority - v1.dictionaryOrder.priority;
-            if (i !== 0) { return i; }
-
             // Sort by length of source term
-            i = v2.source.length - v1.source.length;
+            let i = v2.source.length - v1.source.length;
             if (i !== 0) { return i; }
 
             // Sort by the number of inflection reasons
@@ -1298,6 +1294,10 @@ class Translator {
 
             // Sort by how many terms exactly match the source (e.g. for exact kana prioritization)
             i = v2.sourceTermExactMatchCount - v1.sourceTermExactMatchCount;
+            if (i !== 0) { return i; }
+
+            // Sort by dictionary priority
+            i = v2.dictionaryOrder.priority - v1.dictionaryOrder.priority;
             if (i !== 0) { return i; }
 
             // Sort by term score
