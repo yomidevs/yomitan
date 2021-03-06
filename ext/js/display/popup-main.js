@@ -18,6 +18,7 @@
 /* global
  * Display
  * DisplayProfileSelection
+ * DisplayResizer
  * DocumentFocusController
  * HotkeyHandler
  * JapaneseUtil
@@ -42,6 +43,9 @@
 
         const displayProfileSelection = new DisplayProfileSelection(display);
         displayProfileSelection.prepare();
+
+        const displayResizer = new DisplayResizer(display);
+        displayResizer.prepare();
 
         display.initializeState();
 

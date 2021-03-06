@@ -106,12 +106,6 @@ class Display extends EventDispatcher {
         this._browser = null;
         this._copyTextarea = null;
         this._definitionTextScanner = null;
-        this._frameResizeToken = null;
-        this._frameResizeHandle = document.querySelector('#frame-resizer-handle');
-        this._frameResizeTouchIdentifier = null;
-        this._frameResizeStartSize = null;
-        this._frameResizeStartOffset = null;
-        this._frameResizeEventListeners = new EventListenerCollection();
         this._tagNotification = null;
         this._footerNotificationContainer = document.querySelector('#content-footer');
         this._displayAudio = new DisplayAudio(this);
@@ -204,6 +198,10 @@ class Display extends EventDispatcher {
         return this._frameId;
     }
 
+    get parentPopupId() {
+        return this._parentPopupId;
+    }
+
     async prepare() {
         // State setup
         const {documentElement} = document;
@@ -242,11 +240,6 @@ class Display extends EventDispatcher {
         }
         if (this._navigationNextButton !== null) {
             this._navigationNextButton.addEventListener('click', this._onNextTermView.bind(this), false);
-        }
-
-        if (this._frameResizeHandle !== null) {
-            this._frameResizeHandle.addEventListener('mousedown', this._onFrameResizerMouseDown.bind(this), false);
-            this._frameResizeHandle.addEventListener('touchstart', this._onFrameResizerTouchStart.bind(this), false);
         }
     }
 
@@ -399,7 +392,7 @@ class Display extends EventDispatcher {
     close() {
         switch (this._pageType) {
             case 'popup':
-                this._invokeContentOrigin('closePopup');
+                this.invokeContentOrigin('closePopup');
                 break;
             case 'search':
                 this._closeTab();
@@ -437,6 +430,20 @@ class Display extends EventDispatcher {
             }
         };
         this.setContent(details);
+    }
+
+    async invokeContentOrigin(action, params={}) {
+        if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
+            throw new Error('Content origin is same page');
+        }
+        return await yomichan.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
+    }
+
+    async invokeParentFrame(action, params={}) {
+        if (this._parentFrameId === null || this._parentFrameId === this._frameId) {
+            throw new Error('Invalid parent frame');
+        }
+        return await yomichan.crossFrame.invoke(this._parentFrameId, action, params);
     }
 
     // Message handlers
@@ -1618,13 +1625,6 @@ class Display extends EventDispatcher {
         await frontend.prepare();
     }
 
-    async _invokeContentOrigin(action, params={}) {
-        if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
-            throw new Error('Content origin is same page');
-        }
-        return await yomichan.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
-    }
-
     _copyHostSelection() {
         if (this._contentOriginFrameId === null || window.getSelection().toString()) { return false; }
         this._copyHostSelectionSafe();
@@ -1646,7 +1646,7 @@ class Display extends EventDispatcher {
                 {
                     let text;
                     try {
-                        text = await this._invokeContentOrigin('getSelectionText');
+                        text = await this.invokeContentOrigin('getSelectionText');
                     } catch (e) {
                         break;
                     }
@@ -1654,7 +1654,7 @@ class Display extends EventDispatcher {
                 }
                 break;
             default:
-                await this._invokeContentOrigin('copySelection');
+                await this.invokeContentOrigin('copySelection');
                 break;
         }
     }
@@ -1779,136 +1779,8 @@ class Display extends EventDispatcher {
         this.setContent(details);
     }
 
-    _onFrameResizerMouseDown(e) {
-        if (e.button !== 0) { return; }
-        // Don't do e.preventDefault() here; this allows mousemove events to be processed
-        // if the pointer moves out of the frame.
-        this._startFrameResize(e);
-    }
-
-    _onFrameResizerTouchStart(e) {
-        e.preventDefault();
-        this._startFrameResizeTouch(e);
-    }
-
-    _onFrameResizerMouseUp() {
-        this._stopFrameResize();
-    }
-
-    _onFrameResizerWindowBlur() {
-        this._stopFrameResize();
-    }
-
-    _onFrameResizerMouseMove(e) {
-        if ((e.buttons & 0x1) === 0x0) {
-            this._stopFrameResize();
-        } else {
-            if (this._frameResizeStartSize === null) { return; }
-            const {clientX: x, clientY: y} = e;
-            this._updateFrameSize(x, y);
-        }
-    }
-
-    _onFrameResizerTouchEnd(e) {
-        if (this._getTouch(e.changedTouches, this._frameResizeTouchIdentifier) === null) { return; }
-        this._stopFrameResize();
-    }
-
-    _onFrameResizerTouchCancel(e) {
-        if (this._getTouch(e.changedTouches, this._frameResizeTouchIdentifier) === null) { return; }
-        this._stopFrameResize();
-    }
-
-    _onFrameResizerTouchMove(e) {
-        if (this._frameResizeStartSize === null) { return; }
-        const primaryTouch = this._getTouch(e.changedTouches, this._frameResizeTouchIdentifier);
-        if (primaryTouch === null) { return; }
-        const {clientX: x, clientY: y} = primaryTouch;
-        this._updateFrameSize(x, y);
-    }
-
     _getSearchContext() {
         return {optionsContext: this.getOptionsContext()};
-    }
-
-    _startFrameResize(e) {
-        if (this._frameResizeToken !== null) { return; }
-
-        const {clientX: x, clientY: y} = e;
-        const token = {};
-        this._frameResizeToken = token;
-        this._frameResizeStartOffset = {x, y};
-        this._frameResizeEventListeners.addEventListener(window, 'mouseup', this._onFrameResizerMouseUp.bind(this), false);
-        this._frameResizeEventListeners.addEventListener(window, 'blur', this._onFrameResizerWindowBlur.bind(this), false);
-        this._frameResizeEventListeners.addEventListener(window, 'mousemove', this._onFrameResizerMouseMove.bind(this), false);
-
-        const {documentElement} = document;
-        if (documentElement !== null) {
-            documentElement.dataset.isResizing = 'true';
-        }
-
-        this._initializeFrameResize(token);
-    }
-
-    _startFrameResizeTouch(e) {
-        if (this._frameResizeToken !== null) { return; }
-
-        const {clientX: x, clientY: y, identifier} = e.changedTouches[0];
-        const token = {};
-        this._frameResizeToken = token;
-        this._frameResizeStartOffset = {x, y};
-        this._frameResizeTouchIdentifier = identifier;
-        this._frameResizeEventListeners.addEventListener(window, 'touchend', this._onFrameResizerTouchEnd.bind(this), false);
-        this._frameResizeEventListeners.addEventListener(window, 'touchcancel', this._onFrameResizerTouchCancel.bind(this), false);
-        this._frameResizeEventListeners.addEventListener(window, 'blur', this._onFrameResizerWindowBlur.bind(this), false);
-        this._frameResizeEventListeners.addEventListener(window, 'touchmove', this._onFrameResizerTouchMove.bind(this), false);
-
-        const {documentElement} = document;
-        if (documentElement !== null) {
-            documentElement.dataset.isResizing = 'true';
-        }
-
-        this._initializeFrameResize(token);
-    }
-
-    async _initializeFrameResize(token) {
-        const size = await this._invokeContentOrigin('getFrameSize');
-        if (this._frameResizeToken !== token) { return; }
-        this._frameResizeStartSize = size;
-    }
-
-    _stopFrameResize() {
-        if (this._frameResizeToken === null) { return; }
-
-        this._frameResizeEventListeners.removeAllEventListeners();
-        this._frameResizeStartSize = null;
-        this._frameResizeStartOffset = null;
-        this._frameResizeTouchIdentifier = null;
-        this._frameResizeToken = null;
-
-        const {documentElement} = document;
-        if (documentElement !== null) {
-            delete documentElement.dataset.isResizing;
-        }
-    }
-
-    async _updateFrameSize(x, y) {
-        const handleSize = this._frameResizeHandle.getBoundingClientRect();
-        let {width, height} = this._frameResizeStartSize;
-        width += x - this._frameResizeStartOffset.x;
-        height += y - this._frameResizeStartOffset.y;
-        width = Math.max(Math.max(0, handleSize.width), width);
-        height = Math.max(Math.max(0, handleSize.height), height);
-        await this._invokeContentOrigin('setFrameSize', {width, height});
-    }
-
-    _getTouch(touchList, identifier) {
-        for (const touch of touchList) {
-            if (touch.identifier === identifier) {
-                return touch;
-            }
-        }
-        return null;
     }
 
     _updateHotkeys(options) {
