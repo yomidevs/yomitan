@@ -66,3 +66,8 @@ This page lists several of the browser bugs that have affected Yomichan over the
 * **Browser**: Chrome
 * **Date**: 2021-02-13
 * **Links**: [Demo](https://github.com/toasted-nutbread/chrome-extension-port-disconnect-bug), [Report 1](https://bugs.chromium.org/p/chromium/issues/detail?id=1178188) (MV2), [Report 2](https://bugs.chromium.org/p/chromium/issues/detail?id=1178189) (MV3)
+
+## Ruby elements with padding have incorrect layout
+* **Browser**: Firefox
+* **Date**: 2021-03-05
+* **Links**: [Report](https://bugzilla.mozilla.org/show_bug.cgi?id=1696721)
