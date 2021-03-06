@@ -302,7 +302,7 @@ class DisplayGenerator {
     _createTermGlossaryItemText(glossary) {
         const node = this._templates.instantiate('glossary-item');
         const container = node.querySelector('.glossary');
-        this._setTextContent(container, glossary);
+        this._setMultilineTextContent(container, glossary);
         return node;
     }
 
@@ -350,7 +350,7 @@ class DisplayGenerator {
 
         if (typeof description === 'string') {
             const container = node.querySelector('.glossary-image-description');
-            this._setTextContent(container, description);
+            this._setMultilineTextContent(container, description);
         }
 
         return node;
@@ -385,7 +385,7 @@ class DisplayGenerator {
     _createKanjiGlossaryItem(glossary) {
         const node = this._templates.instantiate('kanji-glossary-item');
         const container = node.querySelector('.kanji-glossary');
-        this._setTextContent(container, glossary);
+        this._setMultilineTextContent(container, glossary);
         return node;
     }
 
@@ -721,11 +721,35 @@ class DisplayGenerator {
     }
 
     _setTextContent(node, value, language) {
-        node.textContent = value;
         if (typeof language === 'string') {
             node.lang = language;
         } else if (this._japaneseUtil.isStringPartiallyJapanese(value)) {
             node.lang = 'ja';
+        }
+
+        node.textContent = value;
+    }
+
+    _setMultilineTextContent(node, value, language) {
+        // This can't just call _setTextContent because the lack of <br> elements will
+        // cause the text to not copy correctly.
+        if (typeof language === 'string') {
+            node.lang = language;
+        } else if (this._japaneseUtil.isStringPartiallyJapanese(value)) {
+            node.lang = 'ja';
+        }
+
+        let start = 0;
+        while (true) {
+            const end = value.indexOf('\n', start);
+            if (end < 0) { break; }
+            node.appendChild(document.createTextNode(value.substring(start, end)));
+            node.appendChild(document.createElement('br'));
+            start = end + 1;
+        }
+
+        if (start < value.length) {
+            node.appendChild(document.createTextNode(start === 0 ? value : value.substring(start)));
         }
     }
 
