@@ -250,18 +250,7 @@ class Translator {
 
     async _findTermWildcard(text, enabledDictionaryMap, wildcard) {
         const databaseDefinitions = await this._database.findTermsBulk([text], enabledDictionaryMap, wildcard);
-        if (databaseDefinitions.length === 0) {
-            return [];
-        }
-
-        return [{
-            source: text,
-            rawSource: text,
-            term: text,
-            rules: 0,
-            reasons: [],
-            databaseDefinitions
-        }];
+        return databaseDefinitions.length > 0 ? [this._createDeinflection(text, text, text, 0, [], databaseDefinitions)] : [];
     }
 
     async _findTermDeinflections(text, enabledDictionaryMap, options) {
@@ -341,16 +330,20 @@ class Translator {
             }
 
             for (let i = text2.length; i > 0; --i) {
-                const text2Substring = text2.substring(0, i);
-                if (used.has(text2Substring)) { break; }
-                used.add(text2Substring);
+                const source = text2.substring(0, i);
+                if (used.has(source)) { break; }
+                used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                for (const deinflection of this._deinflector.deinflect(text2Substring, rawSource)) {
-                    deinflections.push(deinflection);
+                for (const {term, rules, reasons} of this._deinflector.deinflect(source)) {
+                    deinflections.push(this._createDeinflection(source, rawSource, term, rules, reasons, []));
                 }
             }
         }
         return deinflections;
+    }
+
+    _createDeinflection(source, rawSource, term, rules, reasons, databaseDefinitions) {
+        return {source, rawSource, term, rules, reasons, databaseDefinitions};
     }
 
     /**
