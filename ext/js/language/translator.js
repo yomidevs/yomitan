@@ -190,8 +190,8 @@ class Translator {
         }
 
         for (const groupedDefinition of this._groupTerms(unsequencedDefinitions, enabledDictionaryMap)) {
-            const {reasons, score, expression, reading, source, rawSource, sourceTerm, furiganaSegments, termTags, definitions: definitions2} = groupedDefinition;
-            const termDetailsList = [this._createTermDetails(sourceTerm, expression, reading, furiganaSegments, termTags)];
+            const {reasons, score, expression, reading, source, rawSource, definitions: definitions2} = groupedDefinition;
+            const termDetailsList = this._createTermDetailsList(definitions2);
             const compatibilityDefinition = this._createMergedTermDefinition(
                 source,
                 rawSource,
@@ -1119,8 +1119,13 @@ class Translator {
         };
     }
 
+    /**
+     * Creates a grouped definition from an array of 'term' definitions.
+     * @param definitions An array of 'term' definitions.
+     * @returns A single 'termGrouped' definition.
+     */
     _createGroupedTermDefinition(definitions) {
-        const {expression, reading, furiganaSegments, reasons, source, rawSource, sourceTerm} = definitions[0];
+        const {reasons, source, rawSource, sourceTerm, expressions: [{expression, reading, furiganaSegments}]} = definitions[0];
         const score = this._getMaxDefinitionScore(definitions);
         const dictionaryOrder = this._getBestDictionaryOrder(definitions);
         const dictionaryNames = this._getUniqueDictionaryNames(definitions);
@@ -1235,6 +1240,11 @@ class Translator {
         };
     }
 
+    /**
+     * Creates a list of term details from an array of 'term' definitions.
+     * @param definitions An array of 'term' definitions.
+     * @returns An array of term details.
+     */
     _createTermDetailsList(definitions) {
         const termInfoMap = new Map();
         for (const {expression, reading, sourceTerm, furiganaSegments, termTags} of definitions) {
