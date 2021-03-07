@@ -78,7 +78,8 @@ class Translator {
      *     enabledDictionaryMap: (Map of [
      *       (string),
      *       {
-     *         order: (number),
+     *         index: (number),
+     *         priority: (number),
      *         allowSecondarySearches: (boolean)
      *       }
      *     ])
@@ -111,7 +112,8 @@ class Translator {
      *     enabledDictionaryMap: (Map of [
      *       (string),
      *       {
-     *         order: (number)
+     *         index: (number),
+     *         priority: (number)
      *       }
      *     ])
      *   }
@@ -883,7 +885,8 @@ class Translator {
 
     _getDictionaryOrder(dictionary, enabledDictionaryMap) {
         const info = enabledDictionaryMap.get(dictionary);
-        return typeof info !== 'undefined' ? info.order : 0;
+        const {index, priority} = typeof info !== 'undefined' ? info : {index: enabledDictionaryMap.size, priority: 0};
+        return {index, priority};
     }
 
     _getTagNamesWithCategory(tags, category) {
@@ -1019,12 +1022,14 @@ class Translator {
         return result;
     }
 
-    _getMinDictionaryOrder(definitions) {
-        let result = Number.MAX_SAFE_INTEGER;
-        for (const {dictionaryOrder} of definitions) {
-            if (dictionaryOrder < result) { result = dictionaryOrder; }
+    _getBestDictionaryOrder(definitions) {
+        let index = Number.MAX_SAFE_INTEGER;
+        let priority = Number.MIN_SAFE_INTEGER;
+        for (const {dictionaryOrder: {index: index2, priority: priority2}} of definitions) {
+            if (index2 < index) { index = index2; }
+            if (priority2 > priority) { priority = priority2; }
         }
-        return result;
+        return {index, priority};
     }
 
     // Common data creation and cloning functions
@@ -1124,7 +1129,7 @@ class Translator {
     _createGroupedTermDefinition(definitions) {
         const {expression, reading, furiganaSegments, reasons, source, rawSource, sourceTerm} = definitions[0];
         const score = this._getMaxDefinitionScore(definitions);
-        const dictionaryOrder = this._getMinDictionaryOrder(definitions);
+        const dictionaryOrder = this._getBestDictionaryOrder(definitions);
         const dictionaryNames = this._getUniqueDictionaryNames(definitions);
         const termTags = this._getUniqueTermTags(definitions);
         const termDetailsList = [this._createTermDetails(sourceTerm, expression, reading, furiganaSegments, termTags)];
@@ -1157,7 +1162,7 @@ class Translator {
     }
 
     _createMergedTermDefinition(source, rawSource, definitions, expressions, readings, termDetailsList, reasons, score) {
-        const dictionaryOrder = this._getMinDictionaryOrder(definitions);
+        const dictionaryOrder = this._getBestDictionaryOrder(definitions);
         const sourceTermExactMatchCount = this._getSourceTermMatchCountSum(definitions);
         const dictionaryNames = this._getUniqueDictionaryNames(definitions);
         return {
@@ -1208,7 +1213,7 @@ class Translator {
 
         const {glossary} = definitions[0];
         const score = this._getMaxDefinitionScore(definitions);
-        const dictionaryOrder = this._getMinDictionaryOrder(definitions);
+        const dictionaryOrder = this._getBestDictionaryOrder(definitions);
         return {
             type: 'termMergedByGlossary',
             // id
@@ -1279,29 +1284,40 @@ class Translator {
         if (definitions.length <= 1) { return; }
         const stringComparer = this._stringComparer;
         const compareFunction = (v1, v2) => {
-            let i = v1.dictionaryOrder - v2.dictionaryOrder;
+            // Sort by dictionary priority
+            let i = v2.dictionaryOrder.priority - v1.dictionaryOrder.priority;
             if (i !== 0) { return i; }
 
+            // Sort by length of source term
             i = v2.source.length - v1.source.length;
             if (i !== 0) { return i; }
 
+            // Sort by the number of inflection reasons
             i = v1.reasons.length - v2.reasons.length;
             if (i !== 0) { return i; }
 
+            // Sort by how many terms exactly match the source (e.g. for exact kana prioritization)
             i = v2.sourceTermExactMatchCount - v1.sourceTermExactMatchCount;
             if (i !== 0) { return i; }
 
+            // Sort by term score
             i = v2.score - v1.score;
             if (i !== 0) { return i; }
 
+            // Sort by expression string comparison (skip if either expression is not a string, e.g. array)
             const expression1 = v1.expression;
             const expression2 = v2.expression;
-            if (typeof expression1 !== 'string' || typeof expression2 !== 'string') { return 0; } // Skip if either is not a string (array)
+            if (typeof expression1 === 'string' && typeof expression2 === 'string') {
+                i = expression2.length - expression1.length;
+                if (i !== 0) { return i; }
 
-            i = expression2.length - expression1.length;
-            if (i !== 0) { return i; }
+                i = stringComparer.compare(expression1, expression2);
+                if (i !== 0) { return i; }
+            }
 
-            return stringComparer.compare(expression1, expression2);
+            // Sort by dictionary order
+            i = v1.dictionaryOrder.index - v2.dictionaryOrder.index;
+            return i;
         };
         definitions.sort(compareFunction);
     }
@@ -1329,12 +1345,16 @@ class Translator {
 
     _sortTermDefinitionMeta(definition) {
         const compareFunction = (v1, v2) => {
-            // Sort by dictionary
-            let i = v1.dictionaryOrder - v2.dictionaryOrder;
+            // Sort by dictionary priority
+            let i = v2.dictionaryOrder.priority - v1.dictionaryOrder.priority;
             if (i !== 0) { return i; }
 
             // Sory by expression order
             i = v1.expressionIndex - v2.expressionIndex;
+            if (i !== 0) { return i; }
+
+            // Sort by dictionary order
+            i = v1.dictionaryOrder.index - v2.dictionaryOrder.index;
             if (i !== 0) { return i; }
 
             // Default order
@@ -1353,8 +1373,12 @@ class Translator {
 
     _sortKanjiDefinitionMeta(definition) {
         const compareFunction = (v1, v2) => {
-            // Sort by dictionary
-            let i = v1.dictionaryOrder - v2.dictionaryOrder;
+            // Sort by dictionary priority
+            let i = v2.dictionaryOrder.priority - v1.dictionaryOrder.priority;
+            if (i !== 0) { return i; }
+
+            // Sort by dictionary order
+            i = v1.dictionaryOrder.index - v2.dictionaryOrder.index;
             if (i !== 0) { return i; }
 
             // Default order
