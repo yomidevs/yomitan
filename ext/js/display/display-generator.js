@@ -190,11 +190,9 @@ class DisplayGenerator {
                 disambiguationContainer.dataset[attribute] = value;
             }
             for (const {expression, reading} of disambiguation) {
-                const segments = this._japaneseUtil.distributeFurigana(expression, reading);
                 const disambiguationItem = document.createElement('span');
                 disambiguationItem.className = 'tag-details-disambiguation';
-                disambiguationItem.lang = 'ja';
-                this._appendFurigana(disambiguationItem, segments, (container, text) => {
+                this._appendFurigana(disambiguationItem, expression, reading, (container, text) => {
                     container.appendChild(document.createTextNode(text));
                 });
                 disambiguationContainer.appendChild(disambiguationItem);
@@ -232,7 +230,7 @@ class DisplayGenerator {
     // Private
 
     _createTermExpression(details) {
-        const {termFrequency, furiganaSegments, expression, reading, termTags, pitches} = details;
+        const {termFrequency, expression, reading, termTags, pitches} = details;
 
         const searchQueries = [];
         if (expression) { searchQueries.push(expression); }
@@ -253,7 +251,7 @@ class DisplayGenerator {
 
         this._setTextContent(node.querySelector('.expression-reading'), reading);
 
-        this._appendFurigana(expressionContainer, furiganaSegments, this._appendKanjiLinks.bind(this));
+        this._appendFurigana(expressionContainer, expression, reading, this._appendKanjiLinks.bind(this));
         this._appendMultiple(tagContainer, this._createTag.bind(this), termTags);
         this._appendMultiple(tagContainer, this._createSearchTag.bind(this), searchQueries);
 
@@ -651,7 +649,6 @@ class DisplayGenerator {
     }
 
     _appendKanjiLinks(container, text) {
-        container.lang = 'ja';
         const jp = this._japaneseUtil;
         let part = '';
         for (const c of text) {
@@ -692,7 +689,9 @@ class DisplayGenerator {
         return count;
     }
 
-    _appendFurigana(container, segments, addText) {
+    _appendFurigana(container, expression, reading, addText) {
+        container.lang = 'ja';
+        const segments = this._japaneseUtil.distributeFurigana(expression, reading);
         for (const {text, furigana} of segments) {
             if (furigana) {
                 const ruby = document.createElement('ruby');

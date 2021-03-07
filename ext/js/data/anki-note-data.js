@@ -24,7 +24,7 @@
  * The public properties and data should be backwards compatible.
  */
 class AnkiNoteData {
-    constructor({
+    constructor(japaneseUtil, marker, {
         definition,
         resultOutputMode,
         mode,
@@ -32,7 +32,8 @@ class AnkiNoteData {
         compactTags,
         context,
         injectedMedia=null
-    }, marker) {
+    }) {
+        this._japaneseUtil = japaneseUtil;
         this._definition = definition;
         this._resultOutputMode = resultOutputMode;
         this._mode = mode;
@@ -47,6 +48,7 @@ class AnkiNoteData {
         this._uniqueReadings = null;
         this._publicContext = null;
         this._cloze = null;
+        this._furiganaSegmentsCache = null;
 
         this._prepareDefinition(definition, injectedMedia, context);
     }
@@ -236,5 +238,47 @@ class AnkiNoteData {
             enumerable: true,
             get: this._getClozeCached.bind(this)
         });
+
+        for (const definition2 of this._getAllDefinitions(definition)) {
+            if (definition2.type === 'term') {
+                this._defineFuriganaSegments(definition2);
+            }
+            for (const expression of definition2.expressions) {
+                this._defineFuriganaSegments(expression);
+            }
+        }
+    }
+
+    _defineFuriganaSegments(object) {
+        Object.defineProperty(object, 'furiganaSegments', {
+            configurable: true,
+            enumerable: true,
+            get: this._getFuriganaSegments.bind(this, object)
+        });
+    }
+
+    _getFuriganaSegments(object) {
+        if (this._furiganaSegmentsCache !== null) {
+            const cachedResult = this._furiganaSegmentsCache.get(object);
+            if (typeof cachedResult !== 'undefined') { return cachedResult; }
+        } else {
+            this._furiganaSegmentsCache = new Map();
+        }
+
+        const {expression, reading} = object;
+        const result = this._japaneseUtil.distributeFurigana(expression, reading);
+        this._furiganaSegmentsCache.set(object, result);
+        return result;
+    }
+
+    _getAllDefinitions(definition) {
+        const definitions = [definition];
+        for (let i = 0; i < definitions.length; ++i) {
+            const childDefinitions = definitions[i].definitions;
+            if (Array.isArray(childDefinitions)) {
+                definitions.push(...childDefinitions);
+            }
+        }
+        return definitions;
     }
 }
