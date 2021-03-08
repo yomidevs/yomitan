@@ -245,6 +245,7 @@ class AnkiNoteData {
             }
             for (const expression of definition2.expressions) {
                 this._defineFuriganaSegments(expression);
+                this._defineTermFrequency(expression);
             }
         }
     }
@@ -254,6 +255,14 @@ class AnkiNoteData {
             configurable: true,
             enumerable: true,
             get: this._getFuriganaSegments.bind(this, object)
+        });
+    }
+
+    _defineTermFrequency(object) {
+        Object.defineProperty(object, 'termFrequency', {
+            configurable: true,
+            enumerable: true,
+            get: this._getTermFrequency.bind(this, object)
         });
     }
 
@@ -269,6 +278,11 @@ class AnkiNoteData {
         const result = this._japaneseUtil.distributeFurigana(expression, reading);
         this._furiganaSegmentsCache.set(object, result);
         return result;
+    }
+
+    _getTermFrequency(object) {
+        const {termTags} = object;
+        return DictionaryDataUtil.getTermFrequency(termTags);
     }
 
     _getAllDefinitions(definition) {

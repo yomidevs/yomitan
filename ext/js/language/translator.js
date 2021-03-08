@@ -1271,13 +1271,11 @@ class Translator {
     }
 
     _createTermDetails(sourceTerm, expression, reading, termTags) {
-        const termFrequency = this._scoreToTermFrequency(this._getTermTagsScoreSum(termTags));
         return {
             sourceTerm,
             expression,
             reading,
             termTags,
-            termFrequency,
             frequencies: [],
             pitches: []
         };

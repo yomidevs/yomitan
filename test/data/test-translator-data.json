@@ -348,7 +348,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -518,7 +517,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -700,7 +698,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -870,7 +867,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -1040,7 +1036,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -1210,7 +1205,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -1380,7 +1374,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -1550,7 +1543,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -1732,7 +1724,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -1946,7 +1937,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -2160,7 +2150,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -2374,7 +2363,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -2590,7 +2578,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -2762,7 +2749,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -2934,7 +2920,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -3106,7 +3091,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -3276,7 +3260,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -3446,7 +3429,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -3628,7 +3610,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -3765,7 +3746,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -3947,7 +3927,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -4129,7 +4108,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -4299,7 +4277,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -4481,7 +4458,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -4651,7 +4627,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -4833,7 +4808,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -5047,7 +5021,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -5263,7 +5236,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -5435,7 +5407,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -5617,7 +5588,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -5831,7 +5801,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -6047,7 +6016,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -6219,7 +6187,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -6401,7 +6368,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -6560,7 +6526,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -6676,7 +6641,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -6792,7 +6756,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -6908,7 +6871,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -7026,7 +6988,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -7144,7 +7105,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -7262,7 +7222,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -7380,7 +7339,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -7496,7 +7454,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -7612,7 +7569,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -7755,7 +7711,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -7911,7 +7866,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -8125,7 +8079,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -8390,7 +8343,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -8528,7 +8480,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -8742,7 +8693,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -9009,7 +8959,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -9127,7 +9076,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -9299,7 +9247,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -9500,7 +9447,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -9618,7 +9564,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -9790,7 +9735,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -9989,7 +9933,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -10105,7 +10048,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -10304,7 +10246,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -10420,7 +10361,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -10653,7 +10593,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -10739,7 +10678,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -10848,7 +10786,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -10981,7 +10918,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -11252,7 +11188,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -11385,7 +11320,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -11656,7 +11590,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -11789,7 +11722,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -12060,7 +11992,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -12193,7 +12124,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -12568,7 +12498,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -12632,7 +12561,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -12719,7 +12647,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -12832,7 +12759,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -13037,7 +12963,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -13150,7 +13075,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -13355,7 +13279,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -13468,7 +13391,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -13673,7 +13595,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -13786,7 +13707,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -14049,7 +13969,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -14136,7 +14055,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -14247,7 +14165,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -14482,7 +14399,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -14569,7 +14485,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -14680,7 +14595,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -14931,7 +14845,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -15149,7 +15062,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -15367,7 +15279,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -15585,7 +15496,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -15801,7 +15711,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -15973,7 +15882,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -16145,7 +16053,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -16317,7 +16224,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -16487,7 +16393,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -16657,7 +16562,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -16854,7 +16758,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -17068,7 +16971,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -17282,7 +17184,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -17496,7 +17397,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -17712,7 +17612,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -17884,7 +17783,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -18056,7 +17954,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -18228,7 +18125,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -18398,7 +18294,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -18568,7 +18463,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -18765,7 +18659,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -18979,7 +18872,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -19193,7 +19085,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -19407,7 +19298,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -19623,7 +19513,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -19795,7 +19684,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -19967,7 +19855,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -20139,7 +20026,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -20309,7 +20195,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -20479,7 +20364,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -20660,7 +20544,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -20747,7 +20630,6 @@
                                 "expression": "強み",
                                 "reading": "つよみ",
                                 "termTags": [],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -20836,7 +20718,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [],
                                 "pitches": []
                             }
@@ -20955,7 +20836,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -21041,7 +20921,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -21150,7 +21029,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -21283,7 +21161,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -21554,7 +21431,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -21687,7 +21563,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -21958,7 +21833,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -22091,7 +21965,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -22362,7 +22235,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -22495,7 +22367,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -22870,7 +22741,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -22934,7 +22804,6 @@
                                         "redundant": false
                                     }
                                 ],
-                                "termFrequency": "normal",
                                 "frequencies": [
                                     {
                                         "index": 0,
@@ -23021,7 +22890,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -23134,7 +23002,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -23339,7 +23206,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -23450,7 +23316,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -23655,7 +23520,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -23768,7 +23632,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,
@@ -23973,7 +23836,6 @@
                                                 "redundant": false
                                             }
                                         ],
-                                        "termFrequency": "normal",
                                         "frequencies": [
                                             {
                                                 "index": 0,
@@ -24084,7 +23946,6 @@
                                                         "redundant": false
                                                     }
                                                 ],
-                                                "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
                                                         "index": 0,

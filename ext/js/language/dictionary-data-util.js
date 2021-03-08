@@ -143,6 +143,20 @@ class DictionaryDataUtil {
         return results2;
     }
 
+    static getTermFrequency(termTags) {
+        let totalScore = 0;
+        for (const {score} of termTags) {
+            totalScore += score;
+        }
+        if (totalScore > 0) {
+            return 'popular';
+        } else if (totalScore < 0) {
+            return 'rare';
+        } else {
+            return 'normal';
+        }
+    }
+
     // Private
 
     static _createFrequencyGroupsFromMap(map) {

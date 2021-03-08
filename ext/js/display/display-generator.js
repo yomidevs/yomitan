@@ -230,7 +230,7 @@ class DisplayGenerator {
     // Private
 
     _createTermExpression(details) {
-        const {termFrequency, expression, reading, termTags, pitches} = details;
+        const {expression, reading, termTags, pitches} = details;
 
         const searchQueries = [];
         if (expression) { searchQueries.push(expression); }
@@ -242,7 +242,7 @@ class DisplayGenerator {
         const tagContainer = node.querySelector('.expression-tag-list');
 
         node.dataset.readingIsSame = `${reading === expression}`;
-        node.dataset.frequency = termFrequency;
+        node.dataset.frequency = DictionaryDataUtil.getTermFrequency(termTags);
 
         const pitchAccentCategories = this._getPitchAccentCategories(pitches);
         if (pitchAccentCategories !== null) {
