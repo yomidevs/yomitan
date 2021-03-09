@@ -17,6 +17,7 @@
 
 /* global
  * Deinflector
+ * RegexUtil
  * TextSourceMap
  */
 
@@ -534,24 +535,6 @@ class Translator {
         );
     }
 
-    _removeUsedDefinitions(definitions, termInfoMap, usedDefinitions) {
-        for (let i = 0, ii = definitions.length; i < ii; ++i) {
-            const definition = definitions[i];
-            const {expression, reading} = definition;
-            const expressionMap = termInfoMap.get(expression);
-            if (
-                typeof expressionMap !== 'undefined' &&
-                typeof expressionMap.get(reading) !== 'undefined'
-            ) {
-                usedDefinitions.add(definition);
-            } else {
-                definitions.splice(i, 1);
-                --i;
-                --ii;
-            }
-        }
-    }
-
     _getUniqueDefinitionTags(definitions) {
         const definitionTagsMap = new Map();
         for (const {definitionTags} of definitions) {
@@ -794,16 +777,6 @@ class Translator {
 
     // Simple helpers
 
-    _scoreToTermFrequency(score) {
-        if (score > 0) {
-            return 'popular';
-        } else if (score < 0) {
-            return 'rare';
-        } else {
-            return 'normal';
-        }
-    }
-
     _getNameBase(name) {
         const pos = name.indexOf(':');
         return (pos >= 0 ? name.substring(0, pos) : name);
@@ -973,14 +946,6 @@ class Translator {
     }
 
     // Reduction functions
-
-    _getTermTagsScoreSum(termTags) {
-        let result = 0;
-        for (const {score} of termTags) {
-            result += score;
-        }
-        return result;
-    }
 
     _getSourceTermMatchCountSum(definitions) {
         let result = 0;
@@ -1408,59 +1373,8 @@ class Translator {
 
     _applyTextReplacements(text, sourceMap, replacements) {
         for (const {pattern, replacement} of replacements) {
-            text = this._applyTextReplacement(text, sourceMap, pattern, replacement);
+            text = RegexUtil.applyTextReplacement(text, sourceMap, pattern, replacement);
         }
         return text;
-    }
-
-    _applyTextReplacement(text, sourceMap, pattern, replacement) {
-        const isGlobal = pattern.global;
-        if (isGlobal) { pattern.lastIndex = 0; }
-        for (let loop = true; loop; loop = isGlobal) {
-            const match = pattern.exec(text);
-            if (match === null) { break; }
-
-            const matchText = match[0];
-            const index = match.index;
-            const actualReplacement = this._applyMatchReplacement(replacement, match);
-            const actualReplacementLength = actualReplacement.length;
-            const delta = actualReplacementLength - (matchText.length > 0 ? matchText.length : -1);
-
-            text = `${text.substring(0, index)}${actualReplacement}${text.substring(index + matchText.length)}`;
-            pattern.lastIndex += delta;
-
-            if (actualReplacementLength > 0) {
-                sourceMap.insert(index, ...(new Array(actualReplacementLength).fill(0)));
-                sourceMap.combine(index - 1 + actualReplacementLength, matchText.length);
-            } else {
-                sourceMap.combine(index, matchText.length);
-            }
-        }
-        return text;
-    }
-
-    _applyMatchReplacement(replacement, match) {
-        const pattern = /\$(?:\$|&|`|'|(\d\d?)|<([^>]*)>)/g;
-        return replacement.replace(pattern, (g0, g1, g2) => {
-            if (typeof g1 !== 'undefined') {
-                const matchIndex = Number.parseInt(g1, 10);
-                if (matchIndex >= 1 && matchIndex <= match.length) {
-                    return match[matchIndex];
-                }
-            } else if (typeof g2 !== 'undefined') {
-                const {groups} = match;
-                if (typeof groups === 'object' && groups !== null && Object.prototype.hasOwnProperty.call(groups, g2)) {
-                    return groups[g2];
-                }
-            } else {
-                switch (g0) {
-                    case '$': return '$';
-                    case '&': return match[0];
-                    case '`': return replacement.substring(0, match.index);
-                    case '\'': return replacement.substring(match.index + g0.length);
-                }
-            }
-            return g0;
-        });
     }
 }

@@ -36,6 +36,7 @@ self.importScripts(
     '/js/dom/simple-dom-parser.js',
     '/js/general/cache-map.js',
     '/js/general/object-property-accessor.js',
+    '/js/general/regex-util.js',
     '/js/general/text-source-map.js',
     '/js/language/deinflector.js',
     '/js/language/dictionary-data-util.js',
