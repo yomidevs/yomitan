@@ -718,7 +718,7 @@ button.action-button[data-icon=source-term]::before {
     border: none;
     border-right: none;
     font-size: 1em;
-    height: var(--tag-height);
+    min-height: var(--tag-height);
     margin: calc(1em / var(--font-size-no-units)) 0.375em calc(1em / var(--font-size-no-units)) 0;
 }
 .tag-label {
@@ -1201,6 +1201,7 @@ button.action-button[data-icon=source-term]::before {
 :root[data-frequency-display-mode=split-tags] .frequency-group-tag {
     margin: 0;
     display: inline;
+    min-height: auto;
 }
 :root[data-frequency-display-mode=tags] .frequency-group-tag>.tag-label,
 :root[data-frequency-display-mode=split-tags] .frequency-group-tag>.tag-label {
@@ -1225,6 +1226,7 @@ button.action-button[data-icon=source-term]::before {
 :root[data-frequency-display-mode=split-tags-grouped] .frequency-tag {
     margin: 0;
     display: inline;
+    min-height: auto;
 }
 :root[data-frequency-display-mode=list] .frequency-tag>.tag-label,
 :root[data-frequency-display-mode=inline-list] .frequency-tag>.tag-label,
@@ -1314,6 +1316,7 @@ button.action-button[data-icon=source-term]::before {
 }
 :root[data-frequency-display-mode=list] .frequency-group-tag {
     display: block;
+    min-height: auto;
 }
 :root[data-frequency-display-mode=list] .frequency-group-tag>.tag-label {
     display: inline-flex;
