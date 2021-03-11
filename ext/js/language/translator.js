@@ -519,7 +519,7 @@ class Translator {
             );
             glossaryDefinitions.push(glossaryDefinition);
         }
-        this._sortDefinitions(glossaryDefinitions);
+        this._sortDefinitions(glossaryDefinitions, false);
 
         const termDetailsList = this._createTermDetailsList(allDefinitions);
 
@@ -594,7 +594,7 @@ class Translator {
 
         const results = [];
         for (const groupDefinitions of groups.values()) {
-            this._sortDefinitions(groupDefinitions);
+            this._sortDefinitions(groupDefinitions, false);
             const definition = this._createGroupedTermDefinition(groupDefinitions);
             results.push(definition);
         }
@@ -1259,21 +1259,24 @@ class Translator {
         });
     }
 
-    _sortDefinitions(definitions) {
+    _sortDefinitions(definitions, topLevel=true) {
         if (definitions.length <= 1) { return; }
         const stringComparer = this._stringComparer;
         const compareFunction = (v1, v2) => {
-            // Sort by length of source term
-            let i = v2.source.length - v1.source.length;
-            if (i !== 0) { return i; }
+            let i;
+            if (topLevel) {
+                // Sort by length of source term
+                i = v2.source.length - v1.source.length;
+                if (i !== 0) { return i; }
 
-            // Sort by the number of inflection reasons
-            i = v1.reasons.length - v2.reasons.length;
-            if (i !== 0) { return i; }
+                // Sort by the number of inflection reasons
+                i = v1.reasons.length - v2.reasons.length;
+                if (i !== 0) { return i; }
 
-            // Sort by how many terms exactly match the source (e.g. for exact kana prioritization)
-            i = v2.sourceTermExactMatchCount - v1.sourceTermExactMatchCount;
-            if (i !== 0) { return i; }
+                // Sort by how many terms exactly match the source (e.g. for exact kana prioritization)
+                i = v2.sourceTermExactMatchCount - v1.sourceTermExactMatchCount;
+                if (i !== 0) { return i; }
+            }
 
             // Sort by dictionary priority
             i = v2.dictionaryOrder.priority - v1.dictionaryOrder.priority;
