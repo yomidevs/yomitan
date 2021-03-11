@@ -578,7 +578,7 @@ class DocumentUtil {
                     startContinerPre = startContainer;
                 }
 
-                previousStyles = new Map();
+                if (previousStyles === null) { previousStyles = new Map(); }
                 i = this._disableTransparentElement(elements, i, previousStyles);
                 if (i < 0) {
                     return null;
