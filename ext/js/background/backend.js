@@ -180,9 +180,11 @@ class Backend {
         const onMessage = this._onMessageWrapper.bind(this);
         chrome.runtime.onMessage.addListener(onMessage);
 
-        const onPermissionsChanged = this._onWebExtensionEventWrapper(this._onPermissionsChanged.bind(this));
-        chrome.permissions.onAdded.addListener(onPermissionsChanged);
-        chrome.permissions.onRemoved.addListener(onPermissionsChanged);
+        if (this._canObservePermissionsChanges()) {
+            const onPermissionsChanged = this._onWebExtensionEventWrapper(this._onPermissionsChanged.bind(this));
+            chrome.permissions.onAdded.addListener(onPermissionsChanged);
+            chrome.permissions.onRemoved.addListener(onPermissionsChanged);
+        }
     }
 
     async _prepareInternal() {
@@ -2088,7 +2090,12 @@ class Backend {
         this._updateBadge();
     }
 
+    _canObservePermissionsChanges() {
+        return isObject(chrome.permissions) && isObject(chrome.permissions.onAdded) && isObject(chrome.permissions.onRemoved);
+    }
+
     _hasRequiredPermissionsForSettings(options) {
+        if (!this._canObservePermissionsChanges()) { return true; }
         return this._permissions === null || this._permissionsUtil.hasRequiredPermissionsForOptions(this._permissions, options);
     }
 }
