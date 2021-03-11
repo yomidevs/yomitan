@@ -729,16 +729,26 @@ function testDistributeFuriganaInflected() {
             ['美味しい', 'おいしい', '美味しかた'],
             [
                 {text: '美味', furigana: 'おい'},
-                {text: 'し', furigana: ''},
-                {text: 'かた', furigana: ''}
+                {text: 'しかた', furigana: ''}
             ]
         ],
         [
             ['食べる', 'たべる', '食べた'],
             [
                 {text: '食', furigana: 'た'},
-                {text: 'べ', furigana: ''},
-                {text: 'た', furigana: ''}
+                {text: 'べた', furigana: ''}
+            ]
+        ],
+        [
+            ['迄に', 'までに', 'までに'],
+            [
+                {text: 'までに', furigana: ''}
+            ]
+        ],
+        [
+            ['行う', 'おこなう', 'おこなわなかった'],
+            [
+                {text: 'おこなわなかった', furigana: ''}
             ]
         ]
     ];
