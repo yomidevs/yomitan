@@ -466,27 +466,55 @@ const JapaneseUtil = (() => {
         }
 
         distributeFuriganaInflected(expression, reading, source) {
-            let stemLength = 0;
-            const shortest = Math.min(source.length, expression.length);
-            const sourceHiragana = this.convertKatakanaToHiragana(source);
-            const expressionHiragana = this.convertKatakanaToHiragana(expression);
-            while (stemLength < shortest && sourceHiragana[stemLength] === expressionHiragana[stemLength]) {
-                ++stemLength;
-            }
-            const offset = source.length - stemLength;
+            const expressionNormalized = this.convertKatakanaToHiragana(expression);
+            const readingNormalized = this.convertKatakanaToHiragana(reading);
+            const sourceNormalized = this.convertKatakanaToHiragana(source);
 
-            const stemExpression = source.substring(0, source.length - offset);
-            const stemReading = reading.substring(
-                0,
-                offset === 0 ? reading.length : reading.length - expression.length + stemLength
-            );
-            const result = this.distributeFurigana(stemExpression, stemReading);
+            let mainText = expression;
+            let stemLength = this._getStemLength(expressionNormalized, sourceNormalized);
 
-            if (stemLength !== source.length) {
-                result.push(this._createFuriganaSegment(source.substring(stemLength), ''));
+            // Check if source is derived from the reading instead of the expression
+            const readingStemLength = this._getStemLength(readingNormalized, sourceNormalized);
+            if (readingStemLength > stemLength) {
+                mainText = reading;
+                stemLength = readingStemLength;
             }
 
-            return result;
+            const segments = [];
+            if (stemLength > 0) {
+                const segments2 = this.distributeFurigana(mainText, reading);
+                let consumed = 0;
+                for (const segment of segments2) {
+                    const {text} = segment;
+                    const start = consumed;
+                    consumed += text.length;
+                    if (consumed < stemLength) {
+                        segments.push(segment);
+                    } else if (consumed === stemLength) {
+                        segments.push(segment);
+                        break;
+                    } else {
+                        if (start < stemLength) {
+                            segments.push(this._createFuriganaSegment(mainText.substring(start, stemLength), ''));
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (stemLength < source.length) {
+                const remainder = source.substring(stemLength);
+                const segmentCount = segments.length;
+                if (segmentCount > 0 && segments[segmentCount - 1].furigana.length === 0) {
+                    // Append to the last segment if it has an empty reading
+                    segments[segmentCount - 1].text += remainder;
+                } else {
+                    // Otherwise, create a new segment
+                    segments.push(this._createFuriganaSegment(remainder, ''));
+                }
+            }
+
+            return segments;
         }
 
         // Miscellaneous
@@ -647,6 +675,27 @@ const JapaneseUtil = (() => {
             }
 
             return result;
+        }
+
+        _getStemLength(text1, text2) {
+            const minLength = Math.min(text1.length, text2.length);
+            if (minLength === 0) { return 0; }
+
+            let i = 0;
+            while (true) {
+                const char1 = text1.codePointAt(i);
+                const char2 = text2.codePointAt(i);
+                if (char1 !== char2) { break; }
+                const charLength = String.fromCodePoint(char1).length;
+                i += charLength;
+                if (i >= minLength) {
+                    if (i > minLength) {
+                        i -= charLength; // Don't consume partial UTF16 surrogate characters
+                    }
+                    break;
+                }
+            }
+            return i;
         }
     }
 
