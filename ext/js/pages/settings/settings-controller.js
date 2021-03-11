@@ -51,8 +51,10 @@ class SettingsController extends EventDispatcher {
 
     prepare() {
         yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
-        chrome.permissions.onAdded.addListener(this._onPermissionsChanged.bind(this));
-        chrome.permissions.onRemoved.addListener(this._onPermissionsChanged.bind(this));
+        if (this._canObservePermissionsChanges()) {
+            chrome.permissions.onAdded.addListener(this._onPermissionsChanged.bind(this));
+            chrome.permissions.onRemoved.addListener(this._onPermissionsChanged.bind(this));
+        }
     }
 
     async refresh() {
@@ -205,5 +207,9 @@ class SettingsController extends EventDispatcher {
 
         const permissions = await this._permissionsUtil.getAllPermissions();
         this.trigger(event, {permissions});
+    }
+
+    _canObservePermissionsChanges() {
+        return isObject(chrome.permissions) && isObject(chrome.permissions.onAdded) && isObject(chrome.permissions.onRemoved);
     }
 }
