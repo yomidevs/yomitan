@@ -294,9 +294,14 @@ class DictionaryDatabase {
         return this._findGenericBulk('kanjiMeta', 'character', kanjiList, dictionaries, this._createKanjiMeta.bind(this));
     }
 
+    findTagMetaBulk(items) {
+        const predicate = (row, item) => (row.dictionary === item.dictionary);
+        return this._findFirstBulk('tagMeta', 'name', items, predicate, this._createTagMeta.bind(this));
+    }
+
     findTagForTitle(name, title) {
         const query = IDBKeyRange.only(name);
-        return this._db.find('tagMeta', 'name', query, (row) => (row.dictionary === title), null);
+        return this._db.find('tagMeta', 'name', query, (row) => (row.dictionary === title), null, null);
     }
 
     getMedia(targets) {
@@ -393,7 +398,7 @@ class DictionaryDatabase {
 
     async dictionaryExists(title) {
         const query = IDBKeyRange.only(title);
-        const result = await this._db.find('dictionaries', 'title', query);
+        const result = await this._db.find('dictionaries', 'title', query, null, null, void 0);
         return typeof result !== 'undefined';
     }
 
@@ -437,6 +442,36 @@ class DictionaryDatabase {
         });
     }
 
+    _findFirstBulk(objectStoreName, indexName, items, predicate, createResult) {
+        return new Promise((resolve, reject) => {
+            const count = items.length;
+            const results = new Array(count);
+            if (count === 0) {
+                resolve(results);
+                return;
+            }
+
+            const transaction = this._db.transaction([objectStoreName], 'readonly');
+            const terms = transaction.objectStore(objectStoreName);
+            const index = terms.index(indexName);
+
+            let completeCount = 0;
+            for (let i = 0; i < count; ++i) {
+                const itemIndex = i;
+                const item = items[i];
+                const query = IDBKeyRange.only(item.query);
+
+                const onFind = (row) => {
+                    results[itemIndex] = createResult(row, itemIndex);
+                    if (++completeCount >= count) {
+                        resolve(results);
+                    }
+                };
+                this._db.findFirst(index, query, onFind, reject, predicate, item, void 0);
+            }
+        });
+    }
+
     _createTerm(row, index) {
         return {
             index,
@@ -464,6 +499,10 @@ class DictionaryDatabase {
             stats: row.stats,
             dictionary: row.dictionary
         };
+    }
+
+    _createTagMeta(row, index) {
+        return {row, index};
     }
 
     _createTermMeta({expression, mode, data, dictionary}, index) {

@@ -111,27 +111,32 @@ class Database {
         }
     }
 
-    find(objectStoreName, indexName, query, predicate=null, defaultValue) {
+    find(objectStoreName, indexName, query, predicate, predicateArg, defaultValue) {
         return new Promise((resolve, reject) => {
             const transaction = this.transaction([objectStoreName], 'readonly');
             const objectStore = transaction.objectStore(objectStoreName);
             const objectStoreOrIndex = indexName !== null ? objectStore.index(indexName) : objectStore;
-            const request = objectStoreOrIndex.openCursor(query, 'next');
-            request.onerror = (e) => reject(e.target.error);
-            request.onsuccess = (e) => {
-                const cursor = e.target.result;
-                if (cursor) {
-                    const value = cursor.value;
-                    if (typeof predicate !== 'function' || predicate(value)) {
-                        resolve(value);
-                    } else {
-                        cursor.continue();
-                    }
-                } else {
-                    resolve(defaultValue);
-                }
-            };
+            this.findFirst(objectStoreOrIndex, query, resolve, reject, predicate, predicateArg, defaultValue);
         });
+    }
+
+    findFirst(objectStoreOrIndex, query, resolve, reject, predicate, predicateArg, defaultValue) {
+        const noPredicate = (typeof predicate !== 'function');
+        const request = objectStoreOrIndex.openCursor(query, 'next');
+        request.onerror = (e) => reject(e.target.error);
+        request.onsuccess = (e) => {
+            const cursor = e.target.result;
+            if (cursor) {
+                const {value} = cursor;
+                if (noPredicate || predicate(value, predicateArg)) {
+                    resolve(value);
+                } else {
+                    cursor.continue();
+                }
+            } else {
+                resolve(defaultValue);
+            }
+        };
     }
 
     bulkCount(targets, resolve, reject) {
