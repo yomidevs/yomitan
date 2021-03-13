@@ -1171,7 +1171,6 @@ button.fab-button>.icon-button-inner>.icon {
     -moz-appearance: none;
     -webkit-appearance: none;
 }
-/* TODO : Need focus/hover styles */
 .tab-inner {
     display: flex;
     flex-flow: row nowrap;
