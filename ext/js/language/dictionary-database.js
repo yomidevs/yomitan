@@ -296,7 +296,7 @@ class DictionaryDatabase {
 
     findTagMetaBulk(items) {
         const predicate = (row, item) => (row.dictionary === item.dictionary);
-        return this._findFirstBulk('tagMeta', 'name', items, predicate, this._createTagMeta.bind(this));
+        return this._findFirstBulk('tagMeta', 'name', items, predicate);
     }
 
     findTagForTitle(name, title) {
@@ -442,7 +442,7 @@ class DictionaryDatabase {
         });
     }
 
-    _findFirstBulk(objectStoreName, indexName, items, predicate, createResult) {
+    _findFirstBulk(objectStoreName, indexName, items, predicate) {
         return new Promise((resolve, reject) => {
             const count = items.length;
             const results = new Array(count);
@@ -462,7 +462,7 @@ class DictionaryDatabase {
                 const query = IDBKeyRange.only(item.query);
 
                 const onFind = (row) => {
-                    results[itemIndex] = createResult(row, itemIndex);
+                    results[itemIndex] = row;
                     if (++completeCount >= count) {
                         resolve(results);
                     }
@@ -499,10 +499,6 @@ class DictionaryDatabase {
             stats: row.stats,
             dictionary: row.dictionary
         };
-    }
-
-    _createTagMeta(row, index) {
-        return {row, index};
     }
 
     _createTermMeta({expression, mode, data, dictionary}, index) {
