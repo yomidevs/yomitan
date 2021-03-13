@@ -21,7 +21,8 @@
     --entry-horizontal-padding: 0;
 
     --padding: calc(10em / var(--font-size-no-units));
-    --main-content-size: calc(700em / var(--font-size-no-units));
+    --content-width-search: 700;
+    --content-width: calc(1em * var(--content-width-search) / var(--font-size-no-units));
 
     --background-color: #ffffff;
     --separator-color1: #cccccc;

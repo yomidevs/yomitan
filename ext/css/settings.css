@@ -19,7 +19,7 @@
 :root {
     --padding: 10px;
     --padding-negative: calc(var(--padding) * -1);
-    --main-content-size: 700px;
+    --content-width: 700px;
     --main-content-padding: 10px;
     --sidebar-size: 200px;
     --preview-sidebar-expanded-width: 400px;
@@ -263,9 +263,9 @@ a.heading-link-light {
 }
 .content-center {
     flex: 1 1 auto;
-    width: var(--main-content-size);
+    width: var(--content-width);
     padding: 0 var(--main-content-padding);
-    max-width: var(--main-content-size);
+    max-width: var(--content-width);
     box-sizing: border-box;
 }
 .content-right {
@@ -750,7 +750,7 @@ select.short-height {
     max-height: 100%;
 }
 .modal-content.modal-content-full {
-    width: var(--main-content-size);
+    width: var(--content-width);
     height: 100%;
     transform: translate(0, 0);
     border-radius: 0;
@@ -845,7 +845,7 @@ select.short-height {
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-columns: 1fr minmax(auto, var(--main-content-size)) 1fr;
+    grid-template-columns: 1fr minmax(auto, var(--content-width)) 1fr;
     grid-template-rows: auto;
     align-items: stretch;
 }
@@ -963,7 +963,7 @@ button.icon-button.modal-header-button>.icon-button-inner>.icon {
     visibility: hidden;
 }
 .status-footer {
-    max-width: var(--main-content-size);
+    max-width: var(--content-width);
     max-height: 100%;
     width: 100%;
     pointer-events: auto;
@@ -1032,9 +1032,9 @@ button.icon-button.modal-header-button>.icon-button-inner>.icon {
 }
 .fab-container-center {
     flex: 1 1 auto;
-    width: var(--main-content-size);
+    width: var(--content-width);
     padding: 0 var(--main-content-padding);
-    max-width: var(--main-content-size);
+    max-width: var(--content-width);
     box-sizing: border-box;
     display: flex;
     justify-content: flex-end;

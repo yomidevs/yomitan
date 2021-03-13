@@ -55,7 +55,7 @@
     --action-button-padding: 0.3em;
 
     --list-margin: 0.72em;
-    --main-content-size: 100%;
+    --content-width: 100%;
     --main-content-vertical-padding: 0em;
     --main-content-horizontal-padding: 0em;
     --entry-horizontal-padding: 0.72em;
@@ -397,7 +397,7 @@ a {
     position: relative;
 }
 .content-body-inner {
-    width: var(--main-content-size);
+    width: var(--content-width);
     max-width: 100%;
     box-sizing: border-box;
     margin: 0 auto;
@@ -422,7 +422,7 @@ a {
     max-width: 100%;
 }
 .content-footer {
-    width: var(--main-content-size);
+    width: var(--content-width);
     max-width: 100%;
 }
 
@@ -1843,7 +1843,7 @@ button.footer-notification-close-button {
     left: 0;
     top: 0;
     bottom: 0;
-    width: var(--main-content-size);
+    width: var(--content-width);
     max-width: 100%;
     box-sizing: border-box;
     margin: 0 auto;
