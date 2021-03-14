@@ -76,6 +76,13 @@ class Image {
     }
 }
 
+class Blob {
+    constructor(array, options) {
+        this._array = array;
+        this._options = options;
+    }
+}
+
 async function fetch(url2) {
     const filePath = url.fileURLToPath(url2);
     await Promise.resolve();
@@ -89,15 +96,21 @@ async function fetch(url2) {
     };
 }
 
+function atob(data) {
+    return Buffer.from(data, 'base64').toString('ascii');
+}
+
 class DatabaseVM extends VM {
     constructor() {
         super({
             chrome,
             Image,
+            Blob,
             fetch,
             indexedDB: global.indexedDB,
             IDBKeyRange: global.IDBKeyRange,
-            JSZip
+            JSZip,
+            atob
         });
         this.context.window = this.context;
         this.indexedDB = global.indexedDB;

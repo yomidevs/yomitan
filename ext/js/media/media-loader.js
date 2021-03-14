@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * MediaUtil
+ */
+
 class MediaLoader {
     constructor() {
         this._token = {};
@@ -82,22 +86,11 @@ class MediaLoader {
         const token = this._token;
         const data = (await yomichan.api.getMedia([{path, dictionaryName}]))[0];
         if (token === this._token && data !== null) {
-            const contentArrayBuffer = this._base64ToArrayBuffer(data.content);
-            const blob = new Blob([contentArrayBuffer], {type: data.mediaType});
+            const blob = MediaUtil.createBlobFromBase64Content(data.content, data.mediaType);
             const url = URL.createObjectURL(blob);
             cachedData.data = data;
             cachedData.url = url;
         }
         return cachedData;
-    }
-
-    _base64ToArrayBuffer(content) {
-        const binaryContent = window.atob(content);
-        const length = binaryContent.length;
-        const array = new Uint8Array(length);
-        for (let i = 0; i < length; ++i) {
-            array[i] = binaryContent.charCodeAt(i);
-        }
-        return array.buffer;
     }
 }

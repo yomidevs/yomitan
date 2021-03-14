@@ -114,7 +114,7 @@
             "popup.html",
             "template-renderer.html"
         ],
-        "content_security_policy": "default-src 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
+        "content_security_policy": "default-src 'self'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
     },
     "variants": [
         {
@@ -194,7 +194,7 @@
                 {
                     "action": "set",
                     "path": ["content_security_policy"],
-                    "value": "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
+                    "value": "default-src 'self'; script-src 'self' 'unsafe-eval'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
                 },
                 {
                     "action": "set",

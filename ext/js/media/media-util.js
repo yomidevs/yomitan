@@ -129,4 +129,20 @@ class MediaUtil {
                 return null;
         }
     }
+
+    /**
+     * Creates a new `Blob` object from a base64 string of content.
+     * @param content The binary content string encoded in base64.
+     * @param mediaType The type of the media.
+     * @returns A new `Blob` object corresponding to the specified content.
+     */
+    static createBlobFromBase64Content(content, mediaType) {
+        const binaryContent = atob(content);
+        const length = binaryContent.length;
+        const array = new Uint8Array(length);
+        for (let i = 0; i < length; ++i) {
+            array[i] = binaryContent.charCodeAt(i);
+        }
+        return new Blob([array.buffer], {type: mediaType});
+    }
 }

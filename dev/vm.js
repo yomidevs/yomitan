@@ -19,6 +19,7 @@ const fs = require('fs');
 const vm = require('vm');
 const path = require('path');
 const assert = require('assert');
+const crypto = require('crypto');
 
 
 function getContextEnvironmentRecords(context, names) {
@@ -115,9 +116,9 @@ function deepStrictEqual(actual, expected) {
 }
 
 
-function createURLClass() {
+function createURLClass(urlMap) {
     const BaseURL = URL;
-    return function URL(url) {
+    const result = function URL(url) {
         const u = new BaseURL(url);
         this.hash = u.hash;
         this.host = u.host;
@@ -132,12 +133,23 @@ function createURLClass() {
         this.searchParams = u.searchParams;
         this.username = u.username;
     };
+    result.createObjectURL = (object) => {
+        const id = crypto.randomBytes(16).toString('hex');
+        const url = `blob:${id}`;
+        urlMap.set(url, object);
+        return url;
+    };
+    result.revokeObjectURL = (url) => {
+        urlMap.delete(url);
+    };
+    return result;
 }
 
 
 class VM {
     constructor(context={}) {
-        context.URL = createURLClass();
+        this._urlMap = new Map();
+        context.URL = createURLClass(this._urlMap);
         this._context = vm.createContext(context);
         this._assert = {
             deepStrictEqual
@@ -185,6 +197,10 @@ class VM {
         }
 
         return single ? results[0] : results;
+    }
+
+    getUrlObject(url) {
+        return this._urlMap.get(url);
     }
 }
 

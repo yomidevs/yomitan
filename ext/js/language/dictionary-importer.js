@@ -400,7 +400,9 @@ class DictionaryImporter {
                 eventListeners.removeAllEventListeners();
                 reject(new Error('Image failed to load'));
             }, false);
-            image.src = `data:${mediaType};base64,${content}`;
+            const blob = MediaUtil.createBlobFromBase64Content(content, mediaType);
+            const url = URL.createObjectURL(blob);
+            image.src = url;
         });
     }
 }
