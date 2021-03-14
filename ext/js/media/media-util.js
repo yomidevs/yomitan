@@ -26,7 +26,7 @@ class MediaUtil {
      * @returns The file extension, including the '.', or an empty string
      *   if there is no file extension.
      */
-    getFileNameExtension(path) {
+    static getFileNameExtension(path) {
         const match = /\.[^./\\]*$/.exec(path);
         return match !== null ? match[0] : '';
     }
@@ -37,7 +37,7 @@ class MediaUtil {
      * @returns The media type string if it can be determined from the file path,
      *   otherwise null.
      */
-    getImageMediaTypeFromFileName(path) {
+    static getImageMediaTypeFromFileName(path) {
         switch (this.getFileNameExtension(path).toLowerCase()) {
             case '.apng':
                 return 'image/apng';
@@ -74,7 +74,7 @@ class MediaUtil {
      * @returns A file extension including the dot for the media type,
      *   otherwise null.
      */
-    getFileExtensionFromImageMediaType(mediaType) {
+    static getFileExtensionFromImageMediaType(mediaType) {
         switch (mediaType) {
             case 'image/apng':
                 return '.apng';
@@ -105,7 +105,7 @@ class MediaUtil {
      * @returns A file extension including the dot for the media type,
      *   otherwise null.
      */
-    getFileExtensionFromAudioMediaType(mediaType) {
+    static getFileExtensionFromAudioMediaType(mediaType) {
         switch (mediaType) {
             case 'audio/mpeg':
             case 'audio/mp3':

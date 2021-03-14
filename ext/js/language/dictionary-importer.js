@@ -25,7 +25,6 @@ class DictionaryImporter {
     constructor() {
         this._schemas = new Map();
         this._jsonSchemaValidator = new JsonSchemaValidator();
-        this._mediaUtil = new MediaUtil();
     }
 
     async importDictionary(dictionaryDatabase, archiveSource, details, onProgress) {
@@ -325,7 +324,7 @@ class DictionaryImporter {
         }
 
         const content = await file.async('base64');
-        const mediaType = this._mediaUtil.getImageMediaTypeFromFileName(path);
+        const mediaType = MediaUtil.getImageMediaTypeFromFileName(path);
         if (mediaType === null) {
             throw new Error(`Could not determine media type for image at path ${JSON.stringify(path)} for ${errorSource}`);
         }

@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * MediaUtil
+ */
+
 /**
  * Class which can read text and images from the clipboard.
  */
@@ -25,14 +29,13 @@ class ClipboardReader {
      * @param pasteTargetSelector The selector for the paste target element.
      * @param imagePasteTargetSelector The selector for the image paste target element.
      */
-    constructor({document=null, pasteTargetSelector=null, imagePasteTargetSelector=null, mediaUtil=null}) {
+    constructor({document=null, pasteTargetSelector=null, imagePasteTargetSelector=null}) {
         this._document = document;
         this._browser = null;
         this._pasteTarget = null;
         this._pasteTargetSelector = pasteTargetSelector;
         this._imagePasteTarget = null;
         this._imagePasteTargetSelector = imagePasteTargetSelector;
-        this._mediaUtil = mediaUtil;
     }
 
     /**
@@ -107,7 +110,6 @@ class ClipboardReader {
         // See browser-specific notes in getText
         if (
             this._isFirefox() &&
-            this._mediaUtil !== null &&
             typeof navigator.clipboard !== 'undefined' &&
             typeof navigator.clipboard.read === 'function'
         ) {
@@ -120,7 +122,7 @@ class ClipboardReader {
             }
 
             for (const file of files) {
-                if (this._mediaUtil.getFileExtensionFromImageMediaType(file.type) !== null) {
+                if (MediaUtil.getFileExtensionFromImageMediaType(file.type) !== null) {
                     return await this._readFileAsDataURL(file);
                 }
             }
