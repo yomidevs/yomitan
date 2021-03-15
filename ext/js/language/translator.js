@@ -392,7 +392,8 @@ class Translator {
     }
 
     async _addRelatedDefinitions(sequencedDefinitions, unsequencedDefinitions, sequenceList, mainDictionary, enabledDictionaryMap) {
-        const databaseDefinitions = await this._database.findTermsBySequenceBulk(sequenceList, mainDictionary);
+        const items = sequenceList.map((query) => ({query, dictionary: mainDictionary}));
+        const databaseDefinitions = await this._database.findTermsBySequenceBulk(items);
         for (const databaseDefinition of databaseDefinitions) {
             const {relatedDefinitions, definitionIds} = sequencedDefinitions[databaseDefinition.index];
             const {id} = databaseDefinition;
@@ -410,8 +411,7 @@ class Translator {
         if (unsequencedDefinitions.length === 0 && secondarySearchDictionaryMap.size === 0) { return; }
 
         // Prepare grouping info
-        const expressionList = [];
-        const readingList = [];
+        const termList = [];
         const targetList = [];
         const targetMap = new Map();
 
@@ -431,8 +431,7 @@ class Translator {
                 target.sequencedDefinitions.push(sequencedDefinition);
                 if (!definition.isPrimary && !target.searchSecondary) {
                     target.searchSecondary = true;
-                    expressionList.push(expression);
-                    readingList.push(reading);
+                    termList.push({expression, reading});
                     targetList.push(target);
                 }
             }
@@ -456,14 +455,14 @@ class Translator {
         }
 
         // Search database for additional secondary terms
-        if (expressionList.length === 0 || secondarySearchDictionaryMap.size === 0) { return; }
+        if (termList.length === 0 || secondarySearchDictionaryMap.size === 0) { return; }
 
-        const databaseDefinitions = await this._database.findTermsExactBulk(expressionList, readingList, secondarySearchDictionaryMap);
+        const databaseDefinitions = await this._database.findTermsExactBulk(termList, secondarySearchDictionaryMap);
         this._sortDatabaseDefinitionsByIndex(databaseDefinitions);
 
         for (const databaseDefinition of databaseDefinitions) {
             const {index, id} = databaseDefinition;
-            const source = expressionList[index];
+            const source = termList[index].expression;
             const target = targetList[index];
             for (const {definitionIds, secondaryDefinitions} of target.sequencedDefinitions) {
                 if (definitionIds.has(id)) { continue; }

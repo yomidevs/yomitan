@@ -292,8 +292,11 @@ async function testTindTermsExactBulk1(database, titles) {
         {
             inputs: [
                 {
-                    termList: ['打', '打つ', '打ち込む'],
-                    readingList: ['だ', 'うつ', 'うちこむ']
+                    termList: [
+                        {expression: '打', reading: 'だ'},
+                        {expression: '打つ', reading: 'うつ'},
+                        {expression: '打ち込む', reading: 'うちこむ'}
+                    ]
                 }
             ],
             expectedResults: {
@@ -313,8 +316,11 @@ async function testTindTermsExactBulk1(database, titles) {
         {
             inputs: [
                 {
-                    termList: ['打', '打つ', '打ち込む'],
-                    readingList: ['だ?', 'うつ?', 'うちこむ?']
+                    termList: [
+                        {expression: '打', reading: 'だ?'},
+                        {expression: '打つ', reading: 'うつ?'},
+                        {expression: '打ち込む', reading: 'うちこむ?'}
+                    ]
                 }
             ],
             expectedResults: {
@@ -326,8 +332,10 @@ async function testTindTermsExactBulk1(database, titles) {
         {
             inputs: [
                 {
-                    termList: ['打つ', '打つ'],
-                    readingList: ['うつ', 'ぶつ']
+                    termList: [
+                        {expression: '打つ', reading: 'うつ'},
+                        {expression: '打つ', reading: 'ぶつ'}
+                    ]
                 }
             ],
             expectedResults: {
@@ -344,8 +352,9 @@ async function testTindTermsExactBulk1(database, titles) {
         {
             inputs: [
                 {
-                    termList: ['打つ'],
-                    readingList: ['うちこむ']
+                    termList: [
+                        {expression: '打つ', reading: 'うちこむ'}
+                    ]
                 }
             ],
             expectedResults: {
@@ -357,8 +366,7 @@ async function testTindTermsExactBulk1(database, titles) {
         {
             inputs: [
                 {
-                    termList: [],
-                    readingList: []
+                    termList: []
                 }
             ],
             expectedResults: {
@@ -370,8 +378,8 @@ async function testTindTermsExactBulk1(database, titles) {
     ];
 
     for (const {inputs, expectedResults} of data) {
-        for (const {termList, readingList} of inputs) {
-            const results = await database.findTermsExactBulk(termList, readingList, titles);
+        for (const {termList} of inputs) {
+            const results = await database.findTermsExactBulk(termList, titles);
             assert.strictEqual(results.length, expectedResults.total);
             for (const [expression, count] of expectedResults.expressions) {
                 assert.strictEqual(countTermsWithExpression(results, expression), count);
@@ -520,7 +528,7 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
 
     for (const {inputs, expectedResults} of data) {
         for (const {sequenceList} of inputs) {
-            const results = await database.findTermsBySequenceBulk(sequenceList, mainDictionary);
+            const results = await database.findTermsBySequenceBulk(sequenceList.map((query) => ({query, dictionary: mainDictionary})));
             assert.strictEqual(results.length, expectedResults.total);
             for (const [expression, count] of expectedResults.expressions) {
                 assert.strictEqual(countTermsWithExpression(results, expression), count);
@@ -773,8 +781,8 @@ async function testDatabase2() {
     // Error: not prepared
     await assert.rejects(async () => await dictionaryDatabase.deleteDictionary(title, {rate: 1000}, () => {}));
     await assert.rejects(async () => await dictionaryDatabase.findTermsBulk(['?'], titles, null));
-    await assert.rejects(async () => await dictionaryDatabase.findTermsExactBulk(['?'], ['?'], titles));
-    await assert.rejects(async () => await dictionaryDatabase.findTermsBySequenceBulk([1], title));
+    await assert.rejects(async () => await dictionaryDatabase.findTermsExactBulk([{expression: '?', reading: '?'}], titles));
+    await assert.rejects(async () => await dictionaryDatabase.findTermsBySequenceBulk([{query: 1, dictionary: title}]));
     await assert.rejects(async () => await dictionaryDatabase.findTermMetaBulk(['?'], titles));
     await assert.rejects(async () => await dictionaryDatabase.findTermMetaBulk(['?'], titles));
     await assert.rejects(async () => await dictionaryDatabase.findKanjiBulk(['?'], titles));

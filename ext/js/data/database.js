@@ -95,11 +95,11 @@ class Database {
         });
     }
 
-    getAll(objectStoreOrIndex, query, resolve, reject) {
+    getAll(objectStoreOrIndex, query, resolve, reject, data) {
         if (typeof objectStoreOrIndex.getAll === 'function') {
-            this._getAllFast(objectStoreOrIndex, query, resolve, reject);
+            this._getAllFast(objectStoreOrIndex, query, resolve, reject, data);
         } else {
-            this._getAllUsingCursor(objectStoreOrIndex, query, resolve, reject);
+            this._getAllUsingCursor(objectStoreOrIndex, query, resolve, reject, data);
         }
     }
 
@@ -116,25 +116,25 @@ class Database {
             const transaction = this.transaction([objectStoreName], 'readonly');
             const objectStore = transaction.objectStore(objectStoreName);
             const objectStoreOrIndex = indexName !== null ? objectStore.index(indexName) : objectStore;
-            this.findFirst(objectStoreOrIndex, query, resolve, reject, predicate, predicateArg, defaultValue);
+            this.findFirst(objectStoreOrIndex, query, resolve, reject, null, predicate, predicateArg, defaultValue);
         });
     }
 
-    findFirst(objectStoreOrIndex, query, resolve, reject, predicate, predicateArg, defaultValue) {
+    findFirst(objectStoreOrIndex, query, resolve, reject, data, predicate, predicateArg, defaultValue) {
         const noPredicate = (typeof predicate !== 'function');
         const request = objectStoreOrIndex.openCursor(query, 'next');
-        request.onerror = (e) => reject(e.target.error);
+        request.onerror = (e) => reject(e.target.error, data);
         request.onsuccess = (e) => {
             const cursor = e.target.result;
             if (cursor) {
                 const {value} = cursor;
                 if (noPredicate || predicate(value, predicateArg)) {
-                    resolve(value);
+                    resolve(value, data);
                 } else {
                     cursor.continue();
                 }
             } else {
-                resolve(defaultValue);
+                resolve(defaultValue, data);
             }
         };
     }
@@ -256,23 +256,23 @@ class Database {
         return false;
     }
 
-    _getAllFast(objectStoreOrIndex, query, resolve, reject) {
+    _getAllFast(objectStoreOrIndex, query, resolve, reject, data) {
         const request = objectStoreOrIndex.getAll(query);
-        request.onerror = (e) => reject(e.target.error);
-        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject(e.target.error, data);
+        request.onsuccess = (e) => resolve(e.target.result, data);
     }
 
-    _getAllUsingCursor(objectStoreOrIndex, query, resolve, reject) {
+    _getAllUsingCursor(objectStoreOrIndex, query, resolve, reject, data) {
         const results = [];
         const request = objectStoreOrIndex.openCursor(query, 'next');
-        request.onerror = (e) => reject(e.target.error);
+        request.onerror = (e) => reject(e.target.error, data);
         request.onsuccess = (e) => {
             const cursor = e.target.result;
             if (cursor) {
                 results.push(cursor.value);
                 cursor.continue();
             } else {
-                resolve(results);
+                resolve(results, data);
             }
         };
     }

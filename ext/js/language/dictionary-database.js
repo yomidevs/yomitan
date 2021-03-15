@@ -24,6 +24,17 @@ class DictionaryDatabase {
         this._db = new Database();
         this._dbName = 'dict';
         this._schemas = new Map();
+        this._createOnlyQuery1 = (item) => IDBKeyRange.only(item);
+        this._createOnlyQuery2 = (item) => IDBKeyRange.only(item.query);
+        this._createOnlyQuery3 = (item) => IDBKeyRange.only(item.expression);
+        this._createOnlyQuery4 = (item) => IDBKeyRange.only(item.path);
+        this._createBoundQuery1 = (item) => IDBKeyRange.bound(item, `${item}\uffff`, false, false);
+        this._createBoundQuery2 = (item) => { item = stringReverse(item); return IDBKeyRange.bound(item, `${item}\uffff`, false, false); };
+        this._createTermBind = this._createTerm.bind(this);
+        this._createTermMetaBind = this._createTermMeta.bind(this);
+        this._createKanjiBind = this._createKanji.bind(this);
+        this._createKanjiMetaBind = this._createKanjiMeta.bind(this);
+        this._createMediaBind = this._createMedia.bind(this);
     }
 
     // Public
@@ -171,132 +182,61 @@ class DictionaryDatabase {
     }
 
     findTermsBulk(termList, dictionaries, wildcard) {
-        return new Promise((resolve, reject) => {
-            const results = [];
-            const count = termList.length;
-            if (count === 0) {
-                resolve(results);
-                return;
-            }
+        const visited = new Set();
+        const predicate = (row) => {
+            if (!dictionaries.has(row.dictionary)) { return false; }
+            const {id} = row;
+            if (visited.has(id)) { return false; }
+            visited.add(id);
+            return true;
+        };
 
-            const visited = new Set();
-            const useWildcard = !!wildcard;
-            const prefixWildcard = wildcard === 'prefix';
+        const indexNames = (wildcard === 'prefix') ? ['expressionReverse', 'readingReverse'] : ['expression', 'reading'];
 
-            const transaction = this._db.transaction(['terms'], 'readonly');
-            const terms = transaction.objectStore('terms');
-            const index1 = terms.index(prefixWildcard ? 'expressionReverse' : 'expression');
-            const index2 = terms.index(prefixWildcard ? 'readingReverse' : 'reading');
+        let createQuery;
+        switch (wildcard) {
+            case 'suffix':
+                createQuery = this._createBoundQuery1;
+                break;
+            case 'prefix':
+                createQuery = this._createBoundQuery2;
+                break;
+            default:
+                createQuery = this._createOnlyQuery1;
+                break;
+        }
 
-            const count2 = count * 2;
-            let completeCount = 0;
-            for (let i = 0; i < count; ++i) {
-                const inputIndex = i;
-                const term = prefixWildcard ? stringReverse(termList[i]) : termList[i];
-                const query = useWildcard ? IDBKeyRange.bound(term, `${term}\uffff`, false, false) : IDBKeyRange.only(term);
-
-                const onGetAll = (rows) => {
-                    for (const row of rows) {
-                        if (dictionaries.has(row.dictionary) && !visited.has(row.id)) {
-                            visited.add(row.id);
-                            results.push(this._createTerm(row, inputIndex));
-                        }
-                    }
-                    if (++completeCount >= count2) {
-                        resolve(results);
-                    }
-                };
-
-                this._db.getAll(index1, query, onGetAll, reject);
-                this._db.getAll(index2, query, onGetAll, reject);
-            }
-        });
+        return this._findMultiBulk('terms', indexNames, termList, createQuery, predicate, this._createTermBind);
     }
 
-    findTermsExactBulk(termList, readingList, dictionaries) {
-        return new Promise((resolve, reject) => {
-            const results = [];
-            const count = termList.length;
-            if (count === 0) {
-                resolve(results);
-                return;
-            }
-
-            const transaction = this._db.transaction(['terms'], 'readonly');
-            const terms = transaction.objectStore('terms');
-            const index = terms.index('expression');
-
-            let completeCount = 0;
-            for (let i = 0; i < count; ++i) {
-                const inputIndex = i;
-                const reading = readingList[i];
-                const query = IDBKeyRange.only(termList[i]);
-
-                const onGetAll = (rows) => {
-                    for (const row of rows) {
-                        if (row.reading === reading && dictionaries.has(row.dictionary)) {
-                            results.push(this._createTerm(row, inputIndex));
-                        }
-                    }
-                    if (++completeCount >= count) {
-                        resolve(results);
-                    }
-                };
-
-                this._db.getAll(index, query, onGetAll, reject);
-            }
-        });
+    findTermsExactBulk(termList, dictionaries) {
+        const predicate = (row, item) => (row.reading === item.reading && dictionaries.has(row.dictionary));
+        return this._findMultiBulk('terms', ['expression'], termList, this._createOnlyQuery3, predicate, this._createTermBind);
     }
 
-    findTermsBySequenceBulk(sequenceList, mainDictionary) {
-        return new Promise((resolve, reject) => {
-            const results = [];
-            const count = sequenceList.length;
-            if (count === 0) {
-                resolve(results);
-                return;
-            }
-
-            const transaction = this._db.transaction(['terms'], 'readonly');
-            const terms = transaction.objectStore('terms');
-            const index = terms.index('sequence');
-
-            let completeCount = 0;
-            for (let i = 0; i < count; ++i) {
-                const inputIndex = i;
-                const query = IDBKeyRange.only(sequenceList[i]);
-
-                const onGetAll = (rows) => {
-                    for (const row of rows) {
-                        if (row.dictionary === mainDictionary) {
-                            results.push(this._createTerm(row, inputIndex));
-                        }
-                    }
-                    if (++completeCount >= count) {
-                        resolve(results);
-                    }
-                };
-
-                this._db.getAll(index, query, onGetAll, reject);
-            }
-        });
+    findTermsBySequenceBulk(items) {
+        const predicate = (row, item) => (row.dictionary === item.dictionary);
+        return this._findMultiBulk('terms', ['sequence'], items, this._createOnlyQuery2, predicate, this._createTermBind);
     }
 
     findTermMetaBulk(termList, dictionaries) {
-        return this._findGenericBulk('termMeta', 'expression', termList, dictionaries, this._createTermMeta.bind(this));
+        const predicate = (row) => dictionaries.has(row.dictionary);
+        return this._findMultiBulk('termMeta', ['expression'], termList, this._createOnlyQuery1, predicate, this._createTermMetaBind);
     }
 
     findKanjiBulk(kanjiList, dictionaries) {
-        return this._findGenericBulk('kanji', 'character', kanjiList, dictionaries, this._createKanji.bind(this));
+        const predicate = (row) => dictionaries.has(row.dictionary);
+        return this._findMultiBulk('kanji', ['character'], kanjiList, this._createOnlyQuery1, predicate, this._createKanjiBind);
     }
 
     findKanjiMetaBulk(kanjiList, dictionaries) {
-        return this._findGenericBulk('kanjiMeta', 'character', kanjiList, dictionaries, this._createKanjiMeta.bind(this));
+        const predicate = (row) => dictionaries.has(row.dictionary);
+        return this._findMultiBulk('kanjiMeta', ['character'], kanjiList, this._createOnlyQuery1, predicate, this._createKanjiMetaBind);
     }
 
     findTagMetaBulk(items) {
         const predicate = (row, item) => (row.dictionary === item.dictionary);
-        return this._findFirstBulk('tagMeta', 'name', items, predicate);
+        return this._findFirstBulk('tagMeta', 'name', items, this._createOnlyQuery2, predicate);
     }
 
     findTagForTitle(name, title) {
@@ -304,38 +244,9 @@ class DictionaryDatabase {
         return this._db.find('tagMeta', 'name', query, (row) => (row.dictionary === title), null, null);
     }
 
-    getMedia(targets) {
-        return new Promise((resolve, reject) => {
-            const count = targets.length;
-            const results = new Array(count).fill(null);
-            if (count === 0) {
-                resolve(results);
-                return;
-            }
-
-            let completeCount = 0;
-            const transaction = this._db.transaction(['media'], 'readonly');
-            const objectStore = transaction.objectStore('media');
-            const index = objectStore.index('path');
-
-            for (let i = 0; i < count; ++i) {
-                const inputIndex = i;
-                const {path, dictionaryName} = targets[i];
-                const query = IDBKeyRange.only(path);
-
-                const onGetAll = (rows) => {
-                    for (const row of rows) {
-                        if (row.dictionary !== dictionaryName) { continue; }
-                        results[inputIndex] = this._createMedia(row, inputIndex);
-                    }
-                    if (++completeCount >= count) {
-                        resolve(results);
-                    }
-                };
-
-                this._db.getAll(index, query, onGetAll, reject);
-            }
-        });
+    getMedia(items) {
+        const predicate = (row, item) => (row.dictionary === item.dictionary);
+        return this._findMultiBulk('media', ['path'], items, this._createOnlyQuery4, predicate, this._createMediaBind);
     }
 
     getDictionaryInfo() {
@@ -408,66 +319,67 @@ class DictionaryDatabase {
 
     // Private
 
-    async _findGenericBulk(objectStoreName, indexName, indexValueList, dictionaries, createResult) {
+    _findMultiBulk(objectStoreName, indexNames, items, createQuery, predicate, createResult) {
         return new Promise((resolve, reject) => {
+            const itemCount = items.length;
+            const indexCount = indexNames.length;
             const results = [];
-            const count = indexValueList.length;
-            if (count === 0) {
+            if (itemCount === 0 || indexCount === 0) {
                 resolve(results);
                 return;
             }
 
             const transaction = this._db.transaction([objectStoreName], 'readonly');
-            const terms = transaction.objectStore(objectStoreName);
-            const index = terms.index(indexName);
-
+            const objectStore = transaction.objectStore(objectStoreName);
+            const indexList = [];
+            for (const indexName of indexNames) {
+                indexList.push(objectStore.index(indexName));
+            }
             let completeCount = 0;
-            for (let i = 0; i < count; ++i) {
-                const inputIndex = i;
-                const query = IDBKeyRange.only(indexValueList[i]);
-
-                const onGetAll = (rows) => {
-                    for (const row of rows) {
-                        if (dictionaries.has(row.dictionary)) {
-                            results.push(createResult(row, inputIndex));
-                        }
+            const requiredCompleteCount = itemCount * indexCount;
+            const onGetAll = (rows, {item, itemIndex}) => {
+                for (const row of rows) {
+                    if (predicate(row, item)) {
+                        results.push(createResult(row, itemIndex));
                     }
-                    if (++completeCount >= count) {
-                        resolve(results);
-                    }
-                };
-
-                this._db.getAll(index, query, onGetAll, reject);
+                }
+                if (++completeCount >= requiredCompleteCount) {
+                    resolve(results);
+                }
+            };
+            for (let i = 0; i < itemCount; ++i) {
+                const item = items[i];
+                const query = createQuery(item);
+                for (let j = 0; j < indexCount; ++j) {
+                    this._db.getAll(indexList[j], query, onGetAll, reject, {item, itemIndex: i});
+                }
             }
         });
     }
 
-    _findFirstBulk(objectStoreName, indexName, items, predicate) {
+    _findFirstBulk(objectStoreName, indexName, items, createQuery, predicate) {
         return new Promise((resolve, reject) => {
-            const count = items.length;
-            const results = new Array(count);
-            if (count === 0) {
+            const itemCount = items.length;
+            const results = new Array(itemCount);
+            if (itemCount === 0) {
                 resolve(results);
                 return;
             }
 
             const transaction = this._db.transaction([objectStoreName], 'readonly');
-            const terms = transaction.objectStore(objectStoreName);
-            const index = terms.index(indexName);
-
+            const objectStore = transaction.objectStore(objectStoreName);
+            const index = objectStore.index(indexName);
             let completeCount = 0;
-            for (let i = 0; i < count; ++i) {
-                const itemIndex = i;
+            const onFind = (row, itemIndex) => {
+                results[itemIndex] = row;
+                if (++completeCount >= itemCount) {
+                    resolve(results);
+                }
+            };
+            for (let i = 0; i < itemCount; ++i) {
                 const item = items[i];
-                const query = IDBKeyRange.only(item.query);
-
-                const onFind = (row) => {
-                    results[itemIndex] = row;
-                    if (++completeCount >= count) {
-                        resolve(results);
-                    }
-                };
-                this._db.findFirst(index, query, onFind, reject, predicate, item, void 0);
+                const query = createQuery(item);
+                this._db.findFirst(index, query, onFind, reject, i, predicate, item, void 0);
             }
         });
     }

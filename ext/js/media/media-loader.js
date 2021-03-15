@@ -26,13 +26,13 @@ class MediaLoader {
         this._loadMediaData = [];
     }
 
-    async loadMedia(path, dictionaryName, onLoad, onUnload) {
+    async loadMedia(path, dictionary, onLoad, onUnload) {
         const token = this._token;
         const data = {onUnload, loaded: false};
 
         this._loadMediaData.push(data);
 
-        const media = await this.getMedia(path, dictionaryName);
+        const media = await this.getMedia(path, dictionary);
         if (token !== this._token) { return; }
 
         onLoad(media.url);
@@ -59,14 +59,14 @@ class MediaLoader {
         this._token = {};
     }
 
-    async getMedia(path, dictionaryName) {
+    async getMedia(path, dictionary) {
         let cachedData;
-        let dictionaryCache = this._mediaCache.get(dictionaryName);
+        let dictionaryCache = this._mediaCache.get(dictionary);
         if (typeof dictionaryCache !== 'undefined') {
             cachedData = dictionaryCache.get(path);
         } else {
             dictionaryCache = new Map();
-            this._mediaCache.set(dictionaryName, dictionaryCache);
+            this._mediaCache.set(dictionary, dictionaryCache);
         }
 
         if (typeof cachedData === 'undefined') {
@@ -76,15 +76,15 @@ class MediaLoader {
                 url: null
             };
             dictionaryCache.set(path, cachedData);
-            cachedData.promise = this._getMediaData(path, dictionaryName, cachedData);
+            cachedData.promise = this._getMediaData(path, dictionary, cachedData);
         }
 
         return cachedData.promise;
     }
 
-    async _getMediaData(path, dictionaryName, cachedData) {
+    async _getMediaData(path, dictionary, cachedData) {
         const token = this._token;
-        const data = (await yomichan.api.getMedia([{path, dictionaryName}]))[0];
+        const data = (await yomichan.api.getMedia([{path, dictionary}]))[0];
         if (token === this._token && data !== null) {
             const blob = MediaUtil.createBlobFromBase64Content(data.content, data.mediaType);
             const url = URL.createObjectURL(blob);
