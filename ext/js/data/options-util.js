@@ -458,7 +458,8 @@ class OptionsUtil {
             {async: true,  update: this._updateVersion6.bind(this)},
             {async: false, update: this._updateVersion7.bind(this)},
             {async: true,  update: this._updateVersion8.bind(this)},
-            {async: false, update: this._updateVersion9.bind(this)}
+            {async: false, update: this._updateVersion9.bind(this)},
+            {async: false, update: this._updateVersion10.bind(this)}
         ];
     }
 
@@ -746,6 +747,13 @@ class OptionsUtil {
             profile.options.general.frequencyDisplayMode = 'split-tags-grouped';
             profile.options.general.termDisplayMode = 'ruby';
         }
+        return options;
+    }
+
+    _updateVersion10(options) {
+        // Version 10 changes:
+        //  Removed global option useSettingsV2.
+        delete options.global.useSettingsV2;
         return options;
     }
 }

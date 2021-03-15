@@ -1087,8 +1087,7 @@
         "global": {
             "type": "object",
             "required": [
-                "database",
-                "useSettingsV2"
+                "database"
             ],
             "properties": {
                 "database": {
@@ -1102,10 +1101,6 @@
                             "default": false
                         }
                     }
-                },
-                "useSettingsV2": {
-                    "type": "boolean",
-                    "default": true
                 }
             }
         }

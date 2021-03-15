@@ -561,12 +561,11 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 9,
+        version: 10,
         global: {
             database: {
                 prefixWildcardsSupported: false
-            },
-            useSettingsV2: true
+            }
         }
     };
 }

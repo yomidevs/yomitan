@@ -1945,31 +1945,20 @@ class Backend {
     }
 
     async _openSettingsPage(mode) {
-        const {useSettingsV2} = this._options.global;
         const manifest = chrome.runtime.getManifest();
-        const url = chrome.runtime.getURL(useSettingsV2 ? manifest.options_ui.page : '/settings-old.html');
+        const url = chrome.runtime.getURL(manifest.options_ui.page);
         switch (mode) {
             case 'existingOrNewTab':
-                if (!useSettingsV2) {
-                    const predicate = ({url: url2}) => (url2 !== null && url2.startsWith(url));
-                    const tab = await this._findTabs(1000, false, predicate, false);
-                    if (tab !== null) {
-                        await this._focusTab(tab);
-                    } else {
-                        await this._createTab(url);
-                    }
-                } else {
-                    await new Promise((resolve, reject) => {
-                        chrome.runtime.openOptionsPage(() => {
-                            const e = chrome.runtime.lastError;
-                            if (e) {
-                                reject(new Error(e.message));
-                            } else {
-                                resolve();
-                            }
-                        });
+                await new Promise((resolve, reject) => {
+                    chrome.runtime.openOptionsPage(() => {
+                        const e = chrome.runtime.lastError;
+                        if (e) {
+                            reject(new Error(e.message));
+                        } else {
+                            resolve();
+                        }
                     });
-                }
+                });
                 break;
             case 'newTab':
                 await this._createTab(url);
