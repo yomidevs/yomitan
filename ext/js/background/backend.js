@@ -762,8 +762,9 @@ class Backend {
         };
 
         const openInTab = async () => {
-            const tab = await this._findTabs(1000, false, predicate, false);
-            if (tab !== null) {
+            const tabInfo = await this._findTabs(1000, false, predicate, false);
+            if (tabInfo !== null) {
+                const {tab} = tabInfo;
                 await this._focusTab(tab);
                 if (queryParams.query) {
                     await this._updateSearchQuery(tab.id, queryParams.query, true);
