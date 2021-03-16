@@ -750,6 +750,19 @@ function testDistributeFuriganaInflected() {
             [
                 {text: 'おこなわなかった', furigana: ''}
             ]
+        ],
+        [
+            ['いい', 'いい', 'イイ'],
+            [
+                {text: 'イイ', furigana: ''}
+            ]
+        ],
+        [
+            ['否か', 'いなか', '否カ'],
+            [
+                {text: '否', furigana: 'いな'},
+                {text: 'カ', furigana: 'か'}
+            ]
         ]
     ];
 

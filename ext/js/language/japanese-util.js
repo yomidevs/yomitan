@@ -475,13 +475,15 @@ const JapaneseUtil = (() => {
 
             // Check if source is derived from the reading instead of the expression
             const readingStemLength = this._getStemLength(readingNormalized, sourceNormalized);
-            if (readingStemLength > stemLength) {
+            if (readingStemLength > 0 && readingStemLength >= stemLength) {
                 mainText = reading;
                 stemLength = readingStemLength;
+                reading = `${source.substring(0, stemLength)}${reading.substring(stemLength)}`;
             }
 
             const segments = [];
             if (stemLength > 0) {
+                mainText = `${source.substring(0, stemLength)}${mainText.substring(stemLength)}`;
                 const segments2 = this.distributeFurigana(mainText, reading);
                 let consumed = 0;
                 for (const segment of segments2) {
