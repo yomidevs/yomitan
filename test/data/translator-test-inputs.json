@@ -1,0 +1,295 @@
+{
+    "optionsPresets": {
+        "kanji": {
+            "enabledDictionaryMap": [
+                [
+                    "${title}",
+                    {
+                        "index": 0,
+                        "priority": 0
+                    }
+                ]
+            ]
+        },
+        "default": {
+            "wildcard": null,
+            "mainDictionary": "${title}",
+            "alphanumeric": false,
+            "convertHalfWidthCharacters": false,
+            "convertNumericCharacters": false,
+            "convertAlphabeticCharacters": false,
+            "convertHiraganaToKatakana": false,
+            "convertKatakanaToHiragana": false,
+            "collapseEmphaticSequences": false,
+            "textReplacements": [
+                null
+            ],
+            "enabledDictionaryMap": [
+                [
+                    "${title}",
+                    {
+                        "index": 0,
+                        "priority": 0,
+                        "allowSecondarySearches": false
+                    }
+                ]
+            ]
+        }
+    },
+    "tests": [
+        {
+            "name": "Basic kanji test 1",
+            "func": "findKanji",
+            "text": "打",
+            "options": "kanji"
+        },
+        {
+            "name": "Basic kanji test 2",
+            "func": "findKanji",
+            "text": "込",
+            "options": "kanji"
+        },
+        {
+            "name": "Missing kanji test",
+            "func": "findKanji",
+            "text": "画",
+            "options": "kanji"
+        },
+        {
+            "name": "Find term using expression text 1",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "打",
+            "options": "default"
+        },
+        {
+            "name": "Find term using expression text 2",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "打つ",
+            "options": "default"
+        },
+        {
+            "name": "Find term using expression text 3",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "打ち込む",
+            "options": "default"
+        },
+        {
+            "name": "Find term using expression text 4",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "画像",
+            "options": "default"
+        },
+        {
+            "name": "Find term using reading 1",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "だ",
+            "options": "default"
+        },
+        {
+            "name": "Find term using reading 2",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "ダース",
+            "options": "default"
+        },
+        {
+            "name": "Find term using reading 3",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "うつ",
+            "options": "default"
+        },
+        {
+            "name": "Find term using reading 4",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "ぶつ",
+            "options": "default"
+        },
+        {
+            "name": "Find term using reading 5",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "うちこむ",
+            "options": "default"
+        },
+        {
+            "name": "Find term using reading 6",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "ぶちこむ",
+            "options": "default"
+        },
+        {
+            "name": "Find term using reading 7",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "がぞう",
+            "options": "default"
+        },
+        {
+            "name": "Missing term 1",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "為る",
+            "options": "default"
+        },
+        {
+            "name": "Missing term ２",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "する",
+            "options": "default"
+        },
+        {
+            "name": "Search using different modes",
+            "func": "findTerms",
+            "mode": "simple",
+            "text": "打ち込む",
+            "options": "default"
+        },
+        {
+            "name": "Search using different modes",
+            "func": "findTerms",
+            "mode": "group",
+            "text": "打ち込む",
+            "options": "default"
+        },
+        {
+            "name": "Search using different modes",
+            "func": "findTerms",
+            "mode": "merge",
+            "text": "打ち込む",
+            "options": "default"
+        },
+        {
+            "name": "Search inflected term",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "打ち込んでいませんでした",
+            "options": "default"
+        },
+        {
+            "name": "Ignore text inside parentheses",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "打(う)ち込(こ)む",
+            "options": [
+                "default",
+                {
+                    "alphanumeric": true,
+                    "textReplacements": [
+                        null,
+                        [
+                            {
+                                "pattern": "\\(([^)]*)(?:\\)|$)",
+                                "flags": "g",
+                                "replacement": ""
+                            }
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Remove parentheses around text",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "(打)(ち)(込)(む)",
+            "options": [
+                "default",
+                {
+                    "alphanumeric": true,
+                    "textReplacements": [
+                        null,
+                        [
+                            {
+                                "pattern": "\\(([^)]*)(?:\\)|$)",
+                                "flags": "g",
+                                "replacement": "$1"
+                            }
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test non-empty replacement",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "test",
+            "options": [
+                "default",
+                {
+                    "alphanumeric": true,
+                    "textReplacements": [
+                        null,
+                        [
+                            {
+                                "pattern": "test",
+                                "flags": "g",
+                                "replacement": "よみ"
+                            }
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test non-empty replacement at end",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "つtest",
+            "options": [
+                "default",
+                {
+                    "alphanumeric": true,
+                    "textReplacements": [
+                        null,
+                        [
+                            {
+                                "pattern": "test",
+                                "flags": "g",
+                                "replacement": "よみ"
+                            }
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test non-empty replacement at start",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "testました",
+            "options": [
+                "default",
+                {
+                    "alphanumeric": true,
+                    "textReplacements": [
+                        null,
+                        [
+                            {
+                                "pattern": "test",
+                                "flags": "g",
+                                "replacement": "よみ"
+                            }
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Search merged mode with non-primary definitions",
+            "func": "findTerms",
+            "mode": "merge",
+            "text": "うちこむ",
+            "options": "default"
+        }
+    ]
+}
