@@ -688,7 +688,7 @@ button.action-button[data-icon=play-audio]::before {
 button.action-button[data-icon=source-term]::before {
     background-image: url('/images/source-term.svg');
 }
-.entry[data-type=term][data-expression-multi=true] .actions>button.action-button.action-play-audio {
+:root[data-result-output-mode=merge] .entry[data-type=term] .actions>button.action-button.action-play-audio {
     display: none;
 }
 .action-button-badge {
@@ -850,14 +850,14 @@ button.action-button[data-icon=source-term]::before {
 
     display: inline-block;
 }
-.entry[data-expression-multi=true] .expression[data-frequency=popular] {
+:root[data-result-output-mode=merge] .expression[data-frequency=popular] {
     --expression-current-text-color: var(--expression-text-color-popular);
     --expression-current-reading-text-color: var(--expression-reading-text-color-popular);
     --expression-current-furigana-text-color: var(--expression-furigana-text-color-popular);
     --expression-current-kanji-text-color: var(--expression-kanji-text-color-popular);
     --expression-current-kanji-border-color: var(--expression-kanji-border-color-popular);
 }
-.entry[data-expression-multi=true] .expression[data-frequency=rare] {
+:root[data-result-output-mode=merge] .expression[data-frequency=rare] {
     --expression-current-text-color: var(--expression-text-color-rare);
     --expression-current-reading-text-color: var(--expression-reading-text-color-rare);
     --expression-current-furigana-text-color: var(--expression-furigana-text-color-rare);
@@ -915,7 +915,7 @@ button.action-button[data-icon=source-term]::before {
     text-decoration: none;
     cursor: pointer;
 }
-.entry[data-expression-multi=true] .expression-list-details {
+:root[data-result-output-mode=merge] .expression-list-details {
     display: block;
 }
 :root[data-term-display-mode=ruby-and-reading] .expression-text-outer::after,
@@ -1069,7 +1069,7 @@ button.action-button[data-icon=source-term]::before {
 
 
 /* Merged term styles */
-.entry[data-expression-multi=true] .expression-list .expression-details {
+:root[data-result-output-mode=merge] .expression-list .expression-details {
     display: inline-block;
     position: relative;
     width: 0;
@@ -1077,28 +1077,28 @@ button.action-button[data-icon=source-term]::before {
     visibility: hidden;
     z-index: 1;
 }
-.entry[data-expression-multi=true] .expression-list>.expression:not(:last-of-type) .expression-details {
+:root[data-result-output-mode=merge] .expression-list>.expression:not(:last-of-type) .expression-details {
     left: calc(-1 * var(--expression-font-size));
 }
-.entry[data-expression-multi=true] .expression:hover .expression-details {
+:root[data-result-output-mode=merge] .expression:hover .expression-details {
     visibility: visible;
 }
-.entry[data-expression-multi=true] .expression-list .expression-details>.action-play-audio {
+:root[data-result-output-mode=merge] .expression-list .expression-details>.action-play-audio {
     position: absolute;
     left: 0;
     bottom: 0.5em;
 }
-.entry:not([data-expression-multi=true]) .expression-list .expression-details>.action-play-audio {
+:root:not([data-result-output-mode=merge]) .expression-list .expression-details>.action-play-audio {
     display: none;
 }
-.entry[data-expression-multi=true] .expression-list .expression-tag-list {
+:root[data-result-output-mode=merge] .expression-list .expression-tag-list {
     display: block;
     position: absolute;
     left: 0;
     bottom: -0.5em;
     white-space: nowrap;
 }
-.entry[data-type=term][data-expression-multi=true] .expression-list-tag-list>.tag[data-category=search] {
+:root[data-result-output-mode=merge] .entry[data-type=term] .expression-list-tag-list>.tag[data-category=search] {
     display: none;
 }
 
