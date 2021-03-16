@@ -35,16 +35,16 @@
         "sourceDir": "ext"
     },
     "devDependencies": {
-        "browserify": "^16.5.2",
-        "eslint": "^7.15.0",
+        "browserify": "^17.0.0",
+        "eslint": "^7.22.0",
         "eslint-plugin-header": "^3.1.1",
         "eslint-plugin-no-unsanitized": "^3.1.4",
         "fake-indexeddb": "^3.1.2",
-        "html-validate": "^4.3.0",
-        "jsdom": "^16.4.0",
+        "html-validate": "^4.7.0",
+        "jsdom": "^16.5.1",
         "parse5": "^6.0.1",
-        "stylelint": "^13.8.0",
-        "stylelint-config-recommended": "^3.0.0",
-        "web-ext": "^5.4.1"
+        "stylelint": "^13.12.0",
+        "stylelint-config-recommended": "^4.0.0",
+        "web-ext": "^6.0.0"
     }
 }
