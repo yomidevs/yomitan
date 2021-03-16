@@ -243,6 +243,7 @@ class AnkiNoteData {
             if (definition2.type === 'term') {
                 this._defineFuriganaSegments(definition2);
             }
+            if (definition2.type === 'kanji') { continue; }
             for (const expression of definition2.expressions) {
                 this._defineFuriganaSegments(expression);
                 this._defineTermFrequency(expression);
