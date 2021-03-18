@@ -184,7 +184,7 @@ async function main() {
                     const {name, mode, text} = test;
                     const options = buildOptions(optionsPresets, test.options, title);
                     const [definitions, length] = clone(await translator.findTerms(mode, text, options));
-                    const noteDataList = clone(definitions.map((definition) => createTestAnkiNoteData(clone(definition), null)));
+                    const noteDataList = clone(definitions.map((definition) => createTestAnkiNoteData(clone(definition), mode)));
                     actualResults1.push({name, length, definitions});
                     actualResults2.push({name, noteDataList});
                     if (!write) {
