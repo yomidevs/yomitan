@@ -194,7 +194,7 @@ async function main() {
                     const {name, mode, text} = test;
                     const options = vm.buildOptions(optionsPresets, test.options);
                     const [definitions] = clone(await vm.translator.findTerms(mode, text, options));
-                    const results = clone(await getRenderResults(definitions, 'terms', mode, templates, AnkiNoteBuilder, write));
+                    const results = mode !== 'simple' ? clone(await getRenderResults(definitions, 'terms', mode, templates, AnkiNoteBuilder, write)) : null;
                     actualResults1.push({name, results});
                     if (!write) {
                         assert.deepStrictEqual(results, expected1.results);
