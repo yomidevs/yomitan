@@ -16,40 +16,41 @@
  */
 
 class DictionaryDataUtil {
-    static groupTermTags(definition) {
-        const {expressions} = definition;
-        const expressionsLength = expressions.length;
-        const uniqueCheck = (expressionsLength > 1);
-        const resultsMap = new Map();
+    static groupTermTags(dictionaryEntry) {
+        const {headwords} = dictionaryEntry;
+        const headwordCount = headwords.length;
+        const uniqueCheck = (headwordCount > 1);
+        const resultsIndexMap = new Map();
         const results = [];
-        for (let i = 0; i < expressionsLength; ++i) {
-            const {termTags, expression, reading} = expressions[i];
-            for (const tag of termTags) {
+        for (let i = 0; i < headwordCount; ++i) {
+            const {tags} = headwords[i];
+            for (const tag of tags) {
                 if (uniqueCheck) {
                     const {name, category, notes, dictionary} = tag;
                     const key = this._createMapKey([name, category, notes, dictionary]);
-                    const index = resultsMap.get(key);
+                    const index = resultsIndexMap.get(key);
                     if (typeof index !== 'undefined') {
                         const existingItem = results[index];
-                        existingItem.expressions.push({index: i, expression, reading});
+                        existingItem.headwordIndices.push(i);
                         continue;
                     }
-                    resultsMap.set(key, results.length);
+                    resultsIndexMap.set(key, results.length);
                 }
 
-                const item = {
-                    tag,
-                    expressions: [{index: i, expression, reading}]
-                };
+                const item = {tag, headwordIndices: [i]};
                 results.push(item);
             }
         }
         return results;
     }
 
-    static groupTermFrequencies(frequencies) {
+    static groupTermFrequencies(dictionaryEntry) {
+        const {headwords, frequencies} = dictionaryEntry;
+
         const map1 = new Map();
-        for (const {dictionary, expression, reading, hasReading, frequency} of frequencies) {
+        for (const {headwordIndex, dictionary, hasReading, frequency} of frequencies) {
+            const {term, reading} = headwords[headwordIndex];
+
             let map2 = map1.get(dictionary);
             if (typeof map2 === 'undefined') {
                 map2 = new Map();
@@ -57,14 +58,14 @@ class DictionaryDataUtil {
             }
 
             const readingKey = hasReading ? reading : null;
-            const key = this._createMapKey([expression, readingKey]);
+            const key = this._createMapKey([term, readingKey]);
             let frequencyData = map2.get(key);
             if (typeof frequencyData === 'undefined') {
-                frequencyData = {expression, reading: readingKey, frequencies: new Set()};
+                frequencyData = {term, reading: readingKey, values: new Set()};
                 map2.set(key, frequencyData);
             }
 
-            frequencyData.frequencies.add(frequency);
+            frequencyData.values.add(frequency);
         }
         return this._createFrequencyGroupsFromMap(map1);
     }
@@ -80,64 +81,66 @@ class DictionaryDataUtil {
 
             let frequencyData = map2.get(character);
             if (typeof frequencyData === 'undefined') {
-                frequencyData = {character, frequencies: new Set()};
+                frequencyData = {character, values: new Set()};
                 map2.set(character, frequencyData);
             }
 
-            frequencyData.frequencies.add(frequency);
+            frequencyData.values.add(frequency);
         }
         return this._createFrequencyGroupsFromMap(map1);
     }
 
-    static getPitchAccentInfos(definition) {
-        if (definition.type === 'kanji') { return []; }
+    static getPitchAccentInfos(dictionaryEntry) {
+        const {headwords, pronunciations} = dictionaryEntry;
 
-        const results = new Map();
         const allExpressions = new Set();
         const allReadings = new Set();
-
-        for (const {expression, reading, pitches: expressionPitches} of definition.expressions) {
-            allExpressions.add(expression);
+        for (const {term, reading} of headwords) {
+            allExpressions.add(term);
             allReadings.add(reading);
+        }
 
-            for (const {pitches, dictionary} of expressionPitches) {
-                let dictionaryResults = results.get(dictionary);
-                if (typeof dictionaryResults === 'undefined') {
-                    dictionaryResults = [];
-                    results.set(dictionary, dictionaryResults);
+        const pitchAccentInfoMap = new Map();
+        for (const {headwordIndex, dictionary, pitches} of pronunciations) {
+            const {term, reading} = headwords[headwordIndex];
+            let dictionaryPitchAccentInfoList = pitchAccentInfoMap.get(dictionary);
+            if (typeof dictionaryPitchAccentInfoList === 'undefined') {
+                dictionaryPitchAccentInfoList = [];
+                pitchAccentInfoMap.set(dictionary, dictionaryPitchAccentInfoList);
+            }
+            for (const {position, tags} of pitches) {
+                let pitchAccentInfo = this._findExistingPitchAccentInfo(reading, position, tags, dictionaryPitchAccentInfoList);
+                if (pitchAccentInfo === null) {
+                    pitchAccentInfo = {
+                        terms: new Set(),
+                        reading,
+                        position,
+                        tags,
+                        exclusiveTerms: [],
+                        exclusiveReadings: []
+                    };
+                    dictionaryPitchAccentInfoList.push(pitchAccentInfo);
                 }
-
-                for (const {position, tags} of pitches) {
-                    let pitchAccentInfo = this._findExistingPitchAccentInfo(reading, position, tags, dictionaryResults);
-                    if (pitchAccentInfo === null) {
-                        pitchAccentInfo = {expressions: new Set(), reading, position, tags};
-                        dictionaryResults.push(pitchAccentInfo);
-                    }
-                    pitchAccentInfo.expressions.add(expression);
-                }
+                pitchAccentInfo.terms.add(term);
             }
         }
 
         const multipleReadings = (allReadings.size > 1);
-        for (const dictionaryResults of results.values()) {
-            for (const result of dictionaryResults) {
-                const exclusiveExpressions = [];
-                const exclusiveReadings = [];
-                const resultExpressions = result.expressions;
-                if (!this._areSetsEqual(resultExpressions, allExpressions)) {
-                    exclusiveExpressions.push(...this._getSetIntersection(resultExpressions, allExpressions));
+        for (const dictionaryPitchAccentInfoList of pitchAccentInfoMap.values()) {
+            for (const pitchAccentInfo of dictionaryPitchAccentInfoList) {
+                const {terms, reading, exclusiveTerms, exclusiveReadings} = pitchAccentInfo;
+                if (!this._areSetsEqual(terms, allExpressions)) {
+                    exclusiveTerms.push(...this._getSetIntersection(terms, allExpressions));
                 }
                 if (multipleReadings) {
-                    exclusiveReadings.push(result.reading);
+                    exclusiveReadings.push(reading);
                 }
-                result.expressions = [...resultExpressions];
-                result.exclusiveExpressions = exclusiveExpressions;
-                result.exclusiveReadings = exclusiveReadings;
+                pitchAccentInfo.terms = [...terms];
             }
         }
 
         const results2 = [];
-        for (const [dictionary, pitches] of results.entries()) {
+        for (const [dictionary, pitches] of pitchAccentInfoMap.entries()) {
             results2.push({dictionary, pitches});
         }
         return results2;
@@ -157,17 +160,34 @@ class DictionaryDataUtil {
         }
     }
 
+    static getDisambiguations(headwords, headwordIndices, allTermsSet, allReadingsSet) {
+        if (allTermsSet.size <= 1 && allReadingsSet.size <= 1) { return []; }
+
+        const terms = new Set();
+        const readings = new Set();
+        for (const headwordIndex of headwordIndices) {
+            const {term, reading} = headwords[headwordIndex];
+            terms.add(term);
+            readings.add(reading);
+        }
+
+        const disambiguations = [];
+        if (!this._areSetsEqual(terms, allTermsSet)) { disambiguations.push(...this._getSetIntersection(terms, allTermsSet)); }
+        if (!this._areSetsEqual(readings, allReadingsSet)) { disambiguations.push(...this._getSetIntersection(readings, allReadingsSet)); }
+        return disambiguations;
+    }
+
     // Private
 
     static _createFrequencyGroupsFromMap(map) {
         const results = [];
         for (const [dictionary, map2] of map.entries()) {
-            const frequencyDataArray = [];
+            const frequencies = [];
             for (const frequencyData of map2.values()) {
-                frequencyData.frequencies = [...frequencyData.frequencies];
-                frequencyDataArray.push(frequencyData);
+                frequencyData.values = [...frequencyData.values];
+                frequencies.push(frequencyData);
             }
-            results.push({dictionary, frequencyData: frequencyDataArray});
+            results.push({dictionary, frequencies});
         }
         return results;
     }

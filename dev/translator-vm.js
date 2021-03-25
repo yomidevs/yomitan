@@ -30,7 +30,7 @@ class TranslatorVM extends DatabaseVM {
         super();
         this._japaneseUtil = null;
         this._translator = null;
-        this._AnkiNoteData = null;
+        this._ankiNoteDataCreator = null;
         this._dictionaryName = null;
     }
 
@@ -38,10 +38,14 @@ class TranslatorVM extends DatabaseVM {
         return this._translator;
     }
 
+    get ankiNoteDataCreator() {
+        return this._ankiNoteDataCreator;
+    }
+
     async prepare(dictionaryDirectory, dictionaryName) {
         this.execute([
             'js/core.js',
-            'js/data/anki-note-data.js',
+            'js/data/anki-note-data-creator.js',
             'js/data/database.js',
             'js/data/json-schema.js',
             'js/general/cache-map.js',
@@ -60,13 +64,13 @@ class TranslatorVM extends DatabaseVM {
             DictionaryDatabase,
             JapaneseUtil,
             Translator,
-            AnkiNoteData
+            AnkiNoteDataCreator
         ] = this.get([
             'DictionaryImporter',
             'DictionaryDatabase',
             'JapaneseUtil',
             'Translator',
-            'AnkiNoteData'
+            'AnkiNoteDataCreator'
         ]);
 
         // Dictionary
@@ -98,7 +102,7 @@ class TranslatorVM extends DatabaseVM {
         this._translator.prepare(deinflectionReasions);
 
         // Assign properties
-        this._AnkiNoteData = AnkiNoteData;
+        this._ankiNoteDataCreator = new AnkiNoteDataCreator(this._japaneseUtil);
     }
 
     createTestAnkiNoteData(definition, mode) {
@@ -116,8 +120,7 @@ class TranslatorVM extends DatabaseVM {
             },
             injectedMedia: null
         };
-        const AnkiNoteData = this._AnkiNoteData;
-        return new AnkiNoteData(this._japaneseUtil, marker, data).createPublic();
+        return this._ankiNoteDataCreator.create(marker, data);
     }
 
     buildOptions(optionsPresets, optionsArray) {

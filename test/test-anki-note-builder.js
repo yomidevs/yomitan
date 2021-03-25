@@ -42,21 +42,20 @@ async function createVM() {
     const [
         JapaneseUtil,
         TemplateRenderer,
-        AnkiNoteData,
         AnkiNoteBuilder
     ] = vm.get([
         'JapaneseUtil',
         'TemplateRenderer',
-        'AnkiNoteData',
         'AnkiNoteBuilder'
     ]);
 
+    const ankiNoteDataCreator = vm.ankiNoteDataCreator;
     class TemplateRendererProxy {
         constructor() {
             const japaneseUtil = new JapaneseUtil(null);
             this._templateRenderer = new TemplateRenderer(japaneseUtil);
             this._templateRenderer.registerDataType('ankiNote', {
-                modifier: ({data, marker}) => new AnkiNoteData(japaneseUtil, marker, data).createPublic()
+                modifier: ({data, marker}) => ankiNoteDataCreator.create(marker, data)
             });
         }
 
@@ -122,7 +121,7 @@ function getFieldMarkers(type) {
     }
 }
 
-async function getRenderResults(definitions, type, mode, templates, AnkiNoteBuilder, write) {
+async function getRenderResults(dictionaryEntries, type, mode, templates, AnkiNoteBuilder, write) {
     const markers = getFieldMarkers(type);
     const fields = [];
     for (const marker of markers) {
@@ -132,8 +131,18 @@ async function getRenderResults(definitions, type, mode, templates, AnkiNoteBuil
     const clozePrefix = 'cloze-prefix';
     const clozeSuffix = 'cloze-suffix';
     const results = [];
-    for (const definition of definitions) {
-        const source = definition.type === 'kanji' ? definition.character : definition.rawSource;
+    for (const dictionaryEntry of dictionaryEntries) {
+        let source = '';
+        switch (dictionaryEntry.type) {
+            case 'kanji':
+                source = dictionaryEntry.character;
+                break;
+            case 'term':
+                if (dictionaryEntry.headwords.length > 0 && dictionaryEntry.headwords[0].sources.length > 0) {
+                    source = dictionaryEntry.headwords[0].sources[0].originalText;
+                }
+                break;
+        }
         const ankiNoteBuilder = new AnkiNoteBuilder();
         const context = {
             url: 'url:',
@@ -145,7 +154,7 @@ async function getRenderResults(definitions, type, mode, templates, AnkiNoteBuil
         };
         const errors = [];
         const noteFields = (await ankiNoteBuilder.createNote({
-            definition,
+            definition: dictionaryEntry,
             mode: null,
             context,
             templates,
@@ -193,8 +202,8 @@ async function main() {
                 {
                     const {name, mode, text} = test;
                     const options = vm.buildOptions(optionsPresets, test.options);
-                    const [definitions] = clone(await vm.translator.findTerms(mode, text, options));
-                    const results = mode !== 'simple' ? clone(await getRenderResults(definitions, 'terms', mode, templates, AnkiNoteBuilder, write)) : null;
+                    const {dictionaryEntries} = clone(await vm.translator.findTerms(mode, text, options));
+                    const results = mode !== 'simple' ? clone(await getRenderResults(dictionaryEntries, 'terms', mode, templates, AnkiNoteBuilder, write)) : null;
                     actualResults1.push({name, results});
                     if (!write) {
                         assert.deepStrictEqual(results, expected1.results);
@@ -205,8 +214,8 @@ async function main() {
                 {
                     const {name, text} = test;
                     const options = vm.buildOptions(optionsPresets, test.options);
-                    const definitions = clone(await vm.translator.findKanji(text, options));
-                    const results = clone(await getRenderResults(definitions, 'kanji', null, templates, AnkiNoteBuilder, write));
+                    const dictionaryEntries = clone(await vm.translator.findKanji(text, options));
+                    const results = clone(await getRenderResults(dictionaryEntries, 'kanji', null, templates, AnkiNoteBuilder, write));
                     actualResults1.push({name, results});
                     if (!write) {
                         assert.deepStrictEqual(results, expected1.results);

@@ -414,9 +414,9 @@ class Backend {
         const options = this._getProfileOptions(optionsContext);
         const {general: {resultOutputMode: mode, maxResults}} = options;
         const findTermsOptions = this._getTranslatorFindTermsOptions(details, options);
-        const [definitions, length] = await this._translator.findTerms(mode, text, findTermsOptions);
-        definitions.splice(maxResults);
-        return {length, definitions};
+        const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
+        dictionaryEntries.splice(maxResults);
+        return {length: originalTextLength, definitions: dictionaryEntries};
     }
 
     async _onApiTextParse({text, optionsContext}) {
@@ -1050,7 +1050,7 @@ class Backend {
         let i = 0;
         const ii = text.length;
         while (i < ii) {
-            const [definitions, sourceLength] = await this._translator.findTerms(
+            const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
                 'simple',
                 text.substring(i, i + scanningLength),
                 findTermsOptions
@@ -1058,20 +1058,20 @@ class Backend {
             const codePoint = text.codePointAt(i);
             const character = String.fromCodePoint(codePoint);
             if (
-                definitions.length > 0 &&
-                sourceLength > 0 &&
-                (sourceLength !== character.length || this._japaneseUtil.isCodePointJapanese(codePoint))
+                dictionaryEntries.length > 0 &&
+                originalTextLength > 0 &&
+                (originalTextLength !== character.length || this._japaneseUtil.isCodePointJapanese(codePoint))
             ) {
                 previousUngroupedSegment = null;
-                const {expression, reading} = definitions[0];
-                const source = text.substring(i, i + sourceLength);
-                const term = [];
-                for (const {text: text2, furigana} of jp.distributeFuriganaInflected(expression, reading, source)) {
+                const {headwords: [{term, reading}]} = dictionaryEntries[0];
+                const source = text.substring(i, i + originalTextLength);
+                const textSegments = [];
+                for (const {text: text2, furigana} of jp.distributeFuriganaInflected(term, reading, source)) {
                     const reading2 = jp.convertReading(text2, furigana, readingMode);
-                    term.push({text: text2, reading: reading2});
+                    textSegments.push({text: text2, reading: reading2});
                 }
-                results.push(term);
-                i += sourceLength;
+                results.push(textSegments);
+                i += originalTextLength;
             } else {
                 if (previousUngroupedSegment === null) {
                     previousUngroupedSegment = {text: character, reading: ''};

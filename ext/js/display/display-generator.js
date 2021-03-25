@@ -60,23 +60,20 @@ class DisplayGenerator {
         const definitionsContainer = node.querySelector('.definition-list');
         const termTagsContainer = node.querySelector('.expression-list-tag-list');
 
-        const {expressions, type, reasons, frequencies} = details;
-        const definitions = (type === 'term' ? [details] : details.definitions);
-        const merged = (type === 'termMerged' || type === 'termMergedByGlossary');
+        const {headwords: expressions, type, inflections: reasons, definitions, frequencies, pronunciations} = details;
         const pitches = DictionaryDataUtil.getPitchAccentInfos(details);
         const pitchCount = pitches.reduce((i, v) => i + v.pitches.length, 0);
-        const groupedFrequencies = DictionaryDataUtil.groupTermFrequencies(frequencies);
+        const groupedFrequencies = DictionaryDataUtil.groupTermFrequencies(details);
         const termTags = DictionaryDataUtil.groupTermTags(details);
 
         const uniqueExpressions = new Set();
         const uniqueReadings = new Set();
-        for (const {expression, reading} of expressions) {
+        for (const {term: expression, reading} of expressions) {
             uniqueExpressions.add(expression);
             uniqueReadings.add(reading);
         }
 
         node.dataset.format = type;
-        node.dataset.expressionMulti = `${merged}`;
         node.dataset.expressionCount = `${expressions.length}`;
         node.dataset.definitionCount = `${definitions.length}`;
         node.dataset.pitchAccentDictionaryCount = `${pitches.length}`;
@@ -86,7 +83,13 @@ class DisplayGenerator {
         node.dataset.frequencyCount = `${frequencies.length}`;
         node.dataset.groupedFrequencyCount = `${groupedFrequencies.length}`;
 
-        this._appendMultiple(expressionsContainer, this._createTermExpression.bind(this), expressions);
+        for (let i = 0, ii = expressions.length; i < ii; ++i) {
+            const node2 = this._createTermExpression(expressions[i], i, pronunciations);
+            node2.dataset.index = `${i}`;
+            expressionsContainer.appendChild(node2);
+        }
+        expressionsContainer.dataset.count = `${expressions.length}`;
+
         this._appendMultiple(reasonsContainer, this._createTermReason.bind(this), reasons);
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(pitchesContainer, this._createPitches.bind(this), pitches);
@@ -114,7 +117,7 @@ class DisplayGenerator {
                 dictionaryTag.name = dictionary;
             }
 
-            const node2 = this._createTermDefinitionItem(definition, dictionaryTag);
+            const node2 = this._createTermDefinitionItem(definition, dictionaryTag, expressions, uniqueExpressions, uniqueReadings);
             node2.dataset.index = `${i}`;
             definitionsContainer.appendChild(node2);
         }
@@ -144,7 +147,7 @@ class DisplayGenerator {
 
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, true);
         this._appendMultiple(tagContainer, this._createTag.bind(this), [...details.tags, dictionaryTag]);
-        this._appendMultiple(glossaryContainer, this._createKanjiGlossaryItem.bind(this), details.glossary);
+        this._appendMultiple(glossaryContainer, this._createKanjiGlossaryItem.bind(this), details.definitions);
         this._appendMultiple(chineseReadingsContainer, this._createKanjiReading.bind(this), details.onyomi);
         this._appendMultiple(japaneseReadingsContainer, this._createKanjiReading.bind(this), details.kunyomi);
 
@@ -229,8 +232,8 @@ class DisplayGenerator {
 
     // Private
 
-    _createTermExpression(details) {
-        const {expression, reading, termTags, pitches} = details;
+    _createTermExpression(headword, headwordIndex, pronunciations) {
+        const {term: expression, reading, tags: termTags} = headword;
 
         const searchQueries = [];
         if (expression) { searchQueries.push(expression); }
@@ -244,7 +247,7 @@ class DisplayGenerator {
         node.dataset.readingIsSame = `${reading === expression}`;
         node.dataset.frequency = DictionaryDataUtil.getTermFrequency(termTags);
 
-        const pitchAccentCategories = this._getPitchAccentCategories(pitches);
+        const pitchAccentCategories = this._getPitchAccentCategories(reading, pronunciations, headwordIndex);
         if (pitchAccentCategories !== null) {
             node.dataset.pitchAccentCategories = pitchAccentCategories;
         }
@@ -266,19 +269,21 @@ class DisplayGenerator {
         return fragment;
     }
 
-    _createTermDefinitionItem(details, dictionaryTag) {
+    _createTermDefinitionItem(details, dictionaryTag, headwords, uniqueTerms, uniqueReadings) {
+        const {dictionary, tags, headwordIndices, entries} = details;
+        const disambiguations = DictionaryDataUtil.getDisambiguations(headwords, headwordIndices, uniqueTerms, uniqueReadings);
+
         const node = this._templates.instantiate('definition-item');
 
         const tagListContainer = node.querySelector('.definition-tag-list');
         const onlyListContainer = node.querySelector('.definition-disambiguation-list');
         const glossaryContainer = node.querySelector('.glossary-list');
 
-        const {dictionary, definitionTags} = details;
         node.dataset.dictionary = dictionary;
 
-        this._appendMultiple(tagListContainer, this._createTag.bind(this), [...definitionTags, dictionaryTag]);
-        this._appendMultiple(onlyListContainer, this._createTermDisambiguation.bind(this), details.only);
-        this._appendMultiple(glossaryContainer, this._createTermGlossaryItem.bind(this), details.glossary, dictionary);
+        this._appendMultiple(tagListContainer, this._createTag.bind(this), [...tags, dictionaryTag]);
+        this._appendMultiple(onlyListContainer, this._createTermDisambiguation.bind(this), disambiguations);
+        this._appendMultiple(glossaryContainer, this._createTermGlossaryItem.bind(this), entries, dictionary);
 
         return node;
     }
@@ -406,11 +411,12 @@ class DisplayGenerator {
     }
 
     _createKanjiInfoTableItem(details) {
+        const {content, name, value} = details;
         const node = this._templates.instantiate('kanji-info-table-item');
         const nameNode = node.querySelector('.kanji-info-table-item-header');
         const valueNode = node.querySelector('.kanji-info-table-item-value');
-        this._setTextContent(nameNode, details.notes || details.name);
-        this._setTextContent(valueNode, details.value);
+        this._setTextContent(nameNode, content.length > 0 ? content : name);
+        this._setTextContent(valueNode, value);
         return node;
     }
 
@@ -419,37 +425,46 @@ class DisplayGenerator {
     }
 
     _createTag(details) {
-        const {notes, name, category, redundant} = details;
+        const {content, name, category, redundant} = details;
         const node = this._templates.instantiate('tag');
 
         const inner = node.querySelector('.tag-label-content');
 
-        node.title = notes;
+        const contentString = content.join('\n');
+
+        node.title = contentString;
         this._setTextContent(inner, name);
-        node.dataset.details = notes || name;
+        node.dataset.details = contentString.length > 0 ? contentString : name;
         node.dataset.category = category;
         if (redundant) { node.dataset.redundant = 'true'; }
 
         return node;
     }
 
-    _createTermTag(details, totalExpressionCount) {
-        const {tag, expressions} = details;
+    _createTermTag(details, totalHeadwordCount) {
+        const {tag, headwordIndices} = details;
         const node = this._createTag(tag);
-        node.dataset.disambiguation = `${JSON.stringify(expressions)}`;
-        node.dataset.totalExpressionCount = `${totalExpressionCount}`;
-        node.dataset.matchedExpressionCount = `${expressions.length}`;
-        node.dataset.unmatchedExpressionCount = `${Math.max(0, totalExpressionCount - expressions.length)}`;
+        node.dataset.headwords = headwordIndices.join(' ');
+        node.dataset.totalExpressionCount = `${totalHeadwordCount}`;
+        node.dataset.matchedExpressionCount = `${headwordIndices.length}`;
+        node.dataset.unmatchedExpressionCount = `${Math.max(0, totalHeadwordCount - headwordIndices.length)}`;
         return node;
     }
 
-    _createSearchTag(text) {
-        return this._createTag({
-            notes: '',
-            name: text,
-            category: 'search',
+    _createTagData(name, category) {
+        return {
+            name,
+            category,
+            order: 0,
+            score: 0,
+            content: [],
+            dictionaries: [],
             redundant: false
-        });
+        };
+    }
+
+    _createSearchTag(text) {
+        return this._createTag(this._createTagData(text, 'search'));
     }
 
     _createPitches(details) {
@@ -462,7 +477,7 @@ class DisplayGenerator {
         node.dataset.pitchesMulti = 'true';
         node.dataset.pitchesCount = `${pitches.length}`;
 
-        const tag = this._createTag({notes: '', name: dictionary, category: 'pitch-accent-dictionary'});
+        const tag = this._createTag(this._createTagData(dictionary, 'pitch-accent-dictionary'));
         node.querySelector('.pitch-accent-group-tag-list').appendChild(tag);
 
         let hasTags = false;
@@ -482,7 +497,7 @@ class DisplayGenerator {
 
     _createPitch(details) {
         const jp = this._japaneseUtil;
-        const {reading, position, tags, exclusiveExpressions, exclusiveReadings} = details;
+        const {reading, position, tags, exclusiveTerms, exclusiveReadings} = details;
         const morae = jp.getKanaMorae(reading);
 
         const node = this._templates.instantiate('pitch-accent');
@@ -497,7 +512,7 @@ class DisplayGenerator {
         this._appendMultiple(n, this._createTag.bind(this), tags);
 
         n = node.querySelector('.pitch-accent-disambiguation-list');
-        this._createPitchAccentDisambiguations(n, exclusiveExpressions, exclusiveReadings);
+        this._createPitchAccentDisambiguations(n, exclusiveTerms, exclusiveReadings);
 
         n = node.querySelector('.pitch-accent-characters');
         for (let i = 0, ii = morae.length; i < ii; ++i) {
@@ -523,9 +538,9 @@ class DisplayGenerator {
         return node;
     }
 
-    _createPitchAccentDisambiguations(container, exclusiveExpressions, exclusiveReadings) {
+    _createPitchAccentDisambiguations(container, exclusiveTerms, exclusiveReadings) {
         const templateName = 'pitch-accent-disambiguation';
-        for (const exclusiveExpression of exclusiveExpressions) {
+        for (const exclusiveExpression of exclusiveTerms) {
             const node = this._templates.instantiate(templateName);
             node.dataset.type = 'expression';
             this._setTextContent(node, exclusiveExpression, 'ja');
@@ -539,8 +554,8 @@ class DisplayGenerator {
             container.appendChild(node);
         }
 
-        container.dataset.count = `${exclusiveExpressions.length + exclusiveReadings.length}`;
-        container.dataset.expressionCount = `${exclusiveExpressions.length}`;
+        container.dataset.count = `${exclusiveTerms.length + exclusiveReadings.length}`;
+        container.dataset.expressionCount = `${exclusiveTerms.length}`;
         container.dataset.readingCount = `${exclusiveReadings.length}`;
     }
 
@@ -586,7 +601,7 @@ class DisplayGenerator {
     }
 
     _createFrequencyGroup(details, kanji) {
-        const {dictionary, frequencyData} = details;
+        const {dictionary, frequencies} = details;
 
         const node = this._templates.instantiate('frequency-group-item');
         const body = node.querySelector('.tag-body-content');
@@ -594,36 +609,37 @@ class DisplayGenerator {
         this._setTextContent(node.querySelector('.tag-label-content'), dictionary);
         node.dataset.details = dictionary;
 
-        for (let i = 0, ii = frequencyData.length; i < ii; ++i) {
-            const item = frequencyData[i];
+        const ii = frequencies.length;
+        for (let i = 0; i < ii; ++i) {
+            const item = frequencies[i];
             const itemNode = (kanji ? this._createKanjiFrequency(item, dictionary) : this._createTermFrequency(item, dictionary));
             itemNode.dataset.index = `${i}`;
             body.appendChild(itemNode);
         }
 
-        body.dataset.count = `${frequencyData.length}`;
-        node.dataset.count = `${frequencyData.length}`;
+        body.dataset.count = `${ii}`;
+        node.dataset.count = `${ii}`;
         node.dataset.details = dictionary;
 
         return node;
     }
 
     _createTermFrequency(details, dictionary) {
-        const {expression, reading, frequencies} = details;
+        const {term, reading, values} = details;
         const node = this._templates.instantiate('term-frequency-item');
 
         this._setTextContent(node.querySelector('.tag-label-content'), dictionary);
 
-        const frequency = frequencies.join(', ');
+        const frequency = values.join(', ');
 
-        this._setTextContent(node.querySelector('.frequency-disambiguation-expression'), expression, 'ja');
+        this._setTextContent(node.querySelector('.frequency-disambiguation-expression'), term, 'ja');
         this._setTextContent(node.querySelector('.frequency-disambiguation-reading'), (reading !== null ? reading : ''), 'ja');
         this._setTextContent(node.querySelector('.frequency-value'), frequency, 'ja');
 
-        node.dataset.expression = expression;
+        node.dataset.expression = term;
         node.dataset.reading = reading;
         node.dataset.hasReading = `${reading !== null}`;
-        node.dataset.readingIsSame = `${reading === expression}`;
+        node.dataset.readingIsSame = `${reading === term}`;
         node.dataset.dictionary = dictionary;
         node.dataset.frequency = `${frequency}`;
         node.dataset.details = dictionary;
@@ -632,10 +648,10 @@ class DisplayGenerator {
     }
 
     _createKanjiFrequency(details, dictionary) {
-        const {character, frequencies} = details;
+        const {character, values} = details;
         const node = this._templates.instantiate('kanji-frequency-item');
 
-        const frequency = frequencies.join(', ');
+        const frequency = values.join(', ');
 
         this._setTextContent(node.querySelector('.tag-label-content'), dictionary);
         this._setTextContent(node.querySelector('.frequency-value'), frequency, 'ja');
@@ -707,15 +723,7 @@ class DisplayGenerator {
     }
 
     _createDictionaryTag(dictionary) {
-        return {
-            name: dictionary,
-            category: 'dictionary',
-            notes: '',
-            order: 100,
-            score: 0,
-            dictionary,
-            redundant: false
-        };
+        return this._createTagData(dictionary, 'dictionary');
     }
 
     _setTextContent(node, value, language) {
@@ -751,11 +759,12 @@ class DisplayGenerator {
         }
     }
 
-    _getPitchAccentCategories(pitches) {
-        if (pitches.length === 0) { return null; }
+    _getPitchAccentCategories(reading, pronunciations, headwordIndex) {
+        if (pronunciations.length === 0) { return null; }
         const categories = new Set();
-        for (const {reading, pitches: pitches2} of pitches) {
-            for (const {position} of pitches2) {
+        for (const pronunciation of pronunciations) {
+            if (pronunciation.headwordIndex !== headwordIndex) { continue; }
+            for (const {position} of pronunciation.pitches) {
                 const category = this._japaneseUtil.getPitchCategory(reading, position, false);
                 if (category !== null) {
                     categories.add(category);

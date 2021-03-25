@@ -54,13 +54,13 @@ async function main() {
                 {
                     const {name, mode, text} = test;
                     const options = translatorVM.buildOptions(optionsPresets, test.options);
-                    const [definitions, length] = clone(await translatorVM.translator.findTerms(mode, text, options));
-                    const noteDataList = mode !== 'simple' ? clone(definitions.map((definition) => translatorVM.createTestAnkiNoteData(clone(definition), mode))) : null;
-                    actualResults1.push({name, length, definitions});
+                    const {dictionaryEntries, originalTextLength} = clone(await translatorVM.translator.findTerms(mode, text, options));
+                    const noteDataList = mode !== 'simple' ? clone(dictionaryEntries.map((dictionaryEntry) => translatorVM.createTestAnkiNoteData(clone(dictionaryEntry), mode))) : null;
+                    actualResults1.push({name, originalTextLength, dictionaryEntries});
                     actualResults2.push({name, noteDataList});
                     if (!write) {
-                        assert.deepStrictEqual(length, expected1.length);
-                        assert.deepStrictEqual(definitions, expected1.definitions);
+                        assert.deepStrictEqual(originalTextLength, expected1.originalTextLength);
+                        assert.deepStrictEqual(dictionaryEntries, expected1.dictionaryEntries);
                         assert.deepStrictEqual(noteDataList, expected2.noteDataList);
                     }
                 }
@@ -69,12 +69,12 @@ async function main() {
                 {
                     const {name, text} = test;
                     const options = translatorVM.buildOptions(optionsPresets, test.options);
-                    const definitions = clone(await translatorVM.translator.findKanji(text, options));
-                    const noteDataList = clone(definitions.map((definition) => translatorVM.createTestAnkiNoteData(clone(definition), null)));
-                    actualResults1.push({name, definitions});
+                    const dictionaryEntries = clone(await translatorVM.translator.findKanji(text, options));
+                    const noteDataList = clone(dictionaryEntries.map((dictionaryEntry) => translatorVM.createTestAnkiNoteData(clone(dictionaryEntry), null)));
+                    actualResults1.push({name, dictionaryEntries});
                     actualResults2.push({name, noteDataList});
                     if (!write) {
-                        assert.deepStrictEqual(definitions, expected1.definitions);
+                        assert.deepStrictEqual(dictionaryEntries, expected1.dictionaryEntries);
                         assert.deepStrictEqual(noteDataList, expected2.noteDataList);
                     }
                 }
