@@ -31,6 +31,7 @@ class DisplayAudio {
         this._cache = new Map();
         this._menuContainer = document.querySelector('#popup-menus');
         this._entriesToken = {};
+        this._openMenus = new Set();
     }
 
     get autoPlayAudioDelay() {
@@ -198,9 +199,12 @@ class DisplayAudio {
     }
 
     _onAudioPlayMenuCloseClick(definitionIndex, expressionIndex, e) {
-        const {detail: {action, item, menu}} = e;
+        const {detail: {action, item, menu, shiftKey}} = e;
         switch (action) {
             case 'playAudioFromSource':
+                if (shiftKey) {
+                    e.preventDefault();
+                }
                 this._playAudioFromSource(definitionIndex, expressionIndex, item);
                 break;
             case 'setPrimaryAudio':
@@ -306,12 +310,14 @@ class DisplayAudio {
         for (let i = 0, ii = sources.length; i < ii; ++i) {
             const source = sources[i];
 
+            let cacheUpdated = false;
             let infoListPromise;
             let sourceInfo = sourceMap.get(source);
             if (typeof sourceInfo === 'undefined') {
                 infoListPromise = this._getExpressionAudioInfoList(source, expression, reading, details);
                 sourceInfo = {infoListPromise, infoList: null};
                 sourceMap.set(source, sourceInfo);
+                cacheUpdated = true;
             }
 
             let {infoList} = sourceInfo;
@@ -332,14 +338,17 @@ class DisplayAudio {
                 }
             }
 
-            const audio = await this._createAudioFromInfoList(source, infoList, start, end);
-            if (audio !== null) { return audio; }
+            const {result, cacheUpdated: cacheUpdated2} = await this._createAudioFromInfoList(source, infoList, start, end);
+            if (cacheUpdated || cacheUpdated2) { this._updateOpenMenu(); }
+            if (result !== null) { return result; }
         }
 
         return null;
     }
 
     async _createAudioFromInfoList(source, infoList, start, end) {
+        let result = null;
+        let cacheUpdated = false;
         for (let i = start; i < end; ++i) {
             const item = infoList[i];
 
@@ -352,6 +361,8 @@ class DisplayAudio {
                     item.audioPromise = audioPromise;
                 }
 
+                cacheUpdated = true;
+
                 try {
                     audio = await audioPromise;
                 } catch (e) {
@@ -363,11 +374,12 @@ class DisplayAudio {
                 item.audio = audio;
             }
 
-            if (audio === null) { continue; }
-
-            return {audio, source, infoListIndex: i};
+            if (audio !== null) {
+                result = {audio, source, infoListIndex: i};
+                break;
+            }
         }
-        return null;
+        return {result, cacheUpdated};
     }
 
     async _createAudioFromInfo(info, source) {
@@ -471,7 +483,13 @@ class DisplayAudio {
 
         const {expression, reading} = expressionReading;
         const popupMenu = this._createMenu(button, expression, reading);
+        this._openMenus.add(popupMenu);
         popupMenu.prepare();
+        popupMenu.on('close', this._onPopupMenuClose.bind(this));
+    }
+
+    _onPopupMenuClose({menu}) {
+        this._openMenus.delete(menu);
     }
 
     _sourceIsDownloadable(source) {
@@ -533,21 +551,36 @@ class DisplayAudio {
     }
 
     _createMenu(sourceButton, expression, reading) {
-        // Options
-        const sources = this._getAudioSources(this._getAudioOptions());
-
         // Create menu
-        const {displayGenerator} = this._display;
-        const menuNode = displayGenerator.instantiateTemplate('audio-button-popup-menu');
-        const menuBodyNode = menuNode.querySelector('.popup-menu-body');
+        const menuContainerNode = this._display.displayGenerator.instantiateTemplate('audio-button-popup-menu');
+        const menuBodyNode = menuContainerNode.querySelector('.popup-menu-body');
+        menuContainerNode.dataset.expression = expression;
+        menuContainerNode.dataset.reading = reading;
 
         // Set up items based on options and cache data
+        this._createMenuItems(menuContainerNode, menuBodyNode, expression, reading);
+
+        // Update primary card audio display
+        this._updateMenuPrimaryCardAudio(menuBodyNode, expression, reading);
+
+        // Create popup menu
+        this._menuContainer.appendChild(menuContainerNode);
+        return new PopupMenu(sourceButton, menuContainerNode);
+    }
+
+    _createMenuItems(menuContainerNode, menuItemContainer, expression, reading) {
+        const sources = this._getAudioSources(this._getAudioOptions());
+        const {displayGenerator} = this._display;
         let showIcons = false;
+        const currentItems = [...menuItemContainer.children];
         for (const {source, displayName, isInOptions, downloadable} of sources) {
             const entries = this._getMenuItemEntries(source, expression, reading);
             for (let i = 0, ii = entries.length; i < ii; ++i) {
                 const {valid, index, name} = entries[i];
-                const node = displayGenerator.instantiateTemplate('audio-button-popup-menu-item');
+                let node = this._getOrCreateMenuItem(currentItems, source, index);
+                if (node === null) {
+                    node = displayGenerator.instantiateTemplate('audio-button-popup-menu-item');
+                }
 
                 const labelNode = node.querySelector('.popup-menu-item-audio-button .popup-menu-item-label');
                 let label = displayName;
@@ -571,17 +604,32 @@ class DisplayAudio {
                 node.dataset.sourceInOptions = `${isInOptions}`;
                 node.dataset.downloadable = `${downloadable}`;
 
-                menuBodyNode.appendChild(node);
+                menuItemContainer.appendChild(node);
             }
         }
-        menuNode.dataset.showIcons = `${showIcons}`;
+        for (const node of currentItems) {
+            const {parentNode} = node;
+            if (parentNode === null) { continue; }
+            parentNode.removeChild(node);
+        }
+        menuContainerNode.dataset.showIcons = `${showIcons}`;
+    }
 
-        // Update primary card audio display
-        this._updateMenuPrimaryCardAudio(menuBodyNode, expression, reading);
+    _getOrCreateMenuItem(currentItems, source, index) {
+        if (index === null) { index = 0; }
+        index = `${index}`;
+        for (let i = 0, ii = currentItems.length; i < ii; ++i) {
+            const node = currentItems[i];
+            if (source !== node.dataset.source) { continue; }
 
-        // Create popup menu
-        this._menuContainer.appendChild(menuNode);
-        return new PopupMenu(sourceButton, menuNode);
+            let index2 = node.dataset.index;
+            if (typeof index2 === 'undefined') { index2 = '0'; }
+            if (index !== index2) { continue; }
+
+            currentItems.splice(i, 1);
+            return node;
+        }
+        return null;
     }
 
     _getMenuItemEntries(source, expression, reading) {
@@ -629,6 +677,15 @@ class DisplayAudio {
 
             const isPrimaryCardAudio = (source === primaryCardAudioSource && sourceIndex === primaryCardAudioIndex);
             node.dataset.isPrimaryCardAudio = `${isPrimaryCardAudio}`;
+        }
+    }
+
+    _updateOpenMenu() {
+        for (const menu of this._openMenus) {
+            const menuContainerNode = menu.containerNode;
+            const {expression, reading} = menuContainerNode.dataset;
+            this._createMenuItems(menuContainerNode, menu.bodyNode, expression, reading);
+            menu.updatePosition();
         }
     }
 }

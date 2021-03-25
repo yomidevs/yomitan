@@ -24,6 +24,7 @@ class PopupMenu extends EventDispatcher {
         this._bodyNode = containerNode.querySelector('.popup-menu-body');
         this._isClosed = false;
         this._eventListeners = new EventListenerCollection();
+        this._itemEventListeners = new EventListenerCollection();
     }
 
     get sourceElement() {
@@ -47,17 +48,13 @@ class PopupMenu extends EventDispatcher {
     }
 
     prepare() {
-        const items = this._bodyNode.querySelectorAll('.popup-menu-item');
         this._setPosition();
         this._containerNode.focus();
 
         this._eventListeners.addEventListener(window, 'resize', this._onWindowResize.bind(this), false);
         this._eventListeners.addEventListener(this._containerNode, 'click', this._onMenuContainerClick.bind(this), false);
 
-        const onMenuItemClick = this._onMenuItemClick.bind(this);
-        for (const item of items) {
-            this._eventListeners.addEventListener(item, 'click', onMenuItemClick, false);
-        }
+        this.updateMenuItems();
 
         PopupMenu.openMenus.add(this);
 
@@ -69,7 +66,20 @@ class PopupMenu extends EventDispatcher {
     }
 
     close(cancelable=true) {
-        return this._close(null, 'close', cancelable);
+        return this._close(null, 'close', cancelable, {});
+    }
+
+    updateMenuItems() {
+        this._itemEventListeners.removeAllEventListeners();
+        const items = this._bodyNode.querySelectorAll('.popup-menu-item');
+        const onMenuItemClick = this._onMenuItemClick.bind(this);
+        for (const item of items) {
+            this._itemEventListeners.addEventListener(item, 'click', onMenuItemClick, false);
+        }
+    }
+
+    updatePosition() {
+        this._setPosition();
     }
 
     // Private
@@ -78,7 +88,7 @@ class PopupMenu extends EventDispatcher {
         if (e.currentTarget !== e.target) { return; }
         e.stopPropagation();
         e.preventDefault();
-        this._close(null, 'outside', true);
+        this._close(null, 'outside', true, e);
     }
 
     _onMenuItemClick(e) {
@@ -86,11 +96,11 @@ class PopupMenu extends EventDispatcher {
         if (item.disabled) { return; }
         e.stopPropagation();
         e.preventDefault();
-        this._close(item, 'item', true);
+        this._close(item, 'item', true, e);
     }
 
     _onWindowResize() {
-        this._close(null, 'resize', true);
+        this._close(null, 'resize', true, {});
     }
 
     _setPosition() {
@@ -172,15 +182,20 @@ class PopupMenu extends EventDispatcher {
         menu.style.top = `${y}px`;
     }
 
-    _close(item, cause, cancelable) {
+    _close(item, cause, cancelable, originalEvent) {
         if (this._isClosed) { return true; }
         const action = (item !== null ? item.dataset.menuAction : null);
 
+        const {altKey=false, ctrlKey=false, metaKey=false, shiftKey=false} = originalEvent;
         const detail = {
             menu: this,
             item,
             action,
-            cause
+            cause,
+            altKey,
+            ctrlKey,
+            metaKey,
+            shiftKey
         };
         const result = this._sourceElement.dispatchEvent(new CustomEvent('menuClose', {bubbles: false, cancelable, detail}));
         if (cancelable && !result) { return false; }
@@ -189,6 +204,7 @@ class PopupMenu extends EventDispatcher {
 
         this._isClosed = true;
         this._eventListeners.removeAllEventListeners();
+        this._itemEventListeners.removeAllEventListeners();
         if (this._containerNode.parentNode !== null) {
             this._containerNode.parentNode.removeChild(this._containerNode);
         }
