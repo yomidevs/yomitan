@@ -806,7 +806,10 @@ class Display extends EventDispatcher {
             this._tagNotification = new DisplayNotification(this._footerNotificationContainer, node);
         }
 
-        const content = this._displayGenerator.createTagFooterNotificationDetails(tagNode);
+        const index = this._getClosestDefinitionIndex(tagNode);
+        const dictionaryEntry = (index >= 0 && index < this._definitions.length ? this._definitions[index] : null);
+
+        const content = this._displayGenerator.createTagFooterNotificationDetails(tagNode, dictionaryEntry);
         this._tagNotification.setContent(content);
         this._tagNotification.open();
     }

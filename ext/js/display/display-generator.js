@@ -163,7 +163,7 @@ class DisplayGenerator {
         return this._templates.instantiate('footer-notification');
     }
 
-    createTagFooterNotificationDetails(tagNode) {
+    createTagFooterNotificationDetails(tagNode, dictionaryEntry) {
         const node = this._templates.instantiateFragment('footer-notification-tag-details');
 
         let details = tagNode.dataset.details;
@@ -173,32 +173,35 @@ class DisplayGenerator {
         }
         this._setTextContent(node.querySelector('.tag-details'), details);
 
-        let disambiguation = null;
-        try {
-            let a = tagNode.dataset.disambiguation;
-            if (typeof a !== 'undefined') {
-                a = JSON.parse(a);
-                if (Array.isArray(a)) { disambiguation = a; }
+        if (dictionaryEntry !== null) {
+            const {headwords} = dictionaryEntry;
+            const disambiguationHeadwords = [];
+            const {headwords: headwordIndices} = tagNode.dataset;
+            if (typeof headwordIndices === 'string' && headwordIndices.length > 0) {
+                for (let headwordIndex of headwordIndices.split(' ')) {
+                    headwordIndex = Number.parseInt(headwordIndex, 10);
+                    if (!Number.isNaN(headwordIndex) && headwordIndex >= 0 && headwordIndex < headwords.length) {
+                        disambiguationHeadwords.push(headwords[headwordIndex]);
+                    }
+                }
             }
-        } catch (e) {
-            // NOP
-        }
 
-        if (disambiguation !== null) {
-            const disambiguationContainer = node.querySelector('.tag-details-disambiguation-list');
-            const copyAttributes = ['totalExpressionCount', 'matchedExpressionCount', 'unmatchedExpressionCount'];
-            for (const attribute of copyAttributes) {
-                const value = tagNode.dataset[attribute];
-                if (typeof value === 'undefined') { continue; }
-                disambiguationContainer.dataset[attribute] = value;
-            }
-            for (const {expression, reading} of disambiguation) {
-                const disambiguationItem = document.createElement('span');
-                disambiguationItem.className = 'tag-details-disambiguation';
-                this._appendFurigana(disambiguationItem, expression, reading, (container, text) => {
-                    container.appendChild(document.createTextNode(text));
-                });
-                disambiguationContainer.appendChild(disambiguationItem);
+            if (disambiguationHeadwords.length > 0 && disambiguationHeadwords.length < headwords.length) {
+                const disambiguationContainer = node.querySelector('.tag-details-disambiguation-list');
+                const copyAttributes = ['totalExpressionCount', 'matchedExpressionCount', 'unmatchedExpressionCount'];
+                for (const attribute of copyAttributes) {
+                    const value = tagNode.dataset[attribute];
+                    if (typeof value === 'undefined') { continue; }
+                    disambiguationContainer.dataset[attribute] = value;
+                }
+                for (const {term, reading} of disambiguationHeadwords) {
+                    const disambiguationItem = document.createElement('span');
+                    disambiguationItem.className = 'tag-details-disambiguation';
+                    this._appendFurigana(disambiguationItem, term, reading, (container, text) => {
+                        container.appendChild(document.createTextNode(text));
+                    });
+                    disambiguationContainer.appendChild(disambiguationItem);
+                }
             }
         }
 

@@ -1823,6 +1823,9 @@ button.footer-notification-close-button {
     height: calc(16em / var(--font-size-no-units));
     background-color: var(--button-content-color);
 }
+.tag-details-disambiguation-list>.tag-details-disambiguation:not(:last-child)::after {
+    content: var(--disambiguation-separator);
+}
 
 
 /* Overlays */
