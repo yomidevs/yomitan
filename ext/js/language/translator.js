@@ -933,7 +933,7 @@ class Translator {
         return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, hasReading, frequency};
     }
 
-    _createTermDictionaryEntry(id, isPrimary, sequence, inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxDeinflectedTextLength, headwords, definitions) {
+    _createTermDictionaryEntry(id, isPrimary, sequence, inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxTransformedTextLength, headwords, definitions) {
         return {
             type: 'term',
             id,
@@ -944,7 +944,7 @@ class Translator {
             dictionaryIndex,
             dictionaryPriority,
             sourceTermExactMatchCount,
-            maxDeinflectedTextLength,
+            maxTransformedTextLength,
             headwords,
             definitions,
             pronunciations: [],
@@ -958,7 +958,7 @@ class Translator {
         const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const sourceTermExactMatchCount = (isPrimary && deinflectedText === expression ? 1 : 0);
         const source = this._createSource(originalText, transformedText, deinflectedText, isPrimary);
-        const maxDeinflectedTextLength = deinflectedText.length;
+        const maxTransformedTextLength = transformedText.length;
 
         const headwordTagGroups = [];
         const definitionTagGroups = [];
@@ -974,7 +974,7 @@ class Translator {
             dictionaryIndex,
             dictionaryPriority,
             sourceTermExactMatchCount,
-            maxDeinflectedTextLength,
+            maxTransformedTextLength,
             [this._createTermHeadword(0, expression, reading, [source], headwordTagGroups)],
             [this._createTermDefinition(0, [0], dictionary, definitionTagGroups, glossary)]
         );
@@ -1000,7 +1000,7 @@ class Translator {
         let score = Number.MIN_SAFE_INTEGER;
         let dictionaryIndex = Number.MAX_SAFE_INTEGER;
         let dictionaryPriority = Number.MIN_SAFE_INTEGER;
-        let maxDeinflectedTextLength = 0;
+        let maxTransformedTextLength = 0;
         let sourceTermExactMatchCount = 0;
         let isPrimary = false;
         const definitions = [];
@@ -1013,7 +1013,7 @@ class Translator {
             dictionaryPriority = Math.max(dictionaryPriority, dictionaryEntry.dictionaryPriority);
             if (dictionaryEntry.isPrimary) {
                 isPrimary = true;
-                maxDeinflectedTextLength = Math.max(maxDeinflectedTextLength, dictionaryEntry.maxDeinflectedTextLength);
+                maxTransformedTextLength = Math.max(maxTransformedTextLength, dictionaryEntry.maxTransformedTextLength);
                 sourceTermExactMatchCount += dictionaryEntry.sourceTermExactMatchCount;
                 const dictionaryEntryInflections = dictionaryEntry.inflections;
                 if (inflections === null || dictionaryEntryInflections.length < inflections.length) {
@@ -1036,7 +1036,7 @@ class Translator {
             dictionaryIndex,
             dictionaryPriority,
             sourceTermExactMatchCount,
-            maxDeinflectedTextLength,
+            maxTransformedTextLength,
             [...headwords.values()],
             definitions
         );
@@ -1176,11 +1176,12 @@ class Translator {
         const stringComparer = this._stringComparer;
         const compareFunction = (v1, v2) => {
             // Sort by length of source term
-            let i = v2.maxDeinflectedTextLength - v1.maxDeinflectedTextLength;
+            let i = v2.maxTransformedTextLength - v1.maxTransformedTextLength;
             if (i !== 0) { return i; }
 
             // Sort by the number of inflection reasons
             i = v1.inflections.length - v2.inflections.length;
+            console.log({'v1.inflections': v1.inflections, 'v2.inflections': v2.inflections});
             if (i !== 0) { return i; }
 
             // Sort by how many terms exactly match the source (e.g. for exact kana prioritization)

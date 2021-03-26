@@ -258,7 +258,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -388,7 +388,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -524,7 +524,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -654,7 +654,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -784,7 +784,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -914,7 +914,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -1044,7 +1044,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -1174,7 +1174,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -1310,7 +1310,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -1458,7 +1458,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -1606,7 +1606,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -1750,7 +1750,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -1900,7 +1900,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -2032,7 +2032,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -2164,7 +2164,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -2296,7 +2296,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -2426,7 +2426,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -2556,7 +2556,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -2692,7 +2692,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -2818,7 +2818,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -2954,7 +2954,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 3,
+        "maxTransformedTextLength": 3,
         "headwords": [
           {
             "index": 0,
@@ -3090,7 +3090,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -3220,7 +3220,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -3356,7 +3356,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -3486,7 +3486,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -3622,7 +3622,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -3770,7 +3770,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -3916,7 +3916,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -4048,7 +4048,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -4184,7 +4184,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -4332,7 +4332,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -4482,7 +4482,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -4614,7 +4614,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -4750,7 +4750,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 3,
+        "maxTransformedTextLength": 3,
         "headwords": [
           {
             "index": 0,
@@ -4886,7 +4886,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -4930,7 +4930,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -4974,7 +4974,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -5018,7 +5018,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -5064,7 +5064,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -5110,7 +5110,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -5156,7 +5156,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -5202,7 +5202,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -5246,7 +5246,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -5290,7 +5290,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -5340,7 +5340,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 2,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -5549,7 +5549,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 2,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -5738,7 +5738,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 2,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -5909,7 +5909,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 2,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -6078,7 +6078,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -6208,7 +6208,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -6344,7 +6344,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 4,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -6722,7 +6722,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 4,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -7041,7 +7041,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -7171,7 +7171,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -7311,7 +7311,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 12,
         "headwords": [
           {
             "index": 0,
@@ -7463,7 +7463,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 12,
         "headwords": [
           {
             "index": 0,
@@ -7615,7 +7615,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 12,
         "headwords": [
           {
             "index": 0,
@@ -7763,7 +7763,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 12,
         "headwords": [
           {
             "index": 0,
@@ -7913,7 +7913,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -8045,7 +8045,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -8177,7 +8177,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -8309,7 +8309,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -8439,7 +8439,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -8569,7 +8569,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -8705,7 +8705,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -8853,7 +8853,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -9001,7 +9001,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -9145,7 +9145,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -9295,7 +9295,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -9427,7 +9427,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -9559,7 +9559,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -9691,7 +9691,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -9821,7 +9821,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -9951,7 +9951,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -10087,7 +10087,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -10235,7 +10235,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -10383,7 +10383,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -10527,7 +10527,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -10677,7 +10677,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -10809,7 +10809,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -10941,7 +10941,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -11073,7 +11073,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -11203,7 +11203,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -11333,7 +11333,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxDeinflectedTextLength": 1,
+        "maxTransformedTextLength": 1,
         "headwords": [
           {
             "index": 0,
@@ -11471,7 +11471,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,
@@ -11548,7 +11548,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 3,
+        "maxTransformedTextLength": 3,
         "headwords": [
           {
             "index": 0,
@@ -11613,7 +11613,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 5,
         "headwords": [
           {
             "index": 0,
@@ -11690,7 +11690,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 4,
+        "maxTransformedTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -12068,7 +12068,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "maxDeinflectedTextLength": 2,
+        "maxTransformedTextLength": 2,
         "headwords": [
           {
             "index": 0,

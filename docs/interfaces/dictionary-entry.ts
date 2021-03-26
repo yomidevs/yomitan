@@ -225,9 +225,9 @@ namespace Translation {
          */
         sourceTermExactMatchCount: number;
         /**
-         * The maximum deinflected text length of a primary source.
+         * The maximum length of the transformed text for all primary sources.
          */
-        maxDeinflectedTextLength: number;
+        maxTransformedTextLength: number;
         /**
          * Headwords for the entry.
          */
