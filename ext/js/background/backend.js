@@ -1717,12 +1717,12 @@ class Backend {
     }
 
     async _injectAnkNoteAudio(ankiConnect, timestamp, definitionDetails, details) {
-        const {type, expression, reading} = definitionDetails;
+        const {type, term, reading} = definitionDetails;
         if (
             type === 'kanji' ||
-            typeof expression !== 'string' ||
+            typeof term !== 'string' ||
             typeof reading !== 'string' ||
-            (expression.length === 0 && reading.length === 0)
+            (term.length === 0 && reading.length === 0)
         ) {
             return null;
         }
@@ -1734,7 +1734,7 @@ class Backend {
             ({data, contentType} = await this._audioDownloader.downloadExpressionAudio(
                 sources,
                 preferredAudioIndex,
-                expression,
+                term,
                 reading,
                 {
                     textToSpeechVoice: null,
@@ -1804,9 +1804,9 @@ class Backend {
                 break;
             default:
                 {
-                    const {reading, expression} = definitionDetails;
+                    const {reading, term} = definitionDetails;
                     if (reading) { fileName += `_${reading}`; }
-                    if (expression) { fileName += `_${expression}`; }
+                    if (term) { fileName += `_${term}`; }
                 }
                 break;
         }
