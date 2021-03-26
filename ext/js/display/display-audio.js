@@ -405,11 +405,11 @@ class DisplayAudio {
         const definition = definitions[definitionIndex];
         if (definition.type === 'kanji') { return null; }
 
-        const {expressions} = definition;
-        if (expressionIndex < 0 || expressionIndex >= expressions.length) { return null; }
+        const {headwords} = definition;
+        if (expressionIndex < 0 || expressionIndex >= headwords.length) { return null; }
 
-        const {expression, reading} = expressions[expressionIndex];
-        return {expression, reading};
+        const {term, reading} = headwords[expressionIndex];
+        return {expression: term, reading};
     }
 
     _getExpressionReadingKey(expression, reading) {

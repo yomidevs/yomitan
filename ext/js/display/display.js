@@ -1505,7 +1505,7 @@ class Display extends EventDispatcher {
 
         let audioDetails = null;
         if (definitionDetails.type !== 'kanji' && AnkiUtil.fieldsObjectContainsMarker(fields, 'audio')) {
-            const primaryCardAudio = this._displayAudio.getPrimaryCardAudio(definitionDetails.expression, definitionDetails.reading);
+            const primaryCardAudio = this._displayAudio.getPrimaryCardAudio(definitionDetails.term, definitionDetails.reading);
             let preferredAudioIndex = null;
             let sources2 = sources;
             if (primaryCardAudio !== null) {
@@ -1531,26 +1531,31 @@ class Display extends EventDispatcher {
         );
     }
 
-    _getDefinitionDetailsForNote(definition) {
-        const {type} = definition;
+    _getDefinitionDetailsForNote(dictionaryEntry) {
+        const {type} = dictionaryEntry;
         if (type === 'kanji') {
-            const {character} = definition;
+            const {character} = dictionaryEntry;
             return {type, character};
         }
 
-        const termDetailsList = definition.expressions;
+        const {headwords} = dictionaryEntry;
         let bestIndex = -1;
-        for (let i = 0, ii = termDetailsList.length; i < ii; ++i) {
-            const {sourceTerm, expression, reading} = termDetailsList[i];
-            if (expression === sourceTerm) {
-                bestIndex = i;
-                break;
-            } else if (reading === sourceTerm && bestIndex < 0) {
-                bestIndex = i;
+        for (let i = 0, ii = headwords.length; i < ii; ++i) {
+            const {term, reading, sources} = headwords[i];
+            for (const {deinflectedText} of sources) {
+                if (term === deinflectedText) {
+                    bestIndex = i;
+                    i = ii;
+                    break;
+                } else if (reading === deinflectedText && bestIndex < 0) {
+                    bestIndex = i;
+                    break;
+                }
             }
         }
-        const {expression, reading} = termDetailsList[Math.max(0, bestIndex)];
-        return {type, expression, reading};
+
+        const {term, reading} = headwords[Math.max(0, bestIndex)];
+        return {type, term, reading};
     }
 
     async _setOptionsContextIfDifferent(optionsContext) {
