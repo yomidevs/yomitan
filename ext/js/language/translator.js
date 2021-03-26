@@ -1181,7 +1181,6 @@ class Translator {
 
             // Sort by the number of inflection reasons
             i = v1.inflections.length - v2.inflections.length;
-            console.log({'v1.inflections': v1.inflections, 'v2.inflections': v2.inflections});
             if (i !== 0) { return i; }
 
             // Sort by how many terms exactly match the source (e.g. for exact kana prioritization)
