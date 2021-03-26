@@ -108,7 +108,9 @@ class TemplateRenderer {
             ['noop',             this._noop.bind(this)],
             ['isMoraPitchHigh',  this._isMoraPitchHigh.bind(this)],
             ['getKanaMorae',     this._getKanaMorae.bind(this)],
-            ['typeof',           this._getTypeof.bind(this)]
+            ['typeof',           this._getTypeof.bind(this)],
+            ['join',             this._join.bind(this)],
+            ['concat',           this._concat.bind(this)]
         ];
 
         for (const [name, helper] of helpers) {
@@ -413,5 +415,17 @@ class TemplateRenderer {
         const ii = args.length - 1;
         const value = (ii > 0 ? args[0] : args[ii].fn(context));
         return typeof value;
+    }
+
+    _join(context, ...args) {
+        return args.length > 1 ? args.slice(1, args.length - 1).flat().join(args[0]) : '';
+    }
+
+    _concat(context, ...args) {
+        let result = '';
+        for (let i = 0, ii = args.length - 1; i < ii; ++i) {
+            result += args[i];
+        }
+        return result;
     }
 }
