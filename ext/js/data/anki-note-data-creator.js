@@ -441,7 +441,7 @@ class AnkiNoteDataCreator {
         const results = [];
         const {headwords} = dictionaryEntry;
         for (let i = 0, ii = headwords.length; i < ii; ++i) {
-            const {term, reading, tags, sources: [{deinflectedText}]} = headwords[i];
+            const {term, reading, tags, sources: [{deinflectedText}], wordClasses} = headwords[i];
             const termTags = this.createCachedValue(this._convertTags.bind(this, tags));
             const frequencies = this.createCachedValue(this._getTermExpressionFrequencies.bind(this, dictionaryEntry, i));
             const pitches = this.createCachedValue(this._getTermExpressionPitches.bind(this, dictionaryEntry, i));
@@ -455,7 +455,8 @@ class AnkiNoteDataCreator {
                 get frequencies() { return self.getCachedValue(frequencies); },
                 get pitches() { return self.getCachedValue(pitches); },
                 get furiganaSegments() { return self.getCachedValue(furiganaSegments); },
-                get termFrequency() { return self.getCachedValue(termFrequency); }
+                get termFrequency() { return self.getCachedValue(termFrequency); },
+                wordClasses
             };
             results.push(item);
         }

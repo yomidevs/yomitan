@@ -459,7 +459,7 @@ class OptionsUtil {
             {async: false, update: this._updateVersion7.bind(this)},
             {async: true,  update: this._updateVersion8.bind(this)},
             {async: false, update: this._updateVersion9.bind(this)},
-            {async: false, update: this._updateVersion10.bind(this)}
+            {async: true,  update: this._updateVersion10.bind(this)}
         ];
     }
 
@@ -750,9 +750,11 @@ class OptionsUtil {
         return options;
     }
 
-    _updateVersion10(options) {
+    async _updateVersion10(options) {
         // Version 10 changes:
         //  Removed global option useSettingsV2.
+        //  Added part-of-speech field template.
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v10.handlebars');
         delete options.global.useSettingsV2;
         return options;
     }

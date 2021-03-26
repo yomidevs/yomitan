@@ -312,7 +312,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -442,7 +443,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -578,6 +580,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -708,6 +713,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -838,6 +846,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -968,6 +979,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -1098,7 +1112,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -1228,7 +1243,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -1364,6 +1380,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -1512,6 +1531,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -1656,6 +1678,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -1804,6 +1829,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -1954,6 +1982,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -2086,6 +2117,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -2218,6 +2252,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -2350,6 +2387,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -2480,7 +2520,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -2610,7 +2651,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -2746,7 +2788,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -2872,7 +2915,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -3008,7 +3052,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -3144,6 +3189,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -3274,6 +3322,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -3410,6 +3461,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -3540,6 +3594,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -3676,6 +3733,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -3820,6 +3880,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -3970,6 +4033,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -4102,6 +4168,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -4238,6 +4307,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -4386,6 +4458,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -4536,6 +4611,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -4668,6 +4746,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -4804,7 +4885,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -4900,7 +4982,10 @@
                 "isPrimary": true
               }
             ],
-            "tags": []
+            "tags": [],
+            "wordClasses": [
+              "v5"
+            ]
           }
         ],
         "definitions": [
@@ -4944,7 +5029,10 @@
                 "isPrimary": true
               }
             ],
-            "tags": []
+            "tags": [],
+            "wordClasses": [
+              "v5"
+            ]
           }
         ],
         "definitions": [
@@ -4988,7 +5076,10 @@
                 "isPrimary": true
               }
             ],
-            "tags": []
+            "tags": [],
+            "wordClasses": [
+              "v5"
+            ]
           }
         ],
         "definitions": [
@@ -5032,7 +5123,10 @@
                 "isPrimary": true
               }
             ],
-            "tags": []
+            "tags": [],
+            "wordClasses": [
+              "v5"
+            ]
           }
         ],
         "definitions": [
@@ -5078,7 +5172,10 @@
                 "isPrimary": true
               }
             ],
-            "tags": []
+            "tags": [],
+            "wordClasses": [
+              "v5"
+            ]
           }
         ],
         "definitions": [
@@ -5124,7 +5221,10 @@
                 "isPrimary": true
               }
             ],
-            "tags": []
+            "tags": [],
+            "wordClasses": [
+              "v5"
+            ]
           }
         ],
         "definitions": [
@@ -5170,7 +5270,10 @@
                 "isPrimary": true
               }
             ],
-            "tags": []
+            "tags": [],
+            "wordClasses": [
+              "v5"
+            ]
           }
         ],
         "definitions": [
@@ -5216,7 +5319,10 @@
                 "isPrimary": true
               }
             ],
-            "tags": []
+            "tags": [],
+            "wordClasses": [
+              "v5"
+            ]
           }
         ],
         "definitions": [
@@ -5260,7 +5366,8 @@
                 "isPrimary": true
               }
             ],
-            "tags": []
+            "tags": [],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -5304,7 +5411,8 @@
                 "isPrimary": true
               }
             ],
-            "tags": []
+            "tags": [],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -5416,6 +5524,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -5603,6 +5714,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -5792,6 +5906,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -5963,6 +6080,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -6132,7 +6252,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -6262,7 +6383,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -6420,6 +6542,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           },
           {
@@ -6474,6 +6599,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -6776,6 +6904,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           },
           {
@@ -6830,6 +6961,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -7095,7 +7229,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -7225,7 +7360,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -7365,6 +7501,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -7517,6 +7656,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -7665,6 +7807,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -7817,6 +7962,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -7967,6 +8115,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -8099,6 +8250,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -8231,6 +8385,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -8363,6 +8520,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -8493,7 +8653,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -8623,7 +8784,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -8759,6 +8921,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -8907,6 +9072,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -9051,6 +9219,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -9199,6 +9370,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -9349,6 +9523,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -9481,6 +9658,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -9613,6 +9793,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -9745,6 +9928,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -9875,7 +10061,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -10005,7 +10192,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -10141,6 +10329,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -10289,6 +10480,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -10433,6 +10627,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -10581,6 +10778,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -10731,6 +10931,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -10863,6 +11066,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -10995,6 +11201,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -11127,6 +11336,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -11257,7 +11469,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -11387,7 +11600,8 @@
                 ],
                 "redundant": false
               }
-            ]
+            ],
+            "wordClasses": []
           }
         ],
         "definitions": [
@@ -11499,6 +11713,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -11562,7 +11779,10 @@
                 "isPrimary": true
               }
             ],
-            "tags": []
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
           }
         ],
         "definitions": [
@@ -11641,6 +11861,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -11766,6 +11989,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           },
           {
@@ -11820,6 +12046,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],
@@ -12122,6 +12351,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           },
           {
@@ -12176,6 +12408,9 @@
                 ],
                 "redundant": false
               }
+            ],
+            "wordClasses": [
+              "v5"
             ]
           }
         ],

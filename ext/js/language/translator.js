@@ -917,8 +917,8 @@ class Translator {
         return {originalText, transformedText, deinflectedText, isPrimary};
     }
 
-    _createTermHeadword(index, term, reading, sources, tags) {
-        return {index, term, reading, sources, tags};
+    _createTermHeadword(index, term, reading, sources, tags, wordClasses) {
+        return {index, term, reading, sources, tags, wordClasses};
     }
 
     _createTermDefinition(index, headwordIndices, dictionary, tags, entries) {
@@ -953,7 +953,7 @@ class Translator {
     }
 
     _createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, isPrimary, enabledDictionaryMap) {
-        const {expression, reading: rawReading, definitionTags, termTags, glossary, score, dictionary, id, sequence} = databaseEntry;
+        const {expression, reading: rawReading, definitionTags, termTags, glossary, score, dictionary, id, sequence, rules} = databaseEntry;
         const reading = (rawReading.length > 0 ? rawReading : expression);
         const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const sourceTermExactMatchCount = (isPrimary && deinflectedText === expression ? 1 : 0);
@@ -975,7 +975,7 @@ class Translator {
             dictionaryPriority,
             sourceTermExactMatchCount,
             maxTransformedTextLength,
-            [this._createTermHeadword(0, expression, reading, [source], headwordTagGroups)],
+            [this._createTermHeadword(0, expression, reading, [source], headwordTagGroups, rules)],
             [this._createTermDefinition(0, [0], dictionary, definitionTagGroups, glossary)]
         );
     }
@@ -1100,15 +1100,16 @@ class Translator {
 
     _addTermHeadwords(headwordsMap, headwords) {
         const headwordIndexMap = [];
-        for (const {term, reading, sources, tags} of headwords) {
+        for (const {term, reading, sources, tags, wordClasses} of headwords) {
             const key = this._createMapKey([term, reading]);
             let headword = headwordsMap.get(key);
             if (typeof headword === 'undefined') {
-                headword = this._createTermHeadword(headwordsMap.size, term, reading, [], []);
+                headword = this._createTermHeadword(headwordsMap.size, term, reading, [], [], []);
                 headwordsMap.set(key, headword);
             }
             this._addUniqueSources(headword.sources, sources);
             this._addUniqueTagGroups(headword.tags, tags);
+            this._addUniqueStrings(headword.wordClasses, wordClasses);
             headwordIndexMap.push(headword.index);
         }
         return headwordIndexMap;

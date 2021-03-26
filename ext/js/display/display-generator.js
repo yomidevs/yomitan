@@ -250,9 +250,13 @@ class DisplayGenerator {
         node.dataset.readingIsSame = `${reading === expression}`;
         node.dataset.frequency = DictionaryDataUtil.getTermFrequency(termTags);
 
-        const pitchAccentCategories = this._getPitchAccentCategories(reading, pronunciations, headwordIndex);
+        const {wordClasses} = headword;
+        const pitchAccentCategories = this._getPitchAccentCategories(reading, pronunciations, wordClasses, headwordIndex);
         if (pitchAccentCategories !== null) {
             node.dataset.pitchAccentCategories = pitchAccentCategories;
+        }
+        if (wordClasses.length > 0) {
+            node.dataset.wordClasses = wordClasses.join(' ');
         }
 
         this._setTextContent(node.querySelector('.expression-reading'), reading);
@@ -762,18 +766,34 @@ class DisplayGenerator {
         }
     }
 
-    _getPitchAccentCategories(reading, pronunciations, headwordIndex) {
+    _getPitchAccentCategories(reading, pronunciations, wordClasses, headwordIndex) {
         if (pronunciations.length === 0) { return null; }
+        const isVerbOrAdjective = this._isVerbOrAdjective(wordClasses);
         const categories = new Set();
         for (const pronunciation of pronunciations) {
             if (pronunciation.headwordIndex !== headwordIndex) { continue; }
             for (const {position} of pronunciation.pitches) {
-                const category = this._japaneseUtil.getPitchCategory(reading, position, false);
+                const category = this._japaneseUtil.getPitchCategory(reading, position, isVerbOrAdjective);
                 if (category !== null) {
                     categories.add(category);
                 }
             }
         }
         return categories.size > 0 ? [...categories].join(' ') : null;
+    }
+
+    _isVerbOrAdjective(wordClasses) {
+        for (const wordClass of wordClasses) {
+            switch (wordClass) {
+                case 'v1':
+                case 'v5':
+                case 'vs':
+                case 'vk':
+                case 'vz':
+                case 'adj-i':
+                    return true;
+            }
+        }
+        return false;
     }
 }

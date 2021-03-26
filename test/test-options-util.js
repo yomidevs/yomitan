@@ -625,6 +625,7 @@ async function testFieldTemplatesUpdate(extDir) {
     const update4 = loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars');
     const update6 = loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars');
     const update8 = loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars');
+    const update10 = loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars');
 
     const data = [
         // Standard format
@@ -645,6 +646,7 @@ ${update2}
 ${update4}
 ${update6}
 ${update8}
+${update10}
 {{~> (lookup . "marker") ~}}`.trimStart()
         },
         // Non-standard marker format
@@ -665,7 +667,8 @@ ${update8}
 ${update2}
 ${update4}
 ${update6}
-${update8}`.trimStart()
+${update8}
+${update10}`.trimStart()
         },
         // Empty test
         {
@@ -677,6 +680,7 @@ ${update2}
 ${update4}
 ${update6}
 ${update8}
+${update10}
 {{~> (lookup . "marker") ~}}`.trimStart()
         },
         // Definition tags update
@@ -750,6 +754,7 @@ ${update2}
 ${update4}
 ${update6}
 ${update8}
+${update10}
 {{~> (lookup . "marker") ~}}
 `.trimStart()
         },
@@ -890,6 +895,7 @@ ${update8}
 {{/inline}}
 
 ${update8}
+${update10}
 {{~> (lookup . "marker") ~}}`.trimStart()
         }
     ];

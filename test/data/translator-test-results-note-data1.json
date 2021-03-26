@@ -388,7 +388,8 @@
                   "furigana": "だ"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -605,7 +606,8 @@
                   "furigana": "ダース"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -831,7 +833,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -1056,7 +1061,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -1281,7 +1289,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -1506,7 +1517,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -1727,7 +1741,8 @@
                   "furigana": "だ"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -1944,7 +1959,8 @@
                   "furigana": "ダース"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -2200,7 +2216,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -2511,7 +2530,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -2822,7 +2844,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -3133,7 +3158,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -3416,7 +3444,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -3643,7 +3674,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -3870,7 +3904,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -4097,7 +4134,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -4318,7 +4358,8 @@
                   "furigana": "だ"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -4535,7 +4576,8 @@
                   "furigana": "ダース"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -4730,7 +4772,8 @@
                   "furigana": "がぞう"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -4934,7 +4977,8 @@
                   "furigana": "だ"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -5156,7 +5200,8 @@
                   "furigana": "ダース"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -5382,7 +5427,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -5607,7 +5655,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -5837,7 +5888,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -6062,7 +6116,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -6322,7 +6379,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -6633,7 +6693,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -6916,7 +6979,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -7143,7 +7209,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -7403,7 +7472,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -7714,7 +7786,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -7997,7 +8072,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -8224,7 +8302,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -8423,7 +8504,8 @@
                   "furigana": "がぞう"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -8688,7 +8770,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "termTags": [
@@ -9028,7 +9113,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "termTags": [
@@ -9322,7 +9410,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "termTags": [
@@ -9568,7 +9659,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "termTags": [
@@ -9808,7 +9902,8 @@
                   "furigana": "だ"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "termTags": [
@@ -10021,7 +10116,8 @@
                   "furigana": "ダース"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "termTags": [
@@ -10295,7 +10391,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             },
             {
               "sourceTerm": "打ち込む",
@@ -10399,7 +10498,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "definitions": [
@@ -10810,7 +10912,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             },
             {
               "sourceTerm": "打つ",
@@ -10884,7 +10989,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "definitions": [
@@ -11191,7 +11299,8 @@
                   "furigana": "だ"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "definitions": [
@@ -11379,7 +11488,8 @@
                   "furigana": "ダース"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "definitions": [
@@ -11610,7 +11720,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -11925,7 +12038,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -12240,7 +12356,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -12555,7 +12674,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -12838,7 +12960,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -13065,7 +13190,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -13292,7 +13420,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -13519,7 +13650,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -13740,7 +13874,8 @@
                   "furigana": "だ"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -13957,7 +14092,8 @@
                   "furigana": "ダース"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -14213,7 +14349,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -14524,7 +14663,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -14835,7 +14977,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -15146,7 +15291,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -15429,7 +15577,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -15656,7 +15807,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -15883,7 +16037,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -16110,7 +16267,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -16331,7 +16491,8 @@
                   "furigana": "だ"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -16548,7 +16709,8 @@
                   "furigana": "ダース"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -16804,7 +16966,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -17115,7 +17280,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -17426,7 +17594,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -17737,7 +17908,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -18020,7 +18194,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -18247,7 +18424,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -18474,7 +18654,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -18701,7 +18884,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -18922,7 +19108,8 @@
                   "furigana": "だ"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -19139,7 +19326,8 @@
                   "furigana": "ダース"
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": []
             }
           ],
           "glossary": [
@@ -19322,7 +19510,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -19442,7 +19633,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
             }
           ],
           "glossary": [
@@ -19564,7 +19758,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "glossary": [
@@ -19788,7 +19985,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             },
             {
               "sourceTerm": "打ち込む",
@@ -19892,7 +20092,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "definitions": [
@@ -20303,7 +20506,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             },
             {
               "sourceTerm": "打つ",
@@ -20377,7 +20583,10 @@
                   "furigana": ""
                 }
               ],
-              "termFrequency": "normal"
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
             }
           ],
           "definitions": [

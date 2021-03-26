@@ -1,0 +1,30 @@
+{{#*inline "part-of-speech-pretty"}}
+    {{~#if (op "===" . "v1")~}}Ichidan verb
+    {{~else if (op "===" . "v5")~}}Godan verb
+    {{~else if (op "===" . "vk")~}}Kuru verb
+    {{~else if (op "===" . "vs")~}}Suru verb
+    {{~else if (op "===" . "vz")~}}Zuru verb
+    {{~else if (op "===" . "adj-i")~}}I-adjective
+    {{~else if (op "===" . "n")~}}Noun
+    {{~else~}}{{.}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "part-of-speech"}}
+    {{~#scope~}}
+        {{~#if (op "!==" definition.type "kanji")~}}
+            {{~#set "first" true}}{{/set~}}
+            {{~#each definition.expressions~}}
+                {{~#each wordClasses~}}
+                    {{~#unless (get (concat "used_" .))~}}
+                        {{~> part-of-speech-pretty . ~}}
+                        {{~#unless (get "first")}}, {{/unless~}}
+                        {{~#set (concat "used_" .) true~}}{{~/set~}}
+                        {{~#set "first" false~}}{{~/set~}}
+                    {{~/unless~}}
+                {{~/each~}}
+            {{~/each~}}
+            {{~#if (get "first")~}}Unknown{{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}

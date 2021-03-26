@@ -270,6 +270,10 @@ namespace Translation {
          * Tags for the headword.
          */
         tags: Tag[];
+        /**
+         * List of word classes (part of speech) for the headword.
+         */
+        wordClasses: string[];
     }
 
     /**

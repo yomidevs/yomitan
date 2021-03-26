@@ -99,6 +99,7 @@ class AnkiController {
                     'glossary',
                     'glossary-brief',
                     'glossary-no-dictionary',
+                    'part-of-speech',
                     'pitch-accents',
                     'pitch-accent-graphs',
                     'pitch-accent-positions',
