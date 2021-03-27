@@ -3128,7 +3128,15 @@
     <div class="hotkey-list-item-input-label-cell">Input:</div>
     <div class="hotkey-list-item-input-cell">
         <input type="text" class="hotkey-list-item-input" autocomplete="off" spellcheck="false" placeholder="No input" data-property="include">
-        <label class="toggle hotkey-list-item-enabled-label"><input type="checkbox" class="hotkey-list-item-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+        <div class="hotkey-list-item-enabled-button-container">
+            <button class="hotkey-list-item-enabled-button input-button input-with-suffix-button">
+                <label class="hotkey-list-item-enabled-button-label button-inner-label">
+                    <span class="checkbox"><input type="checkbox" class="hotkey-list-item-enabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></span>
+                    <span>Enabled</span>
+                </label>
+            </button>
+            <button class="hotkey-list-item-scopes-button input-suffix-button input-suffix-icon-button light-icon" data-menu="hotkey-list-item-scopes-menu" data-menu-position="below left"><span class="icon" data-icon="material-down-arrow"></span></button>
+        </div>
     </div>
 
     <div class="hotkey-list-item-action-label-cell">Action:</div>
@@ -3155,23 +3163,7 @@
             <option value="copyHostSelection" data-scopes="popup">Copy host window selection</option>
             <option value="scanSelectedText" data-scopes="web">Scan selected text</option>
         </select>
-        <div class="hotkey-list-item-flex-row">
-            <div class="hotkey-list-item-flex-row-label">Scopes:</div>
-            <div class="hotkey-list-item-flex-row">
-                <label class="hotkey-scope-checkbox-container" data-scope="web">
-                    <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="web"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                    <span>Web</span>
-                </label>
-                <label class="hotkey-scope-checkbox-container" data-scope="popup">
-                    <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="popup"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                    <span>Popup</span>
-                </label>
-                <label class="hotkey-scope-checkbox-container" data-scope="search">
-                    <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="search"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                    <span>Search</span>
-                </label>
-            </div>
-        </div>
+        <input type="text" class="hotkey-list-item-action-argument">
     </div>
 </div></div></template>
 
@@ -3191,6 +3183,21 @@
     <button class="popup-menu-item" data-menu-action="clearInputs">Clear input</button>
     <button class="popup-menu-item" data-menu-action="resetInput">Reset input</button>
     <button class="popup-menu-item" data-menu-action="delete">Delete</button>
+</div></div></div></template>
+
+<template id="hotkey-list-item-scopes-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button class="popup-menu-item hotkey-scope-popup-menu-item" data-menu-action="toggleScope" data-scope="web"><label class="hotkey-scope-popup-menu-item-label button-inner-label">
+        <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="web"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+        <span>Web</span>
+    </label></button>
+    <button class="popup-menu-item hotkey-scope-popup-menu-item" data-menu-action="toggleScope" data-scope="popup"><label class="hotkey-scope-popup-menu-item-label button-inner-label">
+        <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="popup"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+        <span>Popup</span>
+    </label></button>
+    <button class="popup-menu-item hotkey-scope-popup-menu-item" data-menu-action="toggleScope" data-scope="search"><label class="hotkey-scope-popup-menu-item-label button-inner-label">
+        <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="search"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+        <span>Search</span>
+    </label></button>
 </div></div></div></template>
 
 <template id="extension-hotkey-list-item-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">

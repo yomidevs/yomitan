@@ -798,10 +798,13 @@ button,
     --button-current-background-color: var(--button-background-color);
     --button-current-shadow: var(--button-shadow);
 
+    --button-padding-vertical: 0.5em;
+    --button-padding-horizontal: 1em;
+
     border-width: var(--thin-border-size);
     border-style: solid;
     border-radius: 0.3em;
-    padding: 0.5em 1em;
+    padding: var(--button-padding-vertical) var(--button-padding-horizontal);
     font-weight: bold;
     font-size: inherit;
     font-family: inherit;
@@ -940,6 +943,35 @@ button.low-emphasis.danger {
     --button-disabled-background-color: var(--danger-color-transparent0);
 }
 
+/* Input button */
+button.input-button {
+    --button-content-color: var(--button-default-icon-color);
+    --button-border-color: var(--input-background-color);
+    --button-background-color: var(--input-background-color);
+    --button-hover-background-color: var(--input-background-color-dark);
+    --button-active-background-color: var(--input-background-color-darker);
+
+    --button-padding-vertical: 0;
+    --button-padding-horizontal: 0.5em;
+
+    text-align: left;
+    font-weight: normal;
+    border-style: none;
+    border-width: 0;
+    width: var(--input-width-large);
+    height: var(--input-height);
+    line-height: var(--input-height);
+    box-sizing: border-box;
+    position: relative;
+}
+button.input-button.input-with-suffix-button {
+    flex: 1 1 auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-style: none;
+    z-index: 1;
+}
+
 /* Input suffix button */
 button.input-suffix-button {
     --button-content-color: var(--button-default-icon-color);
@@ -982,6 +1014,16 @@ input[type=number][data-invalid=true]+button.input-suffix-button {
     border-width: var(--thin-border-size);
     border-style: solid;
     border-left-style: none;
+}
+
+
+/* Button inner label */
+.button-inner-label {
+    margin-top: calc(-1 * var(--button-padding-vertical));
+    margin-bottom: calc(-1 * var(--button-padding-vertical));
+    margin-left: calc(-1 * var(--button-padding-horizontal));
+    margin-right: calc(-1 * var(--button-padding-horizontal));
+    padding: var(--button-padding-vertical) var(--button-padding-horizontal);
 }
 
 
@@ -1140,7 +1182,9 @@ button.popup-menu-item {
     --button-disabled-background-color: transparent;
     --button-disabled-shadow: none;
 
-    padding: 0.625em 1.5em;
+    --button-padding-vertical: 0.625em;
+    --button-padding-horizontal: 1.5em;
+
     flex: 1 1 auto;
     border-radius: 0;
     border-style: none;
@@ -1174,7 +1218,9 @@ button.popup-menu-item:not([hidden]) {
 }
 :root[data-page-type=popup] .popup-menu.popup-menu-auto-size button.popup-menu-item,
 .popup-menu.popup-menu-small button.popup-menu-item {
-    padding: 0.5em 0.75em;
+    --button-padding-vertical: 0.5em;
+    --button-padding-horizontal: 0.75em;
+
     font-size: var(--font-size-small);
 }
 .popup-menu-item-group {

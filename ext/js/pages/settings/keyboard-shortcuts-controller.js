@@ -164,10 +164,11 @@ class KeyboardShortcutHotkeyEntry {
         this._eventListeners = new EventListenerCollection();
         this._inputField = null;
         this._actionSelect = null;
-        this._scopeCheckboxes = null;
-        this._scopeCheckboxContainers = null;
         this._basePath = `inputs.hotkeys[${this._index}]`;
         this._stringComparer = stringComparer;
+        this._enabledButton = null;
+        this._scopeMenu = null;
+        this._scopeMenuEventListeners = new EventListenerCollection();
     }
 
     prepare() {
@@ -176,13 +177,12 @@ class KeyboardShortcutHotkeyEntry {
         const menuButton = node.querySelector('.hotkey-list-item-button');
         const input = node.querySelector('.hotkey-list-item-input');
         const action = node.querySelector('.hotkey-list-item-action');
-        const scopeCheckboxes = node.querySelectorAll('.hotkey-scope-checkbox');
-        const scopeCheckboxContainers = node.querySelectorAll('.hotkey-scope-checkbox-container');
         const enabledToggle = node.querySelector('.hotkey-list-item-enabled');
+        const scopesButton = node.querySelector('.hotkey-list-item-scopes-button');
+        const enabledButton = node.querySelector('.hotkey-list-item-enabled-button');
 
         this._actionSelect = action;
-        this._scopeCheckboxes = scopeCheckboxes;
-        this._scopeCheckboxContainers = scopeCheckboxContainers;
+        this._enabledButton = enabledButton;
 
         this._inputField = new KeyboardMouseInputField(input, null, this._os);
         this._inputField.prepare(this._data.key, this._data.modifiers, false, true);
@@ -192,12 +192,10 @@ class KeyboardShortcutHotkeyEntry {
         enabledToggle.checked = this._data.enabled;
         enabledToggle.dataset.setting = `${this._basePath}.enabled`;
 
-        this._updateCheckboxVisibility();
-        this._updateCheckboxStates();
+        this._updateScopesButton();
 
-        for (const scopeCheckbox of scopeCheckboxes) {
-            this._eventListeners.addEventListener(scopeCheckbox, 'change', this._onScopeCheckboxChange.bind(this), false);
-        }
+        this._eventListeners.addEventListener(scopesButton, 'menuOpen', this._onScopesMenuOpen.bind(this));
+        this._eventListeners.addEventListener(scopesButton, 'menuClose', this._onScopesMenuClose.bind(this));
         this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this), false);
         this._eventListeners.addEventListener(this._actionSelect, 'change', this._onActionSelectChange.bind(this), false);
         this._eventListeners.on(this._inputField, 'change', this._onInputFieldChange.bind(this));
@@ -206,6 +204,7 @@ class KeyboardShortcutHotkeyEntry {
     cleanup() {
         this._eventListeners.removeAllEventListeners();
         this._inputField.cleanup();
+        this._clearScopeMenu();
         if (this._node.parentNode !== null) {
             this._node.parentNode.removeChild(this._node);
         }
@@ -224,6 +223,24 @@ class KeyboardShortcutHotkeyEntry {
             case 'resetInput':
                 this._resetInput();
                 break;
+        }
+    }
+
+    _onScopesMenuOpen(e) {
+        const {menu} = e.detail;
+        this._scopeMenu = menu;
+        this._updateScopeMenuItems(menu);
+        this._updateDisplay(menu.containerNode); // Fix a animation issue due to changing checkbox values
+    }
+
+    _onScopesMenuClose(e) {
+        const {menu, action} = e.detail;
+        if (action === 'toggleScope') {
+            e.preventDefault();
+            return;
+        }
+        if (this._scopeMenu === menu) {
+            this._clearScopeMenu();
         }
     }
 
@@ -276,6 +293,8 @@ class KeyboardShortcutHotkeyEntry {
         } else {
             scopes.splice(index, 1);
         }
+
+        this._updateScopesButton();
 
         await this._modifyProfileSettings([{
             action: 'set',
@@ -346,22 +365,58 @@ class KeyboardShortcutHotkeyEntry {
     }
 
     _updateCheckboxStates() {
-        const scopes = this._data.scopes;
-        for (const scopeCheckbox of this._scopeCheckboxes) {
-            scopeCheckbox.checked = scopes.includes(scopeCheckbox.dataset.scope);
-        }
+        if (this._scopeMenu === null) { return; }
+        this._updateScopeMenuItems(this._scopeMenu);
     }
 
     _updateCheckboxVisibility() {
-        const validScopes = this._getValidScopesForAction(this._data.action);
-        for (const node of this._scopeCheckboxContainers) {
-            node.hidden = !(validScopes === null || validScopes.has(node.dataset.scope));
-        }
+        if (this._scopeMenu === null) { return; }
+        this._updateScopeMenuItems(this._scopeMenu);
     }
 
     _getValidScopesForAction(action) {
         const optionNode = this._actionSelect.querySelector(`option[value="${action}"]`);
         const scopesString = (optionNode !== null ? optionNode.dataset.scopes : void 0);
         return (typeof scopesString === 'string' ? new Set(scopesString.split(' ')) : null);
+    }
+
+    _updateScopeMenuItems(menu) {
+        this._scopeMenuEventListeners.removeAllEventListeners();
+
+        const scopes = this._data.scopes;
+        const validScopes = this._getValidScopesForAction(this._data.action);
+
+        const bodyNode = menu.bodyNode;
+        const menuItems = bodyNode.querySelectorAll('.popup-menu-item');
+        for (const menuItem of menuItems) {
+            if (menuItem.dataset.menuAction !== 'toggleScope') { continue; }
+
+            const {scope} = menuItem.dataset;
+            menuItem.hidden = !(validScopes === null || validScopes.has(scope));
+
+            const checkbox = menuItem.querySelector('.hotkey-scope-checkbox');
+            if (checkbox !== null) {
+                checkbox.checked = scopes.includes(scope);
+                this._scopeMenuEventListeners.addEventListener(checkbox, 'change', this._onScopeCheckboxChange.bind(this), false);
+            }
+        }
+    }
+
+    _clearScopeMenu() {
+        this._scopeMenuEventListeners.removeAllEventListeners();
+        this._scopeMenu = null;
+    }
+
+    _updateScopesButton() {
+        const {scopes} = this._data;
+        this._enabledButton.dataset.scopeCount = `${scopes.length}`;
+    }
+
+    _updateDisplay(node) {
+        const {style} = node;
+        const {display} = style;
+        style.display = 'none';
+        getComputedStyle(node).getPropertyValue('display');
+        style.display = display;
     }
 }
