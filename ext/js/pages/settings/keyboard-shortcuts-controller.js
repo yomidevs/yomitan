@@ -227,6 +227,7 @@ class KeyboardShortcutHotkeyEntry {
 
         this._eventListeners.addEventListener(scopesButton, 'menuOpen', this._onScopesMenuOpen.bind(this));
         this._eventListeners.addEventListener(scopesButton, 'menuClose', this._onScopesMenuClose.bind(this));
+        this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
         this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this), false);
         this._eventListeners.addEventListener(this._actionSelect, 'change', this._onActionSelectChange.bind(this), false);
         this._eventListeners.on(this._inputField, 'change', this._onInputFieldChange.bind(this));
@@ -244,6 +245,18 @@ class KeyboardShortcutHotkeyEntry {
 
     // Private
 
+    _onMenuOpen(e) {
+        const {action} = this._data;
+
+        const {menu} = e.detail;
+        const resetArgument = menu.bodyNode.querySelector('.popup-menu-item[data-menu-action="resetArgument"]');
+
+        const details = this._parent.getActionDetails(action);
+        const argumentDetails = typeof details !== 'undefined' ? details.argument : void 0;
+
+        resetArgument.hidden = (typeof argumentDetails === 'undefined');
+    }
+
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'delete':
@@ -254,6 +267,9 @@ class KeyboardShortcutHotkeyEntry {
                 break;
             case 'resetInput':
                 this._resetInput();
+                break;
+            case 'resetArgument':
+                this._resetArgument();
                 break;
         }
     }
@@ -305,9 +321,6 @@ class KeyboardShortcutHotkeyEntry {
             case 'hotkey-argument-move-offset':
                 newValue = `${DOMDataBinder.convertToNumber(value, node)}`;
                 break;
-        }
-        if (value !== newValue) {
-            this._setArgumentInputValue(node, newValue);
         }
         this._setArgument(newValue);
     }
@@ -367,6 +380,15 @@ class KeyboardShortcutHotkeyEntry {
         const {key, modifiers} = defaultValue;
         await this._setKeyAndModifiers(key, modifiers);
         this._inputField.setInput(key, modifiers);
+    }
+
+    async _resetArgument() {
+        const {action} = this._data;
+        const details = this._parent.getActionDetails(action);
+        const argumentDetails = typeof details !== 'undefined' ? details.argument : void 0;
+        let argumentDefault = typeof argumentDetails !== 'undefined' ? argumentDetails.default : void 0;
+        if (typeof argumentDefault !== 'string') { argumentDefault = ''; }
+        await this._setArgument(argumentDefault);
     }
 
     _getDefaultKeyAndModifiers(defaultHotkeys, action) {
@@ -438,6 +460,12 @@ class KeyboardShortcutHotkeyEntry {
 
     async _setArgument(value) {
         this._data.argument = value;
+
+        const node = this._argumentInput;
+        if (node !== null && this._getArgumentInputValue(node) !== value) {
+            this._setArgumentInputValue(node, value);
+        }
+
         await this._modifyProfileSettings([{
             action: 'set',
             path: `${this._basePath}.argument`,
