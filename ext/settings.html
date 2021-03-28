@@ -3169,6 +3169,7 @@
             <option value="addNoteTermKana">Add term note (reading)</option>
             <option value="viewNote">View note</option>
             <option value="playAudio">Play audio</option>
+            <option value="playAudioFromSource">Play audio from source</option>
             <option value="copyHostSelection">Copy host window selection</option>
             <option value="scanSelectedText">Scan selected text</option>
         </select>
@@ -3218,6 +3219,18 @@
 <template id="hotkey-argument-move-offset-template"><div class="flex-row-nowrap">
     <span class="hotkey-argument-label">Count:</span>
     <input type="number" step="1" min="1" class="hotkey-argument-input">
+</div></template>
+
+<template id="hotkey-argument-audio-source-template"><div class="flex-row-nowrap">
+    <span class="hotkey-argument-label">Source:</span>
+    <select class="audio-source-select hotkey-argument-input">
+        <option value="jpod101">JapanesePod101</option>
+        <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
+        <option value="jisho">Jisho.org</option>
+        <option value="text-to-speech">Text-to-speech</option>
+        <option value="text-to-speech-reading">Text-to-speech (Kana reading)</option>
+        <option value="custom">Custom</option>
+    </select>
 </div></template>
 
 

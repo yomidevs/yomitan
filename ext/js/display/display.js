@@ -126,6 +126,7 @@ class Display extends EventDispatcher {
             ['addNoteTermKana',   () => { this._tryAddAnkiNoteForSelectedDefinition('term-kana'); }],
             ['viewNote',          () => { this._tryViewAnkiNoteForSelectedDefinition(); }],
             ['playAudio',         () => { this._playAudioCurrent(); }],
+            ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)],
             ['copyHostSelection', () => this._copyHostSelection()],
             ['nextEntryDifferentDictionary',     () => { this._focusEntryWithDifferentDictionary(1, true); }],
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
@@ -1828,6 +1829,10 @@ class Display extends EventDispatcher {
         if (!Number.isFinite(count)) { count = 1; }
         count = Math.max(0, Math.floor(count));
         this._focusEntry(this._index + count * sign, true);
+    }
+
+    _onHotkeyActionPlayAudioFromSource(source) {
+        this._displayAudio.playAudio(this._index, 0, [source]);
     }
 
     _closeAllPopupMenus() {
