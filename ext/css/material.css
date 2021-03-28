@@ -177,6 +177,15 @@
 }
 
 
+/* Text styles */
+.light {
+    color: var(--text-color-light2);
+}
+.danger-text {
+    color: var(--danger-color);
+}
+
+
 /* Icons */
 .icon {
     --icon-image: none;

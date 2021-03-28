@@ -18,6 +18,7 @@
 /* global
  * DOMDataBinder
  * KeyboardMouseInputField
+ * ObjectPropertyAccessor
  */
 
 class KeyboardShortcutController {
@@ -50,7 +51,8 @@ class KeyboardShortcutController {
             ['playAudio',                        {scopes: new Set(['popup', 'search'])}],
             ['playAudioFromSource',              {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-audio-source', default: 'jpod101'}}],
             ['copyHostSelection',                {scopes: new Set(['popup'])}],
-            ['scanSelectedText',                 {scopes: new Set(['web'])}]
+            ['scanSelectedText',                 {scopes: new Set(['web'])}],
+            ['toggleOption',                     {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-setting-path', default: ''}}]
         ]);
     }
 
@@ -316,14 +318,13 @@ class KeyboardShortcutHotkeyEntry {
 
     _onArgumentValueChange(template, e) {
         const node = e.currentTarget;
-        const value = this._getArgumentInputValue(node);
-        let newValue = value;
+        let value = this._getArgumentInputValue(node);
         switch (template) {
             case 'hotkey-argument-move-offset':
-                newValue = `${DOMDataBinder.convertToNumber(value, node)}`;
+                value = `${DOMDataBinder.convertToNumber(value, node)}`;
                 break;
         }
-        this._setArgument(newValue);
+        this._setArgument(value);
     }
 
     async _delete() {
@@ -467,6 +468,8 @@ class KeyboardShortcutHotkeyEntry {
             this._setArgumentInputValue(node, value);
         }
 
+        this._updateArgumentInputValidity();
+
         await this._modifyProfileSettings([{
             action: 'set',
             path: `${this._basePath}.argument`,
@@ -540,6 +543,7 @@ class KeyboardShortcutHotkeyEntry {
             if (inputNode !== null) {
                 this._setArgumentInputValue(inputNode, argument);
                 this._argumentInput = inputNode;
+                this._updateArgumentInputValidity();
                 this._argumentEventListeners.addEventListener(inputNode, 'change', this._onArgumentValueChange.bind(this, template), false);
             }
             this._argumentContainer.appendChild(node);
@@ -557,5 +561,42 @@ class KeyboardShortcutHotkeyEntry {
 
     _setArgumentInputValue(node, value) {
         node.value = value;
+    }
+
+    async _updateArgumentInputValidity() {
+        if (this._argumentInput === null) { return; }
+
+        let okay = true;
+        const {action, argument} = this._data;
+        const details = this._parent.getActionDetails(action);
+        const {argument: argumentDetails} = typeof details !== 'undefined' ? details : {};
+
+        if (typeof argumentDetails !== 'undefined') {
+            const {template} = argumentDetails;
+            switch (template) {
+                case 'hotkey-argument-setting-path':
+                    okay = await this._isHotkeyArgumentSettingPathValid(argument);
+                    break;
+            }
+        }
+
+        this._argumentInput.dataset.invalid = `${!okay}`;
+    }
+
+    async _isHotkeyArgumentSettingPathValid(path) {
+        if (path.length === 0) { return true; }
+
+        const options = await this._parent.settingsController.getOptions();
+        const accessor = new ObjectPropertyAccessor(options);
+        const pathArray = ObjectPropertyAccessor.getPathArray(path);
+        try {
+            const value = accessor.get(pathArray, pathArray.length);
+            if (typeof value === 'boolean') {
+                return true;
+            }
+        } catch (e) {
+            // NOP
+        }
+        return false;
     }
 }

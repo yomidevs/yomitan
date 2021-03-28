@@ -3172,6 +3172,7 @@
             <option value="playAudioFromSource">Play audio from source</option>
             <option value="copyHostSelection">Copy host window selection</option>
             <option value="scanSelectedText">Scan selected text</option>
+            <option value="toggleOption">Toggle option</option>
         </select>
         <div class="hotkey-list-item-action-argument-container"></div>
     </div>
@@ -3221,9 +3222,14 @@
     <input type="number" step="1" min="1" class="hotkey-argument-input">
 </div></template>
 
+<template id="hotkey-argument-setting-path-template"><div class="flex-row-nowrap">
+    <span class="hotkey-argument-label">Path:</span>
+    <input type="text" class="hotkey-argument-input horizontal-flex-fill" spellcheck="false" autocomplete="off">
+</div></template>
+
 <template id="hotkey-argument-audio-source-template"><div class="flex-row-nowrap">
     <span class="hotkey-argument-label">Source:</span>
-    <select class="audio-source-select hotkey-argument-input">
+    <select class="audio-source-select hotkey-argument-input horizontal-flex-fill">
         <option value="jpod101">JapanesePod101</option>
         <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
         <option value="jisho">Jisho.org</option>

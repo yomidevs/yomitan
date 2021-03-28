@@ -27,6 +27,7 @@
  * Frontend
  * HotkeyHelpController
  * MediaLoader
+ * OptionToggleHotkeyHandler
  * PopupFactory
  * PopupMenu
  * QueryParser
@@ -112,6 +113,7 @@ class Display extends EventDispatcher {
         this._ankiNoteNotification = null;
         this._ankiNoteNotificationEventListeners = null;
         this._queryPostProcessor = null;
+        this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
 
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
@@ -201,6 +203,10 @@ class Display extends EventDispatcher {
         return this._parentPopupId;
     }
 
+    get notificationContainer() {
+        return this._footerNotificationContainer;
+    }
+
     async prepare() {
         // State setup
         const {documentElement} = document;
@@ -213,6 +219,7 @@ class Display extends EventDispatcher {
         this._displayAudio.prepare();
         this._queryParser.prepare();
         this._history.prepare();
+        this._optionToggleHotkeyHandler.prepare();
 
         // Event setup
         this._history.on('stateChanged', this._onStateChanged.bind(this));
