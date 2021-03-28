@@ -172,8 +172,19 @@ class DictionaryDataUtil {
         }
 
         const disambiguations = [];
-        if (!this._areSetsEqual(terms, allTermsSet)) { disambiguations.push(...this._getSetIntersection(terms, allTermsSet)); }
-        if (!this._areSetsEqual(readings, allReadingsSet)) { disambiguations.push(...this._getSetIntersection(readings, allReadingsSet)); }
+        const addTerms = !this._areSetsEqual(terms, allTermsSet);
+        const addReadings = !this._areSetsEqual(readings, allReadingsSet);
+        if (addTerms) {
+            disambiguations.push(...this._getSetIntersection(terms, allTermsSet));
+        }
+        if (addReadings) {
+            if (addTerms) {
+                for (const term of terms) {
+                    readings.delete(term);
+                }
+            }
+            disambiguations.push(...this._getSetIntersection(readings, allReadingsSet));
+        }
         return disambiguations;
     }
 
