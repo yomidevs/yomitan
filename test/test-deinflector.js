@@ -110,6 +110,7 @@ function testDeinflections() {
                 {term: '食べる', source: '食べておる',       rule: 'v1', reasons: ['-te', 'progressive or perfect']},
                 {term: '食べる', source: '食べてる',         rule: 'v1', reasons: ['-te', 'progressive or perfect']},
                 {term: '食べる', source: '食べとる',         rule: 'v1', reasons: ['-te', 'progressive or perfect']},
+                {term: '食べる', source: '食べてしまう',     rule: 'v1', reasons: ['-te', '-shimau']},
 
                 {term: '買う', source: '買う',             rule: 'v5', reasons: []},
                 {term: '買う', source: '買います',         rule: 'v5', reasons: ['polite']},
@@ -152,6 +153,7 @@ function testDeinflections() {
                 {term: '買う', source: '買っておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '買う', source: '買ってる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '買う', source: '買っとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
+                {term: '買う', source: '買ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
 
                 {term: '行く', source: '行く',             rule: 'v5', reasons: []},
                 {term: '行く', source: '行きます',         rule: 'v5', reasons: ['polite']},
@@ -194,6 +196,7 @@ function testDeinflections() {
                 {term: '行く', source: '行っておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '行く', source: '行ってる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '行く', source: '行っとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
+                {term: '行く', source: '行ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
 
                 {term: '泳ぐ', source: '泳ぐ',             rule: 'v5', reasons: []},
                 {term: '泳ぐ', source: '泳ぎます',         rule: 'v5', reasons: ['polite']},
@@ -235,6 +238,7 @@ function testDeinflections() {
                 {term: '泳ぐ', source: '泳いでいる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '泳ぐ', source: '泳いでおる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '泳ぐ', source: '泳いでる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
+                {term: '泳ぐ', source: '泳いでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
 
                 {term: '話す', source: '話す',             rule: 'v5', reasons: []},
                 {term: '話す', source: '話します',         rule: 'v5', reasons: ['polite']},
@@ -277,6 +281,7 @@ function testDeinflections() {
                 {term: '話す', source: '話しておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '話す', source: '話してる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '話す', source: '話しとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
+                {term: '話す', source: '話してしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
 
                 {term: '待つ', source: '待つ',             rule: 'v5', reasons: []},
                 {term: '待つ', source: '待ちます',         rule: 'v5', reasons: ['polite']},
@@ -319,6 +324,7 @@ function testDeinflections() {
                 {term: '待つ', source: '待っておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '待つ', source: '待ってる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '待つ', source: '待っとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
+                {term: '待つ', source: '待ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
 
                 {term: '死ぬ', source: '死ぬ',             rule: 'v5', reasons: []},
                 {term: '死ぬ', source: '死にます',         rule: 'v5', reasons: ['polite']},
@@ -360,6 +366,7 @@ function testDeinflections() {
                 {term: '死ぬ', source: '死んでいる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '死ぬ', source: '死んでおる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '死ぬ', source: '死んでる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
+                {term: '死ぬ', source: '死んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
 
                 {term: '遊ぶ', source: '遊ぶ',             rule: 'v5', reasons: []},
                 {term: '遊ぶ', source: '遊びます',         rule: 'v5', reasons: ['polite']},
@@ -401,6 +408,7 @@ function testDeinflections() {
                 {term: '遊ぶ', source: '遊んでいる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '遊ぶ', source: '遊んでおる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '遊ぶ', source: '遊んでる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
+                {term: '遊ぶ', source: '遊んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
 
                 {term: '飲む', source: '飲む',             rule: 'v5', reasons: []},
                 {term: '飲む', source: '飲みます',         rule: 'v5', reasons: ['polite']},
@@ -442,6 +450,7 @@ function testDeinflections() {
                 {term: '飲む', source: '飲んでいる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '飲む', source: '飲んでおる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '飲む', source: '飲んでる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
+                {term: '飲む', source: '飲んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
 
                 {term: '作る', source: '作る',             rule: 'v5', reasons: []},
                 {term: '作る', source: '作ります',         rule: 'v5', reasons: ['polite']},
@@ -484,6 +493,7 @@ function testDeinflections() {
                 {term: '作る', source: '作っておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '作る', source: '作ってる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '作る', source: '作っとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
+                {term: '作る', source: '作ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
 
                 // Irregular verbs
                 {term: '為る', source: '為る',           rule: 'vs', reasons: []},
@@ -531,6 +541,7 @@ function testDeinflections() {
                 {term: '為る', source: '為ておる',       rule: 'vs', reasons: ['-te', 'progressive or perfect']},
                 {term: '為る', source: '為てる',         rule: 'vs', reasons: ['-te', 'progressive or perfect']},
                 {term: '為る', source: '為とる',         rule: 'vs', reasons: ['-te', 'progressive or perfect']},
+                {term: '為る', source: '為てしまう',     rule: 'vs', reasons: ['-te', '-shimau']},
 
                 {term: 'する', source: 'する',           rule: 'vs', reasons: []},
                 {term: 'する', source: 'します',         rule: 'vs', reasons: ['polite']},
@@ -577,6 +588,7 @@ function testDeinflections() {
                 {term: 'する', source: 'しておる',       rule: 'vs', reasons: ['-te', 'progressive or perfect']},
                 {term: 'する', source: 'してる',         rule: 'vs', reasons: ['-te', 'progressive or perfect']},
                 {term: 'する', source: 'しとる',         rule: 'vs', reasons: ['-te', 'progressive or perfect']},
+                {term: 'する', source: 'してしまう',     rule: 'vs', reasons: ['-te', '-shimau']},
 
                 {term: '来る', source: '来る',           rule: 'vk', reasons: []},
                 {term: '来る', source: '来ます',         rule: 'vk', reasons: ['polite']},
@@ -619,6 +631,7 @@ function testDeinflections() {
                 {term: '来る', source: '来ておる',       rule: 'vk', reasons: ['-te', 'progressive or perfect']},
                 {term: '来る', source: '来てる',         rule: 'vk', reasons: ['-te', 'progressive or perfect']},
                 {term: '来る', source: '来とる',         rule: 'vk', reasons: ['-te', 'progressive or perfect']},
+                {term: '来る', source: '来てしまう',     rule: 'vk', reasons: ['-te', '-shimau']},
 
                 {term: '來る', source: '來る',           rule: 'vk', reasons: []},
                 {term: '來る', source: '來ます',         rule: 'vk', reasons: ['polite']},
@@ -661,6 +674,7 @@ function testDeinflections() {
                 {term: '來る', source: '來ておる',       rule: 'vk', reasons: ['-te', 'progressive or perfect']},
                 {term: '來る', source: '來てる',         rule: 'vk', reasons: ['-te', 'progressive or perfect']},
                 {term: '來る', source: '來とる',         rule: 'vk', reasons: ['-te', 'progressive or perfect']},
+                {term: '來る', source: '來てしまう',     rule: 'vk', reasons: ['-te', '-shimau']},
 
                 {term: 'くる', source: 'くる',           rule: 'vk', reasons: []},
                 {term: 'くる', source: 'きます',         rule: 'vk', reasons: ['polite']},
@@ -703,6 +717,7 @@ function testDeinflections() {
                 {term: 'くる', source: 'きておる',       rule: 'vk', reasons: ['-te', 'progressive or perfect']},
                 {term: 'くる', source: 'きてる',         rule: 'vk', reasons: ['-te', 'progressive or perfect']},
                 {term: 'くる', source: 'きとる',         rule: 'vk', reasons: ['-te', 'progressive or perfect']},
+                {term: 'くる', source: 'きてしまう',     rule: 'vk', reasons: ['-te', '-shimau']},
 
                 // Zuru verbs
                 {term: '論ずる', source: '論ずる',           rule: 'vz', reasons: []},
@@ -753,6 +768,7 @@ function testDeinflections() {
                 {term: '論ずる', source: '論じておる',       rule: 'vz', reasons: ['-te', 'progressive or perfect']},
                 {term: '論ずる', source: '論じてる',         rule: 'vz', reasons: ['-te', 'progressive or perfect']},
                 {term: '論ずる', source: '論じとる',         rule: 'vz', reasons: ['-te', 'progressive or perfect']},
+                {term: '論ずる', source: '論じてしまう',     rule: 'vz', reasons: ['-te', '-shimau']},
 
                 // Uncommon irregular verbs
                 {term: 'のたまう', source: 'のたもうて',   rule: 'v5', reasons: ['-te']},

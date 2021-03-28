@@ -49,6 +49,10 @@
         {"kanaIn": "来ちまう", "kanaOut": "来る", "rulesIn": ["v5"], "rulesOut": ["vk"]},
         {"kanaIn": "來ちまう", "kanaOut": "來る", "rulesIn": ["v5"], "rulesOut": ["vk"]}
     ],
+    "-shimau": [
+        {"kanaIn": "てしまう", "kanaOut": "て", "rulesIn": ["v5"], "rulesOut": ["iru"]},
+        {"kanaIn": "でしまう", "kanaOut": "で", "rulesIn": ["v5"], "rulesOut": ["iru"]}
+    ],
     "-nasai": [
         {"kanaIn": "なさい", "kanaOut": "る", "rulesIn": [], "rulesOut": ["v1"]},
         {"kanaIn": "いなさい", "kanaOut": "う", "rulesIn": [], "rulesOut": ["v5"]},
