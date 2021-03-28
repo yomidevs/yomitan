@@ -92,6 +92,7 @@ function testDeinflections() {
 
                 {term: '食べる', source: '食べれば',         rule: 'v1', reasons: ['-ba']},
                 {term: '食べる', source: '食べちゃう',       rule: 'v1', reasons: ['-chau']},
+                {term: '食べる', source: '食べちまう',       rule: 'v1', reasons: ['-chimau']},
                 {term: '食べる', source: '食べなさい',       rule: 'v1', reasons: ['-nasai']},
                 {term: '食べる', source: '食べそう',         rule: 'v1', reasons: ['-sou']},
                 {term: '食べる', source: '食べすぎる',       rule: 'v1', reasons: ['-sugiru']},
@@ -133,6 +134,7 @@ function testDeinflections() {
 
                 {term: '買う', source: '買えば',           rule: 'v5', reasons: ['-ba']},
                 {term: '買う', source: '買っちゃう',       rule: 'v5', reasons: ['-chau']},
+                {term: '買う', source: '買っちまう',       rule: 'v5', reasons: ['-chimau']},
                 {term: '買う', source: '買いなさい',       rule: 'v5', reasons: ['-nasai']},
                 {term: '買う', source: '買いそう',         rule: 'v5', reasons: ['-sou']},
                 {term: '買う', source: '買いすぎる',       rule: 'v5', reasons: ['-sugiru']},
@@ -174,6 +176,7 @@ function testDeinflections() {
 
                 {term: '行く', source: '行けば',           rule: 'v5', reasons: ['-ba']},
                 {term: '行く', source: '行っちゃう',       rule: 'v5', reasons: ['-chau']},
+                {term: '行く', source: '行っちまう',       rule: 'v5', reasons: ['-chimau']},
                 {term: '行く', source: '行きなさい',       rule: 'v5', reasons: ['-nasai']},
                 {term: '行く', source: '行きそう',         rule: 'v5', reasons: ['-sou']},
                 {term: '行く', source: '行きすぎる',       rule: 'v5', reasons: ['-sugiru']},
@@ -215,6 +218,7 @@ function testDeinflections() {
 
                 {term: '泳ぐ', source: '泳げば',           rule: 'v5', reasons: ['-ba']},
                 {term: '泳ぐ', source: '泳いじゃう',       rule: 'v5', reasons: ['-chau']},
+                {term: '泳ぐ', source: '泳いじまう',       rule: 'v5', reasons: ['-chimau']},
                 {term: '泳ぐ', source: '泳ぎなさい',       rule: 'v5', reasons: ['-nasai']},
                 {term: '泳ぐ', source: '泳ぎそう',         rule: 'v5', reasons: ['-sou']},
                 {term: '泳ぐ', source: '泳ぎすぎる',       rule: 'v5', reasons: ['-sugiru']},
@@ -255,6 +259,7 @@ function testDeinflections() {
 
                 {term: '話す', source: '話せば',           rule: 'v5', reasons: ['-ba']},
                 {term: '話す', source: '話しちゃう',       rule: 'v5', reasons: ['-chau']},
+                {term: '話す', source: '話しちまう',       rule: 'v5', reasons: ['-chimau']},
                 {term: '話す', source: '話しなさい',       rule: 'v5', reasons: ['-nasai']},
                 {term: '話す', source: '話しそう',         rule: 'v5', reasons: ['-sou']},
                 {term: '話す', source: '話しすぎる',       rule: 'v5', reasons: ['-sugiru']},
@@ -296,6 +301,7 @@ function testDeinflections() {
 
                 {term: '待つ', source: '待てば',           rule: 'v5', reasons: ['-ba']},
                 {term: '待つ', source: '待っちゃう',       rule: 'v5', reasons: ['-chau']},
+                {term: '待つ', source: '待っちまう',       rule: 'v5', reasons: ['-chimau']},
                 {term: '待つ', source: '待ちなさい',       rule: 'v5', reasons: ['-nasai']},
                 {term: '待つ', source: '待ちそう',         rule: 'v5', reasons: ['-sou']},
                 {term: '待つ', source: '待ちすぎる',       rule: 'v5', reasons: ['-sugiru']},
@@ -337,6 +343,7 @@ function testDeinflections() {
 
                 {term: '死ぬ', source: '死ねば',           rule: 'v5', reasons: ['-ba']},
                 {term: '死ぬ', source: '死んじゃう',       rule: 'v5', reasons: ['-chau']},
+                {term: '死ぬ', source: '死んじまう',       rule: 'v5', reasons: ['-chimau']},
                 {term: '死ぬ', source: '死になさい',       rule: 'v5', reasons: ['-nasai']},
                 {term: '死ぬ', source: '死にそう',         rule: 'v5', reasons: ['-sou']},
                 {term: '死ぬ', source: '死にすぎる',       rule: 'v5', reasons: ['-sugiru']},
@@ -377,6 +384,7 @@ function testDeinflections() {
 
                 {term: '遊ぶ', source: '遊べば',           rule: 'v5', reasons: ['-ba']},
                 {term: '遊ぶ', source: '遊んじゃう',       rule: 'v5', reasons: ['-chau']},
+                {term: '遊ぶ', source: '遊んじまう',       rule: 'v5', reasons: ['-chimau']},
                 {term: '遊ぶ', source: '遊びなさい',       rule: 'v5', reasons: ['-nasai']},
                 {term: '遊ぶ', source: '遊びそう',         rule: 'v5', reasons: ['-sou']},
                 {term: '遊ぶ', source: '遊びすぎる',       rule: 'v5', reasons: ['-sugiru']},
@@ -417,6 +425,7 @@ function testDeinflections() {
 
                 {term: '飲む', source: '飲めば',           rule: 'v5', reasons: ['-ba']},
                 {term: '飲む', source: '飲んじゃう',       rule: 'v5', reasons: ['-chau']},
+                {term: '飲む', source: '飲んじまう',       rule: 'v5', reasons: ['-chimau']},
                 {term: '飲む', source: '飲みなさい',       rule: 'v5', reasons: ['-nasai']},
                 {term: '飲む', source: '飲みそう',         rule: 'v5', reasons: ['-sou']},
                 {term: '飲む', source: '飲みすぎる',       rule: 'v5', reasons: ['-sugiru']},
@@ -457,6 +466,7 @@ function testDeinflections() {
 
                 {term: '作る', source: '作れば',           rule: 'v5', reasons: ['-ba']},
                 {term: '作る', source: '作っちゃう',       rule: 'v5', reasons: ['-chau']},
+                {term: '作る', source: '作っちまう',       rule: 'v5', reasons: ['-chimau']},
                 {term: '作る', source: '作りなさい',       rule: 'v5', reasons: ['-nasai']},
                 {term: '作る', source: '作りそう',         rule: 'v5', reasons: ['-sou']},
                 {term: '作る', source: '作りすぎる',       rule: 'v5', reasons: ['-sugiru']},
@@ -503,6 +513,7 @@ function testDeinflections() {
 
                 {term: '為る', source: '為れば',         rule: 'vs', reasons: ['-ba']},
                 {term: '為る', source: '為ちゃう',       rule: 'vs', reasons: ['-chau']},
+                {term: '為る', source: '為ちまう',       rule: 'vs', reasons: ['-chimau']},
                 {term: '為る', source: '為なさい',       rule: 'vs', reasons: ['-nasai']},
                 {term: '為る', source: '為そう',         rule: 'vs', reasons: ['-sou']},
                 {term: '為る', source: '為すぎる',       rule: 'vs', reasons: ['-sugiru']},
@@ -548,6 +559,7 @@ function testDeinflections() {
 
                 {term: 'する', source: 'すれば',         rule: 'vs', reasons: ['-ba']},
                 {term: 'する', source: 'しちゃう',       rule: 'vs', reasons: ['-chau']},
+                {term: 'する', source: 'しちまう',       rule: 'vs', reasons: ['-chimau']},
                 {term: 'する', source: 'しなさい',       rule: 'vs', reasons: ['-nasai']},
                 {term: 'する', source: 'しそう',         rule: 'vs', reasons: ['-sou']},
                 {term: 'する', source: 'しすぎる',       rule: 'vs', reasons: ['-sugiru']},
@@ -589,6 +601,7 @@ function testDeinflections() {
 
                 {term: '来る', source: '来れば',         rule: 'vk', reasons: ['-ba']},
                 {term: '来る', source: '来ちゃう',       rule: 'vk', reasons: ['-chau']},
+                {term: '来る', source: '来ちまう',       rule: 'vk', reasons: ['-chimau']},
                 {term: '来る', source: '来なさい',       rule: 'vk', reasons: ['-nasai']},
                 {term: '来る', source: '来そう',         rule: 'vk', reasons: ['-sou']},
                 {term: '来る', source: '来すぎる',       rule: 'vk', reasons: ['-sugiru']},
@@ -630,6 +643,7 @@ function testDeinflections() {
 
                 {term: '來る', source: '來れば',         rule: 'vk', reasons: ['-ba']},
                 {term: '來る', source: '來ちゃう',       rule: 'vk', reasons: ['-chau']},
+                {term: '來る', source: '來ちまう',       rule: 'vk', reasons: ['-chimau']},
                 {term: '來る', source: '來なさい',       rule: 'vk', reasons: ['-nasai']},
                 {term: '來る', source: '來そう',         rule: 'vk', reasons: ['-sou']},
                 {term: '來る', source: '來すぎる',       rule: 'vk', reasons: ['-sugiru']},
@@ -671,6 +685,7 @@ function testDeinflections() {
 
                 {term: 'くる', source: 'くれば',         rule: 'vk', reasons: ['-ba']},
                 {term: 'くる', source: 'きちゃう',       rule: 'vk', reasons: ['-chau']},
+                {term: 'くる', source: 'きちまう',       rule: 'vk', reasons: ['-chimau']},
                 {term: 'くる', source: 'きなさい',       rule: 'vk', reasons: ['-nasai']},
                 {term: 'くる', source: 'きそう',         rule: 'vk', reasons: ['-sou']},
                 {term: 'くる', source: 'きすぎる',       rule: 'vk', reasons: ['-sugiru']},
@@ -720,6 +735,7 @@ function testDeinflections() {
 
                 {term: '論ずる', source: '論ずれば',         rule: 'vz', reasons: ['-ba']},
                 {term: '論ずる', source: '論じちゃう',       rule: 'vz', reasons: ['-chau']},
+                {term: '論ずる', source: '論じちまう',       rule: 'vz', reasons: ['-chimau']},
                 {term: '論ずる', source: '論じなさい',       rule: 'vz', reasons: ['-nasai']},
                 {term: '論ずる', source: '論じそう',         rule: 'vz', reasons: ['-sou']},
                 {term: '論ずる', source: '論じすぎる',       rule: 'vz', reasons: ['-sugiru']},

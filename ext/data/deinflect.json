@@ -30,6 +30,25 @@
         {"kanaIn": "来ちゃう", "kanaOut": "来る", "rulesIn": ["v5"], "rulesOut": ["vk"]},
         {"kanaIn": "來ちゃう", "kanaOut": "來る", "rulesIn": ["v5"], "rulesOut": ["vk"]}
     ],
+    "-chimau": [
+        {"kanaIn": "ちまう", "kanaOut": "る", "rulesIn": ["v5"], "rulesOut": ["v1"]},
+        {"kanaIn": "いじまう", "kanaOut": "ぐ", "rulesIn": ["v5"], "rulesOut": ["v5"]},
+        {"kanaIn": "いちまう", "kanaOut": "く", "rulesIn": ["v5"], "rulesOut": ["v5"]},
+        {"kanaIn": "しちまう", "kanaOut": "す", "rulesIn": ["v5"], "rulesOut": ["v5"]},
+        {"kanaIn": "っちまう", "kanaOut": "う", "rulesIn": ["v5"], "rulesOut": ["v5"]},
+        {"kanaIn": "っちまう", "kanaOut": "く", "rulesIn": ["v5"], "rulesOut": ["v5"]},
+        {"kanaIn": "っちまう", "kanaOut": "つ", "rulesIn": ["v5"], "rulesOut": ["v5"]},
+        {"kanaIn": "っちまう", "kanaOut": "る", "rulesIn": ["v5"], "rulesOut": ["v5"]},
+        {"kanaIn": "んじまう", "kanaOut": "ぬ", "rulesIn": ["v5"], "rulesOut": ["v5"]},
+        {"kanaIn": "んじまう", "kanaOut": "ぶ", "rulesIn": ["v5"], "rulesOut": ["v5"]},
+        {"kanaIn": "んじまう", "kanaOut": "む", "rulesIn": ["v5"], "rulesOut": ["v5"]},
+        {"kanaIn": "じちまう", "kanaOut": "ずる", "rulesIn": ["v5"], "rulesOut": ["vz"]},
+        {"kanaIn": "しちまう", "kanaOut": "する", "rulesIn": ["v5"], "rulesOut": ["vs"]},
+        {"kanaIn": "為ちまう", "kanaOut": "為る", "rulesIn": ["v5"], "rulesOut": ["vs"]},
+        {"kanaIn": "きちまう", "kanaOut": "くる", "rulesIn": ["v5"], "rulesOut": ["vk"]},
+        {"kanaIn": "来ちまう", "kanaOut": "来る", "rulesIn": ["v5"], "rulesOut": ["vk"]},
+        {"kanaIn": "來ちまう", "kanaOut": "來る", "rulesIn": ["v5"], "rulesOut": ["vk"]}
+    ],
     "-nasai": [
         {"kanaIn": "なさい", "kanaOut": "る", "rulesIn": [], "rulesOut": ["v1"]},
         {"kanaIn": "いなさい", "kanaOut": "う", "rulesIn": [], "rulesOut": ["v5"]},
