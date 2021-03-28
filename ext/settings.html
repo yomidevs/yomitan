@@ -3142,28 +3142,26 @@
     <div class="hotkey-list-item-action-label-cell">Action:</div>
     <div class="hotkey-list-item-action-cell">
         <select class="hotkey-list-item-action">
-            <option value="" data-scopes="popup search">None</option>
-            <option value="close" data-scopes="popup search">Close</option>
-            <option value="focusSearchBox" data-scopes="search">Focus search box</option>
-            <option value="nextEntry" data-scopes="popup search">Go to next entry</option>
-            <option value="nextEntry3" data-scopes="popup search">Go to next entry (x3)</option>
-            <option value="previousEntry" data-scopes="popup search">Go to previous entry</option>
-            <option value="previousEntry3" data-scopes="popup search">Go to previous entry (x3)</option>
-            <option value="lastEntry" data-scopes="popup search">Go to last entry</option>
-            <option value="firstEntry" data-scopes="popup search">Go to first entry</option>
-            <option value="nextEntryDifferentDictionary" data-scopes="popup search">Go to next dictionary</option>
-            <option value="previousEntryDifferentDictionary" data-scopes="popup search">Go to previous dictionary</option>
-            <option value="historyBackward" data-scopes="popup search">Navigate backward in history</option>
-            <option value="historyForward" data-scopes="popup search">Navigate forward in history</option>
-            <option value="addNoteKanji" data-scopes="popup search">Add kanji note</option>
-            <option value="addNoteTermKanji" data-scopes="popup search">Add term note</option>
-            <option value="addNoteTermKana" data-scopes="popup search">Add term note (reading)</option>
-            <option value="viewNote" data-scopes="popup search">View note</option>
-            <option value="playAudio" data-scopes="popup search">Play audio</option>
-            <option value="copyHostSelection" data-scopes="popup">Copy host window selection</option>
-            <option value="scanSelectedText" data-scopes="web">Scan selected text</option>
+            <option value="">None</option>
+            <option value="close">Close</option>
+            <option value="focusSearchBox">Focus search box</option>
+            <option value="nextEntry">Go to next entry</option>
+            <option value="previousEntry">Go to previous entry</option>
+            <option value="lastEntry">Go to last entry</option>
+            <option value="firstEntry">Go to first entry</option>
+            <option value="nextEntryDifferentDictionary">Go to next dictionary</option>
+            <option value="previousEntryDifferentDictionary">Go to previous dictionary</option>
+            <option value="historyBackward">Navigate backward in history</option>
+            <option value="historyForward">Navigate forward in history</option>
+            <option value="addNoteKanji">Add kanji note</option>
+            <option value="addNoteTermKanji">Add term note</option>
+            <option value="addNoteTermKana">Add term note (reading)</option>
+            <option value="viewNote">View note</option>
+            <option value="playAudio">Play audio</option>
+            <option value="copyHostSelection">Copy host window selection</option>
+            <option value="scanSelectedText">Scan selected text</option>
         </select>
-        <input type="text" class="hotkey-list-item-action-argument">
+        <div class="hotkey-list-item-action-argument-container"></div>
     </div>
 </div></div></template>
 
@@ -3204,6 +3202,11 @@
     <button class="popup-menu-item" data-menu-action="clearInput">Clear input</button>
     <button class="popup-menu-item" data-menu-action="resetInput">Reset input</button>
 </div></div></div></template>
+
+<template id="hotkey-argument-move-offset-template"><div class="flex-row-nowrap">
+    <span class="hotkey-argument-label">Count:</span>
+    <input type="number" step="1" min="1" class="hotkey-argument-input">
+</div></template>
 
 
 <!-- Scripts -->

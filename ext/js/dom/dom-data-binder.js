@@ -210,7 +210,7 @@ class DOMDataBinder {
 
     static convertToNumber(value, constraints) {
         value = parseFloat(value);
-        if (!Number.isFinite(value)) { return 0; }
+        if (!Number.isFinite(value)) { value = 0; }
 
         let {min, max, step} = constraints;
         min = DOMDataBinder.convertToNumberOrNull(min);

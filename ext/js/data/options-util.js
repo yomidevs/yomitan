@@ -754,8 +754,32 @@ class OptionsUtil {
         // Version 10 changes:
         //  Removed global option useSettingsV2.
         //  Added part-of-speech field template.
+        //  Added an argument to hotkey inputs.
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v10.handlebars');
         delete options.global.useSettingsV2;
+        for (const profile of options.profiles) {
+            for (const hotkey of profile.options.inputs.hotkeys) {
+                switch (hotkey.action) {
+                    case 'previousEntry':
+                        hotkey.argument = '1';
+                        break;
+                    case 'previousEntry3':
+                        hotkey.action = 'previousEntry';
+                        hotkey.argument = '3';
+                        break;
+                    case 'nextEntry':
+                        hotkey.argument = '1';
+                        break;
+                    case 'nextEntry3':
+                        hotkey.action = 'nextEntry';
+                        hotkey.argument = '3';
+                        break;
+                    default:
+                        hotkey.argument = '';
+                        break;
+                }
+            }
+        }
         return options;
     }
 }

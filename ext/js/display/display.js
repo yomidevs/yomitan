@@ -115,10 +115,8 @@ class Display extends EventDispatcher {
 
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
-            ['nextEntry',         () => { this._focusEntry(this._index + 1, true); }],
-            ['nextEntry3',        () => { this._focusEntry(this._index + 3, true); }],
-            ['previousEntry',     () => { this._focusEntry(this._index - 1, true); }],
-            ['previousEntry3',    () => { this._focusEntry(this._index - 3, true); }],
+            ['nextEntry',         this._onHotkeyActionMoveRelative.bind(this, 1)],
+            ['previousEntry',     this._onHotkeyActionMoveRelative.bind(this, -1)],
             ['lastEntry',         () => { this._focusEntry(this._definitions.length - 1, true); }],
             ['firstEntry',        () => { this._focusEntry(0, true); }],
             ['historyBackward',   () => { this._sourceTermView(); }],
@@ -1823,6 +1821,13 @@ class Display extends EventDispatcher {
     _onHotkeyClose() {
         if (this._closeSinglePopupMenu()) { return; }
         this.close();
+    }
+
+    _onHotkeyActionMoveRelative(sign, argument) {
+        let count = Number.parseInt(argument, 10);
+        if (!Number.isFinite(count)) { count = 1; }
+        count = Math.max(0, Math.floor(count));
+        this._focusEntry(this._index + count * sign, true);
     }
 
     _closeAllPopupMenus() {

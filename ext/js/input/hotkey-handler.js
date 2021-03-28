@@ -166,12 +166,12 @@ class HotkeyHandler extends EventDispatcher {
     }
 
     _invokeHandlers(modifiers, hotkeyInfo) {
-        for (const {modifiers: handlerModifiers, action} of hotkeyInfo.handlers) {
+        for (const {modifiers: handlerModifiers, action, argument} of hotkeyInfo.handlers) {
             if (!this._areSame(handlerModifiers, modifiers)) { continue; }
 
             const actionHandler = this._actions.get(action);
             if (typeof actionHandler !== 'undefined') {
-                const result = actionHandler();
+                const result = actionHandler(argument);
                 if (result !== false) {
                     return true;
                 }
@@ -196,7 +196,7 @@ class HotkeyHandler extends EventDispatcher {
 
         this._hotkeys.clear();
         for (const [scope, registrations] of this._hotkeyRegistrations.entries()) {
-            for (const {action, key, modifiers, scopes, enabled} of registrations) {
+            for (const {action, argument, key, modifiers, scopes, enabled} of registrations) {
                 if (!(enabled && key !== null && action !== '' && scopes.includes(scope))) { continue; }
 
                 let hotkeyInfo = this._hotkeys.get(key);
@@ -205,7 +205,7 @@ class HotkeyHandler extends EventDispatcher {
                     this._hotkeys.set(key, hotkeyInfo);
                 }
 
-                hotkeyInfo.handlers.push({modifiers: new Set(modifiers), action});
+                hotkeyInfo.handlers.push({modifiers: new Set(modifiers), action, argument});
             }
         }
         this._updateEventHandlers();

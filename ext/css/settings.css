@@ -2071,10 +2071,16 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 .hotkey-list-item-enabled-button-label>.checkbox {
     margin-right: 0.5em;
 }
-.hotkey-list-item-action-argument {
+.hotkey-list-item-action-argument-container {
     margin-left: 0.375em;
     flex: 1 1 auto;
-    visibility: hidden;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    width: var(--input-width-large);
+}
+.hotkey-argument-label {
+    margin-right: 0.25em;
 }
 .hotkey-list-item-flex-row {
     display: flex;

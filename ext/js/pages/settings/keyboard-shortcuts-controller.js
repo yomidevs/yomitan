@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DOMDataBinder
  * KeyboardMouseInputField
  */
 
@@ -30,6 +31,26 @@ class KeyboardShortcutController {
         this._emptyIndicator = null;
         this._stringComparer = new Intl.Collator('en-US'); // Invariant locale
         this._scrollContainer = null;
+        this._actionDetails = new Map([
+            ['',                                 {scopes: new Set()}],
+            ['close',                            {scopes: new Set(['popup', 'search'])}],
+            ['focusSearchBox',                   {scopes: new Set(['search'])}],
+            ['nextEntry',                        {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-move-offset', default: '1'}}],
+            ['previousEntry',                    {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-move-offset', default: '1'}}],
+            ['lastEntry',                        {scopes: new Set(['popup', 'search'])}],
+            ['firstEntry',                       {scopes: new Set(['popup', 'search'])}],
+            ['nextEntryDifferentDictionary',     {scopes: new Set(['popup', 'search'])}],
+            ['previousEntryDifferentDictionary', {scopes: new Set(['popup', 'search'])}],
+            ['historyBackward',                  {scopes: new Set(['popup', 'search'])}],
+            ['historyForward',                   {scopes: new Set(['popup', 'search'])}],
+            ['addNoteKanji',                     {scopes: new Set(['popup', 'search'])}],
+            ['addNoteTermKanji',                 {scopes: new Set(['popup', 'search'])}],
+            ['addNoteTermKana',                  {scopes: new Set(['popup', 'search'])}],
+            ['viewNote',                         {scopes: new Set(['popup', 'search'])}],
+            ['playAudio',                        {scopes: new Set(['popup', 'search'])}],
+            ['copyHostSelection',                {scopes: new Set(['popup'])}],
+            ['scanSelectedText',                 {scopes: new Set(['web'])}]
+        ]);
     }
 
     get settingsController() {
@@ -96,6 +117,10 @@ class KeyboardShortcutController {
         return defaultOptions.profiles[0].options.inputs.hotkeys;
     }
 
+    getActionDetails(action) {
+        return this._actionDetails.get(action);
+    }
+
     // Private
 
     _onOptionsChanged({options}) {
@@ -134,6 +159,7 @@ class KeyboardShortcutController {
     async _addNewEntry() {
         const newEntry = {
             action: '',
+            argument: '',
             key: null,
             modifiers: [],
             scopes: ['popup', 'search'],
@@ -169,6 +195,9 @@ class KeyboardShortcutHotkeyEntry {
         this._enabledButton = null;
         this._scopeMenu = null;
         this._scopeMenuEventListeners = new EventListenerCollection();
+        this._argumentContainer = null;
+        this._argumentInput = null;
+        this._argumentEventListeners = new EventListenerCollection();
     }
 
     prepare() {
@@ -183,6 +212,7 @@ class KeyboardShortcutHotkeyEntry {
 
         this._actionSelect = action;
         this._enabledButton = enabledButton;
+        this._argumentContainer = node.querySelector('.hotkey-list-item-action-argument-container');
 
         this._inputField = new KeyboardMouseInputField(input, null, this._os);
         this._inputField.prepare(this._data.key, this._data.modifiers, false, true);
@@ -193,6 +223,7 @@ class KeyboardShortcutHotkeyEntry {
         enabledToggle.dataset.setting = `${this._basePath}.enabled`;
 
         this._updateScopesButton();
+        this._updateActionArgument();
 
         this._eventListeners.addEventListener(scopesButton, 'menuOpen', this._onScopesMenuOpen.bind(this));
         this._eventListeners.addEventListener(scopesButton, 'menuClose', this._onScopesMenuClose.bind(this));
@@ -205,6 +236,7 @@ class KeyboardShortcutHotkeyEntry {
         this._eventListeners.removeAllEventListeners();
         this._inputField.cleanup();
         this._clearScopeMenu();
+        this._clearArgumentEventListeners();
         if (this._node.parentNode !== null) {
             this._node.parentNode.removeChild(this._node);
         }
@@ -228,6 +260,11 @@ class KeyboardShortcutHotkeyEntry {
 
     _onScopesMenuOpen(e) {
         const {menu} = e.detail;
+        const validScopes = this._getValidScopesForAction(this._data.action);
+        if (validScopes.size === 0) {
+            menu.close();
+            return;
+        }
         this._scopeMenu = menu;
         this._updateScopeMenuItems(menu);
         this._updateDisplay(menu.containerNode); // Fix a animation issue due to changing checkbox values
@@ -258,6 +295,21 @@ class KeyboardShortcutHotkeyEntry {
     _onActionSelectChange(e) {
         const value = e.currentTarget.value;
         this._setAction(value);
+    }
+
+    _onArgumentValueChange(template, e) {
+        const node = e.currentTarget;
+        const value = this._getArgumentInputValue(node);
+        let newValue = value;
+        switch (template) {
+            case 'hotkey-argument-move-offset':
+                newValue = `${DOMDataBinder.convertToNumber(value, node)}`;
+                break;
+        }
+        if (value !== newValue) {
+            this._setArgumentInputValue(node, newValue);
+        }
+        this._setArgument(newValue);
     }
 
     async _delete() {
@@ -294,13 +346,13 @@ class KeyboardShortcutHotkeyEntry {
             scopes.splice(index, 1);
         }
 
-        this._updateScopesButton();
-
         await this._modifyProfileSettings([{
             action: 'set',
             path: `${this._basePath}.scopes`,
             value: scopes
         }]);
+
+        this._updateScopesButton();
     }
 
     async _modifyProfileSettings(targets) {
@@ -326,58 +378,81 @@ class KeyboardShortcutHotkeyEntry {
     }
 
     async _setAction(value) {
-        const targets = [{
-            action: 'set',
-            path: `${this._basePath}.action`,
-            value
-        }];
-
-        this._data.action = value;
+        const validScopesOld = this._getValidScopesForAction(this._data.action);
 
         const scopes = this._data.scopes;
-        const validScopes = this._getValidScopesForAction(value);
-        if (validScopes !== null) {
-            let changed = false;
+
+        let details = this._parent.getActionDetails(value);
+        if (typeof details === 'undefined') { details = {}; }
+
+        let validScopes = details.scopes;
+        if (typeof validScopes === 'undefined') { validScopes = new Set(); }
+
+        const {argument: argumentDetails} = details;
+        let defaultArgument = typeof argumentDetails !== 'undefined' ? argumentDetails.default : '';
+        if (typeof defaultArgument !== 'string') { defaultArgument = ''; }
+
+        this._data.action = value;
+        this._data.argument = defaultArgument;
+
+        let scopesChanged = false;
+        if ((validScopesOld !== null ? validScopesOld.size : 0) === scopes.length) {
+            scopes.length = 0;
+            scopesChanged = true;
+        } else {
             for (let i = 0, ii = scopes.length; i < ii; ++i) {
                 if (!validScopes.has(scopes[i])) {
                     scopes.splice(i, 1);
                     --i;
                     --ii;
-                    changed = true;
+                    scopesChanged = true;
                 }
-            }
-            if (changed) {
-                if (scopes.length === 0) {
-                    scopes.push(...validScopes);
-                }
-                targets.push({
-                    action: 'set',
-                    path: `${this._basePath}.scopes`,
-                    value: scopes
-                });
-                this._updateCheckboxStates();
             }
         }
+        if (scopesChanged && scopes.length === 0) {
+            scopes.push(...validScopes);
+        }
 
-        await this._modifyProfileSettings(targets);
+        await this._modifyProfileSettings([
+            {
+                action: 'set',
+                path: `${this._basePath}.action`,
+                value: this._data.action
+            },
+            {
+                action: 'set',
+                path: `${this._basePath}.argument`,
+                value: this._data.argument
+            },
+            {
+                action: 'set',
+                path: `${this._basePath}.scopes`,
+                value: this._data.scopes
+            }
+        ]);
 
-        this._updateCheckboxVisibility();
+        this._updateScopesButton();
+        this._updateScopesMenu();
+        this._updateActionArgument();
     }
 
-    _updateCheckboxStates() {
-        if (this._scopeMenu === null) { return; }
-        this._updateScopeMenuItems(this._scopeMenu);
+    async _setArgument(value) {
+        this._data.argument = value;
+        await this._modifyProfileSettings([{
+            action: 'set',
+            path: `${this._basePath}.argument`,
+            value
+        }]);
     }
 
-    _updateCheckboxVisibility() {
+    _updateScopesMenu() {
         if (this._scopeMenu === null) { return; }
         this._updateScopeMenuItems(this._scopeMenu);
     }
 
     _getValidScopesForAction(action) {
-        const optionNode = this._actionSelect.querySelector(`option[value="${action}"]`);
-        const scopesString = (optionNode !== null ? optionNode.dataset.scopes : void 0);
-        return (typeof scopesString === 'string' ? new Set(scopesString.split(' ')) : null);
+        const details = this._parent.getActionDetails(action);
+        return typeof details !== 'undefined' ? details.scopes : null;
     }
 
     _updateScopeMenuItems(menu) {
@@ -418,5 +493,40 @@ class KeyboardShortcutHotkeyEntry {
         style.display = 'none';
         getComputedStyle(node).getPropertyValue('display');
         style.display = display;
+    }
+
+    _updateActionArgument() {
+        this._clearArgumentEventListeners();
+
+        const {action, argument} = this._data;
+        const details = this._parent.getActionDetails(action);
+        const {argument: argumentDetails} = typeof details !== 'undefined' ? details : {};
+
+        this._argumentContainer.textContent = '';
+        if (typeof argumentDetails !== 'undefined') {
+            const {template} = argumentDetails;
+            const node = this._parent.settingsController.instantiateTemplate(template);
+            const inputSelector = '.hotkey-argument-input';
+            const inputNode = node.matches(inputSelector) ? node : node.querySelector(inputSelector);
+            if (inputNode !== null) {
+                this._setArgumentInputValue(inputNode, argument);
+                this._argumentInput = inputNode;
+                this._argumentEventListeners.addEventListener(inputNode, 'change', this._onArgumentValueChange.bind(this, template), false);
+            }
+            this._argumentContainer.appendChild(node);
+        }
+    }
+
+    _clearArgumentEventListeners() {
+        this._argumentEventListeners.removeAllEventListeners();
+        this._argumentInput = null;
+    }
+
+    _getArgumentInputValue(node) {
+        return node.value;
+    }
+
+    _setArgumentInputValue(node, value) {
+        node.value = value;
     }
 }
