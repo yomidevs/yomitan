@@ -3061,7 +3061,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="low-emphasis danger" id="hotkey-list-reset">Reset</button>
+        <button class="low-emphasis danger" data-modal-action="show,keyboard-shortcuts-reset">Reset</button>
         <button class="low-emphasis" id="hotkey-list-add">Add</button>
         <button data-modal-action="hide">Close</button>
     </div>
@@ -3113,6 +3113,17 @@
         <button class="low-emphasis danger" id="extension-hotkey-list-reset-all">Reset All</button>
         <button class="low-emphasis danger" id="extension-hotkey-list-clear-all">Clear All</button>
         <button data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
+<div id="keyboard-shortcuts-reset-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+    <div class="modal-header"><div class="modal-title">Confirm Keyboard Shortcuts Reset</div></div>
+    <div class="modal-body">
+        Are you sure you want to reset all keyboard shortcuts to their defaults?
+    </div>
+    <div class="modal-footer">
+        <button class="low-emphasis" data-modal-action="hide">Cancel</button>
+        <button class="danger" id="hotkey-list-reset" data-modal-action="hide">Reset All</button>
     </div>
 </div></div>
 
