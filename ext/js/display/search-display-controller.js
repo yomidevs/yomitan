@@ -235,7 +235,7 @@ class SearchDisplayController {
         } else {
             if (this._wanakanaBound) {
                 wanakana.unbind(input);
-                this._wanakanaBound = true;
+                this._wanakanaBound = false;
             }
         }
 
