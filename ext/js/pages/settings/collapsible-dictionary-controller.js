@@ -24,17 +24,16 @@ class CollapsibleDictionaryController {
         this._settingsController = settingsController;
         this._getDictionaryInfoToken = null;
         this._dictionaryInfoMap = new Map();
+        this._eventListeners = new EventListenerCollection();
         this._container = null;
         this._selects = [];
         this._allSelect = null;
-        this._eventListeners = new EventListenerCollection();
     }
 
     async prepare() {
         this._container = document.querySelector('#collapsible-dictionary-list');
 
         await this._onDatabaseUpdated();
-        await this._updateOptions();
 
         yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
@@ -54,20 +53,19 @@ class CollapsibleDictionaryController {
             this._dictionaryInfoMap.set(entry.title, entry);
         }
 
-        await this._updateOptions();
+        const options = await this._settingsController.getOptions();
+        this._onOptionsChanged({options});
     }
 
     _onOptionsChanged({options}) {
         this._eventListeners.removeAllEventListeners();
         this._selects = [];
 
-        const {dictionaries} = options;
-
         const fragment = document.createDocumentFragment();
 
         this._setupAllSelect(fragment, options);
 
-        for (const dictionary of Object.keys(dictionaries)) {
+        for (const dictionary of Object.keys(options.dictionaries)) {
             const dictionaryInfo = this._dictionaryInfoMap.get(dictionary);
             if (typeof dictionaryInfo === 'undefined') { continue; }
 
@@ -118,11 +116,6 @@ class CollapsibleDictionaryController {
         versionNode.textContent = version;
 
         return node.querySelector('.definitions-collapsible');
-    }
-
-    async _updateOptions() {
-        const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
     }
 
     async _updateAllSelectFresh() {

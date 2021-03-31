@@ -23,42 +23,58 @@ class SecondarySearchDictionaryController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._getDictionaryInfoToken = null;
-        this._container = null;
+        this._dictionaryInfoMap = new Map();
         this._eventListeners = new EventListenerCollection();
+        this._container = null;
     }
 
     async prepare() {
         this._container = document.querySelector('#secondary-search-dictionary-list');
 
-        yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
-
         await this._onDatabaseUpdated();
+
+        yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
     }
 
     // Private
 
     async _onDatabaseUpdated() {
-        this._eventListeners.removeAllEventListeners();
-
         const token = {};
         this._getDictionaryInfoToken = token;
         const dictionaries = await this._settingsController.getDictionaryInfo();
         if (this._getDictionaryInfoToken !== token) { return; }
         this._getDictionaryInfoToken = null;
 
+        this._dictionaryInfoMap.clear();
+        for (const entry of dictionaries) {
+            this._dictionaryInfoMap.set(entry.title, entry);
+        }
+
+        const options = await this._settingsController.getOptions();
+        this._onOptionsChanged({options});
+    }
+
+    _onOptionsChanged({options}) {
+        this._eventListeners.removeAllEventListeners();
+
         const fragment = document.createDocumentFragment();
-        for (const {title, revision} of dictionaries) {
+
+        for (const dictionary of Object.keys(options.dictionaries)) {
+            const dictionaryInfo = this._dictionaryInfoMap.get(dictionary);
+            if (typeof dictionaryInfo === 'undefined') { continue; }
+
             const node = this._settingsController.instantiateTemplate('secondary-search-dictionary');
             fragment.appendChild(node);
 
             const nameNode = node.querySelector('.dictionary-title');
-            nameNode.textContent = title;
+            nameNode.textContent = dictionary;
 
             const versionNode = node.querySelector('.dictionary-version');
-            versionNode.textContent = `rev.${revision}`;
+            versionNode.textContent = `rev.${dictionaryInfo.revision}`;
 
             const toggle = node.querySelector('.dictionary-allow-secondary-searches');
-            toggle.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'allowSecondarySearches']);
+            toggle.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', dictionary, 'allowSecondarySearches']);
             this._eventListeners.addEventListener(toggle, 'settingChanged', this._onEnabledChanged.bind(this, node), false);
         }
 
