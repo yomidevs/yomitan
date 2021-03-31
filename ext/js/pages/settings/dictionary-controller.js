@@ -257,6 +257,36 @@ class DictionaryController {
         };
     }
 
+    static async ensureDictionarySettings(settingsController, dictionaries, optionsFull, modifyOptionsFull, newDictionariesEnabled) {
+        if (typeof dictionaries === 'undefined') {
+            dictionaries = await settingsController.getDictionaryInfo();
+        }
+        if (typeof optionsFull === 'undefined') {
+            optionsFull = await settingsController.getOptionsFull();
+        }
+
+        const targets = [];
+        const {profiles} = optionsFull;
+        for (const {title} of dictionaries) {
+            for (let i = 0, ii = profiles.length; i < ii; ++i) {
+                const {options: {dictionaries: dictionaryOptions}} = profiles[i];
+                if (Object.prototype.hasOwnProperty.call(dictionaryOptions, title)) { continue; }
+
+                const value = DictionaryController.createDefaultDictionarySettings(newDictionariesEnabled);
+                if (modifyOptionsFull) {
+                    dictionaryOptions[title] = value;
+                } else {
+                    const path = ObjectPropertyAccessor.getPathString(['profiles', i, 'options', 'dictionaries', title]);
+                    targets.push({action: 'set', path, value});
+                }
+            }
+        }
+
+        if (!modifyOptionsFull && targets.length > 0) {
+            await settingsController.modifyGlobalSettings(targets);
+        }
+    }
+
     // Private
 
     _onOptionsChanged({options}) {
@@ -290,7 +320,7 @@ class DictionaryController {
 
         this._updateDictionariesEnabledWarnings(options);
 
-        await this._ensureDictionarySettings(dictionaries);
+        await DictionaryController.ensureDictionarySettings(this._settingsController, dictionaries, void 0, false, false);
         for (const dictionary of dictionaries) {
             this._createDictionaryEntry(dictionary);
         }
@@ -529,29 +559,6 @@ class DictionaryController {
             }
         }
         await this._settingsController.modifyGlobalSettings(targets);
-    }
-
-    async _ensureDictionarySettings(dictionaries2) {
-        const optionsFull = await this._settingsController.getOptionsFull();
-        const {profiles} = optionsFull;
-        const targets = [];
-        for (const {title} of dictionaries2) {
-            for (let i = 0, ii = profiles.length; i < ii; ++i) {
-                const {options: {dictionaries: dictionaryOptions}} = profiles[i];
-                if (Object.prototype.hasOwnProperty.call(dictionaryOptions, title)) { continue; }
-
-                const path = ObjectPropertyAccessor.getPathString(['profiles', i, 'options', 'dictionaries', title]);
-                targets.push({
-                    action: 'set',
-                    path,
-                    value: DictionaryController.createDefaultDictionarySettings(false)
-                });
-            }
-        }
-
-        if (targets.length > 0) {
-            await this._settingsController.modifyGlobalSettings(targets);
-        }
     }
 
     _triggerStorageChanged() {
