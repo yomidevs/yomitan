@@ -1347,7 +1347,7 @@ class Display extends EventDispatcher {
         const {state} = this._history;
         let {documentTitle, url, sentence} = (isObject(state) ? state : {});
         if (typeof documentTitle !== 'string') {
-            documentTitle = '';
+            documentTitle = document.title;
         }
         if (typeof url !== 'string') {
             url = window.location.href;
