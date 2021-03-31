@@ -45,7 +45,16 @@
         <div class="expression-tag-list tag-list"></div>
     </div>
 </div></template>
-<template id="definition-item-template"><li class="definition-item"><div class="definition-tag-list tag-list"></div><div class="definition-disambiguation-list"></div><ul class="glossary-list"></ul></li></template>
+<template id="definition-item-template" data-remove-whitespace-text="true"><li class="definition-item">
+    <div class="definition-item-inner">
+        <button class="definition-item-expansion-button"><div class="definition-item-expansion-button-icon icon" data-icon="double-down-chevron"></div></button>
+        <div class="definition-item-content">
+            <div class="definition-tag-list tag-list"></div>
+            <div class="definition-disambiguation-list"></div>
+            <ul class="glossary-list"></ul>
+        </div>
+    </div>
+</li></template>
 <template id="definition-disambiguation-template"><span class="definition-disambiguation"></span></template>
 <template id="glossary-item-template"><li class="glossary-item click-scannable"><span class="glossary-separator"> </span><span class="glossary"></span></li></template>
 <template id="glossary-item-image-template"><li class="glossary-item click-scannable" data-has-image="true"><span class="glossary-separator"> </span><span class="glossary"><a class="glossary-image-link" target="_blank" rel="noreferrer noopener"><span class="glossary-image-container"><span class="glossary-image-aspect-ratio-sizer"></span><img class="glossary-image" alt=""><span class="glossary-image-container-overlay"></span></span><span class="glossary-image-link-text">Image</span></a> <span class="glossary-image-description"></span></span></li></template>

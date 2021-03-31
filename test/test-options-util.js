@@ -135,7 +135,13 @@ function createProfileOptionsTestData1() {
             convertKatakanaToHiragana: 'variant',
             collapseEmphaticSequences: 'false'
         },
-        dictionaries: {},
+        dictionaries: {
+            'Test Dictionary': {
+                priority: 0,
+                enabled: true,
+                allowSecondarySearches: false
+            }
+        },
         parsing: {
             enableScanningParser: true,
             enableMecabParser: false,
@@ -401,7 +407,14 @@ function createProfileOptionsUpdatedTestData1() {
                 groups: []
             }
         },
-        dictionaries: {},
+        dictionaries: {
+            'Test Dictionary': {
+                priority: 0,
+                enabled: true,
+                allowSecondarySearches: false,
+                definitionsCollapsible: 'not-collapsible'
+            }
+        },
         parsing: {
             enableScanningParser: true,
             enableMecabParser: false,

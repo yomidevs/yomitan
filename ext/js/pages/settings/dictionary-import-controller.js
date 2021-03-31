@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DictionaryController
  * DictionaryDatabase
  * DictionaryImporter
  * ObjectPropertyAccessor
@@ -212,7 +213,7 @@ class DictionaryImportController {
         const profileCount = optionsFull.profiles.length;
         for (let i = 0; i < profileCount; ++i) {
             const {options} = optionsFull.profiles[i];
-            const value = this._createDictionaryOptions();
+            const value = DictionaryController.createDefaultDictionarySettings(true);
             const path1 = ObjectPropertyAccessor.getPathString(['profiles', i, 'options', 'dictionaries', title]);
             targets.push({action: 'set', path: path1, value});
 
@@ -289,14 +290,6 @@ class DictionaryImportController {
             reader.onerror = () => reject(reader.error);
             reader.readAsBinaryString(file);
         });
-    }
-
-    _createDictionaryOptions() {
-        return {
-            priority: 0,
-            enabled: true,
-            allowSecondarySearches: false
-        };
     }
 
     _errorToString(error) {

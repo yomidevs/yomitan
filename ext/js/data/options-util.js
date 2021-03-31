@@ -755,9 +755,13 @@ class OptionsUtil {
         //  Removed global option useSettingsV2.
         //  Added part-of-speech field template.
         //  Added an argument to hotkey inputs.
+        //  Added definitionsCollapsible to dictionary options.
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v10.handlebars');
         delete options.global.useSettingsV2;
         for (const profile of options.profiles) {
+            for (const dictionaryOptions of Object.values(profile.options.dictionaries)) {
+                dictionaryOptions.definitionsCollapsible = 'not-collapsible';
+            }
             for (const hotkey of profile.options.inputs.hotkeys) {
                 switch (hotkey.action) {
                     case 'previousEntry':

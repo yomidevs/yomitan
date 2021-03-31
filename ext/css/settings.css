@@ -47,6 +47,7 @@
     --outline-item-icon-size: 32px;
     --input-short-width: calc(var(--input-width-large) / 2 - var(--padding) / 2);
     --input-short-height: 24px;
+    --input-medium-width: calc(var(--input-width-large) * 0.75);
     --fab-button-size: 56px;
     --fab-button-padding: 16px;
     --modal-width: 600px;
@@ -656,6 +657,11 @@ input[type=text].short-width,
 input[type=number].short-width,
 select.short-width {
     width: var(--input-short-width);
+}
+input[type=text].medium-width,
+input[type=number].medium-width,
+select.medium-width {
+    width: var(--input-medium-width);
 }
 input[type=text].short-height,
 input[type=number].short-height,
@@ -2123,6 +2129,39 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     right: 0;
     bottom: 0;
     background-color: var(--warning-color);
+}
+
+.collapsible-dictionary-list {
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+}
+.collapsible-dictionary-item {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    margin-left: calc(var(--modal-padding-horizontal) * -1);
+    margin-right: calc(var(--modal-padding-horizontal) * -1);
+    padding: var(--settings-group-inner-horizontal-padding-fourth) var(--modal-padding-horizontal);
+}
+.collapsible-dictionary-item:not(:first-child) {
+    border-top: var(--thin-border-size) solid var(--separator-color2);
+}
+.collapsible-dictionary-cell {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+.collapsible-dictionary-cell:first-of-type {
+    flex: 1 1 auto;
+}
+.collapsible-dictionary-cell:not(:first-of-type) {
+    flex: 0 0 auto;
+    margin-left: 1em;
+}
+.collapsible-dictionary-cell-label {
+    margin-left: 0.375em;
 }
 
 

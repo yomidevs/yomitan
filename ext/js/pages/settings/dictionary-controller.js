@@ -248,6 +248,15 @@ class DictionaryController {
         this._updateDictionariesEnabledWarnings(options);
     }
 
+    static createDefaultDictionarySettings(enabled) {
+        return {
+            priority: 0,
+            enabled,
+            allowSecondarySearches: false,
+            definitionsCollapsible: 'not-collapsible'
+        };
+    }
+
     // Private
 
     _onOptionsChanged({options}) {
@@ -535,7 +544,7 @@ class DictionaryController {
                 targets.push({
                     action: 'set',
                     path,
-                    value: DictionaryController.createDefaultDictionarySettings()
+                    value: DictionaryController.createDefaultDictionarySettings(false)
                 });
             }
         }
@@ -547,13 +556,5 @@ class DictionaryController {
 
     _triggerStorageChanged() {
         yomichan.trigger('storageChanged');
-    }
-
-    static createDefaultDictionarySettings() {
-        return {
-            enabled: false,
-            allowSecondarySearches: false,
-            priority: 0
-        };
     }
 }

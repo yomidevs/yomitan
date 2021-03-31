@@ -23,6 +23,7 @@
  * DisplayHistory
  * DisplayNotification
  * DocumentUtil
+ * ElementOverflowController
  * FrameEndpoint
  * Frontend
  * HotkeyHelpController
@@ -114,6 +115,7 @@ class Display extends EventDispatcher {
         this._ankiNoteNotificationEventListeners = null;
         this._queryPostProcessor = null;
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
+        this._elementOverflowController = new ElementOverflowController();
 
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
@@ -305,6 +307,7 @@ class Display extends EventDispatcher {
         this._hotkeyHelpController.setOptions(options);
         this._displayGenerator.updateHotkeys();
         this._hotkeyHelpController.setupNode(document.documentElement);
+        this._elementOverflowController.setOptions(options);
 
         this._queryParser.setOptions({
             selectedParser: options.parsing.selectedParser,
@@ -535,6 +538,7 @@ class Display extends EventDispatcher {
             this._hideAnkiNoteErrors(false);
             this._definitions = [];
             this._definitionNodes = [];
+            this._elementOverflowController.clearElements();
 
             // Prepare
             const urlSearchParams = new URLSearchParams(location.search);
@@ -966,6 +970,8 @@ class Display extends EventDispatcher {
             if (focusEntry === i) {
                 this._focusEntry(i, false);
             }
+
+            this._elementOverflowController.addElements(entry);
         }
 
         if (typeof scrollX === 'number' || typeof scrollY === 'number') {

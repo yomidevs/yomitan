@@ -20,6 +20,7 @@
  * AnkiTemplatesController
  * AudioController
  * BackupController
+ * CollapsibleDictionaryController
  * DictionaryController
  * DictionaryImportController
  * DocumentFocusController
@@ -145,6 +146,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const mecabController = new MecabController();
         mecabController.prepare();
+
+        const collapsibleDictionaryController = new CollapsibleDictionaryController(settingsController);
+        collapsibleDictionaryController.prepare();
 
         await Promise.all(preparePromises);
 

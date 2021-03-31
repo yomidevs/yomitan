@@ -732,7 +732,8 @@
                                     "required": [
                                         "priority",
                                         "enabled",
-                                        "allowSecondarySearches"
+                                        "allowSecondarySearches",
+                                        "definitionsCollapsible"
                                     ],
                                     "properties": {
                                         "priority": {
@@ -746,6 +747,11 @@
                                         "allowSecondarySearches": {
                                             "type": "boolean",
                                             "default": false
+                                        },
+                                        "definitionsCollapsible": {
+                                            "type": "string",
+                                            "enum": ["not-collapsible", "expanded", "collapsed"],
+                                            "default": "not-collapsible"
                                         }
                                     }
                                 }

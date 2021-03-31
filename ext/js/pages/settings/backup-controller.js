@@ -404,7 +404,7 @@ class BackupController {
         const dictionaries = await this._settingsController.getDictionaryInfo();
         for (const {options: {dictionaries: optionsDictionaries}} of optionsFull.profiles) {
             for (const {title} of dictionaries) {
-                optionsDictionaries[title] = DictionaryController.createDefaultDictionarySettings();
+                optionsDictionaries[title] = DictionaryController.createDefaultDictionarySettings(false);
             }
         }
 

@@ -12,7 +12,7 @@
    inkscape:export-ydpi="192"
    inkscape:export-xdpi="192"
    sodipodi:docname="icons.svg"
-   inkscape:version="1.0.2 (e86c870879, 2021-01-15, custom)"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    id="svg8"
    version="1.1"
    viewBox="0 0 16 16"
@@ -26,17 +26,17 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="22.627417"
-     inkscape:cx="8.8042238"
-     inkscape:cy="5.555245"
+     inkscape:cx="8.8116705"
+     inkscape:cy="3.394636"
      inkscape:document-units="px"
-     inkscape:current-layer="layer51"
+     inkscape:current-layer="g5298"
      showgrid="true"
      units="px"
      inkscape:snap-center="true"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-y="-2"
      inkscape:window-maximized="1"
      viewbox-height="16"
      showguides="true"
@@ -1605,11 +1605,23 @@
   <g
      inkscape:groupmode="layer"
      id="layer51"
-     inkscape:label="Key">
+     inkscape:label="Key"
+     style="display:none">
     <path
        id="path1091"
        style="fill:#000000;stroke-linecap:round;stroke-linejoin:round"
        d="M 10.662109,1 C 8.349293,1.0478398 6.4995053,2.9366893 6.5,5.25 6.5002349,5.62267 6.5494854,5.9936904 6.6464844,6.3535156 L 0.75,12.25 V 13.5 L 2,15 H 4 L 4.5,14.5 V 13 H 6 V 11.5 H 7.5 V 10 H 9 L 9.6464844,9.3535156 C 10.00631,9.4505146 10.37733,9.4997651 10.75,9.5 13.09721,9.5 15,7.5972102 15,5.25 15,2.9027898 13.09721,1 10.75,1 10.7207,0.99969706 10.6914,0.99969706 10.66211,1 Z M 11.5,3 C 12.328427,3 13,3.6715729 13,4.5 13,5.3284271 12.328427,6 11.5,6 10.671573,6 10,5.3284271 10,4.5 10,3.6715729 10.671573,3 11.5,3 Z M 6.75,7.75 7.5,8.5 2.75,13.25 2,12.5 Z"
-       sodipodi:nodetypes="scccccccccccccccsccscssscccccc" />
+       sodipodi:nodetypes="scccccccccccccccsccscssscccccc"
+       inkscape:connector-curvature="0" />
+  </g>
+  <g
+     style="display:inline"
+     inkscape:groupmode="layer"
+     id="g5298"
+     inkscape:label="Double Down Chevron">
+    <path
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       d="M 3 0.5 L 1 2.5 L 8 9.5 L 15 2.5 L 13 0.5 L 8 5.5 L 3 0.5 z M 3 6.5 L 1 8.5 L 8 15.5 L 15 8.5 L 13 6.5 L 8 11.5 L 3 6.5 z "
+       id="path5300" />
   </g>
 </svg>

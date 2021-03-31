@@ -234,6 +234,7 @@
 .icon[data-icon=question-mark-thick]     { --icon-image: url(/images/question-mark-thick.svg); }
 .icon[data-icon=left-chevron]            { --icon-image: url(/images/left-chevron.svg); }
 .icon[data-icon=right-chevron]           { --icon-image: url(/images/right-chevron.svg); }
+.icon[data-icon=double-down-chevron]     { --icon-image: url(/images/double-down-chevron.svg); }
 .icon[data-icon=plus-thick]              { --icon-image: url(/images/plus-thick.svg); }
 .icon[data-icon=clipboard]               { --icon-image: url(/images/clipboard.svg); }
 .icon[data-icon=key]                     { --icon-image: url(/images/key.svg); }

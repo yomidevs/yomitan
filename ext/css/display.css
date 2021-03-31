@@ -101,6 +101,9 @@
     --animation-duration: 0.125s;
     --animation-duration2: calc(2 * var(--animation-duration));
 
+    --collapsible-definition-line-count: 3;
+    --collapsible-definition-test-offset: 0.2em;
+
     /* Colors */
     --background-color: #ffffff;
     --glossary-image-background-color: #eeeeee;
@@ -1153,6 +1156,74 @@ button.action-button[data-icon=source-term]::before {
     font-size: 0;
     opacity: 0;
     white-space: pre-wrap;
+}
+.definition-item {
+    display: list-item;
+    position: relative;
+}
+.definition-item-inner.collapsible.collapsed {
+    max-height: calc(1em * var(--collapsible-definition-line-count) * var(--line-height));
+    overflow: hidden;
+}
+.definition-item-inner.collapse-test {
+    max-height: calc(1em * var(--collapsible-definition-line-count) * var(--line-height) + var(--collapsible-definition-test-offset));
+    overflow: hidden;
+}
+.definition-item-inner {
+    display: flex;
+    flex-flow: row nowrap;
+}
+.definition-item-content {
+    flex: 1 1 auto;
+    background-color: transparent;
+    transition: background-color var(--animation-duration) ease-in-out;
+}
+button.definition-item-expansion-button {
+    --button-content-color: var(--text-color-light4);
+    --button-border-color: transparent;
+    --button-background-color: transparent;
+
+    --button-hover-content-color: var(--text-color-light1);
+    --button-hover-border-color: var(--accent-color-lighter);
+    --button-hover-background-color: var(--accent-color-lighter);
+
+    --button-active-content-color: var(--text-color);
+    --button-active-border-color: var(--accent-color-light);
+    --button-active-background-color: var(--accent-color-light);
+
+    --button-padding-vertical: 0;
+    --button-padding-horizontal: 0.125em;
+
+    flex: 0 0 auto;
+    order: 1;
+    border-radius: 0;
+    border: 0;
+}
+.definition-item-inner:not(.collapsible)>button.definition-item-expansion-button {
+    display: none;
+}
+button.definition-item-expansion-button:hover+.definition-item-content,
+button.definition-item-expansion-button:active+.definition-item-content,
+button.definition-item-expansion-button:focus+.definition-item-content {
+    background-color: var(--accent-color-transparent25);
+}
+button.definition-item-expansion-button:focus:not(:focus-visible)+.definition-item-content {
+    background-color: transparent;
+}
+button.definition-item-expansion-button:focus:hover+.definition-item-content,
+button.definition-item-expansion-button:focus:active+.definition-item-content,
+button.definition-item-expansion-button:focus:focus-visible+.definition-item-content {
+    background-color: var(--accent-color-transparent25);
+}
+.definition-item-expansion-button-icon {
+    transform: rotate(0deg);
+    width: calc(16em / var(--font-size-no-units));
+    height: calc(16em / var(--font-size-no-units));
+    background-color: var(--button-current-content-color);
+    transition: background-color var(--animation-duration) ease-in-out;
+}
+.definition-item-inner.collapsible:not(.collapsed)>button.definition-item-expansion-button>.definition-item-expansion-button-icon {
+    transform: rotate(180deg);
 }
 
 
