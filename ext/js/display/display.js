@@ -1373,7 +1373,6 @@ class Display extends EventDispatcher {
     }
 
     _replaceHistoryStateNoNavigate(state, content) {
-        console.trace('_replaceHistoryStateNoNavigate', state);
         const historyChangeIgnorePre = this._historyChangeIgnore;
         try {
             this._historyChangeIgnore = true;

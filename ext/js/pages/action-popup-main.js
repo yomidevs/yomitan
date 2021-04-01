@@ -213,7 +213,6 @@ class DisplayController {
 
         const warnings = document.querySelectorAll('.action-open-permissions,.permissions-required-warning');
         for (const node of warnings) {
-            console.log(node);
             node.hidden = false;
         }
     }
