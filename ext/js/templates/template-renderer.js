@@ -29,8 +29,8 @@ class TemplateRenderer {
         this._dataTypes = new Map();
     }
 
-    registerDataType(name, {modifier=null, modifierPost=null}) {
-        this._dataTypes.set(name, {modifier, modifierPost});
+    registerDataType(name, {modifier=null}) {
+        this._dataTypes.set(name, {modifier});
     }
 
     async render(template, data, type) {
@@ -47,32 +47,38 @@ class TemplateRenderer {
             cache.set(template, instance);
         }
 
-        let modifier = null;
-        let modifierPost = null;
-        if (typeof type === 'string') {
-            const typeInfo = this._dataTypes.get(type);
-            if (typeof typeInfo !== 'undefined') {
-                ({modifier, modifierPost} = typeInfo);
-            }
-        }
-
         try {
-            if (typeof modifier === 'function') {
-                data = modifier(data);
-            }
-
+            data = this._getModifiedData(data, type);
             this._stateStack = [new Map()];
             return instance(data).trim();
         } finally {
             this._stateStack = null;
-
-            if (typeof modifierPost === 'function') {
-                modifierPost(data);
-            }
         }
     }
 
+    async getModifiedData(data, type) {
+        return this._getModifiedData(data, type);
+    }
+
     // Private
+
+    _getModifier(type) {
+        if (typeof type === 'string') {
+            const typeInfo = this._dataTypes.get(type);
+            if (typeof typeInfo !== 'undefined') {
+                return typeInfo.modifier;
+            }
+        }
+        return null;
+    }
+
+    _getModifiedData(data, type) {
+        const modifier = this._getModifier(type);
+        if (typeof modifier === 'function') {
+            data = modifier(data);
+        }
+        return data;
+    }
 
     _updateCacheSize(maxSize) {
         const cache = this._cache;

@@ -30,6 +30,11 @@ class TemplateRendererProxy {
         return await this._invoke('render', {template, data, type});
     }
 
+    async getModifiedData(data, type) {
+        await this._prepareFrame();
+        return await this._invoke('getModifiedData', {data, type});
+    }
+
     // Private
 
     async _prepareFrame() {

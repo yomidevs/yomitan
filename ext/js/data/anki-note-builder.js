@@ -51,15 +51,7 @@ class AnkiNoteBuilder {
             duplicateScopeCheckChildren = true;
         }
 
-        const data = {
-            definition,
-            mode,
-            context,
-            resultOutputMode,
-            glossaryLayoutMode,
-            compactTags,
-            injectedMedia
-        };
+        const data = this._createData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fields) {
             const formattedFieldValuePromise = this._formatField(fieldValue, data, templates, errors);
@@ -90,7 +82,33 @@ class AnkiNoteBuilder {
         };
     }
 
+    async getRenderingData({
+        definition,
+        mode,
+        context,
+        resultOutputMode='split',
+        glossaryLayoutMode='default',
+        compactTags=false,
+        injectedMedia=null,
+        marker=null
+    }) {
+        const data = this._createData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
+        return await this._templateRenderer.getModifiedData({data, marker}, 'ankiNote');
+    }
+
     // Private
+
+    _createData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia) {
+        return {
+            definition,
+            mode,
+            context,
+            resultOutputMode,
+            glossaryLayoutMode,
+            compactTags,
+            injectedMedia
+        };
+    }
 
     async _formatField(field, data, templates, errors=null) {
         return await this._stringReplaceAsync(field, this._markerPattern, async (g0, marker) => {

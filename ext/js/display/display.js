@@ -757,9 +757,7 @@ class Display extends EventDispatcher {
     _onDebugLogClick(e) {
         const link = e.currentTarget;
         const index = this._getClosestDefinitionIndex(link);
-        if (index < 0 || index >= this._definitions.length) { return; }
-        const definition = this._definitions[index];
-        console.log(definition);
+        this._logDefinitionData(index);
     }
 
     _onDocumentElementMouseUp(e) {
@@ -1375,6 +1373,7 @@ class Display extends EventDispatcher {
     }
 
     _replaceHistoryStateNoNavigate(state, content) {
+        console.trace('_replaceHistoryStateNoNavigate', state);
         const historyChangeIgnorePre = this._historyChangeIgnore;
         try {
             this._historyChangeIgnore = true;
@@ -1865,5 +1864,33 @@ class Display extends EventDispatcher {
     _postProcessQuery(query) {
         const queryPostProcessor = this._queryPostProcessor;
         return typeof queryPostProcessor === 'function' ? queryPostProcessor(query) : query;
+    }
+
+    async _logDefinitionData(index) {
+        if (index < 0 || index >= this._definitions.length) { return; }
+        const definition = this._definitions[index];
+        let ankiNoteData;
+        let ankiNoteDataException;
+        try {
+            const context = this._getNoteContext();
+            const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = this._options;
+            ankiNoteData = await this._ankiNoteBuilder.getRenderingData({
+                definition,
+                mode: 'test',
+                context,
+                resultOutputMode,
+                glossaryLayoutMode,
+                compactTags,
+                injectedMedia: null,
+                marker: 'test'
+            });
+        } catch (e) {
+            ankiNoteDataException = e;
+        }
+        const result = {definition, ankiNoteData};
+        if (typeof ankiNoteDataException !== 'undefined') {
+            result.ankiNoteDataException = ankiNoteDataException;
+        }
+        console.log(result);
     }
 }

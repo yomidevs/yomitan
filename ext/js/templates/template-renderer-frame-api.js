@@ -19,7 +19,8 @@ class TemplateRendererFrameApi {
     constructor(templateRenderer) {
         this._templateRenderer = templateRenderer;
         this._windowMessageHandlers = new Map([
-            ['render', {async: true, handler: this._onRender.bind(this)}]
+            ['render', {async: true, handler: this._onRender.bind(this)}],
+            ['getModifiedData', {async: true, handler: this._onGetModifiedData.bind(this)}]
         ]);
     }
 
@@ -57,6 +58,11 @@ class TemplateRendererFrameApi {
         return await this._templateRenderer.render(template, data, type);
     }
 
+    async _onGetModifiedData({data, type}) {
+        const result = await this._templateRenderer.getModifiedData(data, type);
+        return this._clone(result);
+    }
+
     _errorToJson(error) {
         try {
             if (error !== null && typeof error === 'object') {
@@ -74,5 +80,9 @@ class TemplateRendererFrameApi {
             value: error,
             hasValue: true
         };
+    }
+
+    _clone(value) {
+        return JSON.parse(JSON.stringify(value));
     }
 }
