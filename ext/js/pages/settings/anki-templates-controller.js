@@ -176,14 +176,14 @@ class AnkiTemplatesController {
                     sentence: {text: definition.rawSource, offset: 0},
                     documentTitle: document.title
                 };
-                let templates = options.anki.fieldTemplates;
-                if (typeof templates !== 'string') { templates = this._defaultFieldTemplates; }
+                let template = options.anki.fieldTemplates;
+                if (typeof template !== 'string') { template = this._defaultFieldTemplates; }
                 const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
                 const note = await this._ankiNoteBuilder.createNote({
                     definition,
                     mode,
                     context,
-                    templates,
+                    template,
                     deckName: '',
                     modelName: '',
                     fields: [

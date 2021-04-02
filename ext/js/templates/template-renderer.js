@@ -33,10 +33,21 @@ class TemplateRenderer {
         this._dataTypes.set(name, {modifier});
     }
 
-    async render(template, data, type) {
+    render(template, data, type) {
+        const instance = this._getTemplateInstance(template);
+        data = this._getModifiedData(data, type);
+        return this._renderTemplate(instance, data);
+    }
+
+    getModifiedData(data, type) {
+        return this._getModifiedData(data, type);
+    }
+
+    // Private
+
+    _getTemplateInstance(template) {
         if (!this._helpersRegistered) {
             this._registerHelpers();
-            this._helpersRegistered = true;
         }
 
         const cache = this._cache;
@@ -47,8 +58,11 @@ class TemplateRenderer {
             cache.set(template, instance);
         }
 
+        return instance;
+    }
+
+    _renderTemplate(instance, data) {
         try {
-            data = this._getModifiedData(data, type);
             this._stateStack = [new Map()];
             return instance(data).trim();
         } finally {
@@ -56,26 +70,15 @@ class TemplateRenderer {
         }
     }
 
-    async getModifiedData(data, type) {
-        return this._getModifiedData(data, type);
-    }
-
-    // Private
-
-    _getModifier(type) {
+    _getModifiedData(data, type) {
         if (typeof type === 'string') {
             const typeInfo = this._dataTypes.get(type);
             if (typeof typeInfo !== 'undefined') {
-                return typeInfo.modifier;
+                const {modifier} = typeInfo;
+                if (typeof modifier === 'function') {
+                    data = modifier(data);
+                }
             }
-        }
-        return null;
-    }
-
-    _getModifiedData(data, type) {
-        const modifier = this._getModifier(type);
-        if (typeof modifier === 'function') {
-            data = modifier(data);
         }
         return data;
     }
@@ -122,6 +125,8 @@ class TemplateRenderer {
         for (const [name, helper] of helpers) {
             this._registerHelper(name, helper);
         }
+
+        this._helpersRegistered = true;
     }
 
     _registerHelper(name, helper) {

@@ -27,7 +27,7 @@
     const templateRenderer = new TemplateRenderer(japaneseUtil);
     const ankiNoteDataCreator = new AnkiNoteDataCreator(japaneseUtil);
     templateRenderer.registerDataType('ankiNote', {
-        modifier: ({data, marker}) => ankiNoteDataCreator.create(marker, data)
+        modifier: ({marker, commonData}) => ankiNoteDataCreator.create(marker, commonData)
     });
     const templateRendererFrameApi = new TemplateRendererFrameApi(templateRenderer);
     templateRendererFrameApi.prepare();

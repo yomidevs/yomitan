@@ -30,7 +30,7 @@ class AnkiNoteBuilder {
         definition,
         mode,
         context,
-        templates,
+        template,
         deckName,
         modelName,
         fields,
@@ -51,10 +51,10 @@ class AnkiNoteBuilder {
             duplicateScopeCheckChildren = true;
         }
 
-        const data = this._createData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
+        const commonData = this._createData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fields) {
-            const formattedFieldValuePromise = this._formatField(fieldValue, data, templates, errors);
+            const formattedFieldValuePromise = this._formatField(fieldValue, commonData, template, errors);
             formattedFieldValuePromises.push(formattedFieldValuePromise);
         }
 
@@ -110,12 +110,12 @@ class AnkiNoteBuilder {
         };
     }
 
-    async _formatField(field, data, templates, errors=null) {
+    async _formatField(field, commonData, template, errors=null) {
         return await this._stringReplaceAsync(field, this._markerPattern, async (g0, marker) => {
             try {
-                return await this._renderTemplate(templates, data, marker);
+                return await this._renderTemplate(template, marker, commonData);
             } catch (e) {
-                if (errors) {
+                if (Array.isArray(errors)) {
                     const error = new Error(`Template render error for {${marker}}`);
                     error.data = {error: e};
                     errors.push(error);
@@ -140,7 +140,7 @@ class AnkiNoteBuilder {
         return (await Promise.all(parts)).join('');
     }
 
-    async _renderTemplate(template, data, marker) {
-        return await this._templateRenderer.render(template, {data, marker}, 'ankiNote');
+    async _renderTemplate(template, marker, commonData) {
+        return await this._templateRenderer.render(template, {marker, commonData}, 'ankiNote');
     }
 }

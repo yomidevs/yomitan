@@ -55,7 +55,7 @@ async function createVM() {
             const japaneseUtil = new JapaneseUtil(null);
             this._templateRenderer = new TemplateRenderer(japaneseUtil);
             this._templateRenderer.registerDataType('ankiNote', {
-                modifier: ({data, marker}) => ankiNoteDataCreator.create(marker, data)
+                modifier: ({marker, commonData}) => ankiNoteDataCreator.create(marker, commonData)
             });
         }
 
@@ -122,7 +122,7 @@ function getFieldMarkers(type) {
     }
 }
 
-async function getRenderResults(dictionaryEntries, type, mode, templates, AnkiNoteBuilder, write) {
+async function getRenderResults(dictionaryEntries, type, mode, template, AnkiNoteBuilder, write) {
     const markers = getFieldMarkers(type);
     const fields = [];
     for (const marker of markers) {
@@ -158,7 +158,7 @@ async function getRenderResults(dictionaryEntries, type, mode, templates, AnkiNo
             definition: dictionaryEntry,
             mode: null,
             context,
-            templates,
+            template,
             deckName: 'deckName',
             modelName: 'modelName',
             fields,
@@ -193,7 +193,7 @@ async function main() {
     const expectedResults1 = JSON.parse(fs.readFileSync(testResults1FilePath, {encoding: 'utf8'}));
     const actualResults1 = [];
 
-    const templates = fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/templates/default-anki-field-templates.handlebars'), {encoding: 'utf8'});
+    const template = fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/templates/default-anki-field-templates.handlebars'), {encoding: 'utf8'});
 
     for (let i = 0, ii = tests.length; i < ii; ++i) {
         const test = tests[i];
@@ -204,7 +204,7 @@ async function main() {
                     const {name, mode, text} = test;
                     const options = vm.buildOptions(optionsPresets, test.options);
                     const {dictionaryEntries} = clone(await vm.translator.findTerms(mode, text, options));
-                    const results = mode !== 'simple' ? clone(await getRenderResults(dictionaryEntries, 'terms', mode, templates, AnkiNoteBuilder, write)) : null;
+                    const results = mode !== 'simple' ? clone(await getRenderResults(dictionaryEntries, 'terms', mode, template, AnkiNoteBuilder, write)) : null;
                     actualResults1.push({name, results});
                     if (!write) {
                         assert.deepStrictEqual(results, expected1.results);
@@ -216,7 +216,7 @@ async function main() {
                     const {name, text} = test;
                     const options = vm.buildOptions(optionsPresets, test.options);
                     const dictionaryEntries = clone(await vm.translator.findKanji(text, options));
-                    const results = clone(await getRenderResults(dictionaryEntries, 'kanji', null, templates, AnkiNoteBuilder, write));
+                    const results = clone(await getRenderResults(dictionaryEntries, 'kanji', null, template, AnkiNoteBuilder, write));
                     actualResults1.push({name, results});
                     if (!write) {
                         assert.deepStrictEqual(results, expected1.results);

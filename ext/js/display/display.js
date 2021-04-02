@@ -1463,7 +1463,7 @@ class Display extends EventDispatcher {
 
     async _createNote(definition, mode, context, injectMedia, errors) {
         const options = this._options;
-        const templates = this._ankiFieldTemplates;
+        const template = this._ankiFieldTemplates;
         const {
             general: {resultOutputMode, glossaryLayoutMode, compactTags},
             anki: ankiOptions
@@ -1488,7 +1488,7 @@ class Display extends EventDispatcher {
             definition,
             mode,
             context,
-            templates,
+            template,
             deckName,
             modelName,
             fields,

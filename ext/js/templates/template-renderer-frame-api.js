@@ -19,8 +19,8 @@ class TemplateRendererFrameApi {
     constructor(templateRenderer) {
         this._templateRenderer = templateRenderer;
         this._windowMessageHandlers = new Map([
-            ['render', {async: true, handler: this._onRender.bind(this)}],
-            ['getModifiedData', {async: true, handler: this._onGetModifiedData.bind(this)}]
+            ['render', {async: false, handler: this._onRender.bind(this)}],
+            ['getModifiedData', {async: false, handler: this._onGetModifiedData.bind(this)}]
         ]);
     }
 
@@ -47,25 +47,25 @@ class TemplateRendererFrameApi {
             }
             response = {result};
         } catch (error) {
-            response = {error: this._errorToJson(error)};
+            response = {error: this._serializeError(error)};
         }
 
         if (typeof id === 'undefined') { return; }
         source.postMessage({action: `${action}.response`, params: response, id}, '*');
     }
 
-    async _onRender({template, data, type}) {
-        return await this._templateRenderer.render(template, data, type);
+    _onRender({template, data, type}) {
+        return this._templateRenderer.render(template, data, type);
     }
 
-    async _onGetModifiedData({data, type}) {
-        const result = await this._templateRenderer.getModifiedData(data, type);
+    _onGetModifiedData({data, type}) {
+        const result = this._templateRenderer.getModifiedData(data, type);
         return this._clone(result);
     }
 
-    _errorToJson(error) {
+    _serializeError(error) {
         try {
-            if (error !== null && typeof error === 'object') {
+            if (typeof error === 'object' && error !== null) {
                 return {
                     name: error.name,
                     message: error.message,
