@@ -24,6 +24,8 @@ class AnkiNoteBuilder {
     constructor() {
         this._markerPattern = AnkiUtil.cloneFieldMarkerPattern(true);
         this._templateRenderer = new TemplateRendererProxy();
+        this._batchedRequests = [];
+        this._batchedRequestsQueued = false;
     }
 
     async createNote({
@@ -113,7 +115,7 @@ class AnkiNoteBuilder {
     async _formatField(field, commonData, template, errors=null) {
         return await this._stringReplaceAsync(field, this._markerPattern, async (g0, marker) => {
             try {
-                return await this._renderTemplate(template, marker, commonData);
+                return await this._renderTemplateBatched(template, commonData, marker);
             } catch (e) {
                 if (Array.isArray(errors)) {
                     const error = new Error(`Template render error for {${marker}}`);
@@ -142,5 +144,89 @@ class AnkiNoteBuilder {
 
     async _renderTemplate(template, marker, commonData) {
         return await this._templateRenderer.render(template, {marker, commonData}, 'ankiNote');
+    }
+
+    _getBatchedTemplateGroup(template) {
+        for (const item of this._batchedRequests) {
+            if (item.template === template) {
+                return item;
+            }
+        }
+
+        const result = {template, commonDataRequestsMap: new Map()};
+        this._batchedRequests.push(result);
+        return result;
+    }
+
+    _renderTemplateBatched(template, commonData, marker) {
+        const {promise, resolve, reject} = deferPromise();
+        const {commonDataRequestsMap} = this._getBatchedTemplateGroup(template);
+        let requests = commonDataRequestsMap.get(commonData);
+        if (typeof requests === 'undefined') {
+            requests = [];
+            commonDataRequestsMap.set(commonData, requests);
+        }
+        requests.push({resolve, reject, marker});
+        this._runBatchedRequestsDelayed();
+        return promise;
+    }
+
+    _runBatchedRequestsDelayed() {
+        if (this._batchedRequestsQueued) { return; }
+        this._batchedRequestsQueued = true;
+        Promise.resolve().then(() => {
+            this._batchedRequestsQueued = false;
+            this._runBatchedRequests();
+        });
+    }
+
+    _runBatchedRequests() {
+        if (this._batchedRequests.length === 0) { return; }
+
+        const allRequests = [];
+        const items = [];
+        for (const {template, commonDataRequestsMap} of this._batchedRequests) {
+            const templateItems = [];
+            for (const [commonData, requests] of commonDataRequestsMap.entries()) {
+                const datas = [];
+                for (const {marker} of requests) {
+                    datas.push(marker);
+                }
+                allRequests.push(...requests);
+                templateItems.push({type: 'ankiNote', commonData, datas});
+            }
+            items.push({template, templateItems});
+        }
+
+        this._batchedRequests.length = 0;
+
+        this._resolveBatchedRequests(items, allRequests);
+    }
+
+    async _resolveBatchedRequests(items, requests) {
+        let responses;
+        try {
+            responses = await this._templateRenderer.renderMulti(items);
+        } catch (e) {
+            for (const {reject} of requests) {
+                reject(e);
+            }
+            return;
+        }
+
+        for (let i = 0, ii = requests.length; i < ii; ++i) {
+            const request = requests[i];
+            try {
+                const response = responses[i];
+                const {error} = response;
+                if (typeof error !== 'undefined') {
+                    throw deserializeError(error);
+                } else {
+                    request.resolve(response.result);
+                }
+            } catch (e) {
+                request.reject(e);
+            }
+        }
     }
 }

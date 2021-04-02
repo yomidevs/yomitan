@@ -29,18 +29,39 @@ class TemplateRenderer {
         this._dataTypes = new Map();
     }
 
-    registerDataType(name, {modifier=null}) {
-        this._dataTypes.set(name, {modifier});
+    registerDataType(name, {modifier=null, composeData=null}) {
+        this._dataTypes.set(name, {modifier, composeData});
     }
 
     render(template, data, type) {
         const instance = this._getTemplateInstance(template);
-        data = this._getModifiedData(data, type);
+        data = this._getModifiedData(data, void 0, type);
         return this._renderTemplate(instance, data);
     }
 
+    renderMulti(items) {
+        const results = [];
+        for (const {template, templateItems} of items) {
+            const instance = this._getTemplateInstance(template);
+            for (const {type, commonData, datas} of templateItems) {
+                for (let data of datas) {
+                    let result;
+                    try {
+                        data = this._getModifiedData(data, commonData, type);
+                        result = this._renderTemplate(instance, data);
+                        result = {result};
+                    } catch (error) {
+                        result = {error};
+                    }
+                    results.push(result);
+                }
+            }
+        }
+        return results;
+    }
+
     getModifiedData(data, type) {
-        return this._getModifiedData(data, type);
+        return this._getModifiedData(data, void 0, type);
     }
 
     // Private
@@ -70,10 +91,16 @@ class TemplateRenderer {
         }
     }
 
-    _getModifiedData(data, type) {
+    _getModifiedData(data, commonData, type) {
         if (typeof type === 'string') {
             const typeInfo = this._dataTypes.get(type);
             if (typeof typeInfo !== 'undefined') {
+                if (typeof commonData !== 'undefined') {
+                    const {composeData} = typeInfo;
+                    if (typeof composeData === 'function') {
+                        data = composeData(data, commonData);
+                    }
+                }
                 const {modifier} = typeInfo;
                 if (typeof modifier === 'function') {
                     data = modifier(data);

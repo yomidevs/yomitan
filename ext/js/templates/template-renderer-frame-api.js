@@ -20,6 +20,7 @@ class TemplateRendererFrameApi {
         this._templateRenderer = templateRenderer;
         this._windowMessageHandlers = new Map([
             ['render', {async: false, handler: this._onRender.bind(this)}],
+            ['renderMulti', {async: false, handler: this._onRenderMulti.bind(this)}],
             ['getModifiedData', {async: false, handler: this._onGetModifiedData.bind(this)}]
         ]);
     }
@@ -58,6 +59,10 @@ class TemplateRendererFrameApi {
         return this._templateRenderer.render(template, data, type);
     }
 
+    _onRenderMulti({items}) {
+        return this._serializeMulti(this._templateRenderer.renderMulti(items));
+    }
+
     _onGetModifiedData({data, type}) {
         const result = this._templateRenderer.getModifiedData(data, type);
         return this._clone(result);
@@ -80,6 +85,17 @@ class TemplateRendererFrameApi {
             value: error,
             hasValue: true
         };
+    }
+
+    _serializeMulti(array) {
+        for (let i = 0, ii = array.length; i < ii; ++i) {
+            const value = array[i];
+            const {error} = value;
+            if (typeof error !== 'undefined') {
+                value.error = this._serializeError(error);
+            }
+        }
+        return array;
     }
 
     _clone(value) {

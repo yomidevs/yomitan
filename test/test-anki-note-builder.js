@@ -55,12 +55,28 @@ async function createVM() {
             const japaneseUtil = new JapaneseUtil(null);
             this._templateRenderer = new TemplateRenderer(japaneseUtil);
             this._templateRenderer.registerDataType('ankiNote', {
-                modifier: ({marker, commonData}) => ankiNoteDataCreator.create(marker, commonData)
+                modifier: ({marker, commonData}) => ankiNoteDataCreator.create(marker, commonData),
+                composeData: (marker, commonData) => ({marker, commonData})
             });
         }
 
         async render(template, data, type) {
-            return await this._templateRenderer.render(template, data, type);
+            return this._templateRenderer.render(template, data, type);
+        }
+
+        async renderMulti(items) {
+            return this._serializeMulti(this._templateRenderer.renderMulti(items));
+        }
+
+        _serializeMulti(array) {
+            for (let i = 0, ii = array.length; i < ii; ++i) {
+                const value = array[i];
+                const {error} = value;
+                if (typeof error !== 'undefined') {
+                    value.error = this._serializeError(error);
+                }
+            }
+            return array;
         }
     }
     vm.set({TemplateRendererProxy});
