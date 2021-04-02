@@ -150,6 +150,13 @@ class VM {
     constructor(context={}) {
         this._urlMap = new Map();
         context.URL = createURLClass(this._urlMap);
+        context.crypto = {
+            getRandomValues: (array) => {
+                const buffer = crypto.randomBytes(array.byteLength);
+                buffer.copy(array);
+                return array;
+            }
+        };
         this._context = vm.createContext(context);
         this._assert = {
             deepStrictEqual

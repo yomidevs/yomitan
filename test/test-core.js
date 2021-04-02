@@ -16,19 +16,10 @@
  */
 
 const assert = require('assert');
-const crypto = require('crypto');
 const {testMain} = require('../dev/util');
 const {VM} = require('../dev/vm');
 
-const vm = new VM({
-    crypto: {
-        getRandomValues: (array) => {
-            const buffer = crypto.randomBytes(array.byteLength);
-            buffer.copy(array);
-            return array;
-        }
-    }
-});
+const vm = new VM();
 vm.execute([
     'js/core.js'
 ]);
