@@ -368,7 +368,7 @@ class BackupController {
         }
 
         // Update dictionaries
-        await DictionaryController.ensureDictionarySettings(this._settingsController, void 0, optionsFull, true, false);
+        await DictionaryController.ensureDictionarySettings(this._settingsController, void 0, optionsFull, false, false);
 
         // Assign options
         await this._settingsImportSetOptionsFull(optionsFull);
@@ -404,7 +404,7 @@ class BackupController {
         const optionsFull = this._optionsUtil.getDefault();
 
         // Update dictionaries
-        await DictionaryController.ensureDictionarySettings(this._settingsController, void 0, optionsFull, true, false);
+        await DictionaryController.ensureDictionarySettings(this._settingsController, void 0, optionsFull, false, false);
 
         // Assign options
         try {

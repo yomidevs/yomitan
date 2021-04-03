@@ -191,12 +191,16 @@ class DisplayController {
         const noDictionariesEnabledWarnings = document.querySelectorAll('.no-dictionaries-enabled-warning');
         const dictionaries = await yomichan.api.getDictionaryInfo();
 
+        const enabledDictionaries = new Set();
+        for (const {name, enabled} of options.dictionaries) {
+            if (enabled) {
+                enabledDictionaries.add(name);
+            }
+        }
+
         let enabledCount = 0;
         for (const {title} of dictionaries) {
-            if (
-                Object.prototype.hasOwnProperty.call(options.dictionaries, title) &&
-                options.dictionaries[title].enabled
-            ) {
+            if (enabledDictionaries.has(title)) {
                 ++enabledCount;
             }
         }

@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * ObjectPropertyAccessor
- */
-
 class CollapsibleDictionaryController {
     constructor(settingsController) {
         this._settingsController = settingsController;
@@ -65,12 +61,14 @@ class CollapsibleDictionaryController {
 
         this._setupAllSelect(fragment, options);
 
-        for (const dictionary of Object.keys(options.dictionaries)) {
-            const dictionaryInfo = this._dictionaryInfoMap.get(dictionary);
+        const {dictionaries} = options;
+        for (let i = 0, ii = dictionaries.length; i < ii; ++i) {
+            const {name} = dictionaries[i];
+            const dictionaryInfo = this._dictionaryInfoMap.get(name);
             if (typeof dictionaryInfo === 'undefined') { continue; }
 
-            const select = this._addSelect(fragment, dictionary, `rev.${dictionaryInfo.revision}`);
-            select.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', dictionary, 'definitionsCollapsible']);
+            const select = this._addSelect(fragment, name, `rev.${dictionaryInfo.revision}`);
+            select.dataset.setting = `dictionaries[${i}].definitionsCollapsible`;
             this._eventListeners.addEventListener(select, 'settingChanged', this._onDefinitionsCollapsibleChange.bind(this), false);
 
             this._selects.push(select);
@@ -125,7 +123,7 @@ class CollapsibleDictionaryController {
     _updateAllSelect(options) {
         let value = null;
         let varies = false;
-        for (const {definitionsCollapsible} of Object.values(options.dictionaries)) {
+        for (const {definitionsCollapsible} of options.dictionaries) {
             if (value === null) {
                 value = definitionsCollapsible;
             } else if (value !== definitionsCollapsible) {
@@ -140,8 +138,9 @@ class CollapsibleDictionaryController {
     async _setDefinitionsCollapsibleAll(value) {
         const options = await this._settingsController.getOptions();
         const targets = [];
-        for (const dictionary of Object.keys(options.dictionaries)) {
-            const path = ObjectPropertyAccessor.getPathString(['dictionaries', dictionary, 'definitionsCollapsible']);
+        const {dictionaries} = options;
+        for (let i = 0, ii = dictionaries.length; i < ii; ++i) {
+            const path = `dictionaries[${i}].definitionsCollapsible`;
             targets.push({action: 'set', path, value});
         }
         await this._settingsController.modifyProfileSettings(targets);

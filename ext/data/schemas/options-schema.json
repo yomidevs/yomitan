@@ -726,16 +726,21 @@
                                 }
                             },
                             "dictionaries": {
-                                "type": "object",
-                                "additionalProperties": {
+                                "type": "array",
+                                "items": {
                                     "type": "object",
                                     "required": [
+                                        "name",
                                         "priority",
                                         "enabled",
                                         "allowSecondarySearches",
                                         "definitionsCollapsible"
                                     ],
                                     "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "default": ""
+                                        },
                                         "priority": {
                                             "type": "number",
                                             "default": 0

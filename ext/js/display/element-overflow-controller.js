@@ -29,7 +29,7 @@ class ElementOverflowController {
 
     setOptions(options) {
         this._dictionaries.clear();
-        for (const [dictionary, {definitionsCollapsible}] of Object.entries(options.dictionaries)) {
+        for (const {name, definitionsCollapsible} of options.dictionaries) {
             let collapsible = false;
             let collapsed = false;
             switch (definitionsCollapsible) {
@@ -42,7 +42,7 @@ class ElementOverflowController {
                     break;
             }
             if (!collapsible) { continue; }
-            this._dictionaries.set(dictionary, {collapsed});
+            this._dictionaries.set(name, {collapsed});
         }
     }
 

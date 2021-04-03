@@ -1271,6 +1271,17 @@ class Backend {
                 if (!Array.isArray(array)) { throw new Error('Invalid target type'); }
                 return array.splice(start, deleteCount, ...items);
             }
+            case 'push':
+            {
+                const {path, items} = target;
+                if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                if (!Array.isArray(items)) { throw new Error('Invalid items'); }
+                const array = accessor.get(ObjectPropertyAccessor.getPathArray(path));
+                if (!Array.isArray(array)) { throw new Error('Invalid target type'); }
+                const start = array.length;
+                array.push(...items);
+                return start;
+            }
             default:
                 throw new Error(`Unknown action: ${action}`);
         }
@@ -1358,7 +1369,7 @@ class Backend {
     }
 
     _isAnyDictionaryEnabled(options) {
-        for (const {enabled} of Object.values(options.dictionaries)) {
+        for (const {enabled} of options.dictionaries) {
             if (enabled) {
                 return true;
             }
@@ -1900,12 +1911,9 @@ class Backend {
 
     _getTranslatorEnabledDictionaryMap(options) {
         const enabledDictionaryMap = new Map();
-        const {dictionaries} = options;
-        for (const title in dictionaries) {
-            if (!Object.prototype.hasOwnProperty.call(dictionaries, title)) { continue; }
-            const dictionary = dictionaries[title];
+        for (const dictionary of options.dictionaries) {
             if (!dictionary.enabled) { continue; }
-            enabledDictionaryMap.set(title, {
+            enabledDictionaryMap.set(dictionary.name, {
                 index: enabledDictionaryMap.size,
                 priority: dictionary.priority,
                 allowSecondarySearches: dictionary.allowSecondarySearches

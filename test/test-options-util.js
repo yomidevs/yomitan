@@ -407,14 +407,15 @@ function createProfileOptionsUpdatedTestData1() {
                 groups: []
             }
         },
-        dictionaries: {
-            'Test Dictionary': {
+        dictionaries: [
+            {
+                name: 'Test Dictionary',
                 priority: 0,
                 enabled: true,
                 allowSecondarySearches: false,
                 definitionsCollapsible: 'not-collapsible'
             }
-        },
+        ],
         parsing: {
             enableScanningParser: true,
             enableMecabParser: false,
@@ -574,7 +575,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 10,
+        version: 11,
         global: {
             database: {
                 prefixWildcardsSupported: false

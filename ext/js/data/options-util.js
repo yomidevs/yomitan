@@ -459,7 +459,8 @@ class OptionsUtil {
             {async: false, update: this._updateVersion7.bind(this)},
             {async: true,  update: this._updateVersion8.bind(this)},
             {async: false, update: this._updateVersion9.bind(this)},
-            {async: true,  update: this._updateVersion10.bind(this)}
+            {async: true,  update: this._updateVersion10.bind(this)},
+            {async: true,  update: this._updateVersion11.bind(this)}
         ];
     }
 
@@ -783,6 +784,19 @@ class OptionsUtil {
                         break;
                 }
             }
+        }
+        return options;
+    }
+
+    _updateVersion11(options) {
+        // Version 11 changes:
+        //  Changed dictionaries to an array.
+        for (const profile of options.profiles) {
+            const dictionariesNew = [];
+            for (const [name, {priority, enabled, allowSecondarySearches, definitionsCollapsible}] of Object.entries(profile.options.dictionaries)) {
+                dictionariesNew.push({name, priority, enabled, allowSecondarySearches, definitionsCollapsible});
+            }
+            profile.options.dictionaries = dictionariesNew;
         }
         return options;
     }
