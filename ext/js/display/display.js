@@ -1867,14 +1867,14 @@ class Display extends EventDispatcher {
 
     async _logDefinitionData(index) {
         if (index < 0 || index >= this._definitions.length) { return; }
-        const definition = this._definitions[index];
+        const dictionaryEntry = this._definitions[index];
         let ankiNoteData;
         let ankiNoteDataException;
         try {
             const context = this._getNoteContext();
             const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = this._options;
             ankiNoteData = await this._ankiNoteBuilder.getRenderingData({
-                definition,
+                definition: dictionaryEntry,
                 mode: 'test',
                 context,
                 resultOutputMode,
@@ -1886,7 +1886,7 @@ class Display extends EventDispatcher {
         } catch (e) {
             ankiNoteDataException = e;
         }
-        const result = {definition, ankiNoteData};
+        const result = {dictionaryEntry, ankiNoteData};
         if (typeof ankiNoteDataException !== 'undefined') {
             result.ankiNoteDataException = ankiNoteDataException;
         }
