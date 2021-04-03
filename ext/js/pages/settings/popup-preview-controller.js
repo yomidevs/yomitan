@@ -32,22 +32,17 @@ class PopupPreviewController {
     }
 
     async prepare() {
-        const button = document.querySelector('#settings-popup-preview-button');
-        if (button !== null) {
-            button.addEventListener('click', this._onShowPopupPreviewButtonClick.bind(this), false);
-        } else {
-            this._frame = document.querySelector('#popup-preview-frame');
-            this._customCss = document.querySelector('#custom-popup-css');
-            this._customOuterCss = document.querySelector('#custom-popup-outer-css');
-            this._previewFrameContainer = document.querySelector('.preview-frame-container');
+        this._frame = document.querySelector('#popup-preview-frame');
+        this._customCss = document.querySelector('#custom-popup-css');
+        this._customOuterCss = document.querySelector('#custom-popup-outer-css');
+        this._previewFrameContainer = document.querySelector('.preview-frame-container');
 
-            this._customCss.addEventListener('input', this._onCustomCssChange.bind(this), false);
-            this._customCss.addEventListener('settingChanged', this._onCustomCssChange.bind(this), false);
-            this._customOuterCss.addEventListener('input', this._onCustomOuterCssChange.bind(this), false);
-            this._customOuterCss.addEventListener('settingChanged', this._onCustomOuterCssChange.bind(this), false);
-            this._frame.addEventListener('load', this._onFrameLoad2.bind(this), false);
-            this._settingsController.on('optionsContextChanged', this._onOptionsContextChange.bind(this));
-        }
+        this._customCss.addEventListener('input', this._onCustomCssChange.bind(this), false);
+        this._customCss.addEventListener('settingChanged', this._onCustomCssChange.bind(this), false);
+        this._customOuterCss.addEventListener('input', this._onCustomOuterCssChange.bind(this), false);
+        this._customOuterCss.addEventListener('settingChanged', this._onCustomOuterCssChange.bind(this), false);
+        this._frame.addEventListener('load', this._onFrameLoad2.bind(this), false);
+        this._settingsController.on('optionsContextChanged', this._onOptionsContextChange.bind(this));
     }
 
     // Private

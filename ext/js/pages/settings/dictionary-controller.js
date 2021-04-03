@@ -47,12 +47,9 @@ class DictionaryEntry {
         this._detailsContainer = node.querySelector('.dictionary-details');
 
         const enabledCheckbox = node.querySelector('.dictionary-enabled');
-        const allowSecondarySearchesCheckbox = node.querySelector('.dictionary-allow-secondary-searches');
         const priorityInput = node.querySelector('.dictionary-priority');
-        const deleteButton = node.querySelector('.dictionary-delete-button');
         const menuButton = node.querySelector('.dictionary-menu-button');
         const detailsTable = node.querySelector('.dictionary-details-table');
-        const detailsToggleLink = node.querySelector('.dictionary-details-toggle-link');
         const outdatedContainer = node.querySelector('.dictionary-outdated-notification');
         const titleNode = node.querySelector('.dictionary-title');
         const versionNode = node.querySelector('.dictionary-version');
@@ -69,9 +66,6 @@ class DictionaryEntry {
         if (outdatedContainer !== null) {
             outdatedContainer.hidden = (version >= 3);
         }
-        if (detailsToggleLink !== null) {
-            detailsToggleLink.hidden = !hasDetails;
-        }
         if (enabledCheckbox !== null) {
             enabledCheckbox.dataset.setting = `dictionaries[${index}].enabled`;
             this._eventListeners.addEventListener(enabledCheckbox, 'settingChanged', this._onEnabledChanged.bind(this), false);
@@ -79,18 +73,9 @@ class DictionaryEntry {
         if (priorityInput !== null) {
             priorityInput.dataset.setting = `dictionaries[${index}].priority`;
         }
-        if (allowSecondarySearchesCheckbox !== null) {
-            allowSecondarySearchesCheckbox.dataset.setting = `dictionaries[${index}].allowSecondarySearches`;
-        }
-        if (deleteButton !== null) {
-            this._eventListeners.addEventListener(deleteButton, 'click', this._onDeleteButtonClicked.bind(this), false);
-        }
         if (menuButton !== null) {
             this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
             this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this), false);
-        }
-        if (detailsToggleLink !== null && this._detailsContainer !== null) {
-            this._eventListeners.addEventListener(detailsToggleLink, 'click', this._onDetailsToggleLinkClicked.bind(this), false);
         }
     }
 
@@ -110,11 +95,6 @@ class DictionaryEntry {
     }
 
     // Private
-
-    _onDeleteButtonClicked(e) {
-        e.preventDefault();
-        this._delete();
-    }
 
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
@@ -144,11 +124,6 @@ class DictionaryEntry {
                 if (this._detailsContainer !== null) { this._detailsContainer.hidden = true; }
                 break;
         }
-    }
-
-    _onDetailsToggleLinkClicked(e) {
-        e.preventDefault();
-        this._detailsContainer.hidden = !this._detailsContainer.hidden;
     }
 
     _onEnabledChanged(e) {

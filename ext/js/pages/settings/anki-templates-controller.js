@@ -47,21 +47,7 @@ class AnkiTemplatesController {
         const testRenderButton = document.querySelector('#anki-card-templates-test-render-button');
         const resetButton = document.querySelector('#anki-card-templates-reset-button');
         const resetConfirmButton = document.querySelector('#anki-card-templates-reset-button-confirm');
-        const fieldList = document.querySelector('#anki-card-templates-field-list');
         this._fieldTemplateResetModal = this._modalController.getModal('anki-card-templates-reset');
-
-        const markers = new Set([
-            ...this._ankiController.getFieldMarkers('terms'),
-            ...this._ankiController.getFieldMarkers('kanji')
-        ]);
-
-        if (fieldList !== null) {
-            const fragment = this._ankiController.getFieldMarkersHtml(markers);
-            fieldList.appendChild(fragment);
-            for (const node of fieldList.querySelectorAll('.marker-link')) {
-                node.addEventListener('click', this._onMarkerClicked.bind(this), false);
-            }
-        }
 
         this._fieldTemplatesTextarea.addEventListener('change', this._onChanged.bind(this), false);
         testRenderButton.addEventListener('click', this._onRender.bind(this), false);
@@ -120,11 +106,6 @@ class AnkiTemplatesController {
 
     _onValidateCompile() {
         this._validate(this._compileResultInfo, '{expression}', 'term-kanji', false, true);
-    }
-
-    _onMarkerClicked(e) {
-        e.preventDefault();
-        this._renderFieldInput.value = `{${e.target.textContent}}`;
     }
 
     _onRender(e) {

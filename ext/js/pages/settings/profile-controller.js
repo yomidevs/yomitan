@@ -28,15 +28,10 @@ class ProfileController {
         this._profileActiveSelect = null;
         this._profileTargetSelect = null;
         this._profileCopySourceSelect = null;
-        this._profileNameInput = null;
         this._removeProfileNameElement = null;
         this._profileAddButton = null;
-        this._profileRemoveButton = null;
         this._profileRemoveConfirmButton = null;
-        this._profileCopyButton = null;
         this._profileCopyConfirmButton = null;
-        this._profileMoveUpButton = null;
-        this._profileMoveDownButton = null;
         this._profileEntryListContainer = null;
         this._profileConditionsProfileName = null;
         this._profileRemoveModal = null;
@@ -63,15 +58,10 @@ class ProfileController {
         this._profileActiveSelect = document.querySelector('#profile-active-select');
         this._profileTargetSelect = document.querySelector('#profile-target-select');
         this._profileCopySourceSelect = document.querySelector('#profile-copy-source-select');
-        this._profileNameInput = document.querySelector('#profile-name-input');
         this._removeProfileNameElement = document.querySelector('#profile-remove-name');
         this._profileAddButton = document.querySelector('#profile-add-button');
-        this._profileRemoveButton = document.querySelector('#profile-remove-button');
         this._profileRemoveConfirmButton = document.querySelector('#profile-remove-confirm-button');
-        this._profileCopyButton = document.querySelector('#profile-copy-button');
         this._profileCopyConfirmButton = document.querySelector('#profile-copy-confirm-button');
-        this._profileMoveUpButton = document.querySelector('#profile-move-up-button');
-        this._profileMoveDownButton = document.querySelector('#profile-move-down-button');
         this._profileEntryListContainer = document.querySelector('#profile-entry-list');
         this._profileConditionsProfileName = document.querySelector('#profile-conditions-profile-name');
         this._profileRemoveModal = this._modalController.getModal('profile-remove');
@@ -82,14 +72,9 @@ class ProfileController {
 
         if (this._profileActiveSelect !== null) { this._profileActiveSelect.addEventListener('change', this._onProfileActiveChange.bind(this), false); }
         if (this._profileTargetSelect !== null) { this._profileTargetSelect.addEventListener('change', this._onProfileTargetChange.bind(this), false); }
-        if (this._profileNameInput !== null) { this._profileNameInput.addEventListener('change', this._onNameChanged.bind(this), false); }
         if (this._profileAddButton !== null) { this._profileAddButton.addEventListener('click', this._onAdd.bind(this), false); }
-        if (this._profileRemoveButton !== null) { this._profileRemoveButton.addEventListener('click', this._onDelete.bind(this), false); }
         if (this._profileRemoveConfirmButton !== null) { this._profileRemoveConfirmButton.addEventListener('click', this._onDeleteConfirm.bind(this), false); }
-        if (this._profileCopyButton !== null) { this._profileCopyButton.addEventListener('click', this._onCopy.bind(this), false); }
         if (this._profileCopyConfirmButton !== null) { this._profileCopyConfirmButton.addEventListener('click', this._onCopyConfirm.bind(this), false); }
-        if (this._profileMoveUpButton !== null) { this._profileMoveUpButton.addEventListener('click', this._onMove.bind(this, -1), false); }
-        if (this._profileMoveDownButton !== null) { this._profileMoveDownButton.addEventListener('click', this._onMove.bind(this, 1), false); }
 
         this._profileConditionsUI.on('conditionGroupCountChanged', this._onConditionGroupCountChanged.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
@@ -349,20 +334,12 @@ class ProfileController {
         this._profileCurrent = profileCurrent;
 
         const settingsProfileIndex = this._settingsController.profileIndex;
-        const settingsProfile = this._getProfile(settingsProfileIndex);
 
         // Udpate UI
         this._updateProfileSelectOptions();
 
         this._profileActiveSelect.value = `${profileCurrent}`;
         this._profileTargetSelect.value = `${settingsProfileIndex}`;
-
-        if (this._profileRemoveButton !== null) { this._profileRemoveButton.disabled = (profiles.length <= 1); }
-        if (this._profileCopyButton !== null) { this._profileCopyButton.disabled = (profiles.length <= 1); }
-        if (this._profileMoveUpButton !== null) { this._profileMoveUpButton.disabled = (settingsProfileIndex <= 0); }
-        if (this._profileMoveDownButton !== null) { this._profileMoveDownButton.disabled = (settingsProfileIndex >= profiles.length - 1); }
-
-        if (this._profileNameInput !== null && settingsProfile !== null) { this._profileNameInput.value = settingsProfile.name; }
 
         // Update profile conditions
         this._profileConditionsUI.cleanup();
@@ -395,21 +372,8 @@ class ProfileController {
         this._settingsController.profileIndex = value;
     }
 
-    _onNameChanged(e) {
-        this.setProfileName(this._settingsController.profileIndex, e.currentTarget.value);
-    }
-
     _onAdd() {
         this.duplicateProfile(this._settingsController.profileIndex);
-    }
-
-    _onDelete(e) {
-        const profileIndex = this._settingsController.profileIndex;
-        if (e.shiftKey) {
-            this.deleteProfile(profileIndex);
-        } else {
-            this.openDeleteProfileModal(profileIndex);
-        }
     }
 
     _onDeleteConfirm() {
@@ -423,10 +387,6 @@ class ProfileController {
         if (profileIndex === null) { return; }
 
         this.deleteProfile(profileIndex);
-    }
-
-    _onCopy() {
-        this.openCopyProfileModal(this._settingsController.profileIndex);
     }
 
     _onCopyConfirm() {
@@ -443,10 +403,6 @@ class ProfileController {
         if (sourceProfileIndex === null) { return; }
 
         this.copyProfile(sourceProfileIndex, destinationProfileIndex);
-    }
-
-    _onMove(offset) {
-        this.moveProfile(this._settingsController.profileIndex, offset);
     }
 
     _onConditionGroupCountChanged({count, profileIndex}) {

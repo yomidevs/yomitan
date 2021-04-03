@@ -60,16 +60,12 @@ class AnkiController {
         this._ankiErrorInvalidResponseInfo = document.querySelector('#anki-error-invalid-response-info');
         this._ankiEnableCheckbox = document.querySelector('[data-setting="anki.enable"]');
         this._ankiCardPrimary = document.querySelector('#anki-card-primary');
-        const ankiCardPrimaryTypeSelect = document.querySelector('#anki-card-primary-type');
         const ankiCardPrimaryTypeRadios = document.querySelectorAll('input[type=radio][name=anki-card-primary-type]');
 
         this._setupFieldMenus();
 
         this._ankiErrorMessageDetailsToggle.addEventListener('click', this._onAnkiErrorMessageDetailsToggleClick.bind(this), false);
         if (this._ankiEnableCheckbox !== null) { this._ankiEnableCheckbox.addEventListener('settingChanged', this._onAnkiEnableChanged.bind(this), false); }
-        if (ankiCardPrimaryTypeSelect !== null) {
-            ankiCardPrimaryTypeSelect.addEventListener('change', this._onAnkiCardPrimaryTypeSelectChange.bind(this), false);
-        }
         for (const input of ankiCardPrimaryTypeRadios) {
             input.addEventListener('change', this._onAnkiCardPrimaryTypeRadioChange.bind(this), false);
         }
@@ -183,17 +179,6 @@ class AnkiController {
         for (const cardController of this._selectorObserver.datas()) {
             cardController.updateAnkiState();
         }
-    }
-
-    _onAnkiCardPrimaryTypeSelectChange(e) {
-        const node = e.currentTarget;
-        let ankiCardMenu;
-        if (node.selectedIndex >= 0) {
-            const option = node.options[node.selectedIndex];
-            ankiCardMenu = option.dataset.ankiCardMenu;
-        }
-
-        this._setAnkiCardPrimaryType(node.value, ankiCardMenu);
     }
 
     _onAnkiCardPrimaryTypeRadioChange(e) {

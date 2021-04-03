@@ -24,12 +24,6 @@ class PersistentStorageController {
         this._persistentStorageCheckbox = document.querySelector('#storage-persistent-checkbox');
         this._persistentStorageCheckbox.addEventListener('change', this._onPersistentStorageCheckboxChange.bind(this), false);
 
-        const button = document.querySelector('#storage-persistent-button');
-        if (button !== null) {
-            button.hidden = false;
-            button.addEventListener('click', this._onPersistStorageButtonClick.bind(this), false);
-        }
-
         if (!this._isPersistentStorageSupported()) { return; }
 
         const info = document.querySelector('#storage-persistent-info');
@@ -58,13 +52,6 @@ class PersistentStorageController {
         } else {
             node.checked = true;
         }
-    }
-
-    _onPersistStorageButtonClick() {
-        const {checked} = this._persistentStorageCheckbox;
-        if (checked) { return; }
-        this._persistentStorageCheckbox.checked = !checked;
-        this._persistentStorageCheckbox.dispatchEvent(new Event('change'));
     }
 
     async _attemptPersistStorage() {
