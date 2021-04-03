@@ -94,8 +94,8 @@ class AnkiNoteBuilder {
         injectedMedia=null,
         marker=null
     }) {
-        const data = this._createData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
-        return await this._templateRenderer.getModifiedData({data, marker}, 'ankiNote');
+        const commonData = this._createData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
+        return await this._templateRenderer.getModifiedData({marker, commonData}, 'ankiNote');
     }
 
     // Private
