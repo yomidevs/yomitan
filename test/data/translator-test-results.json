@@ -253,6 +253,7 @@
         "id": 1,
         "isPrimary": true,
         "sequence": 1,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -384,6 +385,7 @@
         "id": 2,
         "isPrimary": true,
         "sequence": 2,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -521,6 +523,7 @@
         "id": 3,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -654,6 +657,7 @@
         "id": 5,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -787,6 +791,7 @@
         "id": 4,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -920,6 +925,7 @@
         "id": 6,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -1053,6 +1059,7 @@
         "id": 1,
         "isPrimary": true,
         "sequence": 1,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -1184,6 +1191,7 @@
         "id": 2,
         "isPrimary": true,
         "sequence": 2,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -1321,6 +1329,7 @@
         "id": 7,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -1472,6 +1481,7 @@
         "id": 9,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -1623,6 +1633,7 @@
         "id": 8,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -1770,6 +1781,7 @@
         "id": 10,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -1921,6 +1933,7 @@
         "id": 3,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -2056,6 +2069,7 @@
         "id": 5,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -2191,6 +2205,7 @@
         "id": 4,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -2326,6 +2341,7 @@
         "id": 6,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -2461,6 +2477,7 @@
         "id": 1,
         "isPrimary": true,
         "sequence": 1,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -2592,6 +2609,7 @@
         "id": 2,
         "isPrimary": true,
         "sequence": 2,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -2729,6 +2747,7 @@
         "id": 11,
         "isPrimary": true,
         "sequence": 5,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -2856,6 +2875,7 @@
         "id": 1,
         "isPrimary": true,
         "sequence": 1,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -2993,6 +3013,7 @@
         "id": 2,
         "isPrimary": true,
         "sequence": 2,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -3130,6 +3151,7 @@
         "id": 3,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -3263,6 +3285,7 @@
         "id": 4,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -3402,6 +3425,7 @@
         "id": 5,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -3535,6 +3559,7 @@
         "id": 6,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -3674,6 +3699,7 @@
         "id": 7,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -3825,6 +3851,7 @@
         "id": 8,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -3972,6 +3999,7 @@
         "id": 3,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -4107,6 +4135,7 @@
         "id": 4,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -4248,6 +4277,7 @@
         "id": 9,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -4399,6 +4429,7 @@
         "id": 10,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -4550,6 +4581,7 @@
         "id": 5,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -4685,6 +4717,7 @@
         "id": 6,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -4826,6 +4859,7 @@
         "id": 11,
         "isPrimary": true,
         "sequence": 5,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -4963,6 +4997,7 @@
         "id": 7,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -5010,6 +5045,7 @@
         "id": 9,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -5057,6 +5093,7 @@
         "id": 8,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -5104,6 +5141,7 @@
         "id": 10,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -5151,6 +5189,7 @@
         "id": 3,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -5200,6 +5239,7 @@
         "id": 5,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -5249,6 +5289,7 @@
         "id": 4,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -5298,6 +5339,7 @@
         "id": 6,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -5347,6 +5389,7 @@
         "id": 1,
         "isPrimary": true,
         "sequence": 1,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -5392,6 +5435,7 @@
         "id": 2,
         "isPrimary": true,
         "sequence": 2,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -5443,6 +5487,7 @@
         "id": -1,
         "isPrimary": true,
         "sequence": -1,
+        "sequenceDictionary": null,
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -5655,6 +5700,7 @@
         "id": -1,
         "isPrimary": true,
         "sequence": -1,
+        "sequenceDictionary": null,
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -5845,6 +5891,7 @@
         "id": -1,
         "isPrimary": true,
         "sequence": -1,
+        "sequenceDictionary": null,
         "inflections": [
           "masu stem"
         ],
@@ -6019,6 +6066,7 @@
         "id": -1,
         "isPrimary": true,
         "sequence": -1,
+        "sequenceDictionary": null,
         "inflections": [
           "masu stem"
         ],
@@ -6193,6 +6241,7 @@
         "id": -1,
         "isPrimary": true,
         "sequence": -1,
+        "sequenceDictionary": null,
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -6324,6 +6373,7 @@
         "id": -1,
         "isPrimary": true,
         "sequence": -1,
+        "sequenceDictionary": null,
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -6460,7 +6510,8 @@
         "type": "term",
         "id": -1,
         "isPrimary": true,
-        "sequence": -1,
+        "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -6842,7 +6893,8 @@
         "type": "term",
         "id": -1,
         "isPrimary": true,
-        "sequence": -1,
+        "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -7169,7 +7221,8 @@
         "type": "term",
         "id": -1,
         "isPrimary": true,
-        "sequence": -1,
+        "sequence": 1,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -7300,7 +7353,8 @@
         "type": "term",
         "id": -1,
         "isPrimary": true,
-        "sequence": -1,
+        "sequence": 2,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -7438,6 +7492,7 @@
         "id": 7,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "-te",
           "progressive or perfect",
@@ -7593,6 +7648,7 @@
         "id": 9,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "-te",
           "progressive or perfect",
@@ -7748,6 +7804,7 @@
         "id": 8,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "-te",
           "progressive or perfect",
@@ -7899,6 +7956,7 @@
         "id": 10,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "-te",
           "progressive or perfect",
@@ -8054,6 +8112,7 @@
         "id": 3,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -8189,6 +8248,7 @@
         "id": 5,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -8324,6 +8384,7 @@
         "id": 4,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -8459,6 +8520,7 @@
         "id": 6,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -8594,6 +8656,7 @@
         "id": 1,
         "isPrimary": true,
         "sequence": 1,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -8725,6 +8788,7 @@
         "id": 2,
         "isPrimary": true,
         "sequence": 2,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -8862,6 +8926,7 @@
         "id": 7,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -9013,6 +9078,7 @@
         "id": 9,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -9164,6 +9230,7 @@
         "id": 8,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -9311,6 +9378,7 @@
         "id": 10,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -9462,6 +9530,7 @@
         "id": 3,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -9597,6 +9666,7 @@
         "id": 5,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -9732,6 +9802,7 @@
         "id": 4,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -9867,6 +9938,7 @@
         "id": 6,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -10002,6 +10074,7 @@
         "id": 1,
         "isPrimary": true,
         "sequence": 1,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -10133,6 +10206,7 @@
         "id": 2,
         "isPrimary": true,
         "sequence": 2,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -10270,6 +10344,7 @@
         "id": 7,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -10421,6 +10496,7 @@
         "id": 9,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -10572,6 +10648,7 @@
         "id": 8,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -10719,6 +10796,7 @@
         "id": 10,
         "isPrimary": true,
         "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -10870,6 +10948,7 @@
         "id": 3,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -11005,6 +11084,7 @@
         "id": 5,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -11140,6 +11220,7 @@
         "id": 4,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -11275,6 +11356,7 @@
         "id": 6,
         "isPrimary": true,
         "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -11410,6 +11492,7 @@
         "id": 1,
         "isPrimary": true,
         "sequence": 1,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -11541,6 +11624,7 @@
         "id": 2,
         "isPrimary": true,
         "sequence": 2,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 1,
         "dictionaryIndex": 0,
@@ -11678,6 +11762,7 @@
         "id": 12,
         "isPrimary": true,
         "sequence": 6,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],
@@ -11760,6 +11845,7 @@
         "id": 13,
         "isPrimary": true,
         "sequence": 7,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 90,
         "dictionaryIndex": 0,
@@ -11826,6 +11912,7 @@
         "id": 12,
         "isPrimary": true,
         "sequence": 6,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "polite past"
         ],
@@ -11907,7 +11994,8 @@
         "type": "term",
         "id": -1,
         "isPrimary": true,
-        "sequence": -1,
+        "sequence": 4,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [],
         "score": 10,
         "dictionaryIndex": 0,
@@ -12289,7 +12377,8 @@
         "type": "term",
         "id": -1,
         "isPrimary": true,
-        "sequence": -1,
+        "sequence": 3,
+        "sequenceDictionary": "Test Dictionary 2",
         "inflections": [
           "masu stem"
         ],

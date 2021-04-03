@@ -353,7 +353,12 @@ class Translator {
             if (mainDictionary === dictionary && sequence >= 0) {
                 let group = groupedDictionaryEntriesMap.get(sequence);
                 if (typeof group === 'undefined') {
-                    group = {ids: new Set(), dictionaryEntries: []};
+                    group = {
+                        sequence,
+                        sequenceDictionary: dictionary,
+                        ids: new Set(),
+                        dictionaryEntries: []
+                    };
                     sequenceList.push({query: sequence, dictionary});
                     groupedDictionaryEntries.push(group);
                     groupedDictionaryEntriesMap.set(sequence, group);
@@ -378,7 +383,7 @@ class Translator {
 
         const newDictionaryEntries = [];
         for (const group of groupedDictionaryEntries) {
-            newDictionaryEntries.push(this._createGroupedDictionaryEntry(group.dictionaryEntries, true));
+            newDictionaryEntries.push(this._createGroupedDictionaryEntry(group.dictionaryEntries, group.sequence, group.sequenceDictionary, true));
         }
         newDictionaryEntries.push(...this._groupDictionaryEntriesByHeadword(ungroupedDictionaryEntriesMap.values()));
         return newDictionaryEntries;
@@ -480,7 +485,7 @@ class Translator {
 
         const results = [];
         for (const dictionaryEntries2 of groups.values()) {
-            const dictionaryEntry = this._createGroupedDictionaryEntry(dictionaryEntries2, false);
+            const dictionaryEntry = this._createGroupedDictionaryEntry(dictionaryEntries2, -1, null, false);
             results.push(dictionaryEntry);
         }
         return results;
@@ -933,12 +938,13 @@ class Translator {
         return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, hasReading, frequency};
     }
 
-    _createTermDictionaryEntry(id, isPrimary, sequence, inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxTransformedTextLength, headwords, definitions) {
+    _createTermDictionaryEntry(id, isPrimary, sequence, sequenceDictionary, inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxTransformedTextLength, headwords, definitions) {
         return {
             type: 'term',
             id,
             isPrimary,
             sequence,
+            sequenceDictionary,
             inflections,
             score,
             dictionaryIndex,
@@ -969,6 +975,7 @@ class Translator {
             id,
             isPrimary,
             sequence,
+            sequence >= 0 ? dictionary : null,
             reasons,
             score,
             dictionaryIndex,
@@ -980,7 +987,7 @@ class Translator {
         );
     }
 
-    _createGroupedDictionaryEntry(dictionaryEntries, checkDuplicateDefinitions) {
+    _createGroupedDictionaryEntry(dictionaryEntries, sequence, sequenceDictionary, checkDuplicateDefinitions) {
         // Headwords are generated before sorting, so that the order of dictionaryEntries can be maintained
         const definitionEntries = [];
         const headwords = new Map();
@@ -1030,7 +1037,8 @@ class Translator {
         return this._createTermDictionaryEntry(
             -1,
             isPrimary,
-            -1,
+            sequence,
+            sequenceDictionary,
             inflections !== null ? inflections : [],
             score,
             dictionaryIndex,

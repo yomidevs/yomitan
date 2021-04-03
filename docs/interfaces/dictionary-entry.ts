@@ -205,6 +205,10 @@ namespace Translation {
          */
         sequence: number;
         /**
+         * The dictionary that the sequence number originated from, or `null` if there is no sequence.
+         */
+        sequenceDictionary: string;
+        /**
          * A list of inflections that was applied to get the term.
          */
         inflections: string[];

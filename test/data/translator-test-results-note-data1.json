@@ -8639,6 +8639,7 @@
           "sourceTerm": "打ち込む",
           "reasons": [],
           "score": 10,
+          "sequence": -1,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -8825,6 +8826,7 @@
           ],
           "definitions": [
             {
+              "sequence": -1,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition13",
@@ -8852,6 +8854,7 @@
               ]
             },
             {
+              "sequence": -1,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition15",
@@ -9000,6 +9003,7 @@
           "sourceTerm": "打ち込む",
           "reasons": [],
           "score": 10,
+          "sequence": -1,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -9150,6 +9154,7 @@
           ],
           "definitions": [
             {
+              "sequence": -1,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition17",
@@ -9177,6 +9182,7 @@
               ]
             },
             {
+              "sequence": -1,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition19",
@@ -9327,6 +9333,7 @@
             "masu stem"
           ],
           "score": 10,
+          "sequence": -1,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -9447,6 +9454,7 @@
           ],
           "definitions": [
             {
+              "sequence": -1,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition5",
@@ -9474,6 +9482,7 @@
               ]
             },
             {
+              "sequence": -1,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition7",
@@ -9576,6 +9585,7 @@
             "masu stem"
           ],
           "score": 10,
+          "sequence": -1,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -9696,6 +9706,7 @@
           ],
           "definitions": [
             {
+              "sequence": -1,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition9",
@@ -9723,6 +9734,7 @@
               ]
             },
             {
+              "sequence": -1,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition11",
@@ -9823,6 +9835,7 @@
           "sourceTerm": "打",
           "reasons": [],
           "score": 1,
+          "sequence": -1,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -9937,6 +9950,7 @@
           ],
           "definitions": [
             {
+              "sequence": -1,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition1",
@@ -10037,6 +10051,7 @@
           "sourceTerm": "打",
           "reasons": [],
           "score": 1,
+          "sequence": -1,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -10151,6 +10166,7 @@
           ],
           "definitions": [
             {
+              "sequence": -1,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition3",
@@ -10255,6 +10271,7 @@
           "rawSource": "打ち込む",
           "reasons": [],
           "score": 10,
+          "sequence": 4,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -10506,6 +10523,7 @@
           ],
           "definitions": [
             {
+              "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition13",
@@ -10536,6 +10554,7 @@
               ]
             },
             {
+              "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition17",
@@ -10566,6 +10585,7 @@
               ]
             },
             {
+              "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition15",
@@ -10596,6 +10616,7 @@
               ]
             },
             {
+              "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition19",
@@ -10824,6 +10845,7 @@
             "masu stem"
           ],
           "score": 10,
+          "sequence": 3,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -10997,6 +11019,7 @@
           ],
           "definitions": [
             {
+              "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition5",
@@ -11027,6 +11050,7 @@
               ]
             },
             {
+              "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition9",
@@ -11057,6 +11081,7 @@
               ]
             },
             {
+              "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition7",
@@ -11087,6 +11112,7 @@
               ]
             },
             {
+              "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition11",
@@ -11216,6 +11242,7 @@
           "rawSource": "打",
           "reasons": [],
           "score": 1,
+          "sequence": 1,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -11305,6 +11332,7 @@
           ],
           "definitions": [
             {
+              "sequence": 1,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition1",
@@ -11405,6 +11433,7 @@
           "rawSource": "打",
           "reasons": [],
           "score": 1,
+          "sequence": 2,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -11494,6 +11523,7 @@
           ],
           "definitions": [
             {
+              "sequence": 2,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition3",
@@ -19849,6 +19879,7 @@
           "rawSource": "うちこむ",
           "reasons": [],
           "score": 10,
+          "sequence": 4,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -20100,6 +20131,7 @@
           ],
           "definitions": [
             {
+              "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition13",
@@ -20130,6 +20162,7 @@
               ]
             },
             {
+              "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition17",
@@ -20160,6 +20193,7 @@
               ]
             },
             {
+              "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition15",
@@ -20190,6 +20224,7 @@
               ]
             },
             {
+              "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition19",
@@ -20418,6 +20453,7 @@
             "masu stem"
           ],
           "score": 10,
+          "sequence": 3,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -20591,6 +20627,7 @@
           ],
           "definitions": [
             {
+              "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition5",
@@ -20621,6 +20658,7 @@
               ]
             },
             {
+              "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition9",
@@ -20651,6 +20689,7 @@
               ]
             },
             {
+              "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition7",
@@ -20681,6 +20720,7 @@
               ]
             },
             {
+              "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition11",
