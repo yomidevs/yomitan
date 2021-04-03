@@ -1652,8 +1652,6 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     line-height: 1;
     padding: 0.01em;
     vertical-align: top;
-    position: relative;
-    z-index: -1;
 }
 .kanji-glyph-data {
     margin-top: 0.75em;
@@ -1702,6 +1700,12 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 }
 .kanji-glossary {
     white-space: pre-line;
+}
+.kanji-tag-list {
+    position: relative;
+}
+.entry[data-type=kanji] .entry-body-section[data-section-type=frequencies] {
+    position: relative;
 }
 
 
