@@ -107,7 +107,7 @@ function createProfileOptionsTestData1() {
             sources: ['jpod101'],
             volume: 100,
             autoPlay: false,
-            customSourceUrl: '',
+            customSourceUrl: 'http://localhost/audio.mp3?term={expression}&reading={reading}',
             textToSpeechVoice: ''
         },
         scanning: {
@@ -309,7 +309,7 @@ function createProfileOptionsUpdatedTestData1() {
             sources: ['jpod101'],
             volume: 100,
             autoPlay: false,
-            customSourceUrl: '',
+            customSourceUrl: 'http://localhost/audio.mp3?term={term}&reading={reading}',
             customSourceType: 'audio',
             textToSpeechVoice: ''
         },

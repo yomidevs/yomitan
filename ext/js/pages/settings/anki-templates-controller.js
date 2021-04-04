@@ -24,8 +24,8 @@ class AnkiTemplatesController {
         this._settingsController = settingsController;
         this._modalController = modalController;
         this._ankiController = ankiController;
-        this._cachedDefinitionValue = null;
-        this._cachedDefinitionText = null;
+        this._cachedDictionaryEntryValue = null;
+        this._cachedDictionaryEntryText = null;
         this._defaultFieldTemplates = null;
         this._fieldTemplatesTextarea = null;
         this._compileResultInfo = null;
@@ -114,7 +114,7 @@ class AnkiTemplatesController {
         const field = this._renderFieldInput.value;
         const infoNode = this._renderResult;
         infoNode.hidden = true;
-        this._cachedDefinitionText = null;
+        this._cachedDictionaryEntryText = null;
         this._validate(infoNode, field, 'term-kanji', true, false);
     }
 
@@ -132,15 +132,18 @@ class AnkiTemplatesController {
         input.dispatchEvent(new Event('change'));
     }
 
-    async _getDefinition(text, optionsContext) {
-        if (this._cachedDefinitionText !== text) {
-            const {definitions} = await yomichan.api.termsFind(text, {}, optionsContext);
-            if (definitions.length === 0) { return null; }
+    async _getDictionaryEntry(text, optionsContext) {
+        if (this._cachedDictionaryEntryText !== text) {
+            const {dictionaryEntries} = await yomichan.api.termsFind(text, {}, optionsContext);
+            if (dictionaryEntries.length === 0) { return null; }
 
-            this._cachedDefinitionValue = definitions[0];
-            this._cachedDefinitionText = text;
+            this._cachedDictionaryEntryValue = dictionaryEntries[0];
+            this._cachedDictionaryEntryText = text;
         }
-        return this._cachedDefinitionValue;
+        return {
+            dictionaryEntry: this._cachedDictionaryEntryValue,
+            text: this._cachedDictionaryEntryText
+        };
     }
 
     async _validate(infoNode, field, mode, showSuccessResult, invalidateInput) {
@@ -149,19 +152,22 @@ class AnkiTemplatesController {
         let result = `No definition found for ${text}`;
         try {
             const optionsContext = this._settingsController.getOptionsContext();
-            const definition = await this._getDefinition(text, optionsContext);
-            if (definition !== null) {
+            const {dictionaryEntry, text: sentenceText} = await this._getDictionaryEntry(text, optionsContext);
+            if (dictionaryEntry !== null) {
                 const options = await this._settingsController.getOptions();
                 const context = {
                     url: window.location.href,
-                    sentence: {text: definition.rawSource, offset: 0},
+                    sentence: {
+                        text: sentenceText,
+                        offset: 0
+                    },
                     documentTitle: document.title
                 };
                 let template = options.anki.fieldTemplates;
                 if (typeof template !== 'string') { template = this._defaultFieldTemplates; }
                 const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
                 const note = await this._ankiNoteBuilder.createNote({
-                    definition,
+                    dictionaryEntry,
                     mode,
                     context,
                     template,

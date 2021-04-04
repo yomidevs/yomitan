@@ -58,12 +58,12 @@ class DisplayAudio {
         this._eventListeners.removeAllEventListeners();
     }
 
-    setupEntry(entry, definitionIndex) {
+    setupEntry(entry, dictionaryEntryIndex) {
         for (const button of entry.querySelectorAll('.action-play-audio')) {
-            const expressionIndex = this._getAudioPlayButtonExpressionIndex(button);
-            this._eventListeners.addEventListener(button, 'click', this._onAudioPlayButtonClick.bind(this, definitionIndex, expressionIndex), false);
-            this._eventListeners.addEventListener(button, 'contextmenu', this._onAudioPlayButtonContextMenu.bind(this, definitionIndex, expressionIndex), false);
-            this._eventListeners.addEventListener(button, 'menuClose', this._onAudioPlayMenuCloseClick.bind(this, definitionIndex, expressionIndex), false);
+            const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
+            this._eventListeners.addEventListener(button, 'click', this._onAudioPlayButtonClick.bind(this, dictionaryEntryIndex, headwordIndex), false);
+            this._eventListeners.addEventListener(button, 'contextmenu', this._onAudioPlayButtonContextMenu.bind(this, dictionaryEntryIndex, headwordIndex), false);
+            this._eventListeners.addEventListener(button, 'menuClose', this._onAudioPlayMenuCloseClick.bind(this, dictionaryEntryIndex, headwordIndex), false);
         }
     }
 
@@ -73,11 +73,11 @@ class DisplayAudio {
 
         this.clearAutoPlayTimer();
 
-        const definitions = this._display.definitions;
-        if (definitions.length === 0) { return; }
+        const {dictionaryEntries} = this._display;
+        if (dictionaryEntries.length === 0) { return; }
 
-        const firstDefinition = definitions[0];
-        if (firstDefinition.type === 'kanji') { return; }
+        const firstDictionaryEntries = dictionaryEntries[0];
+        if (firstDictionaryEntries.type === 'kanji') { return; }
 
         const callback = () => {
             this._autoPlayAudioTimer = null;
@@ -103,18 +103,18 @@ class DisplayAudio {
         this._audioPlaying = null;
     }
 
-    async playAudio(definitionIndex, expressionIndex, sources=null, sourceDetailsMap=null) {
+    async playAudio(dictionaryEntryIndex, headwordIndex, sources=null, sourceDetailsMap=null) {
         this.stopAudio();
         this.clearAutoPlayTimer();
 
-        const expressionReading = this._getExpressionAndReading(definitionIndex, expressionIndex);
-        if (expressionReading === null) {
+        const headword = this._getHeadword(dictionaryEntryIndex, headwordIndex);
+        if (headword === null) {
             return {audio: null, source: null, valid: false};
         }
 
-        const buttons = this._getAudioPlayButtons(definitionIndex, expressionIndex);
+        const buttons = this._getAudioPlayButtons(dictionaryEntryIndex, headwordIndex);
 
-        const {expression, reading} = expressionReading;
+        const {term, reading} = headword;
         const audioOptions = this._getAudioOptions();
         const {textToSpeechVoice, customSourceUrl, customSourceType, volume} = audioOptions;
         if (!Array.isArray(sources)) {
@@ -131,7 +131,7 @@ class DisplayAudio {
             let audio;
             let title;
             let source = null;
-            const info = await this._createExpressionAudio(sources, sourceDetailsMap, expression, reading, {textToSpeechVoice, customSourceUrl, customSourceType});
+            const info = await this._createTermAudio(sources, sourceDetailsMap, term, reading, {textToSpeechVoice, customSourceUrl, customSourceType});
             const valid = (info !== null);
             if (valid) {
                 ({audio, source} = info);
@@ -146,7 +146,7 @@ class DisplayAudio {
             this.stopAudio();
 
             // Update details
-            const potentialAvailableAudioCount = this._getPotentialAvailableAudioCount(expression, reading);
+            const potentialAvailableAudioCount = this._getPotentialAvailableAudioCount(term, reading);
             for (const button of buttons) {
                 const titleDefault = button.dataset.titleDefault || '';
                 button.title = `${titleDefault}\n${title}`;
@@ -174,48 +174,48 @@ class DisplayAudio {
         }
     }
 
-    getPrimaryCardAudio(expression, reading) {
-        const cacheEntry = this._getCacheItem(expression, reading, false);
+    getPrimaryCardAudio(term, reading) {
+        const cacheEntry = this._getCacheItem(term, reading, false);
         const primaryCardAudio = typeof cacheEntry !== 'undefined' ? cacheEntry.primaryCardAudio : null;
         return primaryCardAudio;
     }
 
     // Private
 
-    _onAudioPlayButtonClick(definitionIndex, expressionIndex, e) {
+    _onAudioPlayButtonClick(dictionaryEntryIndex, headwordIndex, e) {
         e.preventDefault();
 
         if (e.shiftKey) {
-            this._showAudioMenu(e.currentTarget, definitionIndex, expressionIndex);
+            this._showAudioMenu(e.currentTarget, dictionaryEntryIndex, headwordIndex);
         } else {
-            this.playAudio(definitionIndex, expressionIndex);
+            this.playAudio(dictionaryEntryIndex, headwordIndex);
         }
     }
 
-    _onAudioPlayButtonContextMenu(definitionIndex, expressionIndex, e) {
+    _onAudioPlayButtonContextMenu(dictionaryEntryIndex, headwordIndex, e) {
         e.preventDefault();
 
-        this._showAudioMenu(e.currentTarget, definitionIndex, expressionIndex);
+        this._showAudioMenu(e.currentTarget, dictionaryEntryIndex, headwordIndex);
     }
 
-    _onAudioPlayMenuCloseClick(definitionIndex, expressionIndex, e) {
+    _onAudioPlayMenuCloseClick(dictionaryEntryIndex, headwordIndex, e) {
         const {detail: {action, item, menu, shiftKey}} = e;
         switch (action) {
             case 'playAudioFromSource':
                 if (shiftKey) {
                     e.preventDefault();
                 }
-                this._playAudioFromSource(definitionIndex, expressionIndex, item);
+                this._playAudioFromSource(dictionaryEntryIndex, headwordIndex, item);
                 break;
             case 'setPrimaryAudio':
                 e.preventDefault();
-                this._setPrimaryAudio(definitionIndex, expressionIndex, item, menu, true);
+                this._setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, menu, true);
                 break;
         }
     }
 
-    _getCacheItem(expression, reading, create) {
-        const key = this._getExpressionReadingKey(expression, reading);
+    _getCacheItem(term, reading, create) {
+        const key = this._getTermReadingKey(term, reading);
         let cacheEntry = this._cache.get(key);
         if (typeof cacheEntry === 'undefined' && create) {
             cacheEntry = {
@@ -242,7 +242,7 @@ class DisplayAudio {
         return {source, index, hasIndex};
     }
 
-    async _playAudioFromSource(definitionIndex, expressionIndex, item) {
+    async _playAudioFromSource(dictionaryEntryIndex, headwordIndex, item) {
         const sourceInfo = this._getMenuItemSourceInfo(item);
         if (sourceInfo === null) { return; }
 
@@ -251,61 +251,61 @@ class DisplayAudio {
 
         try {
             const token = this._entriesToken;
-            const {valid} = await this.playAudio(definitionIndex, expressionIndex, [source], sourceDetailsMap);
+            const {valid} = await this.playAudio(dictionaryEntryIndex, headwordIndex, [source], sourceDetailsMap);
             if (valid && token === this._entriesToken) {
-                this._setPrimaryAudio(definitionIndex, expressionIndex, item, null, false);
+                this._setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, null, false);
             }
         } catch (e) {
             // NOP
         }
     }
 
-    _setPrimaryAudio(definitionIndex, expressionIndex, item, menu, canToggleOff) {
+    _setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, menu, canToggleOff) {
         const sourceInfo = this._getMenuItemSourceInfo(item);
         if (sourceInfo === null) { return; }
 
         const {source, index} = sourceInfo;
         if (!this._sourceIsDownloadable(source)) { return; }
 
-        const expressionReading = this._getExpressionAndReading(definitionIndex, expressionIndex);
-        if (expressionReading === null) { return; }
+        const headword = this._getHeadword(dictionaryEntryIndex, headwordIndex);
+        if (headword === null) { return; }
 
-        const {expression, reading} = expressionReading;
-        const cacheEntry = this._getCacheItem(expression, reading, true);
+        const {term, reading} = headword;
+        const cacheEntry = this._getCacheItem(term, reading, true);
 
         let {primaryCardAudio} = cacheEntry;
         primaryCardAudio = (!canToggleOff || primaryCardAudio === null || primaryCardAudio.source !== source || primaryCardAudio.index !== index) ? {source, index} : null;
         cacheEntry.primaryCardAudio = primaryCardAudio;
 
         if (menu !== null) {
-            this._updateMenuPrimaryCardAudio(menu.bodyNode, expression, reading);
+            this._updateMenuPrimaryCardAudio(menu.bodyNode, term, reading);
         }
     }
 
-    _getAudioPlayButtonExpressionIndex(button) {
-        const expressionNode = button.closest('.expression');
-        if (expressionNode !== null) {
-            const expressionIndex = parseInt(expressionNode.dataset.index, 10);
-            if (Number.isFinite(expressionIndex)) { return expressionIndex; }
+    _getAudioPlayButtonHeadwordIndex(button) {
+        const headwordNode = button.closest('.expression');
+        if (headwordNode !== null) {
+            const headwordIndex = parseInt(headwordNode.dataset.index, 10);
+            if (Number.isFinite(headwordIndex)) { return headwordIndex; }
         }
         return 0;
     }
 
-    _getAudioPlayButtons(definitionIndex, expressionIndex) {
+    _getAudioPlayButtons(dictionaryEntryIndex, headwordIndex) {
         const results = [];
-        const {definitionNodes} = this._display;
-        if (definitionIndex >= 0 && definitionIndex < definitionNodes.length) {
-            const node = definitionNodes[definitionIndex];
-            const button1 = (expressionIndex === 0 ? node.querySelector('.action-play-audio') : null);
-            const button2 = node.querySelector(`.expression:nth-of-type(${expressionIndex + 1}) .action-play-audio`);
+        const {dictionaryEntryNodes} = this._display;
+        if (dictionaryEntryIndex >= 0 && dictionaryEntryIndex < dictionaryEntryNodes.length) {
+            const node = dictionaryEntryNodes[dictionaryEntryIndex];
+            const button1 = (headwordIndex === 0 ? node.querySelector('.action-play-audio') : null);
+            const button2 = node.querySelector(`.expression:nth-of-type(${headwordIndex + 1}) .action-play-audio`);
             if (button1 !== null) { results.push(button1); }
             if (button2 !== null) { results.push(button2); }
         }
         return results;
     }
 
-    async _createExpressionAudio(sources, sourceDetailsMap, expression, reading, details) {
-        const {sourceMap} = this._getCacheItem(expression, reading, true);
+    async _createTermAudio(sources, sourceDetailsMap, term, reading, details) {
+        const {sourceMap} = this._getCacheItem(term, reading, true);
 
         for (let i = 0, ii = sources.length; i < ii; ++i) {
             const source = sources[i];
@@ -314,7 +314,7 @@ class DisplayAudio {
             let infoListPromise;
             let sourceInfo = sourceMap.get(source);
             if (typeof sourceInfo === 'undefined') {
-                infoListPromise = this._getExpressionAudioInfoList(source, expression, reading, details);
+                infoListPromise = this._getTermAudioInfoList(source, term, reading, details);
                 sourceInfo = {infoListPromise, infoList: null};
                 sourceMap.set(source, sourceInfo);
                 cacheUpdated = true;
@@ -393,27 +393,26 @@ class DisplayAudio {
         }
     }
 
-    async _getExpressionAudioInfoList(source, expression, reading, details) {
-        const infoList = await yomichan.api.getExpressionAudioInfoList(source, expression, reading, details);
+    async _getTermAudioInfoList(source, term, reading, details) {
+        const infoList = await yomichan.api.getTermAudioInfoList(source, term, reading, details);
         return infoList.map((info) => ({info, audioPromise: null, audioResolved: false, audio: null}));
     }
 
-    _getExpressionAndReading(definitionIndex, expressionIndex) {
-        const {definitions} = this._display;
-        if (definitionIndex < 0 || definitionIndex >= definitions.length) { return null; }
+    _getHeadword(dictionaryEntryIndex, headwordIndex) {
+        const {dictionaryEntries} = this._display;
+        if (dictionaryEntryIndex < 0 || dictionaryEntryIndex >= dictionaryEntries.length) { return null; }
 
-        const definition = definitions[definitionIndex];
-        if (definition.type === 'kanji') { return null; }
+        const dictionaryEntry = dictionaryEntries[dictionaryEntryIndex];
+        if (dictionaryEntry.type === 'kanji') { return null; }
 
-        const {headwords} = definition;
-        if (expressionIndex < 0 || expressionIndex >= headwords.length) { return null; }
+        const {headwords} = dictionaryEntry;
+        if (headwordIndex < 0 || headwordIndex >= headwords.length) { return null; }
 
-        const {term, reading} = headwords[expressionIndex];
-        return {expression: term, reading};
+        return headwords[headwordIndex];
     }
 
-    _getExpressionReadingKey(expression, reading) {
-        return JSON.stringify([expression, reading]);
+    _getTermReadingKey(term, reading) {
+        return JSON.stringify([term, reading]);
     }
 
     _getAudioOptions() {
@@ -460,8 +459,8 @@ class DisplayAudio {
         }
     }
 
-    _getPotentialAvailableAudioCount(expression, reading) {
-        const cacheEntry = this._getCacheItem(expression, reading, false);
+    _getPotentialAvailableAudioCount(term, reading) {
+        const cacheEntry = this._getCacheItem(term, reading, false);
         if (typeof cacheEntry === 'undefined') { return null; }
 
         const {sourceMap} = cacheEntry;
@@ -477,12 +476,12 @@ class DisplayAudio {
         return count;
     }
 
-    _showAudioMenu(button, definitionIndex, expressionIndex) {
-        const expressionReading = this._getExpressionAndReading(definitionIndex, expressionIndex);
-        if (expressionReading === null) { return; }
+    _showAudioMenu(button, dictionaryEntryIndex, headwordIndex) {
+        const headword = this._getHeadword(dictionaryEntryIndex, headwordIndex);
+        if (headword === null) { return; }
 
-        const {expression, reading} = expressionReading;
-        const popupMenu = this._createMenu(button, expression, reading);
+        const {term, reading} = headword;
+        const popupMenu = this._createMenu(button, term, reading);
         this._openMenus.add(popupMenu);
         popupMenu.prepare();
         popupMenu.on('close', this._onPopupMenuClose.bind(this));
@@ -550,31 +549,31 @@ class DisplayAudio {
         return results;
     }
 
-    _createMenu(sourceButton, expression, reading) {
+    _createMenu(sourceButton, term, reading) {
         // Create menu
         const menuContainerNode = this._display.displayGenerator.instantiateTemplate('audio-button-popup-menu');
         const menuBodyNode = menuContainerNode.querySelector('.popup-menu-body');
-        menuContainerNode.dataset.expression = expression;
+        menuContainerNode.dataset.term = term;
         menuContainerNode.dataset.reading = reading;
 
         // Set up items based on options and cache data
-        this._createMenuItems(menuContainerNode, menuBodyNode, expression, reading);
+        this._createMenuItems(menuContainerNode, menuBodyNode, term, reading);
 
         // Update primary card audio display
-        this._updateMenuPrimaryCardAudio(menuBodyNode, expression, reading);
+        this._updateMenuPrimaryCardAudio(menuBodyNode, term, reading);
 
         // Create popup menu
         this._menuContainer.appendChild(menuContainerNode);
         return new PopupMenu(sourceButton, menuContainerNode);
     }
 
-    _createMenuItems(menuContainerNode, menuItemContainer, expression, reading) {
+    _createMenuItems(menuContainerNode, menuItemContainer, term, reading) {
         const sources = this._getAudioSources(this._getAudioOptions());
         const {displayGenerator} = this._display;
         let showIcons = false;
         const currentItems = [...menuItemContainer.children];
         for (const {source, displayName, isInOptions, downloadable} of sources) {
-            const entries = this._getMenuItemEntries(source, expression, reading);
+            const entries = this._getMenuItemEntries(source, term, reading);
             for (let i = 0, ii = entries.length; i < ii; ++i) {
                 const {valid, index, name} = entries[i];
                 let node = this._getOrCreateMenuItem(currentItems, source, index);
@@ -632,8 +631,8 @@ class DisplayAudio {
         return null;
     }
 
-    _getMenuItemEntries(source, expression, reading) {
-        const cacheEntry = this._getCacheItem(expression, reading, false);
+    _getMenuItemEntries(source, term, reading) {
+        const cacheEntry = this._getCacheItem(term, reading, false);
         if (typeof cacheEntry !== 'undefined') {
             const {sourceMap} = cacheEntry;
             const sourceInfo = sourceMap.get(source);
@@ -659,8 +658,8 @@ class DisplayAudio {
         return [{valid: null, index: null, name: null}];
     }
 
-    _updateMenuPrimaryCardAudio(menuBodyNode, expression, reading) {
-        const primaryCardAudio = this.getPrimaryCardAudio(expression, reading);
+    _updateMenuPrimaryCardAudio(menuBodyNode, term, reading) {
+        const primaryCardAudio = this.getPrimaryCardAudio(term, reading);
         const {source: primaryCardAudioSource, index: primaryCardAudioIndex} = (primaryCardAudio !== null ? primaryCardAudio : {source: null, index: -1});
 
         const itemGroups = menuBodyNode.querySelectorAll('.popup-menu-item-group');
@@ -683,8 +682,8 @@ class DisplayAudio {
     _updateOpenMenu() {
         for (const menu of this._openMenus) {
             const menuContainerNode = menu.containerNode;
-            const {expression, reading} = menuContainerNode.dataset;
-            this._createMenuItems(menuContainerNode, menu.bodyNode, expression, reading);
+            const {term, reading} = menuContainerNode.dataset;
+            this._createMenuItems(menuContainerNode, menu.bodyNode, term, reading);
             menu.updatePosition();
         }
     }

@@ -791,12 +791,20 @@ class OptionsUtil {
     _updateVersion11(options) {
         // Version 11 changes:
         //  Changed dictionaries to an array.
+        //  Changed audio.customSourceUrl's {expression} marker to {term}.
+        const customSourceUrlPattern = /\{expression\}/g;
         for (const profile of options.profiles) {
             const dictionariesNew = [];
             for (const [name, {priority, enabled, allowSecondarySearches, definitionsCollapsible}] of Object.entries(profile.options.dictionaries)) {
                 dictionariesNew.push({name, priority, enabled, allowSecondarySearches, definitionsCollapsible});
             }
             profile.options.dictionaries = dictionariesNew;
+
+            let {customSourceUrl} = profile.options.audio;
+            if (typeof customSourceUrl === 'string') {
+                customSourceUrl = customSourceUrl.replace(customSourceUrlPattern, '{term}');
+            }
+            profile.options.audio.customSourceUrl = customSourceUrl;
         }
         return options;
     }

@@ -304,7 +304,7 @@ class TextScanner extends EventDispatcher {
     }
 
     async _search(textSource, searchTerms, searchKanji, inputInfo) {
-        let definitions = null;
+        let dictionaryEntries = null;
         let sentence = null;
         let type = null;
         let error = null;
@@ -322,13 +322,13 @@ class TextScanner extends EventDispatcher {
 
             searched = true;
 
-            const result = await this._findDefinitions(textSource, searchTerms, searchKanji, optionsContext);
+            const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
-                ({definitions, sentence, type} = result);
+                ({dictionaryEntries, sentence, type} = result);
                 this._inputInfoCurrent = inputInfo;
                 this.setCurrentTextSource(textSource);
             } else if (textSource instanceof TextSourceElement && await this._hasJapanese(textSource.fullContent)) {
-                definitions = [];
+                dictionaryEntries = [];
                 sentence = {sentence: '', offset: 0};
                 type = 'terms';
                 this._inputInfoCurrent = inputInfo;
@@ -343,7 +343,7 @@ class TextScanner extends EventDispatcher {
         const results = {
             textScanner: this,
             type,
-            definitions,
+            dictionaryEntries,
             sentence,
             inputInfo,
             textSource,
@@ -804,22 +804,22 @@ class TextScanner extends EventDispatcher {
         return null;
     }
 
-    async _findDefinitions(textSource, searchTerms, searchKanji, optionsContext) {
+    async _findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext) {
         if (textSource === null) {
             return null;
         }
         if (searchTerms) {
-            const results = await this._findTerms(textSource, optionsContext);
+            const results = await this._findTermDictionaryEntries(textSource, optionsContext);
             if (results !== null) { return results; }
         }
         if (searchKanji) {
-            const results = await this._findKanji(textSource, optionsContext);
+            const results = await this._findKanjiDictionaryEntries(textSource, optionsContext);
             if (results !== null) { return results; }
         }
         return null;
     }
 
-    async _findTerms(textSource, optionsContext) {
+    async _findTermDictionaryEntries(textSource, optionsContext) {
         const scanLength = this._scanLength;
         const sentenceScanExtent = this._sentenceScanExtent;
         const sentenceTerminatorMap = this._sentenceTerminatorMap;
@@ -829,10 +829,10 @@ class TextScanner extends EventDispatcher {
         const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
-        const {definitions, length} = await yomichan.api.termsFind(searchText, {}, optionsContext);
-        if (definitions.length === 0) { return null; }
+        const {dictionaryEntries, originalTextLength} = await yomichan.api.termsFind(searchText, {}, optionsContext);
+        if (dictionaryEntries.length === 0) { return null; }
 
-        textSource.setEndOffset(length, layoutAwareScan);
+        textSource.setEndOffset(originalTextLength, layoutAwareScan);
         const sentence = this._documentUtil.extractSentence(
             textSource,
             layoutAwareScan,
@@ -842,10 +842,10 @@ class TextScanner extends EventDispatcher {
             sentenceBackwardQuoteMap
         );
 
-        return {definitions, sentence, type: 'terms'};
+        return {dictionaryEntries, sentence, type: 'terms'};
     }
 
-    async _findKanji(textSource, optionsContext) {
+    async _findKanjiDictionaryEntries(textSource, optionsContext) {
         const sentenceScanExtent = this._sentenceScanExtent;
         const sentenceTerminatorMap = this._sentenceTerminatorMap;
         const sentenceForwardQuoteMap = this._sentenceForwardQuoteMap;
@@ -854,8 +854,8 @@ class TextScanner extends EventDispatcher {
         const searchText = this.getTextSourceContent(textSource, 1, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
-        const definitions = await yomichan.api.kanjiFind(searchText, optionsContext);
-        if (definitions.length === 0) { return null; }
+        const dictionaryEntries = await yomichan.api.kanjiFind(searchText, optionsContext);
+        if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(1, layoutAwareScan);
         const sentence = this._documentUtil.extractSentence(
@@ -867,7 +867,7 @@ class TextScanner extends EventDispatcher {
             sentenceBackwardQuoteMap
         );
 
-        return {definitions, sentence, type: 'kanji'};
+        return {dictionaryEntries, sentence, type: 'kanji'};
     }
 
     async _searchAt(x, y, inputInfo) {

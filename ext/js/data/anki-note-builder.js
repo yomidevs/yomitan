@@ -29,7 +29,7 @@ class AnkiNoteBuilder {
     }
 
     async createNote({
-        definition,
+        dictionaryEntry,
         mode,
         context,
         template,
@@ -53,7 +53,7 @@ class AnkiNoteBuilder {
             duplicateScopeCheckChildren = true;
         }
 
-        const commonData = this._createData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
+        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fields) {
             const formattedFieldValuePromise = this._formatField(fieldValue, commonData, template, errors);
@@ -85,7 +85,7 @@ class AnkiNoteBuilder {
     }
 
     async getRenderingData({
-        definition,
+        dictionaryEntry,
         mode,
         context,
         resultOutputMode='split',
@@ -94,15 +94,15 @@ class AnkiNoteBuilder {
         injectedMedia=null,
         marker=null
     }) {
-        const commonData = this._createData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
+        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
         return await this._templateRenderer.getModifiedData({marker, commonData}, 'ankiNote');
     }
 
     // Private
 
-    _createData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia) {
+    _createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia) {
         return {
-            definition,
+            dictionaryEntry,
             mode,
             context,
             resultOutputMode,

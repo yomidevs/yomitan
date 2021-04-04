@@ -315,7 +315,7 @@ const JapaneseUtil = (() => {
             return wanakana.toRomaji(text);
         }
 
-        convertReading(expression, reading, readingMode) {
+        convertReading(term, reading, readingMode) {
             switch (readingMode) {
                 case 'hiragana':
                     return this.convertKatakanaToHiragana(reading);
@@ -325,8 +325,8 @@ const JapaneseUtil = (() => {
                     if (reading) {
                         return this.convertToRomaji(reading);
                     } else {
-                        if (this.isStringEntirelyKana(expression)) {
-                            return this.convertToRomaji(expression);
+                        if (this.isStringEntirelyKana(term)) {
+                            return this.convertToRomaji(term);
                         }
                     }
                     return reading;
@@ -429,16 +429,16 @@ const JapaneseUtil = (() => {
 
         // Furigana distribution
 
-        distributeFurigana(expression, reading) {
-            if (reading === expression) {
+        distributeFurigana(term, reading) {
+            if (reading === term) {
                 // Same
-                return [this._createFuriganaSegment(expression, '')];
+                return [this._createFuriganaSegment(term, '')];
             }
 
             const groups = [];
             let groupPre = null;
             let isKanaPre = null;
-            for (const c of expression) {
+            for (const c of term) {
                 const codePoint = c.codePointAt(0);
                 const isKana = !(this.isCodePointKanji(codePoint) || codePoint === ITERATION_MARK_CODE_POINT);
                 if (isKana === isKanaPre) {
@@ -462,18 +462,18 @@ const JapaneseUtil = (() => {
             }
 
             // Fallback
-            return [this._createFuriganaSegment(expression, reading)];
+            return [this._createFuriganaSegment(term, reading)];
         }
 
-        distributeFuriganaInflected(expression, reading, source) {
-            const expressionNormalized = this.convertKatakanaToHiragana(expression);
+        distributeFuriganaInflected(term, reading, source) {
+            const termNormalized = this.convertKatakanaToHiragana(term);
             const readingNormalized = this.convertKatakanaToHiragana(reading);
             const sourceNormalized = this.convertKatakanaToHiragana(source);
 
-            let mainText = expression;
-            let stemLength = this._getStemLength(expressionNormalized, sourceNormalized);
+            let mainText = term;
+            let stemLength = this._getStemLength(termNormalized, sourceNormalized);
 
-            // Check if source is derived from the reading instead of the expression
+            // Check if source is derived from the reading instead of the term
             const readingStemLength = this._getStemLength(readingNormalized, sourceNormalized);
             if (readingStemLength > 0 && readingStemLength >= stemLength) {
                 mainText = reading;

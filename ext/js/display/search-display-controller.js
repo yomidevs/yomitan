@@ -361,7 +361,7 @@ class SearchDisplayController {
                 documentTitle
             },
             content: {
-                definitions: null,
+                dictionaryEntries: null,
                 animate,
                 contentOrigin: {
                     tabId: this.tabId,

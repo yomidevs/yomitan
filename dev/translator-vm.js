@@ -105,10 +105,10 @@ class TranslatorVM extends DatabaseVM {
         this._ankiNoteDataCreator = new AnkiNoteDataCreator(this._japaneseUtil);
     }
 
-    createTestAnkiNoteData(definition, mode) {
+    createTestAnkiNoteData(dictionaryEntry, mode) {
         const marker = '{marker}';
         const data = {
-            definition,
+            dictionaryEntry,
             resultOutputMode: mode,
             mode: 'mode',
             glossaryLayoutMode: 'default',

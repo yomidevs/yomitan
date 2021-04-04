@@ -26,7 +26,7 @@ class DictionaryDatabase {
         this._schemas = new Map();
         this._createOnlyQuery1 = (item) => IDBKeyRange.only(item);
         this._createOnlyQuery2 = (item) => IDBKeyRange.only(item.query);
-        this._createOnlyQuery3 = (item) => IDBKeyRange.only(item.expression);
+        this._createOnlyQuery3 = (item) => IDBKeyRange.only(item.term);
         this._createOnlyQuery4 = (item) => IDBKeyRange.only(item.path);
         this._createBoundQuery1 = (item) => IDBKeyRange.bound(item, `${item}\uffff`, false, false);
         this._createBoundQuery2 = (item) => { item = stringReverse(item); return IDBKeyRange.bound(item, `${item}\uffff`, false, false); };
@@ -387,7 +387,7 @@ class DictionaryDatabase {
     _createTerm(row, index) {
         return {
             index,
-            expression: row.expression,
+            term: row.expression,
             reading: row.reading,
             definitionTags: this._splitField(row.definitionTags || row.tags || ''),
             termTags: this._splitField(row.termTags || ''),
@@ -413,8 +413,8 @@ class DictionaryDatabase {
         };
     }
 
-    _createTermMeta({expression, mode, data, dictionary}, index) {
-        return {expression, mode, data, dictionary, index};
+    _createTermMeta({expression: term, mode, data, dictionary}, index) {
+        return {term, mode, data, dictionary, index};
     }
 
     _createKanjiMeta({character, mode, data, dictionary}, index) {

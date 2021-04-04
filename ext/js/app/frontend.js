@@ -257,7 +257,7 @@ class Frontend {
         }
     }
 
-    _onSearched({type, definitions, sentence, inputInfo: {eventType, passive, detail}, textSource, optionsContext, detail: {documentTitle}, error}) {
+    _onSearched({type, dictionaryEntries, sentence, inputInfo: {eventType, passive, detail}, textSource, optionsContext, detail: {documentTitle}, error}) {
         const scanningOptions = this._options.scanning;
 
         if (error !== null) {
@@ -275,7 +275,7 @@ class Frontend {
                 const focus2 = detail.focus;
                 if (typeof focus2 === 'boolean') { focus = focus2; }
             }
-            this._showContent(textSource, focus, definitions, type, sentence, documentTitle, optionsContext);
+            this._showContent(textSource, focus, dictionaryEntries, type, sentence, documentTitle, optionsContext);
         } else {
             if (scanningOptions.autoHideResults) {
                 this._clearSelectionDelayed(scanningOptions.hideDelay, false);
@@ -505,7 +505,7 @@ class Frontend {
         this._showPopupContent(textSource, null);
     }
 
-    _showContent(textSource, focus, definitions, type, sentence, documentTitle, optionsContext) {
+    _showContent(textSource, focus, dictionaryEntries, type, sentence, documentTitle, optionsContext) {
         const query = textSource.text();
         const {url} = optionsContext;
         const details = {
@@ -524,7 +524,7 @@ class Frontend {
                 documentTitle
             },
             content: {
-                definitions,
+                dictionaryEntries,
                 contentOrigin: {
                     tabId: this._tabId,
                     frameId: this._frameId

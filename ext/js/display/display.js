@@ -47,8 +47,8 @@ class Display extends EventDispatcher {
         this._documentFocusController = documentFocusController;
         this._hotkeyHandler = hotkeyHandler;
         this._container = document.querySelector('#definitions');
-        this._definitions = [];
-        this._definitionNodes = [];
+        this._dictionaryEntries = [];
+        this._dictionaryEntryNodes = [];
         this._optionsContext = {depth: 0, url: window.location.href};
         this._options = null;
         this._index = 0;
@@ -107,7 +107,7 @@ class Display extends EventDispatcher {
         this._frameEndpoint = (pageType === 'popup' ? new FrameEndpoint() : null);
         this._browser = null;
         this._copyTextarea = null;
-        this._definitionTextScanner = null;
+        this._contentTextScanner = null;
         this._tagNotification = null;
         this._footerNotificationContainer = document.querySelector('#content-footer');
         this._displayAudio = new DisplayAudio(this);
@@ -121,14 +121,14 @@ class Display extends EventDispatcher {
             ['close',             () => { this._onHotkeyClose(); }],
             ['nextEntry',         this._onHotkeyActionMoveRelative.bind(this, 1)],
             ['previousEntry',     this._onHotkeyActionMoveRelative.bind(this, -1)],
-            ['lastEntry',         () => { this._focusEntry(this._definitions.length - 1, true); }],
+            ['lastEntry',         () => { this._focusEntry(this._dictionaryEntries.length - 1, true); }],
             ['firstEntry',        () => { this._focusEntry(0, true); }],
             ['historyBackward',   () => { this._sourceTermView(); }],
             ['historyForward',    () => { this._nextTermView(); }],
-            ['addNoteKanji',      () => { this._tryAddAnkiNoteForSelectedDefinition('kanji'); }],
-            ['addNoteTermKanji',  () => { this._tryAddAnkiNoteForSelectedDefinition('term-kanji'); }],
-            ['addNoteTermKana',   () => { this._tryAddAnkiNoteForSelectedDefinition('term-kana'); }],
-            ['viewNote',          () => { this._tryViewAnkiNoteForSelectedDefinition(); }],
+            ['addNoteKanji',      () => { this._tryAddAnkiNoteForSelectedEntry('kanji'); }],
+            ['addNoteTermKanji',  () => { this._tryAddAnkiNoteForSelectedEntry('term-kanji'); }],
+            ['addNoteTermKana',   () => { this._tryAddAnkiNoteForSelectedEntry('term-kana'); }],
+            ['viewNote',          () => { this._tryViewAnkiNoteForSelectedEntry(); }],
             ['playAudio',         () => { this._playAudioCurrent(); }],
             ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)],
             ['copyHostSelection', () => this._copyHostSelection()],
@@ -181,12 +181,12 @@ class Display extends EventDispatcher {
         return this._hotkeyHandler;
     }
 
-    get definitions() {
-        return this._definitions;
+    get dictionaryEntries() {
+        return this._dictionaryEntries;
     }
 
-    get definitionNodes() {
-        return this._definitionNodes;
+    get dictionaryEntryNodes() {
+        return this._dictionaryEntryNodes;
     }
 
     get progressIndicatorVisible() {
@@ -327,7 +327,7 @@ class Display extends EventDispatcher {
         });
 
         this._updateNestedFrontend(options);
-        this._updateDefinitionTextScanner(options);
+        this._updateContentTextScanner(options);
 
         this.trigger('optionsUpdated', {options});
     }
@@ -434,7 +434,7 @@ class Display extends EventDispatcher {
             params: this._createSearchParams(type, query, false),
             state,
             content: {
-                definitions: null,
+                dictionaryEntries: null,
                 contentOrigin: this.getContentOrigin()
             }
         };
@@ -536,8 +536,8 @@ class Display extends EventDispatcher {
             this._displayAudio.cleanupEntries();
             this._hideTagNotification(false);
             this._hideAnkiNoteErrors(false);
-            this._definitions = [];
-            this._definitionNodes = [];
+            this._dictionaryEntries = [];
+            this._dictionaryEntryNodes = [];
             this._elementOverflowController.clearElements();
 
             // Prepare
@@ -606,7 +606,7 @@ class Display extends EventDispatcher {
         }
     }
 
-    _onQueryParserSearch({type, definitions, sentence, inputInfo: {eventType}, textSource, optionsContext}) {
+    _onQueryParserSearch({type, dictionaryEntries, sentence, inputInfo: {eventType}, textSource, optionsContext}) {
         const query = textSource.text();
         const historyState = this._history.state;
         const history = (
@@ -624,7 +624,7 @@ class Display extends EventDispatcher {
                 cause: 'queryParser'
             },
             content: {
-                definitions,
+                dictionaryEntries,
                 contentOrigin: this.getContentOrigin()
             }
         };
@@ -693,7 +693,7 @@ class Display extends EventDispatcher {
             if (typeof documentTitle !== 'string') { documentTitle = document.title; }
             const optionsContext = this.getOptionsContext();
             const query = e.currentTarget.textContent;
-            const definitions = await yomichan.api.kanjiFind(query, optionsContext);
+            const dictionaryEntries = await yomichan.api.kanjiFind(query, optionsContext);
             const details = {
                 focus: false,
                 history: true,
@@ -706,7 +706,7 @@ class Display extends EventDispatcher {
                     documentTitle
                 },
                 content: {
-                    definitions,
+                    dictionaryEntries,
                     contentOrigin: this.getContentOrigin()
                 }
             };
@@ -719,7 +719,7 @@ class Display extends EventDispatcher {
     _onNoteAdd(e) {
         e.preventDefault();
         const link = e.currentTarget;
-        const index = this._getClosestDefinitionIndex(link);
+        const index = this._getClosestDictionaryEntryIndex(link);
         this._addAnkiNote(index, link.dataset.mode);
     }
 
@@ -756,8 +756,8 @@ class Display extends EventDispatcher {
 
     _onDebugLogClick(e) {
         const link = e.currentTarget;
-        const index = this._getClosestDefinitionIndex(link);
-        this._logDefinitionData(index);
+        const index = this._getClosestDictionaryEntryIndex(link);
+        this._logDictionaryEntryData(index);
     }
 
     _onDocumentElementMouseUp(e) {
@@ -814,8 +814,8 @@ class Display extends EventDispatcher {
             this._tagNotification = new DisplayNotification(this._footerNotificationContainer, node);
         }
 
-        const index = this._getClosestDefinitionIndex(tagNode);
-        const dictionaryEntry = (index >= 0 && index < this._definitions.length ? this._definitions[index] : null);
+        const index = this._getClosestDictionaryEntryIndex(tagNode);
+        const dictionaryEntry = (index >= 0 && index < this._dictionaryEntries.length ? this._dictionaryEntries[index] : null);
 
         const content = this._displayGenerator.createTagFooterNotificationDetails(tagNode, dictionaryEntry);
         this._tagNotification.setContent(content);
@@ -850,7 +850,7 @@ class Display extends EventDispatcher {
         document.documentElement.dataset.theme = themeName;
     }
 
-    async _findDefinitions(isTerms, source, wildcardsEnabled, optionsContext) {
+    async _findDictionaryEntries(isTerms, source, wildcardsEnabled, optionsContext) {
         if (isTerms) {
             const findDetails = {};
             if (wildcardsEnabled) {
@@ -865,11 +865,11 @@ class Display extends EventDispatcher {
                 }
             }
 
-            const {definitions} = await yomichan.api.termsFind(source, findDetails, optionsContext);
-            return definitions;
+            const {dictionaryEntries} = await yomichan.api.termsFind(source, findDetails, optionsContext);
+            return dictionaryEntries;
         } else {
-            const definitions = await yomichan.api.kanjiFind(source, optionsContext);
-            return definitions;
+            const dictionaryEntries = await yomichan.api.kanjiFind(source, optionsContext);
+            return dictionaryEntries;
         }
     }
 
@@ -901,11 +901,11 @@ class Display extends EventDispatcher {
         this._setFullQuery(queryFull);
         this._setTitleText(query);
 
-        let {definitions} = content;
-        if (!Array.isArray(definitions)) {
-            definitions = lookup && query.length > 0 ? await this._findDefinitions(isTerms, query, wildcardsEnabled, optionsContext) : [];
+        let {dictionaryEntries} = content;
+        if (!Array.isArray(dictionaryEntries)) {
+            dictionaryEntries = lookup && query.length > 0 ? await this._findDictionaryEntries(isTerms, query, wildcardsEnabled, optionsContext) : [];
             if (this._setContentToken !== token) { return; }
-            content.definitions = definitions;
+            content.dictionaryEntries = dictionaryEntries;
             changeHistory = true;
         }
 
@@ -940,28 +940,28 @@ class Display extends EventDispatcher {
         eventArgs.content = content;
         this.trigger('contentUpdating', eventArgs);
 
-        this._definitions = definitions;
+        this._dictionaryEntries = dictionaryEntries;
 
         this._updateNavigation(this._history.hasPrevious(), this._history.hasNext());
-        this._setNoContentVisible(definitions.length === 0 && lookup);
+        this._setNoContentVisible(dictionaryEntries.length === 0 && lookup);
 
         const container = this._container;
         container.textContent = '';
 
-        for (let i = 0, ii = definitions.length; i < ii; ++i) {
+        for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
             if (i > 0) {
                 await promiseTimeout(1);
                 if (this._setContentToken !== token) { return; }
             }
 
-            const definition = definitions[i];
+            const dictionaryEntry = dictionaryEntries[i];
             const entry = (
                 isTerms ?
-                this._displayGenerator.createTermEntry(definition) :
-                this._displayGenerator.createKanjiEntry(definition)
+                this._displayGenerator.createTermEntry(dictionaryEntry) :
+                this._displayGenerator.createKanjiEntry(dictionaryEntry)
             );
             entry.dataset.index = `${i}`;
-            this._definitionNodes.push(entry);
+            this._dictionaryEntryNodes.push(entry);
             this._addEntryEventListeners(entry);
             this._displayAudio.setupEntry(entry, i);
             container.appendChild(entry);
@@ -982,7 +982,7 @@ class Display extends EventDispatcher {
 
         this._displayAudio.setupEntriesComplete();
 
-        this._updateAdderButtons(token, isTerms, definitions);
+        this._updateAdderButtons(token, isTerms, dictionaryEntries);
     }
 
     _setContentExtensionUnloaded() {
@@ -1069,7 +1069,7 @@ class Display extends EventDispatcher {
         }
     }
 
-    async _updateAdderButtons(token, isTerms, definitions) {
+    async _updateAdderButtons(token, isTerms, dictionaryEntries) {
         await this._updateAdderButtonsPromise;
         if (this._setContentToken !== token) { return; }
 
@@ -1082,7 +1082,7 @@ class Display extends EventDispatcher {
             try {
                 const noteContext = this._getNoteContext();
                 const {checkForDuplicates} = this._options.anki;
-                states = await this._areDefinitionsAddable(definitions, modes, noteContext, checkForDuplicates ? null : true);
+                states = await this._areDictionaryEntriesAddable(dictionaryEntries, modes, noteContext, checkForDuplicates ? null : true);
             } catch (e) {
                 return;
             }
@@ -1136,7 +1136,7 @@ class Display extends EventDispatcher {
     }
 
     _focusEntry(index, smooth) {
-        index = Math.max(Math.min(index, this._definitions.length - 1), 0);
+        index = Math.max(Math.min(index, this._dictionaryEntries.length - 1), 0);
 
         const entry = this._entrySetCurrent(index);
         let target = index === 0 || entry === null ? 0 : this._getElementTop(entry);
@@ -1158,12 +1158,12 @@ class Display extends EventDispatcher {
         if (offsetSign === 0) { return false; }
 
         let index = this._index;
-        const definitionCount = this._definitions.length;
-        if (index < 0 || index >= definitionCount) { return false; }
+        const dictionaryEntryCount = this._dictionaryEntries.length;
+        if (index < 0 || index >= dictionaryEntryCount) { return false; }
 
-        const {dictionary} = this._definitions[index];
-        for (let indexNext = index + offsetSign; indexNext >= 0 && indexNext < definitionCount; indexNext += offsetSign) {
-            const {dictionaryNames} = this._definitions[indexNext];
+        const {dictionary} = this._dictionaryEntries[index];
+        for (let indexNext = index + offsetSign; indexNext >= 0 && indexNext < dictionaryEntryCount; indexNext += offsetSign) {
+            const {dictionaryNames} = this._dictionaryEntries[indexNext];
             if (dictionaryNames.length > 1 || !dictionaryNames.includes(dictionary)) {
                 offset -= offsetSign;
                 if (Math.sign(offsetSign) !== offset) {
@@ -1195,22 +1195,22 @@ class Display extends EventDispatcher {
         }
     }
 
-    _tryAddAnkiNoteForSelectedDefinition(mode) {
+    _tryAddAnkiNoteForSelectedEntry(mode) {
         this._addAnkiNote(this._index, mode);
     }
 
-    _tryViewAnkiNoteForSelectedDefinition() {
+    _tryViewAnkiNoteForSelectedEntry() {
         const button = this._viewerButtonFind(this._index);
         if (button !== null && !button.disabled) {
             yomichan.api.noteView(button.dataset.noteId);
         }
     }
 
-    async _addAnkiNote(definitionIndex, mode) {
-        if (definitionIndex < 0 || definitionIndex >= this._definitions.length) { return; }
-        const definition = this._definitions[definitionIndex];
+    async _addAnkiNote(dictionaryEntryIndex, mode) {
+        if (dictionaryEntryIndex < 0 || dictionaryEntryIndex >= this._dictionaryEntries.length) { return; }
+        const dictionaryEntry = this._dictionaryEntries[dictionaryEntryIndex];
 
-        const button = this._adderButtonFind(definitionIndex, mode);
+        const button = this._adderButtonFind(dictionaryEntryIndex, mode);
         if (button === null || button.disabled) { return; }
 
         this._hideAnkiNoteErrors(true);
@@ -1220,7 +1220,7 @@ class Display extends EventDispatcher {
         try {
             const {anki: {suspendNewCards}} = this._options;
             const noteContext = this._getNoteContext();
-            const note = await this._createNote(definition, mode, noteContext, true, errors);
+            const note = await this._createNote(dictionaryEntry, mode, noteContext, true, errors);
 
             let noteId = null;
             let addNoteOkay = false;
@@ -1244,7 +1244,7 @@ class Display extends EventDispatcher {
                         }
                     }
                     button.disabled = true;
-                    this._viewerButtonShow(definitionIndex, noteId);
+                    this._viewerButtonShow(dictionaryEntryIndex, noteId);
                 }
             }
         } catch (e) {
@@ -1293,7 +1293,7 @@ class Display extends EventDispatcher {
     }
 
     _getEntry(index) {
-        const entries = this._definitionNodes;
+        const entries = this._dictionaryEntryNodes;
         return index >= 0 && index < entries.length ? entries[index] : null;
     }
 
@@ -1304,7 +1304,7 @@ class Display extends EventDispatcher {
         return {text, offset};
     }
 
-    _getClosestDefinitionIndex(element) {
+    _getClosestDictionaryEntryIndex(element) {
         return this._getClosestIndex(element, '.entry');
     }
 
@@ -1424,12 +1424,12 @@ class Display extends EventDispatcher {
         return templates;
     }
 
-    async _areDefinitionsAddable(definitions, modes, context, forceCanAddValue) {
+    async _areDictionaryEntriesAddable(dictionaryEntries, modes, context, forceCanAddValue) {
         const modeCount = modes.length;
         const notePromises = [];
-        for (const definition of definitions) {
+        for (const dictionaryEntry of dictionaryEntries) {
             for (const mode of modes) {
-                const notePromise = this._createNote(definition, mode, context, false, null);
+                const notePromise = this._createNote(dictionaryEntry, mode, context, false, null);
                 notePromises.push(notePromise);
             }
         }
@@ -1461,7 +1461,7 @@ class Display extends EventDispatcher {
         return results;
     }
 
-    async _createNote(definition, mode, context, injectMedia, errors) {
+    async _createNote(dictionaryEntry, mode, context, injectMedia, errors) {
         const options = this._options;
         const template = this._ankiFieldTemplates;
         const {
@@ -1476,7 +1476,7 @@ class Display extends EventDispatcher {
         let injectedMedia = null;
         if (injectMedia) {
             let errors2;
-            ({result: injectedMedia, errors: errors2} = await this._injectAnkiNoteMedia(definition, options, fields));
+            ({result: injectedMedia, errors: errors2} = await this._injectAnkiNoteMedia(dictionaryEntry, options, fields));
             if (Array.isArray(errors)) {
                 for (const error of errors2) {
                     errors.push(deserializeError(error));
@@ -1485,7 +1485,7 @@ class Display extends EventDispatcher {
         }
 
         return await this._ankiNoteBuilder.createNote({
-            definition,
+            dictionaryEntry,
             mode,
             context,
             template,
@@ -1503,7 +1503,7 @@ class Display extends EventDispatcher {
         });
     }
 
-    async _injectAnkiNoteMedia(definition, options, fields) {
+    async _injectAnkiNoteMedia(dictionaryEntry, options, fields) {
         const {
             anki: {screenshot: {format, quality}},
             audio: {sources, customSourceUrl, customSourceType}
@@ -1511,11 +1511,11 @@ class Display extends EventDispatcher {
 
         const timestamp = Date.now();
 
-        const definitionDetails = this._getDefinitionDetailsForNote(definition);
+        const dictionaryEntryDetails = this._getDictionaryEntryDetailsForNote(dictionaryEntry);
 
         let audioDetails = null;
-        if (definitionDetails.type !== 'kanji' && AnkiUtil.fieldsObjectContainsMarker(fields, 'audio')) {
-            const primaryCardAudio = this._displayAudio.getPrimaryCardAudio(definitionDetails.term, definitionDetails.reading);
+        if (dictionaryEntryDetails.type !== 'kanji' && AnkiUtil.fieldsObjectContainsMarker(fields, 'audio')) {
+            const primaryCardAudio = this._displayAudio.getPrimaryCardAudio(dictionaryEntryDetails.term, dictionaryEntryDetails.reading);
             let preferredAudioIndex = null;
             let sources2 = sources;
             if (primaryCardAudio !== null) {
@@ -1534,14 +1534,14 @@ class Display extends EventDispatcher {
 
         return await yomichan.api.injectAnkiNoteMedia(
             timestamp,
-            definitionDetails,
+            dictionaryEntryDetails,
             audioDetails,
             screenshotDetails,
             clipboardDetails
         );
     }
 
-    _getDefinitionDetailsForNote(dictionaryEntry) {
+    _getDictionaryEntryDetailsForNote(dictionaryEntry) {
         const {type} = dictionaryEntry;
         if (type === 'kanji') {
             const {character} = dictionaryEntry;
@@ -1710,16 +1710,16 @@ class Display extends EventDispatcher {
         this._addMultipleEventListeners(entry, '.tag-label', 'click', this._onTagClick.bind(this));
     }
 
-    _updateDefinitionTextScanner(options) {
+    _updateContentTextScanner(options) {
         if (!options.scanning.enablePopupSearch) {
-            if (this._definitionTextScanner !== null) {
-                this._definitionTextScanner.setEnabled(false);
+            if (this._contentTextScanner !== null) {
+                this._contentTextScanner.setEnabled(false);
             }
             return;
         }
 
-        if (this._definitionTextScanner === null) {
-            this._definitionTextScanner = new TextScanner({
+        if (this._contentTextScanner === null) {
+            this._contentTextScanner = new TextScanner({
                 node: window,
                 getSearchContext: this._getSearchContext.bind(this),
                 documentUtil: this._documentUtil,
@@ -1728,14 +1728,14 @@ class Display extends EventDispatcher {
                 searchOnClick: true,
                 searchOnClickOnly: true
             });
-            this._definitionTextScanner.includeSelector = '.click-scannable,.click-scannable *';
-            this._definitionTextScanner.excludeSelector = '.scan-disable,.scan-disable *';
-            this._definitionTextScanner.prepare();
-            this._definitionTextScanner.on('searched', this._onDefinitionTextScannerSearched.bind(this));
+            this._contentTextScanner.includeSelector = '.click-scannable,.click-scannable *';
+            this._contentTextScanner.excludeSelector = '.scan-disable,.scan-disable *';
+            this._contentTextScanner.prepare();
+            this._contentTextScanner.on('searched', this._onContentTextScannerSearched.bind(this));
         }
 
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
-        this._definitionTextScanner.setOptions({
+        this._contentTextScanner.setOptions({
             inputs: [{
                 include: 'mouse0',
                 exclude: '',
@@ -1761,10 +1761,10 @@ class Display extends EventDispatcher {
             sentenceParsingOptions
         });
 
-        this._definitionTextScanner.setEnabled(true);
+        this._contentTextScanner.setEnabled(true);
     }
 
-    _onDefinitionTextScannerSearched({type, definitions, sentence, textSource, optionsContext, error}) {
+    _onContentTextScannerSearched({type, dictionaryEntries, sentence, textSource, optionsContext, error}) {
         if (error !== null && !yomichan.isExtensionUnloaded) {
             log.error(error);
         }
@@ -1790,11 +1790,11 @@ class Display extends EventDispatcher {
                 documentTitle
             },
             content: {
-                definitions,
+                dictionaryEntries,
                 contentOrigin: this.getContentOrigin()
             }
         };
-        this._definitionTextScanner.clearSelection(true);
+        this._contentTextScanner.clearSelection(true);
         this.setContent(details);
     }
 
@@ -1865,16 +1865,16 @@ class Display extends EventDispatcher {
         return typeof queryPostProcessor === 'function' ? queryPostProcessor(query) : query;
     }
 
-    async _logDefinitionData(index) {
-        if (index < 0 || index >= this._definitions.length) { return; }
-        const dictionaryEntry = this._definitions[index];
+    async _logDictionaryEntryData(index) {
+        if (index < 0 || index >= this._dictionaryEntries.length) { return; }
+        const dictionaryEntry = this._dictionaryEntries[index];
         let ankiNoteData;
         let ankiNoteDataException;
         try {
             const context = this._getNoteContext();
             const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = this._options;
             ankiNoteData = await this._ankiNoteBuilder.getRenderingData({
-                definition: dictionaryEntry,
+                dictionaryEntry,
                 mode: 'test',
                 context,
                 resultOutputMode,

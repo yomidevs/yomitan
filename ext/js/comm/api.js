@@ -68,8 +68,8 @@ class API {
         return this._invoke('suspendAnkiCardsForNote', {noteId});
     }
 
-    getExpressionAudioInfoList(source, expression, reading, details) {
-        return this._invoke('getExpressionAudioInfoList', {source, expression, reading, details});
+    getTermAudioInfoList(source, term, reading, details) {
+        return this._invoke('getTermAudioInfoList', {source, term, reading, details});
     }
 
     commandExec(command, params) {

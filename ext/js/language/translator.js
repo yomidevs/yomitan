@@ -27,6 +27,7 @@
 class Translator {
     /**
      * Creates a new Translator instance.
+     * @param japaneseUtil An instance of JapaneseUtil.
      * @param database An instance of DictionaryDatabase.
      */
     constructor({japaneseUtil, database}) {
@@ -396,8 +397,8 @@ class Translator {
             const {id} = databaseEntry;
             if (ids.has(id)) { continue; }
 
-            const sourceText = databaseEntry.expression;
-            const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, sourceText, sourceText, sourceText, [], false, enabledDictionaryMap);
+            const {term} = databaseEntry;
+            const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, term, term, term, [], false, enabledDictionaryMap);
             dictionaryEntries.push(dictionaryEntry);
             ids.add(id);
             ungroupedDictionaryEntriesMap.delete(id);
@@ -426,13 +427,13 @@ class Translator {
                 target.groups.push(group);
                 if (!dictionaryEntry.isPrimary && !target.searchSecondary) {
                     target.searchSecondary = true;
-                    termList.push({expression: term, reading});
+                    termList.push({term, reading});
                     targetList.push(target);
                 }
             }
         }
 
-        // Group unsequenced dictionary entries with sequenced entries that have a matching [expression, reading].
+        // Group unsequenced dictionary entries with sequenced entries that have a matching [term, reading].
         for (const [id, dictionaryEntry] of ungroupedDictionaryEntriesMap.entries()) {
             const {term, reading} = dictionaryEntry.headwords[0];
             const key = this._createMapKey([term, reading]);
@@ -457,7 +458,7 @@ class Translator {
 
         for (const databaseEntry of databaseEntries) {
             const {index, id} = databaseEntry;
-            const sourceText = termList[index].expression;
+            const sourceText = termList[index].term;
             const target = targetList[index];
             for (const {ids, dictionaryEntries} of target.groups) {
                 if (ids.has(id)) { continue; }
@@ -959,10 +960,10 @@ class Translator {
     }
 
     _createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, isPrimary, enabledDictionaryMap) {
-        const {expression, reading: rawReading, definitionTags, termTags, glossary, score, dictionary, id, sequence, rules} = databaseEntry;
-        const reading = (rawReading.length > 0 ? rawReading : expression);
+        const {term, reading: rawReading, definitionTags, termTags, glossary, score, dictionary, id, sequence, rules} = databaseEntry;
+        const reading = (rawReading.length > 0 ? rawReading : term);
         const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
-        const sourceTermExactMatchCount = (isPrimary && deinflectedText === expression ? 1 : 0);
+        const sourceTermExactMatchCount = (isPrimary && deinflectedText === term ? 1 : 0);
         const source = this._createSource(originalText, transformedText, deinflectedText, isPrimary);
         const maxTransformedTextLength = transformedText.length;
 
@@ -982,7 +983,7 @@ class Translator {
             dictionaryPriority,
             sourceTermExactMatchCount,
             maxTransformedTextLength,
-            [this._createTermHeadword(0, expression, reading, [source], headwordTagGroups, rules)],
+            [this._createTermHeadword(0, term, reading, [source], headwordTagGroups, rules)],
             [this._createTermDefinition(0, [0], dictionary, definitionTagGroups, glossary)]
         );
     }
@@ -1204,7 +1205,7 @@ class Translator {
             i = v2.score - v1.score;
             if (i !== 0) { return i; }
 
-            // Sort by expression text
+            // Sort by headword term text
             const headwords1 = v1.headwords;
             const headwords2 = v2.headwords;
             for (let j = 0, jj = Math.min(headwords1.length, headwords2.length); j < jj; ++j) {
@@ -1277,7 +1278,7 @@ class Translator {
             let i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
 
-            // Sory by expression order
+            // Sory by headword order
             i = v1.headwordIndex - v2.headwordIndex;
             if (i !== 0) { return i; }
 

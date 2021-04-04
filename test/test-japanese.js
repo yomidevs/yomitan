@@ -199,7 +199,7 @@ function testConvertReading() {
         [['ありがとう', '', 'none'], ''],
         [['ありがとう', '', 'default'], ''],
 
-        // Cases with falsy readings and kanji expressions
+        // Cases with falsy readings and kanji terms
 
         [['有り難う', '', 'hiragana'], ''],
         [['有り難う', '', 'katakana'], ''],
@@ -208,8 +208,8 @@ function testConvertReading() {
         [['有り難う', '', 'default'], '']
     ];
 
-    for (const [[expression, reading, readingMode], expected] of data) {
-        assert.strictEqual(jp.convertReading(expression, reading, readingMode), expected);
+    for (const [[term, reading, readingMode], expected] of data) {
+        assert.strictEqual(jp.convertReading(term, reading, readingMode), expected);
     }
 }
 
@@ -708,7 +708,7 @@ function testDistributeFurigana() {
                 {text: 'る', furigana: 'ル'}
             ]
         ],
-        // Reading starts with expression, but has remainder characters
+        // Reading starts with term, but has remainder characters
         [
             ['シック', 'シック・ビルしょうこうぐん'],
             [
@@ -717,8 +717,8 @@ function testDistributeFurigana() {
         ]
     ];
 
-    for (const [[expression, reading], expected] of data) {
-        const actual = jp.distributeFurigana(expression, reading);
+    for (const [[term, reading], expected] of data) {
+        const actual = jp.distributeFurigana(term, reading);
         vm.assert.deepStrictEqual(actual, expected);
     }
 }
@@ -766,8 +766,8 @@ function testDistributeFuriganaInflected() {
         ]
     ];
 
-    for (const [[expression, reading, source], expected] of data) {
-        const actual = jp.distributeFuriganaInflected(expression, reading, source);
+    for (const [[term, reading, source], expected] of data) {
+        const actual = jp.distributeFuriganaInflected(term, reading, source);
         vm.assert.deepStrictEqual(actual, expected);
     }
 }

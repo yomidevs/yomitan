@@ -93,10 +93,10 @@ class DictionaryDataUtil {
     static getPitchAccentInfos(dictionaryEntry) {
         const {headwords, pronunciations} = dictionaryEntry;
 
-        const allExpressions = new Set();
+        const allTerms = new Set();
         const allReadings = new Set();
         for (const {term, reading} of headwords) {
-            allExpressions.add(term);
+            allTerms.add(term);
             allReadings.add(reading);
         }
 
@@ -129,8 +129,8 @@ class DictionaryDataUtil {
         for (const dictionaryPitchAccentInfoList of pitchAccentInfoMap.values()) {
             for (const pitchAccentInfo of dictionaryPitchAccentInfoList) {
                 const {terms, reading, exclusiveTerms, exclusiveReadings} = pitchAccentInfo;
-                if (!this._areSetsEqual(terms, allExpressions)) {
-                    exclusiveTerms.push(...this._getSetIntersection(terms, allExpressions));
+                if (!this._areSetsEqual(terms, allTerms)) {
+                    exclusiveTerms.push(...this._getSetIntersection(terms, allTerms));
                 }
                 if (multipleReadings) {
                     exclusiveReadings.push(reading);

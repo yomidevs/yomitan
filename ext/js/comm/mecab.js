@@ -108,7 +108,7 @@ class Mecab {
      *     {
      *         name: (string),
      *         lines: [
-     *             {expression: (string), reading: (string), source: (string)},
+     *             {term: (string), reading: (string), source: (string)},
      *             ...
      *         ]
      *     },
@@ -172,11 +172,11 @@ class Mecab {
             const lines = [];
             for (const rawLine of rawLines) {
                 const line = [];
-                for (let {expression, reading, source} of rawLine) {
-                    if (typeof expression !== 'string') { expression = ''; }
+                for (let {expression: term, reading, source} of rawLine) {
+                    if (typeof term !== 'string') { term = ''; }
                     if (typeof reading !== 'string') { reading = ''; }
                     if (typeof source !== 'string') { source = ''; }
-                    line.push({expression, reading, source});
+                    line.push({term, reading, source});
                 }
                 lines.push(line);
             }

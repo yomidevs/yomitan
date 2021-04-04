@@ -101,7 +101,7 @@ class Backend {
             ['noteView',                     {async: true,  contentScript: true,  handler: this._onApiNoteView.bind(this)}],
             ['suspendAnkiCardsForNote',      {async: true,  contentScript: true,  handler: this._onApiSuspendAnkiCardsForNote.bind(this)}],
             ['commandExec',                  {async: false, contentScript: true,  handler: this._onApiCommandExec.bind(this)}],
-            ['getExpressionAudioInfoList',   {async: true,  contentScript: true,  handler: this._onApiGetExpressionAudioInfoList.bind(this)}],
+            ['getTermAudioInfoList',         {async: true,  contentScript: true,  handler: this._onApiGetTermAudioInfoList.bind(this)}],
             ['sendMessageToFrame',           {async: false, contentScript: true,  handler: this._onApiSendMessageToFrame.bind(this)}],
             ['broadcastTab',                 {async: false, contentScript: true,  handler: this._onApiBroadcastTab.bind(this)}],
             ['frameInformationGet',          {async: true,  contentScript: true,  handler: this._onApiFrameInformationGet.bind(this)}],
@@ -405,9 +405,9 @@ class Backend {
         const options = this._getProfileOptions(optionsContext);
         const {general: {maxResults}} = options;
         const findKanjiOptions = this._getTranslatorFindKanjiOptions(options);
-        const definitions = await this._translator.findKanji(text, findKanjiOptions);
-        definitions.splice(maxResults);
-        return definitions;
+        const dictionaryEntries = await this._translator.findKanji(text, findKanjiOptions);
+        dictionaryEntries.splice(maxResults);
+        return dictionaryEntries;
     }
 
     async _onApiTermsFind({text, details, optionsContext}) {
@@ -416,7 +416,7 @@ class Backend {
         const findTermsOptions = this._getTranslatorFindTermsOptions(details, options);
         const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
         dictionaryEntries.splice(maxResults);
-        return {length: originalTextLength, definitions: dictionaryEntries};
+        return {dictionaryEntries, originalTextLength};
     }
 
     async _onApiTextParse({text, optionsContext}) {
@@ -518,8 +518,8 @@ class Backend {
         return this._runCommand(command, params);
     }
 
-    async _onApiGetExpressionAudioInfoList({source, expression, reading, details}) {
-        return await this._audioDownloader.getExpressionAudioInfoList(source, expression, reading, details);
+    async _onApiGetTermAudioInfoList({source, term, reading, details}) {
+        return await this._audioDownloader.getTermAudioInfoList(source, term, reading, details);
     }
 
     _onApiSendMessageToFrame({frameId: targetFrameId, action, params}, sender) {
@@ -1100,17 +1100,17 @@ class Backend {
         for (const {name, lines} of parseTextResults) {
             const result = [];
             for (const line of lines) {
-                for (const {expression, reading, source} of line) {
-                    const term = [];
+                for (const {term, reading, source} of line) {
+                    const termParts = [];
                     for (const {text: text2, furigana} of jp.distributeFuriganaInflected(
-                        expression.length > 0 ? expression : source,
+                        term.length > 0 ? term : source,
                         jp.convertKatakanaToHiragana(reading),
                         source
                     )) {
                         const reading2 = jp.convertReading(text2, furigana, readingMode);
-                        term.push({text: text2, reading: reading2});
+                        termParts.push({text: text2, reading: reading2});
                     }
-                    result.push(term);
+                    result.push(termParts);
                 }
                 result.push([{text: '\n', reading: ''}]);
             }
@@ -1742,7 +1742,7 @@ class Backend {
         let data;
         let contentType;
         try {
-            ({data, contentType} = await this._audioDownloader.downloadExpressionAudio(
+            ({data, contentType} = await this._audioDownloader.downloadTermAudio(
                 sources,
                 preferredAudioIndex,
                 term,

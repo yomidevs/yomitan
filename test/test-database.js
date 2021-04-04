@@ -41,12 +41,12 @@ function createTestDictionaryArchive(dictionary, dictionaryName) {
 }
 
 
-function countTermsWithExpression(terms, expression) {
-    return terms.reduce((i, v) => (i + (v.expression === expression ? 1 : 0)), 0);
+function countDictionaryDatabaseEntriesWithTerm(dictionaryDatabaseEntries, term) {
+    return dictionaryDatabaseEntries.reduce((i, v) => (i + (v.term === term ? 1 : 0)), 0);
 }
 
-function countTermsWithReading(terms, reading) {
-    return terms.reduce((i, v) => (i + (v.reading === reading ? 1 : 0)), 0);
+function countDictionaryDatabaseEntriesWithReading(dictionaryDatabaseEntries, reading) {
+    return dictionaryDatabaseEntries.reduce((i, v) => (i + (v.reading === reading ? 1 : 0)), 0);
 }
 
 function countMetasWithMode(metas, mode) {
@@ -212,7 +212,7 @@ async function testFindTermsBulkTest1(database, titles) {
             ],
             expectedResults: {
                 total: 32,
-                expressions: [
+                terms: [
                     ['打', 2],
                     ['打つ', 17],
                     ['打ち込む', 13]
@@ -236,7 +236,7 @@ async function testFindTermsBulkTest1(database, titles) {
             ],
             expectedResults: {
                 total: 0,
-                expressions: [],
+                terms: [],
                 readings: []
             }
         },
@@ -249,7 +249,7 @@ async function testFindTermsBulkTest1(database, titles) {
             ],
             expectedResults: {
                 total: 13,
-                expressions: [
+                terms: [
                     ['打ち込む', 13]
                 ],
                 readings: [
@@ -267,7 +267,7 @@ async function testFindTermsBulkTest1(database, titles) {
             ],
             expectedResults: {
                 total: 0,
-                expressions: [],
+                terms: [],
                 readings: []
             }
         }
@@ -277,11 +277,11 @@ async function testFindTermsBulkTest1(database, titles) {
         for (const {termList, wildcard} of inputs) {
             const results = await database.findTermsBulk(termList, titles, wildcard);
             assert.strictEqual(results.length, expectedResults.total);
-            for (const [expression, count] of expectedResults.expressions) {
-                assert.strictEqual(countTermsWithExpression(results, expression), count);
+            for (const [term, count] of expectedResults.terms) {
+                assert.strictEqual(countDictionaryDatabaseEntriesWithTerm(results, term), count);
             }
             for (const [reading, count] of expectedResults.readings) {
-                assert.strictEqual(countTermsWithReading(results, reading), count);
+                assert.strictEqual(countDictionaryDatabaseEntriesWithReading(results, reading), count);
             }
         }
     }
@@ -293,15 +293,15 @@ async function testTindTermsExactBulk1(database, titles) {
             inputs: [
                 {
                     termList: [
-                        {expression: '打', reading: 'だ'},
-                        {expression: '打つ', reading: 'うつ'},
-                        {expression: '打ち込む', reading: 'うちこむ'}
+                        {term: '打', reading: 'だ'},
+                        {term: '打つ', reading: 'うつ'},
+                        {term: '打ち込む', reading: 'うちこむ'}
                     ]
                 }
             ],
             expectedResults: {
                 total: 25,
-                expressions: [
+                terms: [
                     ['打', 1],
                     ['打つ', 15],
                     ['打ち込む', 9]
@@ -317,15 +317,15 @@ async function testTindTermsExactBulk1(database, titles) {
             inputs: [
                 {
                     termList: [
-                        {expression: '打', reading: 'だ?'},
-                        {expression: '打つ', reading: 'うつ?'},
-                        {expression: '打ち込む', reading: 'うちこむ?'}
+                        {term: '打', reading: 'だ?'},
+                        {term: '打つ', reading: 'うつ?'},
+                        {term: '打ち込む', reading: 'うちこむ?'}
                     ]
                 }
             ],
             expectedResults: {
                 total: 0,
-                expressions: [],
+                terms: [],
                 readings: []
             }
         },
@@ -333,14 +333,14 @@ async function testTindTermsExactBulk1(database, titles) {
             inputs: [
                 {
                     termList: [
-                        {expression: '打つ', reading: 'うつ'},
-                        {expression: '打つ', reading: 'ぶつ'}
+                        {term: '打つ', reading: 'うつ'},
+                        {term: '打つ', reading: 'ぶつ'}
                     ]
                 }
             ],
             expectedResults: {
                 total: 17,
-                expressions: [
+                terms: [
                     ['打つ', 17]
                 ],
                 readings: [
@@ -353,13 +353,13 @@ async function testTindTermsExactBulk1(database, titles) {
             inputs: [
                 {
                     termList: [
-                        {expression: '打つ', reading: 'うちこむ'}
+                        {term: '打つ', reading: 'うちこむ'}
                     ]
                 }
             ],
             expectedResults: {
                 total: 0,
-                expressions: [],
+                terms: [],
                 readings: []
             }
         },
@@ -371,7 +371,7 @@ async function testTindTermsExactBulk1(database, titles) {
             ],
             expectedResults: {
                 total: 0,
-                expressions: [],
+                terms: [],
                 readings: []
             }
         }
@@ -381,11 +381,11 @@ async function testTindTermsExactBulk1(database, titles) {
         for (const {termList} of inputs) {
             const results = await database.findTermsExactBulk(termList, titles);
             assert.strictEqual(results.length, expectedResults.total);
-            for (const [expression, count] of expectedResults.expressions) {
-                assert.strictEqual(countTermsWithExpression(results, expression), count);
+            for (const [term, count] of expectedResults.terms) {
+                assert.strictEqual(countDictionaryDatabaseEntriesWithTerm(results, term), count);
             }
             for (const [reading, count] of expectedResults.readings) {
-                assert.strictEqual(countTermsWithReading(results, reading), count);
+                assert.strictEqual(countDictionaryDatabaseEntriesWithReading(results, reading), count);
             }
         }
     }
@@ -401,7 +401,7 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
             ],
             expectedResults: {
                 total: 33,
-                expressions: [
+                terms: [
                     ['打', 2],
                     ['打つ', 17],
                     ['打ち込む', 13],
@@ -426,7 +426,7 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
             ],
             expectedResults: {
                 total: 1,
-                expressions: [
+                terms: [
                     ['打', 1]
                 ],
                 readings: [
@@ -442,7 +442,7 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
             ],
             expectedResults: {
                 total: 1,
-                expressions: [
+                terms: [
                     ['打', 1]
                 ],
                 readings: [
@@ -458,7 +458,7 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
             ],
             expectedResults: {
                 total: 17,
-                expressions: [
+                terms: [
                     ['打つ', 17]
                 ],
                 readings: [
@@ -475,7 +475,7 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
             ],
             expectedResults: {
                 total: 13,
-                expressions: [
+                terms: [
                     ['打ち込む', 13]
                 ],
                 readings: [
@@ -492,7 +492,7 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
             ],
             expectedResults: {
                 total: 1,
-                expressions: [
+                terms: [
                     ['画像', 1]
                 ],
                 readings: [
@@ -508,7 +508,7 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
             ],
             expectedResults: {
                 total: 0,
-                expressions: [],
+                terms: [],
                 readings: []
             }
         },
@@ -520,7 +520,7 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
             ],
             expectedResults: {
                 total: 0,
-                expressions: [],
+                terms: [],
                 readings: []
             }
         }
@@ -530,11 +530,11 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
         for (const {sequenceList} of inputs) {
             const results = await database.findTermsBySequenceBulk(sequenceList.map((query) => ({query, dictionary: mainDictionary})));
             assert.strictEqual(results.length, expectedResults.total);
-            for (const [expression, count] of expectedResults.expressions) {
-                assert.strictEqual(countTermsWithExpression(results, expression), count);
+            for (const [term, count] of expectedResults.terms) {
+                assert.strictEqual(countDictionaryDatabaseEntriesWithTerm(results, term), count);
             }
             for (const [reading, count] of expectedResults.readings) {
-                assert.strictEqual(countTermsWithReading(results, reading), count);
+                assert.strictEqual(countDictionaryDatabaseEntriesWithReading(results, reading), count);
             }
         }
     }
@@ -781,7 +781,7 @@ async function testDatabase2() {
     // Error: not prepared
     await assert.rejects(async () => await dictionaryDatabase.deleteDictionary(title, {rate: 1000}, () => {}));
     await assert.rejects(async () => await dictionaryDatabase.findTermsBulk(['?'], titles, null));
-    await assert.rejects(async () => await dictionaryDatabase.findTermsExactBulk([{expression: '?', reading: '?'}], titles));
+    await assert.rejects(async () => await dictionaryDatabase.findTermsExactBulk([{term: '?', reading: '?'}], titles));
     await assert.rejects(async () => await dictionaryDatabase.findTermsBySequenceBulk([{query: 1, dictionary: title}]));
     await assert.rejects(async () => await dictionaryDatabase.findTermMetaBulk(['?'], titles));
     await assert.rejects(async () => await dictionaryDatabase.findTermMetaBulk(['?'], titles));

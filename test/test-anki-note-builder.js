@@ -171,7 +171,7 @@ async function getRenderResults(dictionaryEntries, type, mode, template, AnkiNot
         };
         const errors = [];
         const noteFields = (await ankiNoteBuilder.createNote({
-            definition: dictionaryEntry,
+            dictionaryEntry,
             mode: null,
             context,
             template,

@@ -38,7 +38,7 @@ class AnkiNoteDataCreator {
      * @returns An object used for rendering Anki templates.
      */
     create(marker, {
-        definition: dictionaryEntry,
+        dictionaryEntry,
         resultOutputMode,
         mode,
         glossaryLayoutMode,
