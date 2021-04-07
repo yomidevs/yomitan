@@ -22,13 +22,17 @@
  * focus a dummy element inside the main content, which gives keyboard scroll focus to that element.
  */
 class DocumentFocusController {
-    constructor() {
+    constructor(autofocusElementSelector=null) {
+        this._autofocusElement = (autofocusElementSelector !== null ? document.querySelector(autofocusElementSelector) : null);
         this._contentScrollFocusElement = document.querySelector('#content-scroll-focus');
     }
 
     prepare() {
         window.addEventListener('focus', this._onWindowFocus.bind(this), false);
         this._updateFocusedElement(false);
+        if (this._autofocusElement !== null && document.activeElement !== this._autofocusElement) {
+            this._autofocusElement.focus({preventScroll: true});
+        }
     }
 
     blurElement(element) {
