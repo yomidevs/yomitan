@@ -26,7 +26,7 @@
 
 (async () => {
     try {
-        const documentFocusController = new DocumentFocusController();
+        const documentFocusController = new DocumentFocusController('#search-textbox');
         documentFocusController.prepare();
 
         await yomichan.prepare();
