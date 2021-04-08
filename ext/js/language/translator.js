@@ -148,13 +148,13 @@ class Translator {
         this._sortDatabaseEntriesByIndex(databaseEntries);
 
         const dictionaryEntries = [];
-        for (const {character, onyomi, kunyomi, tags, glossary, stats, dictionary} of databaseEntries) {
+        for (const {character, onyomi, kunyomi, tags, definitions, stats, dictionary} of databaseEntries) {
             const expandedStats = await this._expandKanjiStats(stats, dictionary);
 
             const tagGroups = [];
             if (tags.length > 0) { tagGroups.push(this._createTagGroup(dictionary, tags)); }
 
-            const dictionaryEntry = this._createKanjiDictionaryEntry(character, dictionary, onyomi, kunyomi, tagGroups, expandedStats, glossary);
+            const dictionaryEntry = this._createKanjiDictionaryEntry(character, dictionary, onyomi, kunyomi, tagGroups, expandedStats, definitions);
             dictionaryEntries.push(dictionaryEntry);
         }
 
@@ -960,7 +960,7 @@ class Translator {
     }
 
     _createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, isPrimary, enabledDictionaryMap) {
-        const {term, reading: rawReading, definitionTags, termTags, glossary, score, dictionary, id, sequence, rules} = databaseEntry;
+        const {term, reading: rawReading, definitionTags, termTags, definitions, score, dictionary, id, sequence, rules} = databaseEntry;
         const reading = (rawReading.length > 0 ? rawReading : term);
         const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const sourceTermExactMatchCount = (isPrimary && deinflectedText === term ? 1 : 0);
@@ -984,7 +984,7 @@ class Translator {
             sourceTermExactMatchCount,
             maxTransformedTextLength,
             [this._createTermHeadword(0, term, reading, [source], headwordTagGroups, rules)],
-            [this._createTermDefinition(0, [0], dictionary, definitionTagGroups, glossary)]
+            [this._createTermDefinition(0, [0], dictionary, definitionTagGroups, definitions)]
         );
     }
 

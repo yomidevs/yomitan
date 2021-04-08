@@ -53,12 +53,12 @@ class DisplayGenerator {
     createTermEntry(dictionaryEntry) {
         const node = this._templates.instantiate('term-entry');
 
-        const headwordsContainer = node.querySelector('.expression-list');
+        const headwordsContainer = node.querySelector('.headword-list');
         const inflectionsContainer = node.querySelector('.inflection-list');
         const pitchesContainer = node.querySelector('.pitch-accent-group-list');
         const frequencyGroupListContainer = node.querySelector('.frequency-group-list');
         const definitionsContainer = node.querySelector('.definition-list');
-        const termTagsContainer = node.querySelector('.expression-list-tag-list');
+        const headwordTagsContainer = node.querySelector('.headword-list-tag-list');
 
         const {headwords, type, inflections, definitions, frequencies, pronunciations} = dictionaryEntry;
         const pitches = DictionaryDataUtil.getPitchAccentInfos(dictionaryEntry);
@@ -74,11 +74,11 @@ class DisplayGenerator {
         }
 
         node.dataset.format = type;
-        node.dataset.expressionCount = `${headwords.length}`;
+        node.dataset.headwordCount = `${headwords.length}`;
         node.dataset.definitionCount = `${definitions.length}`;
         node.dataset.pitchAccentDictionaryCount = `${pitches.length}`;
         node.dataset.pitchAccentCount = `${pitchCount}`;
-        node.dataset.uniqueExpressionCount = `${uniqueTerms.size}`;
+        node.dataset.uniqueTermCount = `${uniqueTerms.size}`;
         node.dataset.uniqueReadingCount = `${uniqueReadings.size}`;
         node.dataset.frequencyCount = `${frequencies.length}`;
         node.dataset.groupedFrequencyCount = `${groupedFrequencies.length}`;
@@ -93,14 +93,14 @@ class DisplayGenerator {
         this._appendMultiple(inflectionsContainer, this._createTermInflection.bind(this), inflections);
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(pitchesContainer, this._createPitches.bind(this), pitches);
-        this._appendMultiple(termTagsContainer, this._createTermTag.bind(this), termTags, headwords.length);
+        this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length);
 
         for (const term of uniqueTerms) {
-            termTagsContainer.appendChild(this._createSearchTag(term));
+            headwordTagsContainer.appendChild(this._createSearchTag(term));
         }
         for (const reading of uniqueReadings) {
             if (uniqueTerms.has(reading)) { continue; }
-            termTagsContainer.appendChild(this._createSearchTag(reading));
+            headwordTagsContainer.appendChild(this._createSearchTag(reading));
         }
 
         // Add definitions
@@ -132,7 +132,7 @@ class DisplayGenerator {
         const glyphContainer = node.querySelector('.kanji-glyph');
         const frequencyGroupListContainer = node.querySelector('.frequency-group-list');
         const tagContainer = node.querySelector('.kanji-tag-list');
-        const definitionsContainer = node.querySelector('.kanji-glossary-list');
+        const definitionsContainer = node.querySelector('.kanji-gloss-list');
         const chineseReadingsContainer = node.querySelector('.kanji-readings-chinese');
         const japaneseReadingsContainer = node.querySelector('.kanji-readings-japanese');
         const statisticsContainer = node.querySelector('.kanji-statistics');
@@ -188,7 +188,7 @@ class DisplayGenerator {
 
             if (disambiguationHeadwords.length > 0 && disambiguationHeadwords.length < headwords.length) {
                 const disambiguationContainer = node.querySelector('.tag-details-disambiguation-list');
-                const copyAttributes = ['totalExpressionCount', 'matchedExpressionCount', 'unmatchedExpressionCount'];
+                const copyAttributes = ['totalHeadwordCount', 'matchedHeadwordCount', 'unmatchedHeadwordCount'];
                 for (const attribute of copyAttributes) {
                     const value = tagNode.dataset[attribute];
                     if (typeof value === 'undefined') { continue; }
@@ -242,10 +242,10 @@ class DisplayGenerator {
         if (term) { searchQueries.push(term); }
         if (reading) { searchQueries.push(reading); }
 
-        const node = this._templates.instantiate('expression');
+        const node = this._templates.instantiate('headword');
 
-        const termContainer = node.querySelector('.expression-text');
-        const tagContainer = node.querySelector('.expression-tag-list');
+        const termContainer = node.querySelector('.headword-term');
+        const tagContainer = node.querySelector('.headword-tag-list');
 
         node.dataset.readingIsSame = `${reading === term}`;
         node.dataset.frequency = DictionaryDataUtil.getTermFrequency(tags);
@@ -259,7 +259,7 @@ class DisplayGenerator {
             node.dataset.wordClasses = wordClasses.join(' ');
         }
 
-        this._setTextContent(node.querySelector('.expression-reading'), reading);
+        this._setTextContent(node.querySelector('.headword-reading'), reading);
 
         this._appendFurigana(termContainer, term, reading, this._appendKanjiLinks.bind(this));
         this._appendMultiple(tagContainer, this._createTag.bind(this), tags);
@@ -284,7 +284,7 @@ class DisplayGenerator {
 
         const tagListContainer = node.querySelector('.definition-tag-list');
         const onlyListContainer = node.querySelector('.definition-disambiguation-list');
-        const entriesContainer = node.querySelector('.glossary-list');
+        const entriesContainer = node.querySelector('.gloss-list');
 
         node.dataset.dictionary = dictionary;
 
@@ -309,8 +309,8 @@ class DisplayGenerator {
     }
 
     _createTermDefinitionEntryText(text) {
-        const node = this._templates.instantiate('glossary-item');
-        const container = node.querySelector('.glossary');
+        const node = this._templates.instantiate('gloss-item');
+        const container = node.querySelector('.gloss-content');
         this._setMultilineTextContent(container, text);
         return node;
     }
@@ -330,22 +330,22 @@ class DisplayGenerator {
             width / height
         );
 
-        const node = this._templates.instantiate('glossary-item-image');
+        const node = this._templates.instantiate('gloss-item-image');
         node.dataset.path = path;
         node.dataset.dictionary = dictionary;
         node.dataset.imageLoadState = 'not-loaded';
 
-        const imageContainer = node.querySelector('.glossary-image-container');
+        const imageContainer = node.querySelector('.gloss-image-container');
         imageContainer.style.width = `${usedWidth}em`;
         if (typeof title === 'string') {
             imageContainer.title = title;
         }
 
-        const aspectRatioSizer = node.querySelector('.glossary-image-aspect-ratio-sizer');
+        const aspectRatioSizer = node.querySelector('.gloss-image-aspect-ratio-sizer');
         aspectRatioSizer.style.paddingTop = `${aspectRatio * 100.0}%`;
 
-        const image = node.querySelector('img.glossary-image');
-        const imageLink = node.querySelector('.glossary-image-link');
+        const image = node.querySelector('img.gloss-image');
+        const imageLink = node.querySelector('.gloss-image-link');
         image.dataset.pixelated = `${pixelated === true}`;
 
         if (this._mediaLoader !== null) {
@@ -358,7 +358,7 @@ class DisplayGenerator {
         }
 
         if (typeof description === 'string') {
-            const container = node.querySelector('.glossary-image-description');
+            const container = node.querySelector('.gloss-image-description');
             this._setMultilineTextContent(container, description);
         }
 
@@ -386,14 +386,14 @@ class DisplayGenerator {
 
     _createKanjiLink(character) {
         const node = document.createElement('a');
-        node.className = 'expression-kanji-link';
+        node.className = 'headword-kanji-link';
         this._setTextContent(node, character, 'ja');
         return node;
     }
 
     _createKanjiDefinition(text) {
-        const node = this._templates.instantiate('kanji-glossary-item');
-        const container = node.querySelector('.kanji-glossary');
+        const node = this._templates.instantiate('kanji-gloss-item');
+        const container = node.querySelector('.kanji-gloss-content');
         this._setMultilineTextContent(container, text);
         return node;
     }
@@ -452,9 +452,9 @@ class DisplayGenerator {
         const {tag, headwordIndices} = tagInfo;
         const node = this._createTag(tag);
         node.dataset.headwords = headwordIndices.join(' ');
-        node.dataset.totalExpressionCount = `${totalHeadwordCount}`;
-        node.dataset.matchedExpressionCount = `${headwordIndices.length}`;
-        node.dataset.unmatchedExpressionCount = `${Math.max(0, totalHeadwordCount - headwordIndices.length)}`;
+        node.dataset.totalHeadwordCount = `${totalHeadwordCount}`;
+        node.dataset.matchedHeadwordCount = `${headwordIndices.length}`;
+        node.dataset.unmatchedHeadwordCount = `${Math.max(0, totalHeadwordCount - headwordIndices.length)}`;
         return node;
     }
 
@@ -549,7 +549,7 @@ class DisplayGenerator {
         const templateName = 'pitch-accent-disambiguation';
         for (const term of exclusiveTerms) {
             const node = this._templates.instantiate(templateName);
-            node.dataset.type = 'expression';
+            node.dataset.type = 'term';
             this._setTextContent(node, term, 'ja');
             container.appendChild(node);
         }
@@ -562,7 +562,7 @@ class DisplayGenerator {
         }
 
         container.dataset.count = `${exclusiveTerms.length + exclusiveReadings.length}`;
-        container.dataset.expressionCount = `${exclusiveTerms.length}`;
+        container.dataset.termCount = `${exclusiveTerms.length}`;
         container.dataset.readingCount = `${exclusiveReadings.length}`;
     }
 
@@ -639,11 +639,11 @@ class DisplayGenerator {
 
         const frequency = values.join(', ');
 
-        this._setTextContent(node.querySelector('.frequency-disambiguation-expression'), term, 'ja');
+        this._setTextContent(node.querySelector('.frequency-disambiguation-term'), term, 'ja');
         this._setTextContent(node.querySelector('.frequency-disambiguation-reading'), (reading !== null ? reading : ''), 'ja');
         this._setTextContent(node.querySelector('.frequency-value'), frequency, 'ja');
 
-        node.dataset.expression = term;
+        node.dataset.term = term;
         node.dataset.reading = reading;
         node.dataset.hasReading = `${reading !== null}`;
         node.dataset.readingIsSame = `${reading === term}`;

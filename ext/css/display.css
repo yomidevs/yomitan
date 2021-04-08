@@ -25,7 +25,7 @@
     --disambiguation-separator: ', ';
     --disambiguation-reading-separator: ':';
 
-    --expression-separator: '\3001';
+    --headword-separator: '\3001';
 
     --inflection-separator: '\00AB';
 
@@ -37,13 +37,13 @@
     --h2-font-size-no-units: 1.25;
     --h2-font-size: calc(1em * var(--h2-font-size-no-units));
 
-    --expression-font-size-no-units: 2;
-    --expression-font-size: calc(1em * var(--expression-font-size-no-units));
-    --expression-reading-font-size-no-units: 0.75;
-    --expression-reading-font-size: calc(var(--expression-reading-font-size-no-units) * var(--expression-font-size));
-    --expression-reading-space: 0.5em;
-    --expression-list-end-space: 0.5em;
-    --expression-thin-border-size: calc(1em / (var(--expression-font-size-no-units) * var(--font-size-no-units)));
+    --headword-font-size-no-units: 2;
+    --headword-font-size: calc(1em * var(--headword-font-size-no-units));
+    --headword-reading-font-size-no-units: 0.75;
+    --headword-reading-font-size: calc(var(--headword-reading-font-size-no-units) * var(--headword-font-size));
+    --headword-reading-space: 0.5em;
+    --headword-list-end-space: 0.5em;
+    --headword-thin-border-size: calc(1em / (var(--headword-font-size-no-units) * var(--font-size-no-units)));
 
     --line-height-no-units: 20;
     --line-height: calc(var(--line-height-no-units) / var(--font-size-no-units));
@@ -106,27 +106,27 @@
 
     /* Colors */
     --background-color: #ffffff;
-    --glossary-image-background-color: #eeeeee;
+    --gloss-image-background-color: #eeeeee;
     --link-color: var(--accent-color);
 
     --text-color: #000000;
     --reason-text-color: var(--text-color-light3);
 
-    --expression-text-color: var(--text-color);
-    --expression-text-color-popular: var(--accent-color);
-    --expression-text-color-rare: var(--text-color-light4);
-    --expression-furigana-text-color: var(--expression-text-color);
-    --expression-furigana-text-color-popular: var(--expression-text-color-popular);
-    --expression-furigana-text-color-rare: var(--expression-text-color-rare);
-    --expression-reading-text-color: var(--expression-furigana-text-color);
-    --expression-reading-text-color-popular: var(--expression-furigana-text-color-popular);
-    --expression-reading-text-color-rare: var(--expression-furigana-text-color-rare);
-    --expression-kanji-text-color: var(--expression-text-color);
-    --expression-kanji-text-color-popular: var(--expression-text-color-popular);
-    --expression-kanji-text-color-rare: var(--expression-text-color-rare);
-    --expression-kanji-border-color: var(--dark-border-color);
-    --expression-kanji-border-color-popular: var(--expression-kanji-border-color);
-    --expression-kanji-border-color-rare: var(--expression-kanji-border-color);
+    --headword-text-color: var(--text-color);
+    --headword-text-color-popular: var(--accent-color);
+    --headword-text-color-rare: var(--text-color-light4);
+    --headword-furigana-text-color: var(--headword-text-color);
+    --headword-furigana-text-color-popular: var(--headword-text-color-popular);
+    --headword-furigana-text-color-rare: var(--headword-text-color-rare);
+    --headword-reading-text-color: var(--headword-furigana-text-color);
+    --headword-reading-text-color-popular: var(--headword-furigana-text-color-popular);
+    --headword-reading-text-color-rare: var(--headword-furigana-text-color-rare);
+    --headword-kanji-text-color: var(--headword-text-color);
+    --headword-kanji-text-color-popular: var(--headword-text-color-popular);
+    --headword-kanji-text-color-rare: var(--headword-text-color-rare);
+    --headword-kanji-border-color: var(--dark-border-color);
+    --headword-kanji-border-color-popular: var(--headword-kanji-border-color);
+    --headword-kanji-border-color-rare: var(--headword-kanji-border-color);
 
     --light-border-color: #eeeeee;
     --medium-border-color: #dddddd;
@@ -181,22 +181,22 @@
 :root[data-theme=dark] {
     /* Colors */
     --background-color: #1e1e1e;
-    --glossary-image-background-color: #2f2f2f;
+    --gloss-image-background-color: #2f2f2f;
     --link-color: var(--accent-color);
 
     --text-color: #d4d4d4;
     --reason-text-color: var(--text-color-light3);
 
-    --expression-text-color: var(--text-color);
-    --expression-text-color-popular: var(--accent-color);
-    --expression-text-color-rare: var(--text-color-light4);
-    --expression-furigana-text-color: var(--expression-text-color);
-    --expression-furigana-text-color-popular: var(--expression-text-color-popular);
-    --expression-furigana-text-color-rare: var(--expression-text-color-rare);
-    --expression-reading-text-color: var(--expression-furigana-text-color);
-    --expression-reading-text-color-popular: var(--expression-furigana-text-color-popular);
-    --expression-reading-text-color-rare: var(--expression-furigana-text-color-rare);
-    --expression-kanji-border-color: var(--dark-border-color);
+    --headword-text-color: var(--text-color);
+    --headword-text-color-popular: var(--accent-color);
+    --headword-text-color-rare: var(--text-color-light4);
+    --headword-furigana-text-color: var(--headword-text-color);
+    --headword-furigana-text-color-popular: var(--headword-text-color-popular);
+    --headword-furigana-text-color-rare: var(--headword-text-color-rare);
+    --headword-reading-text-color: var(--headword-furigana-text-color);
+    --headword-reading-text-color-popular: var(--headword-furigana-text-color-popular);
+    --headword-reading-text-color-rare: var(--headword-furigana-text-color-rare);
+    --headword-kanji-border-color: var(--dark-border-color);
 
     --light-border-color: #2f2f2f;
     --medium-border-color: #3f3f3f;
@@ -589,7 +589,7 @@ button.sidebar-button.sidebar-button-highlight {
     padding-left: var(--entry-horizontal-padding);
     padding-right: var(--entry-horizontal-padding);
     padding-bottom: 0.25em;
-    border-bottom: var(--expression-thin-border-size) solid var(--light-border-color);
+    border-bottom: var(--headword-thin-border-size) solid var(--light-border-color);
 }
 #query-parser-content {
     margin-top: 0.5em;
@@ -839,105 +839,105 @@ button.action-button[data-icon=source-term]::before {
 }
 
 
-/* Expressions */
-.expression-list {
+/* Headwords */
+.headword-list {
     display: inline;
-    margin-right: var(--expression-list-end-space);
+    margin-right: var(--headword-list-end-space);
 }
-.expression {
-    --expression-current-text-color: var(--expression-text-color);
-    --expression-current-reading-text-color: var(--expression-reading-text-color);
-    --expression-current-furigana-text-color: var(--expression-furigana-text-color);
-    --expression-current-kanji-text-color: var(--expression-kanji-text-color);
-    --expression-current-kanji-border-color: var(--expression-kanji-border-color);
+.headword {
+    --headword-current-text-color: var(--headword-text-color);
+    --headword-current-reading-text-color: var(--headword-reading-text-color);
+    --headword-current-furigana-text-color: var(--headword-furigana-text-color);
+    --headword-current-kanji-text-color: var(--headword-kanji-text-color);
+    --headword-current-kanji-border-color: var(--headword-kanji-border-color);
 
     display: inline-block;
 }
-:root[data-result-output-mode=merge] .expression[data-frequency=popular] {
-    --expression-current-text-color: var(--expression-text-color-popular);
-    --expression-current-reading-text-color: var(--expression-reading-text-color-popular);
-    --expression-current-furigana-text-color: var(--expression-furigana-text-color-popular);
-    --expression-current-kanji-text-color: var(--expression-kanji-text-color-popular);
-    --expression-current-kanji-border-color: var(--expression-kanji-border-color-popular);
+:root[data-result-output-mode=merge] .headword[data-frequency=popular] {
+    --headword-current-text-color: var(--headword-text-color-popular);
+    --headword-current-reading-text-color: var(--headword-reading-text-color-popular);
+    --headword-current-furigana-text-color: var(--headword-furigana-text-color-popular);
+    --headword-current-kanji-text-color: var(--headword-kanji-text-color-popular);
+    --headword-current-kanji-border-color: var(--headword-kanji-border-color-popular);
 }
-:root[data-result-output-mode=merge] .expression[data-frequency=rare] {
-    --expression-current-text-color: var(--expression-text-color-rare);
-    --expression-current-reading-text-color: var(--expression-reading-text-color-rare);
-    --expression-current-furigana-text-color: var(--expression-furigana-text-color-rare);
-    --expression-current-kanji-text-color: var(--expression-kanji-text-color-rare);
-    --expression-current-kanji-border-color: var(--expression-kanji-border-color-rare);
+:root[data-result-output-mode=merge] .headword[data-frequency=rare] {
+    --headword-current-text-color: var(--headword-text-color-rare);
+    --headword-current-reading-text-color: var(--headword-reading-text-color-rare);
+    --headword-current-furigana-text-color: var(--headword-furigana-text-color-rare);
+    --headword-current-kanji-text-color: var(--headword-kanji-text-color-rare);
+    --headword-current-kanji-border-color: var(--headword-kanji-border-color-rare);
 }
-.expression-details {
+.headword-details {
     display: inline;
 }
-.expression-tag-list {
+.headword-tag-list {
     display: none;
 }
-.expression-list-details {
+.headword-list-details {
     display: inline;
 }
-.expression-list-tag-list {
+.headword-list-tag-list {
     display: inline;
 }
-.expression-text-container {
+.headword-text-container {
     display: inline-block;
-    margin-left: calc(-1 * var(--expression-reading-space));
+    margin-left: calc(-1 * var(--headword-reading-space));
 }
-.expression-text-outer {
+.headword-term-outer {
     display: inline-block;
     position: relative;
-    margin-left: var(--expression-reading-space);
+    margin-left: var(--headword-reading-space);
 }
-.expression-reading-outer {
+.headword-reading-outer {
     display: none;
     position: relative;
-    margin-left: var(--expression-reading-space);
+    margin-left: var(--headword-reading-space);
 }
-.expression-text {
-    color: var(--expression-current-text-color);
-    font-size: var(--expression-font-size);
+.headword-term {
+    color: var(--headword-current-text-color);
+    font-size: var(--headword-font-size);
 }
-.expression-reading {
-    color: var(--expression-current-reading-text-color);
-    font-size: var(--expression-reading-font-size);
+.headword-reading {
+    color: var(--headword-current-reading-text-color);
+    font-size: var(--headword-reading-font-size);
 }
-.expression-list>.expression:not(:last-of-type)>.expression-text-container>.expression-text-outer::after {
-    content: var(--expression-separator);
-    font-size: var(--expression-font-size);
+.headword-list>.headword:not(:last-of-type)>.headword-text-container>.headword-term-outer::after {
+    content: var(--headword-separator);
+    font-size: var(--headword-font-size);
 }
-.expression-list>.expression:not(:last-of-type)>.expression-text-container>.expression-reading-outer::after {
-    content: var(--expression-separator);
-    font-size: var(--expression-reading-font-size);
+.headword-list>.headword:not(:last-of-type)>.headword-text-container>.headword-reading-outer::after {
+    content: var(--headword-separator);
+    font-size: var(--headword-reading-font-size);
 }
-.expression-text>ruby>rt {
-    color: var(--expression-current-furigana-text-color);
+.headword-term>ruby>rt {
+    color: var(--headword-current-furigana-text-color);
 }
-.expression-kanji-link {
-    border-bottom: var(--expression-thin-border-size) dashed var(--expression-current-kanji-border-color);
-    color: var(--expression-current-kanji-text-color);
+.headword-kanji-link {
+    border-bottom: var(--headword-thin-border-size) dashed var(--headword-current-kanji-border-color);
+    color: var(--headword-current-kanji-text-color);
     text-decoration: none;
     cursor: pointer;
 }
-:root[data-result-output-mode=merge] .expression-list-details {
+:root[data-result-output-mode=merge] .headword-list-details {
     display: block;
 }
-:root[data-term-display-mode=ruby-and-reading] .expression-text-outer::after,
-:root[data-term-display-mode=term-and-reading] .expression-text-outer::after {
+:root[data-term-display-mode=ruby-and-reading] .headword-term-outer::after,
+:root[data-term-display-mode=term-and-reading] .headword-term-outer::after {
     display: none;
 }
-:root[data-term-display-mode=ruby-and-reading] .expression-reading-outer,
-:root[data-term-display-mode=term-and-reading] .expression-reading-outer {
+:root[data-term-display-mode=ruby-and-reading] .headword-reading-outer,
+:root[data-term-display-mode=term-and-reading] .headword-reading-outer {
     display: inline-block;
 }
-:root[data-term-display-mode=ruby-and-reading] .expression[data-reading-is-same=true] .expression-text-outer::after,
-:root[data-term-display-mode=term-and-reading] .expression[data-reading-is-same=true] .expression-text-outer::after {
+:root[data-term-display-mode=ruby-and-reading] .headword[data-reading-is-same=true] .headword-term-outer::after,
+:root[data-term-display-mode=term-and-reading] .headword[data-reading-is-same=true] .headword-term-outer::after {
     display: inline-block;
 }
-:root[data-term-display-mode=ruby-and-reading] .expression[data-reading-is-same=true] .expression-reading-outer,
-:root[data-term-display-mode=term-and-reading] .expression[data-reading-is-same=true] .expression-reading-outer {
+:root[data-term-display-mode=ruby-and-reading] .headword[data-reading-is-same=true] .headword-reading-outer,
+:root[data-term-display-mode=term-and-reading] .headword[data-reading-is-same=true] .headword-reading-outer {
     display: none;
 }
-:root[data-term-display-mode=term-and-reading] .expression-text>ruby>rt {
+:root[data-term-display-mode=term-and-reading] .headword-term>ruby>rt {
     display: none;
 }
 
@@ -1000,7 +1000,7 @@ button.action-button[data-icon=source-term]::before {
 
 
 /* Triangle entry indicator */
-.expression-current-indicator {
+.headword-current-indicator {
     pointer-events: none;
     position: absolute;
     left: calc(-1 * var(--main-content-horizontal-padding));
@@ -1012,17 +1012,17 @@ button.action-button[data-icon=source-term]::before {
         opacity var(--entry-current-indicator-transition-duration) linear,
         visibility 0s linear var(--entry-current-indicator-transition-duration);
 }
-.expression-text .expression-current-indicator {
-    font-size: calc(1em / var(--expression-font-size-no-units));
+.headword-term .headword-current-indicator {
+    font-size: calc(1em / var(--headword-font-size-no-units));
 }
-.entry.entry-current .expression-current-indicator {
+.entry.entry-current .headword-current-indicator {
     opacity: 1;
     visibility: visible;
     transition:
         opacity var(--entry-current-indicator-transition-duration) linear,
         visibility 0s linear 0s;
 }
-.expression-current-indicator::after {
+.headword-current-indicator::after {
     content: '';
     display: block;
     position: absolute;
@@ -1042,8 +1042,8 @@ button.action-button[data-icon=source-term]::before {
     -webkit-mask-size: contain;
     -webkit-mask-image: url(/images/material-right-arrow.svg);
 }
-.expression:not(:first-of-type) .expression-current-indicator,
-:root:not([data-popup-current-indicator-mode=triangle]) .expression-current-indicator {
+headword-list:not(:first-of-type) .headword-current-indicator,
+:root:not([data-popup-current-indicator-mode=triangle]) .headword-current-indicator {
     display: none;
     transition: none;
 }
@@ -1072,7 +1072,7 @@ button.action-button[data-icon=source-term]::before {
 
 
 /* Merged term styles */
-:root[data-result-output-mode=merge] .expression-list .expression-details {
+:root[data-result-output-mode=merge] .headword-list .headword-details {
     display: inline-block;
     position: relative;
     width: 0;
@@ -1080,28 +1080,28 @@ button.action-button[data-icon=source-term]::before {
     visibility: hidden;
     z-index: 1;
 }
-:root[data-result-output-mode=merge] .expression-list>.expression:not(:last-of-type) .expression-details {
-    left: calc(-1 * var(--expression-font-size));
+:root[data-result-output-mode=merge] .headword-list>.headword:not(:last-of-type) .headword-details {
+    left: calc(-1 * var(--headword-font-size));
 }
-:root[data-result-output-mode=merge] .expression:hover .expression-details {
+:root[data-result-output-mode=merge] .headword:hover .headword-details {
     visibility: visible;
 }
-:root[data-result-output-mode=merge] .expression-list .expression-details>.action-play-audio {
+:root[data-result-output-mode=merge] .headword-list .headword-details>.action-play-audio {
     position: absolute;
     left: 0;
     bottom: 0.5em;
 }
-:root:not([data-result-output-mode=merge]) .expression-list .expression-details>.action-play-audio {
+:root:not([data-result-output-mode=merge]) .headword-list .headword-details>.action-play-audio {
     display: none;
 }
-:root[data-result-output-mode=merge] .expression-list .expression-tag-list {
+:root[data-result-output-mode=merge] .headword-list .headword-tag-list {
     display: block;
     position: absolute;
     left: 0;
     bottom: -0.5em;
     white-space: nowrap;
 }
-:root[data-result-output-mode=merge] .entry[data-type=term] .expression-list-tag-list>.tag[data-category=search] {
+:root[data-result-output-mode=merge] .entry[data-type=term] .headword-list-tag-list>.tag[data-category=search] {
     display: none;
 }
 
@@ -1117,21 +1117,21 @@ button.action-button[data-icon=source-term]::before {
     padding-left: 0;
     list-style-type: none;
 }
-.glossary-list {
+.gloss-list {
     margin: 0;
     padding: 0 0 0 var(--list-padding2);
     list-style-type: circle;
 }
-.glossary-list[data-count='0'],
-.glossary-list[data-count='1'] {
+.gloss-list[data-count='0'],
+.gloss-list[data-count='1'] {
     padding-left: 0;
     list-style-type: none;
 }
 .definition-item::marker,
-.glossary-item::marker {
+.gloss-item::marker {
     color: var(--text-color-light3);
 }
-.glossary {
+.gloss-content {
     white-space: pre-line;
 }
 .definition-disambiguation-list {
@@ -1150,7 +1150,7 @@ button.action-button[data-icon=source-term]::before {
 .definition-disambiguation+.definition-disambiguation::before {
     content: var(--disambiguation-separator);
 }
-.glossary-separator,
+.gloss-separator,
 .inflection-separator {
     display: inline;
     font-size: 0;
@@ -1256,14 +1256,14 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     display: inline;
     color: var(--text-color-light3);
 }
-.entry[data-unique-expression-count='1'] .frequency-item[data-has-reading=false] .frequency-disambiguation,
-.entry[data-unique-reading-count='1'][data-unique-expression-count='1'] .frequency-disambiguation,
+.entry[data-unique-term-count='1'] .frequency-item[data-has-reading=false] .frequency-disambiguation,
+.entry[data-unique-reading-count='1'][data-unique-term-count='1'] .frequency-disambiguation,
 .frequency-item[data-reading-is-same=true] .frequency-disambiguation-separator,
 .frequency-item[data-reading-is-same=true] .frequency-disambiguation-reading,
 .frequency-item[data-has-reading=false] .frequency-disambiguation-separator,
 .frequency-item[data-has-reading=false] .frequency-disambiguation-reading,
-.entry[data-unique-expression-count='1'] .frequency-disambiguation-separator,
-.entry[data-unique-expression-count='1'] .frequency-disambiguation-expression,
+.entry[data-unique-term-count='1'] .frequency-disambiguation-separator,
+.entry[data-unique-term-count='1'] .frequency-disambiguation-term,
 .entry[data-unique-reading-count='1'] .frequency-disambiguation-separator,
 .entry[data-unique-reading-count='1'] .frequency-disambiguation-reading {
     display: none;
@@ -1561,7 +1561,7 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 
 
 /* Glossary images */
-.glossary-image-container {
+.gloss-image-container {
     display: inline-block;
     white-space: nowrap;
     max-width: 100%;
@@ -1570,16 +1570,16 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     line-height: 0;
     font-size: calc(1em / var(--font-size-no-units));
     overflow: hidden;
-    background-color: var(--glossary-image-background-color);
+    background-color: var(--gloss-image-background-color);
 }
-.glossary-image-link {
+.gloss-image-link {
     cursor: inherit;
     color: inherit;
 }
-.glossary-image-link[href]:hover {
+.gloss-image-link[href]:hover {
     cursor: pointer;
 }
-.glossary-image-container-overlay {
+.gloss-image-container-overlay {
     position: absolute;
     left: 0;
     top: 0;
@@ -1592,7 +1592,7 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     white-space: normal;
     color: var(--text-color-light3);
 }
-.glossary-item[data-has-image=true][data-image-load-state=load-error] .glossary-image-container-overlay::after {
+.gloss-item[data-has-image=true][data-image-load-state=load-error] .gloss-image-container-overlay::after {
     content: 'Image failed to load';
     display: table-cell;
     width: 100%;
@@ -1601,7 +1601,7 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     text-align: center;
     padding: 0.25em;
 }
-.glossary-image {
+.gloss-image {
     display: inline-block;
     position: absolute;
     left: 0;
@@ -1613,30 +1613,30 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     border: none;
     outline: none;
 }
-.glossary-image:not([src]) {
+.gloss-image:not([src]) {
     display: none;
 }
-.glossary-image[data-pixelated=true] {
+.gloss-image[data-pixelated=true] {
     image-rendering: auto;
     image-rendering: -moz-crisp-edges;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
 }
-.glossary-image-aspect-ratio-sizer {
+.gloss-image-aspect-ratio-sizer {
     content: '';
     display: inline-block;
     width: 0;
     vertical-align: top;
     font-size: 0;
 }
-.glossary-image-link-text::before {
+.gloss-image-link-text::before {
     content: '[';
 }
-.glossary-image-link-text::after {
+.gloss-image-link-text::after {
     content: ']';
 }
-.glossary-image-description {
+.gloss-image-description {
     white-space: pre-line;
 }
 
@@ -1685,20 +1685,20 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 .kanji-glyph-data dd {
     margin-left: 0;
 }
-.kanji-glossary-list {
+.kanji-gloss-list {
     margin: 0;
     padding: 0 0 0 var(--list-padding1);
     list-style-type: decimal;
 }
-.kanji-glossary-list[data-count='0'],
-.kanji-glossary-list[data-count='1'] {
+.kanji-gloss-list[data-count='0'],
+.kanji-gloss-list[data-count='1'] {
     padding-left: 0;
     list-style-type: none;
 }
-.kanji-glossary-item::marker {
+.kanji-gloss-item::marker {
     color: var(--text-color-light3);
 }
-.kanji-glossary {
+.kanji-gloss-content {
     white-space: pre-line;
 }
 .kanji-tag-list {
@@ -2070,22 +2070,22 @@ button.footer-notification-close-button {
 :root[data-glossary-layout-mode=compact] .definition-disambiguation-list:not([data-count='0']) {
     display: inline;
 }
-:root[data-glossary-layout-mode=compact] .glossary-list {
+:root[data-glossary-layout-mode=compact] .gloss-list {
     display: inline;
     list-style: none;
     padding-left: 0;
 }
-:root[data-glossary-layout-mode=compact] .glossary-item {
+:root[data-glossary-layout-mode=compact] .gloss-item {
     display: inline;
 }
-:root[data-glossary-layout-mode=compact] .glossary-item:not(:first-child)::before {
+:root[data-glossary-layout-mode=compact] .gloss-item:not(:first-child)::before {
     white-space: pre-wrap;
     content: var(--compact-list-separator);
     display: inline;
     color: var(--text-color-light3);
 }
 
-:root[data-show-pitch-accent-downstep-notation=true] .pitch-accent-disambiguation-list[data-expression-count='0'],
+:root[data-show-pitch-accent-downstep-notation=true] .pitch-accent-disambiguation-list[data-term-count='0'],
 :root[data-show-pitch-accent-downstep-notation=true] .pitch-accent-disambiguation[data-type=reading] {
     display: none;
 }
@@ -2114,29 +2114,29 @@ button.footer-notification-close-button {
     color: var(--text-color-light3);
 }
 
-:root[data-glossary-layout-mode=compact] .glossary-image-container {
+:root[data-glossary-layout-mode=compact] .gloss-image-container {
     display: none;
     position: absolute;
     left: 0;
     top: 100%;
     z-index: 1;
 }
-:root[data-glossary-layout-mode=compact] .entry:nth-last-of-type(1):not(:nth-of-type(1)) .glossary-image-container {
+:root[data-glossary-layout-mode=compact] .entry:nth-last-of-type(1):not(:nth-of-type(1)) .gloss-image-container {
     bottom: 100%;
     top: auto;
 }
-:root[data-glossary-layout-mode=compact] .glossary-image-link {
+:root[data-glossary-layout-mode=compact] .gloss-image-link {
     position: relative;
     display: inline-block;
 }
-:root[data-glossary-layout-mode=compact] .glossary-image-link:hover .glossary-image-container,
-:root[data-glossary-layout-mode=compact] .glossary-image-link:focus .glossary-image-container {
+:root[data-glossary-layout-mode=compact] .gloss-image-link:hover .gloss-image-container,
+:root[data-glossary-layout-mode=compact] .gloss-image-link:focus .gloss-image-container {
     display: block;
 }
-:root:not([data-glossary-layout-mode=compact]) .glossary-image-link-text {
+:root:not([data-glossary-layout-mode=compact]) .gloss-image-link-text {
     display: none;
 }
-:root:not([data-glossary-layout-mode=compact]) .glossary-image-description {
+:root:not([data-glossary-layout-mode=compact]) .gloss-image-description {
     display: block;
 }
 

@@ -392,7 +392,7 @@ class DictionaryDatabase {
             definitionTags: this._splitField(row.definitionTags || row.tags || ''),
             termTags: this._splitField(row.termTags || ''),
             rules: this._splitField(row.rules),
-            glossary: row.glossary,
+            definitions: row.glossary,
             score: row.score,
             dictionary: row.dictionary,
             id: row.id,
@@ -407,7 +407,7 @@ class DictionaryDatabase {
             onyomi: this._splitField(row.onyomi),
             kunyomi: this._splitField(row.kunyomi),
             tags: this._splitField(row.tags),
-            glossary: row.meanings,
+            definitions: row.meanings,
             stats: row.stats,
             dictionary: row.dictionary
         };

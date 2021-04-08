@@ -46,7 +46,7 @@ class Display extends EventDispatcher {
         this._japaneseUtil = japaneseUtil;
         this._documentFocusController = documentFocusController;
         this._hotkeyHandler = hotkeyHandler;
-        this._container = document.querySelector('#definitions');
+        this._container = document.querySelector('#dictionary-entries');
         this._dictionaryEntries = [];
         this._dictionaryEntryNodes = [];
         this._optionsContext = {depth: 0, url: window.location.href};
@@ -1705,7 +1705,7 @@ class Display extends EventDispatcher {
         this._eventListeners.addEventListener(entry, 'click', this._onEntryClick.bind(this));
         this._addMultipleEventListeners(entry, '.action-add-note', 'click', this._onNoteAdd.bind(this));
         this._addMultipleEventListeners(entry, '.action-view-note', 'click', this._onNoteView.bind(this));
-        this._addMultipleEventListeners(entry, '.expression-kanji-link', 'click', this._onKanjiLookup.bind(this));
+        this._addMultipleEventListeners(entry, '.headword-kanji-link', 'click', this._onKanjiLookup.bind(this));
         this._addMultipleEventListeners(entry, '.debug-log-link', 'click', this._onDebugLogClick.bind(this));
         this._addMultipleEventListeners(entry, '.tag-label', 'click', this._onTagClick.bind(this));
     }
