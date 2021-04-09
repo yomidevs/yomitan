@@ -17,6 +17,8 @@
 
 /* global
  * DocumentFocusController
+ * ModalController
+ * PermissionsOriginController
  * PermissionsToggleController
  * PersistentStorageController
  * SettingsController
@@ -95,11 +97,17 @@ function setupPermissionsToggles() {
             permissionsCheckboxes[i].checked = permissions[i];
         }
 
+        const modalController = new ModalController();
+        modalController.prepare();
+
         const settingsController = new SettingsController(0);
         settingsController.prepare();
 
         const permissionsToggleController = new PermissionsToggleController(settingsController);
         permissionsToggleController.prepare();
+
+        const permissionsOriginController = new PermissionsOriginController(settingsController);
+        permissionsOriginController.prepare();
 
         const persistentStorageController = new PersistentStorageController();
         persistentStorageController.prepare();
@@ -108,7 +116,7 @@ function setupPermissionsToggles() {
 
         document.documentElement.dataset.loaded = 'true';
 
-        const settingsDisplayController = new SettingsDisplayController(settingsController, null);
+        const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
         settingsDisplayController.prepare();
     } catch (e) {
         log.error(e);

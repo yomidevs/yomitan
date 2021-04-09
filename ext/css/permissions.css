@@ -1,0 +1,35 @@
+/*
+ * Copyright (C) 2021  Yomichan Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#permissions-origin-list {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto;
+    align-items: center;
+    justify-content: center;
+}
+.permissions-origin-index {
+    margin: 0 0.5em;
+}
+input[type=text].permissions-origin-input {
+    width: auto;
+    justify-self: stretch;
+}
+.permissions-origin-button {
+    justify-self: center;
+    margin-left: 0.5em;
+}

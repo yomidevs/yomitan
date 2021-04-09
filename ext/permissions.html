@@ -13,6 +13,7 @@
     <link rel="icon" type="image/png" href="/images/icon128.png" sizes="128x128">
     <link rel="stylesheet" type="text/css" href="/css/material.css">
     <link rel="stylesheet" type="text/css" href="/css/settings.css">
+    <link rel="stylesheet" type="text/css" href="/css/permissions.css">
 </head>
 <body>
 
@@ -175,12 +176,80 @@
                 <label class="toggle"><input type="checkbox" id="storage-persistent-checkbox"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
+        <div class="settings-item settings-item-button" data-modal-action="show,origins"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Configure allowed origins&hellip;</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></div>
     </div>
 
     <div class="footer-padding"></div>
 
 </div>
 </div></div>
+
+
+<!-- Auxiliary content -->
+<div id="popup-menus"></div>
+
+
+<!-- Keyboard shortcuts templates -->
+<div id="origins-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+    <div class="modal-header">
+        <div class="modal-title">Allowed Origins</div>
+        <div class="modal-header-button-container">
+            <div class="modal-header-button-group">
+                <button class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                <button class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Allow access to all URLs</div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" class="permissions-origin-toggle" data-origin="&lt;all_urls&gt;"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Additional origins</div>
+                </div>
+            </div>
+            <div class="settings-item-children">
+                <div id="permissions-origin-list" class="generic-list">
+                    <div class="permissions-origin-index generic-list-index-prefix"></div>
+                    <input type="text" class="permissions-origin-input horizontal-flex-fill" autocomplete="off" spellcheck="false" id="permissions-origin-new-input">
+                    <button class="low-emphasis permissions-origin-button" id="permissions-origin-add">Add</button>
+                </div>
+                <div id="permissions-origin-list-empty" class="margin-above">
+                    No additional origins specified.
+                </div>
+                <div id="permissions-origin-list-error" class="margin-above danger-text" hidden></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="low-emphasis" data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
+<template id="permissions-origin-template">
+    <div class="permissions-origin-index generic-list-index-prefix"></div>
+    <input type="text" class="permissions-origin-input horizontal-flex-fill" autocomplete="off" spellcheck="false" readonly>
+    <button class="icon-button permissions-origin-menu-button permissions-origin-button" data-menu="permissions-origin-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+</template>
+
+<template id="permissions-origin-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button class="popup-menu-item" data-menu-action="remove">Remove</button>
+</div></div></div></template>
+
 
 <!-- Scripts -->
 <script src="/js/core.js"></script>
@@ -193,7 +262,12 @@
 <script src="/js/data/permissions-util.js"></script>
 <script src="/js/dom/document-focus-controller.js"></script>
 <script src="/js/dom/html-template-collection.js"></script>
+<script src="/js/dom/panel-element.js"></script>
+<script src="/js/dom/popup-menu.js"></script>
 <script src="/js/dom/selector-observer.js"></script>
+<script src="/js/pages/settings/modal.js"></script>
+<script src="/js/pages/settings/modal-controller.js"></script>
+<script src="/js/pages/settings/permissions-origin-controller.js"></script>
 <script src="/js/pages/settings/permissions-toggle-controller.js"></script>
 <script src="/js/pages/settings/persistent-storage-controller.js"></script>
 <script src="/js/pages/settings/settings-controller.js"></script>
