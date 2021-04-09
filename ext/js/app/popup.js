@@ -664,11 +664,10 @@ class Popup extends EventDispatcher {
             }
         }
 
-        const body = document.body;
         return {
             left: 0,
             top: 0,
-            right: (body !== null ? body.clientWidth : 0),
+            right: window.innerWidth,
             bottom: window.innerHeight
         };
     }
