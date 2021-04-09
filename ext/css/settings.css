@@ -1312,9 +1312,6 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
 #audio-source-list-empty {
     display: none;
 }
-#audio-source-list:empty+#audio-source-list-empty {
-    display: block;
-}
 
 .dictionary-info {
     display: flex;
@@ -1685,9 +1682,6 @@ code.anki-field-marker {
 .scan-input-list {
     margin: 0 calc(var(--modal-padding-horizontal) * -1);
 }
-.scan-input-list:not(:empty)+.scan-input-list-empty-info {
-    display: none;
-}
 .scan-input {
     margin: 0.5em 0;
 }
@@ -1802,12 +1796,6 @@ code.anki-field-marker {
     height: calc(0.425em * 4 + 1em * var(--line-height-default) * 3);
 }
 
-#translation-text-replacement-list-empty {
-    display: none;
-}
-#translation-text-replacement-list:empty+#translation-text-replacement-list-empty {
-    display: block;
-}
 .translation-text-replacement-entry {
     display: grid;
     grid-template-columns: auto auto 1fr auto;
@@ -2194,6 +2182,9 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 .generic-list-index-prefix::after {
     counter-increment: generic-list-index;
     content: counter(generic-list-index);
+}
+.generic-list:not(:empty)~.generic-list-empty-indicator {
+    display: none;
 }
 
 .flex-row-nowrap {

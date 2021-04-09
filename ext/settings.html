@@ -2377,7 +2377,7 @@
 <!-- Audio templates -->
 <template id="audio-source-template"><div class="audio-source horizontal-flex">
     <div class="generic-list-index-prefix"></div>
-    <select class="audio-source-select">
+    <select class="audio-source-select horizontal-flex-fill">
         <option value="jpod101">JapanesePod101</option>
         <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
         <option value="jisho">Jisho.org</option>
@@ -2385,7 +2385,6 @@
         <option value="text-to-speech-reading">Text-to-speech (Kana reading)</option>
         <option value="custom">Custom</option>
     </select>
-    <div class="horizontal-flex-fill"></div>
     <button class="icon-button audio-source-menu-button" data-menu="audio-source-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
 </div></template>
 
@@ -2440,7 +2439,7 @@
             </div>
         </div>
         <div class="scan-input-list generic-list margin-above" id="scan-input-list"></div>
-        <div class="scan-input-list-empty-info warning-text margin-above">
+        <div class="warning-text margin-above generic-list-empty-indicator">
             No scanning inputs have been defined yet.
             Click the <em>Add</em> button to add a new input.
         </div>
@@ -2960,7 +2959,7 @@
             </div>
             <div class="settings-item-children">
                 <div id="translation-text-replacement-list" class="generic-list"></div>
-                <div id="translation-text-replacement-list-empty"><em>None defined</em></div>
+                <div class="generic-list-empty-indicator"><em>None defined</em></div>
             </div>
         </div>
     </div>
