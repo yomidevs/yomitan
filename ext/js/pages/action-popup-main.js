@@ -103,6 +103,10 @@ class DisplayController {
                     let tab;
                     try {
                         tab = await this._getCurrentTab();
+                        // Safari assigns a tab object to the popup, other browsers do not
+                        if (tab && await this._isSafari()) {
+                            tab = void 0;
+                        }
                     } catch (e) {
                         // NOP
                     }
@@ -219,6 +223,11 @@ class DisplayController {
         for (const node of warnings) {
             node.hidden = false;
         }
+    }
+
+    async _isSafari() {
+        const {browser} = await yomichan.api.getEnvironmentInfo();
+        return browser === 'safari';
     }
 }
 

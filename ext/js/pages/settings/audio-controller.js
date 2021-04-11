@@ -39,9 +39,7 @@ class AudioController {
 
         this._audioSourceAddButton.addEventListener('click', this._onAddAudioSource.bind(this), false);
 
-        if (typeof speechSynthesis !== 'undefined') {
-            speechSynthesis.addEventListener('voiceschanged', this._updateTextToSpeechVoices.bind(this), false);
-        }
+        this._audioSystem.on('voiceschanged', this._updateTextToSpeechVoices.bind(this), false);
         this._updateTextToSpeechVoices();
 
         document.querySelector('#text-to-speech-voice-test').addEventListener('click', this._onTestTextToSpeech.bind(this), false);

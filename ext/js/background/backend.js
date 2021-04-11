@@ -112,7 +112,7 @@ class Backend {
             ['getDisplayTemplatesHtml',      {async: true,  contentScript: true,  handler: this._onApiGetDisplayTemplatesHtml.bind(this)}],
             ['getZoom',                      {async: true,  contentScript: true,  handler: this._onApiGetZoom.bind(this)}],
             ['getDefaultAnkiFieldTemplates', {async: false, contentScript: true,  handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this)}],
-            ['getDictionaryInfo',            {async: true,  contentScript: false, handler: this._onApiGetDictionaryInfo.bind(this)}],
+            ['getDictionaryInfo',            {async: true,  contentScript: true,  handler: this._onApiGetDictionaryInfo.bind(this)}],
             ['getDictionaryCounts',          {async: true,  contentScript: false, handler: this._onApiGetDictionaryCounts.bind(this)}],
             ['purgeDatabase',                {async: true,  contentScript: false, handler: this._onApiPurgeDatabase.bind(this)}],
             ['getMedia',                     {async: true,  contentScript: true,  handler: this._onApiGetMedia.bind(this)}],
@@ -1288,10 +1288,14 @@ class Backend {
     }
 
     _validatePrivilegedMessageSender(sender) {
-        const url = sender.url;
-        if (!(typeof url === 'string' && yomichan.isExtensionUrl(url))) {
-            throw new Error('Invalid message sender');
+        let {url} = sender;
+        if (typeof url === 'string' && yomichan.isExtensionUrl(url)) { return; }
+        const {tab} = url;
+        if (typeof tab === 'object' && tab !== null) {
+            ({url} = tab);
+            if (typeof url === 'string' && yomichan.isExtensionUrl(url)) { return; }
         }
+        throw new Error('Invalid message sender');
     }
 
     _getBrowserIconTitle() {

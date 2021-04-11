@@ -83,9 +83,23 @@ class Environment {
             } catch (e) {
                 // NOP
             }
+            if (this._isSafari()) {
+                return 'safari';
+            }
             return 'firefox';
         } else {
             return 'chrome';
         }
+    }
+
+    _isSafari() {
+        const {vendor, userAgent} = navigator;
+        return (
+            typeof vendor === 'string' &&
+            typeof userAgent === 'string' &&
+            vendor.includes('Apple') &&
+            !userAgent.includes('CriOS') &&
+            !userAgent.includes('FxiOS')
+        );
     }
 }

@@ -19,18 +19,20 @@
  * TextToSpeechAudio
  */
 
-class AudioSystem {
+class AudioSystem extends EventDispatcher {
     constructor() {
+        super();
         this._fallbackAudio = null;
     }
 
     prepare() {
         // speechSynthesis.getVoices() will not be populated unless some API call is made.
-        if (typeof speechSynthesis === 'undefined') { return; }
-
-        const eventListeners = new EventListenerCollection();
-        const onVoicesChanged = () => { eventListeners.removeAllEventListeners(); };
-        eventListeners.addEventListener(speechSynthesis, 'voiceschanged', onVoicesChanged, false);
+        if (
+            typeof speechSynthesis !== 'undefined' &&
+            typeof speechSynthesis.addEventListener === 'function'
+        ) {
+            speechSynthesis.addEventListener('voiceschanged', this._onVoicesChanged.bind(this), false);
+        }
     }
 
     getFallbackAudio() {
@@ -63,6 +65,10 @@ class AudioSystem {
     }
 
     // Private
+
+    _onVoicesChanged(e) {
+        this.trigger('voiceschanged', e);
+    }
 
     _isAudioValid(audio, source) {
         switch (source) {

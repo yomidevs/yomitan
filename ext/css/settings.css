@@ -134,7 +134,7 @@ ul+p,
 ul+ol,
 ul+ul,
 li {
-    margin: 0.425em 0;
+    margin: 0.425em 0 0;
 }
 a {
     color: var(--link-color);
@@ -2152,6 +2152,13 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     margin-left: 0.375em;
 }
 
+.page-loading-stalled-notification {
+    border: 1px solid var(--danger-color);
+}
+:root:not([data-loading-stalled=true]) .page-loading-stalled-notification {
+    display: none;
+}
+
 
 /* Generic layouts */
 .margin-above {
@@ -2233,19 +2240,25 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 
 
 /* Environment-specific display */
+:root[data-browser=unknown] [data-show-for-browser],
+:root[data-browser=unknown] [data-hide-for-browser],
 :root[data-browser=edge] [data-show-for-browser]:not([data-show-for-browser~=edge]),
 :root[data-browser=edge-legacy] [data-show-for-browser]:not([data-show-for-browser~=edge-legacy]),
 :root[data-browser=chrome] [data-show-for-browser]:not([data-show-for-browser~=chrome]),
+:root[data-browser=safari] [data-show-for-browser]:not([data-show-for-browser~=safari]),
 :root[data-browser=firefox] [data-show-for-browser]:not([data-show-for-browser~=firefox]),
 :root[data-browser=firefox-mobile] [data-show-for-browser]:not([data-show-for-browser~=firefox-mobile]),
 :root[data-browser=edge] [data-hide-for-browser~=edge],
 :root[data-browser=edge-legacy] [data-hide-for-browser~=edge-legacy],
 :root[data-browser=chrome] [data-hide-for-browser~=chrome],
+:root[data-browser=safari] [data-hide-for-browser~=safari],
 :root[data-browser=firefox] [data-hide-for-browser~=firefox],
 :root[data-browser=firefox-mobile] [data-hide-for-browser~=firefox-mobile] {
     display: none;
 }
 
+:root[data-os=unknown] [data-show-for-os],
+:root[data-os=unknown] [data-hide-for-os],
 :root[data-os=mac] [data-show-for-os]:not([data-show-for-os~=mac]),
 :root[data-os=win] [data-show-for-os]:not([data-show-for-os~=win]),
 :root[data-os=android] [data-show-for-os]:not([data-show-for-os~=android]),
@@ -2261,6 +2274,8 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     display: none;
 }
 
+:root[data-manifest-version=unknown] [data-show-for-manifest-version],
+:root[data-manifest-version=unknown] [data-hide-for-manifest-version],
 :root[data-manifest-version='2'] [data-show-for-manifest-version]:not([data-show-for-manifest-version~='2']),
 :root[data-manifest-version='3'] [data-show-for-manifest-version]:not([data-show-for-manifest-version~='3']),
 :root[data-manifest-version='2'] [data-hide-for-manifest-version~='2'],
