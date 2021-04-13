@@ -340,15 +340,13 @@ class AnkiCardController {
         this._cardMenu = node.dataset.ankiCardMenu;
         this._eventListeners = new EventListenerCollection();
         this._fieldEventListeners = new EventListenerCollection();
-        this._deck = null;
-        this._model = null;
         this._fields = null;
         this._modelChangingTo = null;
-        this._ankiCardDeckSelect = null;
-        this._ankiCardModelSelect = null;
         this._ankiCardFieldsContainer = null;
         this._cleaned = false;
         this._fieldEntries = [];
+        this._deckController = new AnkiCardSelectController();
+        this._modelController = new AnkiCardSelectController();
     }
 
     async prepare() {
@@ -359,19 +357,16 @@ class AnkiCardController {
         const cardOptions = this._getCardOptions(ankiOptions, this._cardType);
         if (cardOptions === null) { return; }
         const {deck, model, fields} = cardOptions;
-        this._deck = deck;
-        this._model = model;
+        this._deckController.prepare(this._node.querySelector('.anki-card-deck'), deck);
+        this._modelController.prepare(this._node.querySelector('.anki-card-model'), model);
         this._fields = fields;
 
-        this._ankiCardDeckSelect = this._node.querySelector('.anki-card-deck');
-        this._ankiCardModelSelect = this._node.querySelector('.anki-card-model');
         this._ankiCardFieldsContainer = this._node.querySelector('.anki-card-fields');
 
-        this._setupSelects([], []);
         this._setupFields();
 
-        this._eventListeners.addEventListener(this._ankiCardDeckSelect, 'change', this._onCardDeckChange.bind(this), false);
-        this._eventListeners.addEventListener(this._ankiCardModelSelect, 'change', this._onCardModelChange.bind(this), false);
+        this._eventListeners.addEventListener(this._deckController.select, 'change', this._onCardDeckChange.bind(this), false);
+        this._eventListeners.addEventListener(this._modelController.select, 'change', this._onCardModelChange.bind(this), false);
         this._eventListeners.on(this._settingsController, 'permissionsChanged', this._onPermissionsChanged.bind(this));
 
         await this.updateAnkiState();
@@ -387,7 +382,8 @@ class AnkiCardController {
         if (this._fields === null) { return; }
         const {deckNames, modelNames} = await this._ankiController.getAnkiData();
         if (this._cleaned) { return; }
-        this._setupSelects(deckNames, modelNames);
+        this._deckController.setOptionValues(deckNames);
+        this._modelController.setOptionValues(modelNames);
     }
 
     isStale() {
@@ -454,31 +450,6 @@ class AnkiCardController {
             case 'kanji': return ankiOptions.kanji;
             default: return null;
         }
-    }
-
-    _setupSelects(deckNames, modelNames) {
-        const deck = this._deck;
-        const model = this._model;
-        if (!deckNames.includes(deck)) { deckNames = [...deckNames, deck]; }
-        if (!modelNames.includes(model)) { modelNames = [...modelNames, model]; }
-
-        this._setSelectOptions(this._ankiCardDeckSelect, deckNames);
-        this._ankiCardDeckSelect.value = deck;
-
-        this._setSelectOptions(this._ankiCardModelSelect, modelNames);
-        this._ankiCardModelSelect.value = model;
-    }
-
-    _setSelectOptions(select, optionValues) {
-        const fragment = document.createDocumentFragment();
-        for (const optionValue of optionValues) {
-            const option = document.createElement('option');
-            option.value = optionValue;
-            option.textContent = optionValue;
-            fragment.appendChild(option);
-        }
-        select.textContent = '';
-        select.appendChild(fragment);
     }
 
     _setupFields() {
@@ -551,7 +522,7 @@ class AnkiCardController {
 
         let fieldNames;
         try {
-            fieldNames = await this._ankiController.getModelFieldNames(this._model);
+            fieldNames = await this._ankiController.getModelFieldNames(this._modelController.value);
         } catch (e) {
             return;
         }
@@ -568,8 +539,8 @@ class AnkiCardController {
     }
 
     async _setDeck(value) {
-        if (this._deck === value) { return; }
-        this._deck = value;
+        if (this._deckController.value === value) { return; }
+        this._deckController.value = value;
 
         await this._settingsController.modifyProfileSettings([{
             action: 'set',
@@ -579,12 +550,13 @@ class AnkiCardController {
     }
 
     async _setModel(value) {
+        const select = this._modelController.select;
         if (this._modelChangingTo !== null) {
             // Revert
-            this._ankiCardModelSelect.value = this._modelChangingTo;
+            select.value = this._modelChangingTo;
             return;
         }
-        if (this._model === value) { return; }
+        if (this._modelController.value === value) { return; }
 
         let fieldNames;
         let options;
@@ -594,7 +566,7 @@ class AnkiCardController {
             options = await this._ankiController.settingsController.getOptions();
         } catch (e) {
             // Revert
-            this._ankiCardModelSelect.value = this._model;
+            select.value = this._modelController.value;
             return;
         } finally {
             this._modelChangingTo = null;
@@ -623,7 +595,7 @@ class AnkiCardController {
             }
         ];
 
-        this._model = value;
+        this._modelController.value = value;
         this._fields = fields;
 
         await this._settingsController.modifyProfileSettings(targets);
@@ -722,5 +694,83 @@ class AnkiCardController {
         }
 
         return '';
+    }
+}
+
+class AnkiCardSelectController {
+    constructor() {
+        this._value = null;
+        this._select = null;
+        this._optionValues = null;
+        this._hasExtraOption = false;
+        this._selectNeedsUpdate = false;
+    }
+
+    get value() {
+        return this._value;
+    }
+
+    set value(value) {
+        this._value = value;
+        this._updateSelect();
+    }
+
+    get select() {
+        return this._select;
+    }
+
+    prepare(select, value) {
+        this._select = select;
+        this._value = value;
+        this._updateSelect();
+    }
+
+    setOptionValues(optionValues) {
+        this._optionValues = optionValues;
+        this._selectNeedsUpdate = true;
+        this._updateSelect();
+    }
+
+    // Private
+
+    _updateSelect() {
+        const value = this._value;
+        let optionValues = this._optionValues;
+        const hasOptionValues = Array.isArray(optionValues) && optionValues.length > 0;
+
+        if (!hasOptionValues) {
+            optionValues = [];
+        }
+
+        const hasExtraOption = !optionValues.includes(value);
+        if (hasExtraOption) {
+            optionValues = [...optionValues, value];
+        }
+
+        const select = this._select;
+        if (this._selectNeedsUpdate || hasExtraOption !== this._hasExtraOption) {
+            this._setSelectOptions(select, optionValues);
+            select.value = value;
+            this._hasExtraOption = hasExtraOption;
+            this._selectNeedsUpdate = false;
+        }
+
+        if (hasOptionValues) {
+            select.dataset.invalid = `${hasExtraOption}`;
+        } else {
+            delete select.dataset.invalid;
+        }
+    }
+
+    _setSelectOptions(select, optionValues) {
+        const fragment = document.createDocumentFragment();
+        for (const optionValue of optionValues) {
+            const option = document.createElement('option');
+            option.value = optionValue;
+            option.textContent = optionValue;
+            fragment.appendChild(option);
+        }
+        select.textContent = '';
+        select.appendChild(fragment);
     }
 }
