@@ -715,13 +715,13 @@ class DisplayGenerator {
     _appendFurigana(container, term, reading, addText) {
         container.lang = 'ja';
         const segments = this._japaneseUtil.distributeFurigana(term, reading);
-        for (const {text, furigana} of segments) {
-            if (furigana) {
+        for (const {text, reading: reading2} of segments) {
+            if (reading2) {
                 const ruby = document.createElement('ruby');
                 const rt = document.createElement('rt');
                 addText(ruby, text);
                 ruby.appendChild(rt);
-                rt.appendChild(document.createTextNode(furigana));
+                rt.appendChild(document.createTextNode(reading2));
                 container.appendChild(ruby);
             } else {
                 addText(container, text);

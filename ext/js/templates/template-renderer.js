@@ -177,11 +177,11 @@ class TemplateRenderer {
         const segs = this._japaneseUtil.distributeFurigana(expression, reading);
 
         let result = '';
-        for (const seg of segs) {
-            if (seg.furigana.length > 0) {
-                result += `<ruby>${seg.text}<rt>${seg.furigana}</rt></ruby>`;
+        for (const {text, reading: reading2} of segs) {
+            if (reading2.length > 0) {
+                result += `<ruby>${text}<rt>${reading2}</rt></ruby>`;
             } else {
-                result += seg.text;
+                result += text;
             }
         }
 
@@ -193,12 +193,12 @@ class TemplateRenderer {
         const segs = this._japaneseUtil.distributeFurigana(expression, reading);
 
         let result = '';
-        for (const seg of segs) {
-            if (seg.furigana.length > 0) {
+        for (const {text, reading: reading2} of segs) {
+            if (reading2.length > 0) {
                 if (result.length > 0) { result += ' '; }
-                result += `${seg.text}[${seg.furigana}]`;
+                result += `${text}[${reading2}]`;
             } else {
-                result += seg.text;
+                result += text;
             }
         }
 

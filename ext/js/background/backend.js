@@ -1066,9 +1066,9 @@ class Backend {
                 const {headwords: [{term, reading}]} = dictionaryEntries[0];
                 const source = text.substring(i, i + originalTextLength);
                 const textSegments = [];
-                for (const {text: text2, furigana} of jp.distributeFuriganaInflected(term, reading, source)) {
-                    const reading2 = jp.convertReading(text2, furigana, readingMode);
-                    textSegments.push({text: text2, reading: reading2});
+                for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(term, reading, source)) {
+                    const reading3 = jp.convertReading(text2, reading2, readingMode);
+                    textSegments.push({text: text2, reading: reading3});
                 }
                 results.push(textSegments);
                 i += originalTextLength;
@@ -1102,13 +1102,13 @@ class Backend {
             for (const line of lines) {
                 for (const {term, reading, source} of line) {
                     const termParts = [];
-                    for (const {text: text2, furigana} of jp.distributeFuriganaInflected(
+                    for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(
                         term.length > 0 ? term : source,
                         jp.convertKatakanaToHiragana(reading),
                         source
                     )) {
-                        const reading2 = jp.convertReading(text2, furigana, readingMode);
-                        termParts.push({text: text2, reading: reading2});
+                        const reading3 = jp.convertReading(text2, reading2, readingMode);
+                        termParts.push({text: text2, reading: reading3});
                     }
                     result.push(termParts);
                 }

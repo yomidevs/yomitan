@@ -507,7 +507,7 @@ const JapaneseUtil = (() => {
             if (stemLength < source.length) {
                 const remainder = source.substring(stemLength);
                 const segmentCount = segments.length;
-                if (segmentCount > 0 && segments[segmentCount - 1].furigana.length === 0) {
+                if (segmentCount > 0 && segments[segmentCount - 1].reading.length === 0) {
                     // Append to the last segment if it has an empty reading
                     segments[segmentCount - 1].text += remainder;
                 } else {
@@ -554,8 +554,8 @@ const JapaneseUtil = (() => {
 
         // Private
 
-        _createFuriganaSegment(text, furigana) {
-            return {text, furigana};
+        _createFuriganaSegment(text, reading) {
+            return {text, reading};
         }
 
         _segmentizeFurigana(reading, readingNormalized, groups, groupsStart) {
@@ -600,8 +600,8 @@ const JapaneseUtil = (() => {
                             // More than one way to segmentize the tail; mark as ambiguous
                             return null;
                         }
-                        const furigana = reading.substring(0, i);
-                        segments.unshift(this._createFuriganaSegment(text, furigana));
+                        const segmentReading = reading.substring(0, i);
+                        segments.unshift(this._createFuriganaSegment(text, segmentReading));
                         result = segments;
                     }
                     // There is only one way to segmentize the last non-kana group

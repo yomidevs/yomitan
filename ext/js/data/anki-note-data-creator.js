@@ -596,6 +596,10 @@ class AnkiNoteDataCreator {
     }
 
     _getTermHeadwordFuriganaSegments(term, reading) {
-        return this._japaneseUtil.distributeFurigana(term, reading);
+        const result = [];
+        for (const {text, reading: reading2} of this._japaneseUtil.distributeFurigana(term, reading)) {
+            result.push({text, furigana: reading2});
+        }
+        return result;
     }
 }
