@@ -265,7 +265,7 @@ class AnkiNoteDataCreator {
             case 'merge': type = 'termMerged'; break;
         }
 
-        const {id, inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, sequence} = dictionaryEntry;
+        const {id, inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount} = dictionaryEntry;
 
         const {
             screenshotFileName=null,
@@ -288,6 +288,7 @@ class AnkiNoteDataCreator {
         const glossary = this.createCachedValue(this._getTermGlossaryArray.bind(this, dictionaryEntry, type));
         const cloze = this.createCachedValue(this._getCloze.bind(this, dictionaryEntry, context));
         const furiganaSegments = this.createCachedValue(this._getTermFuriganaSegments.bind(this, dictionaryEntry, type));
+        const sequence = this.createCachedValue(this._getTermDictionaryEntrySequence.bind(this, dictionaryEntry));
 
         return {
             type,
@@ -298,7 +299,7 @@ class AnkiNoteDataCreator {
             reasons: inflections,
             score,
             isPrimary: (type === 'term' ? dictionaryEntry.isPrimary : void 0),
-            sequence,
+            get sequence() { return self.getCachedValue(sequence); },
             get dictionary() { return self.getCachedValue(dictionaryNames)[0]; },
             dictionaryOrder: {
                 index: dictionaryIndex,
@@ -600,5 +601,22 @@ class AnkiNoteDataCreator {
             result.push({text, furigana: reading2});
         }
         return result;
+    }
+
+    _getTermDictionaryEntrySequence(dictionaryEntry) {
+        let hasSequence = false;
+        let mainSequence = -1;
+        for (const {sequence, isPrimary} of dictionaryEntry.definitions) {
+            if (!isPrimary) { continue; }
+            if (!hasSequence) {
+                mainSequence = sequence;
+                hasSequence = true;
+                if (mainSequence === -1) { break; }
+            } else if (mainSequence !== sequence) {
+                mainSequence = -1;
+                break;
+            }
+        }
+        return mainSequence;
     }
 }

@@ -8639,7 +8639,7 @@
           "sourceTerm": "打ち込む",
           "reasons": [],
           "score": 10,
-          "sequence": -1,
+          "sequence": 4,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -9003,7 +9003,7 @@
           "sourceTerm": "打ち込む",
           "reasons": [],
           "score": 10,
-          "sequence": -1,
+          "sequence": 4,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -9333,7 +9333,7 @@
             "masu stem"
           ],
           "score": 10,
-          "sequence": -1,
+          "sequence": 3,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -9585,7 +9585,7 @@
             "masu stem"
           ],
           "score": 10,
-          "sequence": -1,
+          "sequence": 3,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -9835,7 +9835,7 @@
           "sourceTerm": "打",
           "reasons": [],
           "score": 1,
-          "sequence": -1,
+          "sequence": 1,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
@@ -10051,7 +10051,7 @@
           "sourceTerm": "打",
           "reasons": [],
           "score": 1,
-          "sequence": -1,
+          "sequence": 2,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,
