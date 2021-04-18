@@ -927,8 +927,8 @@ class Translator {
         return {index, term, reading, sources, tags, wordClasses};
     }
 
-    _createTermDefinition(index, headwordIndices, dictionary, tags, entries) {
-        return {index, headwordIndices, dictionary, tags, entries};
+    _createTermDefinition(index, headwordIndices, dictionary, sequence, tags, entries) {
+        return {index, headwordIndices, dictionary, sequence, tags, entries};
     }
 
     _createTermPronunciation(index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches) {
@@ -960,12 +960,14 @@ class Translator {
     }
 
     _createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, isPrimary, enabledDictionaryMap) {
-        const {term, reading: rawReading, definitionTags, termTags, definitions, score, dictionary, id, sequence, rules} = databaseEntry;
+        const {term, reading: rawReading, definitionTags, termTags, definitions, score, dictionary, id, sequence: rawSequence, rules} = databaseEntry;
         const reading = (rawReading.length > 0 ? rawReading : term);
         const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const sourceTermExactMatchCount = (isPrimary && deinflectedText === term ? 1 : 0);
         const source = this._createSource(originalText, transformedText, deinflectedText, isPrimary);
         const maxTransformedTextLength = transformedText.length;
+        const hasSequence = (rawSequence >= 0);
+        const sequence = hasSequence ? rawSequence : -1;
 
         const headwordTagGroups = [];
         const definitionTagGroups = [];
@@ -976,7 +978,7 @@ class Translator {
             id,
             isPrimary,
             sequence,
-            sequence >= 0 ? dictionary : null,
+            hasSequence ? dictionary : null,
             reasons,
             score,
             dictionaryIndex,
@@ -984,7 +986,7 @@ class Translator {
             sourceTermExactMatchCount,
             maxTransformedTextLength,
             [this._createTermHeadword(0, term, reading, [source], headwordTagGroups, rules)],
-            [this._createTermDefinition(0, [0], dictionary, definitionTagGroups, definitions)]
+            [this._createTermDefinition(0, [0], dictionary, sequence, definitionTagGroups, definitions)]
         );
     }
 
@@ -1148,21 +1150,21 @@ class Translator {
     }
 
     _addTermDefinitions(definitions, newDefinitions, headwordIndexMap) {
-        for (const {headwordIndices, dictionary, tags, entries} of newDefinitions) {
+        for (const {headwordIndices, dictionary, sequence, tags, entries} of newDefinitions) {
             const headwordIndicesNew = [];
             for (const headwordIndex of headwordIndices) {
                 headwordIndicesNew.push(headwordIndexMap[headwordIndex]);
             }
-            definitions.push(this._createTermDefinition(definitions.length, headwordIndicesNew, dictionary, tags, entries));
+            definitions.push(this._createTermDefinition(definitions.length, headwordIndicesNew, dictionary, sequence, tags, entries));
         }
     }
 
     _addTermDefinitions2(definitions, definitionsMap, newDefinitions, headwordIndexMap) {
-        for (const {headwordIndices, dictionary, tags, entries} of newDefinitions) {
-            const key = this._createMapKey([dictionary, ...entries]);
+        for (const {headwordIndices, dictionary, sequence, tags, entries} of newDefinitions) {
+            const key = this._createMapKey([dictionary, sequence, ...entries]);
             let definition = definitionsMap.get(key);
             if (typeof definition === 'undefined') {
-                definition = this._createTermDefinition(definitions.length, [], dictionary, [], [...entries]);
+                definition = this._createTermDefinition(definitions.length, [], dictionary, sequence, [], [...entries]);
                 definitions.push(definition);
                 definitionsMap.set(key, definition);
             }

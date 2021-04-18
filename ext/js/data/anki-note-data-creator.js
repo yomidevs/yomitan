@@ -354,7 +354,7 @@ class AnkiNoteDataCreator {
 
         const definitions = [];
         const definitionTags = [];
-        for (const {tags, headwordIndices, entries, dictionary} of dictionaryEntry.definitions) {
+        for (const {tags, headwordIndices, entries, dictionary, sequence} of dictionaryEntry.definitions) {
             const definitionTags2 = [];
             for (const tag of tags) {
                 definitionTags.push(this._convertTag(tag));
@@ -362,7 +362,6 @@ class AnkiNoteDataCreator {
             }
             if (!hasDefinitions) { continue; }
             const only = merged ? DictionaryDataUtil.getDisambiguations(dictionaryEntry.headwords, headwordIndices, allTermsSet, allReadingsSet) : void 0;
-            const {sequence} = dictionaryEntry;
             definitions.push({
                 sequence,
                 dictionary,

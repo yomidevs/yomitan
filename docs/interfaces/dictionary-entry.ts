@@ -297,6 +297,10 @@ namespace Translation {
          */
         dictionary: string;
         /**
+         * Database sequence number for the term. The value will be `-1` if there is no sequence.
+         */
+        sequence: number;
+        /**
          * Tags for the definition.
          */
         tags: Tag[];

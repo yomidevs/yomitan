@@ -8826,7 +8826,7 @@
           ],
           "definitions": [
             {
-              "sequence": -1,
+              "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition13",
@@ -8854,7 +8854,7 @@
               ]
             },
             {
-              "sequence": -1,
+              "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition15",
@@ -9154,7 +9154,7 @@
           ],
           "definitions": [
             {
-              "sequence": -1,
+              "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition17",
@@ -9182,7 +9182,7 @@
               ]
             },
             {
-              "sequence": -1,
+              "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition19",
@@ -9454,7 +9454,7 @@
           ],
           "definitions": [
             {
-              "sequence": -1,
+              "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition5",
@@ -9482,7 +9482,7 @@
               ]
             },
             {
-              "sequence": -1,
+              "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition7",
@@ -9706,7 +9706,7 @@
           ],
           "definitions": [
             {
-              "sequence": -1,
+              "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition9",
@@ -9734,7 +9734,7 @@
               ]
             },
             {
-              "sequence": -1,
+              "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition11",
@@ -9950,7 +9950,7 @@
           ],
           "definitions": [
             {
-              "sequence": -1,
+              "sequence": 1,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition1",
@@ -10166,7 +10166,7 @@
           ],
           "definitions": [
             {
-              "sequence": -1,
+              "sequence": 2,
               "dictionary": "Test Dictionary 2",
               "glossary": [
                 "definition3",
