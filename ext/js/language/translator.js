@@ -172,7 +172,7 @@ class Translator {
         const {alphanumeric, wildcard} = options;
         text = this._getSearchableText(text, alphanumeric);
         if (text.length === 0) {
-            return [[], 0];
+            return {dictionaryEntries: [], originalTextLength: 0};
         }
 
         const deinflections = await (
