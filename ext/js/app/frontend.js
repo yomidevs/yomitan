@@ -683,7 +683,7 @@ class Frontend {
         const range = this._getFirstNonEmptySelectionRange();
         if (range === null) { return false; }
         const source = new TextSourceRange(range, range.toString(), null, null);
-        await this._textScanner.search(source, {focus: true});
+        await this._textScanner.search(source, {focus: true, restoreSelection: true});
         return true;
     }
 

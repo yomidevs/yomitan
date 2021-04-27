@@ -52,6 +52,7 @@ class TextScanner extends EventDispatcher {
         this._textSourceCurrent = null;
         this._textSourceCurrentSelected = false;
         this._pendingLookup = false;
+        this._selectionRestoreInfo = null;
 
         this._deepContentScan = false;
         this._selectText = false;
@@ -258,6 +259,10 @@ class TextScanner extends EventDispatcher {
         if (this._textSourceCurrent !== null) {
             if (this._textSourceCurrentSelected) {
                 this._textSourceCurrent.deselect();
+                if (this._selectionRestoreInfo !== null) {
+                    this._restoreSelection(this._selectionRestoreInfo);
+                    this._selectionRestoreInfo = null;
+                }
             }
             this._textSourceCurrent = null;
             this._textSourceCurrentSelected = false;
@@ -313,6 +318,13 @@ class TextScanner extends EventDispatcher {
         let detail = null;
 
         try {
+            const inputInfoDetail = inputInfo.detail;
+            const selectionRestoreInfo = (
+                (isObject(inputInfoDetail) && inputInfoDetail.restoreSelection) ?
+                (this._inputInfoCurrent === null ? this._createSelectionRestoreInfo() : void 0) :
+                null
+            );
+
             if (this._textSourceCurrent !== null && this._textSourceCurrent.hasSameStart(textSource)) {
                 return null;
             }
@@ -322,17 +334,24 @@ class TextScanner extends EventDispatcher {
 
             searched = true;
 
+            let valid = false;
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
-                this._inputInfoCurrent = inputInfo;
-                this.setCurrentTextSource(textSource);
+                valid = true;
             } else if (textSource instanceof TextSourceElement && await this._hasJapanese(textSource.fullContent)) {
                 dictionaryEntries = [];
                 sentence = {sentence: '', offset: 0};
                 type = 'terms';
+                valid = true;
+            }
+
+            if (valid) {
                 this._inputInfoCurrent = inputInfo;
                 this.setCurrentTextSource(textSource);
+                if (typeof selectionRestoreInfo !== 'undefined') {
+                    this._selectionRestoreInfo = selectionRestoreInfo;
+                }
             }
         } catch (e) {
             error = e;
@@ -1052,6 +1071,29 @@ class TextScanner extends EventDispatcher {
             return await yomichan.api.textHasJapaneseCharacters(text);
         } catch (e) {
             return false;
+        }
+    }
+
+    _createSelectionRestoreInfo() {
+        const ranges = [];
+        const selection = window.getSelection();
+        for (let i = 0, ii = selection.rangeCount; i < ii; ++i) {
+            const range = selection.getRangeAt(i);
+            ranges.push(range.cloneRange());
+        }
+        return {ranges};
+    }
+
+    _restoreSelection(selectionRestoreInfo) {
+        const {ranges} = selectionRestoreInfo;
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        for (const range of ranges) {
+            try {
+                selection.addRange(range);
+            } catch (e) {
+                // NOP
+            }
         }
     }
 }
