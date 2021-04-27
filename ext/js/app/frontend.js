@@ -79,7 +79,8 @@ class Frontend {
         ]);
 
         this._hotkeyHandler.registerActions([
-            ['scanSelectedText', this._onActionScanSelectedText.bind(this)]
+            ['scanSelectedText', this._onActionScanSelectedText.bind(this)],
+            ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)]
         ]);
     }
 
@@ -172,7 +173,11 @@ class Frontend {
     // Action handlers
 
     _onActionScanSelectedText() {
-        this._scanSelectedText();
+        this._scanSelectedText(false);
+    }
+
+    _onActionScanTextAtCaret() {
+        this._scanSelectedText(true);
     }
 
     // API message handlers
@@ -679,19 +684,19 @@ class Frontend {
         };
     }
 
-    async _scanSelectedText() {
-        const range = this._getFirstNonEmptySelectionRange();
+    async _scanSelectedText(allowEmptyRange) {
+        const range = this._getFirstSelectionRange(allowEmptyRange);
         if (range === null) { return false; }
         const source = new TextSourceRange(range, range.toString(), null, null);
         await this._textScanner.search(source, {focus: true, restoreSelection: true});
         return true;
     }
 
-    _getFirstNonEmptySelectionRange() {
+    _getFirstSelectionRange(allowEmptyRange) {
         const selection = window.getSelection();
         for (let i = 0, ii = selection.rangeCount; i < ii; ++i) {
             const range = selection.getRangeAt(i);
-            if (range.toString().length > 0) {
+            if (range.toString().length > 0 || allowEmptyRange) {
                 return range;
             }
         }

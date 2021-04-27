@@ -52,6 +52,7 @@ class KeyboardShortcutController {
             ['playAudioFromSource',              {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-audio-source', default: 'jpod101'}}],
             ['copyHostSelection',                {scopes: new Set(['popup'])}],
             ['scanSelectedText',                 {scopes: new Set(['web'])}],
+            ['scanTextAtCaret',                  {scopes: new Set(['web'])}],
             ['toggleOption',                     {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-setting-path', default: ''}}]
         ]);
     }
