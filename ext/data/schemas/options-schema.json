@@ -245,7 +245,7 @@
                                     },
                                     "showIframePopupsInRootFrame": {
                                         "type": "boolean",
-                                        "default": false
+                                        "default": true
                                     },
                                     "useSecurePopupFrameUrl": {
                                         "type": "boolean",
