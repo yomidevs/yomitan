@@ -783,17 +783,27 @@ class DisplayGenerator {
     }
 
     _isVerbOrAdjective(wordClasses) {
+        let isVerbOrAdjective = false;
+        let isSuruVerb = false;
+        let isNoun = false;
         for (const wordClass of wordClasses) {
             switch (wordClass) {
                 case 'v1':
                 case 'v5':
-                case 'vs':
                 case 'vk':
                 case 'vz':
                 case 'adj-i':
-                    return true;
+                    isVerbOrAdjective = true;
+                    break;
+                case 'vs':
+                    isVerbOrAdjective = true;
+                    isSuruVerb = true;
+                    break;
+                case 'n':
+                    isNoun = true;
+                    break;
             }
         }
-        return false;
+        return isVerbOrAdjective && !(isSuruVerb && isNoun);
     }
 }
