@@ -1042,7 +1042,7 @@ button.action-button[data-icon=source-term]::before {
     -webkit-mask-size: contain;
     -webkit-mask-image: url(/images/material-right-arrow.svg);
 }
-headword-list:not(:first-of-type) .headword-current-indicator,
+.headword-list>.headword:not(:first-of-type) .headword-current-indicator,
 :root:not([data-popup-current-indicator-mode=triangle]) .headword-current-indicator {
     display: none;
     transition: none;
