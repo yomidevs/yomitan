@@ -768,7 +768,7 @@ class DisplayGenerator {
 
     _getPitchAccentCategories(reading, pronunciations, wordClasses, headwordIndex) {
         if (pronunciations.length === 0) { return null; }
-        const isVerbOrAdjective = this._isVerbOrAdjective(wordClasses);
+        const isVerbOrAdjective = DictionaryDataUtil.isNonNounVerbOrAdjective(wordClasses);
         const categories = new Set();
         for (const pronunciation of pronunciations) {
             if (pronunciation.headwordIndex !== headwordIndex) { continue; }
@@ -780,30 +780,5 @@ class DisplayGenerator {
             }
         }
         return categories.size > 0 ? [...categories].join(' ') : null;
-    }
-
-    _isVerbOrAdjective(wordClasses) {
-        let isVerbOrAdjective = false;
-        let isSuruVerb = false;
-        let isNoun = false;
-        for (const wordClass of wordClasses) {
-            switch (wordClass) {
-                case 'v1':
-                case 'v5':
-                case 'vk':
-                case 'vz':
-                case 'adj-i':
-                    isVerbOrAdjective = true;
-                    break;
-                case 'vs':
-                    isVerbOrAdjective = true;
-                    isSuruVerb = true;
-                    break;
-                case 'n':
-                    isNoun = true;
-                    break;
-            }
-        }
-        return isVerbOrAdjective && !(isSuruVerb && isNoun);
     }
 }

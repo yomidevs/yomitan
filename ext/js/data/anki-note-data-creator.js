@@ -53,7 +53,7 @@ class AnkiNoteDataCreator {
         const context2 = this.createCachedValue(this._getPublicContext.bind(this, context));
         const pitches = this.createCachedValue(this._getPitches.bind(this, dictionaryEntry));
         const pitchCount = this.createCachedValue(this._getPitchCount.bind(this, pitches));
-        return {
+        const result = {
             marker,
             get definition() { return self.getCachedValue(definition); },
             glossaryLayoutMode,
@@ -70,6 +70,13 @@ class AnkiNoteDataCreator {
             get pitchCount() { return self.getCachedValue(pitchCount); },
             get context() { return self.getCachedValue(context2); }
         };
+        Object.defineProperty(result, 'dictionaryEntry', {
+            configurable: false,
+            enumerable: false,
+            writable: false,
+            value: dictionaryEntry
+        });
+        return result;
     }
 
     /**

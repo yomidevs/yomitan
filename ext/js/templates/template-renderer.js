@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DictionaryDataUtil
  * Handlebars
  */
 
@@ -146,7 +147,8 @@ class TemplateRenderer {
             ['getKanaMorae',     this._getKanaMorae.bind(this)],
             ['typeof',           this._getTypeof.bind(this)],
             ['join',             this._join.bind(this)],
-            ['concat',           this._concat.bind(this)]
+            ['concat',           this._concat.bind(this)],
+            ['pitchCategories',  this._pitchCategories.bind(this)]
         ];
 
         for (const [name, helper] of helpers) {
@@ -465,5 +467,21 @@ class TemplateRenderer {
             result += args[i];
         }
         return result;
+    }
+
+    _pitchCategories(context, data) {
+        const {pronunciations, headwords} = data.dictionaryEntry;
+        const categories = new Set();
+        for (const {headwordIndex, pitches} of pronunciations) {
+            const {reading, wordClasses} = headwords[headwordIndex];
+            const isVerbOrAdjective = DictionaryDataUtil.isNonNounVerbOrAdjective(wordClasses);
+            for (const {position} of pitches) {
+                const category = this._japaneseUtil.getPitchCategory(reading, position, isVerbOrAdjective);
+                if (category !== null) {
+                    categories.add(category);
+                }
+            }
+        }
+        return [...categories];
     }
 }

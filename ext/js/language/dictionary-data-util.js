@@ -188,6 +188,31 @@ class DictionaryDataUtil {
         return disambiguations;
     }
 
+    static isNonNounVerbOrAdjective(wordClasses) {
+        let isVerbOrAdjective = false;
+        let isSuruVerb = false;
+        let isNoun = false;
+        for (const wordClass of wordClasses) {
+            switch (wordClass) {
+                case 'v1':
+                case 'v5':
+                case 'vk':
+                case 'vz':
+                case 'adj-i':
+                    isVerbOrAdjective = true;
+                    break;
+                case 'vs':
+                    isVerbOrAdjective = true;
+                    isSuruVerb = true;
+                    break;
+                case 'n':
+                    isNoun = true;
+                    break;
+            }
+        }
+        return isVerbOrAdjective && !(isSuruVerb && isNoun);
+    }
+
     // Private
 
     static _createFrequencyGroupsFromMap(map) {
