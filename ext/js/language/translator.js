@@ -64,7 +64,7 @@ class Translator {
      *   {
      *     wildcard: (enum: null, 'prefix', 'suffix'),
      *     mainDictionary: (string),
-     *     alphanumeric: (boolean),
+     *     removeNonJapaneseCharacters: (boolean),
      *     convertHalfWidthCharacters: (enum: 'false', 'true', 'variant'),
      *     convertNumericCharacters: (enum: 'false', 'true', 'variant'),
      *     convertAlphabeticCharacters: (enum: 'false', 'true', 'variant'),
@@ -169,8 +169,10 @@ class Translator {
     // Find terms internal implementation
 
     async _findTermsInternal(text, enabledDictionaryMap, options) {
-        const {alphanumeric, wildcard} = options;
-        text = this._getSearchableText(text, alphanumeric);
+        const {wildcard} = options;
+        if (options.removeNonJapaneseCharacters) {
+            text = this._getJapaneseOnlyText(text);
+        }
         if (text.length === 0) {
             return {dictionaryEntries: [], originalTextLength: 0};
         }
@@ -302,15 +304,16 @@ class Translator {
         return text;
     }
 
-    _getSearchableText(text, allowAlphanumericCharacters) {
-        if (allowAlphanumericCharacters) { return text; }
+    _getJapaneseOnlyText(text) {
         const jp = this._japaneseUtil;
         let length = 0;
         for (const c of text) {
-            if (!jp.isCodePointJapanese(c.codePointAt(0))) { break; }
+            if (!jp.isCodePointJapanese(c.codePointAt(0))) {
+                return text.substring(0, length);
+            }
             length += c.length;
         }
-        return length >= text.length ? text : text.substring(0, length);
+        return text;
     }
 
     _getTextOptionEntryVariants(value) {

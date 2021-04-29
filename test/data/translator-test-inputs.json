@@ -14,7 +14,7 @@
         "default": {
             "wildcard": null,
             "mainDictionary": "${title}",
-            "alphanumeric": false,
+            "removeNonJapaneseCharacters": true,
             "convertHalfWidthCharacters": false,
             "convertNumericCharacters": false,
             "convertAlphabeticCharacters": false,
@@ -182,7 +182,7 @@
             "options": [
                 "default",
                 {
-                    "alphanumeric": true,
+                    "removeNonJapaneseCharacters": false,
                     "textReplacements": [
                         null,
                         [
@@ -204,7 +204,7 @@
             "options": [
                 "default",
                 {
-                    "alphanumeric": true,
+                    "removeNonJapaneseCharacters": false,
                     "textReplacements": [
                         null,
                         [
@@ -226,7 +226,7 @@
             "options": [
                 "default",
                 {
-                    "alphanumeric": true,
+                    "removeNonJapaneseCharacters": false,
                     "textReplacements": [
                         null,
                         [
@@ -248,7 +248,7 @@
             "options": [
                 "default",
                 {
-                    "alphanumeric": true,
+                    "removeNonJapaneseCharacters": false,
                     "textReplacements": [
                         null,
                         [
@@ -270,7 +270,7 @@
             "options": [
                 "default",
                 {
-                    "alphanumeric": true,
+                    "removeNonJapaneseCharacters": false,
                     "textReplacements": [
                         null,
                         [
