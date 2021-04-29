@@ -71,7 +71,7 @@ class PermissionsOriginController {
             const menuButton = node.querySelector('.permissions-origin-button');
             input.value = origin;
             this._eventListeners.addEventListener(menuButton, 'menuClose', this._onOriginMenuClose.bind(this, origin), false);
-            this._originContainerChildren.push(...node.children);
+            this._originContainerChildren.push(...node.childNodes);
             fragment.appendChild(node);
             any = true;
         }
