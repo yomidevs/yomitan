@@ -1313,65 +1313,6 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
     display: none;
 }
 
-.dictionary-info {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-}
-.dictionary-info-label {
-    margin-left: 1em;
-}
-
-.dictionary-title {
-    color: inherit;
-    transition: color var(--animation-duration) ease-in-out;
-}
-.dictionary-item[data-enabled=false] .dictionary-title {
-    color: var(--text-color-light2);
-}
-
-.dictionary-list {
-    display: flex;
-    flex-flow: column nowrap;
-    width: 100%;
-}
-.dictionary-list>.settings-item,
-.dictionary-list>.settings-item+.settings-item {
-    margin-left: calc(var(--modal-padding-horizontal) * -1);
-    margin-right: calc(var(--modal-padding-horizontal) * -1);
-    border-top: var(--thin-border-size) solid var(--separator-color2);
-}
-.dictionary-details-table {
-    display: table;
-    width: 100%;
-}
-.dictionary-details-entry {
-    display: table-row;
-}
-.dictionary-details-entry+.dictionary-details-entry>* {
-    padding-top: 0.25em;
-}
-.dictionary-details-entry-label {
-    display: table-cell;
-    font-weight: bold;
-    white-space: nowrap;
-    padding-right: 0.5em;
-}
-.dictionary-details-entry-info {
-    display: table-cell;
-    white-space: pre-line;
-}
-.dictionary-counts {
-    width: 100%;
-    box-sizing: border-box;
-    font-size: inherit;
-    max-height: 10em;
-    line-height: 1.25;
-    font-family: 'Courier New', Courier, monospace;
-    white-space: pre;
-    overflow: auto;
-}
-
 .profile-add-button-container {
     display: flex;
     flex-flow: row nowrap;
@@ -2096,27 +2037,46 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     top: calc(1em * (3 / var(--font-size-no-units)));
 }
 
-.warning-badge {
+.badge {
     position: relative;
     width: var(--badge-size);
     height: var(--badge-size);
     margin: 0;
     padding: 0;
-    background-color: var(--warning-color-light);
     border-radius: 50%;
     box-shadow: var(--shadow-vertical);
 }
-.warning-badge:not([hidden]) {
+.badge:not([hidden]) {
     display: block;
 }
-.warning-badge>.icon {
+.badge>.icon {
     display: block;
     position: absolute;
     left: 0;
     top: 0;
     right: 0;
     bottom: 0;
+}
+.badge.badge-small-icon>.icon {
+    margin: calc(1em / var(--font-size-no-units));
+}
+.badge.info-badge {
+    background-color: var(--accent-color-lighter);
+}
+.badge.info-badge>.icon {
+    background-color: var(--accent-color);
+}
+.badge.warning-badge {
+    background-color: var(--warning-color-light);
+}
+.badge.warning-badge>.icon {
     background-color: var(--warning-color);
+}
+.badge.danger-badge {
+    background-color: var(--danger-color-lighter);
+}
+.badge.danger-badge>.icon {
+    background-color: var(--danger-color);
 }
 
 .collapsible-dictionary-list {
@@ -2157,6 +2117,107 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 }
 :root:not([data-loading-stalled=true]) .page-loading-stalled-notification {
     display: none;
+}
+
+
+/* Dictionary settings */
+.dictionary-list {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    grid-template-rows: auto;
+    place-items: center start;
+    margin-top: 0.5em;
+}
+.dictionary-list[data-count='0']>.dictionary-item-top {
+    display: none;
+}
+.dictionary-item-button-height {
+    height: var(--icon-button-size);
+}
+.dictionary-item {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    border-top: var(--thin-border-size) solid var(--separator-color2);
+}
+.dictionary-item-enabled-toggle-container {
+    margin-right: 0.5em;
+}
+.dictionary-item-title-container {
+    flex: 1 1 auto;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    margin-right: 0.5em;
+}
+.dictionary-title {
+    color: inherit;
+    transition: color var(--animation-duration) ease-in-out;
+}
+.dictionary-item[data-enabled=false] .dictionary-title {
+    color: var(--text-color-light2);
+}
+input[type=number].dictionary-priority {
+    margin-top: 0;
+    margin-right: 0.5em;
+}
+.dictionary-outdated-button,
+.dictionary-integrity-button {
+    --button-content-color: transparent;
+    --button-border-color: transparent;
+    --button-background-color: transparent;
+    --button-shadow: none;
+
+    --button-hover-content-color: transparent;
+    --button-hover-border-color: transparent;
+    --button-hover-background-color: transparent;
+    --button-hover-shadow: none;
+
+    --button-active-content-color: transparent;
+    --button-active-border-color: transparent;
+    --button-active-background-color: transparent;
+    --button-active-shadow: none;
+
+    --button-disabled-content-color: transparent;
+    --button-disabled-border-color: transparent;
+    --button-disabled-background-color: transparent;
+    --button-disabled-shadow: none;
+
+    --button-padding-vertical: 0;
+    --button-padding-horizontal: 0;
+
+    margin-left: 0.375em;
+}
+.dictionary-details-table {
+    display: table;
+    width: 100%;
+}
+.dictionary-details-entry {
+    display: table-row;
+}
+.dictionary-details-entry+.dictionary-details-entry>* {
+    padding-top: 0.25em;
+}
+.dictionary-details-entry-label {
+    display: table-cell;
+    font-weight: bold;
+    white-space: nowrap;
+    padding-right: 0.5em;
+}
+.dictionary-details-entry-info {
+    display: table-cell;
+    white-space: pre-line;
+}
+.dictionary-counts {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: inherit;
+    max-height: 10em;
+    line-height: 1.25;
+    font-family: 'Courier New', Courier, monospace;
+    white-space: pre;
+    overflow: auto;
 }
 
 

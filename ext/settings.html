@@ -22,7 +22,7 @@
     <div class="sidebar"><div class="sidebar-inner">
         <div class="sidebar-body">
             <a href="#!profile"          class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="profile"></span></span><span class="outline-item-label">Profile</span></a>
-            <a href="#!dictionaries"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="book"></span><span class="outline-item-left-warning-badge no-dictionaries-enabled-warning" hidden><div class="warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div></span></span><span class="outline-item-label">Dictionaries</span></a>
+            <a href="#!dictionaries"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="book"></span><span class="outline-item-left-warning-badge no-dictionaries-enabled-warning" hidden><div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div></span></span><span class="outline-item-label">Dictionaries</span></a>
             <a href="#!general"          class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="cog"></span></span><span class="outline-item-label">General</span></a>
             <a href="#!scanning"         class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="scanning"></span></span><span class="outline-item-label">Scanning</span></a>
             <a href="#!popup"            class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup"></span></span><span class="outline-item-label">Popup</span></a>
@@ -121,7 +121,7 @@
                 <div class="settings-item-label">
                     <div class="flex-row-nowrap">
                         <div>Configure installed and enabled dictionaries&hellip;</div>
-                        <div class="flex-margin-left warning-badge no-dictionaries-enabled-warning" hidden><span class="icon" data-icon="exclamation-point-short"></span></div>
+                        <div class="flex-margin-left badge warning-badge no-dictionaries-enabled-warning" hidden><span class="icon" data-icon="exclamation-point-short"></span></div>
                     </div>
                 </div>
             </div>
@@ -2080,8 +2080,12 @@
             for a list free dictionaries or click the <em>Import</em> button below to select a dictionary file to import.
         </div>
         <div id="dictionary-error" class="danger-text margin-above" hidden></div>
-        <div id="dictionary-list" class="dictionary-list"></div>
-        <div id="dictionary-list-extra" class="dictionary-list"></div>
+        <div id="dictionary-list" class="dictionary-list" data-count="0">
+            <label class="dictionary-item-top toggle dictionary-item-enabled-toggle-container"><input type="checkbox" id="all-dictionaries-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            <div class="dictionary-item-top dictionary-item-title-container">All</div>
+            <div class="dictionary-item-top">Priority</div>
+            <div class="dictionary-item-top dictionary-item-button-height"></div>
+        </div>
 
         <div hidden><input type="file" id="dictionary-import-file-input" accept=".zip,application/zip" multiple></div>
     </div>
@@ -2166,86 +2170,102 @@
     </div>
 </div></div>
 
-
-<!-- Dictionary templates -->
-<template id="dictionary-template"><div class="settings-item dictionary-item">
-    <div class="settings-item-inner">
-        <div class="settings-item-left">
-            <div class="settings-item-label dictionary-info">
-                <label class="toggle"><input type="checkbox" class="dictionary-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                <span class="dictionary-info-label"><strong class="dictionary-title"></strong> <span class="light dictionary-version"></span></span>
-            </div>
-        </div>
-        <div class="settings-item-right">
-            <button class="icon-button dictionary-menu-button" data-menu="dictionary-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
-        </div>
+<div id="dictionary-details-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+    <div class="modal-header">
+        <div class="modal-title"><strong class="dictionary-title"></strong> <span class="light dictionary-version"></span></div>
     </div>
-    <div class="settings-item-children">
-
+    <div class="modal-body">
         <div class="settings-item dictionary-outdated-notification" hidden><div class="settings-item-children danger-text">
             This dictionary is outdated and may not support new extension features.
             Re-import the dictionary to enable support for the latest features.
         </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Priority</div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Prefix wildcard searches supported
+                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" class="dictionary-prefix-wildcard-searches-supported" disabled readonly><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
             </div>
-            <div class="settings-item-right">
-                <input type="number" step="1" class="short-height dictionary-priority">
+            <div class="settings-item-children more" hidden>
+                <p class="warning-text">
+                    Changing this value requires the dictionary to be re-imported.
+                </p>
+                <p><a class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
             </div>
+        </div>
+        <div class="settings-item"><div class="settings-item-children">
+            <div class="dictionary-details-table"></div>
+            <div class="dictionary-counts"></div>
         </div></div>
-        <div class="dictionary-details" hidden>
-            <div class="settings-item">
-                <div class="settings-item-inner">
-                    <div class="settings-item-left">
-                        <div class="settings-item-label">
-                            Prefix wildcard searches supported
-                            <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                        </div>
-                    </div>
-                    <div class="settings-item-right">
-                        <label class="toggle"><input type="checkbox" class="dictionary-prefix-wildcard-searches-supported" disabled readonly><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                    </div>
-                </div>
-                <div class="settings-item-children more" hidden>
-                    <p class="warning-text">
-                        Changing this value requires the dictionary to be re-imported.
-                    </p>
-                    <p><a class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
-                </div>
-            </div>
-            <div class="settings-item"><div class="settings-item-children">
-                <div class="dictionary-details-table"></div>
-                <div class="dictionary-counts"></div>
-            </div></div>
-        </div>
-
     </div>
-</div></template>
+    <div class="modal-footer">
+        <button data-modal-action="hide">Close</button>
+    </div>
+</div></div>
 
-<template id="dictionary-details-entry-template"><div class="dictionary-details-entry">
-    <span class="dictionary-details-entry-label"></span>
-    <span class="dictionary-details-entry-info"></span>
-</div></template>
-
-<template id="dictionary-extra-template"><div class="settings-item">
-    <div class="settings-item-inner">
-        <div class="settings-item-left">
-            <div class="settings-item-label"><strong class="dictionary-title">Unassociated Data</strong> <span class="light dictionary-total-count"></span></div>
+<div id="dictionary-extra-data-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+    <div class="modal-header">
+        <div class="modal-title">
+            <strong class="dictionary-title">Unassociated Data</strong> <span class="light dictionary-total-count"></span>
         </div>
     </div>
-    <div class="settings-item-children">
+    <div class="modal-body">
         <p class="warning-text">
             The database contains extra data which is not associated with any installed dictionary.
             Purging the database can fix this issue.
         </p>
         <div class="dictionary-counts"></div>
     </div>
+    <div class="modal-footer">
+        <button data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
+
+<!-- Dictionary templates -->
+<template id="dictionary-template">
+    <label class="toggle dictionary-item-enabled-toggle-container"><input type="checkbox" class="dictionary-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+    <div class="dictionary-item-title-container">
+        <span>
+            <strong class="dictionary-title"></strong> <span class="light dictionary-version"></span>
+        </span>
+        <button class="dictionary-outdated-button" hidden>
+            <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
+        </button>
+        <button class="dictionary-integrity-button" hidden>
+            <div class="badge info-badge badge-small-icon"><span class="icon" data-icon="checkmark"></span></div>
+        </button>
+    </div>
+    <input type="number" step="1" class="short-height dictionary-priority">
+    <button class="icon-button dictionary-menu-button" data-menu="dictionary-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+</template>
+
+<template id="dictionary-details-entry-template"><div class="dictionary-details-entry">
+    <span class="dictionary-details-entry-label"></span>
+    <span class="dictionary-details-entry-info"></span>
 </div></template>
 
+<template id="dictionary-extra-template">
+    <div class="dictionary-item-bottom"></div>
+    <div class="dictionary-item-bottom dictionary-item-title-container">
+        <span>
+            <strong class="dictionary-title">Unassociated Data</strong> <span class="light dictionary-total-count"></span>
+        </span>
+        <button class="dictionary-integrity-button">
+            <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
+        </button>
+    </div>
+    <div class="dictionary-item-bottom"></div>
+    <div class="dictionary-item-bottom dictionary-item-button-height"></div>
+</template>
+
 <template id="dictionary-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button class="popup-menu-item" data-menu-action="showDetails">Show details</button>
-    <button class="popup-menu-item" data-menu-action="hideDetails" hidden>Hide details</button>
+    <button class="popup-menu-item" data-menu-action="showDetails">Details&hellip;</button>
     <button class="popup-menu-item" data-menu-action="delete">Delete</button>
 </div></div></div></template>
 
