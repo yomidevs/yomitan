@@ -173,7 +173,7 @@ class DOMTextScanner {
                 // Character should be ignored
                 continue;
             } else if (charAttributes === 1) {
-                // Character is collapsable whitespace
+                // Character is collapsible whitespace
                 lineHasWhitespace = true;
             } else {
                 // Character should be added to the content
@@ -263,7 +263,7 @@ class DOMTextScanner {
                 // Character should be ignored
                 continue;
             } else if (charAttributes === 1) {
-                // Character is collapsable whitespace
+                // Character is collapsible whitespace
                 lineHasWhitespace = true;
             } else {
                 // Character should be added to the content
@@ -449,7 +449,7 @@ class DOMTextScanner {
      * @param character A string containing a single character.
      * @returns An integer representing the attributes of the character.
      *   0: Character should be ignored.
-     *   1: Character is collapsable whitespace.
+     *   1: Character is collapsible whitespace.
      *   2: Character should be added to the content.
      *   3: Character should be added to the content and is a newline.
      */
