@@ -51,6 +51,7 @@ class DictionaryEntry {
         this._priorityInput.dataset.setting = `dictionaries[${index}].priority`;
         this._enabledCheckbox.dataset.setting = `dictionaries[${index}].enabled`;
         this._eventListeners.addEventListener(this._enabledCheckbox, 'settingChanged', this._onEnabledChanged.bind(this), false);
+        this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
         this._eventListeners.addEventListener(this._outdatedButton, 'click', this._onOutdatedButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._integrityButton, 'click', this._onIntegrityButtonClick.bind(this), false);
@@ -77,6 +78,13 @@ class DictionaryEntry {
 
     // Private
 
+    _onMenuOpen(e) {
+        const bodyNode = e.detail.menu.bodyNode;
+        const count = this._dictionaryController.dictionaryOptionCount;
+        this._setMenuActionEnabled(bodyNode, 'moveUp', this._index > 0);
+        this._setMenuActionEnabled(bodyNode, 'moveDown', this._index < count - 1);
+    }
+
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'delete':
@@ -84,6 +92,12 @@ class DictionaryEntry {
                 break;
             case 'showDetails':
                 this._showDetails();
+                break;
+            case 'moveUp':
+                this._move(-1);
+                break;
+            case 'moveDown':
+                this._move(1);
                 break;
         }
     }
@@ -147,6 +161,16 @@ class DictionaryEntry {
 
     _delete() {
         this._dictionaryController.deleteDictionary(this.dictionaryTitle);
+    }
+
+    _move(offset) {
+        this._dictionaryController.swapDictionaryOptions(this._index, this._index + offset);
+    }
+
+    _setMenuActionEnabled(menu, action, enabled) {
+        const element = menu.querySelector(`[data-menu-action="${action}"]`);
+        if (element === null) { return; }
+        element.disabled = !enabled;
     }
 }
 
@@ -226,6 +250,10 @@ class DictionaryController {
         return this._modalController;
     }
 
+    get dictionaryOptionCount() {
+        return this._dictionaryEntries.length;
+    }
+
     async prepare() {
         this._checkIntegrityButton = document.querySelector('#dictionary-check-integrity');
         this._dictionaryEntryContainer = document.querySelector('#dictionary-list');
@@ -255,6 +283,25 @@ class DictionaryController {
         modal.node.dataset.dictionaryTitle = dictionaryTitle;
         modal.node.querySelector('#dictionary-confirm-delete-name').textContent = dictionaryTitle;
         modal.setVisible(true);
+    }
+
+    async swapDictionaryOptions(index1, index2) {
+        const options = await this._settingsController.getOptions();
+        const {dictionaries} = options;
+        if (
+            index1 < 0 || index1 >= dictionaries.length ||
+            index2 < 0 || index2 >= dictionaries.length
+        ) {
+            return;
+        }
+
+        await this._settingsController.modifyProfileSettings([{
+            action: 'swap',
+            path1: `dictionaries[${index1}]`,
+            path2: `dictionaries[${index2}]`
+        }]);
+
+        await this._updateEntries();
     }
 
     instantiateTemplate(name) {
