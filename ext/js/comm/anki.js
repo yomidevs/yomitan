@@ -71,6 +71,12 @@ class AnkiConnect {
         return await this._invoke('canAddNotes', {notes});
     }
 
+    async notesInfo(notes) {
+        if (!this._enabled) { return []; }
+        await this._checkVersion();
+        return await this._invoke('notesInfo', {notes});
+    }
+
     async getDeckNames() {
         if (!this._enabled) { return []; }
         await this._checkVersion();

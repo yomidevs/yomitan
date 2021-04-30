@@ -806,7 +806,8 @@
                                     "duplicateScope",
                                     "checkForDuplicates",
                                     "fieldTemplates",
-                                    "suspendNewCards"
+                                    "suspendNewCards",
+                                    "displayTags"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -912,6 +913,11 @@
                                     "suspendNewCards": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "displayTags": {
+                                        "type": "string",
+                                        "enum": ["never", "always", "non-standard"],
+                                        "default": "never"
                                     }
                                 }
                             },

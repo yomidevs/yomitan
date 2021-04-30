@@ -644,6 +644,9 @@ button.action-button[hidden] {
         -webkit-filter var(--animation-duration) linear,
         background-color var(--animation-duration) linear;
 }
+button.collapsible-action-button[hidden] {
+    display: none;
+}
 button.action-button:disabled {
     pointer-events: none;
     cursor: default;
@@ -667,7 +670,7 @@ button.action-button:active {
     background-color: var(--action-button-active-color);
     box-shadow: none;
 }
-button.action-button::before {
+button.action-button[data-icon]::before {
     content: '';
     width: var(--action-button-size);
     height: var(--action-button-size);
@@ -690,6 +693,12 @@ button.action-button[data-icon=play-audio]::before {
 }
 button.action-button[data-icon=source-term]::before {
     background-image: url('/images/source-term.svg');
+}
+.action-view-tags>.icon {
+    display: block;
+    width: var(--action-button-size);
+    height: var(--action-button-size);
+    background-color: var(--text-color);
 }
 :root[data-result-output-mode=merge] .entry[data-type=term] .actions>button.action-button.action-play-audio {
     display: none;

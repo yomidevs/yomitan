@@ -113,6 +113,7 @@ class Display extends EventDispatcher {
         this._displayAudio = new DisplayAudio(this);
         this._ankiNoteNotification = null;
         this._ankiNoteNotificationEventListeners = null;
+        this._ankiTagNotification = null;
         this._queryPostProcessor = null;
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         this._elementOverflowController = new ElementOverflowController();
@@ -1081,8 +1082,8 @@ class Display extends EventDispatcher {
             let states;
             try {
                 const noteContext = this._getNoteContext();
-                const {checkForDuplicates} = this._options.anki;
-                states = await this._areDictionaryEntriesAddable(dictionaryEntries, modes, noteContext, checkForDuplicates ? null : true);
+                const {checkForDuplicates, displayTags} = this._options.anki;
+                states = await this._areDictionaryEntriesAddable(dictionaryEntries, modes, noteContext, checkForDuplicates ? null : true, displayTags !== 'never');
             } catch (e) {
                 return;
             }
@@ -1096,11 +1097,12 @@ class Display extends EventDispatcher {
     }
 
     _updateAdderButtons2(states, modes) {
+        const {displayTags} = this._options.anki;
         for (let i = 0, ii = states.length; i < ii; ++i) {
             const infos = states[i];
             let noteId = null;
             for (let j = 0, jj = infos.length; j < jj; ++j) {
-                const {canAdd, noteIds} = infos[j];
+                const {canAdd, noteIds, noteInfos} = infos[j];
                 const mode = modes[j];
                 const button = this._adderButtonFind(i, mode);
                 if (button === null) {
@@ -1112,11 +1114,58 @@ class Display extends EventDispatcher {
                 }
                 button.disabled = !canAdd;
                 button.hidden = false;
+
+                if (displayTags !== 'never' && Array.isArray(noteInfos)) {
+                    this._setupTagsIndicator(i, noteInfos);
+                }
             }
             if (noteId !== null) {
                 this._viewerButtonShow(i, noteId);
             }
         }
+    }
+
+    _setupTagsIndicator(i, noteInfos) {
+        const tagsIndicator = this._tagsIndicatorFind(i);
+        if (tagsIndicator === null) {
+            return;
+        }
+
+        const {tags: optionTags, displayTags} = this._options.anki;
+        const noteTags = new Set();
+        for (const {tags} of noteInfos) {
+            for (const tag of tags) {
+                noteTags.add(tag);
+            }
+        }
+        if (displayTags === 'non-standard') {
+            for (const tag of optionTags) {
+                noteTags.delete(tag);
+            }
+        }
+
+        if (noteTags.size > 0) {
+            tagsIndicator.disabled = false;
+            tagsIndicator.hidden = false;
+            tagsIndicator.title = `Card tags: ${[...noteTags].join(', ')}`;
+        }
+    }
+
+    _onShowTags(e) {
+        e.preventDefault();
+        const tags = e.currentTarget.title;
+        this._showAnkiTagsNotification(tags);
+    }
+
+    _showAnkiTagsNotification(message) {
+        if (this._ankiTagNotification === null) {
+            const node = this._displayGenerator.createEmptyFooterNotification();
+            node.classList.add('click-scannable');
+            this._ankiTagNotification = new DisplayNotification(this._footerNotificationContainer, node);
+        }
+
+        this._ankiTagNotification.setContent(message);
+        this._ankiTagNotification.open();
     }
 
     _entrySetCurrent(index) {
@@ -1320,6 +1369,11 @@ class Display extends EventDispatcher {
         return entry !== null ? entry.querySelector(`.action-add-note[data-mode="${mode}"]`) : null;
     }
 
+    _tagsIndicatorFind(index) {
+        const entry = this._getEntry(index);
+        return entry !== null ? entry.querySelector('.action-view-tags') : null;
+    }
+
     _viewerButtonFind(index) {
         const entry = this._getEntry(index);
         return entry !== null ? entry.querySelector('.action-view-note') : null;
@@ -1424,7 +1478,7 @@ class Display extends EventDispatcher {
         return templates;
     }
 
-    async _areDictionaryEntriesAddable(dictionaryEntries, modes, context, forceCanAddValue) {
+    async _areDictionaryEntriesAddable(dictionaryEntries, modes, context, forceCanAddValue, fetchAdditionalInfo) {
         const modeCount = modes.length;
         const notePromises = [];
         for (const dictionaryEntry of dictionaryEntries) {
@@ -1442,7 +1496,7 @@ class Display extends EventDispatcher {
             }
             infos = this._getAnkiNoteInfoForceValue(notes, forceCanAddValue);
         } else {
-            infos = await yomichan.api.getAnkiNoteInfo(notes);
+            infos = await yomichan.api.getAnkiNoteInfo(notes, fetchAdditionalInfo);
         }
 
         const results = [];
@@ -1703,6 +1757,7 @@ class Display extends EventDispatcher {
 
     _addEntryEventListeners(entry) {
         this._eventListeners.addEventListener(entry, 'click', this._onEntryClick.bind(this));
+        this._addMultipleEventListeners(entry, '.action-view-tags', 'click', this._onShowTags.bind(this));
         this._addMultipleEventListeners(entry, '.action-add-note', 'click', this._onNoteAdd.bind(this));
         this._addMultipleEventListeners(entry, '.action-view-note', 'click', this._onNoteView.bind(this));
         this._addMultipleEventListeners(entry, '.headword-kanji-link', 'click', this._onKanjiLookup.bind(this));

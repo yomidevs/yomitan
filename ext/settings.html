@@ -1565,6 +1565,34 @@
                 <label class="toggle"><input type="checkbox" data-setting="anki.suspendNewCards"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Show card tags
+                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <select data-setting="anki.displayTags">
+                        <option value="never">Never</option>
+                        <option value="always">Always</option>
+                        <option value="non-standard">Non-Standard</option>
+                    </select>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    When coming across a word that is already in an Anki deck, a button will appear that shows
+                    the tags the card has. If set to <em>Non-Standard</em>, all tags that are included in the
+                    <em>Card tags</em> option will be filtered out from the list. If no tags remain after filtering,
+                    then the button will not be shown.
+                </p>
+                <p>
+                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
         <div class="settings-item settings-item-button" data-modal-action="show,anki-cards"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure Anki card format&hellip;</div>

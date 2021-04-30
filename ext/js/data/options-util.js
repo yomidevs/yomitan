@@ -792,6 +792,7 @@ class OptionsUtil {
         // Version 11 changes:
         //  Changed dictionaries to an array.
         //  Changed audio.customSourceUrl's {expression} marker to {term}.
+        //  Added anki.displayTags.
         const customSourceUrlPattern = /\{expression\}/g;
         for (const profile of options.profiles) {
             const dictionariesNew = [];
@@ -805,6 +806,8 @@ class OptionsUtil {
                 customSourceUrl = customSourceUrl.replace(customSourceUrlPattern, '{term}');
             }
             profile.options.audio.customSourceUrl = customSourceUrl;
+
+            profile.options.anki.displayTags = 'never';
         }
         return options;
     }

@@ -52,8 +52,8 @@ class API {
         return this._invoke('addAnkiNote', {note});
     }
 
-    getAnkiNoteInfo(notes) {
-        return this._invoke('getAnkiNoteInfo', {notes});
+    getAnkiNoteInfo(notes, fetchAdditionalInfo) {
+        return this._invoke('getAnkiNoteInfo', {notes, fetchAdditionalInfo});
     }
 
     injectAnkiNoteMedia(timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails) {

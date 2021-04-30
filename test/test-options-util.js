@@ -431,6 +431,7 @@ function createProfileOptionsUpdatedTestData1() {
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
             duplicateScope: 'collection',
+            displayTags: 'never',
             checkForDuplicates: true,
             fieldTemplates: null,
             suspendNewCards: false
