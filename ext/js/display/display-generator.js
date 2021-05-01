@@ -262,7 +262,6 @@ class DisplayGenerator {
         this._setTextContent(node.querySelector('.headword-reading'), reading);
 
         this._appendFurigana(termContainer, term, reading, this._appendKanjiLinks.bind(this));
-        this._appendMultiple(tagContainer, this._createTag.bind(this), tags);
         this._appendMultiple(tagContainer, this._createSearchTag.bind(this), searchQueries);
 
         return node;
