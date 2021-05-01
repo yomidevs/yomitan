@@ -30,6 +30,10 @@ class ProfileConditionsUI extends EventDispatcher {
         this._eventListeners = new EventListenerCollection();
         this._defaultType = 'popupLevel';
         this._profileIndex = 0;
+        const validateInteger = this._validateInteger.bind(this);
+        const normalizeInteger = this._normalizeInteger.bind(this);
+        const validateFlags = this._validateFlags.bind(this);
+        const normalizeFlags = this._normalizeFlags.bind(this);
         this._descriptors = new Map([
             [
                 'popupLevel',
@@ -37,12 +41,12 @@ class ProfileConditionsUI extends EventDispatcher {
                     displayName: 'Popup Level',
                     defaultOperator: 'equal',
                     operators: new Map([
-                        ['equal',              {displayName: '=',      type: 'integer', defaultValue: '0', validate: this._validateInteger.bind(this), normalize: this._normalizeInteger.bind(this)}],
-                        ['notEqual',           {displayName: '\u2260', type: 'integer', defaultValue: '0', validate: this._validateInteger.bind(this), normalize: this._normalizeInteger.bind(this)}],
-                        ['lessThan',           {displayName: '<',      type: 'integer', defaultValue: '0', validate: this._validateInteger.bind(this), normalize: this._normalizeInteger.bind(this)}],
-                        ['greaterThan',        {displayName: '>',      type: 'integer', defaultValue: '0', validate: this._validateInteger.bind(this), normalize: this._normalizeInteger.bind(this)}],
-                        ['lessThanOrEqual',    {displayName: '\u2264', type: 'integer', defaultValue: '0', validate: this._validateInteger.bind(this), normalize: this._normalizeInteger.bind(this)}],
-                        ['greaterThanOrEqual', {displayName: '\u2265', type: 'integer', defaultValue: '0', validate: this._validateInteger.bind(this), normalize: this._normalizeInteger.bind(this)}]
+                        ['equal',              {displayName: '=',      type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
+                        ['notEqual',           {displayName: '\u2260', type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
+                        ['lessThan',           {displayName: '<',      type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
+                        ['greaterThan',        {displayName: '>',      type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
+                        ['lessThanOrEqual',    {displayName: '\u2264', type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
+                        ['greaterThanOrEqual', {displayName: '\u2265', type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}]
                     ])
                 }
             ],
@@ -69,7 +73,23 @@ class ProfileConditionsUI extends EventDispatcher {
                         ['notInclude', {displayName: 'Don\'t Include', type: 'modifierKeys', defaultValue: ''}]
                     ])
                 }
+            ],
+            [
+                'flags',
+                {
+                    displayName: 'Flags',
+                    defaultOperator: 'are',
+                    operators: new Map([
+                        ['are',        {displayName: 'Are',            type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}],
+                        ['areNot',     {displayName: 'Are Not',        type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}],
+                        ['include',    {displayName: 'Include',        type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}],
+                        ['notInclude', {displayName: 'Don\'t Include', type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}]
+                    ])
+                }
             ]
+        ]);
+        this._validFlags = new Set([
+            'clipboard'
         ]);
     }
 
@@ -278,6 +298,20 @@ class ProfileConditionsUI extends EventDispatcher {
 
     _normalizeDomains(value) {
         return this.splitValue(value).join(', ');
+    }
+
+    _validateFlags(value) {
+        const flags = this.splitValue(value);
+        for (const flag of flags) {
+            if (!this._validFlags.has(flag)) {
+                return false;
+            }
+        }
+        return flags.length > 0;
+    }
+
+    _normalizeFlags(value) {
+        return [...new Set(this.splitValue(value))].join(', ');
     }
 
     _triggerConditionGroupCountChanged(count) {
