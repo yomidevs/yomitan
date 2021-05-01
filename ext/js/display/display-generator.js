@@ -238,14 +238,9 @@ class DisplayGenerator {
     _createTermHeadword(headword, headwordIndex, pronunciations) {
         const {term, reading, tags} = headword;
 
-        const searchQueries = [];
-        if (term) { searchQueries.push(term); }
-        if (reading) { searchQueries.push(reading); }
-
         const node = this._templates.instantiate('headword');
 
         const termContainer = node.querySelector('.headword-term');
-        const tagContainer = node.querySelector('.headword-tag-list');
 
         node.dataset.readingIsSame = `${reading === term}`;
         node.dataset.frequency = DictionaryDataUtil.getTermFrequency(tags);
@@ -262,7 +257,6 @@ class DisplayGenerator {
         this._setTextContent(node.querySelector('.headword-reading'), reading);
 
         this._appendFurigana(termContainer, term, reading, this._appendKanjiLinks.bind(this));
-        this._appendMultiple(tagContainer, this._createSearchTag.bind(this), searchQueries);
 
         return node;
     }

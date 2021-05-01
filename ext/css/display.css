@@ -879,9 +879,6 @@ button.action-button[data-icon=source-term]::before {
 .headword-details {
     display: inline;
 }
-.headword-tag-list {
-    display: none;
-}
 .headword-list-details {
     display: inline;
 }
@@ -1101,16 +1098,6 @@ button.action-button[data-icon=source-term]::before {
     bottom: 0.5em;
 }
 :root:not([data-result-output-mode=merge]) .headword-list .headword-details>.action-play-audio {
-    display: none;
-}
-:root[data-result-output-mode=merge] .headword-list .headword-tag-list {
-    display: block;
-    position: absolute;
-    left: 0;
-    bottom: -0.5em;
-    white-space: nowrap;
-}
-:root[data-result-output-mode=merge] .entry[data-type=term] .headword-list-tag-list>.tag[data-category=search] {
     display: none;
 }
 
