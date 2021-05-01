@@ -368,8 +368,8 @@ class SearchDisplayController {
                 dictionaryEntries: null,
                 animate,
                 contentOrigin: {
-                    tabId: this.tabId,
-                    frameId: this.frameId
+                    tabId: this._tabId,
+                    frameId: this._frameId
                 }
             }
         };

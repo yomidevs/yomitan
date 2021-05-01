@@ -194,14 +194,6 @@ class Display extends EventDispatcher {
         return this._progressIndicatorVisible;
     }
 
-    get tabId() {
-        return this._tabId;
-    }
-
-    get frameId() {
-        return this._frameId;
-    }
-
     get parentPopupId() {
         return this._parentPopupId;
     }
@@ -1635,10 +1627,14 @@ class Display extends EventDispatcher {
 
     async _updateNestedFrontend(options) {
         const isSearchPage = (this._pageType === 'search');
-        const isEnabled = this._childrenSupported && (
-            (isSearchPage) ?
-            (options.scanning.enableOnSearchPage) :
-            (this._depth < options.scanning.popupNestingMaxDepth)
+        const isEnabled = (
+            this._childrenSupported &&
+            typeof this._tabId === 'number' &&
+            (
+                (isSearchPage) ?
+                (options.scanning.enableOnSearchPage) :
+                (this._depth < options.scanning.popupNestingMaxDepth)
+            )
         );
 
         if (this._frontend === null) {
