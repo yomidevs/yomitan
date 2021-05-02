@@ -117,7 +117,7 @@ class DictionaryEntry {
     }
 
     _showDetails() {
-        const {title, revision, version} = this._dictionaryInfo;
+        const {title, revision, version, prefixWildcardsSupported} = this._dictionaryInfo;
 
         const modal = this._dictionaryController.modalController.getModal('dictionary-details');
 
@@ -125,6 +125,7 @@ class DictionaryEntry {
         modal.node.querySelector('.dictionary-version').textContent = `rev.${revision}`;
         modal.node.querySelector('.dictionary-outdated-notification').hidden = (version >= 3);
         modal.node.querySelector('.dictionary-counts').textContent = this._counts !== null ? JSON.stringify(this._counts, null, 4) : '';
+        modal.node.querySelector('.dictionary-prefix-wildcard-searches-supported').checked = prefixWildcardsSupported;
         this._setupDetails(modal.node.querySelector('.dictionary-details-table'));
 
         modal.setVisible(true);
