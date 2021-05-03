@@ -83,6 +83,7 @@ class DictionaryEntry {
         const count = this._dictionaryController.dictionaryOptionCount;
         this._setMenuActionEnabled(bodyNode, 'moveUp', this._index > 0);
         this._setMenuActionEnabled(bodyNode, 'moveDown', this._index < count - 1);
+        this._setMenuActionEnabled(bodyNode, 'moveTo', count > 1);
     }
 
     _onMenuClose(e) {
@@ -98,6 +99,9 @@ class DictionaryEntry {
                 break;
             case 'moveDown':
                 this._move(1);
+                break;
+            case 'moveTo':
+                this._showMoveToModal();
                 break;
         }
     }
@@ -172,6 +176,20 @@ class DictionaryEntry {
         const element = menu.querySelector(`[data-menu-action="${action}"]`);
         if (element === null) { return; }
         element.disabled = !enabled;
+    }
+
+    _showMoveToModal() {
+        const {title} = this._dictionaryInfo;
+        const count = this._dictionaryController.dictionaryOptionCount;
+        const modal = this._dictionaryController.modalController.getModal('dictionary-move-location');
+        const input = modal.node.querySelector('#dictionary-move-location');
+
+        modal.node.dataset.index = `${this._index}`;
+        modal.node.querySelector('.dictionary-title').textContent = title;
+        input.value = `${this._index + 1}`;
+        input.max = `${count}`;
+
+        modal.setVisible(true);
     }
 }
 
@@ -269,6 +287,7 @@ class DictionaryController {
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._allCheckbox.addEventListener('change', this._onAllCheckboxChange.bind(this), false);
         document.querySelector('#dictionary-confirm-delete-button').addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
+        document.querySelector('#dictionary-move-button').addEventListener('click', this._onDictionaryMoveButtonClick.bind(this), false);
         if (this._checkIntegrityButton !== null) {
             this._checkIntegrityButton.addEventListener('click', this._onCheckIntegrityButtonClick.bind(this), false);
         }
@@ -291,7 +310,8 @@ class DictionaryController {
         const {dictionaries} = options;
         if (
             index1 < 0 || index1 >= dictionaries.length ||
-            index2 < 0 || index2 >= dictionaries.length
+            index2 < 0 || index2 >= dictionaries.length ||
+            index1 === index2
         ) {
             return;
         }
@@ -495,6 +515,19 @@ class DictionaryController {
     _onCheckIntegrityButtonClick(e) {
         e.preventDefault();
         this._checkIntegrity();
+    }
+
+    _onDictionaryMoveButtonClick() {
+        const modal = this._modalController.getModal('dictionary-move-location');
+        let {index} = modal.node.dataset;
+        index = Number.parseInt(index, 10);
+
+        let target = document.querySelector('#dictionary-move-location').value;
+        target = Number.parseInt(target, 10) - 1;
+
+        if (!Number.isFinite(target) || !Number.isFinite(index) || index === target) { return; }
+
+        this.swapDictionaryOptions(index, target);
     }
 
     _updateMainDictionarySelectOptions(dictionaries) {
