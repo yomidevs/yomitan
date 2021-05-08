@@ -2146,7 +2146,7 @@
             These dictionaries will be used to search for definitions of the related terms when the grouping mode is
             <em>Group related terms</em>.
         </p>
-        <div id="secondary-search-dictionary-list" class="dictionary-list margin-above"></div>
+        <div id="secondary-search-dictionary-list" class="secondary-search-dictionary-list"></div>
     </div>
     <div class="modal-footer">
         <button data-modal-action="hide">Close</button>
@@ -2289,14 +2289,10 @@
     <button class="popup-menu-item" data-menu-action="delete">Delete</button>
 </div></div></div></template>
 
-<template id="secondary-search-dictionary-template"><div class="settings-item dictionary-item"><div class="settings-item-inner">
-    <div class="settings-item-left">
-        <div class="settings-item-label dictionary-info">
-            <label class="toggle"><input type="checkbox" class="dictionary-allow-secondary-searches"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            <span class="dictionary-info-label"><strong class="dictionary-title"></strong> <span class="light dictionary-version"></span></span>
-        </div>
-    </div>
-</div></div></template>
+<template id="secondary-search-dictionary-template"><div class="secondary-search-dictionary-item horizontal-flex">
+    <label class="toggle"><input type="checkbox" class="dictionary-allow-secondary-searches"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+    <span class="horizontal-flex-fill"><strong class="dictionary-title"></strong> <span class="light dictionary-version"></span></span>
+</div></template>
 
 <template id="collapsible-dictionary-item-template"><div class="collapsible-dictionary-item">
     <div class="collapsible-dictionary-cell">

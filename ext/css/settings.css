@@ -2224,6 +2224,15 @@ input[type=number].dictionary-priority {
 }
 
 
+/* Secondary search dictionary settings */
+.secondary-search-dictionary-list {
+    margin-top: 0.5em;
+}
+.secondary-search-dictionary-item {
+    padding: 0.375em 0;
+}
+
+
 /* Generic layouts */
 .margin-above {
     margin-top: 0.85em;
