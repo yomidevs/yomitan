@@ -353,7 +353,7 @@ class Translator {
         const groupedDictionaryEntriesMap = new Map();
         const ungroupedDictionaryEntriesMap = new Map();
         for (const dictionaryEntry of dictionaryEntries) {
-            const {id, definitions: [{dictionary, sequence}]} = dictionaryEntry;
+            const {id, definitions: [{dictionary, sequences: [sequence]}]} = dictionaryEntry;
             if (mainDictionary === dictionary && sequence >= 0) {
                 let group = groupedDictionaryEntriesMap.get(sequence);
                 if (typeof group === 'undefined') {
@@ -620,7 +620,7 @@ class Translator {
                 tag1.order = Math.min(tag1.order, tag2.order);
                 tag1.score = Math.max(tag1.score, tag2.score);
                 tag1.dictionaries.push(...tag2.dictionaries);
-                this._addUniqueStrings(tag1.content, tag2.content);
+                this._addUniqueSimple(tag1.content, tag2.content);
                 tags.splice(j, 1);
                 --tagCount;
                 --j;
@@ -927,8 +927,8 @@ class Translator {
         return {index, term, reading, sources, tags, wordClasses};
     }
 
-    _createTermDefinition(index, headwordIndices, dictionary, sequence, isPrimary, tags, entries) {
-        return {index, headwordIndices, dictionary, sequence, isPrimary, tags, entries};
+    _createTermDefinition(index, headwordIndices, dictionary, sequences, isPrimary, tags, entries) {
+        return {index, headwordIndices, dictionary, sequences, isPrimary, tags, entries};
     }
 
     _createTermPronunciation(index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches) {
@@ -982,7 +982,7 @@ class Translator {
             sourceTermExactMatchCount,
             maxTransformedTextLength,
             [this._createTermHeadword(0, term, reading, [source], headwordTagGroups, rules)],
-            [this._createTermDefinition(0, [0], dictionary, sequence, isPrimary, definitionTagGroups, definitions)]
+            [this._createTermDefinition(0, [0], dictionary, [sequence], isPrimary, definitionTagGroups, definitions)]
         );
     }
 
@@ -1027,9 +1027,9 @@ class Translator {
                 }
             }
             if (checkDuplicateDefinitions) {
-                this._addTermDefinitions2(definitions, definitionsMap, dictionaryEntry.definitions, headwordIndexMap);
+                this._addTermDefinitions(definitions, definitionsMap, dictionaryEntry.definitions, headwordIndexMap);
             } else {
-                this._addTermDefinitions(definitions, dictionaryEntry.definitions, headwordIndexMap);
+                this._addTermDefinitionsFast(definitions, dictionaryEntry.definitions, headwordIndexMap);
             }
         }
 
@@ -1049,7 +1049,7 @@ class Translator {
 
     // Data collection addition functions
 
-    _addUniqueStrings(list, newItems) {
+    _addUniqueSimple(list, newItems) {
         for (const item of newItems) {
             if (!list.includes(item)) {
                 list.push(item);
@@ -1093,7 +1093,7 @@ class Translator {
                 for (; i < ii; ++i) {
                     const tagGroup = tagGroups[i];
                     if (tagGroup.dictionary === dictionary) {
-                        this._addUniqueStrings(tagGroup.tagNames, newTagGroup.tagNames);
+                        this._addUniqueSimple(tagGroup.tagNames, newTagGroup.tagNames);
                         break;
                     }
                 }
@@ -1114,7 +1114,7 @@ class Translator {
             }
             this._addUniqueSources(headword.sources, sources);
             this._addUniqueTagGroups(headword.tags, tags);
-            this._addUniqueStrings(headword.wordClasses, wordClasses);
+            this._addUniqueSimple(headword.wordClasses, wordClasses);
             headwordIndexMap.push(headword.index);
         }
         return headwordIndexMap;
@@ -1143,28 +1143,29 @@ class Translator {
         headwordIndices.splice(start, 0, headwordIndex);
     }
 
-    _addTermDefinitions(definitions, newDefinitions, headwordIndexMap) {
-        for (const {headwordIndices, dictionary, sequence, isPrimary, tags, entries} of newDefinitions) {
+    _addTermDefinitionsFast(definitions, newDefinitions, headwordIndexMap) {
+        for (const {headwordIndices, dictionary, sequences, isPrimary, tags, entries} of newDefinitions) {
             const headwordIndicesNew = [];
             for (const headwordIndex of headwordIndices) {
                 headwordIndicesNew.push(headwordIndexMap[headwordIndex]);
             }
-            definitions.push(this._createTermDefinition(definitions.length, headwordIndicesNew, dictionary, sequence, isPrimary, tags, entries));
+            definitions.push(this._createTermDefinition(definitions.length, headwordIndicesNew, dictionary, sequences, isPrimary, tags, entries));
         }
     }
 
-    _addTermDefinitions2(definitions, definitionsMap, newDefinitions, headwordIndexMap) {
-        for (const {headwordIndices, dictionary, sequence, isPrimary, tags, entries} of newDefinitions) {
-            const key = this._createMapKey([dictionary, sequence, ...entries]);
+    _addTermDefinitions(definitions, definitionsMap, newDefinitions, headwordIndexMap) {
+        for (const {headwordIndices, dictionary, sequences, isPrimary, tags, entries} of newDefinitions) {
+            const key = this._createMapKey([dictionary, ...entries]);
             let definition = definitionsMap.get(key);
             if (typeof definition === 'undefined') {
-                definition = this._createTermDefinition(definitions.length, [], dictionary, sequence, isPrimary, [], [...entries]);
+                definition = this._createTermDefinition(definitions.length, [], dictionary, [...sequences], isPrimary, [], [...entries]);
                 definitions.push(definition);
                 definitionsMap.set(key, definition);
             } else {
                 if (isPrimary) {
                     definition.isPrimary = true;
                 }
+                this._addUniqueSimple(definition.sequences, sequences);
             }
 
             const newHeadwordIndices = definition.headwordIndices;

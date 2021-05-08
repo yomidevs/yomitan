@@ -362,7 +362,7 @@ class AnkiNoteDataCreator {
 
         const definitions = [];
         const definitionTags = [];
-        for (const {tags, headwordIndices, entries, dictionary, sequence} of dictionaryEntry.definitions) {
+        for (const {tags, headwordIndices, entries, dictionary, sequences} of dictionaryEntry.definitions) {
             const definitionTags2 = [];
             for (const tag of tags) {
                 definitionTags.push(this._convertTag(tag));
@@ -371,7 +371,7 @@ class AnkiNoteDataCreator {
             if (!hasDefinitions) { continue; }
             const only = merged ? DictionaryDataUtil.getDisambiguations(dictionaryEntry.headwords, headwordIndices, allTermsSet, allReadingsSet) : void 0;
             definitions.push({
-                sequence,
+                sequence: sequences[0],
                 dictionary,
                 glossary: entries,
                 definitionTags: definitionTags2,
@@ -613,8 +613,9 @@ class AnkiNoteDataCreator {
     _getTermDictionaryEntrySequence(dictionaryEntry) {
         let hasSequence = false;
         let mainSequence = -1;
-        for (const {sequence, isPrimary} of dictionaryEntry.definitions) {
+        for (const {sequences, isPrimary} of dictionaryEntry.definitions) {
             if (!isPrimary) { continue; }
+            const sequence = sequences[0];
             if (!hasSequence) {
                 mainSequence = sequence;
                 hasSequence = true;
