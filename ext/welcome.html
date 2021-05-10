@@ -247,7 +247,8 @@
             for a list free dictionaries or click the <em>Import</em> button below to select a dictionary file to import.
         </div>
         <div id="dictionary-error" class="danger-text margin-above" hidden></div>
-        <div id="dictionary-list" class="dictionary-list" data-count="0">
+        <div id="dictionary-list" class="dictionary-list generic-list" data-count="0">
+            <div class="dictionary-item-top"></div>
             <label class="dictionary-item-top toggle dictionary-item-enabled-toggle-container"><input type="checkbox" id="all-dictionaries-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             <div class="dictionary-item-top dictionary-item-title-container">All</div>
             <div class="dictionary-item-top">Priority</div>
@@ -334,9 +335,24 @@
     </div>
 </div></div>
 
+<div id="dictionary-move-location-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+    <div class="modal-header"><div class="modal-title">Move Dictionary Options</div></div>
+    <div class="modal-body">
+        <p>Input the location the dictionary <strong class="dictionary-title"></strong> should be moved to:</p>
+        <div class="margin-above">
+            <input type="number" id="dictionary-move-location" min="1" step="1">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="low-emphasis" data-modal-action="hide">Cancel</button>
+        <button data-modal-action="hide" id="dictionary-move-button">Move</button>
+    </div>
+</div></div>
+
 
 <!-- Dictionary templates -->
 <template id="dictionary-template">
+    <div class="dictionary-list-index generic-list-index-prefix"></div>
     <label class="toggle dictionary-item-enabled-toggle-container"><input type="checkbox" class="dictionary-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
     <div class="dictionary-item-title-container">
         <span>
@@ -362,6 +378,7 @@
     <button class="popup-menu-item" data-menu-action="showDetails">Details&hellip;</button>
     <button class="popup-menu-item" data-menu-action="moveUp">Move up</button>
     <button class="popup-menu-item" data-menu-action="moveDown">Move down</button>
+    <button class="popup-menu-item" data-menu-action="moveTo">Move to&hellip;</button>
     <button class="popup-menu-item" data-menu-action="delete">Delete</button>
 </div></div></div></template>
 
