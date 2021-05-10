@@ -624,16 +624,9 @@ class DictionaryController {
         if (index < 0) { return; }
 
         const statusFooter = this._statusFooter;
-        const {node} = this._dictionaryEntries[index];
         const progressSelector = '.dictionary-delete-progress';
-        const progressContainers = [
-            ...node.querySelectorAll('.progress-container'),
-            ...document.querySelectorAll(`#dictionaries-modal ${progressSelector}`)
-        ];
-        const progressBars = [
-            ...node.querySelectorAll('.progress-bar'),
-            ...document.querySelectorAll(`${progressSelector} .progress-bar`)
-        ];
+        const progressContainers = document.querySelectorAll(`#dictionaries-modal ${progressSelector}`);
+        const progressBars = document.querySelectorAll(`${progressSelector} .progress-bar`);
         const infoLabels = document.querySelectorAll(`${progressSelector} .progress-info`);
         const statusLabels = document.querySelectorAll(`${progressSelector} .progress-status`);
         const prevention = this._settingsController.preventPageExit();
