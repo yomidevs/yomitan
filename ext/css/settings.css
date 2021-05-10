@@ -248,7 +248,7 @@ a.heading-link-light {
     overflow-y: scroll;
     position: relative;
     align-items: stretch;
-    justify-content: center;
+    justify-content: flex-start;
 }
 .content-left {
     flex: 1 1 0;
@@ -257,7 +257,7 @@ a.heading-link-light {
     z-index: 5;
 }
 .content-center {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     width: var(--content-width);
     padding: 0 var(--main-content-padding);
     max-width: var(--content-width);
@@ -2309,6 +2309,9 @@ input[type=number].dictionary-priority {
 
 .no-wrap {
     white-space: nowrap;
+}
+.overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
 }
 
 
