@@ -122,14 +122,8 @@ class DictionaryImportController {
         const statusFooter = this._statusFooter;
         const importInfo = document.querySelector('#dictionary-import-info');
         const progressSelector = '.dictionary-import-progress';
-        const progressContainers = [
-            ...document.querySelectorAll('#dictionary-import-progress-container'),
-            ...document.querySelectorAll(`#dictionaries-modal ${progressSelector}`)
-        ];
-        const progressBars = [
-            ...document.querySelectorAll('#dictionary-import-progress-container .progress-bar'),
-            ...document.querySelectorAll(`${progressSelector} .progress-bar`)
-        ];
+        const progressContainers = document.querySelectorAll(`#dictionaries-modal ${progressSelector}`);
+        const progressBars = document.querySelectorAll(`${progressSelector} .progress-bar`);
         const infoLabels = document.querySelectorAll(`${progressSelector} .progress-info`);
         const statusLabels = document.querySelectorAll(`${progressSelector} .progress-status`);
 
