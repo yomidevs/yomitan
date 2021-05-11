@@ -169,7 +169,7 @@ class DictionaryEntry {
     }
 
     _move(offset) {
-        this._dictionaryController.swapDictionaryOptions(this._index, this._index + offset);
+        this._dictionaryController.moveDictionaryOptions(this._index, this._index + offset);
     }
 
     _setMenuActionEnabled(menu, action, enabled) {
@@ -305,21 +305,24 @@ class DictionaryController {
         modal.setVisible(true);
     }
 
-    async swapDictionaryOptions(index1, index2) {
+    async moveDictionaryOptions(currentIndex, targetIndex) {
         const options = await this._settingsController.getOptions();
         const {dictionaries} = options;
         if (
-            index1 < 0 || index1 >= dictionaries.length ||
-            index2 < 0 || index2 >= dictionaries.length ||
-            index1 === index2
+            currentIndex < 0 || currentIndex >= dictionaries.length ||
+            targetIndex < 0 || targetIndex >= dictionaries.length ||
+            currentIndex === targetIndex
         ) {
             return;
         }
 
+        const item = dictionaries.splice(currentIndex, 1)[0];
+        dictionaries.splice(targetIndex, 0, item);
+
         await this._settingsController.modifyProfileSettings([{
-            action: 'swap',
-            path1: `dictionaries[${index1}]`,
-            path2: `dictionaries[${index2}]`
+            action: 'set',
+            path: 'dictionaries',
+            value: dictionaries
         }]);
 
         await this._updateEntries();
@@ -527,7 +530,7 @@ class DictionaryController {
 
         if (!Number.isFinite(target) || !Number.isFinite(index) || index === target) { return; }
 
-        this.swapDictionaryOptions(index, target);
+        this.moveDictionaryOptions(index, target);
     }
 
     _updateMainDictionarySelectOptions(dictionaries) {
