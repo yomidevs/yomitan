@@ -5578,7 +5578,7 @@
         "score": 10,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
-        "sourceTermExactMatchCount": 2,
+        "sourceTermExactMatchCount": 1,
         "maxTransformedTextLength": 4,
         "headwords": [
           {
@@ -5797,7 +5797,7 @@
         "score": 10,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
-        "sourceTermExactMatchCount": 2,
+        "sourceTermExactMatchCount": 1,
         "maxTransformedTextLength": 4,
         "headwords": [
           {
@@ -5996,7 +5996,7 @@
         "score": 10,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
-        "sourceTermExactMatchCount": 2,
+        "sourceTermExactMatchCount": 1,
         "maxTransformedTextLength": 2,
         "headwords": [
           {
@@ -6177,7 +6177,7 @@
         "score": 10,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
-        "sourceTermExactMatchCount": 2,
+        "sourceTermExactMatchCount": 1,
         "maxTransformedTextLength": 2,
         "headwords": [
           {
@@ -6630,7 +6630,7 @@
         "score": 10,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
-        "sourceTermExactMatchCount": 4,
+        "sourceTermExactMatchCount": 2,
         "maxTransformedTextLength": 4,
         "headwords": [
           {
@@ -7029,7 +7029,7 @@
         "score": 10,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
-        "sourceTermExactMatchCount": 4,
+        "sourceTermExactMatchCount": 2,
         "maxTransformedTextLength": 2,
         "headwords": [
           {

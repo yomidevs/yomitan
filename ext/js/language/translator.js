@@ -1007,7 +1007,6 @@ class Translator {
         let dictionaryIndex = Number.MAX_SAFE_INTEGER;
         let dictionaryPriority = Number.MIN_SAFE_INTEGER;
         let maxTransformedTextLength = 0;
-        let sourceTermExactMatchCount = 0;
         let isPrimary = false;
         const definitions = [];
         const definitionsMap = checkDuplicateDefinitions ? new Map() : null;
@@ -1020,7 +1019,6 @@ class Translator {
             if (dictionaryEntry.isPrimary) {
                 isPrimary = true;
                 maxTransformedTextLength = Math.max(maxTransformedTextLength, dictionaryEntry.maxTransformedTextLength);
-                sourceTermExactMatchCount += dictionaryEntry.sourceTermExactMatchCount;
                 const dictionaryEntryInflections = dictionaryEntry.inflections;
                 if (inflections === null || dictionaryEntryInflections.length < inflections.length) {
                     inflections = dictionaryEntryInflections;
@@ -1033,6 +1031,18 @@ class Translator {
             }
         }
 
+        const headwordsArray = [...headwords.values()];
+
+        let sourceTermExactMatchCount = 0;
+        for (const {term, sources} of headwordsArray) {
+            for (const {deinflectedText, isPrimary: isPrimary2} of sources) {
+                if (isPrimary2 && deinflectedText === term) {
+                    ++sourceTermExactMatchCount;
+                    break;
+                }
+            }
+        }
+
         return this._createTermDictionaryEntry(
             -1,
             isPrimary,
@@ -1042,7 +1052,7 @@ class Translator {
             dictionaryPriority,
             sourceTermExactMatchCount,
             maxTransformedTextLength,
-            [...headwords.values()],
+            headwordsArray,
             definitions
         );
     }
