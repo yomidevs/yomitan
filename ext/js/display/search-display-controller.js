@@ -50,6 +50,8 @@ class SearchDisplayController {
     async prepare() {
         await this._display.updateOptions();
 
+        this._searchPersistentStateController.on('modeChange', this._onModeChange.bind(this));
+
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
         yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
 
@@ -64,6 +66,8 @@ class SearchDisplayController {
             ['setMode', {async: false, handler: this._onMessageSetMode.bind(this)}],
             ['updateSearchQuery', {async: false, handler: this._onExternalSearchUpdate.bind(this)}]
         ]);
+
+        this._updateClipboardMonitorEnabled();
 
         this._display.autoPlayAudioDelay = 0;
         this._display.queryParserVisible = true;
@@ -215,6 +219,10 @@ class SearchDisplayController {
     _onClipboardMonitorEnableChange(e) {
         const enabled = e.target.checked;
         this._setClipboardMonitorEnabled(enabled);
+    }
+
+    _onModeChange() {
+        this._updateClipboardMonitorEnabled();
     }
 
     _setWanakanaEnabled(enabled) {

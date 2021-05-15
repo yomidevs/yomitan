@@ -15,8 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class SearchPersistentStateController {
+class SearchPersistentStateController extends EventDispatcher {
     constructor() {
+        super();
         this._mode = null;
     }
 
@@ -59,6 +60,6 @@ class SearchPersistentStateController {
         }
         this._mode = mode;
         document.documentElement.dataset.searchMode = (mode !== null ? mode : '');
-        this._updateClipboardMonitorEnabled();
+        this.trigger('modeChange', {mode});
     }
 }
