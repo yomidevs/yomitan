@@ -21,6 +21,7 @@
  * HotkeyHandler
  * JapaneseUtil
  * SearchDisplayController
+ * SearchPersistentStateController
  * wanakana
  */
 
@@ -28,6 +29,9 @@
     try {
         const documentFocusController = new DocumentFocusController('#search-textbox');
         documentFocusController.prepare();
+
+        const searchPersistentStateController = new SearchPersistentStateController();
+        searchPersistentStateController.prepare();
 
         await yomichan.prepare();
 
@@ -41,7 +45,7 @@
         const display = new Display(tabId, frameId, 'search', japaneseUtil, documentFocusController, hotkeyHandler);
         await display.prepare();
 
-        const searchDisplayController = new SearchDisplayController(tabId, frameId, display, japaneseUtil);
+        const searchDisplayController = new SearchDisplayController(tabId, frameId, display, japaneseUtil, searchPersistentStateController);
         await searchDisplayController.prepare();
 
         display.initializeState();

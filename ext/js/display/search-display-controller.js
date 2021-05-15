@@ -21,10 +21,11 @@
  */
 
 class SearchDisplayController {
-    constructor(tabId, frameId, display, japaneseUtil) {
+    constructor(tabId, frameId, display, japaneseUtil, searchPersistentStateController) {
         this._tabId = tabId;
         this._frameId = frameId;
         this._display = display;
+        this._searchPersistentStateController = searchPersistentStateController;
         this._searchButton = document.querySelector('#search-button');
         this._queryInput = document.querySelector('#search-textbox');
         this._introElement = document.querySelector('#intro');
@@ -44,12 +45,9 @@ class SearchDisplayController {
             }
         });
         this._messageHandlers = new Map();
-        this._mode = null;
     }
 
     async prepare() {
-        this._updateMode();
-
         await this._display.updateOptions();
 
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
@@ -93,11 +91,11 @@ class SearchDisplayController {
     // Messages
 
     _onMessageSetMode({mode}) {
-        this._setMode(mode, true);
+        this._searchPersistentStateController.mode = mode;
     }
 
     _onMessageGetMode() {
-        return this._mode;
+        return this._searchPersistentStateController.mode;
     }
 
     // Private
@@ -323,7 +321,7 @@ class SearchDisplayController {
     _updateClipboardMonitorEnabled() {
         const enabled = this._clipboardMonitorEnabled;
         this._clipboardMonitorEnableCheckbox.checked = enabled;
-        if (enabled && this._mode !== 'popup') {
+        if (enabled && this._searchPersistentStateController.mode !== 'popup') {
             this._clipboardMonitor.start();
         } else {
             this._clipboardMonitor.stop();
@@ -404,34 +402,6 @@ class SearchDisplayController {
         for (const [name, handlerInfo] of handlers) {
             this._messageHandlers.set(name, handlerInfo);
         }
-    }
-
-    _updateMode() {
-        let mode = null;
-        try {
-            mode = sessionStorage.getItem('mode');
-        } catch (e) {
-            // Browsers can throw a SecurityError when cookie blocking is enabled.
-        }
-        this._setMode(mode, false);
-    }
-
-    _setMode(mode, save) {
-        if (mode === this._mode) { return; }
-        if (save) {
-            try {
-                if (mode === null) {
-                    sessionStorage.removeItem('mode');
-                } else {
-                    sessionStorage.setItem('mode', mode);
-                }
-            } catch (e) {
-                // Browsers can throw a SecurityError when cookie blocking is enabled.
-            }
-        }
-        this._mode = mode;
-        document.documentElement.dataset.searchMode = (mode !== null ? mode : '');
-        this._updateClipboardMonitorEnabled();
     }
 
     _isElementInput(element) {
