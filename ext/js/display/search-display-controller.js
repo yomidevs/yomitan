@@ -84,6 +84,10 @@ class SearchDisplayController {
         this._onDisplayOptionsUpdated({options: this._display.getOptions()});
     }
 
+    setMode(mode) {
+        this._setMode(mode, true);
+    }
+
     // Actions
 
     _onActionFocusSearchBox() {
@@ -329,10 +333,20 @@ class SearchDisplayController {
     _updateClipboardMonitorEnabled() {
         const enabled = this._clipboardMonitorEnabled;
         this._clipboardMonitorEnableCheckbox.checked = enabled;
-        if (enabled && this._searchPersistentStateController.mode !== 'popup') {
+        if (enabled && this._canEnableClipboardMonitor()) {
             this._clipboardMonitor.start();
         } else {
             this._clipboardMonitor.stop();
+        }
+    }
+
+    _canEnableClipboardMonitor() {
+        switch (this._searchPersistentStateController.mode) {
+            case 'popup':
+            case 'action-popup':
+                return false;
+            default:
+                return true;
         }
     }
 

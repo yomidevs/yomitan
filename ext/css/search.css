@@ -130,7 +130,7 @@ h1 {
 .search-options {
     display: flex;
     flex-flow: row wrap;
-    margin: 0.5em -1em;
+    margin: 0.5em calc(-1 * var(--main-content-horizontal-padding));
     align-items: center;
 }
 .search-option {
@@ -167,4 +167,12 @@ h1 {
 #intro>p {
     margin: 0;
 }
-
+:root[data-search-mode=action-popup] #intro,
+:root[data-search-mode=action-popup] #search-option-clipboard-monitor-container {
+    display: none;
+}
+:root[data-search-mode=action-popup],
+:root[data-search-mode=action-popup] body {
+    width: 640px;
+    height: 480px;
+}

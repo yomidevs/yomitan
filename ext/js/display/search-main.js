@@ -20,6 +20,7 @@
  * DocumentFocusController
  * HotkeyHandler
  * JapaneseUtil
+ * SearchActionPopupController
  * SearchDisplayController
  * SearchPersistentStateController
  * wanakana
@@ -32,6 +33,9 @@
 
         const searchPersistentStateController = new SearchPersistentStateController();
         searchPersistentStateController.prepare();
+
+        const searchActionPopupController = new SearchActionPopupController(searchPersistentStateController);
+        searchActionPopupController.prepare();
 
         await yomichan.prepare();
 

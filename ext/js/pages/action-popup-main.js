@@ -31,7 +31,7 @@ class DisplayController {
 
         this._showExtensionInfo(manifest);
         this._setupEnvironment();
-        this._setupButtonEvents('.action-open-search', 'openSearchPage', chrome.runtime.getURL('/search.html'));
+        this._setupButtonEvents('.action-open-search', 'openSearchPage', chrome.runtime.getURL('/search.html'), this._onSearchClick.bind(this));
         this._setupButtonEvents('.action-open-info', 'openInfoPage', chrome.runtime.getURL('/info.html'));
 
         const optionsFull = await yomichan.api.optionsGetFull();
@@ -60,6 +60,13 @@ class DisplayController {
 
     // Private
 
+    _onSearchClick(e) {
+        if (!e.shiftKey) { return; }
+        e.preventDefault();
+        location.href = '/search.html?action-popup=true';
+        return false;
+    }
+
     _showExtensionInfo(manifest) {
         const node = document.getElementById('extension-info');
         if (node === null) { return; }
@@ -67,12 +74,16 @@ class DisplayController {
         node.textContent = `${manifest.name} v${manifest.version}`;
     }
 
-    _setupButtonEvents(selector, command, url) {
+    _setupButtonEvents(selector, command, url, customHandler) {
         const nodes = document.querySelectorAll(selector);
         for (const node of nodes) {
             if (typeof command === 'string') {
                 node.addEventListener('click', (e) => {
                     if (e.button !== 0) { return; }
+                    if (typeof customHandler === 'function') {
+                        const result = customHandler(e);
+                        if (typeof result !== 'undefined') { return; }
+                    }
                     yomichan.api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
                     e.preventDefault();
                 }, false);

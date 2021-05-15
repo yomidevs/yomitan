@@ -1571,7 +1571,11 @@ class Display extends EventDispatcher {
             audioDetails = {sources: sources2, preferredAudioIndex, customSourceUrl, customSourceType};
         }
 
-        const screenshotDetails = (AnkiUtil.fieldsObjectContainsMarker(fields, 'screenshot') ? {tabId: this._contentOriginTabId, frameId: this._contentOriginFrameId, format, quality} : null);
+        const screenshotDetails = (
+            AnkiUtil.fieldsObjectContainsMarker(fields, 'screenshot') && typeof this._contentOriginTabId === 'number' ?
+            {tabId: this._contentOriginTabId, frameId: this._contentOriginFrameId, format, quality} :
+            null
+        );
 
         const clipboardDetails = {
             image: AnkiUtil.fieldsObjectContainsMarker(fields, 'clipboard-image'),
