@@ -293,8 +293,6 @@ class DisplayGenerator {
             return this._createTermDefinitionEntryText(entry);
         } else if (typeof entry === 'object' && entry !== null) {
             switch (entry.type) {
-                case 'text':
-                    return this._createTermDefinitionEntryText(entry.text);
                 case 'image':
                     return this._createTermDefinitionEntryImage(entry, dictionary);
             }
