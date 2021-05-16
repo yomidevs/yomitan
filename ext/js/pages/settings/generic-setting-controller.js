@@ -159,7 +159,8 @@ class GenericSettingController {
         );
     }
 
-    _evaluateSimpleOperation(operation, lhs, rhs) {
+    _evaluateSimpleOperation(operationData, lhs) {
+        const {op: operation, value: rhs} = operationData;
         switch (operation) {
             case '!': return !lhs;
             case '!!': return !!lhs;
@@ -169,7 +170,20 @@ class GenericSettingController {
             case '<=': return lhs <= rhs;
             case '>': return lhs > rhs;
             case '<': return lhs < rhs;
-            default: return false;
+            case '&&':
+                for (const operationData2 of rhs) {
+                    const result = this._evaluateSimpleOperation(operationData2, lhs);
+                    if (!result) { return result; }
+                }
+                return true;
+            case '||':
+                for (const operationData2 of rhs) {
+                    const result = this._evaluateSimpleOperation(operationData2, lhs);
+                    if (result) { return result; }
+                }
+                return false;
+            default:
+                return false;
         }
     }
 
@@ -188,7 +202,7 @@ class GenericSettingController {
         const {ancestorDistance, selector, condition} = data;
         const relativeElement = this._getRelativeElement(element, ancestorDistance, selector);
         if (relativeElement !== null) {
-            relativeElement.hidden = !this._evaluateSimpleOperation(condition.op, value, condition.value);
+            relativeElement.hidden = !this._evaluateSimpleOperation(condition, value);
         }
         return value;
     }
@@ -218,11 +232,11 @@ class GenericSettingController {
     _conditionalConvert(value, data) {
         const {cases} = data;
         if (Array.isArray(cases)) {
-            for (const {op, value: value2, default: isDefault, result} of cases) {
-                if (isDefault === true) {
-                    value = result;
-                } else if (this._evaluateSimpleOperation(op, value, value2)) {
-                    value = result;
+            for (const caseData of cases) {
+                if (caseData.default === true) {
+                    value = caseData.result;
+                } else if (this._evaluateSimpleOperation(caseData, value)) {
+                    value = caseData.result;
                     break;
                 }
             }
