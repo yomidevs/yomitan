@@ -69,6 +69,7 @@ class DocumentUtil {
      * @param source The text source object, either `TextSourceRange` or `TextSourceElement`.
      * @param layoutAwareScan Whether or not layout-aware scan mode should be used.
      * @param extent The length of the sentence to extract.
+     * @param terminateAtNewlines Whether or not a sentence should be terminated at newline characters.
      * @param terminatorMap A mapping of characters that terminate a sentence.
      *   Format:
      *   ```js
@@ -87,7 +88,7 @@ class DocumentUtil {
      *   ```
      * @returns The sentence and the offset to the original source: `{sentence: string, offset: integer}`.
      */
-    extractSentence(source, layoutAwareScan, extent, terminatorMap, forwardQuoteMap, backwardQuoteMap) {
+    extractSentence(source, layoutAwareScan, extent, terminateAtNewlines, terminatorMap, forwardQuoteMap, backwardQuoteMap) {
         // Scan text
         source = source.clone();
         const startLength = source.setStartOffset(extent, layoutAwareScan);
@@ -102,7 +103,7 @@ class DocumentUtil {
         let quoteStack = [];
         for (; pos1 > 0; --pos1) {
             const c = text[pos1 - 1];
-            if (c === '\n') { break; }
+            if (c === '\n' && terminateAtNewlines) { break; }
 
             if (quoteStack.length === 0) {
                 const terminatorInfo = terminatorMap.get(c);
@@ -133,7 +134,7 @@ class DocumentUtil {
         quoteStack = [];
         for (; pos2 < textLength; ++pos2) {
             const c = text[pos2];
-            if (c === '\n') { break; }
+            if (c === '\n' && terminateAtNewlines) { break; }
 
             if (quoteStack.length === 0) {
                 const terminatorInfo = terminatorMap.get(c);

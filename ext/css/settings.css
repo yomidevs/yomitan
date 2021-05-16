@@ -2249,6 +2249,9 @@ input[type=number].dictionary-priority {
     align-content: flex-start;
     justify-content: flex-start;
 }
+.horizontal-flex.horizontal-flex-nowrap {
+    flex-wrap: nowrap;
+}
 .horizontal-flex>* {
     margin-left: 0.375em;
 }

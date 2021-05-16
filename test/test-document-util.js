@@ -129,7 +129,8 @@ async function testDocumentTextScanningFunctions(dom, {DocumentUtil, TextSourceR
             resultType,
             sentenceScanExtent,
             sentence,
-            hasImposter
+            hasImposter,
+            terminateAtNewlines
         } = testElement.dataset;
 
         const elementFromPointValue = querySelectorChildOrSelf(testElement, elementFromPointSelector);
@@ -140,6 +141,7 @@ async function testDocumentTextScanningFunctions(dom, {DocumentUtil, TextSourceR
         startOffset = parseInt(startOffset, 10);
         endOffset = parseInt(endOffset, 10);
         sentenceScanExtent = parseInt(sentenceScanExtent, 10);
+        terminateAtNewlines = (terminateAtNewlines !== 'false');
 
         assert.notStrictEqual(elementFromPointValue, null);
         assert.notStrictEqual(caretRangeFromPointValue, null);
@@ -200,6 +202,7 @@ async function testDocumentTextScanningFunctions(dom, {DocumentUtil, TextSourceR
             source,
             false,
             sentenceScanExtent,
+            terminateAtNewlines,
             terminatorMap,
             forwardQuoteMap,
             backwardQuoteMap

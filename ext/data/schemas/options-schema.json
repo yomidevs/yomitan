@@ -925,7 +925,7 @@
                                 "type": "object",
                                 "required": [
                                     "scanExtent",
-                                    "enableTerminationCharacters",
+                                    "terminationCharacterMode",
                                     "terminationCharacters"
                                 ],
                                 "properties": {
@@ -934,8 +934,9 @@
                                         "minimum": 0,
                                         "default": 200
                                     },
-                                    "enableTerminationCharacters": {
-                                        "type": "boolean",
+                                    "terminationCharacterMode": {
+                                        "type": "string",
+                                        "enum": ["custom", "custom-no-newlines", "newlines", "none"],
                                         "default": true
                                     },
                                     "terminationCharacters": {

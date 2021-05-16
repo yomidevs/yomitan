@@ -63,6 +63,7 @@ class TextScanner extends EventDispatcher {
         this._layoutAwareScan = false;
         this._preventMiddleMouse = false;
         this._sentenceScanExtent = 0;
+        this._sentenceTerminateAtNewlines = true;
         this._sentenceTerminatorMap = new Map();
         this._sentenceForwardQuoteMap = new Map();
         this._sentenceBackwardQuoteMap = new Map();
@@ -209,19 +210,23 @@ class TextScanner extends EventDispatcher {
             this._preventMiddleMouse = preventMiddleMouse;
         }
         if (typeof sentenceParsingOptions === 'object' && sentenceParsingOptions !== null) {
-            const {scanExtent, enableTerminationCharacters, terminationCharacters} = sentenceParsingOptions;
-            const hasTerminationCharacters = (typeof terminationCharacters === 'object' && Array.isArray(terminationCharacters));
+            const {scanExtent, terminationCharacterMode, terminationCharacters} = sentenceParsingOptions;
             if (typeof scanExtent === 'number') {
                 this._sentenceScanExtent = sentenceParsingOptions.scanExtent;
             }
-            if (typeof enableTerminationCharacters === 'boolean' || hasTerminationCharacters) {
+            if (typeof terminationCharacterMode === 'string') {
+                this._sentenceTerminateAtNewlines = (terminationCharacterMode === 'custom' || terminationCharacterMode === 'newlines');
                 const sentenceTerminatorMap = this._sentenceTerminatorMap;
                 const sentenceForwardQuoteMap = this._sentenceForwardQuoteMap;
                 const sentenceBackwardQuoteMap = this._sentenceBackwardQuoteMap;
                 sentenceTerminatorMap.clear();
                 sentenceForwardQuoteMap.clear();
                 sentenceBackwardQuoteMap.clear();
-                if (enableTerminationCharacters !== false && hasTerminationCharacters) {
+                if (
+                    typeof terminationCharacters === 'object' &&
+                    Array.isArray(terminationCharacters) &&
+                    (terminationCharacterMode === 'custom' || terminationCharacterMode === 'custom-no-newlines')
+                ) {
                     for (const {enabled, character1, character2, includeCharacterAtStart, includeCharacterAtEnd} of terminationCharacters) {
                         if (!enabled) { continue; }
                         if (character2 === null) {
@@ -841,6 +846,7 @@ class TextScanner extends EventDispatcher {
     async _findTermDictionaryEntries(textSource, optionsContext) {
         const scanLength = this._scanLength;
         const sentenceScanExtent = this._sentenceScanExtent;
+        const sentenceTerminateAtNewlines = this._sentenceTerminateAtNewlines;
         const sentenceTerminatorMap = this._sentenceTerminatorMap;
         const sentenceForwardQuoteMap = this._sentenceForwardQuoteMap;
         const sentenceBackwardQuoteMap = this._sentenceBackwardQuoteMap;
@@ -856,6 +862,7 @@ class TextScanner extends EventDispatcher {
             textSource,
             layoutAwareScan,
             sentenceScanExtent,
+            sentenceTerminateAtNewlines,
             sentenceTerminatorMap,
             sentenceForwardQuoteMap,
             sentenceBackwardQuoteMap
@@ -866,6 +873,7 @@ class TextScanner extends EventDispatcher {
 
     async _findKanjiDictionaryEntries(textSource, optionsContext) {
         const sentenceScanExtent = this._sentenceScanExtent;
+        const sentenceTerminateAtNewlines = this._sentenceTerminateAtNewlines;
         const sentenceTerminatorMap = this._sentenceTerminatorMap;
         const sentenceForwardQuoteMap = this._sentenceForwardQuoteMap;
         const sentenceBackwardQuoteMap = this._sentenceBackwardQuoteMap;
@@ -881,6 +889,7 @@ class TextScanner extends EventDispatcher {
             textSource,
             layoutAwareScan,
             sentenceScanExtent,
+            sentenceTerminateAtNewlines,
             sentenceTerminatorMap,
             sentenceForwardQuoteMap,
             sentenceBackwardQuoteMap

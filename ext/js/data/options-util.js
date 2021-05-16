@@ -460,7 +460,8 @@ class OptionsUtil {
             {async: true,  update: this._updateVersion8.bind(this)},
             {async: false, update: this._updateVersion9.bind(this)},
             {async: true,  update: this._updateVersion10.bind(this)},
-            {async: true,  update: this._updateVersion11.bind(this)}
+            {async: false, update: this._updateVersion11.bind(this)},
+            {async: false, update: this._updateVersion12.bind(this)}
         ];
     }
 
@@ -808,6 +809,17 @@ class OptionsUtil {
             profile.options.audio.customSourceUrl = customSourceUrl;
 
             profile.options.anki.displayTags = 'never';
+        }
+        return options;
+    }
+
+    _updateVersion12(options) {
+        // Version 12 changes:
+        //  Changed sentenceParsing.enableTerminationCharacters to sentenceParsing.terminationCharacterMode.
+        for (const profile of options.profiles) {
+            const {sentenceParsing} = profile.options;
+            sentenceParsing.terminationCharacterMode = sentenceParsing.enableTerminationCharacters ? 'custom' : 'newlines';
+            delete sentenceParsing.enableTerminationCharacters;
         }
         return options;
     }

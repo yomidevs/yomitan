@@ -159,6 +159,48 @@
 
     <div
         class="test"
+        data-test-type="scan"
+        data-element-from-point-selector="span:nth-of-type(3)"
+        data-caret-range-from-point-selector="span:nth-of-type(3)"
+        data-start-node-selector="span:nth-of-type(3)"
+        data-start-offset="0"
+        data-end-node-selector="span:nth-of-type(3)"
+        data-end-offset="0"
+        data-result-type="TextSourceRange"
+        data-sentence-scan-extent="22"
+        data-sentence="ありがとございます3"
+        data-terminate-at-newlines="true"
+    >
+<span>ありがとございます1</span>
+<span>ありがとございます2</span>
+<span>ありがとございます3</span>
+<span>ありがとございます4</span>
+<span>ありがとございます5</span>
+    </div>
+
+    <div
+        class="test"
+        data-test-type="scan"
+        data-element-from-point-selector="span:nth-of-type(3)"
+        data-caret-range-from-point-selector="span:nth-of-type(3)"
+        data-start-node-selector="span:nth-of-type(3)"
+        data-start-offset="0"
+        data-end-node-selector="span:nth-of-type(3)"
+        data-end-offset="0"
+        data-result-type="TextSourceRange"
+        data-sentence-scan-extent="22"
+        data-sentence="ありがとございます1&#10;ありがとございます2&#10;ありがとございます3&#10;ありがとございます4"
+        data-terminate-at-newlines="false"
+    >
+<span>ありがとございます1</span>
+<span>ありがとございます2</span>
+<span>ありがとございます3</span>
+<span>ありがとございます4</span>
+<span>ありがとございます5</span>
+    </div>
+
+    <div
+        class="test"
         data-test-type="text-source-range-seek"
         data-seek-node-selector="span:nth-of-type(1)"
         data-seek-node-is-text="true"

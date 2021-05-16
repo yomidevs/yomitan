@@ -438,7 +438,7 @@ function createProfileOptionsUpdatedTestData1() {
         },
         sentenceParsing: {
             scanExtent: 200,
-            enableTerminationCharacters: true,
+            terminationCharacterMode: 'custom',
             terminationCharacters: [
                 {enabled: true, character1: '「', character2: '」', includeCharacterAtStart: false, includeCharacterAtEnd: false},
                 {enabled: true, character1: '『', character2: '』', includeCharacterAtStart: false, includeCharacterAtEnd: false},
@@ -576,7 +576,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 11,
+        version: 12,
         global: {
             database: {
                 prefixWildcardsSupported: false
