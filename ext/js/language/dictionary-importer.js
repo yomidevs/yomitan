@@ -306,49 +306,8 @@ class DictionaryImporter {
     }
 
     async _formatDictionaryTermGlossaryImage(data, context, entry) {
-        const dictionary = entry.dictionary;
         const {path, width: preferredWidth, height: preferredHeight, title, description, pixelated} = data;
-        if (context.media.has(path)) {
-            // Already exists
-            return data;
-        }
-
-        let errorSource = entry.expression;
-        if (entry.reading.length > 0) {
-            errorSource += ` (${entry.reading});`;
-        }
-
-        const file = context.archive.file(path);
-        if (file === null) {
-            throw new Error(`Could not find image at path ${JSON.stringify(path)} for ${errorSource}`);
-        }
-
-        const content = await file.async('base64');
-        const mediaType = MediaUtil.getImageMediaTypeFromFileName(path);
-        if (mediaType === null) {
-            throw new Error(`Could not determine media type for image at path ${JSON.stringify(path)} for ${errorSource}`);
-        }
-
-        let image;
-        try {
-            image = await this._loadImageBase64(mediaType, content);
-        } catch (e) {
-            throw new Error(`Could not load image at path ${JSON.stringify(path)} for ${errorSource}`);
-        }
-
-        const width = image.naturalWidth;
-        const height = image.naturalHeight;
-
-        // Create image data
-        const mediaData = {
-            dictionary,
-            path,
-            mediaType,
-            width,
-            height,
-            content
-        };
-        context.media.set(path, mediaData);
+        const {width, height} = await this._getImageMedia(path, context, entry);
 
         // Create new data
         const newData = {
@@ -364,6 +323,62 @@ class DictionaryImporter {
         if (typeof pixelated === 'boolean') { newData.pixelated = pixelated; }
 
         return newData;
+    }
+
+    async _getImageMedia(path, context, entry) {
+        const {media} = context;
+        const {dictionary, reading} = entry;
+
+        let errorSource = entry.expression;
+        if (reading.length > 0) {
+            errorSource += ` (${reading})`;
+        }
+        errorSource += dictionary;
+
+        const createError = (message) => new Error(`${message} at path ${JSON.stringify(path)} for ${errorSource}`);
+
+        // Check if already added
+        let mediaData = media.get(path);
+        if (typeof mediaData !== 'undefined') {
+            if (MediaUtil.getFileExtensionFromImageMediaType(mediaData.mediaType) === null) {
+                throw createError('Media file is not a valid image');
+            }
+            return mediaData;
+        }
+
+        // Find file in archive
+        const file = context.archive.file(path);
+        if (file === null) {
+            throw createError('Could not find image');
+        }
+
+        // Load file content
+        const content = await file.async('base64');
+        const mediaType = MediaUtil.getImageMediaTypeFromFileName(path);
+        if (mediaType === null) {
+            throw createError('Could not determine media type for image');
+        }
+
+        // Load image data
+        let image;
+        try {
+            image = await this._loadImageBase64(mediaType, content);
+        } catch (e) {
+            throw createError('Could not load image');
+        }
+
+        // Create image data
+        mediaData = {
+            dictionary,
+            path,
+            mediaType,
+            width: image.naturalWidth,
+            height: image.naturalHeight,
+            content
+        };
+        media.set(path, mediaData);
+
+        return mediaData;
     }
 
     async _fetchJsonAsset(url) {
