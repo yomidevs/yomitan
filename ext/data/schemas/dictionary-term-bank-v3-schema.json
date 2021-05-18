@@ -104,6 +104,16 @@
                                             "type": "boolean",
                                             "description": "Whether or not the image should appear pixelated at sizes larger than the image's native resolution.",
                                             "default": false
+                                        },
+                                        "collapsed": {
+                                            "type": "boolean",
+                                            "description": "Whether or not the image is collapsed by default.",
+                                            "default": false
+                                        },
+                                        "collapsible": {
+                                            "type": "boolean",
+                                            "description": "Whether or not the image can be collapsed.",
+                                            "default": true
                                         }
                                     }
                                 }

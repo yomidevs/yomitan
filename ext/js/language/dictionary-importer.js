@@ -306,10 +306,8 @@ class DictionaryImporter {
     }
 
     async _formatDictionaryTermGlossaryImage(data, context, entry) {
-        const {path, width: preferredWidth, height: preferredHeight, title, description, pixelated} = data;
+        const {path, width: preferredWidth, height: preferredHeight, title, description, pixelated, collapsed, collapsible} = data;
         const {width, height} = await this._getImageMedia(path, context, entry);
-
-        // Create new data
         const newData = {
             type: 'image',
             path,
@@ -321,7 +319,8 @@ class DictionaryImporter {
         if (typeof title === 'string') { newData.title = title; }
         if (typeof description === 'string') { newData.description = description; }
         if (typeof pixelated === 'boolean') { newData.pixelated = pixelated; }
-
+        if (typeof collapsed === 'boolean') { newData.collapsed = collapsed; }
+        if (typeof collapsible === 'boolean') { newData.collapsible = collapsible; }
         return newData;
     }
 

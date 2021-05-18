@@ -309,7 +309,26 @@ class DisplayGenerator {
     }
 
     _createTermDefinitionEntryImage(data, dictionary) {
-        const {path, width, height, preferredWidth, preferredHeight, title, description, pixelated} = data;
+        const {description} = data;
+
+        const node = this._templates.instantiate('gloss-item');
+
+        const contentContainer = node.querySelector('.gloss-content');
+        const image = this._createDefinitionImage(data, dictionary);
+        contentContainer.appendChild(image);
+
+        if (typeof description === 'string') {
+            const fragment = this._templates.instantiateFragment('gloss-item-image-description');
+            const container = fragment.querySelector('.gloss-image-description');
+            this._setMultilineTextContent(container, description);
+            contentContainer.appendChild(fragment);
+        }
+
+        return node;
+    }
+
+    _createDefinitionImage(data, dictionary) {
+        const {path, width, height, preferredWidth, preferredHeight, title, pixelated, collapsed, collapsible} = data;
 
         const usedWidth = (
             typeof preferredWidth === 'number' ?
@@ -327,6 +346,9 @@ class DisplayGenerator {
         node.dataset.path = path;
         node.dataset.dictionary = dictionary;
         node.dataset.imageLoadState = 'not-loaded';
+        node.dataset.hasAspectRatio = 'true';
+        node.dataset.collapsed = typeof collapsed === 'boolean' ? `${collapsed}` : 'false';
+        node.dataset.collapsible = typeof collapsible === 'boolean' ? `${collapsible}` : 'true';
 
         const imageContainer = node.querySelector('.gloss-image-container');
         imageContainer.style.width = `${usedWidth}em`;
@@ -338,35 +360,29 @@ class DisplayGenerator {
         aspectRatioSizer.style.paddingTop = `${aspectRatio * 100.0}%`;
 
         const image = node.querySelector('img.gloss-image');
-        const imageLink = node.querySelector('.gloss-image-link');
         image.dataset.pixelated = `${pixelated === true}`;
 
         if (this._mediaLoader !== null) {
             this._mediaLoader.loadMedia(
                 path,
                 dictionary,
-                (url) => this._setImageData(node, image, imageLink, url, false),
-                () => this._setImageData(node, image, imageLink, null, true)
+                (url) => this._setImageData(node, image, url, false),
+                () => this._setImageData(node, image, null, true)
             );
-        }
-
-        if (typeof description === 'string') {
-            const container = node.querySelector('.gloss-image-description');
-            this._setMultilineTextContent(container, description);
         }
 
         return node;
     }
 
-    _setImageData(container, image, imageLink, url, unloaded) {
+    _setImageData(node, image, url, unloaded) {
         if (url !== null) {
             image.src = url;
-            imageLink.href = url;
-            container.dataset.imageLoadState = 'loaded';
+            node.href = url;
+            node.dataset.imageLoadState = 'loaded';
         } else {
             image.removeAttribute('src');
-            imageLink.removeAttribute('href');
-            container.dataset.imageLoadState = unloaded ? 'unloaded' : 'load-error';
+            node.removeAttribute('href');
+            node.dataset.imageLoadState = unloaded ? 'unloaded' : 'load-error';
         }
     }
 
