@@ -110,6 +110,7 @@ function getFieldMarkers(type) {
                 'pitch-accent-positions',
                 'reading',
                 'screenshot',
+                'search-query',
                 'sentence',
                 'tags',
                 'url'
@@ -128,6 +129,7 @@ function getFieldMarkers(type) {
                 'kunyomi',
                 'onyomi',
                 'screenshot',
+                'search-query',
                 'sentence',
                 'stroke-count',
                 'tags',
@@ -167,7 +169,9 @@ async function getRenderResults(dictionaryEntries, type, mode, template, AnkiNot
                 text: `${clozePrefix}${source}${clozeSuffix}`,
                 offset: clozePrefix.length
             },
-            documentTitle: 'title'
+            documentTitle: 'title',
+            query: 'query',
+            fullQuery: 'fullQuery'
         };
         const errors = [];
         const noteFields = (await ankiNoteBuilder.createNote({

@@ -101,6 +101,7 @@ class AnkiController {
                     'pitch-accent-positions',
                     'reading',
                     'screenshot',
+                    'search-query',
                     'sentence',
                     'tags',
                     'url'
@@ -119,6 +120,7 @@ class AnkiController {
                     'kunyomi',
                     'onyomi',
                     'screenshot',
+                    'search-query',
                     'sentence',
                     'stroke-count',
                     'tags',

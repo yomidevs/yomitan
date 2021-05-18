@@ -15,6 +15,7 @@
         "kunyomi": "う.つ, う.ち-, ぶ.つ",
         "onyomi": "ダ, ダアス",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "stroke-count": "Stroke count: Unknown",
         "tags": "",
@@ -38,6 +39,7 @@
         "kunyomi": "-こ.む, こ.む, こ.み, -こ.み, こ.める",
         "onyomi": "",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix込cloze-suffix",
         "stroke-count": "Stroke count: Unknown",
         "tags": "",
@@ -75,6 +77,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "だ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -102,6 +105,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ダース",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -134,6 +138,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打つcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -161,6 +166,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打つcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -188,6 +194,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打つcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -215,6 +222,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打つcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -242,6 +250,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "だ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -269,6 +278,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ダース",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -301,6 +311,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "うちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -328,6 +339,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -355,6 +367,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "うちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -382,6 +395,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -409,6 +423,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -436,6 +451,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -463,6 +479,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -490,6 +507,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -517,6 +535,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "だ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -544,6 +563,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ダース",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -576,6 +596,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "がぞう",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix画像cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -608,6 +629,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "だ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixだcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -640,6 +662,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ダース",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixダースcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -672,6 +695,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixうつcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -699,6 +723,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixうつcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -731,6 +756,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixぶつcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -758,6 +784,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixぶつcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -790,6 +817,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "うちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixうちこむcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -817,6 +845,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "うちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixうちこむcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -844,6 +873,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixうちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -871,6 +901,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixうちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -903,6 +934,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixぶちこむcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -930,6 +962,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixぶちこむcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -957,6 +990,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixぶちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -984,6 +1018,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixぶちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1016,6 +1051,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "がぞう",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixがぞうcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1060,6 +1096,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "うちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1087,6 +1124,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1114,6 +1152,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1141,6 +1180,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1168,6 +1208,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "だ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1195,6 +1236,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ダース",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1227,6 +1269,7 @@
         "pitch-accent-positions": "<ol><li><em>(うちこむ only) </em><span>[0]</span></li><li><em>(うちこむ only) </em><span>[3]</span></li><li><em>(ぶちこむ only) </em><span>[0]</span></li><li><em>(ぶちこむ only) </em><span>[3]</span></li></ol>",
         "reading": "うちこむ、ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1254,6 +1297,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ、ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1281,6 +1325,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "だ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1308,6 +1353,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ダース",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1340,6 +1386,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "うちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ち込んでいませんでしたcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1367,6 +1414,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ち込んでいませんでしたcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1394,6 +1442,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "うちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ち込んでいませんでしたcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1421,6 +1470,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ち込んでいませんでしたcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1448,6 +1498,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1475,6 +1526,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1502,6 +1554,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1529,6 +1582,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1556,6 +1610,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "だ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1583,6 +1638,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ダース",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1615,6 +1671,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "うちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打(う)ち込(こ)むcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1642,6 +1699,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打(う)ち込(こ)むcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1669,6 +1727,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "うちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打(う)ち込(こ)むcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1696,6 +1755,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打(う)ち込(こ)むcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1723,6 +1783,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打(う)ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1750,6 +1811,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打(う)ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1777,6 +1839,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打(う)ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1804,6 +1867,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打(う)ちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1831,6 +1895,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "だ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1858,6 +1923,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ダース",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1890,6 +1956,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "うちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix(打)(ち)(込)(む)cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1917,6 +1984,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix(打)(ち)(込)(む)cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1944,6 +2012,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "うちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix(打)(ち)(込)(む)cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1971,6 +2040,7 @@
         "pitch-accent-positions": "<ol><li><span>[0]</span></li><li><span>[3]</span></li></ol>",
         "reading": "ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix(打)(ち)(込)(む)cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -1998,6 +2068,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix(打)(ち)cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -2025,6 +2096,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix(打)(ち)cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -2052,6 +2124,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix(打)(ち)cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -2079,6 +2152,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix(打)(ち)cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -2106,6 +2180,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "だ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix(打)cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -2133,6 +2208,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "ダース",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefix(打)cloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -2165,6 +2241,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "よむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixtestcloze-suffix",
         "tags": "popular",
         "url": "<a href=\"url:\">url:</a>"
@@ -2197,6 +2274,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "つよみ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixつtestcloze-suffix",
         "tags": "popular",
         "url": "<a href=\"url:\">url:</a>"
@@ -2229,6 +2307,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "よむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixtestましたcloze-suffix",
         "tags": "popular",
         "url": "<a href=\"url:\">url:</a>"
@@ -2261,6 +2340,7 @@
         "pitch-accent-positions": "<ol><li><em>(うちこむ only) </em><span>[0]</span></li><li><em>(うちこむ only) </em><span>[3]</span></li><li><em>(ぶちこむ only) </em><span>[0]</span></li><li><em>(ぶちこむ only) </em><span>[3]</span></li></ol>",
         "reading": "うちこむ、ぶちこむ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixうちこむcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"
@@ -2288,6 +2368,7 @@
         "pitch-accent-positions": "No pitch accent data",
         "reading": "うつ、ぶつ",
         "screenshot": "<img src=\"\" />",
+        "search-query": "fullQuery",
         "sentence": "cloze-prefixうちcloze-suffix",
         "tags": "tag1, tag2",
         "url": "<a href=\"url:\">url:</a>"

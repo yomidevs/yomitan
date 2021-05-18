@@ -141,9 +141,11 @@ class AnkiNoteDataCreator {
     }
 
     _getPublicContext(context) {
-        let {documentTitle} = this._asObject(context);
+        let {documentTitle, query, fullQuery} = this._asObject(context);
         if (typeof documentTitle !== 'string') { documentTitle = ''; }
         return {
+            query,
+            fullQuery,
             document: {
                 title: documentTitle
             }

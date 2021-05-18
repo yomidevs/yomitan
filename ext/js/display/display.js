@@ -1400,7 +1400,9 @@ class Display extends EventDispatcher {
         return {
             url,
             sentence,
-            documentTitle
+            documentTitle,
+            query: this._query,
+            fullQuery: this._fullQuery
         };
     }
 

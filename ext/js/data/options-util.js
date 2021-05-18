@@ -461,7 +461,7 @@ class OptionsUtil {
             {async: false, update: this._updateVersion9.bind(this)},
             {async: true,  update: this._updateVersion10.bind(this)},
             {async: false, update: this._updateVersion11.bind(this)},
-            {async: false, update: this._updateVersion12.bind(this)}
+            {async: true,  update: this._updateVersion12.bind(this)}
         ];
     }
 
@@ -813,9 +813,11 @@ class OptionsUtil {
         return options;
     }
 
-    _updateVersion12(options) {
+    async _updateVersion12(options) {
         // Version 12 changes:
         //  Changed sentenceParsing.enableTerminationCharacters to sentenceParsing.terminationCharacterMode.
+        //  Added {search-query} field marker.
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v12.handlebars');
         for (const profile of options.profiles) {
             const {sentenceParsing} = profile.options;
             sentenceParsing.terminationCharacterMode = sentenceParsing.enableTerminationCharacters ? 'custom' : 'newlines';

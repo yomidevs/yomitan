@@ -116,7 +116,9 @@ class TranslatorVM extends DatabaseVM {
             context: {
                 url: 'url:',
                 sentence: {text: '', offset: 0},
-                documentTitle: 'title'
+                documentTitle: 'title',
+                query: 'query',
+                fullQuery: 'fullQuery'
             },
             injectedMedia: null
         };

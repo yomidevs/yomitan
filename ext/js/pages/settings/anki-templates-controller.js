@@ -161,7 +161,9 @@ class AnkiTemplatesController {
                         text: sentenceText,
                         offset: 0
                     },
-                    documentTitle: document.title
+                    documentTitle: document.title,
+                    query: sentenceText,
+                    fullQuery: sentenceText
                 };
                 let template = options.anki.fieldTemplates;
                 if (typeof template !== 'string') { template = this._defaultFieldTemplates; }
