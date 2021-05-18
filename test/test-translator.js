@@ -31,7 +31,7 @@ async function main() {
     const write = (process.argv[2] === '--write');
 
     const translatorVM = new TranslatorVM();
-    const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', 'valid-dictionary2');
+    const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', 'valid-dictionary1');
     await translatorVM.prepare(dictionaryDirectory, 'Test Dictionary 2');
 
     const testInputsFilePath = path.join(__dirname, 'data', 'translator-test-inputs.json');

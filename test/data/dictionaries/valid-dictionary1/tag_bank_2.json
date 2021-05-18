@@ -1,9 +1,9 @@
 [
-    ["ktag1", "kcategory1", 0, "ktag1 notes", 0],
-    ["ktag2", "kcategory2", 0, "ktag2 notes", 0],
-    ["kstat1", "kcategory3", 0, "kstat1 notes", 0],
-    ["kstat2", "kcategory4", 0, "kstat2 notes", 0],
-    ["kstat3", "kcategory5", 0, "kstat3 notes", 0],
-    ["kstat4", "kcategory6", 0, "kstat4 notes", 0],
-    ["kstat5", "kcategory7", 0, "kstat5 notes", 0]
+    ["K1", "default", 0, "example kanji tag 1", 0],
+    ["K2", "default", 0, "example kanji tag 2", 0],
+    ["kstat1", "class", 0, "kanji stat 1", 0],
+    ["kstat2", "code", 0, "kanji stat 2", 0],
+    ["kstat3", "index", 0, "kanji stat 3", 0],
+    ["kstat4", "misc", 0, "kanji stat 4", 0],
+    ["kstat5", "misc", 0, "kanji stat 5", 0]
 ]

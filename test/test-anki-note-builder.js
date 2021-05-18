@@ -29,7 +29,7 @@ function clone(value) {
 async function createVM() {
     const vm = new TranslatorVM();
 
-    const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', 'valid-dictionary2');
+    const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', 'valid-dictionary1');
     await vm.prepare(dictionaryDirectory, 'Test Dictionary 2');
 
     vm.execute([

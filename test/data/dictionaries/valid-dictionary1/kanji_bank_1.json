@@ -3,40 +3,40 @@
         "打",
         "ダ ダアス",
         "う.つ う.ち- ぶ.つ",
-        "ktag1 ktag2",
+        "K1 K2",
         [
-            "meaning1",
-            "meaning2",
-            "meaning3",
-            "meaning4",
-            "meaning5"
+            "utsu meaning 1",
+            "utsu meaning 2",
+            "utsu meaning 3",
+            "utsu meaning 4",
+            "utsu meaning 5"
         ],
         {
-            "kstat1": "1",
-            "kstat2": "2",
-            "kstat3": "3",
-            "kstat4": "4",
-            "kstat5": "5"
+            "kstat1": "kanji stat 1 value",
+            "kstat2": "kanji stat 2 value",
+            "kstat3": "kanji stat 3 value",
+            "kstat4": "kanji stat 4 value",
+            "kstat5": "kanji stat 5 value"
         }
     ],
     [
         "込",
         "",
         "-こ.む こ.む こ.み -こ.み こ.める",
-        "ktag1 ktag2",
+        "K1 K2",
         [
-            "meaning1",
-            "meaning2",
-            "meaning3",
-            "meaning4",
-            "meaning5"
+            "komu meaning 1",
+            "komu meaning 2",
+            "komu meaning 3",
+            "komu meaning 4",
+            "komu meaning 5"
         ],
         {
-            "kstat1": "1",
-            "kstat2": "2",
-            "kstat3": "3",
-            "kstat4": "4",
-            "kstat5": "5"
+            "kstat1": "kanji stat 1 value",
+            "kstat2": "kanji stat 2 value",
+            "kstat3": "kanji stat 3 value",
+            "kstat4": "kanji stat 4 value",
+            "kstat5": "kanji stat 5 value"
         }
     ]
 ]

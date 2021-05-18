@@ -162,8 +162,8 @@ async function testDatabase1() {
             true
         );
         vm.assert.deepStrictEqual(counts, {
-            counts: [{kanji: 2, kanjiMeta: 2, terms: 33, termMeta: 12, tagMeta: 14, media: 1}],
-            total: {kanji: 2, kanjiMeta: 2, terms: 33, termMeta: 12, tagMeta: 14, media: 1}
+            counts: [{kanji: 2, kanjiMeta: 2, terms: 14, termMeta: 12, tagMeta: 15, media: 1}],
+            total: {kanji: 2, kanjiMeta: 2, terms: 14, termMeta: 12, tagMeta: 15, media: 1}
         });
 
         // Test find* functions
@@ -211,19 +211,19 @@ async function testFindTermsBulkTest1(database, titles) {
                 }
             ],
             expectedResults: {
-                total: 32,
+                total: 10,
                 terms: [
                     ['打', 2],
-                    ['打つ', 17],
-                    ['打ち込む', 13]
+                    ['打つ', 4],
+                    ['打ち込む', 4]
                 ],
                 readings: [
                     ['だ', 1],
                     ['ダース', 1],
-                    ['うつ', 15],
+                    ['うつ', 2],
                     ['ぶつ', 2],
-                    ['うちこむ', 9],
-                    ['ぶちこむ', 4]
+                    ['うちこむ', 2],
+                    ['ぶちこむ', 2]
                 ]
             }
         },
@@ -248,13 +248,13 @@ async function testFindTermsBulkTest1(database, titles) {
                 }
             ],
             expectedResults: {
-                total: 13,
+                total: 4,
                 terms: [
-                    ['打ち込む', 13]
+                    ['打ち込む', 4]
                 ],
                 readings: [
-                    ['うちこむ', 9],
-                    ['ぶちこむ', 4]
+                    ['うちこむ', 2],
+                    ['ぶちこむ', 2]
                 ]
             }
         },
@@ -300,16 +300,16 @@ async function testTindTermsExactBulk1(database, titles) {
                 }
             ],
             expectedResults: {
-                total: 25,
+                total: 5,
                 terms: [
                     ['打', 1],
-                    ['打つ', 15],
-                    ['打ち込む', 9]
+                    ['打つ', 2],
+                    ['打ち込む', 2]
                 ],
                 readings: [
                     ['だ', 1],
-                    ['うつ', 15],
-                    ['うちこむ', 9]
+                    ['うつ', 2],
+                    ['うちこむ', 2]
                 ]
             }
         },
@@ -339,12 +339,12 @@ async function testTindTermsExactBulk1(database, titles) {
                 }
             ],
             expectedResults: {
-                total: 17,
+                total: 4,
                 terms: [
-                    ['打つ', 17]
+                    ['打つ', 4]
                 ],
                 readings: [
-                    ['うつ', 15],
+                    ['うつ', 2],
                     ['ぶつ', 2]
                 ]
             }
@@ -400,20 +400,20 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
                 }
             ],
             expectedResults: {
-                total: 33,
+                total: 11,
                 terms: [
                     ['打', 2],
-                    ['打つ', 17],
-                    ['打ち込む', 13],
+                    ['打つ', 4],
+                    ['打ち込む', 4],
                     ['画像', 1]
                 ],
                 readings: [
                     ['だ', 1],
                     ['ダース', 1],
-                    ['うつ', 15],
+                    ['うつ', 2],
                     ['ぶつ', 2],
-                    ['うちこむ', 9],
-                    ['ぶちこむ', 4],
+                    ['うちこむ', 2],
+                    ['ぶちこむ', 2],
                     ['がぞう', 1]
                 ]
             }
@@ -457,12 +457,12 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
                 }
             ],
             expectedResults: {
-                total: 17,
+                total: 4,
                 terms: [
-                    ['打つ', 17]
+                    ['打つ', 4]
                 ],
                 readings: [
-                    ['うつ', 15],
+                    ['うつ', 2],
                     ['ぶつ', 2]
                 ]
             }
@@ -474,13 +474,13 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
                 }
             ],
             expectedResults: {
-                total: 13,
+                total: 4,
                 terms: [
-                    ['打ち込む', 13]
+                    ['打ち込む', 4]
                 ],
                 readings: [
-                    ['うちこむ', 9],
-                    ['ぶちこむ', 4]
+                    ['うちこむ', 2],
+                    ['ぶちこむ', 2]
                 ]
             }
         },
@@ -715,21 +715,21 @@ async function testFindTagForTitle1(database, title) {
         {
             inputs: [
                 {
-                    name: 'tag1'
+                    name: 'E1'
                 }
             ],
             expectedResults: {
-                value: {category: 'category1', dictionary: title, name: 'tag1', notes: 'tag1 notes', order: 0, score: 0}
+                value: {category: 'default', dictionary: title, name: 'E1', notes: 'example tag 1', order: 0, score: 0}
             }
         },
         {
             inputs: [
                 {
-                    name: 'ktag1'
+                    name: 'K1'
                 }
             ],
             expectedResults: {
-                value: {category: 'kcategory1', dictionary: title, name: 'ktag1', notes: 'ktag1 notes', order: 0, score: 0}
+                value: {category: 'default', dictionary: title, name: 'K1', notes: 'example kanji tag 1', order: 0, score: 0}
             }
         },
         {
@@ -739,7 +739,7 @@ async function testFindTagForTitle1(database, title) {
                 }
             ],
             expectedResults: {
-                value: {category: 'kcategory3', dictionary: title, name: 'kstat1', notes: 'kstat1 notes', order: 0, score: 0}
+                value: {category: 'class', dictionary: title, name: 'kstat1', notes: 'kanji stat 1', order: 0, score: 0}
             }
         },
         {

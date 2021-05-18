@@ -36,9 +36,9 @@
         {
             "reading": "おてまえ",
             "pitches": [
-                {"position": 2, "tags": ["ptag1"]},
-                {"position": 2, "tags": ["ptag2"]},
-                {"position": 0, "tags": ["ptag2"]}
+                {"position": 2, "tags": ["P1"]},
+                {"position": 2, "tags": ["P2"]},
+                {"position": 0, "tags": ["P2"]}
             ]
         }
     ]

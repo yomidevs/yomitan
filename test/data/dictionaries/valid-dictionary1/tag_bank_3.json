@@ -1,4 +1,4 @@
 [
-    ["ptag1", "pcategory1", 0, "ptag1 notes", 0],
-    ["ptag2", "pcategory2", 0, "ptag2 notes", 0]
+    ["P1", "default", 0, "example pitch tag 1", 0],
+    ["P2", "default", 0, "example pitch tag 2", 0]
 ]
