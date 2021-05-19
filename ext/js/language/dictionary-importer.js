@@ -300,20 +300,58 @@ class DictionaryImporter {
                 return data.text;
             case 'image':
                 return await this._formatDictionaryTermGlossaryImage(data, context, entry);
+            case 'structured-content':
+                return await this._formatStructuredContent(data, context, entry);
             default:
                 throw new Error(`Unhandled data type: ${data.type}`);
         }
     }
 
     async _formatDictionaryTermGlossaryImage(data, context, entry) {
+        return await this._createImageData(data, context, entry, {type: 'image'});
+    }
+
+    async _formatStructuredContent(data, context, entry) {
+        const content = await this._prepareStructuredContent(data.content, context, entry);
+        return {
+            type: 'structured-content',
+            content
+        };
+    }
+
+    async _prepareStructuredContent(content, context, entry) {
+        if (typeof content === 'string' || !(typeof content === 'object' && content !== null)) {
+            return content;
+        }
+        if (Array.isArray(content)) {
+            for (let i = 0, ii = content.length; i < ii; ++i) {
+                content[i] = await this._prepareStructuredContent(content[i], context, entry);
+            }
+            return content;
+        }
+        const {tag} = content;
+        switch (tag) {
+            case 'img':
+                return await this._prepareStructuredContentImage(content, context, entry);
+        }
+        const childContent = content.content;
+        if (typeof childContent !== 'undefined') {
+            content.content = await this._prepareStructuredContent(childContent, context, entry);
+        }
+        return content;
+    }
+
+    async _prepareStructuredContentImage(content, context, entry) {
+        const {verticalAlign} = content;
+        const result = await this._createImageData(content, context, entry, {tag: 'img'});
+        if (typeof verticalAlign === 'string') { result.verticalAlign = verticalAlign; }
+        return result;
+    }
+
+    async _createImageData(data, context, entry, attributes) {
         const {path, width: preferredWidth, height: preferredHeight, title, description, pixelated, collapsed, collapsible} = data;
         const {width, height} = await this._getImageMedia(path, context, entry);
-        const newData = {
-            type: 'image',
-            path,
-            width,
-            height
-        };
+        const newData = Object.assign({}, attributes, {path, width, height});
         if (typeof preferredWidth === 'number') { newData.preferredWidth = preferredWidth; }
         if (typeof preferredHeight === 'number') { newData.preferredHeight = preferredHeight; }
         if (typeof title === 'string') { newData.title = title; }

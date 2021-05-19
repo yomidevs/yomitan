@@ -1,5 +1,97 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "structuredContent": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "description": "Represents a text node."
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structuredContent",
+                        "description": "An array of child content."
+                    }
+                },
+                {
+                    "type": "object",
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "description": "Generic container tags.",
+                            "required": [
+                                "tag"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "tag": {
+                                    "type": "string",
+                                    "enum": ["ruby", "rt", "rp"]
+                                },
+                                "content": {
+                                    "$ref": "#/definitions/structuredContent"
+                                }
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "description": "Image tag.",
+                            "required": [
+                                "tag",
+                                "path"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "tag": {
+                                    "type": "string",
+                                    "const": "img"
+                                },
+                                "path": {
+                                    "type": "string",
+                                    "description": "Path to the image file in the archive."
+                                },
+                                "width": {
+                                    "type": "integer",
+                                    "description": "Preferred width of the image.",
+                                    "minimum": 1
+                                },
+                                "height": {
+                                    "type": "integer",
+                                    "description": "Preferred width of the image.",
+                                    "minimum": 1
+                                },
+                                "title": {
+                                    "type": "string",
+                                    "description": "Hover text for the image."
+                                },
+                                "pixelated": {
+                                    "type": "boolean",
+                                    "description": "Whether or not the image should appear pixelated at sizes larger than the image's native resolution.",
+                                    "default": false
+                                },
+                                "collapsed": {
+                                    "type": "boolean",
+                                    "description": "Whether or not the image is collapsed by default.",
+                                    "default": false
+                                },
+                                "collapsible": {
+                                    "type": "boolean",
+                                    "description": "Whether or not the image can be collapsed.",
+                                    "default": false
+                                },
+                                "verticalAlign": {
+                                    "type": "string",
+                                    "description": "The vertical alignment of the image.",
+                                    "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"]
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    },
     "type": "array",
     "description": "Data file containing term and expression information.",
     "additionalItems": {
@@ -46,7 +138,7 @@
                                 "type": {
                                     "type": "string",
                                     "description": "The type of the data for this definition.",
-                                    "enum": ["text", "image"]
+                                    "enum": ["text", "image", "structured-content"]
                                 }
                             },
                             "oneOf": [
@@ -64,6 +156,23 @@
                                         "text": {
                                             "type": "string",
                                             "description": "Single definition for the term/expression."
+                                        }
+                                    }
+                                },
+                                {
+                                    "required": [
+                                        "type",
+                                        "content"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "enum": ["structured-content"]
+                                        },
+                                        "content": {
+                                            "$ref": "#/definitions/structuredContent",
+                                            "description": "Single definition for the term/expression using a structured content object."
                                         }
                                     }
                                 },

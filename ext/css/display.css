@@ -1643,6 +1643,19 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     white-space: pre-line;
 }
 
+.gloss-image-link[data-vertical-align=baseline] { vertical-align: baseline; }
+.gloss-image-link[data-vertical-align=sub] { vertical-align: sub; }
+.gloss-image-link[data-vertical-align=super] { vertical-align: super; }
+.gloss-image-link[data-vertical-align=text-top] { vertical-align: top; }
+.gloss-image-link[data-vertical-align=text-bottom] { vertical-align: bottom; }
+.gloss-image-link[data-vertical-align=middle] { vertical-align: middle; }
+.gloss-image-link[data-vertical-align=top] { vertical-align: top; }
+.gloss-image-link[data-vertical-align=bottom] { vertical-align: bottom; }
+.gloss-image-link[data-collapsed=true],
+:root[data-glossary-layout-mode=compact] .gloss-image-link[data-collapsible=true] {
+    vertical-align: baseline;
+}
+
 .gloss-image-link[data-collapsed=true] .gloss-image-container,
 :root[data-glossary-layout-mode=compact] .gloss-image-link[data-collapsible=true] .gloss-image-container {
     display: none;

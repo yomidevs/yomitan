@@ -12,5 +12,30 @@
     ["画像", "がぞう", "n", "n", 1, ["gazou definition 1", {"type": "image", "path": "image.gif", "width": 350, "height": 350, "description": "gazou definition 2", "pixelated": true}], 5, "P E1"],
     ["読む", "よむ", "vt", "v5", 100, ["to read"], 6, "P E1"],
     ["強み", "つよみ", "n", "n", 90, ["strong point"], 7, "P E1"],
-    ["テキスト", "テキスト", "n", "n", 1, ["text definition 1", {"type": "text", "text": "text definition 2"}], 8, "P E1"]
+    ["テキスト", "テキスト", "n", "n", 1, ["text definition 1", {"type": "text", "text": "text definition 2"}], 8, "P E1"],
+    [
+        "内容", "ないよう", "n", "n", 35,
+        [
+            "naiyou definition 1",
+            {"type": "structured-content", "content": "naiyou definition 2"},
+            {"type": "structured-content", "content": ["naiyou definition 3"]},
+            {"type": "structured-content", "content": {"tag": "img", "path": "image.gif", "width": 35, "height": 35, "pixelated": true}},
+            {"type": "structured-content", "content": [
+                "naiyou definition 5: ",
+                {"tag": "img", "path": "image.gif", "width": 35, "height": 35, "pixelated": true, "collapsible": false},
+                "\nmore content 1: ",
+                {"tag": "img", "path": "image.gif", "width": 35, "height": 35, "pixelated": true, "collapsible": true},
+                "\nmore content 2: ",
+                {"tag": "img", "path": "image.gif", "width": 35, "height": 35, "pixelated": true, "collapsible": false, "collapsed": false, "verticalAlign": "middle"},
+                " and ",
+                {"tag": "img", "path": "image.gif", "width": 35, "height": 35, "pixelated": true, "collapsible": false, "collapsed": true}
+            ]},
+            {"type": "structured-content", "content": [
+                "naiyou definition 6: ",
+                {"tag": "ruby", "content": ["内", {"tag": "rp", "content": "("}, {"tag": "rt", "content": "ない"}, {"tag": "rp", "content": ")"}]},
+                {"tag": "ruby", "content": ["容", {"tag": "rp", "content": "("}, {"tag": "rt", "content": "よう"}, {"tag": "rp", "content": ")"}]}
+            ]}
+        ],
+        9, "P E1"
+    ]
 ]

@@ -162,8 +162,8 @@ async function testDatabase1() {
             true
         );
         vm.assert.deepStrictEqual(counts, {
-            counts: [{kanji: 2, kanjiMeta: 2, terms: 14, termMeta: 12, tagMeta: 15, media: 1}],
-            total: {kanji: 2, kanjiMeta: 2, terms: 14, termMeta: 12, tagMeta: 15, media: 1}
+            counts: [{kanji: 2, kanjiMeta: 2, terms: 15, termMeta: 12, tagMeta: 15, media: 1}],
+            total: {kanji: 2, kanjiMeta: 2, terms: 15, termMeta: 12, tagMeta: 15, media: 1}
         });
 
         // Test find* functions
