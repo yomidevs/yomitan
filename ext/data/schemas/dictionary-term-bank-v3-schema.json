@@ -52,14 +52,14 @@
                                     "description": "Path to the image file in the archive."
                                 },
                                 "width": {
-                                    "type": "integer",
+                                    "type": "number",
                                     "description": "Preferred width of the image.",
-                                    "minimum": 1
+                                    "minimum": 0
                                 },
                                 "height": {
-                                    "type": "integer",
+                                    "type": "number",
                                     "description": "Preferred width of the image.",
-                                    "minimum": 1
+                                    "minimum": 0
                                 },
                                 "title": {
                                     "type": "string",
@@ -84,6 +84,11 @@
                                     "type": "string",
                                     "description": "The vertical alignment of the image.",
                                     "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"]
+                                },
+                                "sizeUnits": {
+                                    "type": "string",
+                                    "description": "The units for the width and height.",
+                                    "enum": ["px", "em"]
                                 }
                             }
                         }

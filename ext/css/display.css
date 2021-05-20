@@ -1573,6 +1573,7 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     color: inherit;
     display: inline-block;
     position: relative;
+    line-height: 1;
 }
 .gloss-image-link[href]:hover {
     cursor: pointer;
@@ -1631,6 +1632,7 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 }
 .gloss-image-link-text {
     display: none;
+    line-height: var(--line-height);
 }
 .gloss-image-link-text::before {
     content: '[';
@@ -1641,6 +1643,10 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 .gloss-image-description {
     display: block;
     white-space: pre-line;
+}
+
+.gloss-image-link[data-size-units=em] .gloss-image-container {
+    font-size: 1em;
 }
 
 .gloss-image-link[data-vertical-align=baseline] { vertical-align: baseline; }

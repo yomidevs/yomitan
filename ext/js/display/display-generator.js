@@ -340,18 +340,19 @@ class DisplayGenerator {
     }
 
     _createDefinitionImage(data, dictionary) {
-        const {path, width, height, preferredWidth, preferredHeight, title, pixelated, collapsed, collapsible, verticalAlign} = data;
+        const {path, width, height, preferredWidth, preferredHeight, title, pixelated, collapsed, collapsible, verticalAlign, sizeUnits} = data;
 
-        const usedWidth = (
-            typeof preferredWidth === 'number' ?
-            preferredWidth :
-            width
-        );
+        const hasPreferredWidth = (typeof preferredWidth === 'number');
+        const hasPreferredHeight = (typeof preferredHeight === 'number');
         const aspectRatio = (
-            typeof preferredWidth === 'number' &&
-            typeof preferredHeight === 'number' ?
+            hasPreferredWidth && hasPreferredHeight ?
             preferredWidth / preferredHeight :
             width / height
+        );
+        const usedWidth = (
+            hasPreferredWidth ?
+            preferredWidth :
+            (hasPreferredHeight ? preferredHeight * aspectRatio : width)
         );
 
         const node = this._templates.instantiate('gloss-item-image');
@@ -363,6 +364,9 @@ class DisplayGenerator {
         node.dataset.collapsible = typeof collapsible === 'boolean' ? `${collapsible}` : 'true';
         if (typeof verticalAlign === 'string') {
             node.dataset.verticalAlign = verticalAlign;
+        }
+        if (typeof sizeUnits === 'string' && (hasPreferredWidth || hasPreferredHeight)) {
+            node.dataset.sizeUnits = sizeUnits;
         }
 
         const imageContainer = node.querySelector('.gloss-image-container');

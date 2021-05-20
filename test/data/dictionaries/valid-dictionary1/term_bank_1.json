@@ -28,7 +28,9 @@
                 "\nmore content 2: ",
                 {"tag": "img", "path": "image.gif", "width": 35, "height": 35, "pixelated": true, "collapsible": false, "collapsed": false, "verticalAlign": "middle"},
                 " and ",
-                {"tag": "img", "path": "image.gif", "width": 35, "height": 35, "pixelated": true, "collapsible": false, "collapsed": true}
+                {"tag": "img", "path": "image.gif", "width": 35, "height": 35, "pixelated": true, "collapsible": false, "collapsed": true},
+                " and ",
+                {"tag": "img", "path": "image.gif", "width": 1, "height": 1, "pixelated": true, "collapsible": false, "collapsed": false, "sizeUnits": "em"}
             ]},
             {"type": "structured-content", "content": [
                 "naiyou definition 6: ",

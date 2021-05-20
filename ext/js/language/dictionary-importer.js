@@ -342,9 +342,10 @@ class DictionaryImporter {
     }
 
     async _prepareStructuredContentImage(content, context, entry) {
-        const {verticalAlign} = content;
+        const {verticalAlign, sizeUnits} = content;
         const result = await this._createImageData(content, context, entry, {tag: 'img'});
         if (typeof verticalAlign === 'string') { result.verticalAlign = verticalAlign; }
+        if (typeof sizeUnits === 'string') { result.sizeUnits = sizeUnits; }
         return result;
     }
 
