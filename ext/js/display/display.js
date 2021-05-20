@@ -1771,6 +1771,7 @@ class Display extends EventDispatcher {
         if (!options.scanning.enablePopupSearch) {
             if (this._contentTextScanner !== null) {
                 this._contentTextScanner.setEnabled(false);
+                this._contentTextScanner.clearSelection();
             }
             return;
         }
@@ -1788,6 +1789,7 @@ class Display extends EventDispatcher {
             this._contentTextScanner.includeSelector = '.click-scannable,.click-scannable *';
             this._contentTextScanner.excludeSelector = '.scan-disable,.scan-disable *';
             this._contentTextScanner.prepare();
+            this._contentTextScanner.on('clear', this._onContentTextScannerClear.bind(this));
             this._contentTextScanner.on('searched', this._onContentTextScannerSearched.bind(this));
         }
 
@@ -1821,6 +1823,10 @@ class Display extends EventDispatcher {
         this._contentTextScanner.setEnabled(true);
     }
 
+    _onContentTextScannerClear() {
+        this._contentTextScanner.clearSelection();
+    }
+
     _onContentTextScannerSearched({type, dictionaryEntries, sentence, textSource, optionsContext, error}) {
         if (error !== null && !yomichan.isExtensionUnloaded) {
             log.error(error);
@@ -1851,7 +1857,7 @@ class Display extends EventDispatcher {
                 contentOrigin: this.getContentOrigin()
             }
         };
-        this._contentTextScanner.clearSelection(true);
+        this._contentTextScanner.clearSelection();
         this.setContent(details);
     }
 

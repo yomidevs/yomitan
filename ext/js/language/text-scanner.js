@@ -139,8 +139,6 @@ class TextScanner extends EventDispatcher {
 
         if (value) {
             this._hookEvents();
-        } else {
-            this.clearSelection(true);
         }
     }
 
@@ -259,7 +257,7 @@ class TextScanner extends EventDispatcher {
         return (this._textSourceCurrent !== null);
     }
 
-    clearSelection(passive) {
+    clearSelection() {
         if (!this._canClearSelection) { return; }
         if (this._textSourceCurrent !== null) {
             if (this._textSourceCurrentSelected) {
@@ -273,7 +271,6 @@ class TextScanner extends EventDispatcher {
             this._textSourceCurrentSelected = false;
             this._inputInfoCurrent = null;
         }
-        this.trigger('clearSelection', {passive});
     }
 
     getCurrentTextSource() {
@@ -431,7 +428,7 @@ class TextScanner extends EventDispatcher {
             case 0: // Primary
                 if (this._searchOnClick) { this._resetPreventNextClickScan(); }
                 this._scanTimerClear();
-                this.clearSelection(false);
+                this._triggerClear('mousedown');
                 break;
             case 1: // Middle
                 if (this._preventMiddleMouse) {
@@ -1104,5 +1101,9 @@ class TextScanner extends EventDispatcher {
                 // NOP
             }
         }
+    }
+
+    _triggerClear(reason) {
+        this.trigger('clear', {reason});
     }
 }

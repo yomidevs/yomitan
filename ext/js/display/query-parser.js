@@ -47,6 +47,7 @@ class QueryParser extends EventDispatcher {
 
     prepare() {
         this._textScanner.prepare();
+        this._textScanner.on('clear', this._onTextScannerClear.bind(this));
         this._textScanner.on('searched', this._onSearched.bind(this));
         this._queryParserModeSelect.addEventListener('change', this._onParserChange.bind(this), false);
     }
@@ -85,6 +86,10 @@ class QueryParser extends EventDispatcher {
     }
 
     // Private
+
+    _onTextScannerClear() {
+        this._textScanner.clearSelection();
+    }
 
     _onSearched(e) {
         const {error} = e;
