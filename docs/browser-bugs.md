@@ -71,3 +71,13 @@ This page lists several of the browser bugs that have affected Yomichan over the
 * **Browser**: Firefox
 * **Date**: 2021-03-05
 * **Links**: [Report](https://bugzilla.mozilla.org/show_bug.cgi?id=1696721)
+
+## Focus changes don't preserve caret position for caret browsing
+* **Browser**: Chrome
+* **Date**: 2021-05-19
+* **Links**: [Report](https://bugs.chromium.org/p/chromium/issues/detail?id=1211175)
+
+## CSS :active state on &lt;label&gt; element doesn't match state on inner element
+* **Browser**: Chrome
+* **Date**: 2021-05-19
+* **Links**: [Report](https://bugs.chromium.org/p/chromium/issues/detail?id=1211182)
