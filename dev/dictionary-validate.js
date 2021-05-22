@@ -17,6 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const {performance} = require('perf_hooks');
 const {JSZip} = require('./util');
 const {VM} = require('./vm');
 
@@ -96,13 +97,17 @@ async function main() {
     const schemas = getSchemas();
 
     for (const dictionaryFileName of dictionaryFileNames) {
+        const start = performance.now();
         try {
             console.log(`Validating ${dictionaryFileName}...`);
             const source = fs.readFileSync(dictionaryFileName);
             const archive = await JSZip.loadAsync(source);
             await validateDictionary(archive, schemas);
-            console.log('No issues found');
+            const end = performance.now();
+            console.log(`No issues detected (${((end - start) / 1000).toFixed(2)}s)`);
         } catch (e) {
+            const end = performance.now();
+            console.log(`Encountered an error (${((end - start) / 1000).toFixed(2)}s)`);
             console.warn(e);
         }
     }
