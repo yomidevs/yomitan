@@ -24,7 +24,6 @@
  * DictionaryDatabase
  * Environment
  * JapaneseUtil
- * JsonSchemaValidator
  * Mecab
  * MediaUtil
  * ObjectPropertyAccessor
@@ -58,7 +57,6 @@ class Backend {
             clipboardReader: this._clipboardReader
         });
         this._options = null;
-        this._profileConditionsSchemaValidator = new JsonSchemaValidator();
         this._profileConditionsSchemaCache = [];
         this._profileConditionsUtil = new ProfileConditionsUtil();
         this._defaultAnkiFieldTemplates = null;
@@ -1018,7 +1016,7 @@ class Backend {
                 this._profileConditionsSchemaCache.push(schema);
             }
 
-            if (conditionGroups.length > 0 && this._profileConditionsSchemaValidator.isValid(optionsContext, schema)) {
+            if (conditionGroups.length > 0 && schema.isValid(optionsContext)) {
                 return profile;
             }
             ++index;
@@ -1029,7 +1027,6 @@ class Backend {
 
     _clearProfileConditionsSchemaCache() {
         this._profileConditionsSchemaCache = [];
-        this._profileConditionsSchemaValidator.clearCache();
     }
 
     _checkLastError() {

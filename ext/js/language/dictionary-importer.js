@@ -17,14 +17,13 @@
 
 /* global
  * JSZip
- * JsonSchemaValidator
+ * JsonSchema
  * MediaUtil
  */
 
 class DictionaryImporter {
     constructor() {
         this._schemas = new Map();
-        this._jsonSchemaValidator = new JsonSchemaValidator();
     }
 
     async importDictionary(dictionaryDatabase, archiveSource, details, onProgress) {
@@ -235,22 +234,27 @@ class DictionaryImporter {
             return schemaPromise;
         }
 
-        schemaPromise = this._fetchJsonAsset(fileName);
+        schemaPromise = this._createSchema(fileName);
         this._schemas.set(fileName, schemaPromise);
         return schemaPromise;
     }
 
+    async _createSchema(fileName) {
+        const schema = await this._fetchJsonAsset(fileName);
+        return new JsonSchema(schema);
+    }
+
     _validateJsonSchema(value, schema, fileName) {
         try {
-            this._jsonSchemaValidator.validate(value, schema);
+            schema.validate(value);
         } catch (e) {
             throw this._formatSchemaError(e, fileName);
         }
     }
 
     _formatSchemaError(e, fileName) {
-        const valuePathString = this._getSchemaErrorPathString(e.info.valuePath, 'dictionary');
-        const schemaPathString = this._getSchemaErrorPathString(e.info.schemaPath, 'schema');
+        const valuePathString = this._getSchemaErrorPathString(e.valuePath, 'dictionary');
+        const schemaPathString = this._getSchemaErrorPathString(e.schemaPath, 'schema');
 
         const e2 = new Error(`Dictionary has invalid data in '${fileName}' for value '${valuePathString}', validated against '${schemaPathString}': ${e.message}`);
         e2.data = e;
@@ -260,16 +264,16 @@ class DictionaryImporter {
 
     _getSchemaErrorPathString(infoList, base='') {
         let result = base;
-        for (const [part] of infoList) {
-            switch (typeof part) {
+        for (const {path} of infoList) {
+            switch (typeof path) {
                 case 'string':
                     if (result.length > 0) {
                         result += '.';
                     }
-                    result += part;
+                    result += path;
                     break;
                 case 'number':
-                    result += `[${part}]`;
+                    result += `[${path}]`;
                     break;
             }
         }

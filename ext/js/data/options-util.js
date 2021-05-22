@@ -16,19 +16,19 @@
  */
 
 /* global
- * JsonSchemaValidator
+ * JsonSchema
  * TemplatePatcher
  */
 
 class OptionsUtil {
     constructor() {
-        this._schemaValidator = new JsonSchemaValidator();
         this._templatePatcher = null;
         this._optionsSchema = null;
     }
 
     async prepare() {
-        this._optionsSchema = await this._fetchAsset('/data/schemas/options-schema.json', true);
+        const schema = await this._fetchAsset('/data/schemas/options-schema.json', true);
+        this._optionsSchema = new JsonSchema(schema);
     }
 
     async update(options) {
@@ -87,7 +87,7 @@ class OptionsUtil {
         options = await this._applyUpdates(options, this._getVersionUpdates());
 
         // Validation
-        options = this._schemaValidator.getValidValueOrDefault(this._optionsSchema, options);
+        options = this._optionsSchema.getValidValueOrDefault(options);
 
         // Result
         return options;
@@ -135,17 +135,17 @@ class OptionsUtil {
 
     getDefault() {
         const optionsVersion = this._getVersionUpdates().length;
-        const options = this._schemaValidator.getValidValueOrDefault(this._optionsSchema);
+        const options = this._optionsSchema.getValidValueOrDefault();
         options.version = optionsVersion;
         return options;
     }
 
     createValidatingProxy(options) {
-        return this._schemaValidator.createProxy(options, this._optionsSchema);
+        return this._optionsSchema.createProxy(options);
     }
 
     validate(options) {
-        return this._schemaValidator.validate(options, this._optionsSchema);
+        return this._optionsSchema.validate(options);
     }
 
     // Legacy profile updating

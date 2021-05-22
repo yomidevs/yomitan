@@ -19,10 +19,724 @@
  * CacheMap
  */
 
-class JsonSchemaProxyHandler {
-    constructor(schema, jsonSchemaValidator) {
+class JsonSchema {
+    constructor(schema, rootSchema) {
+        this._schema = null;
+        this._startSchema = schema;
+        this._rootSchema = typeof rootSchema !== 'undefined' ? rootSchema : schema;
+        this._regexCache = null;
+        this._valuePath = [];
+        this._schemaPath = [];
+
+        this._schemaPush(null, null);
+        this._valuePush(null, null);
+    }
+
+    get schema() {
+        return this._startSchema;
+    }
+
+    get rootSchema() {
+        return this._rootSchema;
+    }
+
+    createProxy(value) {
+        return (
+            typeof value === 'object' && value !== null ?
+            new Proxy(value, new JsonSchemaProxyHandler(this)) :
+            value
+        );
+    }
+
+    isValid(value) {
+        try {
+            this.validate(value);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    validate(value) {
+        this._schemaPush(null, this._startSchema);
+        this._valuePush(null, value);
+        try {
+            this._validate(value);
+        } finally {
+            this._valuePop();
+            this._schemaPop();
+        }
+    }
+
+    getValidValueOrDefault(value) {
+        return this._getValidValueOrDefault(null, value, [{path: null, schema: this._startSchema}]);
+    }
+
+    getObjectPropertySchema(property) {
+        this._schemaPush(null, this._startSchema);
+        try {
+            const schemaPath = this._getObjectPropertySchemaPath(property);
+            return schemaPath !== null ? new JsonSchema(schemaPath[schemaPath.length - 1].schema, this._rootSchema) : null;
+        } finally {
+            this._schemaPop();
+        }
+    }
+
+    getArrayItemSchema(index) {
+        this._schemaPush(null, this._startSchema);
+        try {
+            const schemaPath = this._getArrayItemSchemaPath(index);
+            return schemaPath !== null ? new JsonSchema(schemaPath[schemaPath.length - 1].schema, this._rootSchema) : null;
+        } finally {
+            this._schemaPop();
+        }
+    }
+
+    isObjectPropertyRequired(property) {
+        const {required} = this._startSchema;
+        return Array.isArray(required) && required.includes(property);
+    }
+
+    // Stack
+
+    _valuePush(path, value) {
+        this._valuePath.push({path, value});
+    }
+
+    _valuePop() {
+        this._valuePath.pop();
+    }
+
+    _schemaPush(path, schema) {
+        this._schemaPath.push({path, schema});
         this._schema = schema;
-        this._jsonSchemaValidator = jsonSchemaValidator;
+    }
+
+    _schemaPop() {
+        this._schemaPath.pop();
+        this._schema = this._schemaPath[this._schemaPath.length - 1].schema;
+    }
+
+    // Private
+
+    _createError(message) {
+        const valuePath = [];
+        for (let i = 1, ii = this._valuePath.length; i < ii; ++i) {
+            const {path, value} = this._valuePath[i];
+            valuePath.push({path, value});
+        }
+
+        const schemaPath = [];
+        for (let i = 1, ii = this._schemaPath.length; i < ii; ++i) {
+            const {path, schema} = this._schemaPath[i];
+            schemaPath.push({path, schema});
+        }
+
+        const error = new Error(message);
+        error.value = valuePath[valuePath.length - 1].value;
+        error.schema = this._schema;
+        error.valuePath = valuePath;
+        error.schemaPath = schemaPath;
+        return error;
+    }
+
+    _isObject(value) {
+        return typeof value === 'object' && value !== null && !Array.isArray(value);
+    }
+
+    _getRegex(pattern, flags) {
+        if (this._regexCache === null) {
+            this._regexCache = new CacheMap(100);
+        }
+
+        const key = `${flags}:${pattern}`;
+        let regex = this._regexCache.get(key);
+        if (typeof regex === 'undefined') {
+            regex = new RegExp(pattern, flags);
+            this._regexCache.set(key, regex);
+        }
+        return regex;
+    }
+
+    _getUnconstrainedSchema() {
+        return {};
+    }
+
+    _getObjectPropertySchemaPath(property) {
+        const {properties} = this._schema;
+        if (this._isObject(properties)) {
+            const propertySchema = properties[property];
+            if (this._isObject(propertySchema)) {
+                return [
+                    {path: 'properties', schema: properties},
+                    {path: property, schema: propertySchema}
+                ];
+            }
+        }
+
+        const {additionalProperties} = this._schema;
+        if (additionalProperties === false) {
+            return null;
+        } else if (this._isObject(additionalProperties)) {
+            return [{path: 'additionalProperties', schema: additionalProperties}];
+        } else {
+            const result = this._getUnconstrainedSchema();
+            return [{path: null, schema: result}];
+        }
+    }
+
+    _getArrayItemSchemaPath(index) {
+        const {items} = this._schema;
+        if (this._isObject(items)) {
+            return [{path: 'items', schema: items}];
+        }
+        if (Array.isArray(items)) {
+            if (index >= 0 && index < items.length) {
+                const propertySchema = items[index];
+                if (this._isObject(propertySchema)) {
+                    return [
+                        {path: 'items', schema: items},
+                        {path: index, schema: propertySchema}
+                    ];
+                }
+            }
+        }
+
+        const {additionalItems} = this._schema;
+        if (additionalItems === false) {
+            return null;
+        } else if (this._isObject(additionalItems)) {
+            return [{path: 'additionalItems', schema: additionalItems}];
+        } else {
+            const result = this._getUnconstrainedSchema();
+            return [{path: null, schema: result}];
+        }
+    }
+
+    _getSchemaOrValueType(value) {
+        const {type} = this._schema;
+
+        if (Array.isArray(type)) {
+            if (typeof value !== 'undefined') {
+                const valueType = this._getValueType(value);
+                if (type.indexOf(valueType) >= 0) {
+                    return valueType;
+                }
+            }
+            return null;
+        }
+
+        if (typeof type !== 'undefined') { return type; }
+        return (typeof value !== 'undefined') ? this._getValueType(value) : null;
+    }
+
+    _getValueType(value) {
+        const type = typeof value;
+        if (type === 'object') {
+            if (value === null) { return 'null'; }
+            if (Array.isArray(value)) { return 'array'; }
+        }
+        return type;
+    }
+
+    _isValueTypeAny(value, type, schemaTypes) {
+        if (typeof schemaTypes === 'string') {
+            return this._isValueType(value, type, schemaTypes);
+        } else if (Array.isArray(schemaTypes)) {
+            for (const schemaType of schemaTypes) {
+                if (this._isValueType(value, type, schemaType)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
+    _isValueType(value, type, schemaType) {
+        return (
+            type === schemaType ||
+            (schemaType === 'integer' && Math.floor(value) === value)
+        );
+    }
+
+    _valuesAreEqualAny(value1, valueList) {
+        for (const value2 of valueList) {
+            if (this._valuesAreEqual(value1, value2)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    _valuesAreEqual(value1, value2) {
+        return value1 === value2;
+    }
+
+    // Validation
+
+    _isValidCurrent(value) {
+        try {
+            this._validate(value);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    _validate(value) {
+        this._validateSingleSchema(value);
+        this._validateConditional(value);
+        this._validateAllOf(value);
+        this._validateAnyOf(value);
+        this._validateOneOf(value);
+        this._validateNoneOf(value);
+    }
+
+    _validateConditional(value) {
+        const ifSchema = this._schema.if;
+        if (!this._isObject(ifSchema)) { return; }
+
+        let okay = true;
+        this._schemaPush('if', ifSchema);
+        try {
+            this._validate(value);
+        } catch (e) {
+            okay = false;
+        } finally {
+            this._schemaPop();
+        }
+
+        const nextSchema = okay ? this._schema.then : this._schema.else;
+        if (this._isObject(nextSchema)) { return; }
+
+        this._schemaPush(okay ? 'then' : 'else', nextSchema);
+        try {
+            this._validate(value);
+        } finally {
+            this._schemaPop();
+        }
+    }
+
+    _validateAllOf(value) {
+        const subSchemas = this._schema.allOf;
+        if (!Array.isArray(subSchemas)) { return; }
+
+        this._schemaPush('allOf', subSchemas);
+        try {
+            for (let i = 0, ii = subSchemas.length; i < ii; ++i) {
+                const subSchema = subSchemas[i];
+                if (!this._isObject(subSchema)) { continue; }
+
+                this._schemaPush(i, subSchema);
+                try {
+                    this._validate(value);
+                } finally {
+                    this._schemaPop();
+                }
+            }
+        } finally {
+            this._schemaPop();
+        }
+    }
+
+    _validateAnyOf(value) {
+        const subSchemas = this._schema.anyOf;
+        if (!Array.isArray(subSchemas)) { return; }
+
+        this._schemaPush('anyOf', subSchemas);
+        try {
+            for (let i = 0, ii = subSchemas.length; i < ii; ++i) {
+                const subSchema = subSchemas[i];
+                if (!this._isObject(subSchema)) { continue; }
+
+                this._schemaPush(i, subSchema);
+                try {
+                    this._validate(value);
+                    return;
+                } catch (e) {
+                    // NOP
+                } finally {
+                    this._schemaPop();
+                }
+            }
+
+            throw this._createError('0 anyOf schemas matched');
+        } finally {
+            this._schemaPop();
+        }
+    }
+
+    _validateOneOf(value) {
+        const subSchemas = this._schema.oneOf;
+        if (!Array.isArray(subSchemas)) { return; }
+
+        this._schemaPush('oneOf', subSchemas);
+        try {
+            let count = 0;
+            for (let i = 0, ii = subSchemas.length; i < ii; ++i) {
+                const subSchema = subSchemas[i];
+                if (!this._isObject(subSchema)) { continue; }
+
+                this._schemaPush(i, subSchema);
+                try {
+                    this._validate(value);
+                    ++count;
+                } catch (e) {
+                    // NOP
+                } finally {
+                    this._schemaPop();
+                }
+            }
+
+            if (count !== 1) {
+                throw this._createError(`${count} oneOf schemas matched`);
+            }
+        } finally {
+            this._schemaPop();
+        }
+    }
+
+    _validateNoneOf(value) {
+        const subSchemas = this._schema.not;
+        if (!Array.isArray(subSchemas)) { return; }
+
+        this._schemaPush('not', subSchemas);
+        try {
+            for (let i = 0, ii = subSchemas.length; i < ii; ++i) {
+                const subSchema = subSchemas[i];
+                if (!this._isObject(subSchema)) { continue; }
+
+                this._schemaPush(i, subSchema);
+                try {
+                    this._validate(value);
+                } catch (e) {
+                    continue;
+                } finally {
+                    this._schemaPop();
+                }
+                throw this._createError(`not[${i}] schema matched`);
+            }
+        } finally {
+            this._schemaPop();
+        }
+    }
+
+    _validateSingleSchema(value) {
+        const type = this._getValueType(value);
+        const schemaType = this._schema.type;
+        if (!this._isValueTypeAny(value, type, schemaType)) {
+            throw this._createError(`Value type ${type} does not match schema type ${schemaType}`);
+        }
+
+        const schemaConst = this._schema.const;
+        if (typeof schemaConst !== 'undefined' && !this._valuesAreEqual(value, schemaConst)) {
+            throw this._createError('Invalid constant value');
+        }
+
+        const schemaEnum = this._schema.enum;
+        if (Array.isArray(schemaEnum) && !this._valuesAreEqualAny(value, schemaEnum)) {
+            throw this._createError('Invalid enum value');
+        }
+
+        switch (type) {
+            case 'number':
+                this._validateNumber(value);
+                break;
+            case 'string':
+                this._validateString(value);
+                break;
+            case 'array':
+                this._validateArray(value);
+                break;
+            case 'object':
+                this._validateObject(value);
+                break;
+        }
+    }
+
+    _validateNumber(value) {
+        const {multipleOf} = this._schema;
+        if (typeof multipleOf === 'number' && Math.floor(value / multipleOf) * multipleOf !== value) {
+            throw this._createError(`Number is not a multiple of ${multipleOf}`);
+        }
+
+        const {minimum} = this._schema;
+        if (typeof minimum === 'number' && value < minimum) {
+            throw this._createError(`Number is less than ${minimum}`);
+        }
+
+        const {exclusiveMinimum} = this._schema;
+        if (typeof exclusiveMinimum === 'number' && value <= exclusiveMinimum) {
+            throw this._createError(`Number is less than or equal to ${exclusiveMinimum}`);
+        }
+
+        const {maximum} = this._schema;
+        if (typeof maximum === 'number' && value > maximum) {
+            throw this._createError(`Number is greater than ${maximum}`);
+        }
+
+        const {exclusiveMaximum} = this._schema;
+        if (typeof exclusiveMaximum === 'number' && value >= exclusiveMaximum) {
+            throw this._createError(`Number is greater than or equal to ${exclusiveMaximum}`);
+        }
+    }
+
+    _validateString(value) {
+        const {minLength} = this._schema;
+        if (typeof minLength === 'number' && value.length < minLength) {
+            throw this._createError('String length too short');
+        }
+
+        const {maxLength} = this._schema;
+        if (typeof maxLength === 'number' && value.length > maxLength) {
+            throw this._createError('String length too long');
+        }
+
+        const {pattern} = this._schema;
+        if (typeof pattern === 'string') {
+            let {patternFlags} = this._schema;
+            if (typeof patternFlags !== 'string') { patternFlags = ''; }
+
+            let regex;
+            try {
+                regex = this._getRegex(pattern, patternFlags);
+            } catch (e) {
+                throw this._createError(`Pattern is invalid (${e.message})`);
+            }
+
+            if (!regex.test(value)) {
+                throw this._createError('Pattern match failed');
+            }
+        }
+    }
+
+    _validateArray(value) {
+        const {length} = value;
+
+        const {minItems} = this._schema;
+        if (typeof minItems === 'number' && length < minItems) {
+            throw this._createError('Array length too short');
+        }
+
+        const {maxItems} = this._schema;
+        if (typeof maxItems === 'number' && length > maxItems) {
+            throw this._createError('Array length too long');
+        }
+
+        this._validateArrayContains(value);
+
+        for (let i = 0; i < length; ++i) {
+            const schemaPath = this._getArrayItemSchemaPath(i);
+            if (schemaPath === null) {
+                throw this._createError(`No schema found for array[${i}]`);
+            }
+
+            const propertyValue = value[i];
+
+            for (const {path, schema} of schemaPath) { this._schemaPush(path, schema); }
+            this._valuePush(i, propertyValue);
+            try {
+                this._validate(propertyValue);
+            } finally {
+                this._valuePop();
+                for (let j = 0, jj = schemaPath.length; j < jj; ++j) { this._schemaPop(); }
+            }
+        }
+    }
+
+    _validateArrayContains(value) {
+        const containsSchema = this._schema.contains;
+        if (!this._isObject(containsSchema)) { return; }
+
+        this._schemaPush('contains', containsSchema);
+        try {
+            for (let i = 0, ii = value.length; i < ii; ++i) {
+                const propertyValue = value[i];
+                this._valuePush(i, propertyValue);
+                try {
+                    this._validate(propertyValue);
+                    return;
+                } catch (e) {
+                    // NOP
+                } finally {
+                    this._valuePop();
+                }
+            }
+            throw this._createError('contains schema didn\'t match');
+        } finally {
+            this._schemaPop();
+        }
+    }
+
+    _validateObject(value) {
+        const properties = new Set(Object.getOwnPropertyNames(value));
+
+        const {required} = this._schema;
+        if (Array.isArray(required)) {
+            for (const property of required) {
+                if (!properties.has(property)) {
+                    throw this._createError(`Missing property ${property}`);
+                }
+            }
+        }
+
+        const {minProperties} = this._schema;
+        if (typeof minProperties === 'number' && properties.length < minProperties) {
+            throw this._createError('Not enough object properties');
+        }
+
+        const {maxProperties} = this._schema;
+        if (typeof maxProperties === 'number' && properties.length > maxProperties) {
+            throw this._createError('Too many object properties');
+        }
+
+        for (const property of properties) {
+            const schemaPath = this._getObjectPropertySchemaPath(property);
+            if (schemaPath === null) {
+                throw this._createError(`No schema found for ${property}`);
+            }
+
+            const propertyValue = value[property];
+
+            for (const {path, schema} of schemaPath) { this._schemaPush(path, schema); }
+            this._valuePush(property, propertyValue);
+            try {
+                this._validate(propertyValue);
+            } finally {
+                this._valuePop();
+                for (let j = 0, jj = schemaPath.length; j < jj; ++j) { this._schemaPop(); }
+            }
+        }
+    }
+
+    // Creation
+
+    _getDefaultTypeValue(type) {
+        if (typeof type === 'string') {
+            switch (type) {
+                case 'null':
+                    return null;
+                case 'boolean':
+                    return false;
+                case 'number':
+                case 'integer':
+                    return 0;
+                case 'string':
+                    return '';
+                case 'array':
+                    return [];
+                case 'object':
+                    return {};
+            }
+        }
+        return null;
+    }
+
+    _getDefaultSchemaValue() {
+        const {type: schemaType, default: schemaDefault} = this._schema;
+        return (
+            typeof schemaDefault !== 'undefined' &&
+            this._isValueTypeAny(schemaDefault, this._getValueType(schemaDefault), schemaType) ?
+            clone(schemaDefault) :
+            this._getDefaultTypeValue(schemaType)
+        );
+    }
+
+    _getValidValueOrDefault(path, value, schemaPath) {
+        this._valuePush(path, value);
+        for (const {path: path2, schema} of schemaPath) { this._schemaPush(path2, schema); }
+        try {
+            return this._getValidValueOrDefaultInner(value);
+        } finally {
+            for (let i = 0, ii = schemaPath.length; i < ii; ++i) { this._schemaPop(); }
+            this._valuePop();
+        }
+    }
+
+    _getValidValueOrDefaultInner(value) {
+        let type = this._getValueType(value);
+        if (typeof value === 'undefined' || !this._isValueTypeAny(value, type, this._schema.type)) {
+            value = this._getDefaultSchemaValue();
+            type = this._getValueType(value);
+        }
+
+        switch (type) {
+            case 'object':
+                value = this._populateObjectDefaults(value);
+                break;
+            case 'array':
+                value = this._populateArrayDefaults(value);
+                break;
+            default:
+                if (!this._isValidCurrent(value)) {
+                    const schemaDefault = this._getDefaultSchemaValue();
+                    if (this._isValidCurrent(schemaDefault)) {
+                        value = schemaDefault;
+                    }
+                }
+                break;
+        }
+
+        return value;
+    }
+
+    _populateObjectDefaults(value) {
+        const properties = new Set(Object.getOwnPropertyNames(value));
+
+        const {required} = this._schema;
+        if (Array.isArray(required)) {
+            for (const property of required) {
+                properties.delete(property);
+                const schemaPath = this._getObjectPropertySchemaPath(property);
+                if (schemaPath === null) { continue; }
+                const propertyValue = Object.prototype.hasOwnProperty.call(value, property) ? value[property] : void 0;
+                value[property] = this._getValidValueOrDefault(property, propertyValue, schemaPath);
+            }
+        }
+
+        for (const property of properties) {
+            const schemaPath = this._getObjectPropertySchemaPath(property);
+            if (schemaPath === null) {
+                Reflect.deleteProperty(value, property);
+            } else {
+                value[property] = this._getValidValueOrDefault(property, value[property], schemaPath);
+            }
+        }
+
+        return value;
+    }
+
+    _populateArrayDefaults(value) {
+        for (let i = 0, ii = value.length; i < ii; ++i) {
+            const schemaPath = this._getArrayItemSchemaPath(i);
+            if (schemaPath === null) { continue; }
+            const propertyValue = value[i];
+            value[i] = this._getValidValueOrDefault(i, propertyValue, schemaPath);
+        }
+
+        const {minItems, maxItems} = this._schema;
+        if (typeof minItems === 'number' && value.length < minItems) {
+            for (let i = value.length; i < minItems; ++i) {
+                const schemaPath = this._getArrayItemSchemaPath(i);
+                if (schemaPath === null) { break; }
+                const item = this._getValidValueOrDefault(i, void 0, schemaPath);
+                value.push(item);
+            }
+        }
+
+        if (typeof maxItems === 'number' && value.length > maxItems) {
+            value.splice(maxItems, value.length - maxItems);
+        }
+
+        return value;
+    }
+}
+
+class JsonSchemaProxyHandler {
+    constructor(schema) {
+        this._schema = schema;
+        this._numberPattern = /^(?:0|[1-9]\d*)$/;
     }
 
     getPrototypeOf(target) {
@@ -55,48 +769,43 @@ class JsonSchemaProxyHandler {
     }
 
     get(target, property) {
-        if (typeof property === 'symbol') {
-            return target[property];
-        }
+        if (typeof property === 'symbol') { return target[property]; }
 
+        let propertySchema;
         if (Array.isArray(target)) {
-            if (typeof property === 'string' && /^\d+$/.test(property)) {
-                property = parseInt(property, 10);
-            } else if (typeof property === 'string') {
+            property = this._getArrayIndex(property);
+            if (property === null) {
+                // Note: this does not currently wrap mutating functions like push, pop, shift, unshift, splice
                 return target[property];
             }
+            propertySchema = this._schema.getArrayItemSchema(property);
+        } else {
+            propertySchema = this._schema.getObjectPropertySchema(property);
         }
 
-        const propertySchema = this._jsonSchemaValidator.getPropertySchema(this._schema, property, target);
-        if (propertySchema === null) {
-            return;
-        }
+        if (propertySchema === null) { return void 0; }
 
         const value = target[property];
-        return value !== null && typeof value === 'object' ? this._jsonSchemaValidator.createProxy(value, propertySchema) : value;
+        return value !== null && typeof value === 'object' ? propertySchema.createProxy(value) : value;
     }
 
     set(target, property, value) {
+        if (typeof property === 'symbol') { throw new Error(`Cannot assign symbol property ${property}`); }
+
+        let propertySchema;
         if (Array.isArray(target)) {
-            if (typeof property === 'string' && /^\d+$/.test(property)) {
-                property = parseInt(property, 10);
-                if (property > target.length) {
-                    throw new Error('Array index out of range');
-                }
-            } else if (typeof property === 'string') {
-                target[property] = value;
-                return true;
-            }
+            property = this._getArrayIndex(property);
+            if (property === null) { throw new Error(`Property ${property} cannot be assigned to array`); }
+            if (property > target.length) { throw new Error('Array index out of range'); }
+            propertySchema = this._schema.getArrayItemSchema(property);
+        } else {
+            propertySchema = this._schema.getObjectPropertySchema(property);
         }
 
-        const propertySchema = this._jsonSchemaValidator.getPropertySchema(this._schema, property, target);
-        if (propertySchema === null) {
-            throw new Error(`Property ${property} not supported`);
-        }
+        if (propertySchema === null) { throw new Error(`Property ${property} not supported`); }
 
         value = clone(value);
-
-        this._jsonSchemaValidator.validate(value, propertySchema);
+        propertySchema.validate(value);
 
         target[property] = value;
         return true;
@@ -105,7 +814,7 @@ class JsonSchemaProxyHandler {
     deleteProperty(target, property) {
         const required = (
             (typeof target === 'object' && target !== null) ?
-            (Array.isArray(target) || this._jsonSchemaValidator.isObjectPropertyRequired(this._schema, property)) :
+            (Array.isArray(target) || this._schema.isObjectPropertyRequired(property)) :
             true
         );
         if (required) {
@@ -125,642 +834,16 @@ class JsonSchemaProxyHandler {
     construct() {
         throw new Error('construct not supported');
     }
-}
-
-class JsonSchemaValidator {
-    constructor() {
-        this._regexCache = new CacheMap(100);
-    }
-
-    createProxy(target, schema) {
-        return new Proxy(target, new JsonSchemaProxyHandler(schema, this));
-    }
-
-    isValid(value, schema) {
-        try {
-            this.validate(value, schema);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }
-
-    validate(value, schema) {
-        const info = new JsonSchemaTraversalInfo(value, schema);
-        this._validate(value, schema, info);
-    }
-
-    getValidValueOrDefault(schema, value) {
-        const info = new JsonSchemaTraversalInfo(value, schema);
-        return this._getValidValueOrDefault(schema, value, info);
-    }
-
-    getPropertySchema(schema, property, value) {
-        return this._getPropertySchema(schema, property, value, null);
-    }
-
-    clearCache() {
-        this._regexCache.clear();
-    }
-
-    isObjectPropertyRequired(schema, property) {
-        const {required} = schema;
-        return Array.isArray(required) && required.includes(property);
-    }
 
     // Private
 
-    _getPropertySchema(schema, property, value, path) {
-        const type = this._getSchemaOrValueType(schema, value);
-        switch (type) {
-            case 'object':
-            {
-                const properties = schema.properties;
-                if (this._isObject(properties)) {
-                    const propertySchema = properties[property];
-                    if (this._isObject(propertySchema)) {
-                        if (path !== null) { path.push(['properties', properties], [property, propertySchema]); }
-                        return propertySchema;
-                    }
-                }
-
-                const additionalProperties = schema.additionalProperties;
-                if (additionalProperties === false) {
-                    return null;
-                } else if (this._isObject(additionalProperties)) {
-                    if (path !== null) { path.push(['additionalProperties', additionalProperties]); }
-                    return additionalProperties;
-                } else {
-                    const result = JsonSchemaValidator.unconstrainedSchema;
-                    if (path !== null) { path.push([null, result]); }
-                    return result;
-                }
-            }
-            case 'array':
-            {
-                const items = schema.items;
-                if (this._isObject(items)) {
-                    return items;
-                }
-                if (Array.isArray(items)) {
-                    if (property >= 0 && property < items.length) {
-                        const propertySchema = items[property];
-                        if (this._isObject(propertySchema)) {
-                            if (path !== null) { path.push(['items', items], [property, propertySchema]); }
-                            return propertySchema;
-                        }
-                    }
-                }
-
-                const additionalItems = schema.additionalItems;
-                if (additionalItems === false) {
-                    return null;
-                } else if (this._isObject(additionalItems)) {
-                    if (path !== null) { path.push(['additionalItems', additionalItems]); }
-                    return additionalItems;
-                } else {
-                    const result = JsonSchemaValidator.unconstrainedSchema;
-                    if (path !== null) { path.push([null, result]); }
-                    return result;
-                }
-            }
-            default:
-                return null;
-        }
-    }
-
-    _getSchemaOrValueType(schema, value) {
-        const type = schema.type;
-
-        if (Array.isArray(type)) {
-            if (typeof value !== 'undefined') {
-                const valueType = this._getValueType(value);
-                if (type.indexOf(valueType) >= 0) {
-                    return valueType;
-                }
-            }
+    _getArrayIndex(property) {
+        if (typeof property === 'string' && this._numberPattern.test(property)) {
+            return Number.parseInt(property, 10);
+        } else if (typeof property === 'number' && Math.floor(property) === property && property >= 0) {
+            return property;
+        } else {
             return null;
         }
-
-        if (typeof type === 'undefined') {
-            if (typeof value !== 'undefined') {
-                return this._getValueType(value);
-            }
-            return null;
-        }
-
-        return type;
-    }
-
-    _validate(value, schema, info) {
-        this._validateSingleSchema(value, schema, info);
-        this._validateConditional(value, schema, info);
-        this._validateAllOf(value, schema, info);
-        this._validateAnyOf(value, schema, info);
-        this._validateOneOf(value, schema, info);
-        this._validateNoneOf(value, schema, info);
-    }
-
-    _validateConditional(value, schema, info) {
-        const ifSchema = schema.if;
-        if (!this._isObject(ifSchema)) { return; }
-
-        let okay = true;
-        info.schemaPush('if', ifSchema);
-        try {
-            this._validate(value, ifSchema, info);
-        } catch (e) {
-            okay = false;
-        }
-        info.schemaPop();
-
-        const nextSchema = okay ? schema.then : schema.else;
-        if (this._isObject(nextSchema)) {
-            info.schemaPush(okay ? 'then' : 'else', nextSchema);
-            this._validate(value, nextSchema, info);
-            info.schemaPop();
-        }
-    }
-
-    _validateAllOf(value, schema, info) {
-        const subSchemas = schema.allOf;
-        if (!Array.isArray(subSchemas)) { return; }
-
-        info.schemaPush('allOf', subSchemas);
-        for (let i = 0; i < subSchemas.length; ++i) {
-            const subSchema = subSchemas[i];
-            info.schemaPush(i, subSchema);
-            this._validate(value, subSchema, info);
-            info.schemaPop();
-        }
-        info.schemaPop();
-    }
-
-    _validateAnyOf(value, schema, info) {
-        const subSchemas = schema.anyOf;
-        if (!Array.isArray(subSchemas)) { return; }
-
-        info.schemaPush('anyOf', subSchemas);
-        for (let i = 0; i < subSchemas.length; ++i) {
-            const subSchema = subSchemas[i];
-            info.schemaPush(i, subSchema);
-            try {
-                this._validate(value, subSchema, info);
-                return;
-            } catch (e) {
-                // NOP
-            }
-            info.schemaPop();
-        }
-
-        throw new JsonSchemaValidationError('0 anyOf schemas matched', value, schema, info);
-        // info.schemaPop(); // Unreachable
-    }
-
-    _validateOneOf(value, schema, info) {
-        const subSchemas = schema.oneOf;
-        if (!Array.isArray(subSchemas)) { return; }
-
-        info.schemaPush('oneOf', subSchemas);
-        let count = 0;
-        for (let i = 0; i < subSchemas.length; ++i) {
-            const subSchema = subSchemas[i];
-            info.schemaPush(i, subSchema);
-            try {
-                this._validate(value, subSchema, info);
-                ++count;
-            } catch (e) {
-                // NOP
-            }
-            info.schemaPop();
-        }
-
-        if (count !== 1) {
-            throw new JsonSchemaValidationError(`${count} oneOf schemas matched`, value, schema, info);
-        }
-
-        info.schemaPop();
-    }
-
-    _validateNoneOf(value, schema, info) {
-        const subSchemas = schema.not;
-        if (!Array.isArray(subSchemas)) { return; }
-
-        info.schemaPush('not', subSchemas);
-        for (let i = 0; i < subSchemas.length; ++i) {
-            const subSchema = subSchemas[i];
-            info.schemaPush(i, subSchema);
-            try {
-                this._validate(value, subSchema, info);
-            } catch (e) {
-                info.schemaPop();
-                continue;
-            }
-            throw new JsonSchemaValidationError(`not[${i}] schema matched`, value, schema, info);
-        }
-        info.schemaPop();
-    }
-
-    _validateSingleSchema(value, schema, info) {
-        const type = this._getValueType(value);
-        const schemaType = schema.type;
-        if (!this._isValueTypeAny(value, type, schemaType)) {
-            throw new JsonSchemaValidationError(`Value type ${type} does not match schema type ${schemaType}`, value, schema, info);
-        }
-
-        const schemaConst = schema.const;
-        if (typeof schemaConst !== 'undefined' && !this._valuesAreEqual(value, schemaConst)) {
-            throw new JsonSchemaValidationError('Invalid constant value', value, schema, info);
-        }
-
-        const schemaEnum = schema.enum;
-        if (Array.isArray(schemaEnum) && !this._valuesAreEqualAny(value, schemaEnum)) {
-            throw new JsonSchemaValidationError('Invalid enum value', value, schema, info);
-        }
-
-        switch (type) {
-            case 'number':
-                this._validateNumber(value, schema, info);
-                break;
-            case 'string':
-                this._validateString(value, schema, info);
-                break;
-            case 'array':
-                this._validateArray(value, schema, info);
-                break;
-            case 'object':
-                this._validateObject(value, schema, info);
-                break;
-        }
-    }
-
-    _validateNumber(value, schema, info) {
-        const multipleOf = schema.multipleOf;
-        if (typeof multipleOf === 'number' && Math.floor(value / multipleOf) * multipleOf !== value) {
-            throw new JsonSchemaValidationError(`Number is not a multiple of ${multipleOf}`, value, schema, info);
-        }
-
-        const minimum = schema.minimum;
-        if (typeof minimum === 'number' && value < minimum) {
-            throw new JsonSchemaValidationError(`Number is less than ${minimum}`, value, schema, info);
-        }
-
-        const exclusiveMinimum = schema.exclusiveMinimum;
-        if (typeof exclusiveMinimum === 'number' && value <= exclusiveMinimum) {
-            throw new JsonSchemaValidationError(`Number is less than or equal to ${exclusiveMinimum}`, value, schema, info);
-        }
-
-        const maximum = schema.maximum;
-        if (typeof maximum === 'number' && value > maximum) {
-            throw new JsonSchemaValidationError(`Number is greater than ${maximum}`, value, schema, info);
-        }
-
-        const exclusiveMaximum = schema.exclusiveMaximum;
-        if (typeof exclusiveMaximum === 'number' && value >= exclusiveMaximum) {
-            throw new JsonSchemaValidationError(`Number is greater than or equal to ${exclusiveMaximum}`, value, schema, info);
-        }
-    }
-
-    _validateString(value, schema, info) {
-        const minLength = schema.minLength;
-        if (typeof minLength === 'number' && value.length < minLength) {
-            throw new JsonSchemaValidationError('String length too short', value, schema, info);
-        }
-
-        const maxLength = schema.maxLength;
-        if (typeof maxLength === 'number' && value.length > maxLength) {
-            throw new JsonSchemaValidationError('String length too long', value, schema, info);
-        }
-
-        const pattern = schema.pattern;
-        if (typeof pattern === 'string') {
-            let patternFlags = schema.patternFlags;
-            if (typeof patternFlags !== 'string') { patternFlags = ''; }
-
-            let regex;
-            try {
-                regex = this._getRegex(pattern, patternFlags);
-            } catch (e) {
-                throw new JsonSchemaValidationError(`Pattern is invalid (${e.message})`, value, schema, info);
-            }
-
-            if (!regex.test(value)) {
-                throw new JsonSchemaValidationError('Pattern match failed', value, schema, info);
-            }
-        }
-    }
-
-    _validateArray(value, schema, info) {
-        const minItems = schema.minItems;
-        if (typeof minItems === 'number' && value.length < minItems) {
-            throw new JsonSchemaValidationError('Array length too short', value, schema, info);
-        }
-
-        const maxItems = schema.maxItems;
-        if (typeof maxItems === 'number' && value.length > maxItems) {
-            throw new JsonSchemaValidationError('Array length too long', value, schema, info);
-        }
-
-        this._validateArrayContains(value, schema, info);
-
-        for (let i = 0, ii = value.length; i < ii; ++i) {
-            const schemaPath = [];
-            const propertySchema = this._getPropertySchema(schema, i, value, schemaPath);
-            if (propertySchema === null) {
-                throw new JsonSchemaValidationError(`No schema found for array[${i}]`, value, schema, info);
-            }
-
-            const propertyValue = value[i];
-
-            for (const [p, s] of schemaPath) { info.schemaPush(p, s); }
-            info.valuePush(i, propertyValue);
-            this._validate(propertyValue, propertySchema, info);
-            info.valuePop();
-            for (let j = 0, jj = schemaPath.length; j < jj; ++j) { info.schemaPop(); }
-        }
-    }
-
-    _validateArrayContains(value, schema, info) {
-        const containsSchema = schema.contains;
-        if (!this._isObject(containsSchema)) { return; }
-
-        info.schemaPush('contains', containsSchema);
-        for (let i = 0, ii = value.length; i < ii; ++i) {
-            const propertyValue = value[i];
-            info.valuePush(i, propertyValue);
-            try {
-                this._validate(propertyValue, containsSchema, info);
-                info.schemaPop();
-                return;
-            } catch (e) {
-                // NOP
-            }
-            info.valuePop();
-        }
-        throw new JsonSchemaValidationError('contains schema didn\'t match', value, schema, info);
-    }
-
-    _validateObject(value, schema, info) {
-        const properties = new Set(Object.getOwnPropertyNames(value));
-
-        const required = schema.required;
-        if (Array.isArray(required)) {
-            for (const property of required) {
-                if (!properties.has(property)) {
-                    throw new JsonSchemaValidationError(`Missing property ${property}`, value, schema, info);
-                }
-            }
-        }
-
-        const minProperties = schema.minProperties;
-        if (typeof minProperties === 'number' && properties.length < minProperties) {
-            throw new JsonSchemaValidationError('Not enough object properties', value, schema, info);
-        }
-
-        const maxProperties = schema.maxProperties;
-        if (typeof maxProperties === 'number' && properties.length > maxProperties) {
-            throw new JsonSchemaValidationError('Too many object properties', value, schema, info);
-        }
-
-        for (const property of properties) {
-            const schemaPath = [];
-            const propertySchema = this._getPropertySchema(schema, property, value, schemaPath);
-            if (propertySchema === null) {
-                throw new JsonSchemaValidationError(`No schema found for ${property}`, value, schema, info);
-            }
-
-            const propertyValue = value[property];
-
-            for (const [p, s] of schemaPath) { info.schemaPush(p, s); }
-            info.valuePush(property, propertyValue);
-            this._validate(propertyValue, propertySchema, info);
-            info.valuePop();
-            for (let i = 0; i < schemaPath.length; ++i) { info.schemaPop(); }
-        }
-    }
-
-    _isValueTypeAny(value, type, schemaTypes) {
-        if (typeof schemaTypes === 'string') {
-            return this._isValueType(value, type, schemaTypes);
-        } else if (Array.isArray(schemaTypes)) {
-            for (const schemaType of schemaTypes) {
-                if (this._isValueType(value, type, schemaType)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        return true;
-    }
-
-    _isValueType(value, type, schemaType) {
-        return (
-            type === schemaType ||
-            (schemaType === 'integer' && Math.floor(value) === value)
-        );
-    }
-
-    _getValueType(value) {
-        const type = typeof value;
-        if (type === 'object') {
-            if (value === null) { return 'null'; }
-            if (Array.isArray(value)) { return 'array'; }
-        }
-        return type;
-    }
-
-    _valuesAreEqualAny(value1, valueList) {
-        for (const value2 of valueList) {
-            if (this._valuesAreEqual(value1, value2)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    _valuesAreEqual(value1, value2) {
-        return value1 === value2;
-    }
-
-    _getDefaultTypeValue(type) {
-        if (typeof type === 'string') {
-            switch (type) {
-                case 'null':
-                    return null;
-                case 'boolean':
-                    return false;
-                case 'number':
-                case 'integer':
-                    return 0;
-                case 'string':
-                    return '';
-                case 'array':
-                    return [];
-                case 'object':
-                    return {};
-            }
-        }
-        return null;
-    }
-
-    _getDefaultSchemaValue(schema) {
-        const schemaType = schema.type;
-        const schemaDefault = schema.default;
-        return (
-            typeof schemaDefault !== 'undefined' &&
-            this._isValueTypeAny(schemaDefault, this._getValueType(schemaDefault), schemaType) ?
-            clone(schemaDefault) :
-            this._getDefaultTypeValue(schemaType)
-        );
-    }
-
-    _getValidValueOrDefault(schema, value, info) {
-        let type = this._getValueType(value);
-        if (typeof value === 'undefined' || !this._isValueTypeAny(value, type, schema.type)) {
-            value = this._getDefaultSchemaValue(schema);
-            type = this._getValueType(value);
-        }
-
-        switch (type) {
-            case 'object':
-                value = this._populateObjectDefaults(value, schema, info);
-                break;
-            case 'array':
-                value = this._populateArrayDefaults(value, schema, info);
-                break;
-            default:
-                if (!this.isValid(value, schema)) {
-                    const schemaDefault = this._getDefaultSchemaValue(schema);
-                    if (this.isValid(schemaDefault, schema)) {
-                        value = schemaDefault;
-                    }
-                }
-                break;
-        }
-
-        return value;
-    }
-
-    _populateObjectDefaults(value, schema, info) {
-        const properties = new Set(Object.getOwnPropertyNames(value));
-
-        const required = schema.required;
-        if (Array.isArray(required)) {
-            for (const property of required) {
-                properties.delete(property);
-
-                const propertySchema = this._getPropertySchema(schema, property, value, null);
-                if (propertySchema === null) { continue; }
-                info.valuePush(property, value);
-                info.schemaPush(property, propertySchema);
-                const hasValue = Object.prototype.hasOwnProperty.call(value, property);
-                value[property] = this._getValidValueOrDefault(propertySchema, hasValue ? value[property] : void 0, info);
-                info.schemaPop();
-                info.valuePop();
-            }
-        }
-
-        for (const property of properties) {
-            const propertySchema = this._getPropertySchema(schema, property, value, null);
-            if (propertySchema === null) {
-                Reflect.deleteProperty(value, property);
-            } else {
-                info.valuePush(property, value);
-                info.schemaPush(property, propertySchema);
-                value[property] = this._getValidValueOrDefault(propertySchema, value[property], info);
-                info.schemaPop();
-                info.valuePop();
-            }
-        }
-
-        return value;
-    }
-
-    _populateArrayDefaults(value, schema, info) {
-        for (let i = 0, ii = value.length; i < ii; ++i) {
-            const propertySchema = this._getPropertySchema(schema, i, value, null);
-            if (propertySchema === null) { continue; }
-            info.valuePush(i, value);
-            info.schemaPush(i, propertySchema);
-            value[i] = this._getValidValueOrDefault(propertySchema, value[i], info);
-            info.schemaPop();
-            info.valuePop();
-        }
-
-        const minItems = schema.minItems;
-        if (typeof minItems === 'number' && value.length < minItems) {
-            for (let i = value.length; i < minItems; ++i) {
-                const propertySchema = this._getPropertySchema(schema, i, value, null);
-                if (propertySchema === null) { break; }
-                info.valuePush(i, value);
-                info.schemaPush(i, propertySchema);
-                const item = this._getValidValueOrDefault(propertySchema, void 0, info);
-                info.schemaPop();
-                info.valuePop();
-                value.push(item);
-            }
-        }
-
-        const maxItems = schema.maxItems;
-        if (typeof maxItems === 'number' && value.length > maxItems) {
-            value.splice(maxItems, value.length - maxItems);
-        }
-
-        return value;
-    }
-
-    _isObject(value) {
-        return typeof value === 'object' && value !== null && !Array.isArray(value);
-    }
-
-    _getRegex(pattern, flags) {
-        const key = `${flags}:${pattern}`;
-        let regex = this._regexCache.get(key);
-        if (typeof regex === 'undefined') {
-            regex = new RegExp(pattern, flags);
-            this._regexCache.set(key, regex);
-        }
-        return regex;
-    }
-}
-
-Object.defineProperty(JsonSchemaValidator, 'unconstrainedSchema', {
-    value: Object.freeze({}),
-    configurable: false,
-    enumerable: true,
-    writable: false
-});
-
-class JsonSchemaTraversalInfo {
-    constructor(value, schema) {
-        this.valuePath = [];
-        this.schemaPath = [];
-        this.valuePush(null, value);
-        this.schemaPush(null, schema);
-    }
-
-    valuePush(path, value) {
-        this.valuePath.push([path, value]);
-    }
-
-    valuePop() {
-        this.valuePath.pop();
-    }
-
-    schemaPush(path, schema) {
-        this.schemaPath.push([path, schema]);
-    }
-
-    schemaPop() {
-        this.schemaPath.pop();
-    }
-}
-
-class JsonSchemaValidationError extends Error {
-    constructor(message, value, schema, info) {
-        super(message);
-        this.value = value;
-        this.schema = schema;
-        this.info = info;
     }
 }

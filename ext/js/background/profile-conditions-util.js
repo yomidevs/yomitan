@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * JsonSchema
+ */
+
 /**
  * Utility class to help processing profile conditions.
  */
@@ -109,11 +113,13 @@ class ProfileConditionsUtil {
                 default: anyOf.push({allOf}); break;
             }
         }
+        let schema;
         switch (anyOf.length) {
-            case 0: return {};
-            case 1: return anyOf[0];
-            default: return {anyOf};
+            case 0: schema = {}; break;
+            case 1: schema = anyOf[0]; break;
+            default: schema = {anyOf}; break;
         }
+        return new JsonSchema(schema);
     }
 
     /**

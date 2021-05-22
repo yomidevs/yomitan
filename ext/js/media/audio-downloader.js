@@ -16,7 +16,7 @@
  */
 
 /* global
- * JsonSchemaValidator
+ * JsonSchema
  * NativeSimpleDOMParser
  * SimpleDOMParser
  */
@@ -26,7 +26,7 @@ class AudioDownloader {
         this._japaneseUtil = japaneseUtil;
         this._requestBuilder = requestBuilder;
         this._customAudioListSchema = null;
-        this._schemaValidator = null;
+        this._customAudioListSchema = null;
         this._getInfoHandlers = new Map([
             ['jpod101', this._getInfoJpod101.bind(this)],
             ['jpod101-alternate', this._getInfoJpod101Alternate.bind(this)],
@@ -222,11 +222,11 @@ class AudioDownloader {
 
         const responseJson = await response.json();
 
-        const schema = await this._getCustomAudioListSchema();
-        if (this._schemaValidator === null) {
-            this._schemaValidator = new JsonSchemaValidator();
+        if (this._customAudioListSchema === null) {
+            const schema = await this._getCustomAudioListSchema();
+            this._customAudioListSchema = new JsonSchema(schema);
         }
-        this._schemaValidator.validate(responseJson, schema);
+        this._customAudioListSchema.validate(responseJson);
 
         const results = [];
         for (const {url: url2, name} of responseJson.audioSources) {

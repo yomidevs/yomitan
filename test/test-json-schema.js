@@ -25,19 +25,19 @@ vm.execute([
     'js/general/cache-map.js',
     'js/data/json-schema.js'
 ]);
-const JsonSchemaValidator = vm.get('JsonSchemaValidator');
+const JsonSchema = vm.get('JsonSchema');
 
 
 function schemaValidate(schema, value) {
-    return new JsonSchemaValidator().isValid(value, schema);
+    return new JsonSchema(schema).isValid(value);
 }
 
 function getValidValueOrDefault(schema, value) {
-    return new JsonSchemaValidator().getValidValueOrDefault(schema, value);
+    return new JsonSchema(schema).getValidValueOrDefault(value);
 }
 
 function createProxy(schema, value) {
-    return new JsonSchemaValidator().createProxy(value, schema);
+    return new JsonSchema(schema).createProxy(value);
 }
 
 function clone(value) {
