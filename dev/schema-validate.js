@@ -16,6 +16,7 @@
  */
 
 const fs = require('fs');
+const {performance} = require('perf_hooks');
 const {VM} = require('./vm');
 
 const vm = new VM();
@@ -41,13 +42,17 @@ function main() {
     const schema = JSON.parse(schemaSource);
 
     for (const dataFileName of args.slice(1)) {
+        const start = performance.now();
         try {
             console.log(`Validating ${dataFileName}...`);
             const dataSource = fs.readFileSync(dataFileName, {encoding: 'utf8'});
             const data = JSON.parse(dataSource);
             new JsonSchemaValidator().validate(data, schema);
-            console.log('No issues found');
+            const end = performance.now();
+            console.log(`No issues detected (${((end - start) / 1000).toFixed(2)}s)`);
         } catch (e) {
+            const end = performance.now();
+            console.log(`Encountered an error (${((end - start) / 1000).toFixed(2)}s)`);
             console.warn(e);
         }
     }
