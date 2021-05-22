@@ -25,8 +25,8 @@ class JsonSchema {
         this._startSchema = schema;
         this._rootSchema = typeof rootSchema !== 'undefined' ? rootSchema : schema;
         this._regexCache = null;
-        this._valuePath = [];
-        this._schemaPath = [];
+        this._valueStack = [];
+        this._schemaStack = [];
 
         this._schemaPush(null, null);
         this._valuePush(null, null);
@@ -58,8 +58,8 @@ class JsonSchema {
     }
 
     validate(value) {
-        this._schemaPush(null, this._startSchema);
-        this._valuePush(null, value);
+        this._schemaPush(this._startSchema, null);
+        this._valuePush(value, null);
         try {
             this._validate(value);
         } finally {
@@ -69,24 +69,24 @@ class JsonSchema {
     }
 
     getValidValueOrDefault(value) {
-        return this._getValidValueOrDefault(null, value, [{path: null, schema: this._startSchema}]);
+        return this._getValidValueOrDefault(null, value, {schema: this._startSchema, path: null});
     }
 
     getObjectPropertySchema(property) {
-        this._schemaPush(null, this._startSchema);
+        this._schemaPush(this._startSchema, null);
         try {
-            const schemaPath = this._getObjectPropertySchemaPath(property);
-            return schemaPath !== null ? new JsonSchema(schemaPath[schemaPath.length - 1].schema, this._rootSchema) : null;
+            const schemaInfo = this._getObjectPropertySchemaPath(property);
+            return schemaInfo !== null ? new JsonSchema(schemaInfo.schema, this._rootSchema) : null;
         } finally {
             this._schemaPop();
         }
     }
 
     getArrayItemSchema(index) {
-        this._schemaPush(null, this._startSchema);
+        this._schemaPush(this._startSchema, null);
         try {
-            const schemaPath = this._getArrayItemSchemaPath(index);
-            return schemaPath !== null ? new JsonSchema(schemaPath[schemaPath.length - 1].schema, this._rootSchema) : null;
+            const schemaInfo = this._getArrayItemSchemaPath(index);
+            return schemaInfo !== null ? new JsonSchema(schemaInfo.schema, this._rootSchema) : null;
         } finally {
             this._schemaPop();
         }
@@ -99,44 +99,44 @@ class JsonSchema {
 
     // Stack
 
-    _valuePush(path, value) {
-        this._valuePath.push({path, value});
+    _valuePush(value, path) {
+        this._valueStack.push({value, path});
     }
 
     _valuePop() {
-        this._valuePath.pop();
+        this._valueStack.pop();
     }
 
-    _schemaPush(path, schema) {
-        this._schemaPath.push({path, schema});
+    _schemaPush(schema, path) {
+        this._schemaStack.push({schema, path});
         this._schema = schema;
     }
 
     _schemaPop() {
-        this._schemaPath.pop();
-        this._schema = this._schemaPath[this._schemaPath.length - 1].schema;
+        this._schemaStack.pop();
+        this._schema = this._schemaStack[this._schemaStack.length - 1].schema;
     }
 
     // Private
 
     _createError(message) {
-        const valuePath = [];
-        for (let i = 1, ii = this._valuePath.length; i < ii; ++i) {
-            const {path, value} = this._valuePath[i];
-            valuePath.push({path, value});
+        const valueStack = [];
+        for (let i = 1, ii = this._valueStack.length; i < ii; ++i) {
+            const {value, path} = this._valueStack[i];
+            valueStack.push({value, path});
         }
 
-        const schemaPath = [];
-        for (let i = 1, ii = this._schemaPath.length; i < ii; ++i) {
-            const {path, schema} = this._schemaPath[i];
-            schemaPath.push({path, schema});
+        const schemaStack = [];
+        for (let i = 1, ii = this._schemaStack.length; i < ii; ++i) {
+            const {schema, path} = this._schemaStack[i];
+            schemaStack.push({schema, path});
         }
 
         const error = new Error(message);
-        error.value = valuePath[valuePath.length - 1].value;
+        error.value = valueStack[valueStack.length - 1].value;
         error.schema = this._schema;
-        error.valuePath = valuePath;
-        error.schemaPath = schemaPath;
+        error.valueStack = valueStack;
+        error.schemaStack = schemaStack;
         return error;
     }
 
@@ -167,10 +167,7 @@ class JsonSchema {
         if (this._isObject(properties)) {
             const propertySchema = properties[property];
             if (this._isObject(propertySchema)) {
-                return [
-                    {path: 'properties', schema: properties},
-                    {path: property, schema: propertySchema}
-                ];
+                return {schema: propertySchema, path: ['properties', property]};
             }
         }
 
@@ -178,26 +175,23 @@ class JsonSchema {
         if (additionalProperties === false) {
             return null;
         } else if (this._isObject(additionalProperties)) {
-            return [{path: 'additionalProperties', schema: additionalProperties}];
+            return {schema: additionalProperties, path: 'additionalProperties'};
         } else {
             const result = this._getUnconstrainedSchema();
-            return [{path: null, schema: result}];
+            return {schema: result, path: null};
         }
     }
 
     _getArrayItemSchemaPath(index) {
         const {items} = this._schema;
         if (this._isObject(items)) {
-            return [{path: 'items', schema: items}];
+            return {schema: items, path: 'items'};
         }
         if (Array.isArray(items)) {
             if (index >= 0 && index < items.length) {
                 const propertySchema = items[index];
                 if (this._isObject(propertySchema)) {
-                    return [
-                        {path: 'items', schema: items},
-                        {path: index, schema: propertySchema}
-                    ];
+                    return {schema: propertySchema, path: ['items', index]};
                 }
             }
         }
@@ -206,10 +200,10 @@ class JsonSchema {
         if (additionalItems === false) {
             return null;
         } else if (this._isObject(additionalItems)) {
-            return [{path: 'additionalItems', schema: additionalItems}];
+            return {schema: additionalItems, path: 'additionalItems'};
         } else {
             const result = this._getUnconstrainedSchema();
-            return [{path: null, schema: result}];
+            return {schema: result, path: null};
         }
     }
 
@@ -298,7 +292,7 @@ class JsonSchema {
         if (!this._isObject(ifSchema)) { return; }
 
         let okay = true;
-        this._schemaPush('if', ifSchema);
+        this._schemaPush(ifSchema, 'if');
         try {
             this._validate(value);
         } catch (e) {
@@ -310,7 +304,7 @@ class JsonSchema {
         const nextSchema = okay ? this._schema.then : this._schema.else;
         if (this._isObject(nextSchema)) { return; }
 
-        this._schemaPush(okay ? 'then' : 'else', nextSchema);
+        this._schemaPush(nextSchema, okay ? 'then' : 'else');
         try {
             this._validate(value);
         } finally {
@@ -322,13 +316,13 @@ class JsonSchema {
         const subSchemas = this._schema.allOf;
         if (!Array.isArray(subSchemas)) { return; }
 
-        this._schemaPush('allOf', subSchemas);
+        this._schemaPush(subSchemas, 'allOf');
         try {
             for (let i = 0, ii = subSchemas.length; i < ii; ++i) {
                 const subSchema = subSchemas[i];
                 if (!this._isObject(subSchema)) { continue; }
 
-                this._schemaPush(i, subSchema);
+                this._schemaPush(subSchema, i);
                 try {
                     this._validate(value);
                 } finally {
@@ -344,13 +338,13 @@ class JsonSchema {
         const subSchemas = this._schema.anyOf;
         if (!Array.isArray(subSchemas)) { return; }
 
-        this._schemaPush('anyOf', subSchemas);
+        this._schemaPush(subSchemas, 'anyOf');
         try {
             for (let i = 0, ii = subSchemas.length; i < ii; ++i) {
                 const subSchema = subSchemas[i];
                 if (!this._isObject(subSchema)) { continue; }
 
-                this._schemaPush(i, subSchema);
+                this._schemaPush(subSchema, i);
                 try {
                     this._validate(value);
                     return;
@@ -371,14 +365,14 @@ class JsonSchema {
         const subSchemas = this._schema.oneOf;
         if (!Array.isArray(subSchemas)) { return; }
 
-        this._schemaPush('oneOf', subSchemas);
+        this._schemaPush(subSchemas, 'oneOf');
         try {
             let count = 0;
             for (let i = 0, ii = subSchemas.length; i < ii; ++i) {
                 const subSchema = subSchemas[i];
                 if (!this._isObject(subSchema)) { continue; }
 
-                this._schemaPush(i, subSchema);
+                this._schemaPush(subSchema, i);
                 try {
                     this._validate(value);
                     ++count;
@@ -401,13 +395,13 @@ class JsonSchema {
         const subSchemas = this._schema.not;
         if (!Array.isArray(subSchemas)) { return; }
 
-        this._schemaPush('not', subSchemas);
+        this._schemaPush(subSchemas, 'not');
         try {
             for (let i = 0, ii = subSchemas.length; i < ii; ++i) {
                 const subSchema = subSchemas[i];
                 if (!this._isObject(subSchema)) { continue; }
 
-                this._schemaPush(i, subSchema);
+                this._schemaPush(subSchema, i);
                 try {
                     this._validate(value);
                 } catch (e) {
@@ -527,20 +521,20 @@ class JsonSchema {
         this._validateArrayContains(value);
 
         for (let i = 0; i < length; ++i) {
-            const schemaPath = this._getArrayItemSchemaPath(i);
-            if (schemaPath === null) {
+            const schemaInfo = this._getArrayItemSchemaPath(i);
+            if (schemaInfo === null) {
                 throw this._createError(`No schema found for array[${i}]`);
             }
 
             const propertyValue = value[i];
 
-            for (const {path, schema} of schemaPath) { this._schemaPush(path, schema); }
-            this._valuePush(i, propertyValue);
+            this._schemaPush(schemaInfo.schema, schemaInfo.path);
+            this._valuePush(propertyValue, i);
             try {
                 this._validate(propertyValue);
             } finally {
                 this._valuePop();
-                for (let j = 0, jj = schemaPath.length; j < jj; ++j) { this._schemaPop(); }
+                this._schemaPop();
             }
         }
     }
@@ -549,11 +543,11 @@ class JsonSchema {
         const containsSchema = this._schema.contains;
         if (!this._isObject(containsSchema)) { return; }
 
-        this._schemaPush('contains', containsSchema);
+        this._schemaPush(containsSchema, 'contains');
         try {
             for (let i = 0, ii = value.length; i < ii; ++i) {
                 const propertyValue = value[i];
-                this._valuePush(i, propertyValue);
+                this._valuePush(propertyValue, i);
                 try {
                     this._validate(propertyValue);
                     return;
@@ -592,20 +586,20 @@ class JsonSchema {
         }
 
         for (const property of properties) {
-            const schemaPath = this._getObjectPropertySchemaPath(property);
-            if (schemaPath === null) {
+            const schemaInfo = this._getObjectPropertySchemaPath(property);
+            if (schemaInfo === null) {
                 throw this._createError(`No schema found for ${property}`);
             }
 
             const propertyValue = value[property];
 
-            for (const {path, schema} of schemaPath) { this._schemaPush(path, schema); }
-            this._valuePush(property, propertyValue);
+            this._schemaPush(schemaInfo.schema, schemaInfo.path);
+            this._valuePush(propertyValue, property);
             try {
                 this._validate(propertyValue);
             } finally {
                 this._valuePop();
-                for (let j = 0, jj = schemaPath.length; j < jj; ++j) { this._schemaPop(); }
+                this._schemaPop();
             }
         }
     }
@@ -643,14 +637,14 @@ class JsonSchema {
         );
     }
 
-    _getValidValueOrDefault(path, value, schemaPath) {
-        this._valuePush(path, value);
-        for (const {path: path2, schema} of schemaPath) { this._schemaPush(path2, schema); }
+    _getValidValueOrDefault(path, value, schemaInfo) {
+        this._schemaPush(schemaInfo.schema, schemaInfo.path);
+        this._valuePush(value, path);
         try {
             return this._getValidValueOrDefaultInner(value);
         } finally {
-            for (let i = 0, ii = schemaPath.length; i < ii; ++i) { this._schemaPop(); }
             this._valuePop();
+            this._schemaPop();
         }
     }
 
@@ -688,19 +682,19 @@ class JsonSchema {
         if (Array.isArray(required)) {
             for (const property of required) {
                 properties.delete(property);
-                const schemaPath = this._getObjectPropertySchemaPath(property);
-                if (schemaPath === null) { continue; }
+                const schemaInfo = this._getObjectPropertySchemaPath(property);
+                if (schemaInfo === null) { continue; }
                 const propertyValue = Object.prototype.hasOwnProperty.call(value, property) ? value[property] : void 0;
-                value[property] = this._getValidValueOrDefault(property, propertyValue, schemaPath);
+                value[property] = this._getValidValueOrDefault(property, propertyValue, schemaInfo);
             }
         }
 
         for (const property of properties) {
-            const schemaPath = this._getObjectPropertySchemaPath(property);
-            if (schemaPath === null) {
+            const schemaInfo = this._getObjectPropertySchemaPath(property);
+            if (schemaInfo === null) {
                 Reflect.deleteProperty(value, property);
             } else {
-                value[property] = this._getValidValueOrDefault(property, value[property], schemaPath);
+                value[property] = this._getValidValueOrDefault(property, value[property], schemaInfo);
             }
         }
 
@@ -709,18 +703,18 @@ class JsonSchema {
 
     _populateArrayDefaults(value) {
         for (let i = 0, ii = value.length; i < ii; ++i) {
-            const schemaPath = this._getArrayItemSchemaPath(i);
-            if (schemaPath === null) { continue; }
+            const schemaInfo = this._getArrayItemSchemaPath(i);
+            if (schemaInfo === null) { continue; }
             const propertyValue = value[i];
-            value[i] = this._getValidValueOrDefault(i, propertyValue, schemaPath);
+            value[i] = this._getValidValueOrDefault(i, propertyValue, schemaInfo);
         }
 
         const {minItems, maxItems} = this._schema;
         if (typeof minItems === 'number' && value.length < minItems) {
             for (let i = value.length; i < minItems; ++i) {
-                const schemaPath = this._getArrayItemSchemaPath(i);
-                if (schemaPath === null) { break; }
-                const item = this._getValidValueOrDefault(i, void 0, schemaPath);
+                const schemaInfo = this._getArrayItemSchemaPath(i);
+                if (schemaInfo === null) { break; }
+                const item = this._getValidValueOrDefault(i, void 0, schemaInfo);
                 value.push(item);
             }
         }

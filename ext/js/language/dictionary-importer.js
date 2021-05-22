@@ -253,8 +253,8 @@ class DictionaryImporter {
     }
 
     _formatSchemaError(e, fileName) {
-        const valuePathString = this._getSchemaErrorPathString(e.valuePath, 'dictionary');
-        const schemaPathString = this._getSchemaErrorPathString(e.schemaPath, 'schema');
+        const valuePathString = this._getSchemaErrorPathString(e.valueStack, 'dictionary');
+        const schemaPathString = this._getSchemaErrorPathString(e.schemaStack, 'schema');
 
         const e2 = new Error(`Dictionary has invalid data in '${fileName}' for value '${valuePathString}', validated against '${schemaPathString}': ${e.message}`);
         e2.data = e;
@@ -265,16 +265,23 @@ class DictionaryImporter {
     _getSchemaErrorPathString(infoList, base='') {
         let result = base;
         for (const {path} of infoList) {
-            switch (typeof path) {
-                case 'string':
-                    if (result.length > 0) {
-                        result += '.';
+            const pathArray = Array.isArray(path) ? path : [path];
+            for (const pathPart of pathArray) {
+                if (pathPart === null) {
+                    result = base;
+                } else {
+                    switch (typeof pathPart) {
+                        case 'string':
+                            if (result.length > 0) {
+                                result += '.';
+                            }
+                            result += pathPart;
+                            break;
+                        case 'number':
+                            result += `[${pathPart}]`;
+                            break;
                     }
-                    result += path;
-                    break;
-                case 'number':
-                    result += `[${path}]`;
-                    break;
+                }
             }
         }
         return result;
