@@ -75,7 +75,7 @@ class JsonSchema {
     getObjectPropertySchema(property) {
         this._schemaPush(this._startSchema, null);
         try {
-            const schemaInfo = this._getObjectPropertySchemaPath(property);
+            const schemaInfo = this._getObjectPropertySchemaInfo(property);
             return schemaInfo !== null ? new JsonSchema(schemaInfo.schema, this._rootSchema) : null;
         } finally {
             this._schemaPop();
@@ -85,7 +85,7 @@ class JsonSchema {
     getArrayItemSchema(index) {
         this._schemaPush(this._startSchema, null);
         try {
-            const schemaInfo = this._getArrayItemSchemaPath(index);
+            const schemaInfo = this._getArrayItemSchemaInfo(index);
             return schemaInfo !== null ? new JsonSchema(schemaInfo.schema, this._rootSchema) : null;
         } finally {
             this._schemaPop();
@@ -162,7 +162,7 @@ class JsonSchema {
         return {};
     }
 
-    _getObjectPropertySchemaPath(property) {
+    _getObjectPropertySchemaInfo(property) {
         const {properties} = this._schema;
         if (this._isObject(properties)) {
             const propertySchema = properties[property];
@@ -182,7 +182,7 @@ class JsonSchema {
         }
     }
 
-    _getArrayItemSchemaPath(index) {
+    _getArrayItemSchemaInfo(index) {
         const {items} = this._schema;
         if (this._isObject(items)) {
             return {schema: items, path: 'items'};
@@ -521,7 +521,7 @@ class JsonSchema {
         this._validateArrayContains(value);
 
         for (let i = 0; i < length; ++i) {
-            const schemaInfo = this._getArrayItemSchemaPath(i);
+            const schemaInfo = this._getArrayItemSchemaInfo(i);
             if (schemaInfo === null) {
                 throw this._createError(`No schema found for array[${i}]`);
             }
@@ -586,7 +586,7 @@ class JsonSchema {
         }
 
         for (const property of properties) {
-            const schemaInfo = this._getObjectPropertySchemaPath(property);
+            const schemaInfo = this._getObjectPropertySchemaInfo(property);
             if (schemaInfo === null) {
                 throw this._createError(`No schema found for ${property}`);
             }
@@ -682,7 +682,7 @@ class JsonSchema {
         if (Array.isArray(required)) {
             for (const property of required) {
                 properties.delete(property);
-                const schemaInfo = this._getObjectPropertySchemaPath(property);
+                const schemaInfo = this._getObjectPropertySchemaInfo(property);
                 if (schemaInfo === null) { continue; }
                 const propertyValue = Object.prototype.hasOwnProperty.call(value, property) ? value[property] : void 0;
                 value[property] = this._getValidValueOrDefault(property, propertyValue, schemaInfo);
@@ -690,7 +690,7 @@ class JsonSchema {
         }
 
         for (const property of properties) {
-            const schemaInfo = this._getObjectPropertySchemaPath(property);
+            const schemaInfo = this._getObjectPropertySchemaInfo(property);
             if (schemaInfo === null) {
                 Reflect.deleteProperty(value, property);
             } else {
@@ -703,7 +703,7 @@ class JsonSchema {
 
     _populateArrayDefaults(value) {
         for (let i = 0, ii = value.length; i < ii; ++i) {
-            const schemaInfo = this._getArrayItemSchemaPath(i);
+            const schemaInfo = this._getArrayItemSchemaInfo(i);
             if (schemaInfo === null) { continue; }
             const propertyValue = value[i];
             value[i] = this._getValidValueOrDefault(i, propertyValue, schemaInfo);
@@ -712,7 +712,7 @@ class JsonSchema {
         const {minItems, maxItems} = this._schema;
         if (typeof minItems === 'number' && value.length < minItems) {
             for (let i = value.length; i < minItems; ++i) {
-                const schemaInfo = this._getArrayItemSchemaPath(i);
+                const schemaInfo = this._getArrayItemSchemaInfo(i);
                 if (schemaInfo === null) { break; }
                 const item = this._getValidValueOrDefault(i, void 0, schemaInfo);
                 value.push(item);
