@@ -103,8 +103,12 @@ class JsonSchemaProxyHandler {
     }
 
     deleteProperty(target, property) {
-        const required = this._schema.required;
-        if (Array.isArray(required) && required.includes(property)) {
+        const required = (
+            (typeof target === 'object' && target !== null) ?
+            (Array.isArray(target) || this._jsonSchemaValidator.isObjectPropertyRequired(this._schema, property)) :
+            true
+        );
+        if (required) {
             throw new Error(`${property} cannot be deleted`);
         }
         return Reflect.deleteProperty(target, property);
@@ -157,6 +161,11 @@ class JsonSchemaValidator {
 
     clearCache() {
         this._regexCache.clear();
+    }
+
+    isObjectPropertyRequired(schema, property) {
+        const {required} = schema;
+        return Array.isArray(required) && required.includes(property);
     }
 
     // Private
