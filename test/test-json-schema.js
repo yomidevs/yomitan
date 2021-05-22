@@ -40,6 +40,10 @@ function createProxy(schema, value) {
     return new JsonSchemaValidator().createProxy(value, schema);
 }
 
+function clone(value) {
+    return JSON.parse(JSON.stringify(value));
+}
+
 
 function testValidate1() {
     const schema = {
@@ -799,8 +803,8 @@ function testProxy1() {
     for (const {schema, tests} of data) {
         for (let {error, value, action} of tests) {
             if (typeof value === 'undefined') { value = getValidValueOrDefault(schema, void 0); }
+            value = clone(value);
             assert.ok(schemaValidate(schema, value));
-            console.log(error, value, schema);
             const valueProxy = createProxy(schema, value);
             if (error) {
                 assert.throws(() => action(valueProxy));
