@@ -119,6 +119,10 @@ class TextScanner extends EventDispatcher {
         this.setEnabled(this._enabled);
     }
 
+    isEnabled() {
+        return this._enabled;
+    }
+
     setEnabled(enabled) {
         this._enabled = enabled;
 

@@ -565,6 +565,7 @@ class Frontend {
 
     _updateTextScannerEnabled() {
         const enabled = (this._options !== null && this._options.general.enable && !this._disabledOverride);
+        if (enabled === this._textScanner.isEnabled()) { return; }
         this._textScanner.setEnabled(enabled);
         this._clearSelection(true);
     }
