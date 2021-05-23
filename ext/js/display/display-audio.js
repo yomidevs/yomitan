@@ -283,7 +283,7 @@ class DisplayAudio {
     }
 
     _getAudioPlayButtonHeadwordIndex(button) {
-        const headwordNode = button.closest('.expression');
+        const headwordNode = button.closest('.headword');
         if (headwordNode !== null) {
             const headwordIndex = parseInt(headwordNode.dataset.index, 10);
             if (Number.isFinite(headwordIndex)) { return headwordIndex; }
@@ -297,7 +297,7 @@ class DisplayAudio {
         if (dictionaryEntryIndex >= 0 && dictionaryEntryIndex < dictionaryEntryNodes.length) {
             const node = dictionaryEntryNodes[dictionaryEntryIndex];
             const button1 = (headwordIndex === 0 ? node.querySelector('.action-play-audio') : null);
-            const button2 = node.querySelector(`.expression:nth-of-type(${headwordIndex + 1}) .action-play-audio`);
+            const button2 = node.querySelector(`.headword:nth-of-type(${headwordIndex + 1}) .action-play-audio`);
             if (button1 !== null) { results.push(button1); }
             if (button2 !== null) { results.push(button2); }
         }
