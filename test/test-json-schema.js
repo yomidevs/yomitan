@@ -413,6 +413,80 @@ function testValidate2() {
                 {expected: false, value: []},
                 {expected: false, value: {}}
             ]
+        },
+
+        // Reference tests
+        {
+            schema: {
+                definitions: {
+                    example: {
+                        type: 'number'
+                    }
+                },
+                $ref: '#/definitions/example'
+            },
+            inputs: [
+                {expected: true,  value: 0},
+                {expected: true,  value: 0.5},
+                {expected: true,  value: 1},
+                {expected: false, value: '0'},
+                {expected: false, value: null},
+                {expected: false, value: []},
+                {expected: false, value: {}}
+            ]
+        },
+        {
+            schema: {
+                definitions: {
+                    example: {
+                        type: 'integer'
+                    }
+                },
+                $ref: '#/definitions/example'
+            },
+            inputs: [
+                {expected: true,  value: 0},
+                {expected: false, value: 0.5},
+                {expected: true,  value: 1},
+                {expected: false, value: '0'},
+                {expected: false, value: null},
+                {expected: false, value: []},
+                {expected: false, value: {}}
+            ]
+        },
+        {
+            schema: {
+                definitions: {
+                    example: {
+                        type: 'object',
+                        additionalProperties: false,
+                        properties: {
+                            test: {
+                                $ref: '#/definitions/example'
+                            }
+                        }
+                    }
+                },
+                $ref: '#/definitions/example'
+            },
+            inputs: [
+                {expected: false, value: 0},
+                {expected: false, value: 0.5},
+                {expected: false, value: 1},
+                {expected: false, value: '0'},
+                {expected: false, value: null},
+                {expected: false, value: []},
+                {expected: true,  value: {}},
+                {expected: false, value: {test: 0}},
+                {expected: false, value: {test: 0.5}},
+                {expected: false, value: {test: 1}},
+                {expected: false, value: {test: '0'}},
+                {expected: false, value: {test: null}},
+                {expected: false, value: {test: []}},
+                {expected: true,  value: {test: {}}},
+                {expected: true,  value: {test: {test: {}}}},
+                {expected: true,  value: {test: {test: {test: {}}}}}
+            ]
         }
     ];
 
@@ -690,6 +764,83 @@ function testGetValidValueOrDefault1() {
                     {test: -1}
                 ]
             ]
+        },
+
+        // Test references
+        {
+            schema: {
+                definitions: {
+                    example: {
+                        type: 'number',
+                        default: 0
+                    }
+                },
+                $ref: '#/definitions/example'
+            },
+            inputs: [
+                [
+                    1,
+                    1
+                ],
+                [
+                    null,
+                    0
+                ],
+                [
+                    'test',
+                    0
+                ],
+                [
+                    {test: 'value'},
+                    0
+                ]
+            ]
+        },
+        {
+            schema: {
+                definitions: {
+                    example: {
+                        type: 'object',
+                        additionalProperties: false,
+                        properties: {
+                            test: {
+                                $ref: '#/definitions/example'
+                            }
+                        }
+                    }
+                },
+                $ref: '#/definitions/example'
+            },
+            inputs: [
+                [
+                    1,
+                    {}
+                ],
+                [
+                    null,
+                    {}
+                ],
+                [
+                    'test',
+                    {}
+                ],
+                [
+                    {},
+                    {}
+                ],
+                [
+                    {test: {}},
+                    {test: {}}
+                ],
+                [
+                    {test: 'value'},
+                    {test: {}}
+                ],
+                [
+                    {test: {test: {}}},
+                    {test: {test: {}}}
+                ]
+            ]
         }
     ];
 
@@ -796,6 +947,33 @@ function testProxy1() {
                 {error: true,  value: ['default'], action: (value) => { value[0] = null; }},
                 {error: true,  value: ['default'], action: (value) => { delete value[0]; }},
                 {error: false, value: ['default'], action: (value) => { value[1] = 'string'; }}
+            ]
+        },
+
+        // Reference tests
+        {
+            schema: {
+                definitions: {
+                    example: {
+                        type: 'object',
+                        additionalProperties: false,
+                        properties: {
+                            test: {
+                                $ref: '#/definitions/example'
+                            }
+                        }
+                    }
+                },
+                $ref: '#/definitions/example'
+            },
+            tests: [
+                {error: false, value: {}, action: (value) => { value.test = {}; }},
+                {error: false, value: {}, action: (value) => { value.test = {}; value.test.test = {}; }},
+                {error: false, value: {}, action: (value) => { value.test = {test: {}}; }},
+                {error: true,  value: {}, action: (value) => { value.test = null; }},
+                {error: true,  value: {}, action: (value) => { value.test = 'string'; }},
+                {error: true,  value: {}, action: (value) => { value.test = {}; value.test.test = 'string'; }},
+                {error: true,  value: {}, action: (value) => { value.test = {test: 'string'}; }}
             ]
         }
     ];

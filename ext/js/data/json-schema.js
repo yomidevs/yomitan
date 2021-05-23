@@ -25,6 +25,7 @@ class JsonSchema {
         this._startSchema = schema;
         this._rootSchema = typeof rootSchema !== 'undefined' ? rootSchema : schema;
         this._regexCache = null;
+        this._refCache = null;
         this._valueStack = [];
         this._schemaStack = [];
 
@@ -73,7 +74,8 @@ class JsonSchema {
     }
 
     getObjectPropertySchema(property) {
-        this._schemaPush(this._startSchema, null);
+        const startSchemaInfo = this._getResolveSchemaInfo({schema: this._startSchema, path: null});
+        this._schemaPush(startSchemaInfo.schema, startSchemaInfo.path);
         try {
             const schemaInfo = this._getObjectPropertySchemaInfo(property);
             return schemaInfo !== null ? new JsonSchema(schemaInfo.schema, this._rootSchema) : null;
@@ -83,7 +85,8 @@ class JsonSchema {
     }
 
     getArrayItemSchema(index) {
-        this._schemaPush(this._startSchema, null);
+        const startSchemaInfo = this._getResolveSchemaInfo({schema: this._startSchema, path: null});
+        this._schemaPush(startSchemaInfo.schema, startSchemaInfo.path);
         try {
             const schemaInfo = this._getArrayItemSchemaInfo(index);
             return schemaInfo !== null ? new JsonSchema(schemaInfo.schema, this._rootSchema) : null;
@@ -267,6 +270,71 @@ class JsonSchema {
         return value1 === value2;
     }
 
+    _getResolveSchemaInfo(schemaInfo) {
+        const ref = schemaInfo.schema.$ref;
+        if (typeof ref !== 'string') { return schemaInfo; }
+
+        const {path: basePath} = schemaInfo;
+        const {schema, path} = this._getReference(ref);
+        if (Array.isArray(basePath)) {
+            path.unshift(...basePath);
+        } else {
+            path.unshift(basePath);
+        }
+        return {schema, path};
+    }
+
+    _getReference(ref) {
+        if (!ref.startsWith('#/')) {
+            throw this._createError(`Unsupported reference path: ${ref}`);
+        }
+
+        let info;
+        if (this._refCache !== null) {
+            info = this._refCache.get(ref);
+        } else {
+            this._refCache = new Map();
+        }
+
+        if (typeof info === 'undefined') {
+            info = this._getReferenceUncached(ref);
+            this._refCache.set(ref, info);
+        }
+
+        return {schema: info.schema, path: [...info.path]};
+    }
+
+    _getReferenceUncached(ref) {
+        const visited = new Set();
+        const path = [];
+        while (true) {
+            if (visited.has(ref)) {
+                throw this._createError(`Recursive reference: ${ref}`);
+            }
+            visited.add(ref);
+
+            const pathParts = ref.substring(2).split('/');
+            let schema = this._rootSchema;
+            try {
+                for (const pathPart of pathParts) {
+                    schema = schema[pathPart];
+                }
+            } catch (e) {
+                throw this._createError(`Invalid reference: ${ref}`);
+            }
+            if (!this._isObject(schema)) {
+                throw this._createError(`Invalid reference: ${ref}`);
+            }
+
+            path.push(null, ...pathParts);
+
+            ref = schema.$ref;
+            if (typeof ref !== 'string') {
+                return {schema, path};
+            }
+        }
+    }
+
     // Validation
 
     _isValidCurrent(value) {
@@ -279,6 +347,22 @@ class JsonSchema {
     }
 
     _validate(value) {
+        const ref = this._schema.$ref;
+        const schemaInfo = (typeof ref === 'string') ? this._getReference(ref) : null;
+
+        if (schemaInfo === null) {
+            this._validateInner(value);
+        } else {
+            this._schemaPush(schemaInfo.schema, schemaInfo.path);
+            try {
+                this._validateInner(value);
+            } finally {
+                this._schemaPop();
+            }
+        }
+    }
+
+    _validateInner(value) {
         this._validateSingleSchema(value);
         this._validateConditional(value);
         this._validateAllOf(value);
@@ -638,6 +722,7 @@ class JsonSchema {
     }
 
     _getValidValueOrDefault(path, value, schemaInfo) {
+        schemaInfo = this._getResolveSchemaInfo(schemaInfo);
         this._schemaPush(schemaInfo.schema, schemaInfo.path);
         this._valuePush(value, path);
         try {
