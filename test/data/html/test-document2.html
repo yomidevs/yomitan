@@ -25,6 +25,9 @@
     bottom: 0;
     right: 0;
 }
+.danger {
+    color: #c83c28;
+}
     </style>
 <body>
 
@@ -108,7 +111,20 @@
 
     <y-test>
         <y-description>&lt;iframe&gt; element with srcdoc.</y-description>
-        <iframe id="iframe-with-srcdoc" allowfullscreen="true" class="container"></iframe>
+        <iframe allowfullscreen="true" class="iframe-with-srcdoc container"></iframe>
+    </y-test>
+
+    <y-test>
+        <y-description>&lt;iframe&gt; element with srcdoc and <code>sandbox="allow-same-origin allow-scripts"</code>.</y-description>
+        <iframe allowfullscreen="true" class="iframe-with-srcdoc container" sandbox="allow-same-origin allow-scripts"></iframe>
+    </y-test>
+
+    <y-test>
+        <y-description>
+            &lt;iframe&gt; element with srcdoc and <code>sandbox="allow-scripts"</code>.<br>
+            <span class="danger">This element is expected to not work.</span>
+        </y-description>
+        <iframe allowfullscreen="true" class="iframe-with-srcdoc container" sandbox="allow-scripts"></iframe>
     </y-test>
 
     <y-test>
@@ -180,9 +196,10 @@
 
     const iframeWithDataUrl = document.querySelector('#iframe-with-data-url');
     const iframeWithBlobUrl = document.querySelector('#iframe-with-blob-url');
-    const iframeWithSrcdoc = document.querySelector('#iframe-with-srcdoc');
     iframeWithBlobUrl.src = URL.createObjectURL(dataUrlToBlob(iframeWithDataUrl.src));
-    iframeWithSrcdoc.srcdoc = dataUrlToContent(iframeWithDataUrl.src).content;
+    for (const iframeWithSrcdoc of document.querySelectorAll('.iframe-with-srcdoc')) {
+        iframeWithSrcdoc.srcdoc = dataUrlToContent(iframeWithDataUrl.src).content;
+    }
 })();
     </script>
 

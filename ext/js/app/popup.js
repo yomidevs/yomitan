@@ -228,20 +228,31 @@ class Popup extends EventDispatcher {
     _inject() {
         let injectPromise = this._injectPromise;
         if (injectPromise === null) {
-            injectPromise = this._createInjectPromise();
+            injectPromise = this._injectInner1();
             this._injectPromise = injectPromise;
             injectPromise.then(
                 () => {
                     if (injectPromise !== this._injectPromise) { return; }
                     this._injectPromiseComplete = true;
                 },
-                () => { this._resetFrame(); }
+                () => {}
             );
         }
         return injectPromise;
     }
 
-    async _createInjectPromise() {
+    async _injectInner1() {
+        try {
+            await this._injectInner2();
+            return true;
+        } catch (e) {
+            this._resetFrame();
+            if (e.source === this) { return false; } // Passive error
+            throw e;
+        }
+    }
+
+    async _injectInner2() {
         if (this._options === null) {
             throw new Error('Options not initialized');
         }
@@ -255,9 +266,16 @@ class Popup extends EventDispatcher {
             frame.removeAttribute('srcdoc');
             this._observeFullscreen(true);
             this._onFullscreenChanged();
+            const {contentDocument} = frame;
+            if (contentDocument === null) {
+                // This can occur when running inside a sandboxed frame without "allow-same-origin"
+                const error = new Error('Popup not supoprted in this context');
+                error.source = this; // Used to detect a passive error which should be ignored
+                throw error;
+            }
             const url = chrome.runtime.getURL('/popup.html');
             if (useSecurePopupFrameUrl) {
-                frame.contentDocument.location.href = url;
+                contentDocument.location.href = url;
             } else {
                 frame.setAttribute('src', url);
             }
@@ -366,7 +384,8 @@ class Popup extends EventDispatcher {
     }
 
     async _show(elementRect, writingMode) {
-        await this._inject();
+        const injected = await this._inject();
+        if (!injected) { return; }
 
         const optionsGeneral = this._options.general;
         const {popupDisplayMode} = optionsGeneral;

@@ -156,7 +156,12 @@ class FrameClient {
             // Prevent unhandled rejections
             frameLoadedPromise.catch(() => {}); // NOP
 
-            setupFrame(frame);
+            try {
+                setupFrame(frame);
+            } catch (e) {
+                cleanup();
+                reject(e);
+            }
         });
     }
 
