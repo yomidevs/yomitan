@@ -852,11 +852,12 @@ class JsonSchemaProxyHandler {
 
         let propertySchema;
         if (Array.isArray(target)) {
-            property = this._getArrayIndex(property);
-            if (property === null) {
+            const index = this._getArrayIndex(property);
+            if (index === null) {
                 // Note: this does not currently wrap mutating functions like push, pop, shift, unshift, splice
                 return target[property];
             }
+            property = index;
             propertySchema = this._schema.getArrayItemSchema(property);
         } else {
             propertySchema = this._schema.getObjectPropertySchema(property);
