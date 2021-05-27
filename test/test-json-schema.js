@@ -945,7 +945,7 @@ function testProxy1() {
             tests: [
                 {error: false, value: ['default'], action: (value) => { value[0] = 'string'; }},
                 {error: true,  value: ['default'], action: (value) => { value[0] = null; }},
-                {error: true,  value: ['default'], action: (value) => { delete value[0]; }},
+                {error: false, value: ['default'], action: (value) => { delete value[0]; }},
                 {error: false, value: ['default'], action: (value) => { value[1] = 'string'; }},
                 {error: false, value: ['default'], action: (value) => {
                     value[1] = 'string';

@@ -874,9 +874,13 @@ class JsonSchemaProxyHandler {
 
         let propertySchema;
         if (Array.isArray(target)) {
-            property = this._getArrayIndex(property);
-            if (property === null) { throw new Error(`Property ${property} cannot be assigned to array`); }
-            if (property > target.length) { throw new Error('Array index out of range'); }
+            const index = this._getArrayIndex(property);
+            if (index === null) {
+                target[property] = value;
+                return true;
+            }
+            if (index > target.length) { throw new Error('Array index out of range'); }
+            property = index;
             propertySchema = this._schema.getArrayItemSchema(property);
         } else {
             propertySchema = this._schema.getObjectPropertySchema(property);
@@ -894,7 +898,7 @@ class JsonSchemaProxyHandler {
     deleteProperty(target, property) {
         const required = (
             (typeof target === 'object' && target !== null) ?
-            (Array.isArray(target) || this._schema.isObjectPropertyRequired(property)) :
+            (!Array.isArray(target) && this._schema.isObjectPropertyRequired(property)) :
             true
         );
         if (required) {
