@@ -2466,6 +2466,45 @@
     </div>
 </div></div>
 
+<div id="audio-source-help-custom-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+    <div class="modal-header">
+        <div class="modal-title">Audio Source - Custom URL</div>
+    </div>
+    <div class="modal-body">
+        <p>
+            A custom URL can be used to play audio from any URL.
+            The replacement tags <code data-select-on-click="">{term}</code> and <code data-select-on-click="">{reading}</code>
+            can be used to specify which term and reading is being looked up.<br>
+        </p>
+        <p>
+            Example:<br>
+            <a data-select-on-click="">http://localhost/audio.mp3?term={term}&amp;reading={reading}</a>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
+<div id="audio-source-help-custom-json-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+    <div class="modal-header">
+        <div class="modal-title">Audio Source - Custom URL (JSON)</div>
+    </div>
+    <div class="modal-body">
+        <p>
+            A custom URL to a JSON file which lists one or more audio URLs for a given term.
+            The format of the JSON file is described in <a href="/data/schemas/custom-audio-list-schema.json" target="_blank" rel="noopener noreferrer">this schema file</a>.
+        </p>
+        <p>
+            Example:<br>
+            <a data-select-on-click="">http://localhost/audio.json?term={term}&amp;reading={reading}</a>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
 
 <!-- Audio templates -->
 <template id="audio-source-template"><div class="audio-source horizontal-flex">
@@ -2483,6 +2522,7 @@
 </div></template>
 
 <template id="audio-source-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button class="popup-menu-item" data-menu-action="help">Help</button>
     <button class="popup-menu-item" data-menu-action="remove">Remove</button>
 </div></div></div></template>
 

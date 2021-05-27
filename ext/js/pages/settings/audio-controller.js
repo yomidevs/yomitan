@@ -20,8 +20,9 @@
  */
 
 class AudioController {
-    constructor(settingsController) {
+    constructor(settingsController, modalController) {
         this._settingsController = settingsController;
+        this._modalController = modalController;
         this._audioSystem = new AudioSystem();
         this._audioSourceContainer = null;
         this._audioSourceAddButton = null;
@@ -166,6 +167,7 @@ class AudioController {
             eventListeners.addEventListener(removeButton, 'click', this._onAudioSourceRemoveClicked.bind(this, entry), false);
         }
         if (menuButton !== null) {
+            eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this, entry), false);
             eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this, entry), false);
         }
 
@@ -222,11 +224,43 @@ class AudioController {
         this._removeAudioSourceEntry(entry);
     }
 
+    _onMenuOpen(entry, e) {
+        const {menu} = e.detail;
+
+        let hasHelp = false;
+        switch (entry.value) {
+            case 'custom':
+            case 'custom-json':
+                hasHelp = true;
+                break;
+        }
+
+        menu.bodyNode.querySelector('.popup-menu-item[data-menu-action=help]').hidden = !hasHelp;
+    }
+
     _onMenuClose(entry, e) {
         switch (e.detail.action) {
+            case 'help':
+                this._showHelp(entry.value);
+                break;
             case 'remove':
                 this._removeAudioSourceEntry(entry);
                 break;
         }
+    }
+
+    _showHelp(type) {
+        switch (type) {
+            case 'custom':
+                this._showModal('audio-source-help-custom');
+                break;
+            case 'custom-json':
+                this._showModal('audio-source-help-custom-json');
+                break;
+        }
+    }
+
+    _showModal(name) {
+        this._modalController.getModal(name).setVisible(true);
     }
 }

@@ -113,7 +113,7 @@ async function setupGenericSettingsController(genericSettingController) {
         const genericSettingController = new GenericSettingController(settingsController);
         preparePromises.push(setupGenericSettingsController(genericSettingController));
 
-        const audioController = new AudioController(settingsController);
+        const audioController = new AudioController(settingsController, modalController);
         audioController.prepare();
 
         const profileController = new ProfileController(settingsController, modalController);
