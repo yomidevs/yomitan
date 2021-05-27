@@ -341,35 +341,16 @@
                                 "type": "object",
                                 "required": [
                                     "enabled",
-                                    "sources",
                                     "volume",
                                     "autoPlay",
                                     "customSourceUrl",
-                                    "customSourceType",
-                                    "textToSpeechVoice"
+                                    "textToSpeechVoice",
+                                    "sources"
                                 ],
                                 "properties": {
                                     "enabled": {
                                         "type": "boolean",
                                         "default": true
-                                    },
-                                    "sources": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "enum": [
-                                                "jpod101",
-                                                "jpod101-alternate",
-                                                "jisho",
-                                                "text-to-speech",
-                                                "text-to-speech-reading",
-                                                "custom"
-                                            ],
-                                            "default": "jpod101"
-                                        },
-                                        "default": [
-                                            "jpod101"
-                                        ]
                                     },
                                     "volume": {
                                         "type": "number",
@@ -385,14 +366,28 @@
                                         "type": "string",
                                         "default": ""
                                     },
-                                    "customSourceType": {
-                                        "type": "string",
-                                        "enum": ["audio", "json"],
-                                        "default": "audio"
-                                    },
                                     "textToSpeechVoice": {
                                         "type": "string",
                                         "default": ""
+                                    },
+                                    "sources": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "enum": [
+                                                "jpod101",
+                                                "jpod101-alternate",
+                                                "jisho",
+                                                "text-to-speech",
+                                                "text-to-speech-reading",
+                                                "custom",
+                                                "custom-json"
+                                            ],
+                                            "default": "jpod101"
+                                        },
+                                        "default": [
+                                            "jpod101"
+                                        ]
                                     }
                                 }
                             },

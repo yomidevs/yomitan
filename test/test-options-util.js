@@ -310,7 +310,6 @@ function createProfileOptionsUpdatedTestData1() {
             volume: 100,
             autoPlay: false,
             customSourceUrl: 'http://localhost/audio.mp3?term={term}&reading={reading}',
-            customSourceType: 'audio',
             textToSpeechVoice: ''
         },
         scanning: {

@@ -116,7 +116,7 @@ class DisplayAudio {
 
         const {term, reading} = headword;
         const audioOptions = this._getAudioOptions();
-        const {textToSpeechVoice, customSourceUrl, customSourceType, volume} = audioOptions;
+        const {textToSpeechVoice, customSourceUrl, volume} = audioOptions;
         if (!Array.isArray(sources)) {
             ({sources} = audioOptions);
         }
@@ -131,7 +131,7 @@ class DisplayAudio {
             let audio;
             let title;
             let source = null;
-            const info = await this._createTermAudio(sources, sourceDetailsMap, term, reading, {textToSpeechVoice, customSourceUrl, customSourceType});
+            const info = await this._createTermAudio(sources, sourceDetailsMap, term, reading, {textToSpeechVoice, customSourceUrl});
             const valid = (info !== null);
             if (valid) {
                 ({audio, source} = info);
@@ -518,7 +518,8 @@ class DisplayAudio {
             ['jisho', 'Jisho.org', true],
             ['text-to-speech', 'Text-to-speech', ttsSupported],
             ['text-to-speech-reading', 'Text-to-speech (Kana reading)', ttsSupported],
-            ['custom', 'Custom', customSupported]
+            ['custom', 'Custom URL', customSupported],
+            ['custom-json', 'Custom URL (JSON)', customSupported]
         ];
 
         const results = [];

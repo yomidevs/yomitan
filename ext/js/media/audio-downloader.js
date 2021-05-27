@@ -33,7 +33,8 @@ class AudioDownloader {
             ['jisho', this._getInfoJisho.bind(this)],
             ['text-to-speech', this._getInfoTextToSpeech.bind(this)],
             ['text-to-speech-reading', this._getInfoTextToSpeechReading.bind(this)],
-            ['custom', this._getInfoCustom.bind(this)]
+            ['custom', this._getInfoCustom.bind(this)],
+            ['custom-json', this._getInfoCustomJson.bind(this)]
         ]);
     }
 
@@ -191,22 +192,14 @@ class AudioDownloader {
         return [{type: 'tts', text: reading, voice: textToSpeechVoice}];
     }
 
-    async _getInfoCustom(term, reading, {customSourceUrl, customSourceType}) {
-        if (typeof customSourceUrl !== 'string') {
-            throw new Error('No custom URL defined');
-        }
-        const data = {term, reading};
-        const url = customSourceUrl.replace(/\{([^}]*)\}/g, (m0, m1) => (Object.prototype.hasOwnProperty.call(data, m1) ? `${data[m1]}` : m0));
-
-        switch (customSourceType) {
-            case 'json':
-                return await this._getInfoCustomJson(url);
-            default:
-                return [{type: 'url', url}];
-        }
+    async _getInfoCustom(term, reading, {customSourceUrl}) {
+        const url = this._getCustomUrl(term, reading, customSourceUrl);
+        return [{type: 'url', url}];
     }
 
-    async _getInfoCustomJson(url) {
+    async _getInfoCustomJson(term, reading, {customSourceUrl}) {
+        const url = this._getCustomUrl(term, reading, customSourceUrl);
+
         const response = await this._requestBuilder.fetchAnonymous(url, {
             method: 'GET',
             mode: 'cors',
@@ -235,6 +228,14 @@ class AudioDownloader {
             results.push(info);
         }
         return results;
+    }
+
+    _getCustomUrl(term, reading, customSourceUrl) {
+        if (typeof customSourceUrl !== 'string') {
+            throw new Error('No custom URL defined');
+        }
+        const data = {term, reading};
+        return customSourceUrl.replace(/\{([^}]*)\}/g, (m0, m1) => (Object.prototype.hasOwnProperty.call(data, m1) ? `${data[m1]}` : m0));
     }
 
     async _downloadAudioFromUrl(url, source) {

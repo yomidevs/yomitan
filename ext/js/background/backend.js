@@ -1742,7 +1742,7 @@ class Backend {
             return null;
         }
 
-        const {sources, preferredAudioIndex, customSourceUrl, customSourceType} = details;
+        const {sources, preferredAudioIndex, customSourceUrl} = details;
         let data;
         let contentType;
         try {
@@ -1754,7 +1754,6 @@ class Backend {
                 {
                     textToSpeechVoice: null,
                     customSourceUrl,
-                    customSourceType,
                     binary: true,
                     disableCache: true
                 }

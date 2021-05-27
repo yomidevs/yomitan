@@ -1554,7 +1554,7 @@ class Display extends EventDispatcher {
     async _injectAnkiNoteMedia(dictionaryEntry, options, fields) {
         const {
             anki: {screenshot: {format, quality}},
-            audio: {sources, customSourceUrl, customSourceType}
+            audio: {sources, customSourceUrl}
         } = options;
 
         const timestamp = Date.now();
@@ -1570,7 +1570,7 @@ class Display extends EventDispatcher {
                 sources2 = [primaryCardAudio.source];
                 preferredAudioIndex = primaryCardAudio.index;
             }
-            audioDetails = {sources: sources2, preferredAudioIndex, customSourceUrl, customSourceType};
+            audioDetails = {sources: sources2, preferredAudioIndex, customSourceUrl};
         }
 
         const screenshotDetails = (

@@ -817,11 +817,25 @@ class OptionsUtil {
         // Version 12 changes:
         //  Changed sentenceParsing.enableTerminationCharacters to sentenceParsing.terminationCharacterMode.
         //  Added {search-query} field marker.
+        //  Updated audio.sources[] to change 'custom' into 'custom-json'.
+        //  Removed audio.customSourceType.
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v12.handlebars');
         for (const profile of options.profiles) {
-            const {sentenceParsing} = profile.options;
+            const {sentenceParsing, audio} = profile.options;
+
             sentenceParsing.terminationCharacterMode = sentenceParsing.enableTerminationCharacters ? 'custom' : 'newlines';
             delete sentenceParsing.enableTerminationCharacters;
+
+            const {sources, customSourceType} = audio;
+            audio.sources = sources.map((type) => {
+                switch (type) {
+                    case 'custom':
+                        return (customSourceType === 'json' ? 'custom-json' : 'custom');
+                    default:
+                        return type;
+                }
+            });
+            delete audio.customSourceType;
         }
         return options;
     }
