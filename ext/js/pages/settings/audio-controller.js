@@ -30,6 +30,14 @@ class AudioController {
         this._ttsVoiceTestTextInput = null;
     }
 
+    get settingsController() {
+        return this._settingsController;
+    }
+
+    get modalController() {
+        return this._modalController;
+    }
+
     async prepare() {
         this._audioSystem.prepare();
 
@@ -51,16 +59,39 @@ class AudioController {
         this._onOptionsChanged({options});
     }
 
+    async removeSource(entry) {
+        const {index} = entry;
+        this._audioSourceEntries.splice(index, 1);
+        entry.cleanup();
+        for (let i = index, ii = this._audioSourceEntries.length; i < ii; ++i) {
+            this._audioSourceEntries[i].index = i;
+        }
+
+        await this._settingsController.modifyProfileSettings([{
+            action: 'splice',
+            path: 'audio.sources',
+            start: index,
+            deleteCount: 1,
+            items: []
+        }]);
+    }
+
     // Private
 
     _onOptionsChanged({options}) {
-        for (let i = this._audioSourceEntries.length - 1; i >= 0; --i) {
-            this._cleanupAudioSourceEntry(i);
+        for (const entry of this._audioSourceEntries) {
+            entry.cleanup();
         }
+        this._audioSourceEntries = [];
 
-        for (const audioSource of options.audio.sources) {
-            this._createAudioSourceEntry(audioSource);
+        const {sources} = options.audio;
+        for (let i = 0, ii = sources.length; i < ii; ++i) {
+            this._createAudioSourceEntry(i, sources[i]);
         }
+    }
+
+    _onAddAudioSource() {
+        this._addAudioSource();
     }
 
     _onTestTextToSpeech() {
@@ -132,103 +163,93 @@ class AudioController {
         );
     }
 
-    _getUnusedAudioSource() {
-        const audioSourcesAvailable = [
+    _createAudioSourceEntry(index, type) {
+        const node = this._settingsController.instantiateTemplate('audio-source');
+        const entry = new AudioSourceEntry(this, index, type, node);
+        this._audioSourceEntries.push(entry);
+        this._audioSourceContainer.appendChild(node);
+        entry.prepare();
+    }
+
+    _getUnusedAudioSourceType() {
+        const typesAvailable = [
             'jpod101',
             'jpod101-alternate',
             'jisho',
             'custom'
         ];
-        for (const source of audioSourcesAvailable) {
-            if (!this._audioSourceEntries.some((metadata) => metadata.value === source)) {
-                return source;
+        for (const type of typesAvailable) {
+            if (!this._audioSourceEntries.some((entry) => entry.type === type)) {
+                return type;
             }
         }
-        return audioSourcesAvailable[0];
+        return typesAvailable[0];
     }
 
-    _createAudioSourceEntry(value) {
-        const eventListeners = new EventListenerCollection();
-        const container = this._settingsController.instantiateTemplate('audio-source');
-        const select = container.querySelector('.audio-source-select');
-        const removeButton = container.querySelector('.audio-source-remove');
-        const menuButton = container.querySelector('.audio-source-menu-button');
-
-        select.value = value;
-
-        const entry = {
-            container,
-            eventListeners,
-            value
-        };
-
-        eventListeners.addEventListener(select, 'change', this._onAudioSourceSelectChange.bind(this, entry), false);
-        if (removeButton !== null) {
-            eventListeners.addEventListener(removeButton, 'click', this._onAudioSourceRemoveClicked.bind(this, entry), false);
-        }
-        if (menuButton !== null) {
-            eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this, entry), false);
-            eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this, entry), false);
-        }
-
-        this._audioSourceContainer.appendChild(container);
-        this._audioSourceEntries.push(entry);
-    }
-
-    async _removeAudioSourceEntry(entry) {
-        const index = this._audioSourceEntries.indexOf(entry);
-        if (index < 0) { return; }
-
-        this._cleanupAudioSourceEntry(index);
-        await this._settingsController.modifyProfileSettings([{
-            action: 'splice',
-            path: 'audio.sources',
-            start: index,
-            deleteCount: 1,
-            items: []
-        }]);
-    }
-
-    _cleanupAudioSourceEntry(index) {
-        const {container, eventListeners} = this._audioSourceEntries[index];
-        if (container.parentNode !== null) {
-            container.parentNode.removeChild(container);
-        }
-        eventListeners.removeAllEventListeners();
-        this._audioSourceEntries.splice(index, 1);
-    }
-
-    async _onAddAudioSource() {
-        const audioSource = this._getUnusedAudioSource();
+    async _addAudioSource() {
+        const type = this._getUnusedAudioSourceType();
         const index = this._audioSourceEntries.length;
-        this._createAudioSourceEntry(audioSource);
+        this._createAudioSourceEntry(index, type);
         await this._settingsController.modifyProfileSettings([{
             action: 'splice',
             path: 'audio.sources',
             start: index,
             deleteCount: 0,
-            items: [audioSource]
+            items: [type]
         }]);
     }
+}
 
-    async _onAudioSourceSelectChange(entry, event) {
-        const index = this._audioSourceEntries.indexOf(entry);
-        if (index < 0) { return; }
-
-        const value = event.currentTarget.value;
-        entry.value = value;
-        await this._settingsController.setProfileSetting(`audio.sources[${index}]`, value);
+class AudioSourceEntry {
+    constructor(parent, index, type, node) {
+        this._parent = parent;
+        this._index = index;
+        this._type = type;
+        this._node = node;
+        this._eventListeners = new EventListenerCollection();
     }
 
-    _onAudioSourceRemoveClicked(entry) {
-        this._removeAudioSourceEntry(entry);
+    get index() {
+        return this._index;
     }
 
-    _onMenuOpen(entry, e) {
+    set index(value) {
+        this._index = value;
+    }
+
+    get type() {
+        return this._type;
+    }
+
+    prepare() {
+        const select = this._node.querySelector('.audio-source-select');
+        const menuButton = this._node.querySelector('.audio-source-menu-button');
+
+        select.value = this._type;
+
+        this._eventListeners.addEventListener(select, 'change', this._onAudioSourceSelectChange.bind(this), false);
+        this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
+        this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this), false);
+    }
+
+    cleanup() {
+        if (this._node.parentNode !== null) {
+            this._node.parentNode.removeChild(this._node);
+        }
+        this._eventListeners.removeAllEventListeners();
+    }
+
+    // Private
+
+    _onAudioSourceSelectChange(event) {
+        this._setType(event.currentTarget.value);
+    }
+
+    _onMenuOpen(e) {
         const {menu} = e.detail;
 
         let hasHelp = false;
-        switch (entry.value) {
+        switch (this._type) {
             case 'custom':
             case 'custom-json':
                 hasHelp = true;
@@ -238,15 +259,20 @@ class AudioController {
         menu.bodyNode.querySelector('.popup-menu-item[data-menu-action=help]').hidden = !hasHelp;
     }
 
-    _onMenuClose(entry, e) {
+    _onMenuClose(e) {
         switch (e.detail.action) {
             case 'help':
-                this._showHelp(entry.value);
+                this._showHelp(this._type);
                 break;
             case 'remove':
-                this._removeAudioSourceEntry(entry);
+                this._parent.removeSource(this);
                 break;
         }
+    }
+
+    async _setType(value) {
+        this._type = value;
+        await this._parent.settingsController.setProfileSetting(`audio.sources[${this._index}]`, value);
     }
 
     _showHelp(type) {
@@ -261,6 +287,6 @@ class AudioController {
     }
 
     _showModal(name) {
-        this._modalController.getModal(name).setVisible(true);
+        this._parent.modalController.getModal(name).setVisible(true);
     }
 }
