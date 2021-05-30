@@ -98,19 +98,19 @@
         }
     },
     "type": "array",
-    "description": "Data file containing term and expression information.",
+    "description": "Data file containing term information.",
     "additionalItems": {
         "type": "array",
-        "description": "Information about a single term/expression.",
+        "description": "Information about a single term.",
         "minItems": 8,
         "items": [
             {
                 "type": "string",
-                "description": "Term or expression."
+                "description": "The text for the term."
             },
             {
                 "type": "string",
-                "description": "Reading of the term/expression, or an empty string if the reading is the same as the term/expression."
+                "description": "Reading of the term, or an empty string if the reading is the same as the term."
             },
             {
                 "type": ["string", "null"],
@@ -126,16 +126,16 @@
             },
             {
                 "type": "array",
-                "description": "Array of definitions for the term/expression.",
+                "description": "Array of definitions for the term.",
                 "items": {
                     "oneOf": [
                         {
                             "type": "string",
-                            "description": "Single definition for the term/expression."
+                            "description": "Single definition for the term."
                         },
                         {
                             "type": "object",
-                            "description": "Single detailed definition for the term/expression.",
+                            "description": "Single detailed definition for the term.",
                             "required": [
                                 "type"
                             ],
@@ -160,7 +160,7 @@
                                         },
                                         "text": {
                                             "type": "string",
-                                            "description": "Single definition for the term/expression."
+                                            "description": "Single definition for the term."
                                         }
                                     }
                                 },
@@ -177,7 +177,7 @@
                                         },
                                         "content": {
                                             "$ref": "#/definitions/structuredContent",
-                                            "description": "Single definition for the term/expression using a structured content object."
+                                            "description": "Single definition for the term using a structured content object."
                                         }
                                     }
                                 },
@@ -238,11 +238,11 @@
             },
             {
                 "type": "integer",
-                "description": "Sequence number for the term/expression. Terms/expressions with the same sequence number can be shown together when the \"resultOutputMode\" option is set to \"merge\"."
+                "description": "Sequence number for the term. Terms with the same sequence number can be shown together when the \"resultOutputMode\" option is set to \"merge\"."
             },
             {
                 "type": "string",
-                "description": "String of space-separated tags for the term/expression. An empty string is treated as no tags."
+                "description": "String of space-separated tags for the term. An empty string is treated as no tags."
             }
         ]
     }

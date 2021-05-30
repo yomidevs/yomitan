@@ -18,7 +18,7 @@
         "sequenced": {
             "type": "boolean",
             "default": false,
-            "description": "Whether or not this dictionary can be used as the primary dictionary. Primary dictionaries typically contain term/expression definitions."
+            "description": "Whether or not this dictionary contains sequencing information for related terms."
         },
         "format": {
             "type": "integer",

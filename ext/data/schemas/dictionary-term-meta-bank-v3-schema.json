@@ -1,15 +1,15 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "array",
-    "description": "Custom metadata for terms/expressions.",
+    "description": "Custom metadata for terms.",
     "additionalItems": {
         "type": "array",
-        "description": "Metadata about a single term/expression.",
+        "description": "Metadata about a single term.",
         "minItems": 3,
         "items": [
             {
                 "type": "string",
-                "description": "Term or expression."
+                "description": "The text for the term."
             },
             {
                 "type": "string",
@@ -17,7 +17,7 @@
                 "description": "Type of data. \"freq\" corresponds to frequency information; \"pitch\" corresponds to pitch information."
             },
             {
-                "description": "Data for the term/expression."
+                "description": "Data for the term."
             }
         ],
         "oneOf": [
@@ -29,7 +29,7 @@
                         "oneOf": [
                             {
                                 "type": ["string", "number"],
-                                "description": "Frequency information for the term or expression."
+                                "description": "Frequency information for the term."
                             },
                             {
                                 "type": ["object"],
@@ -41,11 +41,11 @@
                                 "properties": {
                                     "reading": {
                                         "type": "string",
-                                        "description": "Reading for the term or expression."
+                                        "description": "Reading for the term."
                                     },
                                     "frequency": {
                                         "type": ["string", "number"],
-                                        "description": "Frequency information for the term or expression."
+                                        "description": "Frequency information for the term."
                                     }
                                 }
                             }
@@ -59,7 +59,7 @@
                     {"enum": ["pitch"]},
                     {
                         "type": ["object"],
-                        "description": "Pitch accent information for the term or expression.",
+                        "description": "Pitch accent information for the term.",
                         "required": [
                             "reading",
                             "pitches"
@@ -68,7 +68,7 @@
                         "properties": {
                             "reading": {
                                 "type": "string",
-                                "description": "Reading for the term or expression."
+                                "description": "Reading for the term."
                             },
                             "pitches": {
                                 "type": "array",

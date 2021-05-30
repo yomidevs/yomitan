@@ -1,19 +1,19 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "array",
-    "description": "Data file containing term and expression information.",
+    "description": "Data file containing term information.",
     "additionalItems": {
         "type": "array",
-        "description": "Information about a single term/expression.",
+        "description": "Information about a single term.",
         "minItems": 5,
         "items": [
             {
                 "type": "string",
-                "description": "Term or expression."
+                "description": "The text for the term."
             },
             {
                 "type": "string",
-                "description": "Reading of the term/expression, or an empty string if the reading is the same as the term/expression."
+                "description": "Reading of the term, or an empty string if the reading is the same as the term."
             },
             {
                 "type": ["string", "null"],
@@ -30,7 +30,7 @@
         ],
         "additionalItems": {
             "type": "string",
-            "description": "Single definition for the term/expression."
+            "description": "Single definition for the term."
         }
     }
 }
