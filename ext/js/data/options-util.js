@@ -826,16 +826,21 @@ class OptionsUtil {
             sentenceParsing.terminationCharacterMode = sentenceParsing.enableTerminationCharacters ? 'custom' : 'newlines';
             delete sentenceParsing.enableTerminationCharacters;
 
-            const {sources, customSourceType} = audio;
+            const {sources, customSourceUrl, customSourceType, textToSpeechVoice} = audio;
             audio.sources = sources.map((type) => {
                 switch (type) {
+                    case 'text-to-speech':
+                    case 'text-to-speech-reading':
+                        return {type, url: '', voice: textToSpeechVoice};
                     case 'custom':
-                        return (customSourceType === 'json' ? 'custom-json' : 'custom');
+                        return {type: (customSourceType === 'json' ? 'custom-json' : 'custom'), url: customSourceUrl, voice: ''};
                     default:
-                        return type;
+                        return {type, url: '', voice: ''};
                 }
             });
             delete audio.customSourceType;
+            delete audio.customSourceUrl;
+            delete audio.textToSpeechVoice;
         }
         return options;
     }

@@ -2369,72 +2369,6 @@
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">
-                        Text-to-speech voice
-                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <select data-setting="audio.textToSpeechVoice" id="text-to-speech-voice"></select>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    Change which voice is used for text-to-speech audio playback.
-                </p>
-                <div class="horizontal-flex">
-                    <input type="text" value="よみちゃん" id="text-to-speech-voice-test-text" autocomplete="off" lang="ja">
-                    <button id="text-to-speech-voice-test">Test</button>
-                    <a class="more-toggle" data-parent-distance="3">Hide&hellip;</a>
-                </div>
-            </div>
-        </div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Custom audio source
-                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <div class="settings-item-group">
-                        <div class="settings-item-group-item">
-                            <div class="settings-item-group-item-label">URL</div>
-                            <input class="short-height" type="text" spellcheck="false" autocomplete="off" data-setting="audio.customSourceUrl" placeholder="None">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    The <em>URL</em> property specifies the URL format used for fetching audio clips in <em>Custom</em> mode.
-                    The replacement tags <code data-select-on-click="">{term}</code> and <code data-select-on-click="">{reading}</code> can be used to specify which
-                    term and reading is being looked up.<br>
-                </p>
-                <p>
-                    The <em>Type</em> property specifies how the URL is handled when looking up audio:
-                </p>
-                <ul>
-                    <li>
-                        <strong>Audio</strong> - The link is treated as a direct link to an audio file that the browser can play.
-                    </li>
-                    <li>
-                        <strong>JSON</strong> - The link is interpreted as a link to a JSON file, which is downloaded and parsed for audio URLs.
-                        The format of the JSON file is specified in <a href="/data/schemas/custom-audio-list-schema.json" target="_blank" rel="noopener noreferrer">this schema file</a>.
-                    </li>
-                </ul>
-                <p>
-                    Example URL: <a data-select-on-click="">http://localhost/audio.mp3?term={term}&amp;reading={reading}</a>
-                </p>
-                <p>
-                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-        </div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
                         Audio sources
                         <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
                     </div>
@@ -2505,19 +2439,47 @@
     </div>
 </div></div>
 
+<div id="audio-source-help-text-to-speech-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+    <div class="modal-header">
+        <div class="modal-title">Audio Source - Text-to-speech</div>
+    </div>
+    <div class="modal-body">
+        <p>
+            A synthesized voice will speak the given text, using either the term text or the reading.
+        </p>
+        <div class="horizontal-flex margin-above">
+            <input type="text" value="よみちゃん" id="text-to-speech-voice-test-text" autocomplete="off" lang="ja">
+            <button id="text-to-speech-voice-test">Test</button>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
 
 <!-- Audio templates -->
-<template id="audio-source-template"><div class="audio-source horizontal-flex">
-    <div class="generic-list-index-prefix"></div>
-    <select class="audio-source-select horizontal-flex-fill">
-        <option value="jpod101">JapanesePod101</option>
-        <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
-        <option value="jisho">Jisho.org</option>
-        <option value="text-to-speech">Text-to-speech</option>
-        <option value="text-to-speech-reading">Text-to-speech (Kana reading)</option>
-        <option value="custom">Custom URL</option>
-        <option value="custom-json">Custom URL (JSON)</option>
-    </select>
+<template id="audio-source-template"><div class="audio-source">
+    <div class="audio-source-index generic-list-index-prefix"></div>
+    <div class="audio-source-inner">
+        <select class="audio-source-type-select">
+            <option value="jpod101">JapanesePod101</option>
+            <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
+            <option value="jisho">Jisho.org</option>
+            <option value="text-to-speech">Text-to-speech</option>
+            <option value="text-to-speech-reading">Text-to-speech (Kana reading)</option>
+            <option value="custom">Custom URL</option>
+            <option value="custom-json">Custom URL (JSON)</option>
+        </select>
+        <div class="audio-source-parameter-container" data-field="url" hidden>
+            <span class="audio-source-parameter-label">URL:</span>
+            <input type="text" class="audio-source-parameter">
+        </div>
+        <div class="audio-source-parameter-container" data-field="voice" hidden>
+            <span class="audio-source-parameter-label">Voice:</span>
+            <select class="audio-source-parameter"></select>
+        </div>
+    </div>
     <button class="icon-button audio-source-menu-button" data-menu="audio-source-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
 </div></template>
 

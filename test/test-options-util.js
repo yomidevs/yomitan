@@ -104,11 +104,11 @@ function createProfileOptionsTestData1() {
         },
         audio: {
             enabled: true,
-            sources: ['jpod101'],
+            sources: ['jpod101', 'text-to-speech', 'custom'],
             volume: 100,
             autoPlay: false,
             customSourceUrl: 'http://localhost/audio.mp3?term={expression}&reading={reading}',
-            textToSpeechVoice: ''
+            textToSpeechVoice: 'example-voice'
         },
         scanning: {
             middleMouse: true,
@@ -306,11 +306,25 @@ function createProfileOptionsUpdatedTestData1() {
         },
         audio: {
             enabled: true,
-            sources: ['jpod101'],
+            sources: [
+                {
+                    type: 'jpod101',
+                    url: '',
+                    voice: ''
+                },
+                {
+                    type: 'text-to-speech',
+                    url: '',
+                    voice: 'example-voice'
+                },
+                {
+                    type: 'custom',
+                    url: 'http://localhost/audio.mp3?term={term}&reading={reading}',
+                    voice: ''
+                }
+            ],
             volume: 100,
-            autoPlay: false,
-            customSourceUrl: 'http://localhost/audio.mp3?term={term}&reading={reading}',
-            textToSpeechVoice: ''
+            autoPlay: false
         },
         scanning: {
             touchInputEnabled: true,

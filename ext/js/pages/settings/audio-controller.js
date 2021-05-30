@@ -19,15 +19,17 @@
  * AudioSystem
  */
 
-class AudioController {
+class AudioController extends EventDispatcher {
     constructor(settingsController, modalController) {
+        super();
         this._settingsController = settingsController;
         this._modalController = modalController;
         this._audioSystem = new AudioSystem();
         this._audioSourceContainer = null;
         this._audioSourceAddButton = null;
         this._audioSourceEntries = [];
-        this._ttsVoiceTestTextInput = null;
+        this._voiceTestTextInput = null;
+        this._voices = [];
     }
 
     get settingsController() {
@@ -41,7 +43,7 @@ class AudioController {
     async prepare() {
         this._audioSystem.prepare();
 
-        this._ttsVoiceTestTextInput = document.querySelector('#text-to-speech-voice-test-text');
+        this._voiceTestTextInput = document.querySelector('#text-to-speech-voice-test-text');
         this._audioSourceContainer = document.querySelector('#audio-source-list');
         this._audioSourceAddButton = document.querySelector('#audio-source-add');
         this._audioSourceContainer.textContent = '';
@@ -76,6 +78,14 @@ class AudioController {
         }]);
     }
 
+    getVoices() {
+        return this._voices;
+    }
+
+    setTestVoice(voice) {
+        this._voiceTestTextInput.dataset.voice = voice;
+    }
+
     // Private
 
     _onOptionsChanged({options}) {
@@ -96,9 +106,8 @@ class AudioController {
 
     _onTestTextToSpeech() {
         try {
-            const text = this._ttsVoiceTestTextInput.value || '';
-            const voiceUri = document.querySelector('[data-setting="audio.textToSpeechVoice"]').value;
-
+            const text = this._voiceTestTextInput.value || '';
+            const voiceUri = this._voiceTestTextInput.dataset.voice;
             const audio = this._audioSystem.createTextToSpeechAudio(text, voiceUri);
             audio.volume = 1.0;
             audio.play();
@@ -118,25 +127,8 @@ class AudioController {
             []
         );
         voices.sort(this._textToSpeechVoiceCompare.bind(this));
-
-        for (const select of document.querySelectorAll('[data-setting="audio.textToSpeechVoice"]')) {
-            const fragment = document.createDocumentFragment();
-
-            let option = document.createElement('option');
-            option.value = '';
-            option.textContent = 'None';
-            fragment.appendChild(option);
-
-            for (const {voice} of voices) {
-                option = document.createElement('option');
-                option.value = voice.voiceURI;
-                option.textContent = `${voice.name} (${voice.lang})`;
-                fragment.appendChild(option);
-            }
-
-            select.textContent = '';
-            select.appendChild(fragment);
-        }
+        this._voices = voices;
+        this.trigger('voicesUpdated');
     }
 
     _textToSpeechVoiceCompare(a, b) {
@@ -163,9 +155,9 @@ class AudioController {
         );
     }
 
-    _createAudioSourceEntry(index, type) {
+    _createAudioSourceEntry(index, source) {
         const node = this._settingsController.instantiateTemplate('audio-source');
-        const entry = new AudioSourceEntry(this, index, type, node);
+        const entry = new AudioSourceEntry(this, index, source, node);
         this._audioSourceEntries.push(entry);
         this._audioSourceContainer.appendChild(node);
         entry.prepare();
@@ -188,25 +180,31 @@ class AudioController {
 
     async _addAudioSource() {
         const type = this._getUnusedAudioSourceType();
+        const source = {type, url: '', voice: ''};
         const index = this._audioSourceEntries.length;
-        this._createAudioSourceEntry(index, type);
+        this._createAudioSourceEntry(index, source);
         await this._settingsController.modifyProfileSettings([{
             action: 'splice',
             path: 'audio.sources',
             start: index,
             deleteCount: 0,
-            items: [type]
+            items: [source]
         }]);
     }
 }
 
 class AudioSourceEntry {
-    constructor(parent, index, type, node) {
+    constructor(parent, index, source, node) {
         this._parent = parent;
         this._index = index;
-        this._type = type;
+        this._type = source.type;
+        this._url = source.url;
+        this._voice = source.voice;
         this._node = node;
         this._eventListeners = new EventListenerCollection();
+        this._typeSelect = null;
+        this._urlInput = null;
+        this._voiceSelect = null;
     }
 
     get index() {
@@ -222,14 +220,23 @@ class AudioSourceEntry {
     }
 
     prepare() {
-        const select = this._node.querySelector('.audio-source-select');
+        this._updateTypeParameter();
+
         const menuButton = this._node.querySelector('.audio-source-menu-button');
+        this._typeSelect = this._node.querySelector('.audio-source-type-select');
+        this._urlInput = this._node.querySelector('.audio-source-parameter-container[data-field=url] .audio-source-parameter');
+        this._voiceSelect = this._node.querySelector('.audio-source-parameter-container[data-field=voice] .audio-source-parameter');
 
-        select.value = this._type;
+        this._typeSelect.value = this._type;
+        this._urlInput.value = this._url;
 
-        this._eventListeners.addEventListener(select, 'change', this._onAudioSourceSelectChange.bind(this), false);
+        this._eventListeners.addEventListener(this._typeSelect, 'change', this._onTypeSelectChange.bind(this), false);
+        this._eventListeners.addEventListener(this._urlInput, 'change', this._onUrlInputChange.bind(this), false);
+        this._eventListeners.addEventListener(this._voiceSelect, 'change', this._onVoiceSelectChange.bind(this), false);
         this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
         this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this), false);
+        this._eventListeners.on(this._parent, 'voicesUpdated', this._onVoicesUpdated.bind(this));
+        this._onVoicesUpdated();
     }
 
     cleanup() {
@@ -241,8 +248,38 @@ class AudioSourceEntry {
 
     // Private
 
-    _onAudioSourceSelectChange(event) {
-        this._setType(event.currentTarget.value);
+    _onVoicesUpdated() {
+        const voices = this._parent.getVoices();
+
+        const fragment = document.createDocumentFragment();
+
+        let option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'None';
+        fragment.appendChild(option);
+
+        for (const {voice} of voices) {
+            option = document.createElement('option');
+            option.value = voice.voiceURI;
+            option.textContent = `${voice.name} (${voice.lang})`;
+            fragment.appendChild(option);
+        }
+
+        this._voiceSelect.textContent = '';
+        this._voiceSelect.appendChild(fragment);
+        this._voiceSelect.value = this._voice;
+    }
+
+    _onTypeSelectChange(e) {
+        this._setType(e.currentTarget.value);
+    }
+
+    _onUrlInputChange(e) {
+        this._setUrl(e.currentTarget.value);
+    }
+
+    _onVoiceSelectChange(e) {
+        this._setVoice(e.currentTarget.value);
     }
 
     _onMenuOpen(e) {
@@ -252,6 +289,8 @@ class AudioSourceEntry {
         switch (this._type) {
             case 'custom':
             case 'custom-json':
+            case 'text-to-speech':
+            case 'text-to-speech-reading':
                 hasHelp = true;
                 break;
         }
@@ -272,7 +311,35 @@ class AudioSourceEntry {
 
     async _setType(value) {
         this._type = value;
-        await this._parent.settingsController.setProfileSetting(`audio.sources[${this._index}]`, value);
+        this._updateTypeParameter();
+        await this._parent.settingsController.setProfileSetting(`audio.sources[${this._index}].type`, value);
+    }
+
+    async _setUrl(value) {
+        this._url = value;
+        await this._parent.settingsController.setProfileSetting(`audio.sources[${this._index}].url`, value);
+    }
+
+    async _setVoice(value) {
+        this._voice = value;
+        await this._parent.settingsController.setProfileSetting(`audio.sources[${this._index}].voice`, value);
+    }
+
+    _updateTypeParameter() {
+        let field = null;
+        switch (this._type) {
+            case 'custom':
+            case 'custom-json':
+                field = 'url';
+                break;
+            case 'text-to-speech':
+            case 'text-to-speech-reading':
+                field = 'voice';
+                break;
+        }
+        for (const node of this._node.querySelectorAll('.audio-source-parameter-container')) {
+            node.hidden = (field === null || node.dataset.field !== field);
+        }
     }
 
     _showHelp(type) {
@@ -282,6 +349,11 @@ class AudioSourceEntry {
                 break;
             case 'custom-json':
                 this._showModal('audio-source-help-custom-json');
+                break;
+            case 'text-to-speech':
+            case 'text-to-speech-reading':
+                this._parent.setTestVoice(this._voice);
+                this._showModal('audio-source-help-text-to-speech');
                 break;
         }
     }

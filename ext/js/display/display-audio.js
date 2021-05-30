@@ -146,7 +146,7 @@ class DisplayAudio {
 
     _onOptionsUpdated({options}) {
         if (options === null) { return; }
-        const {enabled, autoPlay, textToSpeechVoice, customSourceUrl, volume, sources} = options.audio;
+        const {enabled, autoPlay, volume, sources} = options.audio;
         this._autoPlay = enabled && autoPlay;
         this._playbackVolume = Number.isFinite(volume) ? Math.max(0.0, Math.min(1.0, volume / 100.0)) : 1.0;
 
@@ -155,13 +155,14 @@ class DisplayAudio {
             'jpod101-alternate',
             'jisho'
         ]);
+        const nameMap = new Map();
         this._audioSources.length = 0;
-        for (const type of sources) {
-            this._addAudioSourceInfo(type, customSourceUrl, textToSpeechVoice, true);
+        for (const {type, url, voice} of sources) {
+            this._addAudioSourceInfo(type, url, voice, true, nameMap);
             requiredAudioSources.delete(type);
         }
         for (const type of requiredAudioSources) {
-            this._addAudioSourceInfo(type, '', '', false);
+            this._addAudioSourceInfo(type, '', '', false, nameMap);
         }
 
         const data = document.documentElement.dataset;
@@ -170,20 +171,36 @@ class DisplayAudio {
         this._cache.clear();
     }
 
-    _addAudioSourceInfo(type, url, voice, isInOptions) {
+    _addAudioSourceInfo(type, url, voice, isInOptions, nameMap) {
         const index = this._audioSources.length;
         const downloadable = this._sourceIsDownloadable(type);
-        let displayName = this._audioSourceTypeNames.get(type);
-        if (typeof displayName === 'undefined') { displayName = 'Unknown'; }
-        this._audioSources.push({
+        let name = this._audioSourceTypeNames.get(type);
+        if (typeof name === 'undefined') { name = 'Unknown'; }
+
+        let entries = nameMap.get(name);
+        if (typeof entries === 'undefined') {
+            entries = [];
+            nameMap.set(name, entries);
+        }
+        const nameIndex = entries.length;
+        if (nameIndex === 1) {
+            entries[0].nameUnique = false;
+        }
+
+        const source = {
             index,
             type,
             url,
             voice,
             isInOptions,
             downloadable,
-            displayName
-        });
+            name,
+            nameIndex,
+            nameUnique: (nameIndex === 0)
+        };
+
+        entries.push(source);
+        this._audioSources.push(source);
     }
 
     _onAudioPlayButtonClick(dictionaryEntryIndex, headwordIndex, e) {
@@ -580,19 +597,23 @@ class DisplayAudio {
         let showIcons = false;
         const currentItems = [...menuItemContainer.children];
         for (const source of this._audioSources) {
-            const {index, displayName, isInOptions, downloadable} = source;
+            const {index, name, nameIndex, nameUnique, isInOptions, downloadable} = source;
             const entries = this._getMenuItemEntries(source, term, reading);
             for (let i = 0, ii = entries.length; i < ii; ++i) {
-                const {valid, index: subIndex, name} = entries[i];
+                const {valid, index: subIndex, name: subName} = entries[i];
                 let node = this._getOrCreateMenuItem(currentItems, index, subIndex);
                 if (node === null) {
                     node = displayGenerator.instantiateTemplate('audio-button-popup-menu-item');
                 }
 
                 const labelNode = node.querySelector('.popup-menu-item-audio-button .popup-menu-item-label');
-                let label = displayName;
+                let label = name;
+                if (!nameUnique) {
+                    label = `${label} ${nameIndex + 1}`;
+                    if (ii > 1) { label = `${label} -`; }
+                }
                 if (ii > 1) { label = `${label} ${i + 1}`; }
-                if (typeof name === 'string' && name.length > 0) { label += `: ${name}`; }
+                if (typeof subName === 'string' && subName.length > 0) { label += `: ${subName}`; }
                 labelNode.textContent = label;
 
                 const cardButton = node.querySelector('.popup-menu-item-set-primary-audio-button');

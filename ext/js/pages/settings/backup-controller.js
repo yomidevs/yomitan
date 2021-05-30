@@ -278,11 +278,18 @@ class BackupController {
 
         const audio = options.audio;
         if (isObject(audio)) {
-            const customSourceUrl = audio.customSourceUrl;
-            if (typeof customSourceUrl === 'string' && customSourceUrl.length > 0 && !this._isLocalhostUrl(customSourceUrl)) {
-                warnings.push('audio.customSourceUrl uses a non-localhost URL');
-                if (!dryRun) {
-                    audio.customSourceUrl = '';
+            const sources = audio.sources;
+            if (Array.isArray(sources)) {
+                for (let i = 0, ii = sources.length; i < ii; ++i) {
+                    const source = sources[i];
+                    if (!isObject(source)) { continue; }
+                    const {url} = source;
+                    if (typeof url === 'string' && url.length > 0 && !this._isLocalhostUrl(url)) {
+                        warnings.push(`audio.sources[${i}].url uses a non-localhost URL`);
+                        if (!dryRun) {
+                            sources[i].url = '';
+                        }
+                    }
                 }
             }
         }

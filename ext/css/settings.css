@@ -1312,6 +1312,45 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
 #audio-source-list-empty {
     display: none;
 }
+.audio-source {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    align-content: flex-start;
+    justify-content: flex-start;
+}
+.audio-source-inner {
+    margin: 0 0.375em;
+    flex: 1 1 auto;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    align-content: flex-start;
+    justify-content: flex-start;
+}
+.audio-source-type-select {
+    flex: 1 0 auto;
+    width: calc(var(--input-width-large) + 2em);
+    margin: 0.125em 0;
+}
+.audio-source-parameter-container {
+    margin: 0.125em 0;
+    flex: 1e8 1 auto;
+    flex-flow: row nowrap;
+    align-items: center;
+    align-content: flex-start;
+    justify-content: flex-start;
+}
+.audio-source-parameter-container:not([hidden]) {
+    display: flex;
+}
+.audio-source-parameter-label {
+    flex: 0 0 auto;
+    margin: 0 0.375em;
+}
+.audio-source-parameter {
+    flex: 1 1 auto;
+}
 
 .profile-add-button-container {
     display: flex;
