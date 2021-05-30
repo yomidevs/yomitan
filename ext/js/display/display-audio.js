@@ -352,6 +352,7 @@ class DisplayAudio {
         const headword = this._getHeadword(dictionaryEntryIndex, headwordIndex);
         if (headword === null) { return; }
 
+        const {index} = source;
         const {term, reading} = headword;
         const cacheEntry = this._getCacheItem(term, reading, true);
 
@@ -359,9 +360,9 @@ class DisplayAudio {
         primaryCardAudio = (
             !canToggleOff ||
             primaryCardAudio === null ||
-            primaryCardAudio.source !== source ||
-            primaryCardAudio.index !== subIndex
-        ) ? {index: source.index, subIndex} : null;
+            primaryCardAudio.index !== index ||
+            primaryCardAudio.subIndex !== subIndex
+        ) ? {index: index, subIndex} : null;
         cacheEntry.primaryCardAudio = primaryCardAudio;
 
         if (menu !== null) {
@@ -698,8 +699,9 @@ class DisplayAudio {
         const primaryCardAudioSubIndex = (primaryCardAudio !== null ? primaryCardAudio.subIndex : null);
         const itemGroups = menuBodyNode.querySelectorAll('.popup-menu-item-group');
         for (const node of itemGroups) {
-            const index = Number.parseInt(node.dataset.index, 10);
-            const subIndex = Number.parseInt(node.dataset.subIndex, 10);
+            let {index, subIndex} = node.dataset;
+            index = Number.parseInt(index, 10);
+            subIndex = typeof subIndex === 'string' ? Number.parseInt(subIndex, 10) : null;
             const isPrimaryCardAudio = (index === primaryCardAudioIndex && subIndex === primaryCardAudioSubIndex);
             node.dataset.isPrimaryCardAudio = `${isPrimaryCardAudio}`;
         }

@@ -2067,25 +2067,32 @@ button.footer-notification-close-button {
     opacity: 0;
     transition: opacity var(--animation-duration) linear;
 }
-.popup-menu-item-group:hover .popup-menu-item-set-primary-audio-button .popup-menu-item-icon {
+.popup-menu-item-audio-button:hover~.popup-menu-item-set-primary-audio-button .popup-menu-item-icon,
+.popup-menu-item-audio-button:active~.popup-menu-item-set-primary-audio-button .popup-menu-item-icon,
+.popup-menu-item-audio-button:focus~.popup-menu-item-set-primary-audio-button .popup-menu-item-icon {
     opacity: 0.25;
 }
-.popup-menu-item-group .popup-menu-item-set-primary-audio-button:hover .popup-menu-item-icon,
-.popup-menu-item-group .popup-menu-item-set-primary-audio-button:active .popup-menu-item-icon,
-.popup-menu-item-group .popup-menu-item-set-primary-audio-button:focus .popup-menu-item-icon {
+.popup-menu-item-set-primary-audio-button:hover .popup-menu-item-icon,
+.popup-menu-item-set-primary-audio-button:active .popup-menu-item-icon,
+.popup-menu-item-set-primary-audio-button:focus .popup-menu-item-icon {
     opacity: 0.375;
 }
-.popup-menu-item-group .popup-menu-item-set-primary-audio-button:focus:not(:focus-visible) .popup-menu-item-icon {
+.popup-menu-item-set-primary-audio-button:focus:not(:focus-visible) .popup-menu-item-icon {
     opacity: 0;
 }
-.popup-menu-item-group .popup-menu-item-set-primary-audio-button:hover:not(:focus-visible) .popup-menu-item-icon,
-.popup-menu-item-group .popup-menu-item-set-primary-audio-button:active:not(:focus-visible) .popup-menu-item-icon {
+.popup-menu-item-audio-button:hover~.popup-menu-item-set-primary-audio-button:not(:focus-visible) .popup-menu-item-icon,
+.popup-menu-item-audio-button:active~.popup-menu-item-set-primary-audio-button:not(:focus-visible) .popup-menu-item-icon,
+.popup-menu-item-audio-button:focus~.popup-menu-item-set-primary-audio-button:not(:focus-visible) .popup-menu-item-icon {
+    opacity: 0.25;
+}
+.popup-menu-item-set-primary-audio-button:hover:not(:focus-visible) .popup-menu-item-icon,
+.popup-menu-item-set-primary-audio-button:active:not(:focus-visible) .popup-menu-item-icon {
     opacity: 0.375;
 }
-.popup-menu-item-group[data-is-primary-card-audio=true] .popup-menu-item-set-primary-audio-button .popup-menu-item-icon,
-.popup-menu-item-group[data-is-primary-card-audio=true] .popup-menu-item-set-primary-audio-button:hover .popup-menu-item-icon,
-.popup-menu-item-group[data-is-primary-card-audio=true] .popup-menu-item-set-primary-audio-button:active .popup-menu-item-icon,
-.popup-menu-item-group[data-is-primary-card-audio=true] .popup-menu-item-set-primary-audio-button:focus .popup-menu-item-icon {
+.popup-menu-item-group[data-is-primary-card-audio=true]>.popup-menu-item-audio-button~.popup-menu-item-set-primary-audio-button .popup-menu-item-icon,
+.popup-menu-item-group[data-is-primary-card-audio=true]>.popup-menu-item-audio-button~.popup-menu-item-set-primary-audio-button:hover .popup-menu-item-icon,
+.popup-menu-item-group[data-is-primary-card-audio=true]>.popup-menu-item-audio-button~.popup-menu-item-set-primary-audio-button:active .popup-menu-item-icon,
+.popup-menu-item-group[data-is-primary-card-audio=true]>.popup-menu-item-audio-button~.popup-menu-item-set-primary-audio-button:focus .popup-menu-item-icon {
     opacity: 1;
 }
 
