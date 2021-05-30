@@ -42,11 +42,11 @@ class AudioSystem extends EventDispatcher {
         return this._fallbackAudio;
     }
 
-    createAudio(url, source) {
+    createAudio(url, sourceType) {
         return new Promise((resolve, reject) => {
             const audio = new Audio(url);
             audio.addEventListener('loadeddata', () => {
-                if (!this._isAudioValid(audio, source)) {
+                if (!this._isAudioValid(audio, sourceType)) {
                     reject(new Error('Could not retrieve audio'));
                 } else {
                     resolve(audio);
@@ -70,8 +70,8 @@ class AudioSystem extends EventDispatcher {
         this.trigger('voiceschanged', e);
     }
 
-    _isAudioValid(audio, source) {
-        switch (source) {
+    _isAudioValid(audio, sourceType) {
+        switch (sourceType) {
             case 'jpod101':
             {
                 const duration = audio.duration;

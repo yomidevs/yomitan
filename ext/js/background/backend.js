@@ -519,8 +519,8 @@ class Backend {
         return this._runCommand(command, params);
     }
 
-    async _onApiGetTermAudioInfoList({source, term, reading, details}) {
-        return await this._audioDownloader.getTermAudioInfoList(source, term, reading, details);
+    async _onApiGetTermAudioInfoList({source, term, reading}) {
+        return await this._audioDownloader.getTermAudioInfoList(source, term, reading);
     }
 
     _onApiSendMessageToFrame({frameId: targetFrameId, action, params}, sender) {
@@ -1742,7 +1742,7 @@ class Backend {
             return null;
         }
 
-        const {sources, preferredAudioIndex, customSourceUrl} = details;
+        const {sources, preferredAudioIndex} = details;
         let data;
         let contentType;
         try {
@@ -1750,13 +1750,7 @@ class Backend {
                 sources,
                 preferredAudioIndex,
                 term,
-                reading,
-                {
-                    textToSpeechVoice: null,
-                    customSourceUrl,
-                    binary: true,
-                    disableCache: true
-                }
+                reading
             ));
         } catch (e) {
             // No audio

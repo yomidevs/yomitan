@@ -25,6 +25,8 @@ class DisplayAudio {
         this._display = display;
         this._audioPlaying = null;
         this._audioSystem = new AudioSystem();
+        this._playbackVolume = 1.0;
+        this._autoPlay = false;
         this._autoPlayAudioTimer = null;
         this._autoPlayAudioDelay = 400;
         this._eventListeners = new EventListenerCollection();
@@ -32,6 +34,16 @@ class DisplayAudio {
         this._menuContainer = document.querySelector('#popup-menus');
         this._entriesToken = {};
         this._openMenus = new Set();
+        this._audioSources = [];
+        this._audioSourceTypeNames = new Map([
+            ['jpod101', 'JapanesePod101'],
+            ['jpod101-alternate', 'JapanesePod101 (Alternate)'],
+            ['jisho', 'Jisho.org'],
+            ['text-to-speech', 'Text-to-speech'],
+            ['text-to-speech-reading', 'Text-to-speech (Kana reading)'],
+            ['custom', 'Custom URL'],
+            ['custom-json', 'Custom URL (JSON)']
+        ]);
     }
 
     get autoPlayAudioDelay() {
@@ -44,11 +56,8 @@ class DisplayAudio {
 
     prepare() {
         this._audioSystem.prepare();
-    }
-
-    updateOptions(options) {
-        const data = document.documentElement.dataset;
-        data.audioEnabled = `${options.audio.enabled && options.audio.sources.length > 0}`;
+        this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
+        this._onOptionsUpdated({options: this._display.getOptions()});
     }
 
     cleanupEntries() {
@@ -68,8 +77,7 @@ class DisplayAudio {
     }
 
     setupEntriesComplete() {
-        const audioOptions = this._getAudioOptions();
-        if (!audioOptions.enabled || !audioOptions.autoPlay) { return; }
+        if (!this._autoPlay) { return; }
 
         this.clearAutoPlayTimer();
 
@@ -103,84 +111,80 @@ class DisplayAudio {
         this._audioPlaying = null;
     }
 
-    async playAudio(dictionaryEntryIndex, headwordIndex, sources=null, sourceDetailsMap=null) {
-        this.stopAudio();
-        this.clearAutoPlayTimer();
-
-        const headword = this._getHeadword(dictionaryEntryIndex, headwordIndex);
-        if (headword === null) {
-            return {audio: null, source: null, valid: false};
-        }
-
-        const buttons = this._getAudioPlayButtons(dictionaryEntryIndex, headwordIndex);
-
-        const {term, reading} = headword;
-        const audioOptions = this._getAudioOptions();
-        const {textToSpeechVoice, customSourceUrl, volume} = audioOptions;
-        if (!Array.isArray(sources)) {
-            ({sources} = audioOptions);
-        }
-        if (!(sourceDetailsMap instanceof Map)) {
-            sourceDetailsMap = null;
-        }
-
-        const progressIndicatorVisible = this._display.progressIndicatorVisible;
-        const overrideToken = progressIndicatorVisible.setOverride(true);
-        try {
-            // Create audio
-            let audio;
-            let title;
-            let source = null;
-            const info = await this._createTermAudio(sources, sourceDetailsMap, term, reading, {textToSpeechVoice, customSourceUrl});
-            const valid = (info !== null);
-            if (valid) {
-                ({audio, source} = info);
-                const sourceIndex = sources.indexOf(source);
-                title = `From source ${1 + sourceIndex}: ${source}`;
-            } else {
-                audio = this._audioSystem.getFallbackAudio();
-                title = 'Could not find audio';
-            }
-
-            // Stop any currently playing audio
-            this.stopAudio();
-
-            // Update details
-            const potentialAvailableAudioCount = this._getPotentialAvailableAudioCount(term, reading);
-            for (const button of buttons) {
-                const titleDefault = button.dataset.titleDefault || '';
-                button.title = `${titleDefault}\n${title}`;
-                this._updateAudioPlayButtonBadge(button, potentialAvailableAudioCount);
-            }
-
-            // Play
-            audio.currentTime = 0;
-            audio.volume = Number.isFinite(volume) ? Math.max(0.0, Math.min(1.0, volume / 100.0)) : 1.0;
-
-            const playPromise = audio.play();
-            this._audioPlaying = audio;
-
-            if (typeof playPromise !== 'undefined') {
-                try {
-                    await playPromise;
-                } catch (e) {
-                    // NOP
+    async playAudio(dictionaryEntryIndex, headwordIndex, sourceType=null) {
+        let sources = this._audioSources;
+        if (sourceType !== null) {
+            sources = [];
+            for (const source of this._audioSources) {
+                if (source.type === sourceType) {
+                    sources.push(source);
                 }
             }
-
-            return {audio, source, valid};
-        } finally {
-            progressIndicatorVisible.clearOverride(overrideToken);
         }
+        await this._playAudio(dictionaryEntryIndex, headwordIndex, sources, null);
     }
 
-    getPrimaryCardAudio(term, reading) {
-        const cacheEntry = this._getCacheItem(term, reading, false);
-        const primaryCardAudio = typeof cacheEntry !== 'undefined' ? cacheEntry.primaryCardAudio : null;
-        return primaryCardAudio;
+    getAnkiNoteMediaAudioDetails(term, reading) {
+        const sources = [];
+        let preferredAudioIndex = null;
+        const primaryCardAudio = this._getPrimaryCardAudio(term, reading);
+        if (primaryCardAudio !== null) {
+            const {index, subIndex} = primaryCardAudio;
+            const source = this._audioSources[index];
+            sources.push(this._getSourceData(source));
+            preferredAudioIndex = subIndex;
+        } else {
+            for (const source of this._audioSources) {
+                if (!source.isInOptions) { continue; }
+                sources.push(this._getSourceData(source));
+            }
+        }
+        return {sources, preferredAudioIndex};
     }
 
     // Private
+
+    _onOptionsUpdated({options}) {
+        if (options === null) { return; }
+        const {enabled, autoPlay, textToSpeechVoice, customSourceUrl, volume, sources} = options.audio;
+        this._autoPlay = enabled && autoPlay;
+        this._playbackVolume = Number.isFinite(volume) ? Math.max(0.0, Math.min(1.0, volume / 100.0)) : 1.0;
+
+        const requiredAudioSources = new Set([
+            'jpod101',
+            'jpod101-alternate',
+            'jisho'
+        ]);
+        this._audioSources.length = 0;
+        for (const type of sources) {
+            this._addAudioSourceInfo(type, customSourceUrl, textToSpeechVoice, true);
+            requiredAudioSources.delete(type);
+        }
+        for (const type of requiredAudioSources) {
+            this._addAudioSourceInfo(type, '', '', false);
+        }
+
+        const data = document.documentElement.dataset;
+        data.audioEnabled = `${enabled && sources.length > 0}`;
+
+        this._cache.clear();
+    }
+
+    _addAudioSourceInfo(type, url, voice, isInOptions) {
+        const index = this._audioSources.length;
+        const downloadable = this._sourceIsDownloadable(type);
+        let displayName = this._audioSourceTypeNames.get(type);
+        if (typeof displayName === 'undefined') { displayName = 'Unknown'; }
+        this._audioSources.push({
+            index,
+            type,
+            url,
+            voice,
+            isInOptions,
+            downloadable,
+            displayName
+        });
+    }
 
     _onAudioPlayButtonClick(dictionaryEntryIndex, headwordIndex, e) {
         e.preventDefault();
@@ -229,29 +233,93 @@ class DisplayAudio {
 
     _getMenuItemSourceInfo(item) {
         const group = item.closest('.popup-menu-item-group');
-        if (group === null) { return null; }
-
-        let {source, index} = group.dataset;
-        if (typeof index !== 'undefined') {
+        if (group !== null) {
+            let {index, subIndex} = group.dataset;
             index = Number.parseInt(index, 10);
+            if (index >= 0 && index < this._audioSources.length) {
+                const source = this._audioSources[index];
+                if (typeof subIndex === 'string') {
+                    subIndex = Number.parseInt(subIndex, 10);
+                } else {
+                    subIndex = null;
+                }
+                return {source, subIndex};
+            }
         }
-        const hasIndex = (Number.isFinite(index) && Math.floor(index) === index);
-        if (!hasIndex) {
-            index = 0;
+        return {source: null, subIndex: null};
+    }
+
+    async _playAudio(dictionaryEntryIndex, headwordIndex, sources, audioInfoListIndex) {
+        this.stopAudio();
+        this.clearAutoPlayTimer();
+
+        const headword = this._getHeadword(dictionaryEntryIndex, headwordIndex);
+        if (headword === null) {
+            return {audio: null, source: null, valid: false};
         }
-        return {source, index, hasIndex};
+
+        const buttons = this._getAudioPlayButtons(dictionaryEntryIndex, headwordIndex);
+
+        const {term, reading} = headword;
+
+        const progressIndicatorVisible = this._display.progressIndicatorVisible;
+        const overrideToken = progressIndicatorVisible.setOverride(true);
+        try {
+            // Create audio
+            let audio;
+            let title;
+            let source = null;
+            let subIndex = 0;
+            const info = await this._createTermAudio(term, reading, sources, audioInfoListIndex);
+            const valid = (info !== null);
+            if (valid) {
+                ({audio, source, subIndex} = info);
+                const sourceIndex = sources.indexOf(source);
+                title = `From source ${1 + sourceIndex}: ${source}`;
+            } else {
+                audio = this._audioSystem.getFallbackAudio();
+                title = 'Could not find audio';
+            }
+
+            // Stop any currently playing audio
+            this.stopAudio();
+
+            // Update details
+            const potentialAvailableAudioCount = this._getPotentialAvailableAudioCount(term, reading);
+            for (const button of buttons) {
+                const titleDefault = button.dataset.titleDefault || '';
+                button.title = `${titleDefault}\n${title}`;
+                this._updateAudioPlayButtonBadge(button, potentialAvailableAudioCount);
+            }
+
+            // Play
+            audio.currentTime = 0;
+            audio.volume = this._playbackVolume;
+
+            const playPromise = audio.play();
+            this._audioPlaying = audio;
+
+            if (typeof playPromise !== 'undefined') {
+                try {
+                    await playPromise;
+                } catch (e) {
+                    // NOP
+                }
+            }
+
+            return {audio, source, subIndex, valid};
+        } finally {
+            progressIndicatorVisible.clearOverride(overrideToken);
+        }
     }
 
     async _playAudioFromSource(dictionaryEntryIndex, headwordIndex, item) {
-        const sourceInfo = this._getMenuItemSourceInfo(item);
-        if (sourceInfo === null) { return; }
-
-        const {source, index, hasIndex} = sourceInfo;
-        const sourceDetailsMap = hasIndex ? new Map([[source, {start: index, end: index + 1}]]) : null;
+        const {source, subIndex} = this._getMenuItemSourceInfo(item);
+        if (source === null) { return; }
 
         try {
             const token = this._entriesToken;
-            const {valid} = await this.playAudio(dictionaryEntryIndex, headwordIndex, [source], sourceDetailsMap);
+            const {valid} = await this._playAudio(dictionaryEntryIndex, headwordIndex, [source], subIndex);
             if (valid && token === this._entriesToken) {
                 this._setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, null, false);
             }
@@ -261,11 +329,8 @@ class DisplayAudio {
     }
 
     _setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, menu, canToggleOff) {
-        const sourceInfo = this._getMenuItemSourceInfo(item);
-        if (sourceInfo === null) { return; }
-
-        const {source, index} = sourceInfo;
-        if (!this._sourceIsDownloadable(source)) { return; }
+        const {source, subIndex} = this._getMenuItemSourceInfo(item);
+        if (source === null || !source.downloadable) { return; }
 
         const headword = this._getHeadword(dictionaryEntryIndex, headwordIndex);
         if (headword === null) { return; }
@@ -274,7 +339,12 @@ class DisplayAudio {
         const cacheEntry = this._getCacheItem(term, reading, true);
 
         let {primaryCardAudio} = cacheEntry;
-        primaryCardAudio = (!canToggleOff || primaryCardAudio === null || primaryCardAudio.source !== source || primaryCardAudio.index !== index) ? {source, index} : null;
+        primaryCardAudio = (
+            !canToggleOff ||
+            primaryCardAudio === null ||
+            primaryCardAudio.source !== source ||
+            primaryCardAudio.index !== subIndex
+        ) ? {index: source.index, subIndex} : null;
         cacheEntry.primaryCardAudio = primaryCardAudio;
 
         if (menu !== null) {
@@ -304,19 +374,19 @@ class DisplayAudio {
         return results;
     }
 
-    async _createTermAudio(sources, sourceDetailsMap, term, reading, details) {
+    async _createTermAudio(term, reading, sources, audioInfoListIndex) {
         const {sourceMap} = this._getCacheItem(term, reading, true);
 
-        for (let i = 0, ii = sources.length; i < ii; ++i) {
-            const source = sources[i];
+        for (const source of sources) {
+            const {index} = source;
 
             let cacheUpdated = false;
             let infoListPromise;
-            let sourceInfo = sourceMap.get(source);
+            let sourceInfo = sourceMap.get(index);
             if (typeof sourceInfo === 'undefined') {
-                infoListPromise = this._getTermAudioInfoList(source, term, reading, details);
+                infoListPromise = this._getTermAudioInfoList(source, term, reading);
                 sourceInfo = {infoListPromise, infoList: null};
-                sourceMap.set(source, sourceInfo);
+                sourceMap.set(index, sourceInfo);
                 cacheUpdated = true;
             }
 
@@ -326,29 +396,29 @@ class DisplayAudio {
                 sourceInfo.infoList = infoList;
             }
 
-            let start = 0;
-            let end = infoList.length;
-
-            if (sourceDetailsMap !== null) {
-                const sourceDetails = sourceDetailsMap.get(source);
-                if (typeof sourceDetails !== 'undefined') {
-                    const {start: start2, end: end2} = sourceDetails;
-                    if (this._isInteger(start2)) { start = this._clamp(start2, start, end); }
-                    if (this._isInteger(end2)) { end = this._clamp(end2, start, end); }
-                }
-            }
-
-            const {result, cacheUpdated: cacheUpdated2} = await this._createAudioFromInfoList(source, infoList, start, end);
+            const {audio, index: subIndex, cacheUpdated: cacheUpdated2} = await this._createAudioFromInfoList(source, infoList, audioInfoListIndex);
             if (cacheUpdated || cacheUpdated2) { this._updateOpenMenu(); }
-            if (result !== null) { return result; }
+            if (audio !== null) {
+                return {audio, source, subIndex};
+            }
         }
 
         return null;
     }
 
-    async _createAudioFromInfoList(source, infoList, start, end) {
-        let result = null;
-        let cacheUpdated = false;
+    async _createAudioFromInfoList(source, infoList, audioInfoListIndex) {
+        let start = 0;
+        let end = infoList.length;
+        if (audioInfoListIndex !== null) {
+            start = Math.max(0, Math.min(end, audioInfoListIndex));
+            end = Math.max(0, Math.min(end, audioInfoListIndex + 1));
+        }
+
+        const result = {
+            audio: null,
+            index: -1,
+            cacheUpdated: false
+        };
         for (let i = start; i < end; ++i) {
             const item = infoList[i];
 
@@ -361,7 +431,7 @@ class DisplayAudio {
                     item.audioPromise = audioPromise;
                 }
 
-                cacheUpdated = true;
+                result.cacheUpdated = true;
 
                 try {
                     audio = await audioPromise;
@@ -375,17 +445,18 @@ class DisplayAudio {
             }
 
             if (audio !== null) {
-                result = {audio, source, infoListIndex: i};
+                result.audio = audio;
+                result.index = i;
                 break;
             }
         }
-        return {result, cacheUpdated};
+        return result;
     }
 
     async _createAudioFromInfo(info, source) {
         switch (info.type) {
             case 'url':
-                return await this._audioSystem.createAudio(info.url, source);
+                return await this._audioSystem.createAudio(info.url, source.type);
             case 'tts':
                 return this._audioSystem.createTextToSpeechAudio(info.text, info.voice);
             default:
@@ -393,8 +464,9 @@ class DisplayAudio {
         }
     }
 
-    async _getTermAudioInfoList(source, term, reading, details) {
-        const infoList = await yomichan.api.getTermAudioInfoList(source, term, reading, details);
+    async _getTermAudioInfoList(source, term, reading) {
+        const sourceData = this._getSourceData(source);
+        const infoList = await yomichan.api.getTermAudioInfoList(sourceData, term, reading);
         return infoList.map((info) => ({info, audioPromise: null, audioResolved: false, audio: null}));
     }
 
@@ -413,22 +485,6 @@ class DisplayAudio {
 
     _getTermReadingKey(term, reading) {
         return JSON.stringify([term, reading]);
-    }
-
-    _getAudioOptions() {
-        return this._display.getOptions().audio;
-    }
-
-    _isInteger(value) {
-        return (
-            typeof value === 'number' &&
-            Number.isFinite(value) &&
-            Math.floor(value) === value
-        );
-    }
-
-    _clamp(value, min, max) {
-        return Math.max(min, Math.min(max, value));
     }
 
     _updateAudioPlayButtonBadge(button, potentialAvailableAudioCount) {
@@ -501,55 +557,6 @@ class DisplayAudio {
         }
     }
 
-    _getAudioSources(audioOptions) {
-        const {sources, textToSpeechVoice, customSourceUrl} = audioOptions;
-        const ttsSupported = (textToSpeechVoice.length > 0);
-        const customSupported = (customSourceUrl.length > 0);
-
-        const sourceIndexMap = new Map();
-        const optionsSourcesCount = sources.length;
-        for (let i = 0; i < optionsSourcesCount; ++i) {
-            sourceIndexMap.set(sources[i], i);
-        }
-
-        const rawSources = [
-            ['jpod101', 'JapanesePod101', true],
-            ['jpod101-alternate', 'JapanesePod101 (Alternate)', true],
-            ['jisho', 'Jisho.org', true],
-            ['text-to-speech', 'Text-to-speech', ttsSupported],
-            ['text-to-speech-reading', 'Text-to-speech (Kana reading)', ttsSupported],
-            ['custom', 'Custom URL', customSupported],
-            ['custom-json', 'Custom URL (JSON)', customSupported]
-        ];
-
-        const results = [];
-        for (const [source, displayName, supported] of rawSources) {
-            if (!supported) { continue; }
-            const downloadable = this._sourceIsDownloadable(source);
-            let optionsIndex = sourceIndexMap.get(source);
-            const isInOptions = typeof optionsIndex !== 'undefined';
-            if (!isInOptions) {
-                optionsIndex = optionsSourcesCount;
-            }
-            results.push({
-                source,
-                displayName,
-                index: results.length,
-                optionsIndex,
-                isInOptions,
-                downloadable
-            });
-        }
-
-        // Sort according to source order in options
-        results.sort((a, b) => {
-            const i = a.optionsIndex - b.optionsIndex;
-            return i !== 0 ? i : a.index - b.index;
-        });
-
-        return results;
-    }
-
     _createMenu(sourceButton, term, reading) {
         // Create menu
         const menuContainerNode = this._display.displayGenerator.instantiateTemplate('audio-button-popup-menu');
@@ -569,15 +576,15 @@ class DisplayAudio {
     }
 
     _createMenuItems(menuContainerNode, menuItemContainer, term, reading) {
-        const sources = this._getAudioSources(this._getAudioOptions());
         const {displayGenerator} = this._display;
         let showIcons = false;
         const currentItems = [...menuItemContainer.children];
-        for (const {source, displayName, isInOptions, downloadable} of sources) {
+        for (const source of this._audioSources) {
+            const {index, displayName, isInOptions, downloadable} = source;
             const entries = this._getMenuItemEntries(source, term, reading);
             for (let i = 0, ii = entries.length; i < ii; ++i) {
-                const {valid, index, name} = entries[i];
-                let node = this._getOrCreateMenuItem(currentItems, source, index);
+                const {valid, index: subIndex, name} = entries[i];
+                let node = this._getOrCreateMenuItem(currentItems, index, subIndex);
                 if (node === null) {
                     node = displayGenerator.instantiateTemplate('audio-button-popup-menu-item');
                 }
@@ -596,9 +603,9 @@ class DisplayAudio {
                     icon.dataset.icon = valid ? 'checkmark' : 'cross';
                     showIcons = true;
                 }
-                node.dataset.source = source;
-                if (index !== null) {
-                    node.dataset.index = `${index}`;
+                node.dataset.index = `${index}`;
+                if (subIndex !== null) {
+                    node.dataset.subIndex = `${subIndex}`;
                 }
                 node.dataset.valid = `${valid}`;
                 node.dataset.sourceInOptions = `${isInOptions}`;
@@ -615,16 +622,16 @@ class DisplayAudio {
         menuContainerNode.dataset.showIcons = `${showIcons}`;
     }
 
-    _getOrCreateMenuItem(currentItems, source, index) {
-        if (index === null) { index = 0; }
+    _getOrCreateMenuItem(currentItems, index, subIndex) {
         index = `${index}`;
+        subIndex = `${subIndex !== null ? subIndex : 0}`;
         for (let i = 0, ii = currentItems.length; i < ii; ++i) {
             const node = currentItems[i];
-            if (source !== node.dataset.source) { continue; }
+            if (index !== node.dataset.index) { continue; }
 
-            let index2 = node.dataset.index;
-            if (typeof index2 === 'undefined') { index2 = '0'; }
-            if (index !== index2) { continue; }
+            let subIndex2 = node.dataset.subIndex;
+            if (typeof subIndex2 === 'undefined') { subIndex2 = '0'; }
+            if (subIndex !== subIndex2) { continue; }
 
             currentItems.splice(i, 1);
             return node;
@@ -636,7 +643,7 @@ class DisplayAudio {
         const cacheEntry = this._getCacheItem(term, reading, false);
         if (typeof cacheEntry !== 'undefined') {
             const {sourceMap} = cacheEntry;
-            const sourceInfo = sourceMap.get(source);
+            const sourceInfo = sourceMap.get(source.index);
             if (typeof sourceInfo !== 'undefined') {
                 const {infoList} = sourceInfo;
                 if (infoList !== null) {
@@ -659,23 +666,20 @@ class DisplayAudio {
         return [{valid: null, index: null, name: null}];
     }
 
+    _getPrimaryCardAudio(term, reading) {
+        const cacheEntry = this._getCacheItem(term, reading, false);
+        return typeof cacheEntry !== 'undefined' ? cacheEntry.primaryCardAudio : null;
+    }
+
     _updateMenuPrimaryCardAudio(menuBodyNode, term, reading) {
-        const primaryCardAudio = this.getPrimaryCardAudio(term, reading);
-        const {source: primaryCardAudioSource, index: primaryCardAudioIndex} = (primaryCardAudio !== null ? primaryCardAudio : {source: null, index: -1});
-
+        const primaryCardAudio = this._getPrimaryCardAudio(term, reading);
+        const primaryCardAudioIndex = (primaryCardAudio !== null ? primaryCardAudio.index : null);
+        const primaryCardAudioSubIndex = (primaryCardAudio !== null ? primaryCardAudio.subIndex : null);
         const itemGroups = menuBodyNode.querySelectorAll('.popup-menu-item-group');
-        let sourceIndex = 0;
-        let sourcePre = null;
         for (const node of itemGroups) {
-            const {source} = node.dataset;
-            if (source !== sourcePre) {
-                sourcePre = source;
-                sourceIndex = 0;
-            } else {
-                ++sourceIndex;
-            }
-
-            const isPrimaryCardAudio = (source === primaryCardAudioSource && sourceIndex === primaryCardAudioIndex);
+            const index = Number.parseInt(node.dataset.index, 10);
+            const subIndex = Number.parseInt(node.dataset.subIndex, 10);
+            const isPrimaryCardAudio = (index === primaryCardAudioIndex && subIndex === primaryCardAudioSubIndex);
             node.dataset.isPrimaryCardAudio = `${isPrimaryCardAudio}`;
         }
     }
@@ -687,5 +691,10 @@ class DisplayAudio {
             this._createMenuItems(menuContainerNode, menu.bodyNode, term, reading);
             menu.updatePosition();
         }
+    }
+
+    _getSourceData(source) {
+        const {type, url, voice} = source;
+        return {type, url, voice};
     }
 }

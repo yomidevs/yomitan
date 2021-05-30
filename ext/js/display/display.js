@@ -296,7 +296,6 @@ class Display extends EventDispatcher {
         this._updateDocumentOptions(options);
         this._updateTheme(options.general.popupTheme);
         this.setCustomCss(options.general.customPopupCss);
-        this._displayAudio.updateOptions(options);
         this._hotkeyHelpController.setOptions(options);
         this._displayGenerator.updateHotkeys();
         this._hotkeyHelpController.setupNode(document.documentElement);
@@ -1330,7 +1329,7 @@ class Display extends EventDispatcher {
     }
 
     async _playAudioCurrent() {
-        return await this._displayAudio.playAudio(this._index, 0);
+        await this._displayAudio.playAudio(this._index, 0);
     }
 
     _getEntry(index) {
@@ -1552,26 +1551,17 @@ class Display extends EventDispatcher {
     }
 
     async _injectAnkiNoteMedia(dictionaryEntry, options, fields) {
-        const {
-            anki: {screenshot: {format, quality}},
-            audio: {sources, customSourceUrl}
-        } = options;
+        const {anki: {screenshot: {format, quality}}} = options;
 
         const timestamp = Date.now();
 
         const dictionaryEntryDetails = this._getDictionaryEntryDetailsForNote(dictionaryEntry);
 
-        let audioDetails = null;
-        if (dictionaryEntryDetails.type !== 'kanji' && AnkiUtil.fieldsObjectContainsMarker(fields, 'audio')) {
-            const primaryCardAudio = this._displayAudio.getPrimaryCardAudio(dictionaryEntryDetails.term, dictionaryEntryDetails.reading);
-            let preferredAudioIndex = null;
-            let sources2 = sources;
-            if (primaryCardAudio !== null) {
-                sources2 = [primaryCardAudio.source];
-                preferredAudioIndex = primaryCardAudio.index;
-            }
-            audioDetails = {sources: sources2, preferredAudioIndex, customSourceUrl};
-        }
+        const audioDetails = (
+            dictionaryEntryDetails.type !== 'kanji' && AnkiUtil.fieldsObjectContainsMarker(fields, 'audio') ?
+            this._displayAudio.getAnkiNoteMediaAudioDetails(dictionaryEntryDetails.term, dictionaryEntryDetails.reading) :
+            null
+        );
 
         const screenshotDetails = (
             AnkiUtil.fieldsObjectContainsMarker(fields, 'screenshot') && typeof this._contentOriginTabId === 'number' ?
@@ -1906,7 +1896,7 @@ class Display extends EventDispatcher {
     }
 
     _onHotkeyActionPlayAudioFromSource(source) {
-        this._displayAudio.playAudio(this._index, 0, [source]);
+        this._displayAudio.playAudio(this._index, 0, source);
     }
 
     _closeAllPopupMenus() {
