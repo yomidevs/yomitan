@@ -98,21 +98,6 @@ function getAllFiles(baseDirectory, predicate=null) {
     return results;
 }
 
-function getDefaultManifest() {
-    const {manifest} = getDefaultManifestAndVariants();
-    return manifest;
-}
-
-function getDefaultManifestAndVariants() {
-    const fileName = path.join(__dirname, 'data', 'manifest-variants.json');
-    const {manifest, variants} = JSON.parse(fs.readFileSync(fileName));
-    return {manifest, variants};
-}
-
-function createManifestString(manifest) {
-    return JSON.stringify(manifest, null, 4) + '\n';
-}
-
 function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
     const fileNames = fs.readdirSync(dictionaryDirectory);
 
@@ -151,9 +136,6 @@ module.exports = {
     get JSZip() { return getJSZip(); },
     getArgs,
     getAllFiles,
-    getDefaultManifest,
-    getDefaultManifestAndVariants,
-    createManifestString,
     createDictionaryArchive,
     testMain
 };

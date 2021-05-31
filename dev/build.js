@@ -21,12 +21,9 @@ const assert = require('assert');
 const readline = require('readline');
 const childProcess = require('child_process');
 const util = require('./util');
-const {getAllFiles, getDefaultManifestAndVariants, createManifestString, getArgs, testMain} = util;
+const {getAllFiles, getArgs, testMain} = util;
+const {ManifestUtil} = require('./manifest-util');
 
-
-function clone(value) {
-    return JSON.parse(JSON.stringify(value));
-}
 
 async function createZip(directory, excludeFiles, outputFileName, sevenZipExes, onUpdate, dryRun) {
     try {
@@ -110,179 +107,7 @@ function getIndexOfFilePath(array, item) {
     return -1;
 }
 
-function applyModifications(manifest, modifications) {
-    if (Array.isArray(modifications)) {
-        for (const modification of modifications) {
-            const {action, path: path2} = modification;
-            switch (action) {
-                case 'set':
-                    {
-                        const {value, before, after} = modification;
-                        const object = getObjectProperties(manifest, path2, path2.length - 1);
-                        const key = path2[path2.length - 1];
-
-                        let {index} = modification;
-                        if (typeof index !== 'number') {
-                            index = -1;
-                        }
-                        if (typeof before === 'string') {
-                            index = getObjectKeyIndex(object, before);
-                        }
-                        if (typeof after === 'string') {
-                            index = getObjectKeyIndex(object, after);
-                            if (index >= 0) { ++index; }
-                        }
-
-                        setObjectKeyAtIndex(object, key, value, index);
-                    }
-                    break;
-                case 'replace':
-                    {
-                        const {pattern, patternFlags, replacement} = modification;
-                        const value = getObjectProperties(manifest, path2, path2.length - 1);
-                        const regex = new RegExp(pattern, patternFlags);
-                        const last = path2[path2.length - 1];
-                        let value2 = value[last];
-                        value2 = `${value2}`.replace(regex, replacement);
-                        value[last] = value2;
-                    }
-                    break;
-                case 'delete':
-                    {
-                        const value = getObjectProperties(manifest, path2, path2.length - 1);
-                        const last = path2[path2.length - 1];
-                        delete value[last];
-                    }
-                    break;
-                case 'remove':
-                    {
-                        const {item} = modification;
-                        const value = getObjectProperties(manifest, path2, path2.length);
-                        const index = value.indexOf(item);
-                        if (index >= 0) { value.splice(index, 1); }
-                    }
-                    break;
-                case 'splice':
-                    {
-                        const {start, deleteCount, items} = modification;
-                        const value = getObjectProperties(manifest, path2, path2.length);
-                        const itemsNew = items.map((v) => clone(v));
-                        value.splice(start, deleteCount, ...itemsNew);
-                    }
-                    break;
-                case 'copy':
-                case 'move':
-                    {
-                        const {newPath, before, after} = modification;
-                        const oldKey = path2[path2.length - 1];
-                        const newKey = newPath[newPath.length - 1];
-                        const oldObject = getObjectProperties(manifest, path2, path2.length - 1);
-                        const newObject = getObjectProperties(manifest, newPath, newPath.length - 1);
-                        const oldObjectIsNewObject = arraysAreSame(path2, newPath, -1);
-                        const value = oldObject[oldKey];
-
-                        let {index} = modification;
-                        if (typeof index !== 'number' || index < 0) {
-                            index = (oldObjectIsNewObject && action !== 'copy') ? getObjectKeyIndex(oldObject, oldKey) : -1;
-                        }
-                        if (typeof before === 'string') {
-                            index = getObjectKeyIndex(newObject, before);
-                        }
-                        if (typeof after === 'string') {
-                            index = getObjectKeyIndex(newObject, after);
-                            if (index >= 0) { ++index; }
-                        }
-
-                        setObjectKeyAtIndex(newObject, newKey, value, index);
-                        if (action !== 'copy' && (!oldObjectIsNewObject || oldKey !== newKey)) {
-                            delete oldObject[oldKey];
-                        }
-                    }
-                    break;
-                case 'add':
-                    {
-                        const {items} = modification;
-                        const value = getObjectProperties(manifest, path2, path2.length);
-                        const itemsNew = items.map((v) => clone(v));
-                        value.push(...itemsNew);
-                    }
-                    break;
-            }
-        }
-    }
-
-    return manifest;
-}
-
-function arraysAreSame(array1, array2, lengthOffset) {
-    let ii = array1.length;
-    if (ii !== array2.length) { return false; }
-    ii += lengthOffset;
-    for (let i = 0; i < ii; ++i) {
-        if (array1[i] !== array2[i]) { return false; }
-    }
-    return true;
-}
-
-function getObjectKeyIndex(object, key) {
-    return Object.keys(object).indexOf(key);
-}
-
-function setObjectKeyAtIndex(object, key, value, index) {
-    if (index < 0 || typeof key === 'number' || Object.prototype.hasOwnProperty.call(object, key)) {
-        object[key] = value;
-        return;
-    }
-
-    const entries = Object.entries(object);
-    index = Math.min(index, entries.length);
-    for (let i = index, ii = entries.length; i < ii; ++i) {
-        const [key2] = entries[i];
-        delete object[key2];
-    }
-    entries.splice(index, 0, [key, value]);
-    for (let i = index, ii = entries.length; i < ii; ++i) {
-        const [key2, value2] = entries[i];
-        object[key2] = value2;
-    }
-}
-
-function getObjectProperties(object, path2, count) {
-    for (let i = 0; i < count; ++i) {
-        object = object[path2[i]];
-    }
-    return object;
-}
-
-function getInheritanceChain(variant, variantMap) {
-    const visited = new Set();
-    const inheritance = [];
-    while (true) {
-        const {name, inherit} = variant;
-        if (visited.has(name)) { break; }
-
-        visited.add(name);
-        inheritance.unshift(variant);
-
-        if (typeof inherit !== 'string') { break; }
-
-        const nextVariant = variantMap.get(inherit);
-        if (typeof nextVariant === 'undefined') { break; }
-
-        variant = nextVariant;
-    }
-    return inheritance;
-}
-
-function createVariantManifest(manifest, variant, variantMap) {
-    let modifiedManifest = clone(manifest);
-    for (const {modifications} of getInheritanceChain(variant, variantMap)) {
-        modifiedManifest = applyModifications(modifiedManifest, modifications);
-    }
-    return modifiedManifest;
-}
-
-async function build(manifest, buildDir, extDir, manifestPath, variantMap, variantNames, dryRun, dryRunBuildZip) {
+async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath, dryRun, dryRunBuildZip) {
     const sevenZipExes = ['7za', '7z'];
 
     // Create build directory
@@ -305,8 +130,8 @@ async function build(manifest, buildDir, extDir, manifestPath, variantMap, varia
     };
 
     for (const variantName of variantNames) {
-        const variant = variantMap.get(variantName);
-        if (typeof variant === 'undefined') { continue; }
+        const variant = manifestUtil.getVariant(variantName);
+        if (typeof variant === 'undefined' || variant.buildable === false) { continue; }
 
         const {name, fileName, fileCopies} = variant;
         let {excludeFiles} = variant;
@@ -314,13 +139,13 @@ async function build(manifest, buildDir, extDir, manifestPath, variantMap, varia
 
         process.stdout.write(`Building ${name}...\n`);
 
-        const modifiedManifest = createVariantManifest(manifest, variant, variantMap);
+        const modifiedManifest = manifestUtil.getManifest(variant.name);
 
         const fileNameSafe = path.basename(fileName);
         const fullFileName = path.join(buildDir, fileNameSafe);
         ensureFilesExist(extDir, excludeFiles);
         if (!dryRun) {
-            fs.writeFileSync(manifestPath, createManifestString(modifiedManifest));
+            fs.writeFileSync(manifestPath, ManifestUtil.createManifestString(modifiedManifest));
         }
 
         if (!dryRun || dryRunBuildZip) {
@@ -360,33 +185,27 @@ async function main(argv) {
     const dryRun = args.get('dry-run');
     const dryRunBuildZip = args.get('dry-run-build-zip');
 
-    const {manifest, variants} = getDefaultManifestAndVariants();
+    const manifestUtil = new ManifestUtil();
 
     const rootDir = path.join(__dirname, '..');
     const extDir = path.join(rootDir, 'ext');
     const buildDir = path.join(rootDir, 'builds');
     const manifestPath = path.join(extDir, 'manifest.json');
 
-    const variantMap = new Map();
-    for (const variant of variants) {
-        variantMap.set(variant.name, variant);
-    }
-
     try {
-        const variantNames = (argv.length === 0 || args.get('all') ? variants.map(({name}) => name) : args.get(null));
-        await build(manifest, buildDir, extDir, manifestPath, variantMap, variantNames, dryRun, dryRunBuildZip);
+        const variantNames = (
+            argv.length === 0 || args.get('all') ?
+            manifestUtil.getVariants().filter(({buildable}) => buildable !== false).map(({name}) => name) :
+            args.get(null)
+        );
+        await build(buildDir, extDir, manifestUtil, variantNames, manifestPath, dryRun, dryRunBuildZip);
     } finally {
         // Restore manifest
-        let restoreManifest = manifest;
-        if (!args.get('default') && args.get('manifest') !== null) {
-            const variant = variantMap.get(args.get('manifest'));
-            if (typeof variant !== 'undefined') {
-                restoreManifest = createVariantManifest(manifest, variant, variantMap);
-            }
-        }
+        const manifestName = (!args.get('default') && args.get('manifest') !== null) ? args.get('manifest') : null;
+        const restoreManifest = manifestUtil.getManifest(manifestName);
         process.stdout.write('Restoring manifest...\n');
         if (!dryRun) {
-            fs.writeFileSync(manifestPath, createManifestString(restoreManifest));
+            fs.writeFileSync(manifestPath, ManifestUtil.createManifestString(restoreManifest));
         }
     }
 }

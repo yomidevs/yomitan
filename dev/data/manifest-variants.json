@@ -116,9 +116,15 @@
         ],
         "content_security_policy": "default-src 'self'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
     },
+    "defaultVariant": "base",
     "variants": [
         {
+            "name": "base",
+            "buildable": false
+        },
+        {
             "name": "chrome",
+            "inherit": "base",
             "fileName": "yomichan-chrome.zip",
             "excludeFiles": [
                 "sw.js",
@@ -128,6 +134,7 @@
         },
         {
             "name": "chrome-dev",
+            "inherit": "chrome",
             "fileName": "yomichan-chrome-dev.zip",
             "modifications": [
                 {
@@ -144,15 +151,11 @@
                     "patternFlags": "",
                     "replacement": "$1. This is a development build; get the stable version here: https://tinyurl.com/yaatdjmp"
                 }
-            ],
-            "excludeFiles": [
-                "sw.js",
-                "js/dom/simple-dom-parser.js",
-                "lib/parse5.js"
             ]
         },
         {
             "name": "chrome-mv3",
+            "inherit": "base",
             "fileName": "yomichan-chrome-mv3.zip",
             "modifications": [
                 {"action": "set",    "path": ["manifest_version"], "value": 3},
@@ -180,6 +183,7 @@
         },
         {
             "name": "firefox",
+            "inherit": "base",
             "fileName": "yomichan-firefox.xpi",
             "modifications": [
                 {

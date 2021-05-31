@@ -18,7 +18,8 @@
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
-const {getDefaultManifest, createManifestString, testMain} = require('../dev/util');
+const {testMain} = require('../dev/util');
+const {ManifestUtil} = require('../dev/manifest-util');
 
 
 function loadManifestString() {
@@ -27,8 +28,9 @@ function loadManifestString() {
 }
 
 function validateManifest() {
+    const manifestUtil = new ManifestUtil();
     const manifest1 = loadManifestString();
-    const manifest2 = createManifestString(getDefaultManifest());
+    const manifest2 = ManifestUtil.createManifestString(manifestUtil.getManifest());
     assert.strictEqual(manifest1, manifest2, 'Manifest data does not match.');
 }
 
