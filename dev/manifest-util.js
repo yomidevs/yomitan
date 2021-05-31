@@ -72,13 +72,14 @@ class ManifestUtil {
 
     _evaluateModificationCommand(data) {
         const {command, args, trim} = data;
-        const {stdout, status} = childProcess.spawnSync(command, args, {
+        const {stdout, stderr, status} = childProcess.spawnSync(command, args, {
             cwd: __dirname,
             stdio: 'pipe',
             shell: false
         });
         if (status !== 0) {
-            throw new Error(`Failed to execute ${command} ${args.join(' ')}`);
+            const message = stderr.toString('utf8').trim();
+            throw new Error(`Failed to execute ${command} ${args.join(' ')}\nstatus=${status}\n${message}`);
         }
         let result = stdout.toString('utf8');
         if (trim) { result = result.trim(); }
