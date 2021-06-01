@@ -13,13 +13,6 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: '12.x'
-    - name: Set up git
-      run: |
-        sudo apt-get install -y git
-        git --version
-        git fetch origin $(git branch --show-current) --unshallow --tags > /dev/null 2> /dev/null
-        git status
-        git describe
     - name: Install dependencies
       run: npm ci
     - name: Lint
