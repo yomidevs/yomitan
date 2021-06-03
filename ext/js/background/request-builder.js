@@ -109,7 +109,7 @@ class RequestBuilder {
 
     _getMatchURL(url) {
         const url2 = new URL(url);
-        return `${url2.protocol}//${url2.host}${url2.pathname}`;
+        return `${url2.protocol}//${url2.host}${url2.pathname}${url2.search}`.replace(/\*/g, '%2a');
     }
 
     _getOriginURL(url) {
