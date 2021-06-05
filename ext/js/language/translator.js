@@ -85,13 +85,14 @@ class Translator {
      *         priority: (number),
      *         allowSecondarySearches: (boolean)
      *       }
-     *     ])
+     *     ]),
+     *     excludeDictionaryDefinitions: (Set of (string) or null)
      *   }
      * ```
      * @returns An object of the structure `{dictionaryEntries, originalTextLength}`.
      */
     async findTerms(mode, text, options) {
-        const {enabledDictionaryMap} = options;
+        const {enabledDictionaryMap, excludeDictionaryDefinitions} = options;
         let {dictionaryEntries, originalTextLength} = await this._findTermsInternal(text, enabledDictionaryMap, options);
 
         switch (mode) {
@@ -101,6 +102,10 @@ class Translator {
             case 'merge':
                 dictionaryEntries = await this._getRelatedDictionaryEntries(dictionaryEntries, options.mainDictionary, enabledDictionaryMap);
                 break;
+        }
+
+        if (excludeDictionaryDefinitions !== null) {
+            this._removeExcludedDefinitions(dictionaryEntries, excludeDictionaryDefinitions);
         }
 
         if (dictionaryEntries.length > 1) {
@@ -490,6 +495,101 @@ class Translator {
             newDictionaryEntries.push(this._createGroupedDictionaryEntry(groupDictionaryEntries, false));
         }
         return newDictionaryEntries;
+    }
+
+    _removeExcludedDefinitions(dictionaryEntries, excludeDictionaryDefinitions) {
+        for (let i = dictionaryEntries.length - 1; i >= 0; --i) {
+            const dictionaryEntry = dictionaryEntries[i];
+            const {definitions, pronunciations, frequencies, headwords} = dictionaryEntry;
+            const definitionsChanged = this._removeArrayItemsWithDictionary(definitions, excludeDictionaryDefinitions);
+            this._removeArrayItemsWithDictionary(pronunciations, excludeDictionaryDefinitions);
+            this._removeArrayItemsWithDictionary(frequencies, excludeDictionaryDefinitions);
+            this._removeTagGroupsWithDictionary(definitions, excludeDictionaryDefinitions);
+            this._removeTagGroupsWithDictionary(headwords, excludeDictionaryDefinitions);
+
+            if (!definitionsChanged) { continue; }
+
+            if (definitions.length === 0) {
+                dictionaryEntries.splice(i, 1);
+            } else {
+                this._removeUnusedHeadwords(dictionaryEntry);
+            }
+        }
+    }
+
+    _removeUnusedHeadwords(dictionaryEntry) {
+        const {definitions, pronunciations, frequencies, headwords} = dictionaryEntry;
+        const removeHeadwordIndices = new Set();
+        for (let i = 0, ii = headwords.length; i < ii; ++i) {
+            removeHeadwordIndices.add(i);
+        }
+        for (const {headwordIndices} of definitions) {
+            for (const headwordIndex of headwordIndices) {
+                removeHeadwordIndices.delete(headwordIndex);
+            }
+        }
+
+        if (removeHeadwordIndices.size === 0) { return; }
+
+        const indexRemap = new Map();
+        let oldIndex = 0;
+        for (let i = 0, ii = headwords.length; i < ii; ++i) {
+            if (removeHeadwordIndices.has(i)) {
+                headwords.splice(i, 1);
+                --i;
+                --ii;
+            } else {
+                indexRemap.set(oldIndex, indexRemap.size);
+            }
+            ++oldIndex;
+        }
+
+        this._updateDefinitionHeadwordIndices(definitions, indexRemap);
+        this._updateArrayItemsHeadwordIndex(pronunciations, indexRemap);
+        this._updateArrayItemsHeadwordIndex(frequencies, indexRemap);
+    }
+
+    _updateDefinitionHeadwordIndices(definitions, indexRemap) {
+        for (const {headwordIndices} of definitions) {
+            for (let i = headwordIndices.length - 1; i >= 0; --i) {
+                const newHeadwordIndex = indexRemap.get(headwordIndices[i]);
+                if (typeof newHeadwordIndex === 'undefined') {
+                    headwordIndices.splice(i, 1);
+                } else {
+                    headwordIndices[i] = newHeadwordIndex;
+                }
+            }
+        }
+    }
+
+    _updateArrayItemsHeadwordIndex(array, indexRemap) {
+        for (let i = array.length - 1; i >= 0; --i) {
+            const item = array[i];
+            const {headwordIndex} = item;
+            const newHeadwordIndex = indexRemap.get(headwordIndex);
+            if (typeof newHeadwordIndex === 'undefined') {
+                array.splice(i, 1);
+            } else {
+                item.headwordIndex = newHeadwordIndex;
+            }
+        }
+    }
+
+    _removeArrayItemsWithDictionary(array, excludeDictionaryDefinitions) {
+        let changed = false;
+        for (let j = array.length - 1; j >= 0; --j) {
+            const {dictionary} = array[j];
+            if (!excludeDictionaryDefinitions.has(dictionary)) { continue; }
+            array.splice(j, 1);
+            changed = true;
+        }
+        return changed;
+    }
+
+    _removeTagGroupsWithDictionary(array, excludeDictionaryDefinitions) {
+        for (const {tags} of array) {
+            this._removeArrayItemsWithDictionary(tags, excludeDictionaryDefinitions);
+        }
     }
 
     // Tags

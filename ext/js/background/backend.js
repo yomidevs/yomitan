@@ -411,7 +411,7 @@ class Backend {
     async _onApiTermsFind({text, details, optionsContext}) {
         const options = this._getProfileOptions(optionsContext);
         const {general: {resultOutputMode: mode, maxResults}} = options;
-        const findTermsOptions = this._getTranslatorFindTermsOptions(details, options);
+        const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
         const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
         dictionaryEntries.splice(maxResults);
         return {dictionaryEntries, originalTextLength};
@@ -1044,14 +1044,15 @@ class Backend {
     async _textParseScanning(text, options) {
         const jp = this._japaneseUtil;
         const {scanning: {length: scanningLength}, parsing: {readingMode}} = options;
-        const findTermsOptions = this._getTranslatorFindTermsOptions({wildcard: null}, options);
+        const mode = 'simple';
+        const findTermsOptions = this._getTranslatorFindTermsOptions(mode, {wildcard: null}, options);
         const results = [];
         let previousUngroupedSegment = null;
         let i = 0;
         const ii = text.length;
         while (i < ii) {
             const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
-                'simple',
+                mode,
                 text.substring(i, i + scanningLength),
                 findTermsOptions
             );
@@ -1869,7 +1870,7 @@ class Backend {
         this._applyOptions(source);
     }
 
-    _getTranslatorFindTermsOptions(details, options) {
+    _getTranslatorFindTermsOptions(mode, details, options) {
         const {wildcard} = details;
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
@@ -1886,6 +1887,16 @@ class Backend {
             }
         } = options;
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
+        let excludeDictionaryDefinitions = null;
+        if (mode === 'merge' && !enabledDictionaryMap.has(mainDictionary)) {
+            enabledDictionaryMap.set(mainDictionary, {
+                index: enabledDictionaryMap.size,
+                priority: 0,
+                allowSecondarySearches: false
+            });
+            excludeDictionaryDefinitions = new Set();
+            excludeDictionaryDefinitions.add(mainDictionary);
+        }
         return {
             wildcard,
             mainDictionary,
@@ -1897,7 +1908,8 @@ class Backend {
             convertKatakanaToHiragana,
             collapseEmphaticSequences,
             textReplacements,
-            enabledDictionaryMap
+            enabledDictionaryMap,
+            excludeDictionaryDefinitions
         };
     }
 

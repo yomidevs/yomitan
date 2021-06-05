@@ -170,6 +170,12 @@ class TranslatorVM extends DatabaseVM {
             enabledDictionaryMap = new Map(enabledDictionaryMap);
             options.enabledDictionaryMap = enabledDictionaryMap;
         }
+        const {excludeDictionaryDefinitions} = options;
+        options.excludeDictionaryDefinitions = (
+            Array.isArray(excludeDictionaryDefinitions) ?
+            new Set(excludeDictionaryDefinitions) :
+            null
+        );
 
         return options;
     }
