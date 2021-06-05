@@ -42,18 +42,13 @@ class AudioSystem extends EventDispatcher {
         return this._fallbackAudio;
     }
 
-    createAudio(url, sourceType) {
-        return new Promise((resolve, reject) => {
-            const audio = new Audio(url);
-            audio.addEventListener('loadeddata', () => {
-                if (!this._isAudioValid(audio, sourceType)) {
-                    reject(new Error('Could not retrieve audio'));
-                } else {
-                    resolve(audio);
-                }
-            });
-            audio.addEventListener('error', () => reject(audio.error));
-        });
+    async createAudio(url, sourceType) {
+        const audio = new Audio(url);
+        await this._waitForData(audio);
+        if (!this._isAudioValid(audio, sourceType)) {
+            throw new Error('Could not retrieve audio');
+        }
+        return audio;
     }
 
     createTextToSpeechAudio(text, voiceUri) {
@@ -68,6 +63,13 @@ class AudioSystem extends EventDispatcher {
 
     _onVoicesChanged(e) {
         this.trigger('voiceschanged', e);
+    }
+
+    _waitForData(audio) {
+        return new Promise((resolve, reject) => {
+            audio.addEventListener('loadeddata', () => resolve());
+            audio.addEventListener('error', () => reject(audio.error));
+        });
     }
 
     _isAudioValid(audio, sourceType) {
