@@ -340,7 +340,22 @@ class DisplayGenerator {
     }
 
     _createDefinitionImage(data, dictionary) {
-        const {path, width, height, preferredWidth, preferredHeight, title, pixelated, collapsed, collapsible, verticalAlign, sizeUnits} = data;
+        const {
+            path,
+            width,
+            height,
+            preferredWidth,
+            preferredHeight,
+            title,
+            pixelated,
+            imageRendering,
+            appearance,
+            background,
+            collapsed,
+            collapsible,
+            verticalAlign,
+            sizeUnits
+        } = data;
 
         const hasPreferredWidth = (typeof preferredWidth === 'number');
         const hasPreferredHeight = (typeof preferredHeight === 'number');
@@ -356,10 +371,18 @@ class DisplayGenerator {
         );
 
         const node = this._templates.instantiate('gloss-item-image');
+        const imageContainer = node.querySelector('.gloss-image-container');
+        const aspectRatioSizer = node.querySelector('.gloss-image-aspect-ratio-sizer');
+        const image = node.querySelector('.gloss-image');
+        const imageBackground = node.querySelector('.gloss-image-background');
+
         node.dataset.path = path;
         node.dataset.dictionary = dictionary;
         node.dataset.imageLoadState = 'not-loaded';
         node.dataset.hasAspectRatio = 'true';
+        node.dataset.imageRendering = typeof imageRendering === 'string' ? imageRendering : (pixelated ? 'pixelated' : 'auto');
+        node.dataset.appearance = typeof appearance === 'string' ? appearance : 'auto';
+        node.dataset.background = typeof background === 'boolean' ? `${background}` : 'true';
         node.dataset.collapsed = typeof collapsed === 'boolean' ? `${collapsed}` : 'false';
         node.dataset.collapsible = typeof collapsible === 'boolean' ? `${collapsible}` : 'true';
         if (typeof verticalAlign === 'string') {
@@ -369,39 +392,36 @@ class DisplayGenerator {
             node.dataset.sizeUnits = sizeUnits;
         }
 
-        const imageContainer = node.querySelector('.gloss-image-container');
         imageContainer.style.width = `${usedWidth}em`;
         if (typeof title === 'string') {
             imageContainer.title = title;
         }
 
-        const aspectRatioSizer = node.querySelector('.gloss-image-aspect-ratio-sizer');
         aspectRatioSizer.style.paddingTop = `${aspectRatio * 100.0}%`;
-
-        const image = node.querySelector('img.gloss-image');
-        image.dataset.pixelated = `${pixelated === true}`;
 
         if (this._mediaLoader !== null) {
             this._mediaLoader.loadMedia(
                 path,
                 dictionary,
-                (url) => this._setImageData(node, image, url, false),
-                () => this._setImageData(node, image, null, true)
+                (url) => this._setImageData(node, image, imageBackground, url, false),
+                () => this._setImageData(node, image, imageBackground, null, true)
             );
         }
 
         return node;
     }
 
-    _setImageData(node, image, url, unloaded) {
+    _setImageData(node, image, imageBackground, url, unloaded) {
         if (url !== null) {
             image.src = url;
             node.href = url;
             node.dataset.imageLoadState = 'loaded';
+            imageBackground.style.setProperty('--image', `url("${url}")`);
         } else {
             image.removeAttribute('src');
             node.removeAttribute('href');
             node.dataset.imageLoadState = unloaded ? 'unloaded' : 'load-error';
+            imageBackground.style.removeProperty('--image');
         }
     }
 

@@ -208,6 +208,10 @@ class Display extends EventDispatcher {
         const {browser} = await yomichan.api.getEnvironmentInfo();
         this._browser = browser;
 
+        if (documentElement !== null) {
+            documentElement.dataset.browser = browser;
+        }
+
         // Prepare
         await this._hotkeyHelpController.prepare();
         await this._displayGenerator.prepare();

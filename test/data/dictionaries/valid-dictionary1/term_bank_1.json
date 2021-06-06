@@ -36,6 +36,29 @@
                 "naiyou definition 6: ",
                 {"tag": "ruby", "content": ["内", {"tag": "rp", "content": "("}, {"tag": "rt", "content": "ない"}, {"tag": "rp", "content": ")"}]},
                 {"tag": "ruby", "content": ["容", {"tag": "rp", "content": "("}, {"tag": "rt", "content": "よう"}, {"tag": "rp", "content": ")"}]}
+            ]},
+            {"type": "structured-content", "content": [
+                "imageRendering=auto: ",
+                {"tag": "img", "path": "character.gif", "width": 1, "height": 1, "imageRendering": "auto", "collapsible": false, "collapsed": false, "sizeUnits": "em"},
+                "莢 ",
+                {"tag": "img", "path": "character.gif", "width": 1, "height": 1, "imageRendering": "auto", "background": false, "collapsible": false, "collapsed": false, "sizeUnits": "em"},
+                "莢 ",
+                {"tag": "img", "path": "character.gif", "width": 1, "height": 1, "imageRendering": "auto", "background": false, "appearance": "monochrome", "collapsible": false, "collapsed": false, "sizeUnits": "em"},
+                "莢\n",
+                "imageRendering=pixelated: ",
+                {"tag": "img", "path": "character.gif", "width": 1, "height": 1, "imageRendering": "pixelated", "collapsible": false, "collapsed": false, "sizeUnits": "em"},
+                "莢 ",
+                {"tag": "img", "path": "character.gif", "width": 1, "height": 1, "imageRendering": "pixelated", "background": false, "collapsible": false, "collapsed": false, "sizeUnits": "em"},
+                "莢 ",
+                {"tag": "img", "path": "character.gif", "width": 1, "height": 1, "imageRendering": "pixelated", "background": false, "appearance": "monochrome", "collapsible": false, "collapsed": false, "sizeUnits": "em"},
+                "莢\n",
+                "imageRendering=crisp-edges: ",
+                {"tag": "img", "path": "character.gif", "width": 1, "height": 1, "imageRendering": "crisp-edges", "collapsible": false, "collapsed": false, "sizeUnits": "em"},
+                "莢 ",
+                {"tag": "img", "path": "character.gif", "width": 1, "height": 1, "imageRendering": "crisp-edges", "background": false, "collapsible": false, "collapsed": false, "sizeUnits": "em"},
+                "莢 ",
+                {"tag": "img", "path": "character.gif", "width": 1, "height": 1, "imageRendering": "crisp-edges", "background": false, "appearance": "monochrome", "collapsible": false, "collapsed": false, "sizeUnits": "em"},
+                "莢\n"
             ]}
         ],
         9, "P E1"
