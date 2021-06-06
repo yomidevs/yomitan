@@ -81,3 +81,8 @@ This page lists several of the browser bugs that have affected Yomichan over the
 * **Browser**: Chrome
 * **Date**: 2021-05-19
 * **Links**: [Report](https://bugs.chromium.org/p/chromium/issues/detail?id=1211182)
+
+## Caret browsing doesn't work properly for certain display:none elements
+* **Browser**: Firefox
+* **Date**: 2021-06-06
+* **Links**: [Report](https://bugzilla.mozilla.org/show_bug.cgi?id=1714883)
