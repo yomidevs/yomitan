@@ -246,7 +246,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 1,
+        "ids": [
+          1
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -343,7 +345,9 @@
       },
       {
         "type": "term",
-        "id": 2,
+        "ids": [
+          2
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -459,7 +463,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 3,
+        "ids": [
+          3
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -569,7 +575,9 @@
       },
       {
         "type": "term",
-        "id": 5,
+        "ids": [
+          5
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -679,7 +687,9 @@
       },
       {
         "type": "term",
-        "id": 4,
+        "ids": [
+          4
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -789,7 +799,9 @@
       },
       {
         "type": "term",
-        "id": 6,
+        "ids": [
+          6
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -899,7 +911,9 @@
       },
       {
         "type": "term",
-        "id": 1,
+        "ids": [
+          1
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -996,7 +1010,9 @@
       },
       {
         "type": "term",
-        "id": 2,
+        "ids": [
+          2
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -1112,7 +1128,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 7,
+        "ids": [
+          7
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -1240,7 +1258,9 @@
       },
       {
         "type": "term",
-        "id": 9,
+        "ids": [
+          9
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -1368,7 +1388,9 @@
       },
       {
         "type": "term",
-        "id": 8,
+        "ids": [
+          8
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -1496,7 +1518,9 @@
       },
       {
         "type": "term",
-        "id": 10,
+        "ids": [
+          10
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -1624,7 +1648,9 @@
       },
       {
         "type": "term",
-        "id": 3,
+        "ids": [
+          3
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -1736,7 +1762,9 @@
       },
       {
         "type": "term",
-        "id": 5,
+        "ids": [
+          5
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -1848,7 +1876,9 @@
       },
       {
         "type": "term",
-        "id": 4,
+        "ids": [
+          4
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -1960,7 +1990,9 @@
       },
       {
         "type": "term",
-        "id": 6,
+        "ids": [
+          6
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -2072,7 +2104,9 @@
       },
       {
         "type": "term",
-        "id": 1,
+        "ids": [
+          1
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -2169,7 +2203,9 @@
       },
       {
         "type": "term",
-        "id": 2,
+        "ids": [
+          2
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -2285,7 +2321,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 11,
+        "ids": [
+          11
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -2391,7 +2429,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 1,
+        "ids": [
+          1
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -2494,7 +2534,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 2,
+        "ids": [
+          2
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -2610,7 +2652,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 3,
+        "ids": [
+          3
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -2720,7 +2764,9 @@
       },
       {
         "type": "term",
-        "id": 4,
+        "ids": [
+          4
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -2836,7 +2882,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 5,
+        "ids": [
+          5
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -2946,7 +2994,9 @@
       },
       {
         "type": "term",
-        "id": 6,
+        "ids": [
+          6
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -3062,7 +3112,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 7,
+        "ids": [
+          7
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -3190,7 +3242,9 @@
       },
       {
         "type": "term",
-        "id": 8,
+        "ids": [
+          8
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -3318,7 +3372,9 @@
       },
       {
         "type": "term",
-        "id": 3,
+        "ids": [
+          3
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -3430,7 +3486,9 @@
       },
       {
         "type": "term",
-        "id": 4,
+        "ids": [
+          4
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -3548,7 +3606,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 9,
+        "ids": [
+          9
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -3676,7 +3736,9 @@
       },
       {
         "type": "term",
-        "id": 10,
+        "ids": [
+          10
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -3804,7 +3866,9 @@
       },
       {
         "type": "term",
-        "id": 5,
+        "ids": [
+          5
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -3916,7 +3980,9 @@
       },
       {
         "type": "term",
-        "id": 6,
+        "ids": [
+          6
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -4034,7 +4100,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 11,
+        "ids": [
+          11
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -4150,7 +4218,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 7,
+        "ids": [
+          7
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -4200,7 +4270,9 @@
       },
       {
         "type": "term",
-        "id": 9,
+        "ids": [
+          9
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -4250,7 +4322,9 @@
       },
       {
         "type": "term",
-        "id": 8,
+        "ids": [
+          8
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -4300,7 +4374,9 @@
       },
       {
         "type": "term",
-        "id": 10,
+        "ids": [
+          10
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -4350,7 +4426,9 @@
       },
       {
         "type": "term",
-        "id": 3,
+        "ids": [
+          3
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -4402,7 +4480,9 @@
       },
       {
         "type": "term",
-        "id": 5,
+        "ids": [
+          5
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -4454,7 +4534,9 @@
       },
       {
         "type": "term",
-        "id": 4,
+        "ids": [
+          4
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -4506,7 +4588,9 @@
       },
       {
         "type": "term",
-        "id": 6,
+        "ids": [
+          6
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -4558,7 +4642,9 @@
       },
       {
         "type": "term",
-        "id": 1,
+        "ids": [
+          1
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -4608,7 +4694,9 @@
       },
       {
         "type": "term",
-        "id": 2,
+        "ids": [
+          2
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -4664,7 +4752,10 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": -1,
+        "ids": [
+          7,
+          8
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -4835,7 +4926,10 @@
       },
       {
         "type": "term",
-        "id": -1,
+        "ids": [
+          9,
+          10
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -5006,7 +5100,10 @@
       },
       {
         "type": "term",
-        "id": -1,
+        "ids": [
+          3,
+          4
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -5161,7 +5258,10 @@
       },
       {
         "type": "term",
-        "id": -1,
+        "ids": [
+          5,
+          6
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -5316,7 +5416,9 @@
       },
       {
         "type": "term",
-        "id": -1,
+        "ids": [
+          1
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -5413,7 +5515,9 @@
       },
       {
         "type": "term",
-        "id": -1,
+        "ids": [
+          2
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -5529,7 +5633,12 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": -1,
+        "ids": [
+          7,
+          9,
+          8,
+          10
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -5852,7 +5961,12 @@
       },
       {
         "type": "term",
-        "id": -1,
+        "ids": [
+          3,
+          5,
+          4,
+          6
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -6142,7 +6256,9 @@
       },
       {
         "type": "term",
-        "id": -1,
+        "ids": [
+          1
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -6239,7 +6355,9 @@
       },
       {
         "type": "term",
-        "id": -1,
+        "ids": [
+          2
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -6355,7 +6473,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 7,
+        "ids": [
+          7
+        ],
         "isPrimary": true,
         "inflections": [
           "-te",
@@ -6487,7 +6607,9 @@
       },
       {
         "type": "term",
-        "id": 9,
+        "ids": [
+          9
+        ],
         "isPrimary": true,
         "inflections": [
           "-te",
@@ -6619,7 +6741,9 @@
       },
       {
         "type": "term",
-        "id": 8,
+        "ids": [
+          8
+        ],
         "isPrimary": true,
         "inflections": [
           "-te",
@@ -6751,7 +6875,9 @@
       },
       {
         "type": "term",
-        "id": 10,
+        "ids": [
+          10
+        ],
         "isPrimary": true,
         "inflections": [
           "-te",
@@ -6883,7 +7009,9 @@
       },
       {
         "type": "term",
-        "id": 3,
+        "ids": [
+          3
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -6995,7 +7123,9 @@
       },
       {
         "type": "term",
-        "id": 5,
+        "ids": [
+          5
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -7107,7 +7237,9 @@
       },
       {
         "type": "term",
-        "id": 4,
+        "ids": [
+          4
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -7219,7 +7351,9 @@
       },
       {
         "type": "term",
-        "id": 6,
+        "ids": [
+          6
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -7331,7 +7465,9 @@
       },
       {
         "type": "term",
-        "id": 1,
+        "ids": [
+          1
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -7428,7 +7564,9 @@
       },
       {
         "type": "term",
-        "id": 2,
+        "ids": [
+          2
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -7544,7 +7682,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 7,
+        "ids": [
+          7
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -7672,7 +7812,9 @@
       },
       {
         "type": "term",
-        "id": 9,
+        "ids": [
+          9
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -7800,7 +7942,9 @@
       },
       {
         "type": "term",
-        "id": 8,
+        "ids": [
+          8
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -7928,7 +8072,9 @@
       },
       {
         "type": "term",
-        "id": 10,
+        "ids": [
+          10
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -8056,7 +8202,9 @@
       },
       {
         "type": "term",
-        "id": 3,
+        "ids": [
+          3
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -8168,7 +8316,9 @@
       },
       {
         "type": "term",
-        "id": 5,
+        "ids": [
+          5
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -8280,7 +8430,9 @@
       },
       {
         "type": "term",
-        "id": 4,
+        "ids": [
+          4
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -8392,7 +8544,9 @@
       },
       {
         "type": "term",
-        "id": 6,
+        "ids": [
+          6
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -8504,7 +8658,9 @@
       },
       {
         "type": "term",
-        "id": 1,
+        "ids": [
+          1
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -8601,7 +8757,9 @@
       },
       {
         "type": "term",
-        "id": 2,
+        "ids": [
+          2
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -8717,7 +8875,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 7,
+        "ids": [
+          7
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -8845,7 +9005,9 @@
       },
       {
         "type": "term",
-        "id": 9,
+        "ids": [
+          9
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -8973,7 +9135,9 @@
       },
       {
         "type": "term",
-        "id": 8,
+        "ids": [
+          8
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -9101,7 +9265,9 @@
       },
       {
         "type": "term",
-        "id": 10,
+        "ids": [
+          10
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -9229,7 +9395,9 @@
       },
       {
         "type": "term",
-        "id": 3,
+        "ids": [
+          3
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -9341,7 +9509,9 @@
       },
       {
         "type": "term",
-        "id": 5,
+        "ids": [
+          5
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -9453,7 +9623,9 @@
       },
       {
         "type": "term",
-        "id": 4,
+        "ids": [
+          4
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -9565,7 +9737,9 @@
       },
       {
         "type": "term",
-        "id": 6,
+        "ids": [
+          6
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -9677,7 +9851,9 @@
       },
       {
         "type": "term",
-        "id": 1,
+        "ids": [
+          1
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -9774,7 +9950,9 @@
       },
       {
         "type": "term",
-        "id": 2,
+        "ids": [
+          2
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -9890,7 +10068,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 12,
+        "ids": [
+          12
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -9988,7 +10168,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 13,
+        "ids": [
+          13
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 90,
@@ -10084,7 +10266,9 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": 12,
+        "ids": [
+          12
+        ],
         "isPrimary": true,
         "inflections": [
           "polite past"
@@ -10182,7 +10366,12 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "id": -1,
+        "ids": [
+          7,
+          9,
+          8,
+          10
+        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -10505,7 +10694,12 @@
       },
       {
         "type": "term",
-        "id": -1,
+        "ids": [
+          3,
+          5,
+          4,
+          6
+        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"

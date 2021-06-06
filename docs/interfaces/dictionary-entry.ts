@@ -192,9 +192,9 @@ namespace Translation {
      */
     export interface TermDictionaryEntry extends DictionaryEntry {
         /**
-         * Database ID for the term, or `-1` if multiple entries have been merged.
+         * Database IDs for the term.
          */
-        id: number;
+        ids: number[];
         /**
          * Whether or not any of the sources is a primary source. Primary sources are derived from the
          * original search text, while non-primary sources originate from related terms.

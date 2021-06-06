@@ -358,7 +358,7 @@ class Translator {
         const groupedDictionaryEntriesMap = new Map();
         const ungroupedDictionaryEntriesMap = new Map();
         for (const dictionaryEntry of dictionaryEntries) {
-            const {id, definitions: [{dictionary, sequences: [sequence]}]} = dictionaryEntry;
+            const {ids: [id], definitions: [{dictionary, sequences: [sequence]}]} = dictionaryEntry;
             if (mainDictionary === dictionary && sequence >= 0) {
                 let group = groupedDictionaryEntriesMap.get(sequence);
                 if (typeof group === 'undefined') {
@@ -448,12 +448,10 @@ class Translator {
 
             for (const {ids, dictionaryEntries} of target.groups) {
                 if (ids.has(id)) { continue; }
-
                 dictionaryEntries.push(dictionaryEntry);
                 ids.add(id);
-                ungroupedDictionaryEntriesMap.delete(id);
-                break;
             }
+            ungroupedDictionaryEntriesMap.delete(id);
         }
 
         // Search database for additional secondary terms
@@ -1039,10 +1037,10 @@ class Translator {
         return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, hasReading, frequency};
     }
 
-    _createTermDictionaryEntry(id, isPrimary, inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxTransformedTextLength, headwords, definitions) {
+    _createTermDictionaryEntry(ids, isPrimary, inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxTransformedTextLength, headwords, definitions) {
         return {
             type: 'term',
-            id,
+            ids,
             isPrimary,
             inflections,
             score,
@@ -1073,7 +1071,7 @@ class Translator {
         if (definitionTags.length > 0) { definitionTagGroups.push(this._createTagGroup(dictionary, definitionTags)); }
 
         return this._createTermDictionaryEntry(
-            id,
+            [id],
             isPrimary,
             reasons,
             score,
@@ -1111,6 +1109,7 @@ class Translator {
         const definitions = [];
         const definitionsMap = checkDuplicateDefinitions ? new Map() : null;
         let inflections = null;
+        const ids = new Set();
 
         for (const {dictionaryEntry, headwordIndexMap} of definitionEntries) {
             score = Math.max(score, dictionaryEntry.score);
@@ -1124,6 +1123,7 @@ class Translator {
                     inflections = dictionaryEntryInflections;
                 }
             }
+            for (const id of dictionaryEntry.ids) { ids.add(id); }
             if (checkDuplicateDefinitions) {
                 this._addTermDefinitions(definitions, definitionsMap, dictionaryEntry.definitions, headwordIndexMap);
             } else {
@@ -1144,7 +1144,7 @@ class Translator {
         }
 
         return this._createTermDictionaryEntry(
-            -1,
+            [...ids],
             isPrimary,
             inflections !== null ? inflections : [],
             score,
@@ -1380,7 +1380,7 @@ class Translator {
 
     _sortTermDictionaryEntriesById(dictionaryEntries) {
         if (dictionaryEntries.length <= 1) { return; }
-        dictionaryEntries.sort((a, b) => a.id - b.id);
+        dictionaryEntries.sort((a, b) => a.ids[0] - b.ids[0]);
     }
 
     _sortTermDictionaryEntryData(dictionaryEntries) {
