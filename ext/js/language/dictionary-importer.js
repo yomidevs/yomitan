@@ -361,7 +361,19 @@ class DictionaryImporter {
     }
 
     async _createImageData(data, context, entry, attributes) {
-        const {path, width: preferredWidth, height: preferredHeight, title, description, pixelated, collapsed, collapsible} = data;
+        const {
+            path,
+            width: preferredWidth,
+            height: preferredHeight,
+            title,
+            description,
+            pixelated,
+            imageRendering,
+            appearance,
+            background,
+            collapsed,
+            collapsible
+        } = data;
         const {width, height} = await this._getImageMedia(path, context, entry);
         const newData = Object.assign({}, attributes, {path, width, height});
         if (typeof preferredWidth === 'number') { newData.preferredWidth = preferredWidth; }
@@ -369,6 +381,9 @@ class DictionaryImporter {
         if (typeof title === 'string') { newData.title = title; }
         if (typeof description === 'string') { newData.description = description; }
         if (typeof pixelated === 'boolean') { newData.pixelated = pixelated; }
+        if (typeof imageRendering === 'string') { newData.imageRendering = imageRendering; }
+        if (typeof appearance === 'string') { newData.appearance = appearance; }
+        if (typeof background === 'boolean') { newData.background = background; }
         if (typeof collapsed === 'boolean') { newData.collapsed = collapsed; }
         if (typeof collapsible === 'boolean') { newData.collapsible = collapsible; }
         return newData;

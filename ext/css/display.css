@@ -1566,6 +1566,8 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     line-height: 0;
     font-size: calc(1em / var(--font-size-no-units));
     overflow: hidden;
+}
+.gloss-image-link[data-background=true]>.gloss-image-container {
     background-color: var(--gloss-image-background-color);
 }
 .gloss-image-link {
@@ -1600,6 +1602,18 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     text-align: center;
     padding: 0.25em;
 }
+.gloss-image-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--text-color);
+
+    --image: none;
+    --icon-size: contain;
+    --icon-image: var(--image);
+}
 .gloss-image {
     display: inline-block;
     vertical-align: top;
@@ -1617,12 +1631,26 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 .gloss-image:not([src]) {
     display: none;
 }
-.gloss-image[data-pixelated=true] {
+.gloss-image-link[data-image-rendering=pixelated] .gloss-image,
+.gloss-image-link[data-image-rendering=pixelated] .gloss-image-background {
     image-rendering: auto;
     image-rendering: -moz-crisp-edges;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+}
+.gloss-image-link[data-image-rendering=crisp-edges] .gloss-image,
+.gloss-image-link[data-image-rendering=crisp-edges] .gloss-image-background {
+    image-rendering: auto;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+:root[data-browser=firefox] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image,
+:root[data-browser=firefox] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image-background,
+:root[data-browser=firefox-mobile] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image,
+:root[data-browser=firefox-mobile] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image-background {
+    image-rendering: auto;
 }
 .gloss-image-link[data-has-aspect-ratio=true] .gloss-image-aspect-ratio-sizer {
     display: inline-block;
@@ -1643,6 +1671,13 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 .gloss-image-description {
     display: block;
     white-space: pre-line;
+}
+
+.gloss-image-link[data-appearance=monochrome] .gloss-image {
+    visibility: hidden;
+}
+.gloss-image-link:not([data-appearance=monochrome]) .gloss-image-background {
+    display: none;
 }
 
 .gloss-image-link[data-size-units=em] .gloss-image-container {

@@ -57,7 +57,15 @@
 </li></template>
 <template id="definition-disambiguation-template"><span class="definition-disambiguation"></span></template>
 <template id="gloss-item-template"><li class="gloss-item click-scannable"><span class="gloss-separator"> </span><span class="gloss-content"></span></li></template>
-<template id="gloss-item-image-template"><a class="gloss-image-link" target="_blank" rel="noreferrer noopener"><span class="gloss-image-container"><span class="gloss-image-aspect-ratio-sizer"></span><img class="gloss-image" alt=""><span class="gloss-image-container-overlay"></span></span><span class="gloss-image-link-text">Image</span></a></template>
+<template id="gloss-item-image-template" data-remove-whitespace-text="true"><a class="gloss-image-link" target="_blank" rel="noreferrer noopener">
+    <span class="gloss-image-container">
+        <span class="gloss-image-aspect-ratio-sizer"></span>
+        <span class="gloss-image-background icon"></span>
+        <img class="gloss-image" alt="">
+        <span class="gloss-image-container-overlay"></span>
+    </span>
+    <span class="gloss-image-link-text">Image</span>
+</a></template>
 <template id="gloss-item-image-description-template"> <span class="gloss-image-description"></span></template>
 <template id="inflection-template"><span class="inflection"></span><span class="inflection-separator"> </span></template>
 
