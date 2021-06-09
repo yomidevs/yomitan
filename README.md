@@ -1,4 +1,4 @@
-# Yomichan #
+# Yomichan
 
 Yomichan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
 which would be otherwise too difficult tackle. This extension is similar to
@@ -16,7 +16,7 @@ Yomichan provides advanced features not available in other browser-based diction
 *   Automatic note creation for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 *   Clean, modern code makes it easy for developers to [contribute](https://github.com/FooSoft/yomichan/blob/master/CONTRIBUTING.md) new features.
 
-## Table of Contents ##
+## Table of Contents
 
 *   [Installation](#installation)
 *   [Dictionaries](#dictionaries)
@@ -30,7 +30,7 @@ Yomichan provides advanced features not available in other browser-based diction
 *   [Licenses](#licenses)
 *   [Screenshots](#screenshots)
 
-## Installation ##
+## Installation
 
 Yomichan comes in two flavors: *stable* and *testing*. Over the years, this extension has evolved to contain many
 complex features which have become increasingly difficult to test across different browsers, versions, and
@@ -48,7 +48,7 @@ submitting issues on GitHub, try the *testing* version; otherwise, the *stable* 
 
     [![](https://foosoft.net/projects/yomichan/img/firefox-marketplace.png)](https://addons.mozilla.org/en-US/firefox/addon/yomichan/)
 
-## Dictionaries ##
+## Dictionaries
 
 There are several free Japanese dictionaries available for Yomichan, with two of them having glossaries available in
 different languages. You must download and import the dictionaries you wish to use in order to enable Yomichan
@@ -82,7 +82,7 @@ primary language is not English, you may consider also importing the English ver
 *   **[Kanjium](https://github.com/mifunetoshiro/kanjium)** (Pitch dictionary, see [related project page](https://github.com/toasted-nutbread/yomichan-pitch-accent-dictionary) for details)
     *   [kanjium_pitch_accents.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjium_pitch_accents.zip)
 
-## Basic Usage ##
+## Basic Usage
 
 1.  Click the <img src="ext/images/yomichan-icon.svg" alt="" width="16" height="16"> _Yomichan_ button in the browser bar to open the quick-actions popup.
 
@@ -114,7 +114,7 @@ primary language is not English, you may consider also importing the English ver
 
     <a href="resources/images/search-popup-kanji.png"><img src="resources/images/search-popup-kanji-thumb.png" width="103" height="128"></a>
 
-## Custom Dictionaries ##
+## Custom Dictionaries
 
 Yomichan supports the use of custom dictionaries, including the esoteric but popular
 [EPWING](https://ja.wikipedia.org/wiki/EPWING) format. They were often utilized in portable electronic dictionaries
@@ -127,13 +127,13 @@ Import](https://foosoft.net/projects/yomichan-import). Check the project page fo
 
 [![Pocket EPWING dictionaries](https://foosoft.net/projects/yomichan/img/epwing-devices-thumb.png)](https://foosoft.net/projects/yomichan/img/epwing-devices.jpg)
 
-## Anki Integration ##
+## Anki Integration
 
 Yomichan features automatic flashcard creation for [Anki](https://apps.ankiweb.net/), a free application designed to help you
 retain knowledge. This feature requires the prior installation of an Anki plugin called [AnkiConnect](https://foosoft.net/projects/anki-connect).
 Check the respective project page for more information about how to set up this software.
 
-### Flashcard Configuration ###
+### Flashcard Configuration
 
 Before flashcards can be automatically created, you must configure the templates used to create term and/or kanji notes.
 If you are unfamiliar with Anki deck and model management, this would be a good time to reference the [Anki
@@ -150,7 +150,7 @@ Flashcard fields can be configured with the following steps:
     once). Advanced users can also configure the actual [Handlebars](https://handlebarsjs.com/) templates used to create
     the flashcard contents (this is strictly optional).
 
-    #### Markers for Term Cards ####
+    #### Markers for Term Cards
 
     Marker | Description
     -------|------------
@@ -181,7 +181,7 @@ Flashcard fields can be configured with the following steps:
     `{tags}` | Grammar and usage tags providing information about the term (unavailable in *grouped* mode).
     `{url}` | Address of the web page in which the term appeared in.
 
-    #### Markers for Kanji Cards ####
+    #### Markers for Kanji Cards
 
     Marker | Description
     -------|------------
@@ -209,7 +209,7 @@ added to a deck by default; it uses the first field in the model to check for du
 configured to be the first field in your model and <ruby>橋<rt>はし</rt></ruby> is already in your deck, you will not
 be able to create a flashcard for <ruby>箸<rt>はし</rt></ruby> because they share the same reading.
 
-### Flashcard Creation ###
+### Flashcard Creation
 
 Once Yomichan is configured, it becomes trivial to create new flashcards with a single click. You will see the following
 icons next to term definitions:
@@ -223,7 +223,7 @@ Below are some troubleshooting tips you can try if you are unable to create new 
 *   If all of the buttons appear grayed out, then you should double-check your deck and model configuration settings.
 *   If no icons appear at all, make sure that Anki is running in the background and that [AnkiConnect](https://foosoft.net/projects/anki-connect) has been installed.
 
-## Keyboard Shortcuts ##
+## Keyboard Shortcuts
 
 The following shortcuts are globally available:
 
@@ -249,7 +249,7 @@ Shortcut | Action
 <kbd>Alt</kbd> + <kbd>p</kbd> | Play audio for current term.
 <kbd>Alt</kbd> + <kbd>k</kbd> | Add current kanji to Anki.
 
-## Frequently Asked Questions ##
+## Frequently Asked Questions
 
 **I'm having problems importing dictionaries in Firefox, what do I do?**
 
@@ -319,7 +319,7 @@ languages would not only require many additional changes to the codebase, it wou
 overhead and knowledge demands for the developers. Therefore, suggestions and contributions for supporting
 new languages will be declined, allowing Yomichan's focus to remain Japanese-centric.
 
-## Licenses ##
+## Licenses
 
 Required licensing notices for this project follow below:
 
@@ -335,7 +335,7 @@ Required licensing notices for this project follow below:
     The pitch accent notation, verb particle data, phonetics, homonyms and other additions or modifications to EDICT,
     KANJIDIC or KRADFILE were provided by Uros Ozvatic through his free database.
 
-### Third-Party Libraries ###
+### Third-Party Libraries
 
 Yomichan uses several third-party libraries to function. Below are links to homepages, snapshots, and licenses of the exact
 versions packaged.
@@ -345,7 +345,7 @@ versions packaged.
 *   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://unpkg.com/wanakana@4.0.2/umd/wanakana.min.js) - [license](https://github.com/WaniKani/WanaKana/blob/4.0.2/LICENSE)
 *   parse5: [homepage](https://github.com/inikulin/parse5) - [snapshot](https://github.com/inikulin/parse5/tree/v6.0.1/packages/parse5) - [license](https://github.com/inikulin/parse5/blob/v6.0.1/LICENSE) _(Only used in MV3 build)_
 
-## Screenshots ##
+## Screenshots
 
 [![Term definitions](https://foosoft.net/projects/yomichan/img/ss-terms-thumb.png)](https://foosoft.net/projects/yomichan/img/ss-terms.png)
 [![Kanji information](https://foosoft.net/projects/yomichan/img/ss-kanji-thumb.png)](https://foosoft.net/projects/yomichan/img/ss-kanji.png)
