@@ -503,7 +503,10 @@ class Popup extends EventDispatcher {
     }
 
     _getFrameParentElement() {
-        const defaultParent = document.body;
+        let defaultParent = document.body;
+        if (defaultParent !== null && defaultParent.tagName.toLowerCase() === 'frameset') {
+            defaultParent = document.documentElement;
+        }
         const fullscreenElement = DocumentUtil.getFullscreenElement();
         if (
             fullscreenElement === null ||
