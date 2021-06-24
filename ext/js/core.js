@@ -426,7 +426,7 @@ class EventDispatcher {
      */
     off(eventName, callback) {
         const callbacks = this._eventMap.get(eventName);
-        if (typeof callbacks === 'undefined') { return true; }
+        if (typeof callbacks === 'undefined') { return false; }
 
         const ii = callbacks.length;
         for (let i = 0; i < ii; ++i) {
