@@ -435,7 +435,7 @@ class SearchDisplayController {
             case 'select':
                 return true;
         }
-        if (element.contentEditable) { return true; }
+        if (element.isContentEditable) { return true; }
         return false;
     }
 }
