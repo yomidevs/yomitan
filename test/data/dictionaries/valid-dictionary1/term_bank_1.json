@@ -59,6 +59,79 @@
                 "莢 ",
                 {"tag": "img", "path": "character.gif", "width": 1, "height": 1, "imageRendering": "crisp-edges", "background": false, "appearance": "monochrome", "collapsible": false, "collapsed": false, "sizeUnits": "em"},
                 "莢\n"
+            ]},
+            {"type": "structured-content", "content": [
+                {"tag": "div", "style": {"fontStyle": "normal"}, "content": "fontStyle:normal"},
+                {"tag": "div", "style": {"fontStyle": "italic"}, "content": "fontStyle:italic"},
+                {"tag": "div", "style": {"fontWeight": "normal"}, "content": "fontWeight:normal"},
+                {"tag": "div", "style": {"fontWeight": "bold"}, "content": "fontWeight:bold"},
+                {"tag": "div", "style": {"fontSize": "xx-small"}, "content": "fontSize:xx-small"},
+                {"tag": "div", "style": {"fontSize": "x-small"}, "content": "fontSize:x-small"},
+                {"tag": "div", "style": {"fontSize": "small"}, "content": "fontSize:small"},
+                {"tag": "div", "style": {"fontSize": "medium"}, "content": "fontSize:medium"},
+                {"tag": "div", "style": {"fontSize": "large"}, "content": "fontSize:large"},
+                {"tag": "div", "style": {"fontSize": "x-large"}, "content": "fontSize:x-large"},
+                {"tag": "div", "style": {"fontSize": "xx-large"}, "content": "fontSize:xx-large"},
+                {"tag": "div", "style": {"fontSize": "xxx-large"}, "content": "fontSize:xxx-large"},
+                {"tag": "div", "style": {"textDecorationLine": "none"}, "content": "textDecorationLine:none "},
+                {"tag": "div", "style": {"textDecorationLine": "underline"}, "content": "textDecorationLine:underline "},
+                {"tag": "div", "style": {"textDecorationLine": "overline"}, "content": "textDecorationLine:overline "},
+                {"tag": "div", "style": {"textDecorationLine": "line-through"}, "content": "textDecorationLine:line-through "},
+                {"tag": "div", "style": {"textDecorationLine": ["underline", "overline", "line-through"]}, "content": "textDecorationLine:[underline,overline,line-through] "},
+                {"tag": "div", "content": ["baseline ", {"tag": "span", "style": {"verticalAlign": "baseline"}, "content": "verticalAlign:baseline "}]},
+                {"tag": "div", "content": ["baseline ", {"tag": "span", "style": {"verticalAlign": "sub"}, "content": "verticalAlign:sub "}]},
+                {"tag": "div", "content": ["baseline ", {"tag": "span", "style": {"verticalAlign": "super"}, "content": "verticalAlign:super "}]},
+                {"tag": "div", "content": ["baseline ", {"tag": "span", "style": {"verticalAlign": "text-top"}, "content": "verticalAlign:text-top "}]},
+                {"tag": "div", "content": ["baseline ", {"tag": "span", "style": {"verticalAlign": "text-bottom"}, "content": "verticalAlign:text-bottom "}]},
+                {"tag": "div", "content": ["baseline ", {"tag": "span", "style": {"verticalAlign": "middle"}, "content": "verticalAlign:middle "}]},
+                {"tag": "div", "content": ["baseline ", {"tag": "span", "style": {"verticalAlign": "top"}, "content": "verticalAlign:top "}]},
+                {"tag": "div", "content": ["baseline ", {"tag": "span", "style": {"verticalAlign": "bottom"}, "content": "verticalAlign:bottom "}]}
+            ]},
+            {"type": "structured-content", "content": [
+                "br",
+                {"tag": "br"},
+                "br"
+            ]},
+            {"type": "structured-content", "content": [
+                {"tag": "table", "content": [
+                    {"tag": "thead", "content": [
+                        {"tag": "tr", "content": [
+                            {"tag": "th", "content": "Header 1"},
+                            {"tag": "th", "content": "Header 2"},
+                            {"tag": "th", "content": "Header 3"},
+                            {"tag": "th", "content": "Header 4"}
+                        ]}
+                    ]},
+                    {"tag": "tbody", "content": [
+                        {"tag": "tr", "content": [
+                            {"tag": "td", "content": "Cell A1"},
+                            {"tag": "td", "content": "Cell B1"},
+                            {"tag": "td", "content": "Cell C1"},
+                            {"tag": "td", "content": "Cell D1"}
+                        ]},
+                        {"tag": "tr", "content": [
+                            {"tag": "td", "content": "Cell A2"},
+                            {"tag": "td", "content": "Cell B2"},
+                            {"tag": "td", "content": "Cell C2:D2", "colSpan": 2}
+                        ]},
+                        {"tag": "tr", "content": [
+                            {"tag": "td", "content": "Cell A3"},
+                            {"tag": "td", "content": "Cell B3\nCell B4", "rowSpan": 2},
+                            {"tag": "td", "content": "Cell C3:D3\nCell C4:D4", "rowSpan": 2, "colSpan": 2}
+                        ]},
+                        {"tag": "tr", "content": [
+                            {"tag": "td", "content": "Cell A4"}
+                        ]}
+                    ]},
+                    {"tag": "tfoot", "content": [
+                        {"tag": "tr", "content": [
+                            {"tag": "th", "content": "Footer 1"},
+                            {"tag": "th", "content": "Footer 2"},
+                            {"tag": "th", "content": "Footer 3"},
+                            {"tag": "th", "content": "Footer 4"}
+                        ]}
+                    ]}
+                ]}
             ]}
         ],
         9, "P E1"

@@ -442,21 +442,76 @@ class DisplayGenerator {
         }
         const {tag} = content;
         switch (tag) {
+            case 'br':
+                return this._createStructuredContentElement(tag, content, dictionary, 'simple', false, false);
             case 'ruby':
             case 'rt':
             case 'rp':
-            {
-                const node = document.createElement(tag);
-                const child = this._createStructuredContent(content.content, dictionary);
-                if (child !== null) {
-                    node.appendChild(child);
-                }
-                return node;
-            }
+                return this._createStructuredContentElement(tag, content, dictionary, 'simple', true, false);
+            case 'table':
+                return this._createStructuredContentTableElement(tag, content, dictionary);
+            case 'thead':
+            case 'tbody':
+            case 'tfoot':
+            case 'tr':
+                return this._createStructuredContentElement(tag, content, dictionary, 'table', true, false);
+            case 'th':
+            case 'td':
+                return this._createStructuredContentElement(tag, content, dictionary, 'table-cell', true, true);
+            case 'div':
+            case 'span':
+                return this._createStructuredContentElement(tag, content, dictionary, 'simple', true, true);
             case 'img':
                 return this._createDefinitionImage(content, dictionary);
         }
         return null;
+    }
+
+    _createStructuredContentTableElement(tag, content, dictionary) {
+        const container = document.createElement('div');
+        container.classList = 'gloss-sc-table-container';
+        const table = this._createStructuredContentElement(tag, content, dictionary, 'table', true, false);
+        container.appendChild(table);
+        return container;
+    }
+
+    _createStructuredContentElement(tag, content, dictionary, type, hasChildren, hasStyle) {
+        const node = document.createElement(tag);
+        node.className = `gloss-sc-${tag}`;
+        switch (type) {
+            case 'table-cell':
+                {
+                    const {colSpan, rowSpan} = content;
+                    if (typeof colSpan === 'number') { node.colSpan = colSpan; }
+                    if (typeof rowSpan === 'number') { node.rowSpan = rowSpan; }
+                }
+                break;
+        }
+        if (hasStyle) {
+            const {style} = content;
+            if (typeof style === 'object' && style !== null) {
+                this._setStructuredContentElementStyle(node, style);
+            }
+        }
+        if (hasChildren) {
+            const child = this._createStructuredContent(content.content, dictionary);
+            if (child !== null) { node.appendChild(child); }
+        }
+        return node;
+    }
+
+    _setStructuredContentElementStyle(node, contentStyle) {
+        const {style} = node;
+        const {fontStyle, fontWeight, fontSize, textDecorationLine, verticalAlign} = contentStyle;
+        if (typeof fontStyle === 'string') { style.fontStyle = fontStyle; }
+        if (typeof fontWeight === 'string') { style.fontWeight = fontWeight; }
+        if (typeof fontSize === 'string') { style.fontSize = fontSize; }
+        if (typeof verticalAlign === 'string') { style.verticalAlign = verticalAlign; }
+        if (typeof textDecorationLine === 'string') {
+            style.textDecoration = textDecorationLine;
+        } else if (Array.isArray(textDecorationLine)) {
+            style.textDecoration = textDecorationLine.join(' ');
+        }
     }
 
     _createTermDisambiguation(disambiguation) {

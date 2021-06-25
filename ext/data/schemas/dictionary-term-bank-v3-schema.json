@@ -19,6 +19,20 @@
                     "oneOf": [
                         {
                             "type": "object",
+                            "description": "Empty tags.",
+                            "required": [
+                                "tag"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "tag": {
+                                    "type": "string",
+                                    "enum": ["br"]
+                                }
+                            }
+                        },
+                        {
+                            "type": "object",
                             "description": "Generic container tags.",
                             "required": [
                                 "tag"
@@ -27,10 +41,58 @@
                             "properties": {
                                 "tag": {
                                     "type": "string",
-                                    "enum": ["ruby", "rt", "rp"]
+                                    "enum": ["ruby", "rt", "rp", "table", "thead", "tbody", "tfoot", "tr"]
                                 },
                                 "content": {
                                     "$ref": "#/definitions/structuredContent"
+                                }
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "description": "Table tags.",
+                            "required": [
+                                "tag"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "tag": {
+                                    "type": "string",
+                                    "enum": ["td", "th"]
+                                },
+                                "content": {
+                                    "$ref": "#/definitions/structuredContent"
+                                },
+                                "colSpan": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "rowSpan": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "style": {
+                                    "$ref": "#/definitions/structuredContentStyle"
+                                }
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "description": "Container tags supporting configurable styles.",
+                            "required": [
+                                "tag"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "tag": {
+                                    "type": "string",
+                                    "enum": ["span", "div"]
+                                },
+                                "content": {
+                                    "$ref": "#/definitions/structuredContent"
+                                },
+                                "style": {
+                                    "$ref": "#/definitions/structuredContentStyle"
                                 }
                             }
                         },
@@ -112,6 +174,49 @@
                     ]
                 }
             ]
+        },
+        "structuredContentStyle": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "fontStyle": {
+                    "type": "string",
+                    "enum": ["normal", "italic"],
+                    "default": "normal"
+                },
+                "fontWeight": {
+                    "type": "string",
+                    "enum": ["normal", "bold"],
+                    "default": "normal"
+                },
+                "fontSize": {
+                    "type": "string",
+                    "enum": ["xx-small", "x-small", "small", "medium", "large", "x-large", "xx-large", "xxx-large"],
+                    "default": "medium"
+                },
+                "textDecorationLine": {
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "enum": ["none", "underline", "overline", "line-through"],
+                            "default": "none"
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["underline", "overline", "line-through"],
+                                "default": "none"
+                            }
+                        }
+                    ]
+                },
+                "verticalAlign": {
+                    "type": "string",
+                    "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"],
+                    "default": "baseline"
+                }
+            }
         }
     },
     "type": "array",

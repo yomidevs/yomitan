@@ -1726,6 +1726,32 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 }
 
 
+/* Structured content glossary styles */
+.gloss-sc-table-container {
+    display: block;
+}
+.gloss-sc-table {
+    table-layout: auto;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+.gloss-sc-tbody {
+    background-color: transparent;
+}
+.gloss-sc-thead,
+.gloss-sc-tfoot,
+.gloss-sc-th {
+    font-weight: bold;
+    background-color: var(--background-color-dark1);
+}
+.gloss-sc-th,
+.gloss-sc-td {
+    border: calc(1em / var(--font-size-no-units)) solid var(--text-color-light2);
+    padding: 0.25em;
+    vertical-align: top;
+}
+
+
 /* Kanji */
 .kanji-glyph-container {
     display: block;
