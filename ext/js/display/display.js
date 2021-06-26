@@ -1961,16 +1961,19 @@ class Display extends EventDispatcher {
         for (const mode of modes) {
             let ankiNote;
             let ankiNoteException;
-            const ankiNoteErrors = [];
+            const errors = [];
             try {
                 const noteContext = this._getNoteContext();
-                ankiNote = await this._createNote(dictionaryEntry, mode, noteContext, false, ankiNoteErrors);
+                ankiNote = await this._createNote(dictionaryEntry, mode, noteContext, false, errors);
             } catch (e) {
                 ankiNoteException = e;
             }
             const entry = {mode, ankiNote};
             if (typeof ankiNoteException !== 'undefined') {
                 entry.ankiNoteException = ankiNoteException;
+            }
+            if (errors.length > 0) {
+                entry.errors = errors;
             }
             ankiNotes.push(entry);
         }
