@@ -18,6 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
+const {JSDOM} = require('jsdom');
 const {testMain} = require('../dev/util');
 const {TranslatorVM} = require('../dev/translator-vm');
 
@@ -27,7 +28,10 @@ function clone(value) {
 }
 
 async function createVM() {
-    const vm = new TranslatorVM();
+    const dom = new JSDOM();
+    const {document} = dom.window;
+
+    const vm = new TranslatorVM({document});
 
     const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', 'valid-dictionary1');
     await vm.prepare(dictionaryDirectory, 'Test Dictionary 2');
@@ -66,6 +70,25 @@ async function createVM() {
 
         async renderMulti(items) {
             return this._serializeMulti(this._templateRenderer.renderMulti(items));
+        }
+
+        _serializeError(error) {
+            try {
+                if (typeof error === 'object' && error !== null) {
+                    return {
+                        name: error.name,
+                        message: error.message,
+                        stack: error.stack,
+                        data: error.data
+                    };
+                }
+            } catch (e) {
+                // NOP
+            }
+            return {
+                value: error,
+                hasValue: true
+            };
         }
 
         _serializeMulti(array) {

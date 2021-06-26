@@ -101,8 +101,8 @@ function atob(data) {
 }
 
 class DatabaseVM extends VM {
-    constructor() {
-        super({
+    constructor(globals={}) {
+        super(Object.assign({
             chrome,
             Image,
             Blob,
@@ -111,7 +111,7 @@ class DatabaseVM extends VM {
             IDBKeyRange: global.IDBKeyRange,
             JSZip,
             atob
-        });
+        }, globals));
         this.context.window = this.context;
         this.indexedDB = global.indexedDB;
     }

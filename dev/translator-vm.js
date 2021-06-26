@@ -26,8 +26,8 @@ function clone(value) {
 }
 
 class TranslatorVM extends DatabaseVM {
-    constructor() {
-        super();
+    constructor(globals) {
+        super(globals);
         this._japaneseUtil = null;
         this._translator = null;
         this._ankiNoteDataCreator = null;
