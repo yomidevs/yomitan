@@ -27,14 +27,13 @@ class DisplayGenerator {
         this._mediaLoader = mediaLoader;
         this._hotkeyHelpController = hotkeyHelpController;
         this._templates = null;
-        this._structuredContentGenerator = null;
+        this._structuredContentGenerator = new StructuredContentGenerator(this._mediaLoader, document);
         this._termPitchAccentStaticTemplateIsSetup = false;
     }
 
     async prepare() {
         const html = await yomichan.api.getDisplayTemplatesHtml();
         this._templates = new HtmlTemplateCollection(html);
-        this._structuredContentGenerator = new StructuredContentGenerator(this._templates, this._mediaLoader, document);
         this.updateHotkeys();
     }
 
