@@ -111,6 +111,7 @@
             "files": [
                 "ext/js/core.js",
                 "ext/js/data/anki-note-data-creator.js",
+                "ext/js/display/structured-content-generator.js",
                 "ext/js/language/dictionary-data-util.js",
                 "ext/js/templates/template-renderer.js"
             ],
@@ -123,6 +124,7 @@
             "excludedFiles": [
                 "ext/js/core.js",
                 "ext/js/data/anki-note-data-creator.js",
+                "ext/js/display/structured-content-generator.js",
                 "ext/js/language/dictionary-data-util.js",
                 "ext/js/templates/template-renderer.js"
             ],
@@ -152,6 +154,7 @@
                 "ext/js/core.js",
                 "ext/js/yomichan.js",
                 "ext/js/data/anki-note-data-creator.js",
+                "ext/js/display/structured-content-generator.js",
                 "ext/js/language/dictionary-data-util.js",
                 "ext/js/templates/template-renderer.js"
             ],
