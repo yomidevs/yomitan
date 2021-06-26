@@ -274,7 +274,7 @@ class AnkiNoteDataCreator {
             case 'merge': type = 'termMerged'; break;
         }
 
-        const {ids, inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount} = dictionaryEntry;
+        const {inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, definitions} = dictionaryEntry;
 
         const {
             screenshotFileName=null,
@@ -301,7 +301,7 @@ class AnkiNoteDataCreator {
 
         return {
             type,
-            id: (type === 'term' ? ids[0] : void 0),
+            id: (type === 'term' && definitions.length > 0 ? definitions[0].id : void 0),
             source: (primarySource !== null ? primarySource.transformedText : null),
             rawSource: (primarySource !== null ? primarySource.originalText : null),
             sourceTerm: (type !== 'termMerged' ? (primarySource !== null ? primarySource.deinflectedText : null) : void 0),

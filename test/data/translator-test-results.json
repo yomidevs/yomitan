@@ -246,9 +246,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          1
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -296,6 +293,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 1,
+            "score": 1,
             "sequences": [
               1
             ],
@@ -345,9 +346,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          2
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -395,6 +393,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 2,
+            "score": 1,
             "sequences": [
               2
             ],
@@ -463,9 +465,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          3
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -526,6 +525,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 3,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -575,9 +578,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          5
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -638,6 +638,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 5,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -687,9 +691,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          4
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -750,6 +751,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -799,9 +804,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          6
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -862,6 +864,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 6,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -911,9 +917,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          1
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -961,6 +964,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 1,
+            "score": 1,
             "sequences": [
               1
             ],
@@ -1010,9 +1017,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          2
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -1060,6 +1064,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 2,
+            "score": 1,
             "sequences": [
               2
             ],
@@ -1128,9 +1136,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          7
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -1191,6 +1196,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 7,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -1258,9 +1267,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          9
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -1321,6 +1327,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 9,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -1388,9 +1398,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          8
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -1451,6 +1458,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 8,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -1518,9 +1529,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          10
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -1581,6 +1589,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 10,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -1648,9 +1660,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          3
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -1713,6 +1722,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 3,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -1762,9 +1775,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          5
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -1827,6 +1837,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 5,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -1876,9 +1890,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          4
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -1941,6 +1952,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -1990,9 +2005,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          6
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -2055,6 +2067,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 6,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -2104,9 +2120,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          1
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -2154,6 +2167,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 1,
+            "score": 1,
             "sequences": [
               1
             ],
@@ -2203,9 +2220,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          2
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -2253,6 +2267,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 2,
+            "score": 1,
             "sequences": [
               2
             ],
@@ -2321,9 +2339,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          11
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -2384,6 +2399,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 11,
+            "score": 1,
             "sequences": [
               5
             ],
@@ -2429,9 +2448,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          1
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -2479,6 +2495,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 1,
+            "score": 1,
             "sequences": [
               1
             ],
@@ -2534,9 +2554,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          2
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -2584,6 +2601,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 2,
+            "score": 1,
             "sequences": [
               2
             ],
@@ -2652,9 +2673,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          3
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -2715,6 +2733,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 3,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -2764,9 +2786,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          4
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -2827,6 +2846,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -2882,9 +2905,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          5
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -2945,6 +2965,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 5,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -2994,9 +3018,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          6
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -3057,6 +3078,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 6,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -3112,9 +3137,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          7
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -3175,6 +3197,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 7,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -3242,9 +3268,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          8
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -3305,6 +3328,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 8,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -3372,9 +3399,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          3
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -3437,6 +3461,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 3,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -3486,9 +3514,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          4
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -3551,6 +3576,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -3606,9 +3635,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          9
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -3669,6 +3695,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 9,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -3736,9 +3766,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          10
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -3799,6 +3826,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 10,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -3866,9 +3897,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          5
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -3931,6 +3959,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 5,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -3980,9 +4012,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          6
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -4045,6 +4074,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 6,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -4100,9 +4133,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          11
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -4163,6 +4193,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 11,
+            "score": 1,
             "sequences": [
               5
             ],
@@ -4218,9 +4252,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          7
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -4254,6 +4285,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 7,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -4270,9 +4305,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          9
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -4306,6 +4338,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 9,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -4322,9 +4358,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          8
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -4358,6 +4391,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 8,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -4374,9 +4411,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          10
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -4410,6 +4444,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 10,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -4426,9 +4464,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          3
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -4464,6 +4499,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 3,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -4480,9 +4519,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          5
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -4518,6 +4554,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 5,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -4534,9 +4574,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          4
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -4572,6 +4609,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -4588,9 +4629,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          6
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -4626,6 +4664,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 6,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -4642,9 +4684,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          1
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -4678,6 +4717,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 1,
+            "score": 1,
             "sequences": [
               1
             ],
@@ -4694,9 +4737,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          2
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -4730,6 +4770,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 2,
+            "score": 1,
             "sequences": [
               2
             ],
@@ -4752,10 +4796,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          7,
-          8
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -4829,6 +4869,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 7,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -4859,6 +4903,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 8,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -4926,10 +4974,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          9,
-          10
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -5003,6 +5047,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 9,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -5033,6 +5081,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 10,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -5100,10 +5152,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          3,
-          4
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -5179,6 +5227,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 3,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -5209,6 +5261,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -5258,10 +5314,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          5,
-          6
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -5337,6 +5389,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 5,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -5367,6 +5423,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 6,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -5416,9 +5476,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          1
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -5466,6 +5523,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 1,
+            "score": 1,
             "sequences": [
               1
             ],
@@ -5515,9 +5576,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          2
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -5565,6 +5623,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 2,
+            "score": 1,
             "sequences": [
               2
             ],
@@ -5633,12 +5695,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          7,
-          9,
-          8,
-          10
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -5769,6 +5825,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 7,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -5799,6 +5859,10 @@
               1
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 9,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -5829,6 +5893,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 8,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -5859,6 +5927,10 @@
               1
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 10,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -5961,12 +6033,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          3,
-          5,
-          4,
-          6
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -6099,6 +6165,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 3,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -6129,6 +6199,10 @@
               1
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 5,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -6159,6 +6233,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -6189,6 +6267,10 @@
               1
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 6,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -6256,9 +6338,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          1
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -6306,6 +6385,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 1,
+            "score": 1,
             "sequences": [
               1
             ],
@@ -6355,9 +6438,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          2
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -6405,6 +6485,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 2,
+            "score": 1,
             "sequences": [
               2
             ],
@@ -6473,9 +6557,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          7
-        ],
         "isPrimary": true,
         "inflections": [
           "-te",
@@ -6540,6 +6621,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 7,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -6607,9 +6692,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          9
-        ],
         "isPrimary": true,
         "inflections": [
           "-te",
@@ -6674,6 +6756,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 9,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -6741,9 +6827,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          8
-        ],
         "isPrimary": true,
         "inflections": [
           "-te",
@@ -6808,6 +6891,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 8,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -6875,9 +6962,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          10
-        ],
         "isPrimary": true,
         "inflections": [
           "-te",
@@ -6942,6 +7026,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 10,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -7009,9 +7097,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          3
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -7074,6 +7159,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 3,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -7123,9 +7212,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          5
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -7188,6 +7274,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 5,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -7237,9 +7327,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          4
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -7302,6 +7389,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -7351,9 +7442,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          6
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -7416,6 +7504,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 6,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -7465,9 +7557,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          1
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -7515,6 +7604,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 1,
+            "score": 1,
             "sequences": [
               1
             ],
@@ -7564,9 +7657,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          2
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -7614,6 +7704,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 2,
+            "score": 1,
             "sequences": [
               2
             ],
@@ -7682,9 +7776,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          7
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -7745,6 +7836,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 7,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -7812,9 +7907,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          9
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -7875,6 +7967,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 9,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -7942,9 +8038,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          8
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -8005,6 +8098,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 8,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -8072,9 +8169,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          10
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -8135,6 +8229,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 10,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -8202,9 +8300,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          3
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -8267,6 +8362,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 3,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -8316,9 +8415,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          5
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -8381,6 +8477,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 5,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -8430,9 +8530,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          4
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -8495,6 +8592,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -8544,9 +8645,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          6
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -8609,6 +8707,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 6,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -8658,9 +8760,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          1
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -8708,6 +8807,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 1,
+            "score": 1,
             "sequences": [
               1
             ],
@@ -8757,9 +8860,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          2
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -8807,6 +8907,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 2,
+            "score": 1,
             "sequences": [
               2
             ],
@@ -8875,9 +8979,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          7
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -8938,6 +9039,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 7,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -9005,9 +9110,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          9
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -9068,6 +9170,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 9,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -9135,9 +9241,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          8
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -9198,6 +9301,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 8,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -9265,9 +9372,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          10
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -9328,6 +9432,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 10,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -9395,9 +9503,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          3
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -9460,6 +9565,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 3,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -9509,9 +9618,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          5
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -9574,6 +9680,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 5,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -9623,9 +9733,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          4
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -9688,6 +9795,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -9737,9 +9848,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          6
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -9802,6 +9910,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 6,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -9851,9 +9963,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          1
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -9901,6 +10010,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 1,
+            "score": 1,
             "sequences": [
               1
             ],
@@ -9950,9 +10063,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          2
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 1,
@@ -10000,6 +10110,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 2,
+            "score": 1,
             "sequences": [
               2
             ],
@@ -10068,9 +10182,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          12
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -10133,6 +10244,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 12,
+            "score": 100,
             "sequences": [
               6
             ],
@@ -10168,9 +10283,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          13
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 90,
@@ -10231,6 +10343,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 13,
+            "score": 90,
             "sequences": [
               7
             ],
@@ -10266,9 +10382,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          12
-        ],
         "isPrimary": true,
         "inflections": [
           "polite past"
@@ -10331,6 +10444,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 12,
+            "score": 100,
             "sequences": [
               6
             ],
@@ -10366,12 +10483,6 @@
     "dictionaryEntries": [
       {
         "type": "term",
-        "ids": [
-          7,
-          9,
-          8,
-          10
-        ],
         "isPrimary": true,
         "inflections": [],
         "score": 10,
@@ -10502,6 +10613,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 7,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -10532,6 +10647,10 @@
               1
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 9,
+            "score": 10,
             "sequences": [
               4
             ],
@@ -10562,6 +10681,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 8,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -10592,6 +10715,10 @@
               1
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 10,
+            "score": 1,
             "sequences": [
               4
             ],
@@ -10694,12 +10821,6 @@
       },
       {
         "type": "term",
-        "ids": [
-          3,
-          5,
-          4,
-          6
-        ],
         "isPrimary": true,
         "inflections": [
           "masu stem"
@@ -10832,6 +10953,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 3,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -10862,6 +10987,10 @@
               1
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 5,
+            "score": 10,
             "sequences": [
               3
             ],
@@ -10892,6 +11021,10 @@
               0
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
             "sequences": [
               3
             ],
@@ -10922,6 +11055,10 @@
               1
             ],
             "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 6,
+            "score": 1,
             "sequences": [
               3
             ],

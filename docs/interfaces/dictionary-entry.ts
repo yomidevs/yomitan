@@ -192,10 +192,6 @@ namespace Translation {
      */
     export interface TermDictionaryEntry extends DictionaryEntry {
         /**
-         * Database IDs for the term.
-         */
-        ids: number[];
-        /**
          * Whether or not any of the sources is a primary source. Primary sources are derived from the
          * original search text, while non-primary sources originate from related terms.
          */
@@ -288,6 +284,22 @@ namespace Translation {
          * The name of the dictionary that the definition information originated from.
          */
         dictionary: string;
+        /**
+         * The index of the dictionary in the original list of dictionaries used for the lookup.
+         */
+        dictionaryIndex: number;
+        /**
+         * The priority of the dictionary.
+         */
+        dictionaryPriority: number;
+        /**
+         * Database ID for the definition.
+         */
+        id: number[];
+        /**
+         * A score for the definition.
+         */
+        score: number;
         /**
          * A list of database sequence numbers for the term. A value of `-1` corresponds to no sequence.
          * The list can have multiple values if multiple definitions with different sequences have been merged.
