@@ -1073,7 +1073,7 @@ class Display extends EventDispatcher {
         try {
             this._updateAdderButtonsPromise = promise;
 
-            const modes = isTerms ? ['term-kanji', 'term-kana'] : ['kanji'];
+            const modes = this._getModes(isTerms);
             let states;
             try {
                 const noteContext = this._getNoteContext();
@@ -1922,9 +1922,16 @@ class Display extends EventDispatcher {
         return typeof queryPostProcessor === 'function' ? queryPostProcessor(query) : query;
     }
 
+    _getModes(isTerms) {
+        return isTerms ? ['term-kanji', 'term-kana'] : ['kanji'];
+    }
+
     async _logDictionaryEntryData(index) {
         if (index < 0 || index >= this._dictionaryEntries.length) { return; }
         const dictionaryEntry = this._dictionaryEntries[index];
+        const result = {dictionaryEntry};
+
+        // Anki note data
         let ankiNoteData;
         let ankiNoteDataException;
         try {
@@ -1943,10 +1950,32 @@ class Display extends EventDispatcher {
         } catch (e) {
             ankiNoteDataException = e;
         }
-        const result = {dictionaryEntry, ankiNoteData};
+        result.ankiNoteData = ankiNoteData;
         if (typeof ankiNoteDataException !== 'undefined') {
             result.ankiNoteDataException = ankiNoteDataException;
         }
+
+        // Anki notes
+        const ankiNotes = [];
+        const modes = this._getModes(dictionaryEntry.type === 'term');
+        for (const mode of modes) {
+            let ankiNote;
+            let ankiNoteException;
+            const ankiNoteErrors = [];
+            try {
+                const noteContext = this._getNoteContext();
+                ankiNote = await this._createNote(dictionaryEntry, mode, noteContext, false, ankiNoteErrors);
+            } catch (e) {
+                ankiNoteException = e;
+            }
+            const entry = {mode, ankiNote};
+            if (typeof ankiNoteException !== 'undefined') {
+                entry.ankiNoteException = ankiNoteException;
+            }
+            ankiNotes.push(entry);
+        }
+        result.ankiNotes = ankiNotes;
+
         console.log(result);
     }
 }
