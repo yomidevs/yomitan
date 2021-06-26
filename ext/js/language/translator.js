@@ -108,16 +108,21 @@ class Translator {
             this._removeExcludedDefinitions(dictionaryEntries, excludeDictionaryDefinitions);
         }
 
-        if (dictionaryEntries.length > 1) {
-            this._sortTermDictionaryEntries(dictionaryEntries);
-        }
-
         if (mode === 'simple') {
             this._clearTermTags(dictionaryEntries);
         } else {
             await this._addTermMeta(dictionaryEntries, enabledDictionaryMap);
             await this._expandTermTags(dictionaryEntries);
-            this._sortTermDictionaryEntryData(dictionaryEntries);
+        }
+
+        if (dictionaryEntries.length > 1) {
+            this._sortTermDictionaryEntries(dictionaryEntries);
+        }
+        for (const {definitions, frequencies, pronunciations} of dictionaryEntries) {
+            this._flagRedundantDefinitionTags(definitions);
+            if (definitions.length > 1) { this._sortTermDictionaryEntryDefinitions(definitions); }
+            if (frequencies.length > 1) { this._sortTermDictionaryEntrySimpleData(frequencies); }
+            if (pronunciations.length > 1) { this._sortTermDictionaryEntrySimpleData(pronunciations); }
         }
 
         return {dictionaryEntries, originalTextLength};
@@ -1090,9 +1095,7 @@ class Translator {
         }
 
         // Sort
-        if (definitionEntries.length > 1) {
-            this._sortTermDefinitionEntries(definitionEntries);
-        } else {
+        if (definitionEntries.length <= 1) {
             checkDuplicateDefinitions = false;
         }
 
@@ -1330,11 +1333,8 @@ class Translator {
         dictionaryEntries.sort(compareFunction);
     }
 
-    _sortTermDefinitionEntries(definitionEntries) {
-        const compareFunction = (e1, e2) => {
-            const v1 = e1.dictionaryEntry;
-            const v2 = e2.dictionaryEntry;
-
+    _sortTermDictionaryEntryDefinitions(definitions) {
+        const compareFunction = (v1, v2) => {
             // Sort by dictionary priority
             let i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
@@ -1344,20 +1344,14 @@ class Translator {
             if (i !== 0) { return i; }
 
             // Sort by definition headword index
-            const definitions1 = v1.definitions;
-            const definitions2 = v2.definitions;
-            const headwordIndexMap1 = e1.headwordIndexMap;
-            const headwordIndexMap2 = e2.headwordIndexMap;
-            for (let j = 0, jj = Math.min(definitions1.length, definitions2.length); j < jj; ++j) {
-                const headwordIndices1 = definitions1[j].headwordIndices;
-                const headwordIndices2 = definitions2[j].headwordIndices;
-                const kk = headwordIndices1.length;
-                i = headwordIndices2.length - kk;
+            const headwordIndices1 = v1.headwordIndices;
+            const headwordIndices2 = v2.headwordIndices;
+            const jj = headwordIndices1.length;
+            i = headwordIndices2.length - jj;
+            if (i !== 0) { return i; }
+            for (let j = 0; j < jj; ++j) {
+                i = headwordIndices1[j] - headwordIndices2[j];
                 if (i !== 0) { return i; }
-                for (let k = 0; k < kk; ++k) {
-                    i = headwordIndexMap1[headwordIndices1[k]] - headwordIndexMap2[headwordIndices2[k]];
-                    if (i !== 0) { return i; }
-                }
             }
 
             // Sort by dictionary order
@@ -1365,10 +1359,10 @@ class Translator {
             if (i !== 0) { return i; }
 
             // Sort by original order
-            i = e1.index - e2.index;
+            i = v1.index - v2.index;
             return i;
         };
-        definitionEntries.sort(compareFunction);
+        definitions.sort(compareFunction);
     }
 
     _sortTermDictionaryEntriesById(dictionaryEntries) {
@@ -1376,7 +1370,7 @@ class Translator {
         dictionaryEntries.sort((a, b) => a.definitions[0].id - b.definitions[0].id);
     }
 
-    _sortTermDictionaryEntryData(dictionaryEntries) {
+    _sortTermDictionaryEntrySimpleData(dataList) {
         const compare = (v1, v2) => {
             // Sort by dictionary priority
             let i = v2.dictionaryPriority - v1.dictionaryPriority;
@@ -1394,12 +1388,7 @@ class Translator {
             i = v1.index - v2.index;
             return i;
         };
-
-        for (const {definitions, frequencies, pronunciations} of dictionaryEntries) {
-            this._flagRedundantDefinitionTags(definitions);
-            frequencies.sort(compare);
-            pronunciations.sort(compare);
-        }
+        dataList.sort(compare);
     }
 
     _sortKanjiDictionaryEntryData(dictionaryEntries) {
