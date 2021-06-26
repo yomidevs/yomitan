@@ -115,7 +115,8 @@ class AnkiNoteBuilder {
     async _formatField(field, commonData, template, errors=null) {
         return await this._stringReplaceAsync(field, this._markerPattern, async (g0, marker) => {
             try {
-                return await this._renderTemplateBatched(template, commonData, marker);
+                const {result} = await this._renderTemplateBatched(template, commonData, marker);
+                return result;
             } catch (e) {
                 if (Array.isArray(errors)) {
                     const error = new Error(`Template render error for {${marker}}`);
@@ -140,10 +141,6 @@ class AnkiNoteBuilder {
         }
         parts.push(str.substring(index));
         return (await Promise.all(parts)).join('');
-    }
-
-    async _renderTemplate(template, marker, commonData) {
-        return await this._templateRenderer.render(template, {marker, commonData}, 'ankiNote');
     }
 
     _getBatchedTemplateGroup(template) {

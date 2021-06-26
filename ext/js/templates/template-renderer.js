@@ -28,6 +28,7 @@ class TemplateRenderer {
         this._helpersRegistered = false;
         this._stateStack = null;
         this._dataTypes = new Map();
+        this._requirements = null;
     }
 
     registerDataType(name, {modifier=null, composeData=null}) {
@@ -85,10 +86,14 @@ class TemplateRenderer {
 
     _renderTemplate(instance, data) {
         try {
+            const requirements = [];
             this._stateStack = [new Map()];
-            return instance(data).trim();
+            this._requirements = requirements;
+            const result = instance(data).trim();
+            return {result, requirements};
         } finally {
             this._stateStack = null;
+            this._requirements = null;
         }
     }
 
