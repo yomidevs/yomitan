@@ -1,0 +1,50 @@
+/*
+ * Copyright (C) 2021  Yomichan Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the entrys of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+.gloss-image-container {
+    font-size: 1px;
+}
+.gloss-image-link[data-background=true]>.gloss-image-container {
+    /* remove-property background-color */
+}
+.gloss-image-container-overlay {
+    font-size: initial;
+    line-height: initial;
+    color: initial;
+}
+.gloss-image-background {
+    background-color: currentColor;
+}
+:root[data-browser=firefox] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image,
+:root[data-browser=firefox] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image-background,
+:root[data-browser=firefox-mobile] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image,
+:root[data-browser=firefox-mobile] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image-background {
+    /* remove-rule */
+}
+.gloss-image-link-text {
+    line-height: initial;
+}
+.gloss-sc-thead,
+.gloss-sc-tfoot,
+.gloss-sc-th {
+    /* remove-property background-color */
+}
+.gloss-sc-th,
+.gloss-sc-td {
+    border-width: 1px;
+    border-color: currentColor;
+}

@@ -201,9 +201,6 @@
     table-layout: auto;
     border-collapse: collapse;
 }
-.gloss-sc-tbody {
-    background-color: transparent;
-}
 .gloss-sc-thead,
 .gloss-sc-tfoot,
 .gloss-sc-th {
