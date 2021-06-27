@@ -532,6 +532,119 @@ Returns an array of the mora for a kana string.
 </details>
 
 
+### `typeof`
+
+Returns the type of a value.
+
+<details>
+  <summary>Syntax:</summary>
+
+  <code>{{#typeof <i>value</i>}}{{/get}}</code><br>
+  <code>{{#typeof}}<i>value</i>{{/get}}</code><br>
+
+  * _`value`_ <br>
+    The value to check.
+</details>
+<details>
+  <summary>Example:</summary>
+
+  ```handlebars
+  {{#typeof "よみちゃん"}}{{/typeof}}
+  {{#typeof 1}}{{/typeof}}
+  {{#typeof}}よみちゃん{{/typeof}}
+  ```
+
+  Output:
+  ```html
+  string
+  number
+  string
+  ```
+</details>
+
+
+### `join`
+
+Joins the arguments to a single string with a separator, flattening any arguments that are arrays.
+
+<details>
+  <summary>Syntax:</summary>
+
+  <code>{{#join <i>separator</i> <i>value1</i> <i>value2</i> <i>valueN</i>...}}{{/join}}</code><br>
+
+  * _`separator`_ <br>
+    The separator string to use between values.
+  * _`valueN`_ <br>
+    An individual value to join into the resulting string
+</details>
+<details>
+  <summary>Example:</summary>
+
+  ```handlebars
+  {{#set "index" 32}}{{/set~}}
+  {{~#join "_" "yomichan" (get "index") "value"}}{{/join}}
+  ```
+
+  Output:
+  ```html
+  yomichan_32_value
+  ```
+</details>
+
+
+### `concat`
+
+Joins the arguments to a single string, without flattening arguments that are arrays.
+
+<details>
+  <summary>Syntax:</summary>
+
+  <code>{{#concat <i>value1</i> <i>value1</i> <i>valueN</i>...}}{{/concat}}</code><br>
+
+  * _`valueN`_ <br>
+    A value to join into the resulting string
+</details>
+<details>
+  <summary>Example:</summary>
+
+  ```handlebars
+  {{#set "index" 32}}{{/set~}}
+  {{~#concat "yomichan_" (get "index") "_value"}}{{/concat}}
+  ```
+
+  Output:
+  ```html
+  yomichan_32_value
+  ```
+</details>
+
+
+### `pitchCategories`
+
+Returns an array representing the different pitch categories for a specific term.
+
+<details>
+  <summary>Syntax:</summary>
+
+  <code>{{#pitchCategories @root}}{{/pitchCategories}}</code><br>
+
+  * _`@root`_ <br>
+    The argument passed should always be the root data object.
+</details>
+<details>
+  <summary>Example:</summary>
+
+  ```handlebars
+  [{{#each (pitchCategories @root)}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}]
+  ```
+
+  Output:
+  ```html
+  [heiban, kifuku]
+  ```
+</details>
+
+
 ## Legacy Helpers
 
 Yomichan has historically used Handlebars templates to generate the HTML used on the search page and results popup.
