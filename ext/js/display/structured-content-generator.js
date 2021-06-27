@@ -104,7 +104,7 @@ class StructuredContentGenerator {
         const aspectRatioSizer = this._createElement('span', 'gloss-image-aspect-ratio-sizer');
         imageContainer.appendChild(aspectRatioSizer);
 
-        const imageBackground = this._createElement('span', 'gloss-image-background icon');
+        const imageBackground = this._createElement('span', 'gloss-image-background');
         imageContainer.appendChild(imageBackground);
 
         const image = this._createElement('img', 'gloss-image');
