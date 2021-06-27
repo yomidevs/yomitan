@@ -27,6 +27,7 @@ class TemplateRendererFrameApi {
 
     prepare() {
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
+        this._postMessage(window.parent, 'ready', {}, null);
     }
 
     // Private
@@ -52,7 +53,7 @@ class TemplateRendererFrameApi {
         }
 
         if (typeof id === 'undefined') { return; }
-        source.postMessage({action: `${action}.response`, params: response, id}, '*');
+        this._postMessage(source, `${action}.response`, response, id);
     }
 
     _onRender({template, data, type}) {
@@ -100,5 +101,9 @@ class TemplateRendererFrameApi {
 
     _clone(value) {
         return JSON.parse(JSON.stringify(value));
+    }
+
+    _postMessage(target, action, params, id) {
+        return target.postMessage({action, params, id}, '*');
     }
 }
