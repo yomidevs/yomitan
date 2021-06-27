@@ -77,6 +77,7 @@ class TemplatePatcher {
     // Private
 
     _addFieldTemplatesBeforeEnd(template, addition) {
+        if (addition.length === 0) { return template; }
         const newline = '\n';
         let replaced = false;
         template = template.replace(this._lookupMarkerPattern, (g0) => {

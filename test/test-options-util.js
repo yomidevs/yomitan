@@ -649,12 +649,23 @@ async function testFieldTemplatesUpdate(extDir) {
         const content = fs.readFileSync(path.join(extDir, fileName), {encoding: 'utf8'});
         return templatePatcher.parsePatch(content).addition;
     };
-    const update2 = loadDataFile('data/templates/anki-field-templates-upgrade-v2.handlebars');
-    const update4 = loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars');
-    const update6 = loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars');
-    const update8 = loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars');
-    const update10 = loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars');
-    const update12 = loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars');
+    const updates = [
+        {version: 2,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v2.handlebars')},
+        {version: 4,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars')},
+        {version: 6,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars')},
+        {version: 8,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
+        {version: 10, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars')},
+        {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')}
+    ];
+    const getUpdateAdditions = (startVersion=0) => {
+        let value = '';
+        for (const {version, changes} of updates) {
+            if (version < startVersion || changes.length === 0) { continue; }
+            if (value.length > 0) { value += '\n'; }
+            value += changes;
+        }
+        return value;
+    };
 
     const data = [
         // Standard format
@@ -671,12 +682,7 @@ async function testFieldTemplatesUpdate(extDir) {
     {{~definition.character~}}
 {{/inline}}
 
-${update2}
-${update4}
-${update6}
-${update8}
-${update10}
-${update12}
+${getUpdateAdditions()}
 {{~> (lookup . "marker") ~}}`.trimStart()
         },
         // Non-standard marker format
@@ -694,12 +700,7 @@ ${update12}
 {{/inline}}
 
 {{~> (lookup . "marker2") ~}}
-${update2}
-${update4}
-${update6}
-${update8}
-${update10}
-${update12}`.trimStart()
+${getUpdateAdditions()}`.trimStart()
         },
         // Empty test
         {
@@ -707,12 +708,7 @@ ${update12}`.trimStart()
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
             expected: `
-${update2}
-${update4}
-${update6}
-${update8}
-${update10}
-${update12}
+${getUpdateAdditions()}
 {{~> (lookup . "marker") ~}}`.trimStart()
         },
         // Definition tags update
@@ -782,12 +778,7 @@ ${update12}
     {{~> glossary-single definition brief=brief compactGlossaries=../compactGlossaries data=../.~}}
 {{/inline}}
 
-${update2}
-${update4}
-${update6}
-${update8}
-${update10}
-${update12}
+${getUpdateAdditions()}
 {{~> (lookup . "marker") ~}}
 `.trimStart()
         },
@@ -927,9 +918,7 @@ ${update12}
     {{~> glossary brief=true ~}}
 {{/inline}}
 
-${update8}
-${update10}
-${update12}
+${getUpdateAdditions(7)}
 {{~> (lookup . "marker") ~}}`.trimStart()
         }
     ];
