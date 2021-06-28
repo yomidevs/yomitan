@@ -56,8 +56,9 @@ async function createVM() {
     const ankiNoteDataCreator = vm.ankiNoteDataCreator;
     class TemplateRendererProxy {
         constructor() {
-            const japaneseUtil = new JapaneseUtil(null);
-            this._templateRenderer = new TemplateRenderer(japaneseUtil);
+            this._preparePromise = null;
+            this._japaneseUtil = new JapaneseUtil(null);
+            this._templateRenderer = new TemplateRenderer(this._japaneseUtil);
             this._templateRenderer.registerDataType('ankiNote', {
                 modifier: ({marker, commonData}) => ankiNoteDataCreator.create(marker, commonData),
                 composeData: (marker, commonData) => ({marker, commonData})
@@ -65,11 +66,24 @@ async function createVM() {
         }
 
         async render(template, data, type) {
-            return this._templateRenderer.render(template, data, type);
+            await this._prepare();
+            return await this._templateRenderer.render(template, data, type);
         }
 
         async renderMulti(items) {
-            return this._serializeMulti(this._templateRenderer.renderMulti(items));
+            await this._prepare();
+            return await this._serializeMulti(this._templateRenderer.renderMulti(items));
+        }
+
+        _prepare() {
+            if (this._preparePromise === null) {
+                this._preparePromise = this._prepareInternal();
+            }
+            return this._preparePromise;
+        }
+
+        async _prepareInternal() {
+            // Empty
         }
 
         _serializeError(error) {
