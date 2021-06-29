@@ -5,6 +5,7 @@
             ["display", "inline-block"],
             ["white-space", "nowrap"],
             ["max-width", "100%"],
+            ["max-height", "100vh"],
             ["position", "relative"],
             ["vertical-align", "top"],
             ["line-height", "0"],
@@ -19,7 +20,8 @@
             ["color", "inherit"],
             ["display", "inline-block"],
             ["position", "relative"],
-            ["line-height", "1"]
+            ["line-height", "1"],
+            ["max-width", "100%"]
         ]
     },
     {
@@ -130,7 +132,7 @@
         ]
     },
     {
-        "selectors": [".gloss-image-link[data-has-aspect-ratio=true] .gloss-image-aspect-ratio-sizer"],
+        "selectors": [".gloss-image-link[data-has-aspect-ratio=true] .gloss-image-sizer"],
         "styles": [
             ["display", "inline-block"],
             ["width", "0"],

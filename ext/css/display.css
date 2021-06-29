@@ -1128,6 +1128,7 @@ button.action-button[data-icon=source-term]::before {
     color: var(--text-color-light3);
 }
 .gloss-content {
+    display: block;
     white-space: pre-line;
 }
 .definition-disambiguation-list {
@@ -1153,6 +1154,9 @@ button.action-button[data-icon=source-term]::before {
     opacity: 0;
     white-space: pre-wrap;
 }
+.gloss-separator {
+    display: none;
+}
 .definition-item {
     display: list-item;
     position: relative;
@@ -1170,6 +1174,7 @@ button.action-button[data-icon=source-term]::before {
     flex-flow: row nowrap;
 }
 .definition-item-content {
+    width: 100%;
     flex: 1 1 auto;
     background-color: transparent;
     transition: background-color var(--animation-duration) ease-in-out;
@@ -2005,6 +2010,12 @@ button.footer-notification-close-button {
     content: var(--compact-list-separator);
     display: inline;
     color: var(--text-color-light3);
+}
+:root[data-glossary-layout-mode=compact] .gloss-content {
+    display: inline;
+}
+:root[data-glossary-layout-mode=compact] .gloss-separator {
+    display: inline;
 }
 
 :root[data-show-pitch-accent-downstep-notation=true] .pitch-accent-disambiguation-list[data-term-count='0'],

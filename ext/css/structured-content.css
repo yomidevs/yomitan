@@ -20,6 +20,7 @@
     display: inline-block;
     white-space: nowrap;
     max-width: 100%;
+    max-height: 100vh;
     position: relative;
     vertical-align: top;
     line-height: 0;
@@ -35,6 +36,7 @@
     display: inline-block;
     position: relative;
     line-height: 1;
+    max-width: 100%;
 }
 .gloss-image-link[href]:hover {
     cursor: pointer;
@@ -119,7 +121,7 @@
 :root[data-browser=firefox-mobile] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image-background {
     image-rendering: auto;
 }
-.gloss-image-link[data-has-aspect-ratio=true] .gloss-image-aspect-ratio-sizer {
+.gloss-image-link[data-has-aspect-ratio=true] .gloss-image-sizer {
     display: inline-block;
     width: 0;
     vertical-align: top;
