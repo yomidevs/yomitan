@@ -32,11 +32,14 @@
 }
 .gloss-image-link {
     cursor: inherit;
-    color: inherit;
+    color: var(--accent-color);
     display: inline-block;
     position: relative;
     line-height: 1;
     max-width: 100%;
+}
+.gloss-image-link:hover {
+    color: var(--accent-color-dark);
 }
 .gloss-image-link[href]:hover {
     cursor: pointer;

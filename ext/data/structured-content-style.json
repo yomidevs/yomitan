@@ -17,11 +17,11 @@
         "selectors": [".gloss-image-link"],
         "styles": [
             ["cursor", "inherit"],
-            ["color", "inherit"],
             ["display", "inline-block"],
             ["position", "relative"],
             ["line-height", "1"],
-            ["max-width", "100%"]
+            ["max-width", "100%"],
+            ["color", "inherit"]
         ]
     },
     {

@@ -21,6 +21,12 @@
 .gloss-image-link[data-background=true]>.gloss-image-container {
     /* remove-property background-color */
 }
+.gloss-image-link {
+    color: inherit;
+}
+.gloss-image-link:hover {
+    /* remove-rule */
+}
 .gloss-image-container-overlay {
     font-size: initial;
     line-height: initial;
