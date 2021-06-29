@@ -83,15 +83,15 @@ class StructuredContentGenerator {
 
         const hasPreferredWidth = (typeof preferredWidth === 'number');
         const hasPreferredHeight = (typeof preferredHeight === 'number');
-        const aspectRatio = (
+        const invAspectRatio = (
             hasPreferredWidth && hasPreferredHeight ?
-            preferredWidth / preferredHeight :
-            width / height
+            preferredHeight / preferredWidth :
+            height / width
         );
         const usedWidth = (
             hasPreferredWidth ?
             preferredWidth :
-            (hasPreferredHeight ? preferredHeight * aspectRatio : width)
+            (hasPreferredHeight ? preferredHeight * invAspectRatio : width)
         );
 
         const node = this._createElement('a', 'gloss-image-link');
@@ -139,7 +139,7 @@ class StructuredContentGenerator {
             imageContainer.title = title;
         }
 
-        aspectRatioSizer.style.paddingTop = `${aspectRatio * 100.0}%`;
+        aspectRatioSizer.style.paddingTop = `${invAspectRatio * 100.0}%`;
 
         if (this._mediaLoader !== null) {
             this._mediaLoader.loadMedia(
