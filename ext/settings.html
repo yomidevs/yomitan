@@ -31,7 +31,6 @@
             <a href="#!window"           class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="window"></span></span><span class="outline-item-label">Window</span></a>
             <a href="#!audio"            class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="speaker"></span></span><span class="outline-item-label">Audio</span></a>
             <a href="#!text-parsing"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="text-parsing"></span></span><span class="outline-item-label">Text Parsing</span></a>
-            <a href="#!sentence-parsing" class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="sentence-parsing"></span></span><span class="outline-item-label">Sentence Parsing</span></a>
             <a href="#!translation"      class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="translation"></span></span><span class="outline-item-label">Translation</span></a>
             <a href="#!anki"             class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="note-card"></span></span><span class="outline-item-label">Anki</span></a>
             <a href="#!clipboard"        class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="clipboard"></span></span><span class="outline-item-label">Clipboard</span></a>
@@ -1158,8 +1157,9 @@
         </div>
         <div class="heading-description more" hidden>
             <p>
-                Yomichan can attempt to parse entire sentences or longer text blocks on the search page,
-                adding furigana above words and optional space between words.
+                Yomichan is able to scan the sentence surrounding a term and parse individual words
+                of the query text on the search page.
+                This information can be added to Anki cards to provide additional context.
             </p>
             <p>
                 <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -1227,26 +1227,7 @@
                 </select>
             </div>
         </div></div>
-    </div>
-
-    <!-- Text Parsing -->
-    <div class="advanced-only">
-        <div class="heading-container">
-            <div class="heading-container-icon"><span class="icon" data-icon="sentence-parsing"></span></div>
-            <div class="heading-container-left"><h2 id="sentence-parsing"><a href="#!sentence-parsing">Sentence Parsing</a></h2></div>
-            <div class="heading-container-right"><a class="more-toggle more-only heading-link-light" data-parent-distance="3">Info&hellip;</a></div>
-        </div>
-        <div class="heading-description more" hidden>
-            <p>
-                Yomichan can scan and parse sentences which can be used as contextual information for Anki cards.
-            </p>
-            <p>
-                <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-            </p>
-        </div>
-    </div>
-    <div class="settings-group advanced-only">
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Sentence scanning extent</div>
                 <div class="settings-item-description">Adjust how many characters are bidirectionally scanned to form a sentence.</div>
@@ -1255,7 +1236,7 @@
                 <input type="number" data-setting="sentenceParsing.scanExtent" min="0" step="1">
             </div>
         </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Sentence termination characters</div>
             </div>
