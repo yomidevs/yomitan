@@ -380,16 +380,6 @@ class Display extends EventDispatcher {
         }
     }
 
-    authenticateMessageData(data) {
-        if (this._frameEndpoint === null) {
-            return data;
-        }
-        if (!this._frameEndpoint.authenticate(data)) {
-            throw new Error('Invalid authentication');
-        }
-        return data.data;
-    }
-
     setQueryPostProcessor(func) {
         this._queryPostProcessor = func;
     }
@@ -454,7 +444,7 @@ class Display extends EventDispatcher {
     // Message handlers
 
     _onDirectMessage(data) {
-        data = this.authenticateMessageData(data);
+        data = this._authenticateMessageData(data);
         const {action, params} = data;
         const handlerInfo = this._directMessageHandlers.get(action);
         if (typeof handlerInfo === 'undefined') {
@@ -468,7 +458,7 @@ class Display extends EventDispatcher {
 
     _onWindowMessage({data}) {
         try {
-            data = this.authenticateMessageData(data);
+            data = this._authenticateMessageData(data);
         } catch (e) {
             return;
         }
@@ -517,6 +507,16 @@ class Display extends EventDispatcher {
     }
 
     // Private
+
+    _authenticateMessageData(data) {
+        if (this._frameEndpoint === null) {
+            return data;
+        }
+        if (!this._frameEndpoint.authenticate(data)) {
+            throw new Error('Invalid authentication');
+        }
+        return data.data;
+    }
 
     async _onStateChanged() {
         if (this._historyChangeIgnore) { return; }
