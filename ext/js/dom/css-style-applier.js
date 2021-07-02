@@ -57,9 +57,6 @@ class CssStyleApplier {
             const {className} = element;
             if (className.length === 0) { continue; }
             let cssTextNew = '';
-            if (className.indexOf('th') >= 0) {
-                console.log(className, this._getRulesForClass(className));
-            }
             for (const {selectorText, styles} of this._getRulesForClass(className)) {
                 if (!element.matches(selectorText)) { continue; }
                 cssTextNew += this._getCssText(styles);
@@ -69,7 +66,17 @@ class CssStyleApplier {
         }
         for (const {element, style} of elementStyles) {
             element.removeAttribute('class');
-            element.setAttribute('style', style);
+            if (style.length > 0) {
+                element.setAttribute('style', style);
+            } else {
+                element.removeAttribute('style');
+            }
+        }
+        for (const element of elements) {
+            const {dataset} = element;
+            for (const key of Object.keys(dataset)) {
+                delete dataset[key];
+            }
         }
     }
 
