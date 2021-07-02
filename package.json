@@ -6,6 +6,7 @@
         "test": "test"
     },
     "scripts": {
+        "postinstall": "node ./dev/patch-dependencies.js",
         "build": "node ./dev/build.js",
         "test": "npm run test-lint && npm run test-lint-css && npm run test-lint-html && npm run test-code && npm run test-manifest && npm run test-build",
         "test-lint": "npx eslint . && node ./dev/lint/global-declarations.js && node ./dev/lint/html-scripts.js",
