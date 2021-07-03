@@ -1,0 +1,17 @@
+{{<<<<<<<}}
+{{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{/each}}
+{{=======}}
+{{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
+{{=======}}
+{{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}
+{{=======}}
+{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}
+{{>>>>>>>}}

@@ -29,9 +29,13 @@ function clone(value) {
 
 async function createVM() {
     const dom = new JSDOM();
-    const {document} = dom.window;
+    const {Node, NodeFilter, document} = dom.window;
 
-    const vm = new TranslatorVM({document});
+    const vm = new TranslatorVM({
+        Node,
+        NodeFilter,
+        document
+    });
 
     const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', 'valid-dictionary1');
     await vm.prepare(dictionaryDirectory, 'Test Dictionary 2');
@@ -39,6 +43,8 @@ async function createVM() {
     vm.execute([
         'js/data/anki-note-builder.js',
         'js/data/anki-util.js',
+        'js/dom/css-style-applier.js',
+        'js/display/structured-content-generator.js',
         'js/templates/template-renderer.js',
         'lib/handlebars.min.js'
     ]);
@@ -46,11 +52,13 @@ async function createVM() {
     const [
         JapaneseUtil,
         TemplateRenderer,
-        AnkiNoteBuilder
+        AnkiNoteBuilder,
+        CssStyleApplier
     ] = vm.get([
         'JapaneseUtil',
         'TemplateRenderer',
-        'AnkiNoteBuilder'
+        'AnkiNoteBuilder',
+        'CssStyleApplier'
     ]);
 
     const ankiNoteDataCreator = vm.ankiNoteDataCreator;
@@ -58,7 +66,8 @@ async function createVM() {
         constructor() {
             this._preparePromise = null;
             this._japaneseUtil = new JapaneseUtil(null);
-            this._templateRenderer = new TemplateRenderer(this._japaneseUtil);
+            this._cssStyleApplier = new CssStyleApplier('/data/structured-content-style.json');
+            this._templateRenderer = new TemplateRenderer(this._japaneseUtil, this._cssStyleApplier);
             this._templateRenderer.registerDataType('ankiNote', {
                 modifier: ({marker, commonData}) => ankiNoteDataCreator.create(marker, commonData),
                 composeData: (marker, commonData) => ({marker, commonData})
@@ -83,7 +92,7 @@ async function createVM() {
         }
 
         async _prepareInternal() {
-            // Empty
+            await this._cssStyleApplier.prepare();
         }
 
         _serializeError(error) {

@@ -461,7 +461,8 @@ class OptionsUtil {
             {async: false, update: this._updateVersion9.bind(this)},
             {async: true,  update: this._updateVersion10.bind(this)},
             {async: false, update: this._updateVersion11.bind(this)},
-            {async: true,  update: this._updateVersion12.bind(this)}
+            {async: true,  update: this._updateVersion12.bind(this)},
+            {async: true,  update: this._updateVersion13.bind(this)}
         ];
     }
 
@@ -842,6 +843,13 @@ class OptionsUtil {
             delete audio.customSourceUrl;
             delete audio.textToSpeechVoice;
         }
+        return options;
+    }
+
+    async _updateVersion13(options) {
+        // Version 13 changes:
+        //  Handlebars templates updated to use formatGlossary.
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v13.handlebars');
         return options;
     }
 }

@@ -17,14 +17,17 @@
 
 /* globals
  * AnkiNoteDataCreator
+ * CssStyleApplier
  * JapaneseUtil
  * TemplateRenderer
  * TemplateRendererFrameApi
  */
 
-(() => {
+(async () => {
+    const cssStyleApplier = new CssStyleApplier('/data/structured-content-style.json');
+    await cssStyleApplier.prepare();
     const japaneseUtil = new JapaneseUtil(null);
-    const templateRenderer = new TemplateRenderer(japaneseUtil);
+    const templateRenderer = new TemplateRenderer(japaneseUtil, cssStyleApplier);
     const ankiNoteDataCreator = new AnkiNoteDataCreator(japaneseUtil);
     templateRenderer.registerDataType('ankiNote', {
         modifier: ({marker, commonData}) => ankiNoteDataCreator.create(marker, commonData),

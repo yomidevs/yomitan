@@ -589,7 +589,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 12,
+        version: 13,
         global: {
             database: {
                 prefixWildcardsSupported: false
@@ -655,7 +655,8 @@ async function testFieldTemplatesUpdate(extDir) {
         {version: 6,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars')},
         {version: 8,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
         {version: 10, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars')},
-        {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')}
+        {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')},
+        {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')}
     ];
     const getUpdateAdditions = (startVersion=0) => {
         let value = '';
@@ -875,11 +876,11 @@ ${getUpdateAdditions()}
         {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
     {{~/unless~}}
     {{~#if (op "<=" glossary.length 1)~}}
-        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{/each}}
+        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
     {{~else if @root.compactGlossaries~}}
-        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
+        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
     {{~else~}}
-        <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
+        <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
     {{~/if~}}
     {{~#set "previousDictionary" dictionary~}}{{~/set~}}
 {{/inline}}
@@ -920,6 +921,27 @@ ${getUpdateAdditions()}
 
 ${getUpdateAdditions(7)}
 {{~> (lookup . "marker") ~}}`.trimStart()
+        },
+        // formatGlossary update
+        {
+            oldVersion: 12,
+            old: `
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
+    {{~else~}}
+        <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
+    {{~/if~}}`.trimStart(),
+
+            expected: `
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
+    {{~else~}}
+        <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
+    {{~/if~}}`.trimStart()
         }
     ];
 

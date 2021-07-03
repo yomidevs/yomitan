@@ -18,11 +18,13 @@
 /* global
  * DictionaryDataUtil
  * Handlebars
+ * StructuredContentGenerator
  */
 
 class TemplateRenderer {
-    constructor(japaneseUtil) {
+    constructor(japaneseUtil, cssStyleApplier) {
         this._japaneseUtil = japaneseUtil;
+        this._cssStyleApplier = cssStyleApplier;
         this._cache = new Map();
         this._cacheMaxSize = 5;
         this._helpersRegistered = false;
@@ -31,6 +33,7 @@ class TemplateRenderer {
         this._requirements = null;
         this._cleanupCallbacks = null;
         this._customData = null;
+        this._temporaryElement = null;
     }
 
     registerDataType(name, {modifier=null, composeData=null}) {
@@ -161,7 +164,8 @@ class TemplateRenderer {
             ['typeof',           this._getTypeof.bind(this)],
             ['join',             this._join.bind(this)],
             ['concat',           this._concat.bind(this)],
-            ['pitchCategories',  this._pitchCategories.bind(this)]
+            ['pitchCategories',  this._pitchCategories.bind(this)],
+            ['formatGlossary',   this._formatGlossary.bind(this)]
         ];
 
         for (const [name, helper] of helpers) {
@@ -244,8 +248,12 @@ class TemplateRenderer {
         return result;
     }
 
+    _stringToMultiLineHtml(string) {
+        return string.split('\n').join('<br>');
+    }
+
     _multiLine(context, options) {
-        return options.fn(context).split('\n').join('<br>');
+        return this._stringToMultiLineHtml(options.fn(context));
     }
 
     _sanitizeCssClass(context, options) {
@@ -496,5 +504,131 @@ class TemplateRenderer {
             }
         }
         return [...categories];
+    }
+
+    _getTemporaryElement() {
+        let element = this._temporaryElement;
+        if (element === null) {
+            element = document.createElement('div');
+            this._temporaryElement = element;
+        }
+        return element;
+    }
+
+    _getHtml(node) {
+        const container = this._getTemporaryElement();
+        container.appendChild(node);
+        this._normalizeHtml(container);
+        const result = container.innerHTML;
+        container.textContent = '';
+        return result;
+    }
+
+    _normalizeHtml(root) {
+        const {ELEMENT_NODE, TEXT_NODE} = Node;
+        const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+        const elements = [];
+        const textNodes = [];
+        while (true) {
+            const node = treeWalker.nextNode();
+            if (node === null) { break; }
+            switch (node.nodeType) {
+                case ELEMENT_NODE:
+                    elements.push(node);
+                    break;
+                case TEXT_NODE:
+                    textNodes.push(node);
+                    break;
+            }
+        }
+        this._cssStyleApplier.applyClassStyles(elements);
+        for (const element of elements) {
+            const {dataset} = element;
+            for (const key of Object.keys(dataset)) {
+                delete dataset[key];
+            }
+        }
+        for (const textNode of textNodes) {
+            this._replaceNewlines(textNode);
+        }
+    }
+
+    _replaceNewlines(textNode) {
+        const parts = textNode.nodeValue.split('\n');
+        if (parts.length <= 1) { return; }
+        const {parentNode} = textNode;
+        if (parentNode === null) { return; }
+        const fragment = document.createDocumentFragment();
+        for (let i = 0, ii = parts.length; i < ii; ++i) {
+            if (i > 0) { fragment.appendChild(document.createElement('br')); }
+            fragment.appendChild(document.createTextNode(parts[i]));
+        }
+        parentNode.replaceChild(fragment, textNode);
+    }
+
+    _getDictionaryMedia(data, dictionary, path) {
+        const {media} = data;
+        if (typeof media === 'object' && media !== null && Object.prototype.hasOwnProperty.call(media, 'dictionaryMedia')) {
+            const {dictionaryMedia} = media;
+            if (typeof dictionaryMedia === 'object' && dictionaryMedia !== null && Object.prototype.hasOwnProperty.call(dictionaryMedia, dictionary)) {
+                const dictionaryMedia2 = dictionaryMedia[dictionary];
+                if (Object.prototype.hasOwnProperty.call(dictionaryMedia2, path)) {
+                    return dictionaryMedia2[path];
+                }
+            }
+        }
+        return null;
+    }
+
+    _createStructuredContentGenerator(data) {
+        const mediaLoader = {
+            loadMedia: async (path, dictionary, onLoad, onUnload) => {
+                const imageUrl = this._getDictionaryMedia(data, dictionary, path);
+                if (imageUrl !== null) {
+                    onLoad(imageUrl);
+                    this._cleanupCallbacks.push(() => onUnload(true));
+                } else {
+                    let set = this._customData.requiredDictionaryMedia;
+                    if (typeof set === 'undefined') {
+                        set = new Set();
+                        this._customData.requiredDictionaryMedia = set;
+                    }
+                    const key = JSON.stringify([dictionary, path]);
+                    if (!set.has(key)) {
+                        set.add(key);
+                        this._requirements.push({
+                            type: 'dictionaryMedia',
+                            dictionary,
+                            path
+                        });
+                    }
+                }
+            }
+        };
+        return new StructuredContentGenerator(mediaLoader, document);
+    }
+
+    _formatGlossary(context, dictionary, options) {
+        const data = options.data.root;
+        const content = options.fn(context);
+        if (typeof content === 'string') { return this._stringToMultiLineHtml(content); }
+        if (!(typeof content === 'object' && content !== null)) { return ''; }
+        switch (content.type) {
+            case 'image': return this._formatGlossaryImage(content, dictionary, data);
+            case 'structured-content': return this._formatStructuredContent(content, dictionary, data);
+        }
+        return '';
+    }
+
+    _formatGlossaryImage(content, dictionary, data) {
+        const structuredContentGenerator = this._createStructuredContentGenerator(data);
+        const node = structuredContentGenerator.createDefinitionImage(content, dictionary);
+        return this._getHtml(node);
+    }
+
+    _formatStructuredContent(content, dictionary, data) {
+        const structuredContentGenerator = this._createStructuredContentGenerator(data);
+        const node = structuredContentGenerator.createStructuredContent(content.content, dictionary);
+        return node !== null ? this._getHtml(node) : '';
     }
 }

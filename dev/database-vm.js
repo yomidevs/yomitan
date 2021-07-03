@@ -84,7 +84,13 @@ class Blob {
 }
 
 async function fetch(url2) {
-    const filePath = url.fileURLToPath(url2);
+    const extDir = path.join(__dirname, '..', 'ext');
+    let filePath;
+    try {
+        filePath = url.fileURLToPath(url2);
+    } catch (e) {
+        filePath = path.resolve(extDir, url2.replace(/^[/\\]/, ''));
+    }
     await Promise.resolve();
     const content = fs.readFileSync(filePath, {encoding: null});
     return {

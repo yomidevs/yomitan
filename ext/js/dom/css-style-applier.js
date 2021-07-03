@@ -72,12 +72,6 @@ class CssStyleApplier {
                 element.removeAttribute('style');
             }
         }
-        for (const element of elements) {
-            const {dataset} = element;
-            for (const key of Object.keys(dataset)) {
-                delete dataset[key];
-            }
-        }
     }
 
     // Private

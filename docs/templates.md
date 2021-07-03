@@ -645,6 +645,35 @@ Returns an array representing the different pitch categories for a specific term
 </details>
 
 
+### `formatGlossary`
+
+Formats a glossary entry to a HTML content string. This helper handles image and
+structured-content generation.
+
+<details>
+  <summary>Syntax:</summary>
+
+  <code>{{#formatGlossary <i>dictionary</i>}}{{{definitionEntry}}}{{/pitchCategories}}</code><br>
+
+  * _`@dictionary`_ <br>
+    The dictionary that the glossary entry belongs to.
+  * _`@definitionEntry`_ <br>
+    The definition entry object in raw form.
+</details>
+<details>
+  <summary>Example:</summary>
+
+  ```handlebars
+  {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
+  ```
+
+  Output:
+  ```html
+  Here is the content of a gloss, which may include formatted HTML.
+  ```
+</details>
+
+
 ## Legacy Helpers
 
 Yomichan has historically used Handlebars templates to generate the HTML used on the search page and results popup.
