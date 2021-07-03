@@ -32,7 +32,6 @@ class TemplateRenderer {
         this._dataTypes = new Map();
         this._requirements = null;
         this._cleanupCallbacks = null;
-        this._customData = null;
         this._temporaryElement = null;
     }
 
@@ -93,7 +92,6 @@ class TemplateRenderer {
         const cleanupCallbacks = [];
         const requirements = [];
         try {
-            this._customData = {};
             this._stateStack = [new Map()];
             this._requirements = requirements;
             this._cleanupCallbacks = cleanupCallbacks;
@@ -104,7 +102,6 @@ class TemplateRenderer {
             this._stateStack = null;
             this._requirements = null;
             this._cleanupCallbacks = null;
-            this._customData = null;
         }
     }
 
@@ -588,20 +585,11 @@ class TemplateRenderer {
                     onLoad(imageUrl);
                     this._cleanupCallbacks.push(() => onUnload(true));
                 } else {
-                    let set = this._customData.requiredDictionaryMedia;
-                    if (typeof set === 'undefined') {
-                        set = new Set();
-                        this._customData.requiredDictionaryMedia = set;
-                    }
-                    const key = JSON.stringify([dictionary, path]);
-                    if (!set.has(key)) {
-                        set.add(key);
-                        this._requirements.push({
-                            type: 'dictionaryMedia',
-                            dictionary,
-                            path
-                        });
-                    }
+                    this._requirements.push({
+                        type: 'dictionaryMedia',
+                        dictionary,
+                        path
+                    });
                 }
             }
         };
