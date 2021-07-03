@@ -72,7 +72,7 @@
         "pages": [
             "template-renderer.html"
         ],
-        "content_security_policy": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-eval'"
+        "content_security_policy": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'unsafe-inline'"
     },
     "permissions": [
         "<all_urls>",

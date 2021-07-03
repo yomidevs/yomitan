@@ -112,6 +112,7 @@
                 "ext/js/core.js",
                 "ext/js/data/anki-note-data-creator.js",
                 "ext/js/display/structured-content-generator.js",
+                "ext/js/dom/css-style-applier.js",
                 "ext/js/language/dictionary-data-util.js",
                 "ext/js/templates/template-renderer.js"
             ],
@@ -125,6 +126,7 @@
                 "ext/js/core.js",
                 "ext/js/data/anki-note-data-creator.js",
                 "ext/js/display/structured-content-generator.js",
+                "ext/js/dom/css-style-applier.js",
                 "ext/js/language/dictionary-data-util.js",
                 "ext/js/templates/template-renderer.js"
             ],
@@ -155,6 +157,7 @@
                 "ext/js/yomichan.js",
                 "ext/js/data/anki-note-data-creator.js",
                 "ext/js/display/structured-content-generator.js",
+                "ext/js/dom/css-style-applier.js",
                 "ext/js/language/dictionary-data-util.js",
                 "ext/js/templates/template-renderer.js"
             ],
