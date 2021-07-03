@@ -16,8 +16,7 @@
  */
 
 /* global
- * AnkiNoteBuilder
- * AnkiUtil
+ * DisplayAnki
  * DisplayAudio
  * DisplayGenerator
  * DisplayHistory
@@ -86,10 +85,6 @@ class Display extends EventDispatcher {
             getSearchContext: this._getSearchContext.bind(this),
             documentUtil: this._documentUtil
         });
-        this._ankiFieldTemplates = null;
-        this._ankiFieldTemplatesDefault = null;
-        this._ankiNoteBuilder = new AnkiNoteBuilder();
-        this._updateAdderButtonsPromise = Promise.resolve();
         this._contentScrollElement = document.querySelector('#content-scroll');
         this._contentScrollBodyElement = document.querySelector('#content-body');
         this._windowScroll = new ScrollElement(this._contentScrollElement);
@@ -111,12 +106,10 @@ class Display extends EventDispatcher {
         this._tagNotification = null;
         this._footerNotificationContainer = document.querySelector('#content-footer');
         this._displayAudio = new DisplayAudio(this);
-        this._ankiNoteNotification = null;
-        this._ankiNoteNotificationEventListeners = null;
-        this._ankiTagNotification = null;
         this._queryPostProcessor = null;
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         this._elementOverflowController = new ElementOverflowController();
+        this._displayAnki = new DisplayAnki(this);
 
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
@@ -126,10 +119,6 @@ class Display extends EventDispatcher {
             ['firstEntry',        () => { this._focusEntry(0, true); }],
             ['historyBackward',   () => { this._sourceTermView(); }],
             ['historyForward',    () => { this._nextTermView(); }],
-            ['addNoteKanji',      () => { this._tryAddAnkiNoteForSelectedEntry('kanji'); }],
-            ['addNoteTermKanji',  () => { this._tryAddAnkiNoteForSelectedEntry('term-kanji'); }],
-            ['addNoteTermKana',   () => { this._tryAddAnkiNoteForSelectedEntry('term-kana'); }],
-            ['viewNote',          () => { this._tryViewAnkiNoteForSelectedEntry(); }],
             ['playAudio',         () => { this._playAudioCurrent(); }],
             ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)],
             ['copyHostSelection', () => this._copyHostSelection()],
@@ -202,6 +191,22 @@ class Display extends EventDispatcher {
         return this._footerNotificationContainer;
     }
 
+    get selectedIndex() {
+        return this._index;
+    }
+
+    get history() {
+        return this._history;
+    }
+
+    get query() {
+        return this._query;
+    }
+
+    get fullQuery() {
+        return this._fullQuery;
+    }
+
     async prepare() {
         // State setup
         const {documentElement} = document;
@@ -216,6 +221,7 @@ class Display extends EventDispatcher {
         await this._hotkeyHelpController.prepare();
         await this._displayGenerator.prepare();
         this._displayAudio.prepare();
+        this._displayAnki.prepare();
         this._queryParser.prepare();
         this._history.prepare();
         this._optionToggleHotkeyHandler.prepare();
@@ -291,10 +297,8 @@ class Display extends EventDispatcher {
 
     async updateOptions() {
         const options = await yomichan.api.optionsGet(this.getOptionsContext());
-        const templates = await this._getAnkiFieldTemplates(options);
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
-        this._ankiFieldTemplates = templates;
 
         this._updateHotkeys(options);
         this._updateDocumentOptions(options);
@@ -441,6 +445,17 @@ class Display extends EventDispatcher {
         return await yomichan.crossFrame.invoke(this._parentFrameId, action, params);
     }
 
+    getElementDictionaryEntryIndex(element) {
+        const node = element.closest('.entry');
+        if (node === null) { return -1; }
+        const index = parseInt(node.dataset.index, 10);
+        return Number.isFinite(index) ? index : -1;
+    }
+
+    getAnkiNoteMediaAudioDetails(term, reading) {
+        return this._displayAudio.getAnkiNoteMediaAudioDetails(term, reading);
+    }
+
     // Message handlers
 
     _onDirectMessage(data) {
@@ -530,8 +545,8 @@ class Display extends EventDispatcher {
             this._eventListeners.removeAllEventListeners();
             this._mediaLoader.unloadAll();
             this._displayAudio.cleanupEntries();
+            this._displayAnki.cleanupEntries();
             this._hideTagNotification(false);
-            this._hideAnkiNoteErrors(false);
             this._dictionaryEntries = [];
             this._dictionaryEntryNodes = [];
             this._elementOverflowController.clearElements();
@@ -712,19 +727,6 @@ class Display extends EventDispatcher {
         }
     }
 
-    _onNoteAdd(e) {
-        e.preventDefault();
-        const link = e.currentTarget;
-        const index = this._getClosestDictionaryEntryIndex(link);
-        this._addAnkiNote(index, link.dataset.mode);
-    }
-
-    _onNoteView(e) {
-        e.preventDefault();
-        const link = e.currentTarget;
-        yomichan.api.noteView(link.dataset.noteId);
-    }
-
     _onWheel(e) {
         if (e.altKey) {
             if (e.deltaY !== 0) {
@@ -752,7 +754,7 @@ class Display extends EventDispatcher {
 
     _onDebugLogClick(e) {
         const link = e.currentTarget;
-        const index = this._getClosestDictionaryEntryIndex(link);
+        const index = this.getElementDictionaryEntryIndex(link);
         this._logDictionaryEntryData(index);
     }
 
@@ -810,7 +812,7 @@ class Display extends EventDispatcher {
             this._tagNotification = new DisplayNotification(this._footerNotificationContainer, node);
         }
 
-        const index = this._getClosestDictionaryEntryIndex(tagNode);
+        const index = this.getElementDictionaryEntryIndex(tagNode);
         const dictionaryEntry = (index >= 0 && index < this._dictionaryEntries.length ? this._dictionaryEntries[index] : null);
 
         const content = this._displayGenerator.createTagFooterNotificationDetails(tagNode, dictionaryEntry);
@@ -960,6 +962,7 @@ class Display extends EventDispatcher {
             this._dictionaryEntryNodes.push(entry);
             this._addEntryEventListeners(entry);
             this._displayAudio.setupEntry(entry, i);
+            this._displayAnki.setupEntry(entry, i);
             container.appendChild(entry);
             if (focusEntry === i) {
                 this._focusEntry(i, false);
@@ -977,8 +980,7 @@ class Display extends EventDispatcher {
         }
 
         this._displayAudio.setupEntriesComplete();
-
-        this._updateAdderButtons(token, isTerms, dictionaryEntries);
+        this._displayAnki.setupEntriesComplete(isTerms, dictionaryEntries);
     }
 
     _setContentExtensionUnloaded() {
@@ -1065,104 +1067,6 @@ class Display extends EventDispatcher {
         }
     }
 
-    async _updateAdderButtons(token, isTerms, dictionaryEntries) {
-        await this._updateAdderButtonsPromise;
-        if (this._setContentToken !== token) { return; }
-
-        const {promise, resolve} = deferPromise();
-        try {
-            this._updateAdderButtonsPromise = promise;
-
-            const modes = this._getModes(isTerms);
-            let states;
-            try {
-                const noteContext = this._getNoteContext();
-                const {checkForDuplicates, displayTags} = this._options.anki;
-                states = await this._areDictionaryEntriesAddable(dictionaryEntries, modes, noteContext, checkForDuplicates ? null : true, displayTags !== 'never');
-            } catch (e) {
-                return;
-            }
-
-            if (this._setContentToken !== token) { return; }
-
-            this._updateAdderButtons2(states, modes);
-        } finally {
-            resolve();
-        }
-    }
-
-    _updateAdderButtons2(states, modes) {
-        const {displayTags} = this._options.anki;
-        for (let i = 0, ii = states.length; i < ii; ++i) {
-            const infos = states[i];
-            let noteId = null;
-            for (let j = 0, jj = infos.length; j < jj; ++j) {
-                const {canAdd, noteIds, noteInfos} = infos[j];
-                const mode = modes[j];
-                const button = this._adderButtonFind(i, mode);
-                if (button === null) {
-                    continue;
-                }
-
-                if (Array.isArray(noteIds) && noteIds.length > 0) {
-                    noteId = noteIds[0];
-                }
-                button.disabled = !canAdd;
-                button.hidden = false;
-
-                if (displayTags !== 'never' && Array.isArray(noteInfos)) {
-                    this._setupTagsIndicator(i, noteInfos);
-                }
-            }
-            if (noteId !== null) {
-                this._viewerButtonShow(i, noteId);
-            }
-        }
-    }
-
-    _setupTagsIndicator(i, noteInfos) {
-        const tagsIndicator = this._tagsIndicatorFind(i);
-        if (tagsIndicator === null) {
-            return;
-        }
-
-        const {tags: optionTags, displayTags} = this._options.anki;
-        const noteTags = new Set();
-        for (const {tags} of noteInfos) {
-            for (const tag of tags) {
-                noteTags.add(tag);
-            }
-        }
-        if (displayTags === 'non-standard') {
-            for (const tag of optionTags) {
-                noteTags.delete(tag);
-            }
-        }
-
-        if (noteTags.size > 0) {
-            tagsIndicator.disabled = false;
-            tagsIndicator.hidden = false;
-            tagsIndicator.title = `Card tags: ${[...noteTags].join(', ')}`;
-        }
-    }
-
-    _onShowTags(e) {
-        e.preventDefault();
-        const tags = e.currentTarget.title;
-        this._showAnkiTagsNotification(tags);
-    }
-
-    _showAnkiTagsNotification(message) {
-        if (this._ankiTagNotification === null) {
-            const node = this._displayGenerator.createEmptyFooterNotification();
-            node.classList.add('click-scannable');
-            this._ankiTagNotification = new DisplayNotification(this._footerNotificationContainer, node);
-        }
-
-        this._ankiTagNotification.setContent(message);
-        this._ankiTagNotification.open();
-    }
-
     _entrySetCurrent(index) {
         const entryPre = this._getEntry(this._index);
         if (entryPre !== null) {
@@ -1239,100 +1143,6 @@ class Display extends EventDispatcher {
         }
     }
 
-    _tryAddAnkiNoteForSelectedEntry(mode) {
-        this._addAnkiNote(this._index, mode);
-    }
-
-    _tryViewAnkiNoteForSelectedEntry() {
-        const button = this._viewerButtonFind(this._index);
-        if (button !== null && !button.disabled) {
-            yomichan.api.noteView(button.dataset.noteId);
-        }
-    }
-
-    async _addAnkiNote(dictionaryEntryIndex, mode) {
-        if (dictionaryEntryIndex < 0 || dictionaryEntryIndex >= this._dictionaryEntries.length) { return; }
-        const dictionaryEntry = this._dictionaryEntries[dictionaryEntryIndex];
-
-        const button = this._adderButtonFind(dictionaryEntryIndex, mode);
-        if (button === null || button.disabled) { return; }
-
-        this._hideAnkiNoteErrors(true);
-
-        const allErrors = [];
-        const overrideToken = this._progressIndicatorVisible.setOverride(true);
-        try {
-            const {anki: {suspendNewCards}} = this._options;
-            const noteContext = this._getNoteContext();
-            const {note, errors} = await this._createNote(dictionaryEntry, mode, noteContext, true);
-            allErrors.push(...errors);
-
-            let noteId = null;
-            let addNoteOkay = false;
-            try {
-                noteId = await yomichan.api.addAnkiNote(note);
-                addNoteOkay = true;
-            } catch (e) {
-                allErrors.length = 0;
-                allErrors.push(e);
-            }
-
-            if (addNoteOkay) {
-                if (noteId === null) {
-                    allErrors.push(new Error('Note could not be added'));
-                } else {
-                    if (suspendNewCards) {
-                        try {
-                            await yomichan.api.suspendAnkiCardsForNote(noteId);
-                        } catch (e) {
-                            allErrors.push(e);
-                        }
-                    }
-                    button.disabled = true;
-                    this._viewerButtonShow(dictionaryEntryIndex, noteId);
-                }
-            }
-        } catch (e) {
-            allErrors.push(e);
-        } finally {
-            this._progressIndicatorVisible.clearOverride(overrideToken);
-        }
-
-        if (allErrors.length > 0) {
-            this._showAnkiNoteErrors(allErrors);
-        } else {
-            this._hideAnkiNoteErrors(true);
-        }
-    }
-
-    _showAnkiNoteErrors(errors) {
-        if (this._ankiNoteNotificationEventListeners !== null) {
-            this._ankiNoteNotificationEventListeners.removeAllEventListeners();
-        }
-
-        if (this._ankiNoteNotification === null) {
-            const node = this._displayGenerator.createEmptyFooterNotification();
-            this._ankiNoteNotification = new DisplayNotification(this._footerNotificationContainer, node);
-            this._ankiNoteNotificationEventListeners = new EventListenerCollection();
-        }
-
-        const content = this._displayGenerator.createAnkiNoteErrorsNotificationContent(errors);
-        for (const node of content.querySelectorAll('.anki-note-error-log-link')) {
-            this._ankiNoteNotificationEventListeners.addEventListener(node, 'click', () => {
-                console.log({ankiNoteErrors: errors});
-            }, false);
-        }
-
-        this._ankiNoteNotification.setContent(content);
-        this._ankiNoteNotification.open();
-    }
-
-    _hideAnkiNoteErrors(animate) {
-        if (this._ankiNoteNotification === null) { return; }
-        this._ankiNoteNotification.close(animate);
-        this._ankiNoteNotificationEventListeners.removeAllEventListeners();
-    }
-
     async _playAudioCurrent() {
         await this._displayAudio.playAudio(this._index, 0);
     }
@@ -1342,72 +1152,10 @@ class Display extends EventDispatcher {
         return index >= 0 && index < entries.length ? entries[index] : null;
     }
 
-    _getValidSentenceData(sentence) {
-        let {text, offset} = (isObject(sentence) ? sentence : {});
-        if (typeof text !== 'string') { text = ''; }
-        if (typeof offset !== 'number') { offset = 0; }
-        return {text, offset};
-    }
-
-    _getClosestDictionaryEntryIndex(element) {
-        return this._getClosestIndex(element, '.entry');
-    }
-
-    _getClosestIndex(element, selector) {
-        const node = element.closest(selector);
-        if (node === null) { return -1; }
-        const index = parseInt(node.dataset.index, 10);
-        return Number.isFinite(index) ? index : -1;
-    }
-
-    _adderButtonFind(index, mode) {
-        const entry = this._getEntry(index);
-        return entry !== null ? entry.querySelector(`.action-add-note[data-mode="${mode}"]`) : null;
-    }
-
-    _tagsIndicatorFind(index) {
-        const entry = this._getEntry(index);
-        return entry !== null ? entry.querySelector('.action-view-tags') : null;
-    }
-
-    _viewerButtonFind(index) {
-        const entry = this._getEntry(index);
-        return entry !== null ? entry.querySelector('.action-view-note') : null;
-    }
-
-    _viewerButtonShow(index, noteId) {
-        const viewerButton = this._viewerButtonFind(index);
-        if (viewerButton === null) {
-            return;
-        }
-        viewerButton.disabled = false;
-        viewerButton.hidden = false;
-        viewerButton.dataset.noteId = noteId;
-    }
-
     _getElementTop(element) {
         const elementRect = element.getBoundingClientRect();
         const documentRect = this._contentScrollBodyElement.getBoundingClientRect();
         return elementRect.top - documentRect.top;
-    }
-
-    _getNoteContext() {
-        const {state} = this._history;
-        let {documentTitle, url, sentence} = (isObject(state) ? state : {});
-        if (typeof documentTitle !== 'string') {
-            documentTitle = document.title;
-        }
-        if (typeof url !== 'string') {
-            url = window.location.href;
-        }
-        sentence = this._getValidSentenceData(sentence);
-        return {
-            url,
-            sentence,
-            documentTitle,
-            query: this._query,
-            fullQuery: this._fullQuery
-        };
     }
 
     _historyHasState() {
@@ -1462,158 +1210,6 @@ class Display extends EventDispatcher {
 
     _closePopups() {
         yomichan.trigger('closePopups');
-    }
-
-    async _getAnkiFieldTemplates(options) {
-        let templates = options.anki.fieldTemplates;
-        if (typeof templates === 'string') { return templates; }
-
-        templates = this._ankiFieldTemplatesDefault;
-        if (typeof templates === 'string') { return templates; }
-
-        templates = await yomichan.api.getDefaultAnkiFieldTemplates();
-        this._ankiFieldTemplatesDefault = templates;
-        return templates;
-    }
-
-    async _areDictionaryEntriesAddable(dictionaryEntries, modes, context, forceCanAddValue, fetchAdditionalInfo) {
-        const modeCount = modes.length;
-        const notePromises = [];
-        for (const dictionaryEntry of dictionaryEntries) {
-            for (const mode of modes) {
-                const notePromise = this._createNote(dictionaryEntry, mode, context, false);
-                notePromises.push(notePromise);
-            }
-        }
-        const notes = (await Promise.all(notePromises)).map(({note}) => note);
-
-        let infos;
-        if (forceCanAddValue !== null) {
-            if (!await yomichan.api.isAnkiConnected()) {
-                throw new Error('Anki not connected');
-            }
-            infos = this._getAnkiNoteInfoForceValue(notes, forceCanAddValue);
-        } else {
-            infos = await yomichan.api.getAnkiNoteInfo(notes, fetchAdditionalInfo);
-        }
-
-        const results = [];
-        for (let i = 0, ii = infos.length; i < ii; i += modeCount) {
-            results.push(infos.slice(i, i + modeCount));
-        }
-        return results;
-    }
-
-    _getAnkiNoteInfoForceValue(notes, canAdd) {
-        const results = [];
-        for (const note of notes) {
-            const valid = AnkiUtil.isNoteDataValid(note);
-            results.push({canAdd, valid, noteIds: null});
-        }
-        return results;
-    }
-
-    async _createNote(dictionaryEntry, mode, context, injectMedia) {
-        const options = this._options;
-        const template = this._ankiFieldTemplates;
-        const {
-            general: {resultOutputMode, glossaryLayoutMode, compactTags},
-            anki: ankiOptions
-        } = options;
-        const {tags, checkForDuplicates, duplicateScope} = ankiOptions;
-        const modeOptions = (mode === 'kanji') ? ankiOptions.kanji : ankiOptions.terms;
-        const {deck: deckName, model: modelName} = modeOptions;
-        const fields = Object.entries(modeOptions.fields);
-
-        const errors = [];
-        let injectedMedia = null;
-        if (injectMedia) {
-            let errors2;
-            ({result: injectedMedia, errors: errors2} = await this._injectAnkiNoteMedia(dictionaryEntry, options, fields));
-            for (const error of errors2) {
-                errors.push(deserializeError(error));
-            }
-        }
-
-        const {note, errors: createNoteErrors} = await this._ankiNoteBuilder.createNote({
-            dictionaryEntry,
-            mode,
-            context,
-            template,
-            deckName,
-            modelName,
-            fields,
-            tags,
-            checkForDuplicates,
-            duplicateScope,
-            resultOutputMode,
-            glossaryLayoutMode,
-            compactTags,
-            injectedMedia,
-            errors
-        });
-        errors.push(...createNoteErrors);
-        return {note, errors};
-    }
-
-    async _injectAnkiNoteMedia(dictionaryEntry, options, fields) {
-        const {anki: {screenshot: {format, quality}}} = options;
-
-        const timestamp = Date.now();
-
-        const dictionaryEntryDetails = this._getDictionaryEntryDetailsForNote(dictionaryEntry);
-
-        const audioDetails = (
-            dictionaryEntryDetails.type !== 'kanji' && AnkiUtil.fieldsObjectContainsMarker(fields, 'audio') ?
-            this._displayAudio.getAnkiNoteMediaAudioDetails(dictionaryEntryDetails.term, dictionaryEntryDetails.reading) :
-            null
-        );
-
-        const screenshotDetails = (
-            AnkiUtil.fieldsObjectContainsMarker(fields, 'screenshot') && typeof this._contentOriginTabId === 'number' ?
-            {tabId: this._contentOriginTabId, frameId: this._contentOriginFrameId, format, quality} :
-            null
-        );
-
-        const clipboardDetails = {
-            image: AnkiUtil.fieldsObjectContainsMarker(fields, 'clipboard-image'),
-            text: AnkiUtil.fieldsObjectContainsMarker(fields, 'clipboard-text')
-        };
-
-        return await yomichan.api.injectAnkiNoteMedia(
-            timestamp,
-            dictionaryEntryDetails,
-            audioDetails,
-            screenshotDetails,
-            clipboardDetails
-        );
-    }
-
-    _getDictionaryEntryDetailsForNote(dictionaryEntry) {
-        const {type} = dictionaryEntry;
-        if (type === 'kanji') {
-            const {character} = dictionaryEntry;
-            return {type, character};
-        }
-
-        const {headwords} = dictionaryEntry;
-        let bestIndex = -1;
-        for (let i = 0, ii = headwords.length; i < ii; ++i) {
-            const {term, reading, sources} = headwords[i];
-            for (const {deinflectedText} of sources) {
-                if (term === deinflectedText) {
-                    bestIndex = i;
-                    i = ii;
-                    break;
-                } else if (reading === deinflectedText && bestIndex < 0) {
-                    bestIndex = i;
-                    break;
-                }
-            }
-        }
-
-        const {term, reading} = headwords[Math.max(0, bestIndex)];
-        return {type, term, reading};
     }
 
     async _setOptionsContextIfDifferent(optionsContext) {
@@ -1755,9 +1351,6 @@ class Display extends EventDispatcher {
 
     _addEntryEventListeners(entry) {
         this._eventListeners.addEventListener(entry, 'click', this._onEntryClick.bind(this));
-        this._addMultipleEventListeners(entry, '.action-view-tags', 'click', this._onShowTags.bind(this));
-        this._addMultipleEventListeners(entry, '.action-add-note', 'click', this._onNoteAdd.bind(this));
-        this._addMultipleEventListeners(entry, '.action-view-note', 'click', this._onNoteView.bind(this));
         this._addMultipleEventListeners(entry, '.headword-kanji-link', 'click', this._onKanjiLookup.bind(this));
         this._addMultipleEventListeners(entry, '.debug-log-link', 'click', this._onDebugLogClick.bind(this));
         this._addMultipleEventListeners(entry, '.tag-label', 'click', this._onTagClick.bind(this));
@@ -1924,58 +1517,13 @@ class Display extends EventDispatcher {
         return typeof queryPostProcessor === 'function' ? queryPostProcessor(query) : query;
     }
 
-    _getModes(isTerms) {
-        return isTerms ? ['term-kanji', 'term-kana'] : ['kanji'];
-    }
-
     async _logDictionaryEntryData(index) {
         if (index < 0 || index >= this._dictionaryEntries.length) { return; }
         const dictionaryEntry = this._dictionaryEntries[index];
         const result = {dictionaryEntry};
 
-        // Anki note data
-        let ankiNoteData;
-        let ankiNoteDataException;
-        try {
-            const context = this._getNoteContext();
-            const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = this._options;
-            ankiNoteData = await this._ankiNoteBuilder.getRenderingData({
-                dictionaryEntry,
-                mode: 'test',
-                context,
-                resultOutputMode,
-                glossaryLayoutMode,
-                compactTags,
-                injectedMedia: null,
-                marker: 'test'
-            });
-        } catch (e) {
-            ankiNoteDataException = e;
-        }
-        result.ankiNoteData = ankiNoteData;
-        if (typeof ankiNoteDataException !== 'undefined') {
-            result.ankiNoteDataException = ankiNoteDataException;
-        }
-
-        // Anki notes
-        const ankiNotes = [];
-        const modes = this._getModes(dictionaryEntry.type === 'term');
-        for (const mode of modes) {
-            let note;
-            let errors;
-            try {
-                const noteContext = this._getNoteContext();
-                ({note: note, errors} = await this._createNote(dictionaryEntry, mode, noteContext, false));
-            } catch (e) {
-                errors = [e];
-            }
-            const entry = {mode, note};
-            if (Array.isArray(errors) && errors.length > 0) {
-                entry.errors = errors;
-            }
-            ankiNotes.push(entry);
-        }
-        result.ankiNotes = ankiNotes;
+        const result2 = await this._displayAnki.getLogData(dictionaryEntry);
+        Object.assign(result, result2);
 
         console.log(result);
     }
