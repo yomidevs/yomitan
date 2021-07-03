@@ -611,7 +611,7 @@ class TemplateRenderer {
     _formatGlossary(context, dictionary, options) {
         const data = options.data.root;
         const content = options.fn(context);
-        if (typeof content === 'string') { return this._stringToMultiLineHtml(content); }
+        if (typeof content === 'string') { return this._stringToMultiLineHtml(this._escape(content)); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }
         switch (content.type) {
             case 'image': return this._formatGlossaryImage(content, dictionary, data);
