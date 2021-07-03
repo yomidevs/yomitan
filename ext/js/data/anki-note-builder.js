@@ -42,8 +42,7 @@ class AnkiNoteBuilder {
         duplicateScope='collection',
         resultOutputMode='split',
         glossaryLayoutMode='default',
-        compactTags=false,
-        errors=null
+        compactTags=false
     }) {
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
@@ -53,6 +52,7 @@ class AnkiNoteBuilder {
             duplicateScopeCheckChildren = true;
         }
 
+        const errors = [];
         const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fields) {
@@ -68,7 +68,7 @@ class AnkiNoteBuilder {
             noteFields[fieldName] = formattedFieldValue;
         }
 
-        return {
+        const note = {
             fields: noteFields,
             tags,
             deckName,
@@ -82,6 +82,7 @@ class AnkiNoteBuilder {
                 }
             }
         };
+        return {note, errors};
     }
 
     async getRenderingData({
@@ -112,17 +113,15 @@ class AnkiNoteBuilder {
         };
     }
 
-    async _formatField(field, commonData, template, errors=null) {
+    async _formatField(field, commonData, template, errors) {
         return await this._stringReplaceAsync(field, this._markerPattern, async (g0, marker) => {
             try {
                 const {result} = await this._renderTemplateBatched(template, commonData, marker);
                 return result;
             } catch (e) {
-                if (Array.isArray(errors)) {
-                    const error = new Error(`Template render error for {${marker}}`);
-                    error.data = {error: e};
-                    errors.push(error);
-                }
+                const error = new Error(`Template render error for {${marker}}`);
+                error.data = {error: e};
+                errors.push(error);
                 return `{${marker}-render-error}`;
             }
         });

@@ -147,8 +147,8 @@ class AnkiTemplatesController {
     }
 
     async _validate(infoNode, field, mode, showSuccessResult, invalidateInput) {
+        const allErrors = [];
         const text = this._renderTextInput.value || '';
-        const errors = [];
         let result = `No definition found for ${text}`;
         try {
             const optionsContext = this._settingsController.getOptionsContext();
@@ -168,7 +168,7 @@ class AnkiTemplatesController {
                 let template = options.anki.fieldTemplates;
                 if (typeof template !== 'string') { template = this._defaultFieldTemplates; }
                 const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
-                const note = await this._ankiNoteBuilder.createNote({
+                const {note, errors} = await this._ankiNoteBuilder.createNote({
                     dictionaryEntry,
                     mode,
                     context,
@@ -180,13 +180,13 @@ class AnkiTemplatesController {
                     ],
                     resultOutputMode,
                     glossaryLayoutMode,
-                    compactTags,
-                    errors
+                    compactTags
                 });
                 result = note.fields.field;
+                allErrors.push(...errors);
             }
         } catch (e) {
-            errors.push(e);
+            allErrors.push(e);
         }
 
         const errorToMessageString = (e) => {
@@ -205,9 +205,9 @@ class AnkiTemplatesController {
             return `${e}`;
         };
 
-        const hasError = errors.length > 0;
+        const hasError = allErrors.length > 0;
         infoNode.hidden = !(showSuccessResult || hasError);
-        infoNode.textContent = hasError ? errors.map(errorToMessageString).join('\n') : (showSuccessResult ? result : '');
+        infoNode.textContent = hasError ? allErrors.map(errorToMessageString).join('\n') : (showSuccessResult ? result : '');
         infoNode.classList.toggle('text-danger', hasError);
         if (invalidateInput) {
             this._fieldTemplatesTextarea.dataset.invalid = `${hasError}`;

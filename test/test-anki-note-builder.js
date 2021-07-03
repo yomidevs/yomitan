@@ -219,8 +219,7 @@ async function getRenderResults(dictionaryEntries, type, mode, template, AnkiNot
             query: 'query',
             fullQuery: 'fullQuery'
         };
-        const errors = [];
-        const noteFields = (await ankiNoteBuilder.createNote({
+        const {note: {fields: noteFields}, errors} = await ankiNoteBuilder.createNote({
             dictionaryEntry,
             mode: null,
             context,
@@ -234,11 +233,10 @@ async function getRenderResults(dictionaryEntries, type, mode, template, AnkiNot
             duplicateScope: 'collection',
             resultOutputMode: mode,
             glossaryLayoutMode: 'default',
-            compactTags: false,
-            errors
-        })).fields;
+            compactTags: false
+        });
         if (!write) {
-            assert.deepStrictEqual(errors, []);
+            assert.strictEqual(errors.length, 0);
         }
         results.push(noteFields);
     }

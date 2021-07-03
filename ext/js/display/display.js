@@ -1259,12 +1259,13 @@ class Display extends EventDispatcher {
 
         this._hideAnkiNoteErrors(true);
 
-        const errors = [];
+        const allErrors = [];
         const overrideToken = this._progressIndicatorVisible.setOverride(true);
         try {
             const {anki: {suspendNewCards}} = this._options;
             const noteContext = this._getNoteContext();
-            const note = await this._createNote(dictionaryEntry, mode, noteContext, true, errors);
+            const {note, errors} = await this._createNote(dictionaryEntry, mode, noteContext, true);
+            allErrors.push(...errors);
 
             let noteId = null;
             let addNoteOkay = false;
@@ -1272,19 +1273,19 @@ class Display extends EventDispatcher {
                 noteId = await yomichan.api.addAnkiNote(note);
                 addNoteOkay = true;
             } catch (e) {
-                errors.length = 0;
-                errors.push(e);
+                allErrors.length = 0;
+                allErrors.push(e);
             }
 
             if (addNoteOkay) {
                 if (noteId === null) {
-                    errors.push(new Error('Note could not be added'));
+                    allErrors.push(new Error('Note could not be added'));
                 } else {
                     if (suspendNewCards) {
                         try {
                             await yomichan.api.suspendAnkiCardsForNote(noteId);
                         } catch (e) {
-                            errors.push(e);
+                            allErrors.push(e);
                         }
                     }
                     button.disabled = true;
@@ -1292,13 +1293,13 @@ class Display extends EventDispatcher {
                 }
             }
         } catch (e) {
-            errors.push(e);
+            allErrors.push(e);
         } finally {
             this._progressIndicatorVisible.clearOverride(overrideToken);
         }
 
-        if (errors.length > 0) {
-            this._showAnkiNoteErrors(errors);
+        if (allErrors.length > 0) {
+            this._showAnkiNoteErrors(allErrors);
         } else {
             this._hideAnkiNoteErrors(true);
         }
@@ -1480,11 +1481,11 @@ class Display extends EventDispatcher {
         const notePromises = [];
         for (const dictionaryEntry of dictionaryEntries) {
             for (const mode of modes) {
-                const notePromise = this._createNote(dictionaryEntry, mode, context, false, null);
+                const notePromise = this._createNote(dictionaryEntry, mode, context, false);
                 notePromises.push(notePromise);
             }
         }
-        const notes = await Promise.all(notePromises);
+        const notes = (await Promise.all(notePromises)).map(({note}) => note);
 
         let infos;
         if (forceCanAddValue !== null) {
@@ -1512,7 +1513,7 @@ class Display extends EventDispatcher {
         return results;
     }
 
-    async _createNote(dictionaryEntry, mode, context, injectMedia, errors) {
+    async _createNote(dictionaryEntry, mode, context, injectMedia) {
         const options = this._options;
         const template = this._ankiFieldTemplates;
         const {
@@ -1524,18 +1525,17 @@ class Display extends EventDispatcher {
         const {deck: deckName, model: modelName} = modeOptions;
         const fields = Object.entries(modeOptions.fields);
 
+        const errors = [];
         let injectedMedia = null;
         if (injectMedia) {
             let errors2;
             ({result: injectedMedia, errors: errors2} = await this._injectAnkiNoteMedia(dictionaryEntry, options, fields));
-            if (Array.isArray(errors)) {
-                for (const error of errors2) {
-                    errors.push(deserializeError(error));
-                }
+            for (const error of errors2) {
+                errors.push(deserializeError(error));
             }
         }
 
-        return await this._ankiNoteBuilder.createNote({
+        const {note, errors: createNoteErrors} = await this._ankiNoteBuilder.createNote({
             dictionaryEntry,
             mode,
             context,
@@ -1552,6 +1552,8 @@ class Display extends EventDispatcher {
             injectedMedia,
             errors
         });
+        errors.push(...createNoteErrors);
+        return {note, errors};
     }
 
     async _injectAnkiNoteMedia(dictionaryEntry, options, fields) {
@@ -1959,20 +1961,16 @@ class Display extends EventDispatcher {
         const ankiNotes = [];
         const modes = this._getModes(dictionaryEntry.type === 'term');
         for (const mode of modes) {
-            let ankiNote;
-            let ankiNoteException;
-            const errors = [];
+            let note;
+            let errors;
             try {
                 const noteContext = this._getNoteContext();
-                ankiNote = await this._createNote(dictionaryEntry, mode, noteContext, false, errors);
+                ({note: note, errors} = await this._createNote(dictionaryEntry, mode, noteContext, false));
             } catch (e) {
-                ankiNoteException = e;
+                errors = [e];
             }
-            const entry = {mode, ankiNote};
-            if (typeof ankiNoteException !== 'undefined') {
-                entry.ankiNoteException = ankiNoteException;
-            }
-            if (errors.length > 0) {
+            const entry = {mode, note};
+            if (Array.isArray(errors) && errors.length > 0) {
                 entry.errors = errors;
             }
             ankiNotes.push(entry);
