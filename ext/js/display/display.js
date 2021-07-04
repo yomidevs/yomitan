@@ -946,6 +946,8 @@ class Display extends EventDispatcher {
         const container = this._container;
         container.textContent = '';
 
+        this._displayAnki.setupEntriesBegin();
+
         for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
             if (i > 0) {
                 await promiseTimeout(1);

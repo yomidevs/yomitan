@@ -33,6 +33,7 @@ class DisplayAnki {
         this._updateAdderButtonsPromise = Promise.resolve();
         this._updateAdderButtonsToken = null;
         this._eventListeners = new EventListenerCollection();
+        this._noteContext = null;
         this._checkForDuplicates = false;
         this._suspendNewCards = false;
         this._compactTags = false;
@@ -50,6 +51,7 @@ class DisplayAnki {
     }
 
     prepare() {
+        this._noteContext = this._getNoteContext();
         this._display.hotkeyHandler.registerActions([
             ['addNoteKanji',      () => { this._tryAddAnkiNoteForSelectedEntry('kanji'); }],
             ['addNoteTermKanji',  () => { this._tryAddAnkiNoteForSelectedEntry('term-kanji'); }],
@@ -62,6 +64,10 @@ class DisplayAnki {
     cleanupEntries() {
         this._updateAdderButtonsToken = null;
         this._hideAnkiNoteErrors(false);
+    }
+
+    setupEntriesBegin() {
+        this._noteContext = this._getNoteContext();
     }
 
     setupEntry(entry) {
@@ -81,11 +87,10 @@ class DisplayAnki {
         let ankiNoteData;
         let ankiNoteDataException;
         try {
-            const context = this._getNoteContext();
             ankiNoteData = await this._ankiNoteBuilder.getRenderingData({
                 dictionaryEntry,
                 mode: 'test',
-                context,
+                context: this._noteContext,
                 resultOutputMode: this.resultOutputMode,
                 glossaryLayoutMode: this._glossaryLayoutMode,
                 compactTags: this._compactTags,
@@ -107,8 +112,7 @@ class DisplayAnki {
             let note;
             let errors;
             try {
-                const noteContext = this._getNoteContext();
-                ({note: note, errors} = await this._createNote(dictionaryEntry, mode, noteContext, false));
+                ({note: note, errors} = await this._createNote(dictionaryEntry, mode, false));
             } catch (e) {
                 errors = [e];
             }
@@ -263,11 +267,9 @@ class DisplayAnki {
             const modes = this._getModes(isTerms);
             let states;
             try {
-                const noteContext = this._getNoteContext();
                 states = await this._areDictionaryEntriesAddable(
                     dictionaryEntries,
                     modes,
-                    noteContext,
                     this._checkForDuplicates ? null : true,
                     this._displayTags !== 'never'
                 );
@@ -376,8 +378,7 @@ class DisplayAnki {
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
         const overrideToken = progressIndicatorVisible.setOverride(true);
         try {
-            const noteContext = this._getNoteContext();
-            const {note, errors} = await this._createNote(dictionaryEntry, mode, noteContext, true);
+            const {note, errors} = await this._createNote(dictionaryEntry, mode, true);
             allErrors.push(...errors);
 
             let noteId = null;
@@ -462,12 +463,12 @@ class DisplayAnki {
         return templates;
     }
 
-    async _areDictionaryEntriesAddable(dictionaryEntries, modes, context, forceCanAddValue, fetchAdditionalInfo) {
+    async _areDictionaryEntriesAddable(dictionaryEntries, modes, forceCanAddValue, fetchAdditionalInfo) {
         const modeCount = modes.length;
         const notePromises = [];
         for (const dictionaryEntry of dictionaryEntries) {
             for (const mode of modes) {
-                const notePromise = this._createNote(dictionaryEntry, mode, context, false);
+                const notePromise = this._createNote(dictionaryEntry, mode, false);
                 notePromises.push(notePromise);
             }
         }
@@ -499,7 +500,8 @@ class DisplayAnki {
         return results;
     }
 
-    async _createNote(dictionaryEntry, mode, context, injectMedia) {
+    async _createNote(dictionaryEntry, mode, injectMedia) {
+        const context = this._noteContext;
         const modeOptions = this._modeOptions.get(mode);
         if (typeof modeOptions === 'undefined') { throw new Error(`Unsupported note type: ${mode}`); }
         const template = this._ankiFieldTemplates;
