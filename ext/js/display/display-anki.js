@@ -45,6 +45,10 @@ class DisplayAnki {
         this._screenshotQuality = 100;
         this._noteTags = [];
         this._modeOptions = new Map();
+        this._dictionaryEntryTypeModeMap = new Map([
+            ['kanji', ['kanji']],
+            ['term', ['term-kanji', 'term-kana']]
+        ]);
         this._onShowTagsBind = this._onShowTags.bind(this);
         this._onNoteAddBind = this._onNoteAdd.bind(this);
         this._onNoteViewBind = this._onNoteView.bind(this);
@@ -76,8 +80,8 @@ class DisplayAnki {
         this._addMultipleEventListeners(entry, '.action-view-note', 'click', this._onNoteViewBind);
     }
 
-    setupEntriesComplete(isTerms, dictionaryEntries) { // TODO : Don't pass (isTerms, dictionaryEntries)
-        this._updateAdderButtons(isTerms, dictionaryEntries);
+    setupEntriesComplete() {
+        this._updateAdderButtons();
     }
 
     async getLogData(dictionaryEntry) {
@@ -254,7 +258,8 @@ class DisplayAnki {
         return {type, term, reading};
     }
 
-    async _updateAdderButtons(isTerms, dictionaryEntries) {
+    async _updateAdderButtons() {
+        const {dictionaryEntries} = this._display;
         const token = {};
         this._updateAdderButtonsToken = token;
         await this._updateAdderButtonsPromise;
@@ -264,35 +269,26 @@ class DisplayAnki {
         try {
             this._updateAdderButtonsPromise = promise;
 
-            const modes = this._getModes(isTerms);
             let states;
             try {
-                states = await this._areDictionaryEntriesAddable(
-                    dictionaryEntries,
-                    modes,
-                    this._checkForDuplicates ? null : true,
-                    this._displayTags !== 'never'
-                );
+                states = await this._areDictionaryEntriesAddable(dictionaryEntries);
             } catch (e) {
                 return;
             }
 
             if (this._updateAdderButtonsToken !== token) { return; }
 
-            this._updateAdderButtons2(states, modes);
+            this._updateAdderButtons2(states);
         } finally {
             resolve();
         }
     }
 
-    _updateAdderButtons2(states, modes) {
+    _updateAdderButtons2(states) {
         const displayTags = this._displayTags;
         for (let i = 0, ii = states.length; i < ii; ++i) {
-            const infos = states[i];
             let noteId = null;
-            for (let j = 0, jj = infos.length; j < jj; ++j) {
-                const {canAdd, noteIds, noteInfos} = infos[j];
-                const mode = modes[j];
+            for (const {mode, canAdd, noteIds, noteInfos} of states[i]) {
                 const button = this._adderButtonFind(i, mode);
                 if (button === null) {
                     continue;
@@ -463,16 +459,26 @@ class DisplayAnki {
         return templates;
     }
 
-    async _areDictionaryEntriesAddable(dictionaryEntries, modes, forceCanAddValue, fetchAdditionalInfo) {
-        const modeCount = modes.length;
+    async _areDictionaryEntriesAddable(dictionaryEntries) {
+        const forceCanAddValue = (this._checkForDuplicates ? null : true);
+        const fetchAdditionalInfo = (this._displayTags !== 'never');
+
         const notePromises = [];
-        for (const dictionaryEntry of dictionaryEntries) {
+        const noteTargets = [];
+        for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
+            const dictionaryEntry = dictionaryEntries[i];
+            const {type} = dictionaryEntry;
+            const modes = this._dictionaryEntryTypeModeMap.get(type);
+            if (typeof modes === 'undefined') { continue; }
             for (const mode of modes) {
                 const notePromise = this._createNote(dictionaryEntry, mode, false);
                 notePromises.push(notePromise);
+                noteTargets.push({index: i, mode});
             }
         }
-        const notes = (await Promise.all(notePromises)).map(({note}) => note);
+
+        const noteInfoList = await Promise.all(notePromises);
+        const notes = noteInfoList.map(({note}) => note);
 
         let infos;
         if (forceCanAddValue !== null) {
@@ -485,8 +491,14 @@ class DisplayAnki {
         }
 
         const results = [];
-        for (let i = 0, ii = infos.length; i < ii; i += modeCount) {
-            results.push(infos.slice(i, i + modeCount));
+        for (let i = 0, ii = noteInfoList.length; i < ii; ++i) {
+            const {note, errors} = noteInfoList[i];
+            const {canAdd, valid, noteIds, noteInfos} = infos[i];
+            const {mode, index} = noteTargets[i];
+            while (index >= results.length) {
+                results.push([]);
+            }
+            results[index].push({mode, note, errors, canAdd, valid, noteIds, noteInfos});
         }
         return results;
     }

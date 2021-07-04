@@ -982,7 +982,7 @@ class Display extends EventDispatcher {
         }
 
         this._displayAudio.setupEntriesComplete();
-        this._displayAnki.setupEntriesComplete(isTerms, dictionaryEntries);
+        this._displayAnki.setupEntriesComplete();
     }
 
     _setContentExtensionUnloaded() {
