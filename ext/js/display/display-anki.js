@@ -117,14 +117,18 @@ class DisplayAnki {
         for (const mode of modes) {
             let note;
             let errors;
+            let requirements;
             try {
-                ({note: note, errors} = await this._createNote(dictionaryEntry, mode, false));
+                ({note: note, errors, requirements} = await this._createNote(dictionaryEntry, mode, false, []));
             } catch (e) {
                 errors = [e];
             }
             const entry = {mode, note};
             if (Array.isArray(errors) && errors.length > 0) {
                 entry.errors = errors;
+            }
+            if (Array.isArray(requirements) && requirements.length > 0) {
+                entry.requirements = requirements;
             }
             ankiNotes.push(entry);
         }
@@ -289,7 +293,7 @@ class DisplayAnki {
         const dictionaryEntryDetails = this._dictionaryEntryDetails;
         for (let i = 0, ii = dictionaryEntryDetails.length; i < ii; ++i) {
             let noteId = null;
-            for (const {mode, canAdd, noteIds, noteInfos, ankiError} of dictionaryEntryDetails[i]) {
+            for (const {mode, canAdd, noteIds, noteInfos, ankiError} of dictionaryEntryDetails[i].modeMap.values()) {
                 const button = this._adderButtonFind(i, mode);
                 if (button !== null) {
                     button.disabled = !canAdd;
@@ -362,8 +366,20 @@ class DisplayAnki {
 
     async _addAnkiNote(dictionaryEntryIndex, mode) {
         const dictionaryEntries = this._display.dictionaryEntries;
-        if (dictionaryEntryIndex < 0 || dictionaryEntryIndex >= dictionaryEntries.length) { return; }
+        const dictionaryEntryDetails = this._dictionaryEntryDetails;
+        if (!(
+            dictionaryEntryDetails !== null &&
+            dictionaryEntryIndex >= 0 &&
+            dictionaryEntryIndex < dictionaryEntries.length &&
+            dictionaryEntryIndex < dictionaryEntryDetails.length
+        )) {
+            return;
+        }
         const dictionaryEntry = dictionaryEntries[dictionaryEntryIndex];
+        const details = dictionaryEntryDetails[dictionaryEntryIndex].modeMap.get(mode);
+        if (typeof details === 'undefined') { return; }
+
+        const {requirements} = details;
 
         const button = this._adderButtonFind(dictionaryEntryIndex, mode);
         if (button === null || button.disabled) { return; }
@@ -374,8 +390,15 @@ class DisplayAnki {
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
         const overrideToken = progressIndicatorVisible.setOverride(true);
         try {
-            const {note, errors} = await this._createNote(dictionaryEntry, mode, true);
+            const {note, errors, requirements: outputRequirements} = await this._createNote(dictionaryEntry, mode, true, requirements);
             allErrors.push(...errors);
+
+            if (outputRequirements.length > 0) {
+                const error = new Error('The created card may not have some content');
+                error.requirements = requirements;
+                error.outputRequirements = outputRequirements;
+                allErrors.push(error);
+            }
 
             let noteId = null;
             let addNoteOkay = false;
@@ -471,7 +494,7 @@ class DisplayAnki {
             const modes = this._dictionaryEntryTypeModeMap.get(type);
             if (typeof modes === 'undefined') { continue; }
             for (const mode of modes) {
-                const notePromise = this._createNote(dictionaryEntry, mode, false);
+                const notePromise = this._createNote(dictionaryEntry, mode, false, []);
                 notePromises.push(notePromise);
                 noteTargets.push({index: i, mode});
             }
@@ -497,14 +520,17 @@ class DisplayAnki {
         }
 
         const results = [];
+        for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
+            results.push({
+                modeMap: new Map()
+            });
+        }
+
         for (let i = 0, ii = noteInfoList.length; i < ii; ++i) {
             const {note, errors, requirements} = noteInfoList[i];
             const {canAdd, valid, noteIds, noteInfos} = infos[i];
             const {mode, index} = noteTargets[i];
-            while (index >= results.length) {
-                results.push([]);
-            }
-            results[index].push({mode, note, errors, requirements, canAdd, valid, noteIds, noteInfos, ankiError});
+            results[index].modeMap.set(mode, {mode, note, errors, requirements, canAdd, valid, noteIds, noteInfos, ankiError});
         }
         return results;
     }
@@ -518,7 +544,7 @@ class DisplayAnki {
         return results;
     }
 
-    async _createNote(dictionaryEntry, mode, injectMedia) {
+    async _createNote(dictionaryEntry, mode, injectMedia, _requirements) {
         const context = this._noteContext;
         const modeOptions = this._modeOptions.get(mode);
         if (typeof modeOptions === 'undefined') { throw new Error(`Unsupported note type: ${mode}`); }
@@ -536,7 +562,7 @@ class DisplayAnki {
             }
         }
 
-        const {note, errors: createNoteErrors, requirements} = await this._ankiNoteBuilder.createNote({
+        const {note, errors: createNoteErrors, requirements: outputRequirements} = await this._ankiNoteBuilder.createNote({
             dictionaryEntry,
             mode,
             context,
@@ -554,7 +580,7 @@ class DisplayAnki {
             errors
         });
         errors.push(...createNoteErrors);
-        return {note, errors, requirements};
+        return {note, errors, requirements: outputRequirements};
     }
 
     async _injectAnkiNoteMedia(dictionaryEntry, fields) {
