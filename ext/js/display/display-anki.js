@@ -498,13 +498,13 @@ class DisplayAnki {
 
         const results = [];
         for (let i = 0, ii = noteInfoList.length; i < ii; ++i) {
-            const {note, errors} = noteInfoList[i];
+            const {note, errors, requirements} = noteInfoList[i];
             const {canAdd, valid, noteIds, noteInfos} = infos[i];
             const {mode, index} = noteTargets[i];
             while (index >= results.length) {
                 results.push([]);
             }
-            results[index].push({mode, note, errors, canAdd, valid, noteIds, noteInfos, ankiError});
+            results[index].push({mode, note, errors, requirements, canAdd, valid, noteIds, noteInfos, ankiError});
         }
         return results;
     }
@@ -536,7 +536,7 @@ class DisplayAnki {
             }
         }
 
-        const {note, errors: createNoteErrors} = await this._ankiNoteBuilder.createNote({
+        const {note, errors: createNoteErrors, requirements} = await this._ankiNoteBuilder.createNote({
             dictionaryEntry,
             mode,
             context,
@@ -554,7 +554,7 @@ class DisplayAnki {
             errors
         });
         errors.push(...createNoteErrors);
-        return {note, errors};
+        return {note, errors, requirements};
     }
 
     async _injectAnkiNoteMedia(dictionaryEntry, fields) {

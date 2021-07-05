@@ -52,20 +52,27 @@ class AnkiNoteBuilder {
             duplicateScopeCheckChildren = true;
         }
 
-        const errors = [];
         const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fields) {
-            const formattedFieldValuePromise = this._formatField(fieldValue, commonData, template, errors);
+            const formattedFieldValuePromise = this._formatField(fieldValue, commonData, template);
             formattedFieldValuePromises.push(formattedFieldValuePromise);
         }
 
         const formattedFieldValues = await Promise.all(formattedFieldValuePromises);
+        const errors = [];
+        const uniqueRequirements = new Map();
         const noteFields = {};
         for (let i = 0, ii = fields.length; i < ii; ++i) {
             const fieldName = fields[i][0];
-            const formattedFieldValue = formattedFieldValues[i];
-            noteFields[fieldName] = formattedFieldValue;
+            const {value, errors: fieldErrors, requirements} = formattedFieldValues[i];
+            noteFields[fieldName] = value;
+            errors.push(...fieldErrors);
+            for (const requirement of requirements) {
+                const key = JSON.stringify(requirement);
+                if (uniqueRequirements.has(key)) { continue; }
+                uniqueRequirements.set(key, requirement);
+            }
         }
 
         const note = {
@@ -82,7 +89,7 @@ class AnkiNoteBuilder {
                 }
             }
         };
-        return {note, errors};
+        return {note, errors, requirements: [...uniqueRequirements.values()]};
     }
 
     async getRenderingData({
@@ -113,10 +120,13 @@ class AnkiNoteBuilder {
         };
     }
 
-    async _formatField(field, commonData, template, errors) {
-        return await this._stringReplaceAsync(field, this._markerPattern, async (g0, marker) => {
+    async _formatField(field, commonData, template) {
+        const errors = [];
+        const requirements = [];
+        const value = await this._stringReplaceAsync(field, this._markerPattern, async (g0, marker) => {
             try {
-                const {result} = await this._renderTemplateBatched(template, commonData, marker);
+                const {result, requirements: fieldRequirements} = await this._renderTemplateBatched(template, commonData, marker);
+                requirements.push(...fieldRequirements);
                 return result;
             } catch (e) {
                 const error = new Error(`Template render error for {${marker}}`);
@@ -125,6 +135,7 @@ class AnkiNoteBuilder {
                 return `{${marker}-render-error}`;
             }
         });
+        return {value, errors, requirements};
     }
 
     async _stringReplaceAsync(str, regex, replacer) {
