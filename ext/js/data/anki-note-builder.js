@@ -37,12 +37,13 @@ class AnkiNoteBuilder {
         modelName,
         fields,
         tags=[],
-        injectedMedia=null,
+        requirements=[],
         checkForDuplicates=true,
         duplicateScope='collection',
         resultOutputMode='split',
         glossaryLayoutMode='default',
-        compactTags=false
+        compactTags=false,
+        mediaOptions=null
     }) {
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
@@ -52,7 +53,19 @@ class AnkiNoteBuilder {
             duplicateScopeCheckChildren = true;
         }
 
-        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
+        const allErrors = [];
+        let media;
+        if (requirements.length > 0 && mediaOptions !== null) {
+            let errors;
+            ({media, errors} = await this._injectMedia(dictionaryEntry, requirements, mediaOptions));
+            for (const error of errors) {
+                allErrors.push(deserializeError(error));
+            }
+        } else {
+            media = {};
+        }
+
+        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media);
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fields) {
             const formattedFieldValuePromise = this._formatField(fieldValue, commonData, template);
@@ -60,15 +73,14 @@ class AnkiNoteBuilder {
         }
 
         const formattedFieldValues = await Promise.all(formattedFieldValuePromises);
-        const errors = [];
         const uniqueRequirements = new Map();
         const noteFields = {};
         for (let i = 0, ii = fields.length; i < ii; ++i) {
             const fieldName = fields[i][0];
-            const {value, errors: fieldErrors, requirements} = formattedFieldValues[i];
+            const {value, errors: fieldErrors, requirements: fieldRequirements} = formattedFieldValues[i];
             noteFields[fieldName] = value;
-            errors.push(...fieldErrors);
-            for (const requirement of requirements) {
+            allErrors.push(...fieldErrors);
+            for (const requirement of fieldRequirements) {
                 const key = JSON.stringify(requirement);
                 if (uniqueRequirements.has(key)) { continue; }
                 uniqueRequirements.set(key, requirement);
@@ -89,7 +101,7 @@ class AnkiNoteBuilder {
                 }
             }
         };
-        return {note, errors, requirements: [...uniqueRequirements.values()]};
+        return {note, errors: allErrors, requirements: [...uniqueRequirements.values()]};
     }
 
     async getRenderingData({
@@ -99,16 +111,42 @@ class AnkiNoteBuilder {
         resultOutputMode='split',
         glossaryLayoutMode='default',
         compactTags=false,
-        injectedMedia=null,
         marker=null
     }) {
-        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia);
+        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, {});
         return await this._templateRenderer.getModifiedData({marker, commonData}, 'ankiNote');
+    }
+
+    getDictionaryEntryDetailsForNote(dictionaryEntry) {
+        const {type} = dictionaryEntry;
+        if (type === 'kanji') {
+            const {character} = dictionaryEntry;
+            return {type, character};
+        }
+
+        const {headwords} = dictionaryEntry;
+        let bestIndex = -1;
+        for (let i = 0, ii = headwords.length; i < ii; ++i) {
+            const {term, reading, sources} = headwords[i];
+            for (const {deinflectedText} of sources) {
+                if (term === deinflectedText) {
+                    bestIndex = i;
+                    i = ii;
+                    break;
+                } else if (reading === deinflectedText && bestIndex < 0) {
+                    bestIndex = i;
+                    break;
+                }
+            }
+        }
+
+        const {term, reading} = headwords[Math.max(0, bestIndex)];
+        return {type, term, reading};
     }
 
     // Private
 
-    _createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, injectedMedia) {
+    _createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media) {
         return {
             dictionaryEntry,
             mode,
@@ -116,7 +154,7 @@ class AnkiNoteBuilder {
             resultOutputMode,
             glossaryLayoutMode,
             compactTags,
-            injectedMedia
+            media
         };
     }
 
@@ -235,5 +273,69 @@ class AnkiNoteBuilder {
                 request.reject(e);
             }
         }
+    }
+
+    async _injectMedia(dictionaryEntry, requirements, mediaOptions) {
+        const timestamp = Date.now();
+
+        // Parse requirements
+        let injectAudio = false;
+        let injectScreenshot = false;
+        let injectClipboardImage = false;
+        let injectClipboardText = false;
+        const injectDictionaryMedia = [];
+        for (const requirement of requirements) {
+            const {type} = requirement;
+            switch (type) {
+                case 'audio': injectAudio = true; break;
+                case 'screenshot': injectScreenshot = true; break;
+                case 'clipboardImage': injectClipboardImage = true; break;
+                case 'clipboardText': injectClipboardText = true; break;
+                case 'dictionaryMedia': injectDictionaryMedia.push(requirement); break;
+            }
+        }
+
+        // Generate request data
+        const dictionaryEntryDetails = this.getDictionaryEntryDetailsForNote(dictionaryEntry);
+        let audioDetails = null;
+        let screenshotDetails = null;
+        const clipboardDetails = {image: injectClipboardImage, text: injectClipboardText};
+        if (injectAudio && dictionaryEntryDetails.type !== 'kanji') {
+            const audioOptions = mediaOptions.audio;
+            if (typeof audioOptions === 'object' && audioOptions !== null) {
+                const {sources, preferredAudioIndex} = audioOptions;
+                audioDetails = {sources, preferredAudioIndex};
+            }
+        }
+        if (injectScreenshot) {
+            const screenshotOptions = mediaOptions.screenshot;
+            if (typeof screenshotOptions === 'object' && screenshotOptions !== null) {
+                const {format, quality, contentOrigin: {tabId, frameId}} = screenshotOptions;
+                if (typeof tabId === 'number' && typeof frameId === 'number') {
+                    screenshotDetails = {tabId, frameId, format, quality};
+                }
+            }
+        }
+
+        // Inject media
+        // TODO : injectDictionaryMedia
+        const {result: {audioFileName, screenshotFileName, clipboardImageFileName, clipboardText}, errors} = await yomichan.api.injectAnkiNoteMedia(
+            timestamp,
+            dictionaryEntryDetails,
+            audioDetails,
+            screenshotDetails,
+            clipboardDetails
+        );
+
+        // Format results
+        const dictionaryMedia = {}; // TODO
+        const media = {
+            audio: (typeof audioFileName === 'string' ? {fileName: audioFileName} : null),
+            screenshot: (typeof screenshotFileName === 'string' ? {fileName: screenshotFileName} : null),
+            clipboardImage: (typeof clipboardImageFileName === 'string' ? {fileName: clipboardImageFileName} : null),
+            clipboardText: (typeof clipboardText === 'string' ? {text: clipboardText} : null),
+            dictionaryMedia
+        };
+        return {media, errors};
     }
 }

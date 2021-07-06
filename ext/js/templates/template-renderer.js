@@ -19,12 +19,14 @@
  * DictionaryDataUtil
  * Handlebars
  * StructuredContentGenerator
+ * TemplateRendererMediaProvider
  */
 
 class TemplateRenderer {
     constructor(japaneseUtil, cssStyleApplier) {
         this._japaneseUtil = japaneseUtil;
         this._cssStyleApplier = cssStyleApplier;
+        this._mediaProvider = new TemplateRendererMediaProvider();
         this._cache = new Map();
         this._cacheMaxSize = 5;
         this._helpersRegistered = false;
@@ -94,6 +96,7 @@ class TemplateRenderer {
         try {
             this._stateStack = [new Map()];
             this._requirements = requirements;
+            this._mediaProvider.requirements = requirements;
             this._cleanupCallbacks = cleanupCallbacks;
             const result = instance(data).trim();
             return {result, requirements};
@@ -101,6 +104,7 @@ class TemplateRenderer {
             for (const callback of cleanupCallbacks) { callback(); }
             this._stateStack = null;
             this._requirements = null;
+            this._mediaProvider.requirements = null;
             this._cleanupCallbacks = null;
         }
     }
@@ -162,7 +166,9 @@ class TemplateRenderer {
             ['join',             this._join.bind(this)],
             ['concat',           this._concat.bind(this)],
             ['pitchCategories',  this._pitchCategories.bind(this)],
-            ['formatGlossary',   this._formatGlossary.bind(this)]
+            ['formatGlossary',   this._formatGlossary.bind(this)],
+            ['hasMedia',         this._hasMedia.bind(this)],
+            ['getMedia',         this._getMedia.bind(this)]
         ];
 
         for (const [name, helper] of helpers) {
@@ -563,33 +569,13 @@ class TemplateRenderer {
         parentNode.replaceChild(fragment, textNode);
     }
 
-    _getDictionaryMedia(data, dictionary, path) {
-        const {media} = data;
-        if (typeof media === 'object' && media !== null && Object.prototype.hasOwnProperty.call(media, 'dictionaryMedia')) {
-            const {dictionaryMedia} = media;
-            if (typeof dictionaryMedia === 'object' && dictionaryMedia !== null && Object.prototype.hasOwnProperty.call(dictionaryMedia, dictionary)) {
-                const dictionaryMedia2 = dictionaryMedia[dictionary];
-                if (Object.prototype.hasOwnProperty.call(dictionaryMedia2, path)) {
-                    return dictionaryMedia2[path];
-                }
-            }
-        }
-        return null;
-    }
-
     _createStructuredContentGenerator(data) {
         const mediaLoader = {
             loadMedia: async (path, dictionary, onLoad, onUnload) => {
-                const imageUrl = this._getDictionaryMedia(data, dictionary, path);
+                const imageUrl = this._mediaProvider.getMedia(data, ['dictionaryMedia', path], {dictionary, format: 'fileName', default: null});
                 if (imageUrl !== null) {
                     onLoad(imageUrl);
                     this._cleanupCallbacks.push(() => onUnload(true));
-                } else {
-                    this._requirements.push({
-                        type: 'dictionaryMedia',
-                        dictionary,
-                        path
-                    });
                 }
             }
         };
@@ -618,5 +604,17 @@ class TemplateRenderer {
         const structuredContentGenerator = this._createStructuredContentGenerator(data);
         const node = structuredContentGenerator.createStructuredContent(content.content, dictionary);
         return node !== null ? this._getHtml(node) : '';
+    }
+
+    _hasMedia(context, ...args) {
+        const ii = args.length - 1;
+        const options = args[ii];
+        return this._mediaProvider.hasMedia(options.data.root, args.slice(0, ii), options.hash);
+    }
+
+    _getMedia(context, ...args) {
+        const ii = args.length - 1;
+        const options = args[ii];
+        return this._mediaProvider.getMedia(options.data.root, args.slice(0, ii), options.hash);
     }
 }

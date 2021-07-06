@@ -100,7 +100,6 @@ class DisplayAnki {
                 resultOutputMode: this.resultOutputMode,
                 glossaryLayoutMode: this._glossaryLayoutMode,
                 compactTags: this._compactTags,
-                injectedMedia: null,
                 marker: 'test'
             });
         } catch (e) {
@@ -119,7 +118,7 @@ class DisplayAnki {
             let errors;
             let requirements;
             try {
-                ({note: note, errors, requirements} = await this._createNote(dictionaryEntry, mode, false, []));
+                ({note: note, errors, requirements} = await this._createNote(dictionaryEntry, mode, []));
             } catch (e) {
                 errors = [e];
             }
@@ -235,33 +234,6 @@ class DisplayAnki {
             query: this._display.query,
             fullQuery: this._display.fullQuery
         };
-    }
-
-    _getDictionaryEntryDetailsForNote(dictionaryEntry) {
-        const {type} = dictionaryEntry;
-        if (type === 'kanji') {
-            const {character} = dictionaryEntry;
-            return {type, character};
-        }
-
-        const {headwords} = dictionaryEntry;
-        let bestIndex = -1;
-        for (let i = 0, ii = headwords.length; i < ii; ++i) {
-            const {term, reading, sources} = headwords[i];
-            for (const {deinflectedText} of sources) {
-                if (term === deinflectedText) {
-                    bestIndex = i;
-                    i = ii;
-                    break;
-                } else if (reading === deinflectedText && bestIndex < 0) {
-                    bestIndex = i;
-                    break;
-                }
-            }
-        }
-
-        const {term, reading} = headwords[Math.max(0, bestIndex)];
-        return {type, term, reading};
     }
 
     async _updateDictionaryEntryDetails() {
@@ -390,7 +362,7 @@ class DisplayAnki {
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
         const overrideToken = progressIndicatorVisible.setOverride(true);
         try {
-            const {note, errors, requirements: outputRequirements} = await this._createNote(dictionaryEntry, mode, true, requirements);
+            const {note, errors, requirements: outputRequirements} = await this._createNote(dictionaryEntry, mode, requirements);
             allErrors.push(...errors);
 
             if (outputRequirements.length > 0) {
@@ -494,7 +466,7 @@ class DisplayAnki {
             const modes = this._dictionaryEntryTypeModeMap.get(type);
             if (typeof modes === 'undefined') { continue; }
             for (const mode of modes) {
-                const notePromise = this._createNote(dictionaryEntry, mode, false, []);
+                const notePromise = this._createNote(dictionaryEntry, mode, []);
                 notePromises.push(notePromise);
                 noteTargets.push({index: i, mode});
             }
@@ -544,25 +516,18 @@ class DisplayAnki {
         return results;
     }
 
-    async _createNote(dictionaryEntry, mode, injectMedia, _requirements) {
+    async _createNote(dictionaryEntry, mode, requirements) {
         const context = this._noteContext;
         const modeOptions = this._modeOptions.get(mode);
         if (typeof modeOptions === 'undefined') { throw new Error(`Unsupported note type: ${mode}`); }
         const template = this._ankiFieldTemplates;
         const {deck: deckName, model: modelName} = modeOptions;
         const fields = Object.entries(modeOptions.fields);
+        const contentOrigin = this._display.getContentOrigin();
+        const details = this._ankiNoteBuilder.getDictionaryEntryDetailsForNote(dictionaryEntry);
+        const audioDetails = (details.type === 'term' ? this._display.getAnkiNoteMediaAudioDetails(details.term, details.reading) : null);
 
-        const errors = [];
-        let injectedMedia = null;
-        if (injectMedia) {
-            let errors2;
-            ({result: injectedMedia, errors: errors2} = await this._injectAnkiNoteMedia(dictionaryEntry, fields));
-            for (const error of errors2) {
-                errors.push(deserializeError(error));
-            }
-        }
-
-        const {note, errors: createNoteErrors, requirements: outputRequirements} = await this._ankiNoteBuilder.createNote({
+        const {note, errors, requirements: outputRequirements} = await this._ankiNoteBuilder.createNote({
             dictionaryEntry,
             mode,
             context,
@@ -576,43 +541,17 @@ class DisplayAnki {
             resultOutputMode: this.resultOutputMode,
             glossaryLayoutMode: this._glossaryLayoutMode,
             compactTags: this._compactTags,
-            injectedMedia,
-            errors
+            mediaOptions: {
+                audio: audioDetails,
+                screenshot: {
+                    format: this._screenshotFormat,
+                    quality: this._screenshotQuality,
+                    contentOrigin
+                }
+            },
+            requirements
         });
-        errors.push(...createNoteErrors);
         return {note, errors, requirements: outputRequirements};
-    }
-
-    async _injectAnkiNoteMedia(dictionaryEntry, fields) {
-        const timestamp = Date.now();
-
-        const dictionaryEntryDetails = this._getDictionaryEntryDetailsForNote(dictionaryEntry);
-
-        const audioDetails = (
-            dictionaryEntryDetails.type !== 'kanji' && AnkiUtil.fieldsObjectContainsMarker(fields, 'audio') ?
-            this._display.getAnkiNoteMediaAudioDetails(dictionaryEntryDetails.term, dictionaryEntryDetails.reading) :
-            null
-        );
-
-        const {tabId, frameId} = this._display.getContentOrigin();
-        const screenshotDetails = (
-            AnkiUtil.fieldsObjectContainsMarker(fields, 'screenshot') && typeof tabId === 'number' ?
-            {tabId, frameId, format: this._screenshotFormat, quality: this._screenshotQuality} :
-            null
-        );
-
-        const clipboardDetails = {
-            image: AnkiUtil.fieldsObjectContainsMarker(fields, 'clipboard-image'),
-            text: AnkiUtil.fieldsObjectContainsMarker(fields, 'clipboard-text')
-        };
-
-        return await yomichan.api.injectAnkiNoteMedia(
-            timestamp,
-            dictionaryEntryDetails,
-            audioDetails,
-            screenshotDetails,
-            clipboardDetails
-        );
     }
 
     _getModes(isTerms) {

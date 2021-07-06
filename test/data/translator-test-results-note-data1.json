@@ -111,10 +111,6 @@
               "frequency": 1
             }
           ],
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -141,7 +137,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -256,10 +253,6 @@
               "frequency": 2
             }
           ],
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -286,7 +279,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -432,10 +426,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -472,7 +462,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -618,10 +609,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -658,7 +645,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -822,10 +810,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -866,7 +850,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -1025,10 +1010,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -1069,7 +1050,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -1228,10 +1210,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -1272,7 +1250,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -1431,10 +1410,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -1475,7 +1450,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -1612,10 +1588,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -1652,7 +1624,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -1798,10 +1771,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -1838,7 +1807,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -2054,10 +2024,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -2132,7 +2098,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -2343,10 +2310,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -2421,7 +2384,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -2632,10 +2596,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -2710,7 +2670,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -2921,10 +2882,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -2999,7 +2956,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -3160,10 +3118,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -3204,7 +3158,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -3365,10 +3320,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -3409,7 +3360,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -3570,10 +3522,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -3614,7 +3562,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -3775,10 +3724,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -3819,7 +3764,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -3956,10 +3902,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -3996,7 +3938,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -4142,10 +4085,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -4182,7 +4121,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -4297,10 +4237,6 @@
           "frequencies": [],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -4337,7 +4273,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -4479,10 +4416,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -4519,7 +4452,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -4670,10 +4604,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -4710,7 +4640,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -4874,10 +4805,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -4918,7 +4845,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -5077,10 +5005,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -5121,7 +5045,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -5285,10 +5210,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -5329,7 +5250,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -5488,10 +5410,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -5532,7 +5450,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -5748,10 +5667,6 @@
             }
           ],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -5826,7 +5741,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -6037,10 +5953,6 @@
             }
           ],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -6115,7 +6027,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -6276,10 +6189,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -6320,7 +6229,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -6481,10 +6391,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -6525,7 +6431,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -6741,10 +6648,6 @@
             }
           ],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -6819,7 +6722,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -7030,10 +6934,6 @@
             }
           ],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -7108,7 +7008,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -7269,10 +7170,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -7313,7 +7210,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -7474,10 +7372,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -7518,7 +7412,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -7633,10 +7528,6 @@
           "frequencies": [],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -7673,7 +7564,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -7942,10 +7834,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -8002,7 +7890,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -8254,10 +8143,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -8314,7 +8199,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -8516,10 +8402,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -8550,7 +8432,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -8752,10 +8635,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -8786,7 +8665,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -8927,10 +8807,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -8961,7 +8837,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -9111,10 +8988,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -9145,7 +9018,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -9581,10 +9455,6 @@
             }
           ],
           "sourceTermExactMatchCount": 2,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -9670,7 +9540,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -10000,10 +9871,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 2,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -10035,7 +9902,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -10169,10 +10037,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -10203,7 +10067,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -10346,10 +10211,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -10380,7 +10241,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -10600,10 +10462,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -10678,7 +10536,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -10893,10 +10752,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -10971,7 +10826,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -11186,10 +11042,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -11264,7 +11116,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -11479,10 +11332,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -11557,7 +11406,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -11718,10 +11568,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -11762,7 +11608,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -11923,10 +11770,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -11967,7 +11810,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -12128,10 +11972,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -12172,7 +12012,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -12333,10 +12174,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -12377,7 +12214,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -12514,10 +12352,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -12554,7 +12388,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -12700,10 +12535,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -12740,7 +12571,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -12956,10 +12788,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -13034,7 +12862,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -13245,10 +13074,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -13323,7 +13148,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -13534,10 +13360,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -13612,7 +13434,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -13823,10 +13646,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -13901,7 +13720,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -14062,10 +13882,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -14106,7 +13922,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -14267,10 +14084,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -14311,7 +14124,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -14472,10 +14286,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -14516,7 +14326,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -14677,10 +14488,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -14721,7 +14528,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -14858,10 +14666,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -14898,7 +14702,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -15044,10 +14849,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -15084,7 +14885,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -15300,10 +15102,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -15378,7 +15176,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -15589,10 +15388,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -15667,7 +15462,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -15878,10 +15674,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -15956,7 +15748,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -16167,10 +15960,6 @@
             }
           ],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -16245,7 +16034,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -16406,10 +16196,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -16450,7 +16236,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -16611,10 +16398,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -16655,7 +16438,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -16816,10 +16600,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -16860,7 +16640,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -17021,10 +16802,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -17065,7 +16842,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -17202,10 +16980,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -17242,7 +17016,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -17388,10 +17163,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 1,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -17428,7 +17199,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -17539,10 +17311,6 @@
           "frequencies": [],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -17583,7 +17351,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -17692,10 +17461,6 @@
           "frequencies": [],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -17736,7 +17501,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -17847,10 +17613,6 @@
           "frequencies": [],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -17891,7 +17653,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   },
@@ -18327,10 +18090,6 @@
             }
           ],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -18416,7 +18175,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       },
       {
         "marker": "{marker}",
@@ -18746,10 +18506,6 @@
           ],
           "pitches": [],
           "sourceTermExactMatchCount": 0,
-          "screenshotFileName": null,
-          "clipboardImageFileName": null,
-          "clipboardText": null,
-          "audioFileName": null,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -18781,7 +18537,8 @@
           "document": {
             "title": "title"
           }
-        }
+        },
+        "media": {}
       }
     ]
   }

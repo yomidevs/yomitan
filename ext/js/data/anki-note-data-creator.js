@@ -44,15 +44,16 @@ class AnkiNoteDataCreator {
         glossaryLayoutMode,
         compactTags,
         context,
-        injectedMedia=null
+        media
     }) {
         const self = this;
-        const definition = this.createCachedValue(this._getDefinition.bind(this, dictionaryEntry, injectedMedia, context, resultOutputMode));
+        const definition = this.createCachedValue(this._getDefinition.bind(this, dictionaryEntry, context, resultOutputMode));
         const uniqueExpressions = this.createCachedValue(this._getUniqueExpressions.bind(this, dictionaryEntry));
         const uniqueReadings = this.createCachedValue(this._getUniqueReadings.bind(this, dictionaryEntry));
         const context2 = this.createCachedValue(this._getPublicContext.bind(this, context));
         const pitches = this.createCachedValue(this._getPitches.bind(this, dictionaryEntry));
         const pitchCount = this.createCachedValue(this._getPitchCount.bind(this, pitches));
+        if (typeof media !== 'object' || media === null || Array.isArray(media)) { media = {}; }
         const result = {
             marker,
             get definition() { return self.getCachedValue(definition); },
@@ -68,7 +69,8 @@ class AnkiNoteDataCreator {
             get uniqueReadings() { return self.getCachedValue(uniqueReadings); },
             get pitches() { return self.getCachedValue(pitches); },
             get pitchCount() { return self.getCachedValue(pitchCount); },
-            get context() { return self.getCachedValue(context2); }
+            get context() { return self.getCachedValue(context2); },
+            media
         };
         Object.defineProperty(result, 'dictionaryEntry', {
             configurable: false,
@@ -178,28 +180,21 @@ class AnkiNoteDataCreator {
         return pitches.reduce((i, v) => i + v.pitches.length, 0);
     }
 
-    _getDefinition(dictionaryEntry, injectedMedia, context, resultOutputMode) {
+    _getDefinition(dictionaryEntry, context, resultOutputMode) {
         switch (dictionaryEntry.type) {
             case 'term':
-                return this._getTermDefinition(dictionaryEntry, injectedMedia, context, resultOutputMode);
+                return this._getTermDefinition(dictionaryEntry, context, resultOutputMode);
             case 'kanji':
-                return this._getKanjiDefinition(dictionaryEntry, injectedMedia, context);
+                return this._getKanjiDefinition(dictionaryEntry, context);
             default:
                 return {};
         }
     }
 
-    _getKanjiDefinition(dictionaryEntry, injectedMedia, context) {
+    _getKanjiDefinition(dictionaryEntry, context) {
         const self = this;
 
         const {character, dictionary, onyomi, kunyomi, definitions} = dictionaryEntry;
-
-        const {
-            screenshotFileName=null,
-            clipboardImageFileName=null,
-            clipboardText=null,
-            audioFileName=null
-        } = this._asObject(injectedMedia);
 
         let {url} = this._asObject(context);
         if (typeof url !== 'string') { url = ''; }
@@ -219,10 +214,6 @@ class AnkiNoteDataCreator {
             get tags() { return self.getCachedValue(tags); },
             get stats() { return self.getCachedValue(stats); },
             get frequencies() { return self.getCachedValue(frequencies); },
-            screenshotFileName,
-            clipboardImageFileName,
-            clipboardText,
-            audioFileName,
             url,
             get cloze() { return self.getCachedValue(cloze); }
         };
@@ -265,7 +256,7 @@ class AnkiNoteDataCreator {
         return results;
     }
 
-    _getTermDefinition(dictionaryEntry, injectedMedia, context, resultOutputMode) {
+    _getTermDefinition(dictionaryEntry, context, resultOutputMode) {
         const self = this;
 
         let type = 'term';
@@ -275,13 +266,6 @@ class AnkiNoteDataCreator {
         }
 
         const {inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, definitions} = dictionaryEntry;
-
-        const {
-            screenshotFileName=null,
-            clipboardImageFileName=null,
-            clipboardText=null,
-            audioFileName=null
-        } = this._asObject(injectedMedia);
 
         let {url} = this._asObject(context);
         if (typeof url !== 'string') { url = ''; }
@@ -331,10 +315,6 @@ class AnkiNoteDataCreator {
             get frequencies() { return self.getCachedValue(frequencies); },
             get pitches() { return self.getCachedValue(pitches); },
             sourceTermExactMatchCount,
-            screenshotFileName,
-            clipboardImageFileName,
-            clipboardText,
-            audioFileName,
             url,
             get cloze() { return self.getCachedValue(cloze); },
             get furiganaSegments() { return self.getCachedValue(furiganaSegments); }

@@ -46,6 +46,7 @@ async function createVM() {
         'js/dom/css-style-applier.js',
         'js/display/structured-content-generator.js',
         'js/templates/template-renderer.js',
+        'js/templates/template-renderer-media-provider.js',
         'lib/handlebars.min.js'
     ]);
 
@@ -228,7 +229,6 @@ async function getRenderResults(dictionaryEntries, type, mode, template, AnkiNot
             modelName: 'modelName',
             fields,
             tags: ['yomichan'],
-            injectedMedia: null,
             checkForDuplicates: true,
             duplicateScope: 'collection',
             resultOutputMode: mode,

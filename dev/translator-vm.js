@@ -120,7 +120,7 @@ class TranslatorVM extends DatabaseVM {
                 query: 'query',
                 fullQuery: 'fullQuery'
             },
-            injectedMedia: null
+            media: {}
         };
         return this._ankiNoteDataCreator.create(marker, data);
     }

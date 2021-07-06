@@ -31,8 +31,8 @@
 {{/inline}}
 
 {{#*inline "audio"}}
-    {{~#if definition.audioFileName~}}
-        [sound:{{definition.audioFileName}}]
+    {{~#if (hasMedia "audio")~}}
+        [sound:{{#getMedia "audio" format="fileName"}}{{/getMedia}}]
     {{~/if~}}
 {{/inline}}
 
@@ -173,7 +173,9 @@
 {{/inline}}
 
 {{#*inline "screenshot"}}
-    <img src="{{definition.screenshotFileName}}" />
+    {{~#if (hasMedia "screenshot")~}}
+        <img src="{{#getMedia "screenshot" format="fileName"}}{{/getMedia}}" />
+    {{~/if~}}
 {{/inline}}
 
 {{#*inline "document-title"}}
@@ -291,13 +293,13 @@
 {{! End Pitch Accents }}
 
 {{#*inline "clipboard-image"}}
-    {{~#if definition.clipboardImageFileName~}}
-        <img src="{{definition.clipboardImageFileName}}" />
+    {{~#if (hasMedia "clipboardImage")~}}
+        <img src="{{#getMedia "clipboardImage" format="fileName"}}{{/getMedia}}" />
     {{~/if~}}
 {{/inline}}
 
 {{#*inline "clipboard-text"}}
-    {{~#if definition.clipboardText~}}{{definition.clipboardText}}{{~/if~}}
+    {{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText" format="text"}}{{/getMedia}}{{/if~}}
 {{/inline}}
 
 {{#*inline "conjugation"}}

@@ -15,3 +15,37 @@
 {{=======}}
 {{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}
 {{>>>>>>>}}
+
+{{<<<<<<<}}
+    {{~#if definition.audioFileName~}}
+        [sound:{{definition.audioFileName}}]
+    {{~/if~}}
+{{=======}}
+    {{~#if (hasMedia "audio")~}}
+        [sound:{{#getMedia "audio" format="fileName"}}{{/getMedia}}]
+    {{~/if~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+    <img src="{{definition.screenshotFileName}}" />
+{{=======}}
+    {{~#if (hasMedia "screenshot")~}}
+        <img src="{{#getMedia "screenshot" format="fileName"}}{{/getMedia}}" />
+    {{~/if~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+    {{~#if definition.clipboardImageFileName~}}
+        <img src="{{definition.clipboardImageFileName}}" />
+    {{~/if~}}
+{{=======}}
+    {{~#if (hasMedia "clipboardImage")~}}
+        <img src="{{#getMedia "clipboardImage" format="fileName"}}{{/getMedia}}" />
+    {{~/if~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#if definition.clipboardText~}}{{definition.clipboardText}}{{~/if~}}
+{{=======}}
+{{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText" format="text"}}{{/getMedia}}{{/if~}}
+{{>>>>>>>}}

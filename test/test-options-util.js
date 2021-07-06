@@ -952,6 +952,54 @@ async function testFieldTemplatesUpdate(extDir) {
     {{~else~}}
         <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
     {{~/if~}}`.trimStart()
+        },
+        // hasMedia/getMedia update
+        {
+            oldVersion: 12,
+            newVersion: 13,
+            old: `
+{{#*inline "audio"}}
+    {{~#if definition.audioFileName~}}
+        [sound:{{definition.audioFileName}}]
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "screenshot"}}
+    <img src="{{definition.screenshotFileName}}" />
+{{/inline}}
+
+{{#*inline "clipboard-image"}}
+    {{~#if definition.clipboardImageFileName~}}
+        <img src="{{definition.clipboardImageFileName}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if definition.clipboardText~}}{{definition.clipboardText}}{{~/if~}}
+{{/inline}}`.trimStart(),
+
+            expected: `
+{{#*inline "audio"}}
+    {{~#if (hasMedia "audio")~}}
+        [sound:{{#getMedia "audio" format="fileName"}}{{/getMedia}}]
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "screenshot"}}
+    {{~#if (hasMedia "screenshot")~}}
+        <img src="{{#getMedia "screenshot" format="fileName"}}{{/getMedia}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-image"}}
+    {{~#if (hasMedia "clipboardImage")~}}
+        <img src="{{#getMedia "clipboardImage" format="fileName"}}{{/getMedia}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText" format="text"}}{{/getMedia}}{{/if~}}
+{{/inline}}`.trimStart()
         }
     ];
 

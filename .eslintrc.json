@@ -114,7 +114,8 @@
                 "ext/js/display/structured-content-generator.js",
                 "ext/js/dom/css-style-applier.js",
                 "ext/js/language/dictionary-data-util.js",
-                "ext/js/templates/template-renderer.js"
+                "ext/js/templates/template-renderer.js",
+                "ext/js/templates/template-renderer-media-provider.js"
             ],
             "env": {
                 "webextensions": false
@@ -128,7 +129,8 @@
                 "ext/js/display/structured-content-generator.js",
                 "ext/js/dom/css-style-applier.js",
                 "ext/js/language/dictionary-data-util.js",
-                "ext/js/templates/template-renderer.js"
+                "ext/js/templates/template-renderer.js",
+                "ext/js/templates/template-renderer-media-provider.js"
             ],
             "globals": {
                 "serializeError": "readonly",
@@ -159,7 +161,8 @@
                 "ext/js/display/structured-content-generator.js",
                 "ext/js/dom/css-style-applier.js",
                 "ext/js/language/dictionary-data-util.js",
-                "ext/js/templates/template-renderer.js"
+                "ext/js/templates/template-renderer.js",
+                "ext/js/templates/template-renderer-media-provider.js"
             ],
             "globals": {
                 "yomichan": "readonly"
