@@ -658,10 +658,10 @@ async function testFieldTemplatesUpdate(extDir) {
         {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')},
         {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')}
     ];
-    const getUpdateAdditions = (startVersion=0) => {
+    const getUpdateAdditions = (startVersion, targetVersion) => {
         let value = '';
         for (const {version, changes} of updates) {
-            if (version < startVersion || changes.length === 0) { continue; }
+            if (version < startVersion || version > targetVersion || changes.length === 0) { continue; }
             if (value.length > 0) { value += '\n'; }
             value += changes;
         }
@@ -671,6 +671,8 @@ async function testFieldTemplatesUpdate(extDir) {
     const data = [
         // Standard format
         {
+            oldVersion: 0,
+            newVersion: 12,
             old: `
 {{#*inline "character"}}
     {{~definition.character~}}
@@ -683,11 +685,13 @@ async function testFieldTemplatesUpdate(extDir) {
     {{~definition.character~}}
 {{/inline}}
 
-${getUpdateAdditions()}
+<<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
         },
         // Non-standard marker format
         {
+            oldVersion: 0,
+            newVersion: 12,
             old: `
 {{#*inline "character"}}
     {{~definition.character~}}
@@ -701,19 +705,23 @@ ${getUpdateAdditions()}
 {{/inline}}
 
 {{~> (lookup . "marker2") ~}}
-${getUpdateAdditions()}`.trimStart()
+<<<UPDATE-ADDITIONS>>>`.trimStart()
         },
         // Empty test
         {
+            oldVersion: 0,
+            newVersion: 12,
             old: `
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
             expected: `
-${getUpdateAdditions()}
+<<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
         },
         // Definition tags update
         {
+            oldVersion: 0,
+            newVersion: 12,
             old: `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
@@ -779,13 +787,14 @@ ${getUpdateAdditions()}
     {{~> glossary-single definition brief=brief compactGlossaries=../compactGlossaries data=../.~}}
 {{/inline}}
 
-${getUpdateAdditions()}
+<<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}
 `.trimStart()
         },
         // glossary and glossary-brief update
         {
             oldVersion: 7,
+            newVersion: 12,
             old: `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
@@ -876,11 +885,11 @@ ${getUpdateAdditions()}
         {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
     {{~/unless~}}
     {{~#if (op "<=" glossary.length 1)~}}
-        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
+        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{/each}}
     {{~else if @root.compactGlossaries~}}
-        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
+        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
     {{~else~}}
-        <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
+        <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
     {{~/if~}}
     {{~#set "previousDictionary" dictionary~}}{{~/set~}}
 {{/inline}}
@@ -919,12 +928,13 @@ ${getUpdateAdditions()}
     {{~> glossary brief=true ~}}
 {{/inline}}
 
-${getUpdateAdditions(7)}
+<<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
         },
         // formatGlossary update
         {
             oldVersion: 12,
+            newVersion: 13,
             old: `
     {{~#if (op "<=" glossary.length 1)~}}
         {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{/each}}
@@ -945,16 +955,17 @@ ${getUpdateAdditions(7)}
         }
     ];
 
-    for (const {old, expected, oldVersion} of data) {
+    const updatesPattern = /<<<UPDATE-ADDITIONS>>>/g;
+    for (const {old, expected, oldVersion, newVersion} of data) {
         const options = createOptionsTestData1();
         options.profiles[0].options.anki.fieldTemplates = old;
-        if (typeof oldVersion === 'number') {
-            options.version = oldVersion;
-        }
+        options.version = oldVersion;
 
-        const optionsUpdated = clone(await optionsUtil.update(options));
+        const expected2 = expected.replace(updatesPattern, getUpdateAdditions(oldVersion, newVersion));
+
+        const optionsUpdated = clone(await optionsUtil.update(options, newVersion));
         const fieldTemplatesActual = optionsUpdated.profiles[0].options.anki.fieldTemplates;
-        assert.deepStrictEqual(fieldTemplatesActual, expected);
+        assert.deepStrictEqual(fieldTemplatesActual, expected2);
     }
 }
 

@@ -31,7 +31,7 @@ class OptionsUtil {
         this._optionsSchema = new JsonSchema(schema);
     }
 
-    async update(options) {
+    async update(options, targetVersion=null) {
         // Invalid options
         if (!isObject(options)) {
             options = {};
@@ -84,7 +84,7 @@ class OptionsUtil {
         }
 
         // Generic updates
-        options = await this._applyUpdates(options, this._getVersionUpdates());
+        options = await this._applyUpdates(options, this._getVersionUpdates(targetVersion));
 
         // Validation
         options = this._optionsSchema.getValidValueOrDefault(options);
@@ -448,8 +448,8 @@ class OptionsUtil {
         return options;
     }
 
-    _getVersionUpdates() {
-        return [
+    _getVersionUpdates(targetVersion) {
+        const result = [
             {async: false, update: this._updateVersion1.bind(this)},
             {async: false, update: this._updateVersion2.bind(this)},
             {async: true,  update: this._updateVersion3.bind(this)},
@@ -464,6 +464,10 @@ class OptionsUtil {
             {async: true,  update: this._updateVersion12.bind(this)},
             {async: true,  update: this._updateVersion13.bind(this)}
         ];
+        if (typeof targetVersion === 'number' && targetVersion < result.length) {
+            result.splice(targetVersion);
+        }
+        return result;
     }
 
     _updateVersion1(options) {
