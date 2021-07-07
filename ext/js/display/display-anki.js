@@ -97,7 +97,7 @@ class DisplayAnki {
                 dictionaryEntry,
                 mode: 'test',
                 context: this._noteContext,
-                resultOutputMode: this.resultOutputMode,
+                resultOutputMode: this._resultOutputMode,
                 glossaryLayoutMode: this._glossaryLayoutMode,
                 compactTags: this._compactTags,
                 marker: 'test'
@@ -538,7 +538,7 @@ class DisplayAnki {
             tags: this._noteTags,
             checkForDuplicates: this._checkForDuplicates,
             duplicateScope: this._duplicateScope,
-            resultOutputMode: this.resultOutputMode,
+            resultOutputMode: this._resultOutputMode,
             glossaryLayoutMode: this._glossaryLayoutMode,
             compactTags: this._compactTags,
             mediaOptions: {
