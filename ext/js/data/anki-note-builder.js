@@ -283,7 +283,7 @@ class AnkiNoteBuilder {
         let injectScreenshot = false;
         let injectClipboardImage = false;
         let injectClipboardText = false;
-        const injectDictionaryMedia = [];
+        const dictionaryMediaDetails = [];
         for (const requirement of requirements) {
             const {type} = requirement;
             switch (type) {
@@ -291,7 +291,12 @@ class AnkiNoteBuilder {
                 case 'screenshot': injectScreenshot = true; break;
                 case 'clipboardImage': injectClipboardImage = true; break;
                 case 'clipboardText': injectClipboardText = true; break;
-                case 'dictionaryMedia': injectDictionaryMedia.push(requirement); break;
+                case 'dictionaryMedia':
+                    {
+                        const {dictionary, path} = requirement;
+                        dictionaryMediaDetails.push({dictionary, path});
+                    }
+                    break;
             }
         }
 
@@ -318,17 +323,26 @@ class AnkiNoteBuilder {
         }
 
         // Inject media
-        // TODO : injectDictionaryMedia
-        const {result: {audioFileName, screenshotFileName, clipboardImageFileName, clipboardText}, errors} = await yomichan.api.injectAnkiNoteMedia(
+        const {audioFileName, screenshotFileName, clipboardImageFileName, clipboardText, dictionaryMedia: dictionaryMediaArray, errors} = await yomichan.api.injectAnkiNoteMedia(
             timestamp,
             dictionaryEntryDetails,
             audioDetails,
             screenshotDetails,
-            clipboardDetails
+            clipboardDetails,
+            dictionaryMediaDetails
         );
 
         // Format results
-        const dictionaryMedia = {}; // TODO
+        const dictionaryMedia = {};
+        for (const {dictionary, path, fileName} of dictionaryMediaArray) {
+            if (fileName === null) { continue; }
+            const dictionaryMedia2 = (
+                Object.prototype.hasOwnProperty.call(dictionaryMedia, dictionary) ?
+                (dictionaryMedia[dictionary]) :
+                (dictionaryMedia[dictionary] = {})
+            );
+            dictionaryMedia2[path] = {fileName};
+        }
         const media = {
             audio: (typeof audioFileName === 'string' ? {fileName: audioFileName} : null),
             screenshot: (typeof screenshotFileName === 'string' ? {fileName: screenshotFileName} : null),

@@ -490,14 +490,15 @@ class Backend {
         return results;
     }
 
-    async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails}) {
+    async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails}) {
         return await this._injectAnkNoteMedia(
             this._anki,
             timestamp,
             definitionDetails,
             audioDetails,
             screenshotDetails,
-            clipboardDetails
+            clipboardDetails,
+            dictionaryMediaDetails
         );
     }
 
@@ -1682,7 +1683,7 @@ class Backend {
         }
     }
 
-    async _injectAnkNoteMedia(ankiConnect, timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails) {
+    async _injectAnkNoteMedia(ankiConnect, timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails) {
         let screenshotFileName = null;
         let clipboardImageFileName = null;
         let clipboardText = null;
@@ -1721,14 +1722,25 @@ class Backend {
             errors.push(serializeError(e));
         }
 
+        let dictionaryMedia;
+        try {
+            let errors2;
+            ({results: dictionaryMedia, errors: errors2} = await this._injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, definitionDetails, dictionaryMediaDetails));
+            for (const error of errors2) {
+                errors.push(serializeError(error));
+            }
+        } catch (e) {
+            dictionaryMedia = [];
+            errors.push(serializeError(e));
+        }
+
         return {
-            result: {
-                screenshotFileName,
-                clipboardImageFileName,
-                clipboardText,
-                audioFileName
-            },
-            errors
+            screenshotFileName,
+            clipboardImageFileName,
+            clipboardText,
+            audioFileName,
+            dictionaryMedia,
+            errors: errors
         };
     }
 
@@ -1799,6 +1811,50 @@ class Backend {
         await ankiConnect.storeMediaFile(fileName, data);
 
         return fileName;
+    }
+
+    async _injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, definitionDetails, dictionaryMediaDetails) {
+        const targets = [];
+        const detailsList = [];
+        const detailsMap = new Map();
+        for (const {dictionary, path} of dictionaryMediaDetails) {
+            const target = {dictionary, path};
+            const details = {dictionary, path, media: null};
+            const key = JSON.stringify(target);
+            targets.push(target);
+            detailsList.push(details);
+            detailsMap.set(key, details);
+        }
+        const mediaList = await this._dictionaryDatabase.getMedia(targets);
+
+        for (const media of mediaList) {
+            const {dictionary, path} = media;
+            const key = JSON.stringify({dictionary, path});
+            const details = detailsMap.get(key);
+            if (typeof details === 'undefined' || details.media !== null) { continue; }
+            details.media = media;
+        }
+
+        const errors = [];
+        const results = [];
+        for (let i = 0, ii = detailsList.length; i < ii; ++i) {
+            const {dictionary, path, media} = detailsList[i];
+            let fileName = null;
+            if (media !== null) {
+                const {content, mediaType} = media;
+                const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
+                fileName = this._generateAnkiNoteMediaFileName(`yomichan_dictionary_media_${i + 1}`, extension, timestamp, definitionDetails);
+                try {
+                    await ankiConnect.storeMediaFile(fileName, content);
+                } catch (e) {
+                    errors.push(e);
+                    fileName = null;
+                }
+            }
+            results.push({dictionary, path, fileName});
+        }
+
+        return {results, errors};
     }
 
     _generateAnkiNoteMediaFileName(prefix, extension, timestamp, definitionDetails) {
