@@ -661,7 +661,7 @@ async function testFieldTemplatesUpdate(extDir) {
     const getUpdateAdditions = (startVersion, targetVersion) => {
         let value = '';
         for (const {version, changes} of updates) {
-            if (version < startVersion || version > targetVersion || changes.length === 0) { continue; }
+            if (version <= startVersion || version > targetVersion || changes.length === 0) { continue; }
             if (value.length > 0) { value += '\n'; }
             value += changes;
         }
@@ -936,22 +936,30 @@ async function testFieldTemplatesUpdate(extDir) {
             oldVersion: 12,
             newVersion: 13,
             old: `
+{{#*inline "example"}}
     {{~#if (op "<=" glossary.length 1)~}}
         {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{/each}}
     {{~else if @root.compactGlossaries~}}
         {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
     {{~else~}}
         <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
-    {{~/if~}}`.trimStart(),
+    {{~/if~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
 
             expected: `
+{{#*inline "example"}}
     {{~#if (op "<=" glossary.length 1)~}}
         {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
     {{~else if @root.compactGlossaries~}}
         {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
     {{~else~}}
         <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
-    {{~/if~}}`.trimStart()
+    {{~/if~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart()
         },
         // hasMedia/getMedia update
         {
@@ -976,7 +984,9 @@ async function testFieldTemplatesUpdate(extDir) {
 
 {{#*inline "clipboard-text"}}
     {{~#if definition.clipboardText~}}{{definition.clipboardText}}{{~/if~}}
-{{/inline}}`.trimStart(),
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
 
             expected: `
 {{#*inline "audio"}}
@@ -999,7 +1009,9 @@ async function testFieldTemplatesUpdate(extDir) {
 
 {{#*inline "clipboard-text"}}
     {{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText" format="text"}}{{/getMedia}}{{/if~}}
-{{/inline}}`.trimStart()
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart()
         }
     ];
 

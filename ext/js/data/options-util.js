@@ -853,6 +853,7 @@ class OptionsUtil {
     async _updateVersion13(options) {
         // Version 13 changes:
         //  Handlebars templates updated to use formatGlossary.
+        //  Handlebars templates updated to use new media format.
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v13.handlebars');
         return options;
     }
