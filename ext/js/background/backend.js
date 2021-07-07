@@ -1691,7 +1691,7 @@ class Backend {
 
         try {
             if (screenshotDetails !== null) {
-                screenshotFileName = await this._injectAnkNoteScreenshot(ankiConnect, timestamp, definitionDetails, screenshotDetails);
+                screenshotFileName = await this._injectAnkiNoteScreenshot(ankiConnect, timestamp, definitionDetails, screenshotDetails);
             }
         } catch (e) {
             errors.push(serializeError(e));
@@ -1699,7 +1699,7 @@ class Backend {
 
         try {
             if (clipboardDetails !== null && clipboardDetails.image) {
-                clipboardImageFileName = await this._injectAnkNoteClipboardImage(ankiConnect, timestamp, definitionDetails);
+                clipboardImageFileName = await this._injectAnkiNoteClipboardImage(ankiConnect, timestamp, definitionDetails);
             }
         } catch (e) {
             errors.push(serializeError(e));
@@ -1715,7 +1715,7 @@ class Backend {
 
         try {
             if (audioDetails !== null) {
-                audioFileName = await this._injectAnkNoteAudio(ankiConnect, timestamp, definitionDetails, audioDetails);
+                audioFileName = await this._injectAnkiNoteAudio(ankiConnect, timestamp, definitionDetails, audioDetails);
             }
         } catch (e) {
             errors.push(serializeError(e));
@@ -1732,7 +1732,7 @@ class Backend {
         };
     }
 
-    async _injectAnkNoteAudio(ankiConnect, timestamp, definitionDetails, details) {
+    async _injectAnkiNoteAudio(ankiConnect, timestamp, definitionDetails, details) {
         const {type, term, reading} = definitionDetails;
         if (
             type === 'kanji' ||
@@ -1767,7 +1767,7 @@ class Backend {
         return fileName;
     }
 
-    async _injectAnkNoteScreenshot(ankiConnect, timestamp, definitionDetails, details) {
+    async _injectAnkiNoteScreenshot(ankiConnect, timestamp, definitionDetails, details) {
         const {tabId, frameId, format, quality} = details;
         const dataUrl = await this._getScreenshot(tabId, frameId, format, quality);
 
@@ -1783,7 +1783,7 @@ class Backend {
         return fileName;
     }
 
-    async _injectAnkNoteClipboardImage(ankiConnect, timestamp, definitionDetails) {
+    async _injectAnkiNoteClipboardImage(ankiConnect, timestamp, definitionDetails) {
         const dataUrl = await this._clipboardReader.getImage();
         if (dataUrl === null) {
             return null;
