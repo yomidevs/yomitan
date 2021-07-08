@@ -102,6 +102,7 @@ class AnkiController {
                     'reading',
                     'screenshot',
                     'search-query',
+                    'selection-text',
                     'sentence',
                     'tags',
                     'url'
@@ -121,6 +122,7 @@ class AnkiController {
                     'onyomi',
                     'screenshot',
                     'search-query',
+                    'selection-text',
                     'sentence',
                     'stroke-count',
                     'tags',

@@ -283,6 +283,7 @@ class AnkiNoteBuilder {
         let injectScreenshot = false;
         let injectClipboardImage = false;
         let injectClipboardText = false;
+        let injectSelectionText = false;
         const dictionaryMediaDetails = [];
         for (const requirement of requirements) {
             const {type} = requirement;
@@ -291,6 +292,7 @@ class AnkiNoteBuilder {
                 case 'screenshot': injectScreenshot = true; break;
                 case 'clipboardImage': injectClipboardImage = true; break;
                 case 'clipboardText': injectClipboardText = true; break;
+                case 'selectionText': injectSelectionText = true; break;
                 case 'dictionaryMedia':
                     {
                         const {dictionary, path} = requirement;
@@ -323,7 +325,8 @@ class AnkiNoteBuilder {
         }
 
         // Inject media
-        const {audioFileName, screenshotFileName, clipboardImageFileName, clipboardText, dictionaryMedia: dictionaryMediaArray, errors} = await yomichan.api.injectAnkiNoteMedia(
+        const selectionText = injectSelectionText ? this._getSelectionText() : null;
+        const injectedMedia = await yomichan.api.injectAnkiNoteMedia(
             timestamp,
             dictionaryEntryDetails,
             audioDetails,
@@ -331,6 +334,7 @@ class AnkiNoteBuilder {
             clipboardDetails,
             dictionaryMediaDetails
         );
+        const {audioFileName, screenshotFileName, clipboardImageFileName, clipboardText, dictionaryMedia: dictionaryMediaArray, errors} = injectedMedia;
 
         // Format results
         const dictionaryMedia = {};
@@ -348,8 +352,13 @@ class AnkiNoteBuilder {
             screenshot: (typeof screenshotFileName === 'string' ? {fileName: screenshotFileName} : null),
             clipboardImage: (typeof clipboardImageFileName === 'string' ? {fileName: clipboardImageFileName} : null),
             clipboardText: (typeof clipboardText === 'string' ? {text: clipboardText} : null),
+            selectionText: (typeof selectionText === 'string' ? {text: selectionText} : null),
             dictionaryMedia
         };
         return {media, errors};
+    }
+
+    _getSelectionText() {
+        return document.getSelection().toString();
     }
 }

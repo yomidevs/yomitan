@@ -959,6 +959,7 @@ async function testFieldTemplatesUpdate(extDir) {
     {{~/if~}}
 {{/inline}}
 
+<<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
         },
         // hasMedia/getMedia update
@@ -1011,6 +1012,7 @@ async function testFieldTemplatesUpdate(extDir) {
     {{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText" format="text"}}{{/getMedia}}{{/if~}}
 {{/inline}}
 
+<<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
         }
     ];

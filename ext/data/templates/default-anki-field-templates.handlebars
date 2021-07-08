@@ -378,4 +378,8 @@
     {{~#multiLine}}{{context.fullQuery}}{{/multiLine~}}
 {{/inline}}
 
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{#getMedia "selectionText" format="text"}}{{/getMedia}}{{/if~}}
+{{/inline}}
+
 {{~> (lookup . "marker") ~}}

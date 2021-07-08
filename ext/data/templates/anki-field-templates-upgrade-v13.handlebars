@@ -1,3 +1,7 @@
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{#getMedia "selectionText" format="text"}}{{/getMedia}}{{/if~}}
+{{/inline}}
+
 {{<<<<<<<}}
 {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{/each}}
 {{=======}}

@@ -78,6 +78,7 @@ class TemplateRendererMediaProvider {
             case 'screenshot': return this._getSimpleMediaData(media, 'screenshot');
             case 'clipboardImage': return this._getSimpleMediaData(media, 'clipboardImage');
             case 'clipboardText': return this._getSimpleMediaData(media, 'clipboardText');
+            case 'selectionText': return this._getSimpleMediaData(media, 'selectionText');
             case 'dictionaryMedia': return this._getDictionaryMedia(media, args[1], namedArgs);
             default: return null;
         }

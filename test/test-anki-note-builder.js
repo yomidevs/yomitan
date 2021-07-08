@@ -158,6 +158,7 @@ function getFieldMarkers(type) {
                 'reading',
                 'screenshot',
                 'search-query',
+                'selection-text',
                 'sentence',
                 'tags',
                 'url'
@@ -177,6 +178,7 @@ function getFieldMarkers(type) {
                 'onyomi',
                 'screenshot',
                 'search-query',
+                'selection-text',
                 'sentence',
                 'stroke-count',
                 'tags',

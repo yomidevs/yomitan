@@ -16,6 +16,7 @@
         "onyomi": "ダ, ダアス",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "stroke-count": "Stroke count: Unknown",
         "tags": "",
@@ -40,6 +41,7 @@
         "onyomi": "",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix込cloze-suffix",
         "stroke-count": "Stroke count: Unknown",
         "tags": "",
@@ -78,6 +80,7 @@
         "reading": "だ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
@@ -106,6 +109,7 @@
         "reading": "ダース",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "abbr, n",
         "url": "<a href=\"url:\">url:</a>"
@@ -139,6 +143,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打つcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -167,6 +172,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打つcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -195,6 +201,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打つcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -223,6 +230,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打つcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -251,6 +259,7 @@
         "reading": "だ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
@@ -279,6 +288,7 @@
         "reading": "ダース",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "abbr, n",
         "url": "<a href=\"url:\">url:</a>"
@@ -312,6 +322,7 @@
         "reading": "うちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -340,6 +351,7 @@
         "reading": "ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -368,6 +380,7 @@
         "reading": "うちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -396,6 +409,7 @@
         "reading": "ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -424,6 +438,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -452,6 +467,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -480,6 +496,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -508,6 +525,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -536,6 +554,7 @@
         "reading": "だ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
@@ -564,6 +583,7 @@
         "reading": "ダース",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "abbr, n",
         "url": "<a href=\"url:\">url:</a>"
@@ -597,6 +617,7 @@
         "reading": "がぞう",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix画像cloze-suffix",
         "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
@@ -630,6 +651,7 @@
         "reading": "だ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixだcloze-suffix",
         "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
@@ -663,6 +685,7 @@
         "reading": "ダース",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixダースcloze-suffix",
         "tags": "abbr, n",
         "url": "<a href=\"url:\">url:</a>"
@@ -696,6 +719,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixうつcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -724,6 +748,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixうつcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -757,6 +782,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixぶつcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -785,6 +811,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixぶつcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -818,6 +845,7 @@
         "reading": "うちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixうちこむcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -846,6 +874,7 @@
         "reading": "うちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixうちこむcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -874,6 +903,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixうちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -902,6 +932,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixうちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -935,6 +966,7 @@
         "reading": "ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixぶちこむcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -963,6 +995,7 @@
         "reading": "ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixぶちこむcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -991,6 +1024,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixぶちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1019,6 +1053,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixぶちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1052,6 +1087,7 @@
         "reading": "がぞう",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixがぞうcloze-suffix",
         "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
@@ -1097,6 +1133,7 @@
         "reading": "うちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1125,6 +1162,7 @@
         "reading": "ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1153,6 +1191,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1181,6 +1220,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1209,6 +1249,7 @@
         "reading": "だ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
@@ -1237,6 +1278,7 @@
         "reading": "ダース",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "abbr, n",
         "url": "<a href=\"url:\">url:</a>"
@@ -1270,6 +1312,7 @@
         "reading": "うちこむ、ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ち込むcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1298,6 +1341,7 @@
         "reading": "うつ、ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1326,6 +1370,7 @@
         "reading": "だ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
@@ -1354,6 +1399,7 @@
         "reading": "ダース",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "abbr, n",
         "url": "<a href=\"url:\">url:</a>"
@@ -1387,6 +1433,7 @@
         "reading": "うちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ち込んでいませんでしたcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1415,6 +1462,7 @@
         "reading": "ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ち込んでいませんでしたcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1443,6 +1491,7 @@
         "reading": "うちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ち込んでいませんでしたcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1471,6 +1520,7 @@
         "reading": "ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ち込んでいませんでしたcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1499,6 +1549,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1527,6 +1578,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1555,6 +1607,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1583,6 +1636,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1611,6 +1665,7 @@
         "reading": "だ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
@@ -1639,6 +1694,7 @@
         "reading": "ダース",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "abbr, n",
         "url": "<a href=\"url:\">url:</a>"
@@ -1672,6 +1728,7 @@
         "reading": "うちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打(う)ち込(こ)むcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1700,6 +1757,7 @@
         "reading": "ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打(う)ち込(こ)むcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1728,6 +1786,7 @@
         "reading": "うちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打(う)ち込(こ)むcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1756,6 +1815,7 @@
         "reading": "ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打(う)ち込(こ)むcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1784,6 +1844,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打(う)ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1812,6 +1873,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打(う)ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1840,6 +1902,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打(う)ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1868,6 +1931,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打(う)ちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1896,6 +1960,7 @@
         "reading": "だ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
@@ -1924,6 +1989,7 @@
         "reading": "ダース",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix打cloze-suffix",
         "tags": "abbr, n",
         "url": "<a href=\"url:\">url:</a>"
@@ -1957,6 +2023,7 @@
         "reading": "うちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix(打)(ち)(込)(む)cloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -1985,6 +2052,7 @@
         "reading": "ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix(打)(ち)(込)(む)cloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -2013,6 +2081,7 @@
         "reading": "うちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix(打)(ち)(込)(む)cloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -2041,6 +2110,7 @@
         "reading": "ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix(打)(ち)(込)(む)cloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -2069,6 +2139,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix(打)(ち)cloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -2097,6 +2168,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix(打)(ち)cloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -2125,6 +2197,7 @@
         "reading": "うつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix(打)(ち)cloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -2153,6 +2226,7 @@
         "reading": "ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix(打)(ち)cloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -2181,6 +2255,7 @@
         "reading": "だ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix(打)cloze-suffix",
         "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
@@ -2209,6 +2284,7 @@
         "reading": "ダース",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefix(打)cloze-suffix",
         "tags": "abbr, n",
         "url": "<a href=\"url:\">url:</a>"
@@ -2242,6 +2318,7 @@
         "reading": "よむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixtestcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -2275,6 +2352,7 @@
         "reading": "つよみ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixつtestcloze-suffix",
         "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
@@ -2308,6 +2386,7 @@
         "reading": "よむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixtestましたcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -2341,6 +2420,7 @@
         "reading": "うちこむ、ぶちこむ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixうちこむcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"
@@ -2369,6 +2449,7 @@
         "reading": "うつ、ぶつ",
         "screenshot": "",
         "search-query": "fullQuery",
+        "selection-text": "",
         "sentence": "cloze-prefixうちcloze-suffix",
         "tags": "vt",
         "url": "<a href=\"url:\">url:</a>"

@@ -177,6 +177,7 @@ Flashcard fields can be configured with the following steps:
     `{reading}` | Kana reading for the term (empty for terms where the expression is the reading).
     `{screenshot}` | Screenshot of the web page taken at the time the term was added.
     `{search-query}` | The full search query shown on the search page.
+    `{selection-text}` | The selected text on the search page or popup.
     `{sentence}` | Sentence, quote, or phrase that the term appears in from the source content.
     `{tags}` | Grammar and usage tags providing information about the term (unavailable in *grouped* mode).
     `{url}` | Address of the web page in which the term appeared in.
@@ -199,6 +200,7 @@ Flashcard fields can be configured with the following steps:
     `{onyomi}` | Onyomi (Chinese reading) for the kanji expressed as hiragana.
     `{screenshot}` | Screenshot of the web page taken at the time the kanji was added.
     `{search-query}` | The full search query shown on the search page.
+    `{selection-text}` | The selected text on the search page or popup.
     `{sentence}` | Sentence, quote, or phrase that the character appears in from the source content.
     `{stroke-count}` | Number of strokes that the kanji character has.
     `{url}` | Address of the web page in which the kanji appeared in.
