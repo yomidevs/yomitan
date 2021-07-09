@@ -322,14 +322,13 @@ const JapaneseUtil = (() => {
                 case 'katakana':
                     return this.convertHiraganaToKatakana(reading);
                 case 'romaji':
-                    if (reading) {
+                    if (reading.length > 0) {
                         return this.convertToRomaji(reading);
+                    } else if (this.isStringEntirelyKana(term)) {
+                        return this.convertToRomaji(term);
                     } else {
-                        if (this.isStringEntirelyKana(term)) {
-                            return this.convertToRomaji(term);
-                        }
+                        return reading;
                     }
-                    return reading;
                 case 'none':
                     return '';
                 default:

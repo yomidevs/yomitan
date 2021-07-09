@@ -32,8 +32,8 @@ class API {
         return this._invoke('termsFind', {text, details, optionsContext});
     }
 
-    textParse(text, optionsContext) {
-        return this._invoke('textParse', {text, optionsContext});
+    parseText(text, optionsContext, scanLength, useInternalParser, useMecabParser) {
+        return this._invoke('parseText', {text, optionsContext, scanLength, useInternalParser, useMecabParser});
     }
 
     kanjiFind(text, optionsContext) {

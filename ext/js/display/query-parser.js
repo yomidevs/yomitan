@@ -20,13 +20,18 @@
  */
 
 class QueryParser extends EventDispatcher {
-    constructor({getSearchContext, documentUtil}) {
+    constructor({getSearchContext, documentUtil, japaneseUtil}) {
         super();
         this._getSearchContext = getSearchContext;
         this._documentUtil = documentUtil;
+        this._japaneseUtil = japaneseUtil;
         this._text = '';
         this._setTextToken = null;
         this._selectedParser = null;
+        this._readingMode = 'none';
+        this._scanLength = 1;
+        this._useInternalParser = true;
+        this._useMecabParser = false;
         this._parseResults = [];
         this._queryParser = document.querySelector('#query-parser-content');
         this._queryParserModeContainer = document.querySelector('#query-parser-mode-container');
@@ -52,7 +57,7 @@ class QueryParser extends EventDispatcher {
         this._queryParserModeSelect.addEventListener('change', this._onParserChange.bind(this), false);
     }
 
-    setOptions({selectedParser, termSpacing, scanning}) {
+    setOptions({selectedParser, termSpacing, readingMode, useInternalParser, useMecabParser, scanning}) {
         let selectedParserChanged = false;
         if (selectedParser === null || typeof selectedParser === 'string') {
             selectedParserChanged = (this._selectedParser !== selectedParser);
@@ -61,7 +66,20 @@ class QueryParser extends EventDispatcher {
         if (typeof termSpacing === 'boolean') {
             this._queryParser.dataset.termSpacing = `${termSpacing}`;
         }
+        if (typeof readingMode === 'string') {
+            this._readingMode = readingMode;
+        }
+        if (typeof useInternalParser === 'boolean') {
+            this._useInternalParser = useInternalParser;
+        }
+        if (typeof useMecabParser === 'boolean') {
+            this._useMecabParser = useMecabParser;
+        }
         if (scanning !== null && typeof scanning === 'object') {
+            const {scanLength} = scanning;
+            if (typeof scanLength === 'number') {
+                this._scanLength = scanLength;
+            }
             this._textScanner.setOptions(scanning);
         }
         this._textScanner.setEnabled(true);
@@ -76,7 +94,7 @@ class QueryParser extends EventDispatcher {
 
         const token = {};
         this._setTextToken = token;
-        this._parseResults = await yomichan.api.textParse(text, this._getOptionsContext());
+        this._parseResults = await yomichan.api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser);
         if (this._setTextToken !== token) { return; }
 
         this._refreshSelectedParser();
@@ -189,16 +207,19 @@ class QueryParser extends EventDispatcher {
         select.selectedIndex = selectedIndex;
     }
 
-    _createParseResult(terms) {
+    _createParseResult(data) {
+        const jp = this._japaneseUtil;
+        const readingMode = this._readingMode;
         const fragment = document.createDocumentFragment();
-        for (const term of terms) {
+        for (const term of data) {
             const termNode = document.createElement('span');
             termNode.className = 'query-parser-term';
-            for (const segment of term) {
-                if (segment.reading.trim().length === 0) {
-                    termNode.appendChild(document.createTextNode(segment.text));
+            for (const {text, reading} of term) {
+                if (reading.length === 0) {
+                    termNode.appendChild(document.createTextNode(text));
                 } else {
-                    termNode.appendChild(this._createSegment(segment));
+                    const reading2 = jp.convertReading(text, reading, readingMode);
+                    termNode.appendChild(this._createSegment(text, reading2));
                 }
             }
             fragment.appendChild(termNode);
@@ -206,7 +227,7 @@ class QueryParser extends EventDispatcher {
         return fragment;
     }
 
-    _createSegment(segment) {
+    _createSegment(text, reading) {
         const segmentNode = document.createElement('ruby');
         segmentNode.className = 'query-parser-segment';
 
@@ -219,8 +240,8 @@ class QueryParser extends EventDispatcher {
         segmentNode.appendChild(textNode);
         segmentNode.appendChild(readingNode);
 
-        textNode.textContent = segment.text;
-        readingNode.textContent = segment.reading;
+        textNode.textContent = text;
+        readingNode.textContent = reading;
 
         return segmentNode;
     }

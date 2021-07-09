@@ -90,7 +90,7 @@ class Backend {
             ['optionsGetFull',               {async: false, contentScript: true,  handler: this._onApiOptionsGetFull.bind(this)}],
             ['kanjiFind',                    {async: true,  contentScript: true,  handler: this._onApiKanjiFind.bind(this)}],
             ['termsFind',                    {async: true,  contentScript: true,  handler: this._onApiTermsFind.bind(this)}],
-            ['textParse',                    {async: true,  contentScript: true,  handler: this._onApiTextParse.bind(this)}],
+            ['parseText',                    {async: true,  contentScript: true,  handler: this._onApiParseText.bind(this)}],
             ['getAnkiConnectVersion',        {async: true,  contentScript: true,  handler: this._onApGetAnkiConnectVersion.bind(this)}],
             ['isAnkiConnected',              {async: true,  contentScript: true,  handler: this._onApiIsAnkiConnected.bind(this)}],
             ['addAnkiNote',                  {async: true,  contentScript: true,  handler: this._onApiAddAnkiNote.bind(this)}],
@@ -417,26 +417,30 @@ class Backend {
         return {dictionaryEntries, originalTextLength};
     }
 
-    async _onApiTextParse({text, optionsContext}) {
-        const options = this._getProfileOptions(optionsContext);
+    async _onApiParseText({text, optionsContext, scanLength, useInternalParser, useMecabParser}) {
+        const [internalResults, mecabResults] = await Promise.all([
+            (useInternalParser ? this._textParseScanning(text, scanLength, optionsContext) : null),
+            (useMecabParser ? this._textParseMecab(text) : null)
+        ]);
+
         const results = [];
 
-        if (options.parsing.enableScanningParser) {
+        if (internalResults !== null) {
             results.push({
-                source: 'scanning-parser',
                 id: 'scan',
-                content: await this._textParseScanning(text, options)
+                source: 'scanning-parser',
+                dictionary: null,
+                content: internalResults
             });
         }
 
-        if (options.parsing.enableMecabParser) {
-            const mecabResults = await this._textParseMecab(text, options);
-            for (const [mecabDictName, mecabDictResults] of mecabResults) {
+        if (mecabResults !== null) {
+            for (const [dictionary, content] of mecabResults) {
                 results.push({
+                    id: `mecab-${dictionary}`,
                     source: 'mecab',
-                    dictionary: mecabDictName,
-                    id: `mecab-${mecabDictName}`,
-                    content: mecabDictResults
+                    dictionary,
+                    content
                 });
             }
         }
@@ -1042,10 +1046,10 @@ class Backend {
         return true;
     }
 
-    async _textParseScanning(text, options) {
+    async _textParseScanning(text, scanLength, optionsContext) {
         const jp = this._japaneseUtil;
-        const {scanning: {length: scanningLength}, parsing: {readingMode}} = options;
         const mode = 'simple';
+        const options = this._getProfileOptions(optionsContext);
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, {wildcard: null}, options);
         const results = [];
         let previousUngroupedSegment = null;
@@ -1054,7 +1058,7 @@ class Backend {
         while (i < ii) {
             const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
                 mode,
-                text.substring(i, i + scanningLength),
+                text.substring(i, i + scanLength),
                 findTermsOptions
             );
             const codePoint = text.codePointAt(i);
@@ -1069,8 +1073,7 @@ class Backend {
                 const source = text.substring(i, i + originalTextLength);
                 const textSegments = [];
                 for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(term, reading, source)) {
-                    const reading3 = jp.convertReading(text2, reading2, readingMode);
-                    textSegments.push({text: text2, reading: reading3});
+                    textSegments.push({text: text2, reading: reading2});
                 }
                 results.push(textSegments);
                 i += originalTextLength;
@@ -1087,9 +1090,8 @@ class Backend {
         return results;
     }
 
-    async _textParseMecab(text, options) {
+    async _textParseMecab(text) {
         const jp = this._japaneseUtil;
-        const {parsing: {readingMode}} = options;
 
         let parseTextResults;
         try {
@@ -1109,8 +1111,7 @@ class Backend {
                         jp.convertKatakanaToHiragana(reading),
                         source
                     )) {
-                        const reading3 = jp.convertReading(text2, reading2, readingMode);
-                        termParts.push({text: text2, reading: reading3});
+                        termParts.push({text: text2, reading: reading2});
                     }
                     result.push(termParts);
                 }

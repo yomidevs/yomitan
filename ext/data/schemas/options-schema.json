@@ -797,7 +797,7 @@
                                     },
                                     "readingMode": {
                                         "type": "string",
-                                        "enum": ["hiragana", "katakana", "romaji", "none"],
+                                        "enum": ["hiragana", "katakana", "romaji", "dictionary-reading", "none"],
                                         "default": "hiragana"
                                     }
                                 }
