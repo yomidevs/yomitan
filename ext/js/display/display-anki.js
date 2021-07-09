@@ -22,11 +22,11 @@
  */
 
 class DisplayAnki {
-    constructor(display) {
+    constructor(display, japaneseUtil) {
         this._display = display;
         this._ankiFieldTemplates = null;
         this._ankiFieldTemplatesDefault = null;
-        this._ankiNoteBuilder = new AnkiNoteBuilder();
+        this._ankiNoteBuilder = new AnkiNoteBuilder({japaneseUtil});
         this._ankiNoteNotification = null;
         this._ankiNoteNotificationEventListeners = null;
         this._ankiTagNotification = null;
@@ -44,6 +44,7 @@ class DisplayAnki {
         this._duplicateScope = 'collection';
         this._screenshotFormat = 'png';
         this._screenshotQuality = 100;
+        this._scanLength = 10;
         this._noteTags = [];
         this._modeOptions = new Map();
         this._dictionaryEntryTypeModeMap = new Map([
@@ -141,7 +142,8 @@ class DisplayAnki {
     _onOptionsUpdated({options}) {
         const {
             general: {resultOutputMode, glossaryLayoutMode, compactTags},
-            anki: {tags, duplicateScope, suspendNewCards, checkForDuplicates, displayTags, kanji, terms, screenshot: {format, quality}}
+            anki: {tags, duplicateScope, suspendNewCards, checkForDuplicates, displayTags, kanji, terms, screenshot: {format, quality}},
+            scanning: {length: scanLength}
         } = options;
 
         this._checkForDuplicates = checkForDuplicates;
@@ -153,6 +155,7 @@ class DisplayAnki {
         this._duplicateScope = duplicateScope;
         this._screenshotFormat = format;
         this._screenshotQuality = quality;
+        this._scanLength = scanLength;
         this._noteTags = [...tags];
         this._modeOptions.clear();
         this._modeOptions.set('kanji', kanji);
@@ -526,6 +529,7 @@ class DisplayAnki {
         const contentOrigin = this._display.getContentOrigin();
         const details = this._ankiNoteBuilder.getDictionaryEntryDetailsForNote(dictionaryEntry);
         const audioDetails = (details.type === 'term' ? this._display.getAnkiNoteMediaAudioDetails(details.term, details.reading) : null);
+        const optionsContext = this._display.getOptionsContext();
 
         const {note, errors, requirements: outputRequirements} = await this._ankiNoteBuilder.createNote({
             dictionaryEntry,
@@ -547,6 +551,10 @@ class DisplayAnki {
                     format: this._screenshotFormat,
                     quality: this._screenshotQuality,
                     contentOrigin
+                },
+                textParsing: {
+                    optionsContext,
+                    scanLength: this._scanLength
                 }
             },
             requirements

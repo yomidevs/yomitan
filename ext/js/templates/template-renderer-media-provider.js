@@ -54,21 +54,7 @@ class TemplateRendererMediaProvider {
     }
 
     _getFormattedValue(data, format) {
-        switch (format) {
-            case 'fileName':
-                {
-                    const {fileName} = data;
-                    if (typeof fileName === 'string') { return fileName; }
-                }
-                break;
-            case 'text':
-                {
-                    const {text} = data;
-                    if (typeof text === 'string') { return text; }
-                }
-                break;
-        }
-        return null;
+        return Object.prototype.hasOwnProperty.call(data, format) ? data[format] : null;
     }
 
     _getMediaData(media, args, namedArgs) {
@@ -79,6 +65,7 @@ class TemplateRendererMediaProvider {
             case 'clipboardImage': return this._getSimpleMediaData(media, 'clipboardImage');
             case 'clipboardText': return this._getSimpleMediaData(media, 'clipboardText');
             case 'selectionText': return this._getSimpleMediaData(media, 'selectionText');
+            case 'textFurigana': return this._getTextFurigana(media, args[1], namedArgs);
             case 'dictionaryMedia': return this._getDictionaryMedia(media, args[1], namedArgs);
             default: return null;
         }
@@ -111,6 +98,23 @@ class TemplateRendererMediaProvider {
             type: 'dictionaryMedia',
             dictionary,
             path
+        });
+        return null;
+    }
+
+    _getTextFurigana(media, text, namedArgs) {
+        const {readingMode=null} = namedArgs;
+        const {textFurigana} = media;
+        if (Array.isArray(textFurigana)) {
+            for (const entry of textFurigana) {
+                if (entry.text !== text || entry.readingMode !== readingMode) { continue; }
+                return entry.details;
+            }
+        }
+        this._addRequirement({
+            type: 'textFurigana',
+            text,
+            readingMode
         });
         return null;
     }

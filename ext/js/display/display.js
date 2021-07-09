@@ -110,7 +110,7 @@ class Display extends EventDispatcher {
         this._queryPostProcessor = null;
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         this._elementOverflowController = new ElementOverflowController();
-        this._displayAnki = new DisplayAnki(this);
+        this._displayAnki = new DisplayAnki(this, japaneseUtil);
 
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],

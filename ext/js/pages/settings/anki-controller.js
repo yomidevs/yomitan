@@ -104,6 +104,7 @@ class AnkiController {
                     'search-query',
                     'selection-text',
                     'sentence',
+                    'sentence-furigana',
                     'tags',
                     'url'
                 ];
@@ -123,6 +124,7 @@ class AnkiController {
                     'screenshot',
                     'search-query',
                     'selection-text',
+                    'sentence-furigana',
                     'sentence',
                     'stroke-count',
                     'tags',

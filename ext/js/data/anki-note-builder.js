@@ -21,7 +21,8 @@
  */
 
 class AnkiNoteBuilder {
-    constructor() {
+    constructor({japaneseUtil}) {
+        this._japaneseUtil = japaneseUtil;
         this._markerPattern = AnkiUtil.cloneFieldMarkerPattern(true);
         this._templateRenderer = new TemplateRendererProxy();
         this._batchedRequests = [];
@@ -284,6 +285,7 @@ class AnkiNoteBuilder {
         let injectClipboardImage = false;
         let injectClipboardText = false;
         let injectSelectionText = false;
+        const textFuriganaDetails = [];
         const dictionaryMediaDetails = [];
         for (const requirement of requirements) {
             const {type} = requirement;
@@ -293,6 +295,12 @@ class AnkiNoteBuilder {
                 case 'clipboardImage': injectClipboardImage = true; break;
                 case 'clipboardText': injectClipboardText = true; break;
                 case 'selectionText': injectSelectionText = true; break;
+                case 'textFurigana':
+                    {
+                        const {text, readingMode} = requirement;
+                        textFuriganaDetails.push({text, readingMode});
+                    }
+                    break;
                 case 'dictionaryMedia':
                     {
                         const {dictionary, path} = requirement;
@@ -323,6 +331,14 @@ class AnkiNoteBuilder {
                 }
             }
         }
+        let textFuriganaPromise = null;
+        if (textFuriganaDetails.length > 0) {
+            const textParsingOptions = mediaOptions.textParsing;
+            if (typeof textParsingOptions === 'object' && textParsingOptions !== null) {
+                const {optionsContext, scanLength} = textParsingOptions;
+                textFuriganaPromise = this._getTextFurigana(textFuriganaDetails, optionsContext, scanLength);
+            }
+        }
 
         // Inject media
         const selectionText = injectSelectionText ? this._getSelectionText() : null;
@@ -335,6 +351,7 @@ class AnkiNoteBuilder {
             dictionaryMediaDetails
         );
         const {audioFileName, screenshotFileName, clipboardImageFileName, clipboardText, dictionaryMedia: dictionaryMediaArray, errors} = injectedMedia;
+        const textFurigana = textFuriganaPromise !== null ? await textFuriganaPromise : [];
 
         // Format results
         const dictionaryMedia = {};
@@ -353,6 +370,7 @@ class AnkiNoteBuilder {
             clipboardImage: (typeof clipboardImageFileName === 'string' ? {fileName: clipboardImageFileName} : null),
             clipboardText: (typeof clipboardText === 'string' ? {text: clipboardText} : null),
             selectionText: (typeof selectionText === 'string' ? {text: selectionText} : null),
+            textFurigana,
             dictionaryMedia
         };
         return {media, errors};
@@ -360,5 +378,51 @@ class AnkiNoteBuilder {
 
     _getSelectionText() {
         return document.getSelection().toString();
+    }
+
+    async _getTextFurigana(entries, optionsContext, scanLength) {
+        const results = [];
+        for (const {text, readingMode} of entries) {
+            const parseResults = await yomichan.api.parseText(text, optionsContext, scanLength, true, false);
+            let data = null;
+            for (const {source, content} of parseResults) {
+                if (source !== 'scanning-parser') { continue; }
+                data = content;
+                break;
+            }
+            if (data !== null) {
+                const html = this._createFuriganaHtml(data, readingMode);
+                results.push({text, readingMode, details: {html}});
+            }
+        }
+        return results;
+    }
+
+    _createFuriganaHtml(data, readingMode) {
+        let result = '';
+        for (const term of data) {
+            result += '<span class="term">';
+            for (const {text, reading} of term) {
+                if (reading.length > 0) {
+                    const reading2 = this._convertReading(reading, readingMode);
+                    result += `<ruby>${text}<rt>${reading2}</rt></ruby>`;
+                } else {
+                    result += text;
+                }
+            }
+            result += '</span>';
+        }
+        return result;
+    }
+
+    _convertReading(reading, readingMode) {
+        switch (readingMode) {
+            case 'hiragana':
+                return this._japaneseUtil.convertKatakanaToHiragana(reading);
+            case 'katakana':
+                return this._japaneseUtil.convertHiraganaToKatakana(reading);
+            default:
+                return reading;
+        }
     }
 }

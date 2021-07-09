@@ -179,6 +179,7 @@ Flashcard fields can be configured with the following steps:
     `{search-query}` | The full search query shown on the search page.
     `{selection-text}` | The selected text on the search page or popup.
     `{sentence}` | Sentence, quote, or phrase that the term appears in from the source content.
+    `{sentence-furigana}` | Sentence, quote, or phrase that the term appears in from the source content, with furigana added.
     `{tags}` | Grammar and usage tags providing information about the term (unavailable in *grouped* mode).
     `{url}` | Address of the web page in which the term appeared in.
 
@@ -202,6 +203,7 @@ Flashcard fields can be configured with the following steps:
     `{search-query}` | The full search query shown on the search page.
     `{selection-text}` | The selected text on the search page or popup.
     `{sentence}` | Sentence, quote, or phrase that the character appears in from the source content.
+    `{sentence-furigana}` | Sentence, quote, or phrase that the character appears in from the source content, with furigana added.
     `{stroke-count}` | Number of strokes that the kanji character has.
     `{url}` | Address of the web page in which the kanji appeared in.
 
