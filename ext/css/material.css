@@ -1211,6 +1211,9 @@ button.popup-menu-item {
 button.popup-menu-item:not([hidden]) {
     display: flex;
 }
+button.popup-menu-item.popup-menu-item-thin {
+    --button-padding-vertical: 0.375em;
+}
 .popup-menu-item-icon {
     width: calc(16em / var(--font-size-no-units));
     height: calc(16em / var(--font-size-no-units));
@@ -1235,6 +1238,10 @@ button.popup-menu-item:not([hidden]) {
     --button-padding-horizontal: 0.75em;
 
     font-size: var(--font-size-small);
+}
+:root[data-page-type=popup] .popup-menu.popup-menu-auto-size button.popup-menu-item.popup-menu-item-thin,
+.popup-menu.popup-menu-small button.popup-menu-item.popup-menu-item-thin {
+    --button-padding-vertical: 0.25em;
 }
 .popup-menu-item-group {
     position: relative;

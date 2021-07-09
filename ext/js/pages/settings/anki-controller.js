@@ -241,7 +241,7 @@ class AnkiController {
             for (const marker of markers) {
                 const option = document.createElement('button');
                 option.textContent = marker;
-                option.className = 'popup-menu-item';
+                option.className = 'popup-menu-item popup-menu-item-thin';
                 option.dataset.menuAction = 'setFieldMarker';
                 option.dataset.marker = marker;
                 fragment.appendChild(option);
