@@ -171,48 +171,6 @@ function testConvertToRomaji() {
     }
 }
 
-function testConvertReading() {
-    const data = [
-        [['アリガトウ', 'アリガトウ', 'hiragana'], 'ありがとう'],
-        [['アリガトウ', 'アリガトウ', 'katakana'], 'アリガトウ'],
-        [['アリガトウ', 'アリガトウ', 'romaji'], 'arigatou'],
-        [['アリガトウ', 'アリガトウ', 'none'], ''],
-        [['アリガトウ', 'アリガトウ', 'default'], 'アリガトウ'],
-
-        [['ありがとう', 'ありがとう', 'hiragana'], 'ありがとう'],
-        [['ありがとう', 'ありがとう', 'katakana'], 'アリガトウ'],
-        [['ありがとう', 'ありがとう', 'romaji'], 'arigatou'],
-        [['ありがとう', 'ありがとう', 'none'], ''],
-        [['ありがとう', 'ありがとう', 'default'], 'ありがとう'],
-
-        [['有り難う', 'ありがとう', 'hiragana'], 'ありがとう'],
-        [['有り難う', 'ありがとう', 'katakana'], 'アリガトウ'],
-        [['有り難う', 'ありがとう', 'romaji'], 'arigatou'],
-        [['有り難う', 'ありがとう', 'none'], ''],
-        [['有り難う', 'ありがとう', 'default'], 'ありがとう'],
-
-        // Cases with falsy readings
-
-        [['ありがとう', '', 'hiragana'], ''],
-        [['ありがとう', '', 'katakana'], ''],
-        [['ありがとう', '', 'romaji'], 'arigatou'],
-        [['ありがとう', '', 'none'], ''],
-        [['ありがとう', '', 'default'], ''],
-
-        // Cases with falsy readings and kanji terms
-
-        [['有り難う', '', 'hiragana'], ''],
-        [['有り難う', '', 'katakana'], ''],
-        [['有り難う', '', 'romaji'], ''],
-        [['有り難う', '', 'none'], ''],
-        [['有り難う', '', 'default'], '']
-    ];
-
-    for (const [[term, reading, readingMode], expected] of data) {
-        assert.strictEqual(jp.convertReading(term, reading, readingMode), expected);
-    }
-}
-
 function testConvertNumericToFullWidth() {
     const data = [
         ['0123456789', '０１２３４５６７８９'],
@@ -888,7 +846,6 @@ function main() {
     testConvertKatakanaToHiragana();
     testConvertHiraganaToKatakana();
     testConvertToRomaji();
-    testConvertReading();
     testConvertNumericToFullWidth();
     testConvertHalfWidthKanaToFullWidth();
     testConvertAlphabeticToKana();

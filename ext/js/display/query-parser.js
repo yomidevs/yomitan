@@ -208,8 +208,6 @@ class QueryParser extends EventDispatcher {
     }
 
     _createParseResult(data) {
-        const jp = this._japaneseUtil;
-        const readingMode = this._readingMode;
         const fragment = document.createDocumentFragment();
         for (const term of data) {
             const termNode = document.createElement('span');
@@ -218,7 +216,7 @@ class QueryParser extends EventDispatcher {
                 if (reading.length === 0) {
                     termNode.appendChild(document.createTextNode(text));
                 } else {
-                    const reading2 = jp.convertReading(text, reading, readingMode);
+                    const reading2 = this._convertReading(text, reading);
                     termNode.appendChild(this._createSegment(text, reading2));
                 }
             }
@@ -244,5 +242,27 @@ class QueryParser extends EventDispatcher {
         readingNode.textContent = reading;
 
         return segmentNode;
+    }
+
+    _convertReading(term, reading) {
+        switch (this._readingMode) {
+            case 'hiragana':
+                return this._japaneseUtil.convertKatakanaToHiragana(reading);
+            case 'katakana':
+                return this._japaneseUtil.convertHiraganaToKatakana(reading);
+            case 'romaji':
+                if (this._japaneseUtil.convertToRomajiSupported()) {
+                    if (reading.length > 0) {
+                        return this._japaneseUtil.convertToRomaji(reading);
+                    } else if (this._japaneseUtil.isStringEntirelyKana(term)) {
+                        return this._japaneseUtil.convertToRomaji(term);
+                    }
+                }
+                return reading;
+            case 'none':
+                return '';
+            default:
+                return reading;
+        }
     }
 }

@@ -277,6 +277,10 @@ const JapaneseUtil = (() => {
             return this._getWanakana().toKana(text);
         }
 
+        convertToKanaSupported() {
+            return this._wanakana !== null;
+        }
+
         convertKatakanaToHiragana(text) {
             let result = '';
             const offset = (HIRAGANA_CONVERSION_RANGE[0] - KATAKANA_CONVERSION_RANGE[0]);
@@ -315,25 +319,8 @@ const JapaneseUtil = (() => {
             return wanakana.toRomaji(text);
         }
 
-        convertReading(term, reading, readingMode) {
-            switch (readingMode) {
-                case 'hiragana':
-                    return this.convertKatakanaToHiragana(reading);
-                case 'katakana':
-                    return this.convertHiraganaToKatakana(reading);
-                case 'romaji':
-                    if (reading.length > 0) {
-                        return this.convertToRomaji(reading);
-                    } else if (this.isStringEntirelyKana(term)) {
-                        return this.convertToRomaji(term);
-                    } else {
-                        return reading;
-                    }
-                case 'none':
-                    return '';
-                default:
-                    return reading;
-            }
+        convertToRomajiSupported() {
+            return this._wanakana !== null;
         }
 
         convertNumericToFullWidth(text) {
@@ -424,6 +411,10 @@ const JapaneseUtil = (() => {
                 result += this._convertAlphabeticPartToKana(part, sourceMap, result.length);
             }
             return result;
+        }
+
+        convertAlphabeticToKanaSupported() {
+            return this._wanakana !== null;
         }
 
         // Furigana distribution

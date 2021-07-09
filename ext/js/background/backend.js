@@ -1066,7 +1066,7 @@ class Backend {
             if (
                 dictionaryEntries.length > 0 &&
                 originalTextLength > 0 &&
-                (originalTextLength !== character.length || this._japaneseUtil.isCodePointJapanese(codePoint))
+                (originalTextLength !== character.length || jp.isCodePointJapanese(codePoint))
             ) {
                 previousUngroupedSegment = null;
                 const {headwords: [{term, reading}]} = dictionaryEntries[0];
