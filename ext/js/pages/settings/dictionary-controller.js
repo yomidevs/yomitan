@@ -325,6 +325,8 @@ class DictionaryController {
             value: dictionaries
         }]);
 
+        this._settingsController.trigger('dictionarySettingsReordered', {source: this});
+
         await this._updateEntries();
     }
 

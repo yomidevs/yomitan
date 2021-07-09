@@ -33,6 +33,7 @@ class CollapsibleDictionaryController {
 
         yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+        this._settingsController.on('dictionarySettingsReordered', this._onDictionarySettingsReordered.bind(this));
     }
 
     // Private
@@ -86,6 +87,11 @@ class CollapsibleDictionaryController {
         const {value} = e.currentTarget;
         if (value === 'varies') { return; }
         this._setDefinitionsCollapsibleAll(value);
+    }
+
+    async _onDictionarySettingsReordered() {
+        const options = await this._settingsController.getOptions();
+        this._onOptionsChanged({options});
     }
 
     _setupAllSelect(fragment, options) {

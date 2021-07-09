@@ -31,6 +31,7 @@ class SecondarySearchDictionaryController {
 
         yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+        this._settingsController.on('dictionarySettingsReordered', this._onDictionarySettingsReordered.bind(this));
     }
 
     // Private
@@ -83,5 +84,10 @@ class SecondarySearchDictionaryController {
     _onEnabledChanged(node, e) {
         const {detail: {value}} = e;
         node.dataset.enabled = `${value}`;
+    }
+
+    async _onDictionarySettingsReordered() {
+        const options = await this._settingsController.getOptions();
+        this._onOptionsChanged({options});
     }
 }
