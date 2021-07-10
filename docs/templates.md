@@ -655,9 +655,9 @@ structured-content generation.
 
   <code>{{#formatGlossary <i>dictionary</i>}}{{{definitionEntry}}}{{/pitchCategories}}</code><br>
 
-  * _`@dictionary`_ <br>
+  * _`dictionary`_ <br>
     The dictionary that the glossary entry belongs to.
-  * _`@definitionEntry`_ <br>
+  * _`definitionEntry`_ <br>
     The definition entry object in raw form.
 </details>
 <details>
@@ -670,6 +670,74 @@ structured-content generation.
   Output:
   ```html
   Here is the content of a gloss, which may include formatted HTML.
+  ```
+</details>
+
+
+### `hasMedia` & `getMedia`
+
+Checks to see if a certain type of media is available for a card and injects the relevant content.
+These functions are used together in order to request media and other types of optional asynchronous content.
+
+<details>
+  <summary>Syntax:</summary>
+
+  <code>{{#hasMedia <i>type</i> <i>args</i>...}}{{/hasMedia}}</code><br>
+  <code>{{#getMedia <i>type</i> <i>args</i>... <i>[escape=true|false]</i>}}{{/getMedia}}</code><br>
+
+  * _`type`_ <br>
+    The type of media to check for.
+  * _`args`_ <br>
+    Additional arguments for the media. The arguments depend on the media type.
+  * _`escape`_ <br>
+    Whether or not the resulting text should be HTML-escaped. If omitted, defaults to `true`.
+
+  **Available media types and arguments**
+
+  * <code>"audio"</code>
+  * <code>"screenshot"</code>
+  * <code>"clipboardImage"</code>
+  * <code>"clipboardText"</code>
+  * <code>"selectionText"</code>
+  * <code>"textFurigana" <i>japaneseText</i> <i>readingMode="default|hiragana|katakana"</i></code>
+  * <code>"dictionaryMedia" <i>fileName</i> <i>dictionary="Dictionary Name"</i></code>
+</details>
+<details>
+  <summary>Examples:</summary>
+
+  ```handlebars
+  {{#if (hasMedia "audio")}}The audio file name is: {{#getMedia "audio"}}{{/getMedia}}{{/if}}
+
+  {{#if (hasMedia "screenshot")}}The screenshot file name is: {{#getMedia "screenshot"}}{{/getMedia}}{{/if}}
+
+  {{#if (hasMedia "clipboardImage")}}The clipboard image file name is: {{#getMedia "clipboardImage"}}{{/getMedia}}{{/if}}
+
+  {{#if (hasMedia "clipboardText")}}The clipboard text is: {{#getMedia "clipboardText"}}{{/getMedia}}{{/if}}
+
+  {{#if (hasMedia "selectionText")}}The selection text is: {{#getMedia "selectionText"}}{{/getMedia}}{{/if}}
+
+  {{#if (hasMedia "textFurigana" "日本語")}}This is an example of text with generated furigana: {{#getMedia "textFurigana" "日本語" escape=false}}{{/getMedia}}{{/if}}
+
+  {{#if (hasMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary")}}The remapped file name for image.png is: {{#getMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary"}}{{/getMedia}}{{/if}}
+  ```
+
+  Output:
+  ```html
+  The audio file name is: yomichan_audio_にほんご_日本語.mp3
+
+  The screenshot file name is: yomichan_browser_screenshot_にほんご_日本語.png
+
+  The clipboard image file name is: yomichan_clipboard_image_にほんご_日本語.png
+
+  The clipboard text is: This is the clipboard text
+
+  The selection text is: This is the selection text
+
+  The selection text is: This is the selection text
+
+  This is an example of text with generated furigana: <ruby>日本語<rt>にほんご</rt></ruby>
+
+  The remapped file name for image.png is: yomichan_dictionary_media_1_にほんご_日本語.png
   ```
 </details>
 
