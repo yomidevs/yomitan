@@ -368,12 +368,8 @@ class DisplayAnki {
             const {note, errors, requirements: outputRequirements} = await this._createNote(dictionaryEntry, mode, requirements);
             allErrors.push(...errors);
 
-            if (outputRequirements.length > 0) {
-                const error = new Error('The created card may not have some content');
-                error.requirements = requirements;
-                error.outputRequirements = outputRequirements;
-                allErrors.push(error);
-            }
+            const error = this._getAddNoteRequirementsError(requirements, outputRequirements);
+            if (error !== null) { allErrors.push(error); }
 
             let noteId = null;
             let addNoteOkay = false;
@@ -411,6 +407,29 @@ class DisplayAnki {
         } else {
             this._hideAnkiNoteErrors(true);
         }
+    }
+
+    _getAddNoteRequirementsError(requirements, outputRequirements) {
+        if (outputRequirements.length === 0) { return null; }
+
+        let count = 0;
+        for (const requirement of outputRequirements) {
+            const {type} = requirement;
+            switch (type) {
+                case 'audio':
+                case 'clipboardImage':
+                    break;
+                default:
+                    ++count;
+                    break;
+            }
+        }
+        if (count === 0) { return null; }
+
+        const error = new Error('The created card may not have some content');
+        error.requirements = requirements;
+        error.outputRequirements = outputRequirements;
+        return error;
     }
 
     _showAnkiNoteErrors(errors) {
