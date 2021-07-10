@@ -362,14 +362,14 @@ class AnkiNoteBuilder {
                 (dictionaryMedia[dictionary]) :
                 (dictionaryMedia[dictionary] = {})
             );
-            dictionaryMedia2[path] = {fileName};
+            dictionaryMedia2[path] = {value: fileName};
         }
         const media = {
-            audio: (typeof audioFileName === 'string' ? {fileName: audioFileName} : null),
-            screenshot: (typeof screenshotFileName === 'string' ? {fileName: screenshotFileName} : null),
-            clipboardImage: (typeof clipboardImageFileName === 'string' ? {fileName: clipboardImageFileName} : null),
-            clipboardText: (typeof clipboardText === 'string' ? {text: clipboardText} : null),
-            selectionText: (typeof selectionText === 'string' ? {text: selectionText} : null),
+            audio: (typeof audioFileName === 'string' ? {value: audioFileName} : null),
+            screenshot: (typeof screenshotFileName === 'string' ? {value: screenshotFileName} : null),
+            clipboardImage: (typeof clipboardImageFileName === 'string' ? {value: clipboardImageFileName} : null),
+            clipboardText: (typeof clipboardText === 'string' ? {value: clipboardText} : null),
+            selectionText: (typeof selectionText === 'string' ? {value: selectionText} : null),
             textFurigana,
             dictionaryMedia
         };
@@ -391,8 +391,8 @@ class AnkiNoteBuilder {
                 break;
             }
             if (data !== null) {
-                const html = this._createFuriganaHtml(data, readingMode);
-                results.push({text, readingMode, details: {html}});
+                const value = this._createFuriganaHtml(data, readingMode);
+                results.push({text, readingMode, details: {value}});
             }
         }
         return results;

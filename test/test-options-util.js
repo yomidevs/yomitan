@@ -992,24 +992,24 @@ async function testFieldTemplatesUpdate(extDir) {
             expected: `
 {{#*inline "audio"}}
     {{~#if (hasMedia "audio")~}}
-        [sound:{{#getMedia "audio" format="fileName"}}{{/getMedia}}]
+        [sound:{{#getMedia "audio"}}{{/getMedia}}]
     {{~/if~}}
 {{/inline}}
 
 {{#*inline "screenshot"}}
     {{~#if (hasMedia "screenshot")~}}
-        <img src="{{#getMedia "screenshot" format="fileName"}}{{/getMedia}}" />
+        <img src="{{#getMedia "screenshot"}}{{/getMedia}}" />
     {{~/if~}}
 {{/inline}}
 
 {{#*inline "clipboard-image"}}
     {{~#if (hasMedia "clipboardImage")~}}
-        <img src="{{#getMedia "clipboardImage" format="fileName"}}{{/getMedia}}" />
+        <img src="{{#getMedia "clipboardImage"}}{{/getMedia}}" />
     {{~/if~}}
 {{/inline}}
 
 {{#*inline "clipboard-text"}}
-    {{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText" format="text"}}{{/getMedia}}{{/if~}}
+    {{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText"}}{{/getMedia}}{{/if~}}
 {{/inline}}
 
 <<<UPDATE-ADDITIONS>>>

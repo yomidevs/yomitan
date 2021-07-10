@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * Handlebars
+ */
+
 class TemplateRendererMediaProvider {
     constructor() {
         this._requirements = null;
@@ -38,8 +42,7 @@ class TemplateRendererMediaProvider {
         const {media} = root;
         const data = this._getMediaData(media, args, namedArgs);
         if (data !== null) {
-            const {format} = namedArgs;
-            const result = this._getFormattedValue(data, format);
+            const result = this._getFormattedValue(data, namedArgs);
             if (typeof result === 'string') { return result; }
         }
         const defaultValue = namedArgs.default;
@@ -53,8 +56,13 @@ class TemplateRendererMediaProvider {
         this._requirements.push(value);
     }
 
-    _getFormattedValue(data, format) {
-        return Object.prototype.hasOwnProperty.call(data, format) ? data[format] : null;
+    _getFormattedValue(data, namedArgs) {
+        let {value} = data;
+        const {escape=true} = namedArgs;
+        if (escape) {
+            value = Handlebars.Utils.escapeExpression(value);
+        }
+        return value;
     }
 
     _getMediaData(media, args, namedArgs) {
