@@ -67,20 +67,32 @@ class TemplateRendererProxy {
 
     _loadFrame(frame, url, timeout=5000) {
         return new Promise((resolve, reject) => {
+            let state = 0x0; // 0x1 = frame added; 0x2 = frame loaded; 0x4 = frame ready
             const cleanup = () => {
+                frame.removeEventListener('load', onLoad, false);
                 window.removeEventListener('message', onWindowMessage, false);
                 if (timer !== null) {
                     clearTimeout(timer);
                     timer = null;
                 }
             };
+            const updateState = (flags) => {
+                state |= flags;
+                if (state !== 0x7) { return; }
+                cleanup();
+                resolve();
+            };
+            const onLoad = () => {
+                if ((state & 0x3) !== 0x1) { return; }
+                updateState(0x2);
+            };
             const onWindowMessage = (e) => {
+                if ((state & 0x5) !== 0x1) { return; }
                 const frameWindow = frame.contentWindow;
                 if (frameWindow === null || frameWindow !== e.source) { return; }
                 const {data} = e;
                 if (!(typeof data === 'object' && data !== null && data.action === 'ready')) { return; }
-                cleanup();
-                resolve();
+                updateState(0x4);
             };
 
             let timer = setTimeout(() => {
@@ -91,9 +103,11 @@ class TemplateRendererProxy {
 
             frame.removeAttribute('src');
             frame.removeAttribute('srcdoc');
+            frame.addEventListener('load', onLoad, false);
             window.addEventListener('message', onWindowMessage, false);
             try {
                 document.body.appendChild(frame);
+                state = 0x1;
                 frame.contentDocument.location.href = url;
             } catch (e) {
                 cleanup();
