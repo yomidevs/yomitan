@@ -812,6 +812,7 @@
                                     "terms",
                                     "kanji",
                                     "duplicateScope",
+                                    "duplicateScopeCheckAllModels",
                                     "checkForDuplicates",
                                     "fieldTemplates",
                                     "suspendNewCards",
@@ -909,6 +910,10 @@
                                         "type": "string",
                                         "default": "collection",
                                         "enum": ["collection", "deck", "deck-root"]
+                                    },
+                                    "duplicateScopeCheckAllModels": {
+                                        "type": "boolean",
+                                        "default": false
                                     },
                                     "checkForDuplicates": {
                                         "type": "boolean",

@@ -41,6 +41,7 @@ class AnkiNoteBuilder {
         requirements=[],
         checkForDuplicates=true,
         duplicateScope='collection',
+        duplicateScopeCheckAllModels=false,
         resultOutputMode='split',
         glossaryLayoutMode='default',
         compactTags=false,
@@ -98,7 +99,8 @@ class AnkiNoteBuilder {
                 duplicateScope,
                 duplicateScopeOptions: {
                     deckName: duplicateScopeDeckName,
-                    checkChildren: duplicateScopeCheckChildren
+                    checkChildren: duplicateScopeCheckChildren,
+                    checkAllModels: duplicateScopeCheckAllModels
                 }
             }
         };

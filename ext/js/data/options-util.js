@@ -856,7 +856,11 @@ class OptionsUtil {
         //  Handlebars templates updated to use new media format.
         //  Added {selection-text} field marker.
         //  Added {sentence-furigana} field marker.
+        //  Added anki.duplicateScopeCheckAllModels.
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v13.handlebars');
+        for (const profile of options.profiles) {
+            profile.options.anki.duplicateScopeCheckAllModels = false;
+        }
         return options;
     }
 }

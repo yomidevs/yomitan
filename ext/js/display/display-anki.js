@@ -42,6 +42,7 @@ class DisplayAnki {
         this._glossaryLayoutMode = 'default';
         this._displayTags = 'never';
         this._duplicateScope = 'collection';
+        this._duplicateScopeCheckAllModels = false;
         this._screenshotFormat = 'png';
         this._screenshotQuality = 100;
         this._scanLength = 10;
@@ -142,7 +143,7 @@ class DisplayAnki {
     _onOptionsUpdated({options}) {
         const {
             general: {resultOutputMode, glossaryLayoutMode, compactTags},
-            anki: {tags, duplicateScope, suspendNewCards, checkForDuplicates, displayTags, kanji, terms, screenshot: {format, quality}},
+            anki: {tags, duplicateScope, duplicateScopeCheckAllModels, suspendNewCards, checkForDuplicates, displayTags, kanji, terms, screenshot: {format, quality}},
             scanning: {length: scanLength}
         } = options;
 
@@ -153,6 +154,7 @@ class DisplayAnki {
         this._glossaryLayoutMode = glossaryLayoutMode;
         this._displayTags = displayTags;
         this._duplicateScope = duplicateScope;
+        this._duplicateScopeCheckAllModels = duplicateScopeCheckAllModels;
         this._screenshotFormat = format;
         this._screenshotQuality = quality;
         this._scanLength = scanLength;
@@ -561,6 +563,7 @@ class DisplayAnki {
             tags: this._noteTags,
             checkForDuplicates: this._checkForDuplicates,
             duplicateScope: this._duplicateScope,
+            duplicateScopeCheckAllModels: this._duplicateScopeCheckAllModels,
             resultOutputMode: this._resultOutputMode,
             glossaryLayoutMode: this._glossaryLayoutMode,
             compactTags: this._compactTags,

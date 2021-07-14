@@ -236,6 +236,7 @@ async function getRenderResults(dictionaryEntries, type, mode, template, AnkiNot
             tags: ['yomichan'],
             checkForDuplicates: true,
             duplicateScope: 'collection',
+            duplicateScopeCheckAllModels: false,
             resultOutputMode: mode,
             glossaryLayoutMode: 'default',
             compactTags: false
