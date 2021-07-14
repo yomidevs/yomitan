@@ -950,7 +950,7 @@
                                     "terminationCharacterMode": {
                                         "type": "string",
                                         "enum": ["custom", "custom-no-newlines", "newlines", "none"],
-                                        "default": true
+                                        "default": "custom"
                                     },
                                     "terminationCharacters": {
                                         "type": "array",
