@@ -996,14 +996,27 @@ class Backend {
     _getProfile(optionsContext, useSchema=false) {
         const options = this._getOptionsFull(useSchema);
         const profiles = options.profiles;
-        if (optionsContext.current) {
-            return profiles[options.profileCurrent];
+        if (!optionsContext.current) {
+            // Specific index
+            const {index} = optionsContext;
+            if (typeof index === 'number') {
+                if (index < 0 || index >= profiles.length) {
+                    throw this._createDataError(`Invalid profile index: ${index}`, optionsContext);
+                }
+                return profiles[index];
+            }
+            // From context
+            const profile = this._getProfileFromContext(options, optionsContext);
+            if (profile !== null) {
+                return profile;
+            }
         }
-        if (typeof optionsContext.index === 'number') {
-            return profiles[optionsContext.index];
+        // Default
+        const {profileCurrent} = options;
+        if (profileCurrent < 0 || profileCurrent >= profiles.length) {
+            throw this._createDataError(`Invalid current profile index: ${profileCurrent}`, optionsContext);
         }
-        const profile = this._getProfileFromContext(options, optionsContext);
-        return profile !== null ? profile : profiles[options.profileCurrent];
+        return profiles[profileCurrent];
     }
 
     _getProfileFromContext(options, optionsContext) {
@@ -1028,6 +1041,12 @@ class Backend {
         }
 
         return null;
+    }
+
+    _createDataError(message, data) {
+        const error = new Error(message);
+        error.data = data;
+        return error;
     }
 
     _clearProfileConditionsSchemaCache() {
