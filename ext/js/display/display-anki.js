@@ -19,6 +19,7 @@
  * AnkiNoteBuilder
  * AnkiUtil
  * DisplayNotification
+ * PopupMenu
  */
 
 class DisplayAnki {
@@ -52,9 +53,12 @@ class DisplayAnki {
             ['kanji', ['kanji']],
             ['term', ['term-kanji', 'term-kana']]
         ]);
+        this._menuContainer = document.querySelector('#popup-menus');
         this._onShowTagsBind = this._onShowTags.bind(this);
         this._onNoteAddBind = this._onNoteAdd.bind(this);
-        this._onNoteViewBind = this._onNoteView.bind(this);
+        this._onViewNoteButtonClickBind = this._onViewNoteButtonClick.bind(this);
+        this._onViewNoteButtonContextMenuBind = this._onViewNoteButtonContextMenu.bind(this);
+        this._onViewNoteButtonMenuCloseBind = this._onViewNoteButtonMenuClose.bind(this);
     }
 
     prepare() {
@@ -63,7 +67,7 @@ class DisplayAnki {
             ['addNoteKanji',      () => { this._tryAddAnkiNoteForSelectedEntry('kanji'); }],
             ['addNoteTermKanji',  () => { this._tryAddAnkiNoteForSelectedEntry('term-kanji'); }],
             ['addNoteTermKana',   () => { this._tryAddAnkiNoteForSelectedEntry('term-kana'); }],
-            ['viewNote',          () => { this._tryViewAnkiNoteForSelectedEntry(); }]
+            ['viewNote',          this._viewNoteForSelectedEntry.bind(this)]
         ]);
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
     }
@@ -81,7 +85,9 @@ class DisplayAnki {
     setupEntry(entry) {
         this._addMultipleEventListeners(entry, '.action-view-tags', 'click', this._onShowTagsBind);
         this._addMultipleEventListeners(entry, '.action-add-note', 'click', this._onNoteAddBind);
-        this._addMultipleEventListeners(entry, '.action-view-note', 'click', this._onNoteViewBind);
+        this._addMultipleEventListeners(entry, '.action-view-note', 'click', this._onViewNoteButtonClickBind);
+        this._addMultipleEventListeners(entry, '.action-view-note', 'contextmenu', this._onViewNoteButtonContextMenuBind);
+        this._addMultipleEventListeners(entry, '.action-view-note', 'menuClose', this._onViewNoteButtonMenuCloseBind);
     }
 
     setupEntriesComplete() {
@@ -180,12 +186,6 @@ class DisplayAnki {
         this._showAnkiTagsNotification(tags);
     }
 
-    _onNoteView(e) {
-        e.preventDefault();
-        const link = e.currentTarget;
-        yomichan.api.noteView(link.dataset.noteId);
-    }
-
     _addMultipleEventListeners(container, selector, ...args) {
         for (const node of container.querySelectorAll(selector)) {
             this._eventListeners.addEventListener(node, ...args);
@@ -202,24 +202,9 @@ class DisplayAnki {
         return entry !== null ? entry.querySelector('.action-view-tags') : null;
     }
 
-    _viewerButtonFind(index) {
-        const entry = this._getEntry(index);
-        return entry !== null ? entry.querySelector('.action-view-note') : null;
-    }
-
     _getEntry(index) {
         const entries = this._display.dictionaryEntryNodes;
         return index >= 0 && index < entries.length ? entries[index] : null;
-    }
-
-    _viewerButtonShow(index, noteId) {
-        const viewerButton = this._viewerButtonFind(index);
-        if (viewerButton === null) {
-            return;
-        }
-        viewerButton.disabled = false;
-        viewerButton.hidden = false;
-        viewerButton.dataset.noteId = noteId;
     }
 
     _getNoteContext() {
@@ -269,7 +254,7 @@ class DisplayAnki {
         const displayTags = this._displayTags;
         const dictionaryEntryDetails = this._dictionaryEntryDetails;
         for (let i = 0, ii = dictionaryEntryDetails.length; i < ii; ++i) {
-            let noteId = null;
+            const allNoteIds = [];
             for (const {mode, canAdd, noteIds, noteInfos, ankiError} of dictionaryEntryDetails[i].modeMap.values()) {
                 const button = this._adderButtonFind(i, mode);
                 if (button !== null) {
@@ -278,16 +263,14 @@ class DisplayAnki {
                 }
 
                 if (Array.isArray(noteIds) && noteIds.length > 0) {
-                    noteId = noteIds[0];
+                    allNoteIds.push(...noteIds);
                 }
 
                 if (displayTags !== 'never' && Array.isArray(noteInfos)) {
                     this._setupTagsIndicator(i, noteInfos);
                 }
             }
-            if (noteId !== null) {
-                this._viewerButtonShow(i, noteId);
-            }
+            this._updateViewNoteButton(i, allNoteIds, false);
         }
     }
 
@@ -331,14 +314,6 @@ class DisplayAnki {
     _tryAddAnkiNoteForSelectedEntry(mode) {
         const index = this._display.selectedIndex;
         this._addAnkiNote(index, mode);
-    }
-
-    _tryViewAnkiNoteForSelectedEntry() {
-        const index = this._display.selectedIndex;
-        const button = this._viewerButtonFind(index);
-        if (button !== null && !button.disabled) {
-            yomichan.api.noteView(button.dataset.noteId);
-        }
     }
 
     async _addAnkiNote(dictionaryEntryIndex, mode) {
@@ -395,7 +370,7 @@ class DisplayAnki {
                         }
                     }
                     button.disabled = true;
-                    this._viewerButtonShow(dictionaryEntryIndex, noteId);
+                    this._updateViewNoteButton(dictionaryEntryIndex, [noteId], true);
                 }
             }
         } catch (e) {
@@ -593,5 +568,102 @@ class DisplayAnki {
         if (typeof text !== 'string') { text = ''; }
         if (typeof offset !== 'number') { offset = 0; }
         return {text, offset};
+    }
+
+    // View note functions
+
+    _onViewNoteButtonClick(e) {
+        e.preventDefault();
+        if (e.shiftKey) {
+            this._showViewNoteMenu(e.currentTarget);
+        } else {
+            this._viewNote(e.currentTarget);
+        }
+    }
+
+    _onViewNoteButtonContextMenu(e) {
+        e.preventDefault();
+        this._showViewNoteMenu(e.currentTarget);
+    }
+
+    _onViewNoteButtonMenuClose(e) {
+        const {detail: {action, item}} = e;
+        switch (action) {
+            case 'viewNote':
+                this._viewNote(item);
+                break;
+        }
+    }
+
+    _updateViewNoteButton(index, noteIds, prepend) {
+        const button = this._getViewNoteButton(index);
+        if (button === null) { return; }
+        if (prepend) {
+            const currentNoteIds = button.dataset.noteIds;
+            if (typeof currentNoteIds === 'string' && currentNoteIds.length > 0) {
+                noteIds = [...noteIds, currentNoteIds.split(' ')];
+            }
+        }
+        const disabled = (noteIds.length === 0);
+        button.disabled = disabled;
+        button.hidden = disabled;
+        button.dataset.noteIds = noteIds.join(' ');
+
+        const badge = button.querySelector('.action-button-badge');
+        if (badge !== null) {
+            const badgeData = badge.dataset;
+            if (noteIds.length > 1) {
+                badgeData.icon = 'plus-thick';
+                badgeData.hidden = false;
+            } else {
+                delete badgeData.icon;
+                badgeData.hidden = true;
+            }
+        }
+    }
+
+    _viewNote(node) {
+        const noteIds = this._getNodeNoteIds(node);
+        if (noteIds.length === 0) { return; }
+        yomichan.api.noteView(noteIds[0]);
+    }
+
+    _showViewNoteMenu(node) {
+        const noteIds = this._getNodeNoteIds(node);
+        if (noteIds.length === 0) { return; }
+
+        const menuContainerNode = this._display.displayGenerator.instantiateTemplate('view-note-button-popup-menu');
+        const menuBodyNode = menuContainerNode.querySelector('.popup-menu-body');
+
+        for (let i = 0, ii = noteIds.length; i < ii; ++i) {
+            const noteId = noteIds[i];
+            const item = this._display.displayGenerator.instantiateTemplate('view-note-button-popup-menu-item');
+            item.querySelector('.popup-menu-item-label').textContent = `Note ${i + 1}: ${noteId}`;
+            item.dataset.menuAction = 'viewNote';
+            item.dataset.noteIds = `${noteId}`;
+            menuBodyNode.appendChild(item);
+        }
+
+        this._menuContainer.appendChild(menuContainerNode);
+        const popupMenu = new PopupMenu(node, menuContainerNode);
+        popupMenu.prepare();
+    }
+
+    _getNodeNoteIds(node) {
+        const {noteIds} = node.dataset;
+        return typeof noteIds === 'string' && noteIds.length > 0 ? noteIds.split(' ') : [];
+    }
+
+    _getViewNoteButton(index) {
+        const entry = this._getEntry(index);
+        return entry !== null ? entry.querySelector('.action-view-note') : null;
+    }
+
+    _viewNoteForSelectedEntry() {
+        const index = this._display.selectedIndex;
+        const button = this._getViewNoteButton(index);
+        if (button !== null) {
+            this._viewNote(button);
+        }
     }
 }
