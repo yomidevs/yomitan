@@ -468,12 +468,17 @@ class DisplayGenerator {
 
     _createPitch(details) {
         const jp = this._japaneseUtil;
-        const {reading, position, tags, exclusiveTerms, exclusiveReadings} = details;
+        const {reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} = details;
         const morae = jp.getKanaMorae(reading);
+
+        const nasalPositionsSet = nasalPositions.length > 0 ? new Set(nasalPositions) : null;
+        const devoicePositionsSet = devoicePositions.length > 0 ? new Set(devoicePositions) : null;
 
         const node = this._templates.instantiate('pitch-accent');
 
         node.dataset.pitchAccentPosition = `${position}`;
+        if (nasalPositions.length > 0) { node.dataset.nasalMoraPosition = nasalPositions.join(' '); }
+        if (devoicePositions.length > 0) { node.dataset.devoiceMoraPosition = devoicePositions.join(' '); }
         node.dataset.tagCount = `${tags.length}`;
 
         let n = node.querySelector('.pitch-accent-position');
@@ -487,17 +492,38 @@ class DisplayGenerator {
 
         n = node.querySelector('.pitch-accent-characters');
         for (let i = 0, ii = morae.length; i < ii; ++i) {
+            const i1 = i + 1;
             const mora = morae[i];
             const highPitch = jp.isMoraPitchHigh(i, position);
-            const highPitchNext = jp.isMoraPitchHigh(i + 1, position);
+            const highPitchNext = jp.isMoraPitchHigh(i1, position);
+            const nasal = nasalPositionsSet !== null && nasalPositionsSet.has(i1);
+            const devoice = devoicePositionsSet !== null && devoicePositionsSet.has(i1);
 
-            const n1 = this._templates.instantiate('pitch-accent-character');
-            const n2 = n1.querySelector('.pitch-accent-character-inner');
+            const n1 = document.createElement('span');
+            n1.className = 'pitch-accent-character';
+
+            const n2 = document.createElement('span');
+            n2.className = 'pitch-accent-character-inner';
+
+            n1.appendChild(n2);
 
             n1.dataset.position = `${i}`;
             n1.dataset.pitch = highPitch ? 'high' : 'low';
             n1.dataset.pitchNext = highPitchNext ? 'high' : 'low';
             this._setTextContent(n2, mora, 'ja');
+
+            if (devoice) {
+                n1.dataset.devoice = 'true';
+                const n3 = document.createElement('span');
+                n3.className = 'pitch-accent-character-devoice-indicator';
+                n1.appendChild(n3);
+            }
+            if (nasal) {
+                n1.dataset.nasal = 'true';
+                const n3 = document.createElement('span');
+                n3.className = 'pitch-accent-character-nasal-indicator';
+                n1.appendChild(n3);
+            }
 
             n.appendChild(n1);
         }

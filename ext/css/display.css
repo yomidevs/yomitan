@@ -1512,6 +1512,31 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     padding-right: 0.1em;
     margin-right: 0.1em;
 }
+.pitch-accent-character-devoice-indicator {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1.125em;
+    height: 1.125em;
+    border: calc(1.5em / var(--font-size-no-units)) dotted var(--danger-color);
+    border-radius: 50%;
+    box-sizing: border-box;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+}
+.pitch-accent-character-nasal-indicator {
+    display: block;
+    position: absolute;
+    right: -0.125em;
+    top: 0.125em;
+    width: 0.375em;
+    height: 0.375em;
+    border: calc(1.5em / var(--font-size-no-units)) solid var(--danger-color);
+    border-radius: 50%;
+    box-sizing: border-box;
+    z-index: 1;
+}
 .pitch-accent-position::before {
     content: ' [';
 }

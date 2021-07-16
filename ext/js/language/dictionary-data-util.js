@@ -108,13 +108,15 @@ class DictionaryDataUtil {
                 dictionaryPitchAccentInfoList = [];
                 pitchAccentInfoMap.set(dictionary, dictionaryPitchAccentInfoList);
             }
-            for (const {position, tags} of pitches) {
-                let pitchAccentInfo = this._findExistingPitchAccentInfo(reading, position, tags, dictionaryPitchAccentInfoList);
+            for (const {position, nasalPositions, devoicePositions, tags} of pitches) {
+                let pitchAccentInfo = this._findExistingPitchAccentInfo(reading, position, nasalPositions, devoicePositions, tags, dictionaryPitchAccentInfoList);
                 if (pitchAccentInfo === null) {
                     pitchAccentInfo = {
                         terms: new Set(),
                         reading,
                         position,
+                        nasalPositions,
+                        devoicePositions,
                         tags,
                         exclusiveTerms: [],
                         exclusiveReadings: []
@@ -228,17 +230,28 @@ class DictionaryDataUtil {
         return results;
     }
 
-    static _findExistingPitchAccentInfo(reading, position, tags, pitchAccentInfoList) {
+    static _findExistingPitchAccentInfo(reading, position, nasalPositions, devoicePositions, tags, pitchAccentInfoList) {
         for (const pitchInfo of pitchAccentInfoList) {
             if (
                 pitchInfo.reading === reading &&
                 pitchInfo.position === position &&
+                this._areArraysEqual(pitchInfo.nasalPositions, nasalPositions) &&
+                this._areArraysEqual(pitchInfo.devoicePositions, devoicePositions) &&
                 this._areTagListsEqual(pitchInfo.tags, tags)
             ) {
                 return pitchInfo;
             }
         }
         return null;
+    }
+
+    static _areArraysEqual(array1, array2) {
+        const ii = array1.length;
+        if (ii !== array2.length) { return false; }
+        for (let i = 0; i < ii; ++i) {
+            if (array1[i] !== array2[i]) { return false; }
+        }
+        return true;
     }
 
     static _areTagListsEqual(tagList1, tagList2) {

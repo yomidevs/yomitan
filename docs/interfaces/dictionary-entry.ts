@@ -355,6 +355,14 @@ namespace Translation {
          */
         position: number;
         /**
+         * Positions of moras that have a .
+         */
+        nasalPositions: number[];
+        /**
+         * Position of the downstep, as a number of mora.
+         */
+        devoicePositions: [];
+        /**
          * Tags for the pitch accent.
          */
         tags: Tag[];

@@ -41,5 +41,35 @@
                 {"position": 0, "tags": ["P2"]}
             ]
         }
+    ],
+    [
+        "番号",
+        "pitch",
+        {
+            "reading": "ばんごう",
+            "pitches": [
+                {"position": 3, "nasal": 3}
+            ]
+        }
+    ],
+    [
+        "中腰",
+        "pitch",
+        {
+            "reading": "ちゅうごし",
+            "pitches": [
+                {"position": 0, "nasal": 3}
+            ]
+        }
+    ],
+    [
+        "土木工事",
+        "pitch",
+        {
+            "reading": "どぼくこうじ",
+            "pitches": [
+                {"position": 4, "devoice": 3}
+            ]
+        }
     ]
 ]

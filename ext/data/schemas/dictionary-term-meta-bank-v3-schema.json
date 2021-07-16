@@ -85,6 +85,40 @@
                                             "description": "Mora position of the pitch accent downstep. A value of 0 indicates that the word does not have a downstep (heiban).",
                                             "minimum": 0
                                         },
+                                        "nasal": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "integer",
+                                                    "description": "Position of a mora with nasal sound.",
+                                                    "minimum": 0
+                                                },
+                                                {
+                                                    "type": "array",
+                                                    "description": "Positions of morae with nasal sound.",
+                                                    "items": {
+                                                        "type": "integer",
+                                                        "minimum": 0
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "devoice": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "integer",
+                                                    "description": "Position of a mora with devoiced sound.",
+                                                    "minimum": 0
+                                                },
+                                                {
+                                                    "type": "array",
+                                                    "description": "Positions of morae with devoiced sound.",
+                                                    "items": {
+                                                        "type": "integer",
+                                                        "minimum": 0
+                                                    }
+                                                }
+                                            ]
+                                        },
                                         "tags": {
                                             "type": "array",
                                             "description": "List of tags for this pitch accent.",

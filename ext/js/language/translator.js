@@ -828,12 +828,14 @@ class Translator {
                         {
                             if (data.reading !== reading) { continue; }
                             const pitches = [];
-                            for (const {position, tags} of data.pitches) {
+                            for (const {position, tags, nasal, devoice} of data.pitches) {
                                 const tags2 = [];
                                 if (Array.isArray(tags) && tags.length > 0) {
                                     tags2.push(this._createTagGroup(dictionary, tags));
                                 }
-                                pitches.push({position, tags: tags2});
+                                const nasalPositions = this._toNumberArray(nasal);
+                                const devoicePositions = this._toNumberArray(devoice);
+                                pitches.push({position, nasalPositions, devoicePositions, tags: tags2});
                             }
                             for (const {pronunciations, headwordIndex} of targets) {
                                 pronunciations.push(this._createTermPronunciation(
@@ -966,6 +968,10 @@ class Translator {
 
     _createMapKey(array) {
         return JSON.stringify(array);
+    }
+
+    _toNumberArray(value) {
+        return Array.isArray(value) ? value : (typeof value === 'number' ? [value] : []);
     }
 
     // Kanji data
