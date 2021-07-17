@@ -18,6 +18,7 @@
 /* global
  * DictionaryDataUtil
  * HtmlTemplateCollection
+ * PronunciationGenerator
  * StructuredContentGenerator
  */
 
@@ -28,7 +29,7 @@ class DisplayGenerator {
         this._hotkeyHelpController = hotkeyHelpController;
         this._templates = null;
         this._structuredContentGenerator = new StructuredContentGenerator(this._mediaLoader, document);
-        this._termPitchAccentStaticTemplateIsSetup = false;
+        this._pronunciationGenerator = new PronunciationGenerator(japaneseUtil);
     }
 
     async prepare() {
@@ -43,13 +44,6 @@ class DisplayGenerator {
         for (const template of this._templates.getAllTemplates()) {
             hotkeyHelpController.setupNode(template.content);
         }
-    }
-
-    preparePitchAccents() {
-        if (this._termPitchAccentStaticTemplateIsSetup) { return; }
-        this._termPitchAccentStaticTemplateIsSetup = true;
-        const t = this._templates.instantiate('pitch-accent-static');
-        document.head.appendChild(t);
     }
 
     createTermEntry(dictionaryEntry) {
@@ -439,8 +433,6 @@ class DisplayGenerator {
     }
 
     _createPitches(details) {
-        this.preparePitchAccents();
-
         const {dictionary, pitches} = details;
 
         const node = this._templates.instantiate('pitch-accent-group');
@@ -471,9 +463,6 @@ class DisplayGenerator {
         const {reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} = details;
         const morae = jp.getKanaMorae(reading);
 
-        const nasalPositionsSet = nasalPositions.length > 0 ? new Set(nasalPositions) : null;
-        const devoicePositionsSet = devoicePositions.length > 0 ? new Set(devoicePositions) : null;
-
         const node = this._templates.instantiate('pitch-accent');
 
         node.dataset.pitchAccentPosition = `${position}`;
@@ -491,46 +480,10 @@ class DisplayGenerator {
         this._createPitchAccentDisambiguations(n, exclusiveTerms, exclusiveReadings);
 
         n = node.querySelector('.pitch-accent-characters');
-        for (let i = 0, ii = morae.length; i < ii; ++i) {
-            const i1 = i + 1;
-            const mora = morae[i];
-            const highPitch = jp.isMoraPitchHigh(i, position);
-            const highPitchNext = jp.isMoraPitchHigh(i1, position);
-            const nasal = nasalPositionsSet !== null && nasalPositionsSet.has(i1);
-            const devoice = devoicePositionsSet !== null && devoicePositionsSet.has(i1);
+        n.lang = 'ja';
+        n.appendChild(this._pronunciationGenerator.createPitchAccentHtml(morae, position, nasalPositions, devoicePositions));
 
-            const n1 = document.createElement('span');
-            n1.className = 'pitch-accent-character';
-
-            const n2 = document.createElement('span');
-            n2.className = 'pitch-accent-character-inner';
-
-            n1.appendChild(n2);
-
-            n1.dataset.position = `${i}`;
-            n1.dataset.pitch = highPitch ? 'high' : 'low';
-            n1.dataset.pitchNext = highPitchNext ? 'high' : 'low';
-            this._setTextContent(n2, mora, 'ja');
-
-            if (devoice) {
-                n1.dataset.devoice = 'true';
-                const n3 = document.createElement('span');
-                n3.className = 'pitch-accent-character-devoice-indicator';
-                n1.appendChild(n3);
-            }
-            if (nasal) {
-                n1.dataset.nasal = 'true';
-                const n3 = document.createElement('span');
-                n3.className = 'pitch-accent-character-nasal-indicator';
-                n1.appendChild(n3);
-            }
-
-            n.appendChild(n1);
-        }
-
-        if (morae.length > 0) {
-            this._populatePitchGraph(node.querySelector('.pitch-accent-graph'), position, morae);
-        }
+        node.querySelector('.pitch-accent-details').appendChild(this._pronunciationGenerator.createPitchGraph(morae, position));
 
         return node;
     }
@@ -554,47 +507,6 @@ class DisplayGenerator {
         container.dataset.count = `${exclusiveTerms.length + exclusiveReadings.length}`;
         container.dataset.termCount = `${exclusiveTerms.length}`;
         container.dataset.readingCount = `${exclusiveReadings.length}`;
-    }
-
-    _populatePitchGraph(svg, position, morae) {
-        const jp = this._japaneseUtil;
-        const svgns = svg.getAttribute('xmlns');
-        const ii = morae.length;
-        svg.setAttribute('viewBox', `0 0 ${50 * (ii + 1)} 100`);
-
-        const pathPoints = [];
-        for (let i = 0; i < ii; ++i) {
-            const highPitch = jp.isMoraPitchHigh(i, position);
-            const highPitchNext = jp.isMoraPitchHigh(i + 1, position);
-            const graphic = (highPitch && !highPitchNext ? '#pitch-accent-graph-dot-downstep' : '#pitch-accent-graph-dot');
-            const x = `${i * 50 + 25}`;
-            const y = highPitch ? '25' : '75';
-            const use = document.createElementNS(svgns, 'use');
-            use.setAttribute('href', graphic);
-            use.setAttribute('x', x);
-            use.setAttribute('y', y);
-            svg.appendChild(use);
-            pathPoints.push(`${x} ${y}`);
-        }
-
-        let path = svg.querySelector('.pitch-accent-graph-line');
-        path.setAttribute('d', `M${pathPoints.join(' L')}`);
-
-        pathPoints.splice(0, ii - 1);
-        {
-            const highPitch = jp.isMoraPitchHigh(ii, position);
-            const x = `${ii * 50 + 25}`;
-            const y = highPitch ? '25' : '75';
-            const use = document.createElementNS(svgns, 'use');
-            use.setAttribute('href', '#pitch-accent-graph-triangle');
-            use.setAttribute('x', x);
-            use.setAttribute('y', y);
-            svg.appendChild(use);
-            pathPoints.push(`${x} ${y}`);
-        }
-
-        path = svg.querySelector('.pitch-accent-graph-line-tail');
-        path.setAttribute('d', `M${pathPoints.join(' L')}`);
     }
 
     _createFrequencyGroup(details, kanji) {

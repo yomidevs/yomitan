@@ -1,0 +1,119 @@
+/*
+ * Copyright (C) 2021  Yomichan Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the entrys of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+:root {
+    --pitch-accent-annotation-color: #000000;
+}
+:root[data-theme=dark] {
+    --pitch-accent-annotation-color: #ffffff;
+}
+
+.pitch-accent-character {
+    display: inline-block;
+    position: relative;
+}
+.pitch-accent-character::before {
+    border-color: var(--pitch-accent-annotation-color);
+}
+.pitch-accent-character[data-pitch='high']::before {
+    content: '';
+    display: block;
+    user-select: none;
+    pointer-events: none;
+    position: absolute;
+    top: 0.1em;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top-width: 0.1em;
+    border-top-style: solid;
+}
+.pitch-accent-character[data-pitch='high'][data-pitch-next='low']::before {
+    right: -0.1em;
+    height: 0.4em;
+    border-right-width: 0.1em;
+    border-right-style: solid;
+}
+.pitch-accent-character[data-pitch='high'][data-pitch-next='low'] {
+    padding-right: 0.1em;
+    margin-right: 0.1em;
+}
+.pitch-accent-character-devoice-indicator {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1.125em;
+    height: 1.125em;
+    border: calc(1.5em / var(--font-size-no-units)) dotted var(--danger-color);
+    border-radius: 50%;
+    box-sizing: border-box;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+}
+.pitch-accent-character-nasal-indicator {
+    display: block;
+    position: absolute;
+    right: -0.125em;
+    top: 0.125em;
+    width: 0.375em;
+    height: 0.375em;
+    border: calc(1.5em / var(--font-size-no-units)) solid var(--danger-color);
+    border-radius: 50%;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+.pitch-accent-position::before {
+    content: ' [';
+}
+.pitch-accent-position::after {
+    content: ']';
+}
+
+.pitch-accent-graph {
+    display: block;
+    height: 1.5em;
+    transform: translateY(-0.875em);
+}
+.pitch-accent-graph-line,
+.pitch-accent-graph-line-tail {
+    fill: none;
+    stroke: var(--pitch-accent-annotation-color);
+    stroke-width: 5;
+}
+.pitch-accent-graph-line-tail {
+    stroke-dasharray: 5 5;
+}
+.pitch-accent-graph-dot {
+    fill: var(--pitch-accent-annotation-color);
+    stroke: var(--pitch-accent-annotation-color);
+    stroke-width: 5;
+}
+.pitch-accent-graph-dot-downstep1 {
+    fill: none;
+    stroke: var(--pitch-accent-annotation-color);
+    stroke-width: 5;
+}
+.pitch-accent-graph-dot-downstep2 {
+    fill: var(--pitch-accent-annotation-color);
+}
+.pitch-accent-graph-triangle {
+    fill: none;
+    stroke: var(--pitch-accent-annotation-color);
+    stroke-width: 5;
+}

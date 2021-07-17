@@ -11,7 +11,7 @@
     <link rel="icon" type="image/png" href="/images/icon48.png" sizes="48x48">
     <link rel="icon" type="image/png" href="/images/icon64.png" sizes="64x64">
     <link rel="icon" type="image/png" href="/images/icon128.png" sizes="128x128">
-    <link rel="stylesheet" type="text/css" href="/css/display.css">
+    <link rel="stylesheet" type="text/css" href="/css/display-pronunciation.css">
     <link rel="stylesheet" type="text/css" href="/css/pitch-accents-preview.css">
 </head>
 <body>
@@ -35,12 +35,13 @@
         <strong>Graph</strong> -
         <span class="format-preview">
             <span class="pitch-accent-details">
-                <svg class="pitch-accent-graph" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100" focusable="false">
+                <svg xmlns="http://www.w3.org/2000/svg" class="pitch-accent-graph" focusable="false" viewBox="0 0 150 100">
                     <path class="pitch-accent-graph-line" d="M25 25 L75 75"></path>
                     <path class="pitch-accent-graph-line-tail" d="M75 75 L125 75"></path>
-                    <use href="#pitch-accent-graph-dot-downstep" x="25" y="25"></use>
-                    <use href="#pitch-accent-graph-dot" x="75" y="75"></use>
-                    <use href="#pitch-accent-graph-triangle" x="125" y="75"></use>
+                    <circle class="pitch-accent-graph-dot-downstep1" cx="25" cy="25" r="15"></circle>
+                    <circle class="pitch-accent-graph-dot-downstep2" cx="25" cy="25" r="5"></circle>
+                    <circle class="pitch-accent-graph-dot" cx="75" cy="75" r="15"></circle>
+                    <path class="pitch-accent-graph-triangle" d="M0 13 L15 -13 L-15 -13 Z" transform="translate(125,75)"></path>
                 </svg>
             </span>
         </span>
@@ -48,19 +49,6 @@
 </ul>
 
 </div></div>
-
-<!-- Scripts -->
-<script src="/js/core.js"></script>
-
-<script src="/js/yomichan.js"></script>
-
-<script src="/js/comm/api.js"></script>
-<script src="/js/comm/cross-frame-api.js"></script>
-<script src="/js/display/display-generator.js"></script>
-<script src="/js/display/structured-content-generator.js"></script>
-<script src="/js/dom/html-template-collection.js"></script>
-
-<script src="/js/pages/settings/pitch-accents-preview-main.js"></script>
 
 </body>
 </html>

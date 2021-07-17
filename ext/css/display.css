@@ -132,8 +132,6 @@
     --medium-border-color: #dddddd;
     --dark-border-color: #777777;
 
-    --pitch-accent-annotation-color: #000000;
-
     --tag-text-color: #ffffff;
     --tag-border-color: transparent;
     --tag-default-background-color: #8a8a91;
@@ -201,8 +199,6 @@
     --light-border-color: #2f2f2f;
     --medium-border-color: #3f3f3f;
     --dark-border-color: #888888;
-
-    --pitch-accent-annotation-color: #ffffff;
 
     --tag-text-color: #f1f1f1;
     --tag-border-color: transparent;
@@ -1482,107 +1478,11 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 .pitch-accent-tag-list:not([data-count='0']) {
     margin-right: 0.375em;
 }
-.pitch-accent-character {
-    display: inline-block;
-    position: relative;
-}
-.pitch-accent-character::before {
-    border-color: var(--pitch-accent-annotation-color);
-}
-.pitch-accent-character[data-pitch='high']::before {
-    content: '';
-    display: block;
-    user-select: none;
-    pointer-events: none;
-    position: absolute;
-    top: 0.1em;
-    left: 0;
-    right: 0;
-    height: 0;
-    border-top-width: 0.1em;
-    border-top-style: solid;
-}
-.pitch-accent-character[data-pitch='high'][data-pitch-next='low']::before {
-    right: -0.1em;
-    height: 0.4em;
-    border-right-width: 0.1em;
-    border-right-style: solid;
-}
-.pitch-accent-character[data-pitch='high'][data-pitch-next='low'] {
-    padding-right: 0.1em;
-    margin-right: 0.1em;
-}
-.pitch-accent-character-devoice-indicator {
-    display: block;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 1.125em;
-    height: 1.125em;
-    border: calc(1.5em / var(--font-size-no-units)) dotted var(--danger-color);
-    border-radius: 50%;
-    box-sizing: border-box;
-    z-index: 1;
-    transform: translate(-50%, -50%);
-}
-.pitch-accent-character-nasal-indicator {
-    display: block;
-    position: absolute;
-    right: -0.125em;
-    top: 0.125em;
-    width: 0.375em;
-    height: 0.375em;
-    border: calc(1.5em / var(--font-size-no-units)) solid var(--danger-color);
-    border-radius: 50%;
-    box-sizing: border-box;
-    z-index: 1;
-}
-.pitch-accent-position::before {
-    content: ' [';
-}
-.pitch-accent-position::after {
-    content: ']';
-}
 .pitch-accent-details {
     display: inline-block;
     height: 0;
     padding: 0 0.25em;
     vertical-align: middle;
-}
-
-
-/* Pitch accent graph styles */
-.pitch-accent-graph {
-    display: block;
-    height: 1.5em;
-    transform: translateY(-0.875em);
-}
-.pitch-accent-graph-line,
-.pitch-accent-graph-line-tail {
-    fill: none;
-    stroke: var(--pitch-accent-annotation-color);
-    stroke-width: 5;
-}
-.pitch-accent-graph-line-tail {
-    stroke-dasharray: 5 5;
-}
-#pitch-accent-graph-dot {
-    fill: var(--pitch-accent-annotation-color);
-    stroke: var(--pitch-accent-annotation-color);
-    stroke-width: 5;
-}
-#pitch-accent-graph-dot-downstep {
-    fill: none;
-    stroke: var(--pitch-accent-annotation-color);
-    stroke-width: 5;
-}
-#pitch-accent-graph-dot-downstep>circle:last-of-type {
-    fill: var(--pitch-accent-annotation-color);
-}
-#pitch-accent-graph-triangle {
-    fill: none;
-    stroke: var(--pitch-accent-annotation-color);
-    stroke-width: 5;
 }
 
 
