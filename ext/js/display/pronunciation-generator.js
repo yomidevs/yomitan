@@ -20,11 +20,12 @@ class PronunciationGenerator {
         this._japaneseUtil = japaneseUtil;
     }
 
-    createPitchAccentHtml(morae, downstepPosition, nasalPositions, devoicePositions) {
+    createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions) {
         const jp = this._japaneseUtil;
         const nasalPositionsSet = nasalPositions.length > 0 ? new Set(nasalPositions) : null;
         const devoicePositionsSet = devoicePositions.length > 0 ? new Set(devoicePositions) : null;
-        const fragment = document.createDocumentFragment();
+        const container = document.createElement('span');
+        container.className = 'pronunciation-text';
         for (let i = 0, ii = morae.length; i < ii; ++i) {
             const i1 = i + 1;
             const mora = morae[i];
@@ -34,48 +35,72 @@ class PronunciationGenerator {
             const devoice = devoicePositionsSet !== null && devoicePositionsSet.has(i1);
 
             const n1 = document.createElement('span');
-            n1.className = 'pitch-accent-character';
+            n1.className = 'pronunciation-mora';
             n1.dataset.position = `${i}`;
             n1.dataset.pitch = highPitch ? 'high' : 'low';
             n1.dataset.pitchNext = highPitchNext ? 'high' : 'low';
 
-            const n2 = document.createElement('span');
-            n2.className = 'pitch-accent-character-inner';
-            n2.textContent = mora;
-            n1.appendChild(n2);
+            const characterNodes = [];
+            for (const character of mora) {
+                const n2 = document.createElement('span');
+                n2.className = 'pronunciation-character';
+                n2.textContent = character;
+                n1.appendChild(n2);
+                characterNodes.push(n2);
+            }
 
             if (devoice) {
                 n1.dataset.devoice = 'true';
                 const n3 = document.createElement('span');
-                n3.className = 'pitch-accent-character-devoice-indicator';
+                n3.className = 'pronunciation-devoice-indicator';
                 n1.appendChild(n3);
             }
-            if (nasal) {
+            if (nasal && characterNodes.length > 0) {
                 n1.dataset.nasal = 'true';
-                n1.dataset.originalText = mora;
-                n2.textContent = this._getPlainMora(mora);
+
+                const group = document.createElement('span');
+                group.className = 'pronunciation-character-group';
+
+                const n2 = characterNodes[0];
+                const character = n2.textContent;
+
+                const characterInfo = jp.getKanaDiacriticInfo(character);
+                if (characterInfo !== null) {
+                    n1.dataset.originalText = mora;
+                    n2.dataset.originalText = character;
+                    n2.textContent = characterInfo.character;
+                }
+
                 let n3 = document.createElement('span');
-                n3.className = 'pitch-accent-character-nasal-diacritic';
+                n3.className = 'pronunciation-nasal-diacritic';
                 n3.textContent = '\u309a'; // Combining handakuten
-                n1.appendChild(n3);
+                group.appendChild(n3);
+
                 n3 = document.createElement('span');
-                n3.className = 'pitch-accent-character-nasal-indicator';
-                n1.appendChild(n3);
+                n3.className = 'pronunciation-nasal-indicator';
+                group.appendChild(n3);
+
+                n2.parentNode.replaceChild(group, n2);
+                group.insertBefore(n2, group.firstChild);
             }
 
-            fragment.appendChild(n1);
+            const line = document.createElement('span');
+            line.className = 'pronunciation-mora-line';
+            n1.appendChild(line);
+
+            container.appendChild(n1);
         }
-        return fragment;
+        return container;
     }
 
-    createPitchGraph(morae, downstepPosition) {
+    createPronunciationGraph(morae, downstepPosition) {
         const jp = this._japaneseUtil;
         const ii = morae.length;
 
         const svgns = 'http://www.w3.org/2000/svg';
         const svg = document.createElementNS(svgns, 'svg');
         svg.setAttribute('xmlns', svgns);
-        svg.setAttribute('class', 'pitch-accent-graph');
+        svg.setAttribute('class', 'pronunciation-graph');
         svg.setAttribute('focusable', 'false');
         svg.setAttribute('viewBox', `0 0 ${50 * (ii + 1)} 100`);
 
@@ -101,7 +126,7 @@ class PronunciationGenerator {
             pathPoints.push(`${x} ${y}`);
         }
 
-        path1.setAttribute('class', 'pitch-accent-graph-line');
+        path1.setAttribute('class', 'pronunciation-graph-line');
         path1.setAttribute('d', `M${pathPoints.join(' L')}`);
 
         pathPoints.splice(0, ii - 1);
@@ -113,26 +138,51 @@ class PronunciationGenerator {
             pathPoints.push(`${x} ${y}`);
         }
 
-        path2.setAttribute('class', 'pitch-accent-graph-line-tail');
+        path2.setAttribute('class', 'pronunciation-graph-line-tail');
         path2.setAttribute('d', `M${pathPoints.join(' L')}`);
 
         return svg;
     }
 
+    createPronunciationDownstepNotation(downstepPosition) {
+        downstepPosition = `${downstepPosition}`;
+
+        const n1 = document.createElement('span');
+        n1.className = 'pronunciation-downstep-notation';
+        n1.dataset.downstepPosition = downstepPosition;
+
+        let n2 = document.createElement('span');
+        n2.className = 'pronunciation-downstep-notation-prefix';
+        n2.textContent = '[';
+        n1.appendChild(n2);
+
+        n2 = document.createElement('span');
+        n2.className = 'pronunciation-downstep-notation-number';
+        n2.textContent = downstepPosition;
+        n1.appendChild(n2);
+
+        n2 = document.createElement('span');
+        n2.className = 'pronunciation-downstep-notation-suffix';
+        n2.textContent = ']';
+        n1.appendChild(n2);
+
+        return n1;
+    }
+
     // Private
 
     _addGraphDot(container, svgns, x, y) {
-        container.appendChild(this._createGraphCircle(svgns, 'pitch-accent-graph-dot', x, y, '15'));
+        container.appendChild(this._createGraphCircle(svgns, 'pronunciation-graph-dot', x, y, '15'));
     }
 
     _addGraphDotDownstep(container, svgns, x, y) {
-        container.appendChild(this._createGraphCircle(svgns, 'pitch-accent-graph-dot-downstep1', x, y, '15'));
-        container.appendChild(this._createGraphCircle(svgns, 'pitch-accent-graph-dot-downstep2', x, y, '5'));
+        container.appendChild(this._createGraphCircle(svgns, 'pronunciation-graph-dot-downstep1', x, y, '15'));
+        container.appendChild(this._createGraphCircle(svgns, 'pronunciation-graph-dot-downstep2', x, y, '5'));
     }
 
     _addGraphTriangle(container, svgns, x, y) {
         const node = document.createElementNS(svgns, 'path');
-        node.setAttribute('class', 'pitch-accent-graph-triangle');
+        node.setAttribute('class', 'pronunciation-graph-triangle');
         node.setAttribute('d', 'M0 13 L15 -13 L-15 -13 Z');
         node.setAttribute('transform', `translate(${x},${y})`);
         container.appendChild(node);
@@ -145,12 +195,5 @@ class PronunciationGenerator {
         node.setAttribute('cy', `${y}`);
         node.setAttribute('r', radius);
         return node;
-    }
-
-    _getPlainMora(mora) {
-        const first = mora[0];
-        const info = this._japaneseUtil.getKanaDiacriticInfo(first);
-        if (info === null) { return mora; }
-        return `${info.character}${mora.substring(1)}`;
     }
 }

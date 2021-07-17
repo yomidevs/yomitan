@@ -22,15 +22,21 @@
     --pitch-accent-annotation-color: #ffffff;
 }
 
-.pitch-accent-character {
+.pronunciation-downstep-notation {
+    display: inline;
+}
+
+.pronunciation-text {
+    display: inline;
+}
+.pronunciation-mora {
     display: inline-block;
     position: relative;
 }
-.pitch-accent-character::before {
+.pronunciation-mora-line {
     border-color: var(--pitch-accent-annotation-color);
 }
-.pitch-accent-character[data-pitch='high']::before {
-    content: '';
+.pronunciation-mora[data-pitch=high]>.pronunciation-mora-line {
     display: block;
     user-select: none;
     pointer-events: none;
@@ -42,17 +48,17 @@
     border-top-width: 0.1em;
     border-top-style: solid;
 }
-.pitch-accent-character[data-pitch='high'][data-pitch-next='low']::before {
+.pronunciation-mora[data-pitch=high][data-pitch-next=low]>.pronunciation-mora-line {
     right: -0.1em;
     height: 0.4em;
     border-right-width: 0.1em;
     border-right-style: solid;
 }
-.pitch-accent-character[data-pitch='high'][data-pitch-next='low'] {
+.pronunciation-mora[data-pitch=high][data-pitch-next=low] {
     padding-right: 0.1em;
     margin-right: 0.1em;
 }
-.pitch-accent-character-devoice-indicator {
+.pronunciation-devoice-indicator {
     display: block;
     position: absolute;
     left: 50%;
@@ -65,7 +71,7 @@
     z-index: 1;
     transform: translate(-50%, -50%);
 }
-.pitch-accent-character-nasal-indicator {
+.pronunciation-nasal-indicator {
     display: block;
     position: absolute;
     right: -0.125em;
@@ -77,48 +83,48 @@
     box-sizing: border-box;
     z-index: 1;
 }
-.pitch-accent-character-nasal-diacritic {
+.pronunciation-nasal-diacritic {
     position: absolute;
     width: 0;
     height: 0;
     opacity: 0;
 }
-
-.pitch-accent-position::before {
-    content: ' [';
+.pronunciation-character {
+    display: inline;
 }
-.pitch-accent-position::after {
-    content: ']';
+.pronunciation-character-group {
+    display: inline-block;
+    position: relative;
 }
 
-.pitch-accent-graph {
-    display: block;
+.pronunciation-graph {
+    display: inline-block;
+    vertical-align: middle;
     height: 1.5em;
-    transform: translateY(-0.875em);
 }
-.pitch-accent-graph-line,
-.pitch-accent-graph-line-tail {
+.pronunciation-graph-line,
+.pronunciation-graph-line-tail {
     fill: none;
     stroke: var(--pitch-accent-annotation-color);
     stroke-width: 5;
 }
-.pitch-accent-graph-line-tail {
+.pronunciation-graph-line-tail {
     stroke-dasharray: 5 5;
 }
-.pitch-accent-graph-dot {
+.pronunciation-graph-dot {
     fill: var(--pitch-accent-annotation-color);
     stroke: var(--pitch-accent-annotation-color);
     stroke-width: 5;
 }
-.pitch-accent-graph-dot-downstep1 {
+.pronunciation-graph-dot-downstep1 {
     fill: none;
     stroke: var(--pitch-accent-annotation-color);
     stroke-width: 5;
 }
-.pitch-accent-graph-dot-downstep2 {
+.pronunciation-graph-dot-downstep2 {
     fill: var(--pitch-accent-annotation-color);
 }
-.pitch-accent-graph-triangle {
+.pronunciation-graph-triangle {
     fill: none;
     stroke: var(--pitch-accent-annotation-color);
     stroke-width: 5;

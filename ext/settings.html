@@ -13,6 +13,7 @@
     <link rel="icon" type="image/png" href="/images/icon128.png" sizes="128x128">
     <link rel="stylesheet" type="text/css" href="/css/material.css">
     <link rel="stylesheet" type="text/css" href="/css/settings.css">
+    <link rel="stylesheet" type="text/css" href="/css/display-pronunciation.css">
 </head>
 <body>
 
@@ -747,7 +748,35 @@
                     Pitch accents for terms and expressions can be shown if a dictionary supporting pitch accents is installed.
                     There are currently three different ways that pitch accents can be presented:
                 </p>
-                <iframe data-src="/pitch-accents-preview.html" id="pitch-accents-preview-frame" class="defer-load-iframe" data-parent-distance="1"></iframe>
+                <ul>
+                    <li>
+                        <strong>Downstep notation</strong> -
+                        <span class="format-preview" lang="ja">
+                            <span class="pronunciation-text-container"><span class="pronunciation-text"><span class="pronunciation-mora" data-position="0" data-pitch="high" data-pitch-next="low"><span class="pronunciation-character">よ</span><span class="pronunciation-mora-line"></span></span><span class="pronunciation-mora" data-position="1" data-pitch="low" data-pitch-next="low"><span class="pronunciation-character">む</span><span class="pronunciation-mora-line"></span></span></span></span>
+                        </span>
+                    </li>
+                    <li>
+                        <strong>Downstep position</strong> -
+                        <span class="format-preview">
+                            <span class="pronunciation-downstep-notation-container"><span class="pronunciation-downstep-notation" data-downstep-position="1"><span class="pronunciation-downstep-notation-prefix">[</span><span class="pronunciation-downstep-notation-number">1</span><span class="pronunciation-downstep-notation-suffix">]</span></span></span>
+                        </span>
+                    </li>
+                    <li>
+                        <strong>Graph</strong> -
+                        <span class="format-preview">
+                            <span class="pronunciation-graph-container">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="pronunciation-graph" focusable="false" viewBox="0 0 150 100">
+                                    <path class="pronunciation-graph-line" d="M25 25 L75 75"></path>
+                                    <path class="pronunciation-graph-line-tail" d="M75 75 L125 75"></path>
+                                    <circle class="pronunciation-graph-dot-downstep1" cx="25" cy="25" r="15"></circle>
+                                    <circle class="pronunciation-graph-dot-downstep2" cx="25" cy="25" r="5"></circle>
+                                    <circle class="pronunciation-graph-dot" cx="75" cy="75" r="15"></circle>
+                                    <path class="pronunciation-graph-triangle" d="M0 13 L15 -13 L-15 -13 Z" transform="translate(125,75)"></path>
+                                </svg>
+                            </span>
+                        </span>
+                    </li>
+                </ul>
                 <p>
                     <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
                 </p>

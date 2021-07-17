@@ -470,20 +470,20 @@ class DisplayGenerator {
         if (devoicePositions.length > 0) { node.dataset.devoiceMoraPosition = devoicePositions.join(' '); }
         node.dataset.tagCount = `${tags.length}`;
 
-        let n = node.querySelector('.pitch-accent-position');
-        this._setTextContent(n, `${position}`, '');
-
-        n = node.querySelector('.pitch-accent-tag-list');
+        let n = node.querySelector('.pitch-accent-tag-list');
         this._appendMultiple(n, this._createTag.bind(this), tags);
 
         n = node.querySelector('.pitch-accent-disambiguation-list');
         this._createPitchAccentDisambiguations(n, exclusiveTerms, exclusiveReadings);
 
-        n = node.querySelector('.pitch-accent-characters');
-        n.lang = 'ja';
-        n.appendChild(this._pronunciationGenerator.createPitchAccentHtml(morae, position, nasalPositions, devoicePositions));
+        n = node.querySelector('.pronunciation-downstep-notation-container');
+        n.appendChild(this._pronunciationGenerator.createPronunciationDownstepNotation(position));
 
-        node.querySelector('.pitch-accent-details').appendChild(this._pronunciationGenerator.createPitchGraph(morae, position));
+        n = node.querySelector('.pronunciation-text-container');
+        n.lang = 'ja';
+        n.appendChild(this._pronunciationGenerator.createPronunciationText(morae, position, nasalPositions, devoicePositions));
+
+        node.querySelector('.pronunciation-graph-container').appendChild(this._pronunciationGenerator.createPronunciationGraph(morae, position));
 
         return node;
     }

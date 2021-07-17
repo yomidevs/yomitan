@@ -63,6 +63,16 @@
         }
     ],
     [
+        "所業",
+        "pitch",
+        {
+            "reading": "しょぎょう",
+            "pitches": [
+                {"position": 0, "nasal": 2}
+            ]
+        }
+    ],
+    [
         "土木工事",
         "pitch",
         {

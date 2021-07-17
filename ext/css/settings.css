@@ -1768,14 +1768,6 @@ code.anki-field-marker {
     align-items: flex-start;
 }
 
-#pitch-accents-preview-frame {
-    border: none;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: calc(0.425em * 4 + 1em * var(--line-height-default) * 3);
-}
-
 .translation-text-replacement-entry {
     display: grid;
     grid-template-columns: auto auto 1fr auto;
