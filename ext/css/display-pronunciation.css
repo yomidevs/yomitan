@@ -77,6 +77,12 @@
     box-sizing: border-box;
     z-index: 1;
 }
+.pitch-accent-character-nasal-diacritic {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
 
 .pitch-accent-position::before {
     content: ' [';

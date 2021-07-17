@@ -35,16 +35,14 @@ class PronunciationGenerator {
 
             const n1 = document.createElement('span');
             n1.className = 'pitch-accent-character';
-
-            const n2 = document.createElement('span');
-            n2.className = 'pitch-accent-character-inner';
-
-            n1.appendChild(n2);
-
             n1.dataset.position = `${i}`;
             n1.dataset.pitch = highPitch ? 'high' : 'low';
             n1.dataset.pitchNext = highPitchNext ? 'high' : 'low';
+
+            const n2 = document.createElement('span');
+            n2.className = 'pitch-accent-character-inner';
             n2.textContent = mora;
+            n1.appendChild(n2);
 
             if (devoice) {
                 n1.dataset.devoice = 'true';
@@ -54,7 +52,13 @@ class PronunciationGenerator {
             }
             if (nasal) {
                 n1.dataset.nasal = 'true';
-                const n3 = document.createElement('span');
+                n1.dataset.originalText = mora;
+                n2.textContent = this._getPlainMora(mora);
+                let n3 = document.createElement('span');
+                n3.className = 'pitch-accent-character-nasal-diacritic';
+                n3.textContent = '\u309a'; // Combining handakuten
+                n1.appendChild(n3);
+                n3 = document.createElement('span');
                 n3.className = 'pitch-accent-character-nasal-indicator';
                 n1.appendChild(n3);
             }
@@ -141,5 +145,12 @@ class PronunciationGenerator {
         node.setAttribute('cy', `${y}`);
         node.setAttribute('r', radius);
         return node;
+    }
+
+    _getPlainMora(mora) {
+        const first = mora[0];
+        const info = this._japaneseUtil.getKanaDiacriticInfo(first);
+        if (info === null) { return mora; }
+        return `${info.character}${mora.substring(1)}`;
     }
 }

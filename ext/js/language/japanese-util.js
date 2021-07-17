@@ -154,6 +154,21 @@ const JapaneseUtil = (() => {
         return map;
     })();
 
+    const DIACRITIC_MAPPING = (() => {
+        const kana = 'うゔ-かが-きぎ-くぐ-けげ-こご-さざ-しじ-すず-せぜ-そぞ-ただ-ちぢ-つづ-てで-とど-はばぱひびぴふぶぷへべぺほぼぽワヷ-ヰヸ-ウヴ-ヱヹ-ヲヺ-カガ-キギ-クグ-ケゲ-コゴ-サザ-シジ-スズ-セゼ-ソゾ-タダ-チヂ-ツヅ-テデ-トド-ハバパヒビピフブプヘベペホボポ';
+        const map = new Map();
+        for (let i = 0, ii = kana.length; i < ii; i += 3) {
+            const character = kana[i];
+            const dakuten = kana[i + 1];
+            const handakuten = kana[i + 2];
+            map.set(dakuten, {character, type: 'dakuten'});
+            if (handakuten !== '-') {
+                map.set(handakuten, {character, type: 'handakuten'});
+            }
+        }
+        return map;
+    })();
+
 
     function isCodePointInRange(codePoint, [min, max]) {
         return (codePoint >= min && codePoint <= max);
@@ -415,6 +430,11 @@ const JapaneseUtil = (() => {
 
         convertAlphabeticToKanaSupported() {
             return this._wanakana !== null;
+        }
+
+        getKanaDiacriticInfo(character) {
+            const info = DIACRITIC_MAPPING.get(character);
+            return typeof info !== 'undefined' ? {character: info.character, type: info.type} : null;
         }
 
         // Furigana distribution
