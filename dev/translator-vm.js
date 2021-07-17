@@ -45,17 +45,17 @@ class TranslatorVM extends DatabaseVM {
     async prepare(dictionaryDirectory, dictionaryName) {
         this.execute([
             'js/core.js',
-            'js/data/anki-note-data-creator.js',
+            'js/data/sandbox/anki-note-data-creator.js',
             'js/data/database.js',
             'js/data/json-schema.js',
             'js/general/cache-map.js',
             'js/general/regex-util.js',
             'js/general/text-source-map.js',
             'js/language/deinflector.js',
-            'js/language/dictionary-data-util.js',
+            'js/language/sandbox/dictionary-data-util.js',
             'js/language/dictionary-importer.js',
             'js/language/dictionary-database.js',
-            'js/language/japanese-util.js',
+            'js/language/sandbox/japanese-util.js',
             'js/language/translator.js',
             'js/media/media-util.js'
         ]);

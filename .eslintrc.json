@@ -110,13 +110,7 @@
         {
             "files": [
                 "ext/js/core.js",
-                "ext/js/data/anki-note-data-creator.js",
-                "ext/js/display/pronunciation-generator.js",
-                "ext/js/display/structured-content-generator.js",
-                "ext/js/dom/css-style-applier.js",
-                "ext/js/language/dictionary-data-util.js",
-                "ext/js/templates/template-renderer.js",
-                "ext/js/templates/template-renderer-media-provider.js"
+                "ext/js/**/sandbox/**/*.js"
             ],
             "env": {
                 "webextensions": false
@@ -126,13 +120,7 @@
             "files": ["ext/**/*.js"],
             "excludedFiles": [
                 "ext/js/core.js",
-                "ext/js/data/anki-note-data-creator.js",
-                "ext/js/display/pronunciation-generator.js",
-                "ext/js/display/structured-content-generator.js",
-                "ext/js/dom/css-style-applier.js",
-                "ext/js/language/dictionary-data-util.js",
-                "ext/js/templates/template-renderer.js",
-                "ext/js/templates/template-renderer-media-provider.js"
+                "ext/js/**/sandbox/**/*.js"
             ],
             "globals": {
                 "serializeError": "readonly",
@@ -159,13 +147,7 @@
             "excludedFiles": [
                 "ext/js/core.js",
                 "ext/js/yomichan.js",
-                "ext/js/data/anki-note-data-creator.js",
-                "ext/js/display/pronunciation-generator.js",
-                "ext/js/display/structured-content-generator.js",
-                "ext/js/dom/css-style-applier.js",
-                "ext/js/language/dictionary-data-util.js",
-                "ext/js/templates/template-renderer.js",
-                "ext/js/templates/template-renderer-media-provider.js"
+                "ext/js/**/sandbox/**/*.js"
             ],
             "globals": {
                 "yomichan": "readonly"
@@ -217,9 +199,9 @@
                 "ext/js/general/regex-util.js",
                 "ext/js/general/text-source-map.js",
                 "ext/js/language/deinflector.js",
-                "ext/js/language/dictionary-data-util.js",
                 "ext/js/language/dictionary-database.js",
-                "ext/js/language/japanese-util.js",
+                "ext/js/language/sandbox/dictionary-data-util.js",
+                "ext/js/language/sandbox/japanese-util.js",
                 "ext/js/language/translator.js",
                 "ext/js/media/audio-downloader.js",
                 "ext/js/media/media-util.js",

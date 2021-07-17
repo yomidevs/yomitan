@@ -3,7 +3,7 @@
 ## Helpers
 
 Yomichan supports several custom Handlebars helpers for rendering templates.
-The source code for these templates can be found [here](../ext/js/templates/template-renderer.js).
+The source code for these templates can be found [here](../ext/js/templates/sandbox/template-renderer.js).
 
 
 ### `dumpObject`

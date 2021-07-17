@@ -22,7 +22,7 @@ const {VM} = require('../dev/vm');
 const vm = new VM();
 vm.execute([
     'lib/wanakana.min.js',
-    'js/language/japanese-util.js',
+    'js/language/sandbox/japanese-util.js',
     'js/general/text-source-map.js'
 ]);
 const [JapaneseUtil, TextSourceMap, wanakana] = vm.get(['JapaneseUtil', 'TextSourceMap', 'wanakana']);
