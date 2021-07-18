@@ -1,0 +1,166 @@
+[
+    {
+        "selectors": [".pronunciation-downstep-notation"],
+        "styles": [
+            ["display", "inline"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-text"],
+        "styles": [
+            ["display", "inline"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-mora"],
+        "styles": [
+            ["display", "inline-block"],
+            ["position", "relative"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-mora-line"],
+        "styles": [
+            ["border-color", "currentColor"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-mora[data-pitch=high]>.pronunciation-mora-line"],
+        "styles": [
+            ["display", "block"],
+            ["user-select", "none"],
+            ["pointer-events", "none"],
+            ["position", "absolute"],
+            ["top", "0.1em"],
+            ["left", "0"],
+            ["right", "0"],
+            ["height", "0"],
+            ["border-top-width", "0.1em"],
+            ["border-top-style", "solid"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-mora[data-pitch=high][data-pitch-next=low]>.pronunciation-mora-line"],
+        "styles": [
+            ["right", "-0.1em"],
+            ["height", "0.4em"],
+            ["border-right-width", "0.1em"],
+            ["border-right-style", "solid"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-mora[data-pitch=high][data-pitch-next=low]"],
+        "styles": [
+            ["padding-right", "0.1em"],
+            ["margin-right", "0.1em"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-devoice-indicator"],
+        "styles": [
+            ["display", "block"],
+            ["position", "absolute"],
+            ["left", "50%"],
+            ["top", "50%"],
+            ["width", "1.125em"],
+            ["height", "1.125em"],
+            ["border-radius", "50%"],
+            ["box-sizing", "border-box"],
+            ["z-index", "1"],
+            ["transform", "translate(-50%, -50%)"],
+            ["border", "1.5px dotted #c83c28"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-nasal-indicator"],
+        "styles": [
+            ["display", "block"],
+            ["position", "absolute"],
+            ["right", "-0.125em"],
+            ["top", "0.125em"],
+            ["width", "0.375em"],
+            ["height", "0.375em"],
+            ["border-radius", "50%"],
+            ["box-sizing", "border-box"],
+            ["z-index", "1"],
+            ["border", "1.5px solid #c83c28"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-nasal-diacritic"],
+        "styles": [
+            ["position", "absolute"],
+            ["width", "0"],
+            ["height", "0"],
+            ["opacity", "0"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-character"],
+        "styles": [
+            ["display", "inline"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-character-group"],
+        "styles": [
+            ["display", "inline-block"],
+            ["position", "relative"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-graph"],
+        "styles": [
+            ["display", "inline-block"],
+            ["vertical-align", "middle"],
+            ["height", "1.5em"]
+        ]
+    },
+    {
+        "selectors": [
+            ".pronunciation-graph-line",
+            ".pronunciation-graph-line-tail"
+        ],
+        "styles": [
+            ["fill", "none"],
+            ["stroke-width", "5"],
+            ["stroke", "currentColor"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-graph-line-tail"],
+        "styles": [
+            ["stroke-dasharray", "5 5"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-graph-dot"],
+        "styles": [
+            ["stroke-width", "5"],
+            ["fill", "currentColor"],
+            ["stroke", "currentColor"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-graph-dot-downstep1"],
+        "styles": [
+            ["fill", "none"],
+            ["stroke-width", "5"],
+            ["stroke", "currentColor"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-graph-dot-downstep2"],
+        "styles": [
+            ["fill", "currentColor"]
+        ]
+    },
+    {
+        "selectors": [".pronunciation-graph-triangle"],
+        "styles": [
+            ["fill", "none"],
+            ["stroke-width", "5"],
+            ["stroke", "currentColor"]
+        ]
+    }
+]

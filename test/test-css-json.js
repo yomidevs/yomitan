@@ -18,15 +18,19 @@
 const fs = require('fs');
 const assert = require('assert');
 const {testMain} = require('../dev/util');
-const {generateRulesJson, getOutputPath} = require('../dev/generate-structured-content-style');
+const {formatRulesJson, generateRules} = require('../dev/css-to-json-util');
+const {getTargets} = require('../dev/generate-css-json');
 
 
 function main() {
-    const outputPath = getOutputPath();
-    const actual = fs.readFileSync(outputPath, {encoding: 'utf8'});
-    const expected = generateRulesJson();
-    assert.deepStrictEqual(actual, expected);
+    for (const {cssFile, overridesCssFile, outputPath} of getTargets()) {
+        const actual = fs.readFileSync(outputPath, {encoding: 'utf8'});
+        const expected = formatRulesJson(generateRules(cssFile, overridesCssFile));
+        assert.deepStrictEqual(actual, expected);
+    }
 }
 
 
-if (require.main === module) { testMain(main); }
+if (require.main === module) {
+    testMain(main, process.argv.slice(2));
+}

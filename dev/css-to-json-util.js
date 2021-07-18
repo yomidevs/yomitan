@@ -84,9 +84,9 @@ function formatRulesJson(rules) {
     return result;
 }
 
-function generateRules(cssFile, cssFileOverrides) {
+function generateRules(cssFile, overridesCssFile) {
     const content1 = fs.readFileSync(cssFile, {encoding: 'utf8'});
-    const content2 = fs.readFileSync(cssFileOverrides, {encoding: 'utf8'});
+    const content2 = fs.readFileSync(overridesCssFile, {encoding: 'utf8'});
     const stylesheet1 = css.parse(content1, {}).stylesheet;
     const stylesheet2 = css.parse(content2, {}).stylesheet;
 
