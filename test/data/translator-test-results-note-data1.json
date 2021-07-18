@@ -18541,5 +18541,931 @@
         "media": {}
       }
     ]
+  },
+  {
+    "name": "Test pronunciations 1",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 15,
+          "source": "お手前",
+          "rawSource": "お手前",
+          "sourceTerm": "お手前",
+          "reasons": [],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 9,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "お手前",
+          "reading": "おてまえ",
+          "expressions": [
+            {
+              "sourceTerm": "お手前",
+              "expression": "お手前",
+              "reading": "おてまえ",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "お手前",
+                  "reading": "おてまえ",
+                  "pitches": [
+                    {
+                      "position": 2,
+                      "tags": [
+                        {
+                          "name": "P1",
+                          "category": "default",
+                          "notes": "example pitch tag 1",
+                          "order": 0,
+                          "score": 0,
+                          "dictionary": "Test Dictionary 2",
+                          "redundant": false
+                        }
+                      ]
+                    },
+                    {
+                      "position": 2,
+                      "tags": [
+                        {
+                          "name": "P2",
+                          "category": "default",
+                          "notes": "example pitch tag 2",
+                          "order": 0,
+                          "score": 0,
+                          "dictionary": "Test Dictionary 2",
+                          "redundant": false
+                        }
+                      ]
+                    },
+                    {
+                      "position": 0,
+                      "tags": [
+                        {
+                          "name": "P2",
+                          "category": "default",
+                          "notes": "example pitch tag 2",
+                          "order": 0,
+                          "score": 0,
+                          "dictionary": "Test Dictionary 2",
+                          "redundant": false
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "furiganaSegments": [
+                {
+                  "text": "お",
+                  "furigana": ""
+                },
+                {
+                  "text": "手前",
+                  "furigana": "てまえ"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "otemae definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "お手前",
+              "reading": "おてまえ",
+              "pitches": [
+                {
+                  "position": 2,
+                  "tags": [
+                    {
+                      "name": "P1",
+                      "category": "default",
+                      "notes": "example pitch tag 1",
+                      "order": 0,
+                      "score": 0,
+                      "dictionary": "Test Dictionary 2",
+                      "redundant": false
+                    }
+                  ]
+                },
+                {
+                  "position": 2,
+                  "tags": [
+                    {
+                      "name": "P2",
+                      "category": "default",
+                      "notes": "example pitch tag 2",
+                      "order": 0,
+                      "score": 0,
+                      "dictionary": "Test Dictionary 2",
+                      "redundant": false
+                    }
+                  ]
+                },
+                {
+                  "position": 0,
+                  "tags": [
+                    {
+                      "name": "P2",
+                      "category": "default",
+                      "notes": "example pitch tag 2",
+                      "order": 0,
+                      "score": 0,
+                      "dictionary": "Test Dictionary 2",
+                      "redundant": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "お",
+              "furigana": ""
+            },
+            {
+              "text": "手前",
+              "furigana": "てまえ"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "お手前"
+        ],
+        "uniqueReadings": [
+          "おてまえ"
+        ],
+        "pitches": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "pitches": [
+              {
+                "expressions": [
+                  "お手前"
+                ],
+                "reading": "おてまえ",
+                "position": 2,
+                "tags": [
+                  {
+                    "name": "P1",
+                    "category": "default",
+                    "order": 0,
+                    "score": 0,
+                    "content": [
+                      "example pitch tag 1"
+                    ],
+                    "dictionaries": [
+                      "Test Dictionary 2"
+                    ],
+                    "redundant": false
+                  }
+                ],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "お手前"
+                ],
+                "reading": "おてまえ",
+                "position": 2,
+                "tags": [
+                  {
+                    "name": "P2",
+                    "category": "default",
+                    "order": 0,
+                    "score": 0,
+                    "content": [
+                      "example pitch tag 2"
+                    ],
+                    "dictionaries": [
+                      "Test Dictionary 2"
+                    ],
+                    "redundant": false
+                  }
+                ],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "お手前"
+                ],
+                "reading": "おてまえ",
+                "position": 0,
+                "tags": [
+                  {
+                    "name": "P2",
+                    "category": "default",
+                    "order": 0,
+                    "score": 0,
+                    "content": [
+                      "example pitch tag 2"
+                    ],
+                    "dictionaries": [
+                      "Test Dictionary 2"
+                    ],
+                    "redundant": false
+                  }
+                ],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              }
+            ]
+          }
+        ],
+        "pitchCount": 3,
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test pronunciations 2",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 16,
+          "source": "番号",
+          "rawSource": "番号",
+          "sourceTerm": "番号",
+          "reasons": [],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 10,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "番号",
+          "reading": "ばんごう",
+          "expressions": [
+            {
+              "sourceTerm": "番号",
+              "expression": "番号",
+              "reading": "ばんごう",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "番号",
+                  "reading": "ばんごう",
+                  "pitches": [
+                    {
+                      "position": 3,
+                      "tags": []
+                    }
+                  ]
+                }
+              ],
+              "furiganaSegments": [
+                {
+                  "text": "番号",
+                  "furigana": "ばんごう"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "bangou definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "番号",
+              "reading": "ばんごう",
+              "pitches": [
+                {
+                  "position": 3,
+                  "tags": []
+                }
+              ]
+            }
+          ],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "番号",
+              "furigana": "ばんごう"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "番号"
+        ],
+        "uniqueReadings": [
+          "ばんごう"
+        ],
+        "pitches": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "pitches": [
+              {
+                "expressions": [
+                  "番号"
+                ],
+                "reading": "ばんごう",
+                "position": 3,
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              }
+            ]
+          }
+        ],
+        "pitchCount": 1,
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test pronunciations 3",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 17,
+          "source": "中腰",
+          "rawSource": "中腰",
+          "sourceTerm": "中腰",
+          "reasons": [],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 11,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "中腰",
+          "reading": "ちゅうごし",
+          "expressions": [
+            {
+              "sourceTerm": "中腰",
+              "expression": "中腰",
+              "reading": "ちゅうごし",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "中腰",
+                  "reading": "ちゅうごし",
+                  "pitches": [
+                    {
+                      "position": 0,
+                      "tags": []
+                    }
+                  ]
+                }
+              ],
+              "furiganaSegments": [
+                {
+                  "text": "中腰",
+                  "furigana": "ちゅうごし"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "chuugoshi definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "中腰",
+              "reading": "ちゅうごし",
+              "pitches": [
+                {
+                  "position": 0,
+                  "tags": []
+                }
+              ]
+            }
+          ],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "中腰",
+              "furigana": "ちゅうごし"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "中腰"
+        ],
+        "uniqueReadings": [
+          "ちゅうごし"
+        ],
+        "pitches": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "pitches": [
+              {
+                "expressions": [
+                  "中腰"
+                ],
+                "reading": "ちゅうごし",
+                "position": 0,
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              }
+            ]
+          }
+        ],
+        "pitchCount": 1,
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test pronunciations 4",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 18,
+          "source": "所業",
+          "rawSource": "所業",
+          "sourceTerm": "所業",
+          "reasons": [],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 12,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "所業",
+          "reading": "しょぎょう",
+          "expressions": [
+            {
+              "sourceTerm": "所業",
+              "expression": "所業",
+              "reading": "しょぎょう",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "所業",
+                  "reading": "しょぎょう",
+                  "pitches": [
+                    {
+                      "position": 0,
+                      "tags": []
+                    }
+                  ]
+                }
+              ],
+              "furiganaSegments": [
+                {
+                  "text": "所業",
+                  "furigana": "しょぎょう"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "shogyouu definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "所業",
+              "reading": "しょぎょう",
+              "pitches": [
+                {
+                  "position": 0,
+                  "tags": []
+                }
+              ]
+            }
+          ],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "所業",
+              "furigana": "しょぎょう"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "所業"
+        ],
+        "uniqueReadings": [
+          "しょぎょう"
+        ],
+        "pitches": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "pitches": [
+              {
+                "expressions": [
+                  "所業"
+                ],
+                "reading": "しょぎょう",
+                "position": 0,
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              }
+            ]
+          }
+        ],
+        "pitchCount": 1,
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test pronunciations 5",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 19,
+          "source": "土木工事",
+          "rawSource": "土木工事",
+          "sourceTerm": "土木工事",
+          "reasons": [],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 13,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "土木工事",
+          "reading": "どぼくこうじ",
+          "expressions": [
+            {
+              "sourceTerm": "土木工事",
+              "expression": "土木工事",
+              "reading": "どぼくこうじ",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "土木工事",
+                  "reading": "どぼくこうじ",
+                  "pitches": [
+                    {
+                      "position": 4,
+                      "tags": []
+                    }
+                  ]
+                }
+              ],
+              "furiganaSegments": [
+                {
+                  "text": "土木工事",
+                  "furigana": "どぼくこうじ"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "dobokukouji definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "土木工事",
+              "reading": "どぼくこうじ",
+              "pitches": [
+                {
+                  "position": 4,
+                  "tags": []
+                }
+              ]
+            }
+          ],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "土木工事",
+              "furigana": "どぼくこうじ"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "土木工事"
+        ],
+        "uniqueReadings": [
+          "どぼくこうじ"
+        ],
+        "pitches": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "pitches": [
+              {
+                "expressions": [
+                  "土木工事"
+                ],
+                "reading": "どぼくこうじ",
+                "position": 4,
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              }
+            ]
+          }
+        ],
+        "pitchCount": 1,
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
   }
 ]

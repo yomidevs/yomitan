@@ -11229,5 +11229,507 @@
         ]
       }
     ]
+  },
+  {
+    "name": "Test pronunciations 1",
+    "originalTextLength": 3,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflections": [],
+        "score": 1,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxTransformedTextLength": 3,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "お手前",
+            "reading": "おてまえ",
+            "sources": [
+              {
+                "originalText": "お手前",
+                "transformedText": "お手前",
+                "deinflectedText": "お手前",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 15,
+            "score": 1,
+            "sequences": [
+              9
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "otemae definition"
+            ]
+          }
+        ],
+        "pronunciations": [
+          {
+            "index": 0,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "pitches": [
+              {
+                "position": 2,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [
+                  {
+                    "name": "P1",
+                    "category": "default",
+                    "order": 0,
+                    "score": 0,
+                    "content": [
+                      "example pitch tag 1"
+                    ],
+                    "dictionaries": [
+                      "Test Dictionary 2"
+                    ],
+                    "redundant": false
+                  }
+                ]
+              },
+              {
+                "position": 2,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [
+                  {
+                    "name": "P2",
+                    "category": "default",
+                    "order": 0,
+                    "score": 0,
+                    "content": [
+                      "example pitch tag 2"
+                    ],
+                    "dictionaries": [
+                      "Test Dictionary 2"
+                    ],
+                    "redundant": false
+                  }
+                ]
+              },
+              {
+                "position": 0,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [
+                  {
+                    "name": "P2",
+                    "category": "default",
+                    "order": 0,
+                    "score": 0,
+                    "content": [
+                      "example pitch tag 2"
+                    ],
+                    "dictionaries": [
+                      "Test Dictionary 2"
+                    ],
+                    "redundant": false
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frequencies": []
+      }
+    ]
+  },
+  {
+    "name": "Test pronunciations 2",
+    "originalTextLength": 2,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflections": [],
+        "score": 1,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxTransformedTextLength": 2,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "番号",
+            "reading": "ばんごう",
+            "sources": [
+              {
+                "originalText": "番号",
+                "transformedText": "番号",
+                "deinflectedText": "番号",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 16,
+            "score": 1,
+            "sequences": [
+              10
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "bangou definition"
+            ]
+          }
+        ],
+        "pronunciations": [
+          {
+            "index": 0,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "pitches": [
+              {
+                "position": 3,
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          }
+        ],
+        "frequencies": []
+      }
+    ]
+  },
+  {
+    "name": "Test pronunciations 3",
+    "originalTextLength": 2,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflections": [],
+        "score": 1,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxTransformedTextLength": 2,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "中腰",
+            "reading": "ちゅうごし",
+            "sources": [
+              {
+                "originalText": "中腰",
+                "transformedText": "中腰",
+                "deinflectedText": "中腰",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 17,
+            "score": 1,
+            "sequences": [
+              11
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "chuugoshi definition"
+            ]
+          }
+        ],
+        "pronunciations": [
+          {
+            "index": 0,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "pitches": [
+              {
+                "position": 0,
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          }
+        ],
+        "frequencies": []
+      }
+    ]
+  },
+  {
+    "name": "Test pronunciations 4",
+    "originalTextLength": 2,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflections": [],
+        "score": 1,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxTransformedTextLength": 2,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "所業",
+            "reading": "しょぎょう",
+            "sources": [
+              {
+                "originalText": "所業",
+                "transformedText": "所業",
+                "deinflectedText": "所業",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 18,
+            "score": 1,
+            "sequences": [
+              12
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "shogyouu definition"
+            ]
+          }
+        ],
+        "pronunciations": [
+          {
+            "index": 0,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "pitches": [
+              {
+                "position": 0,
+                "nasalPositions": [
+                  2
+                ],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          }
+        ],
+        "frequencies": []
+      }
+    ]
+  },
+  {
+    "name": "Test pronunciations 5",
+    "originalTextLength": 4,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflections": [],
+        "score": 1,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxTransformedTextLength": 4,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "土木工事",
+            "reading": "どぼくこうじ",
+            "sources": [
+              {
+                "originalText": "土木工事",
+                "transformedText": "土木工事",
+                "deinflectedText": "土木工事",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 19,
+            "score": 1,
+            "sequences": [
+              13
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "dobokukouji definition"
+            ]
+          }
+        ],
+        "pronunciations": [
+          {
+            "index": 0,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "pitches": [
+              {
+                "position": 4,
+                "nasalPositions": [],
+                "devoicePositions": [
+                  3
+                ],
+                "tags": []
+              }
+            ]
+          }
+        ],
+        "frequencies": []
+      }
+    ]
   }
 ]

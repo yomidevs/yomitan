@@ -13,6 +13,11 @@
     ["読む", "よむ", "vt", "v5", 100, ["to read"], 6, "P E1"],
     ["強み", "つよみ", "n", "n", 90, ["strong point"], 7, "P E1"],
     ["テキスト", "テキスト", "n", "n", 1, ["text definition 1", {"type": "text", "text": "text definition 2"}], 8, "P E1"],
+    ["お手前", "おてまえ", "n", "n", 1, ["otemae definition"], 9, ""],
+    ["番号", "ばんごう", "n", "n", 1, ["bangou definition"], 10, ""],
+    ["中腰", "ちゅうごし", "n", "n", 1, ["chuugoshi definition"], 11, ""],
+    ["所業", "しょぎょう", "n", "n", 1, ["shogyouu definition"], 12, ""],
+    ["土木工事", "どぼくこうじ", "n", "n", 1, ["dobokukouji definition"], 13, ""],
     [
         "内容", "ないよう", "n", "n", 35,
         [
@@ -134,6 +139,6 @@
                 ]}
             ]}
         ],
-        9, "P E1"
+        100, "P E1"
     ]
 ]

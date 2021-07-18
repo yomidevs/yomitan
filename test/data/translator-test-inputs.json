@@ -290,6 +290,41 @@
             "mode": "merge",
             "text": "うちこむ",
             "options": "default"
+        },
+        {
+            "name": "Test pronunciations 1",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "お手前",
+            "options": "default"
+        },
+        {
+            "name": "Test pronunciations 2",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "番号",
+            "options": "default"
+        },
+        {
+            "name": "Test pronunciations 3",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "中腰",
+            "options": "default"
+        },
+        {
+            "name": "Test pronunciations 4",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "所業",
+            "options": "default"
+        },
+        {
+            "name": "Test pronunciations 5",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "土木工事",
+            "options": "default"
         }
     ]
 }
