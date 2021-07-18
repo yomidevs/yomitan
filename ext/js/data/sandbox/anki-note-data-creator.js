@@ -159,11 +159,13 @@ class AnkiNoteDataCreator {
         if (dictionaryEntry.type === 'term') {
             for (const {dictionary, pitches} of DictionaryDataUtil.getPitchAccentInfos(dictionaryEntry)) {
                 const pitches2 = [];
-                for (const {terms, reading, position, tags, exclusiveTerms, exclusiveReadings} of pitches) {
+                for (const {terms, reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} of pitches) {
                     pitches2.push({
                         expressions: terms,
                         reading,
                         position,
+                        nasalPositions,
+                        devoicePositions,
                         tags,
                         exclusiveExpressions: exclusiveTerms,
                         exclusiveReadings
