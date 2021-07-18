@@ -144,7 +144,7 @@ class PronunciationGenerator {
         return svg;
     }
 
-    createPronunciationDownstepNotation(downstepPosition) {
+    createPronunciationDownstepPosition(downstepPosition) {
         downstepPosition = `${downstepPosition}`;
 
         const n1 = document.createElement('span');

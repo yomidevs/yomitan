@@ -54,7 +54,7 @@ class CssStyleApplier {
     applyClassStyles(elements) {
         const elementStyles = [];
         for (const element of elements) {
-            const {className} = element;
+            const className = element.getAttribute('class');
             if (className.length === 0) { continue; }
             let cssTextNew = '';
             for (const {selectorText, styles} of this._getRulesForClass(className)) {

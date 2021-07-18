@@ -3,7 +3,7 @@
 ## Helpers
 
 Yomichan supports several custom Handlebars helpers for rendering templates.
-The source code for these templates can be found [here](../ext/js/templates/sandbox/template-renderer.js).
+The source code for these templates can be found [here](../ext/js/templates/sandbox/anki-template-renderer.js).
 
 
 ### `dumpObject`
@@ -689,7 +689,7 @@ These functions are used together in order to request media and other types of o
     The type of media to check for.
   * _`args`_ <br>
     Additional arguments for the media. The arguments depend on the media type.
-  * _`escape`_ <br>
+  * _`escape`_ _(optional)_ <br>
     Whether or not the resulting text should be HTML-escaped. If omitted, defaults to `true`.
 
   **Available media types and arguments**
@@ -738,6 +738,39 @@ These functions are used together in order to request media and other types of o
   This is an example of text with generated furigana: <ruby>日本語<rt>にほんご</rt></ruby>
 
   The remapped file name for image.png is: yomichan_dictionary_media_1_にほんご_日本語.png
+  ```
+</details>
+
+
+### `pronunciation`
+
+Converts pronunciation information into a formatted HTML content string. The display layout is the
+same as the system used for generating popup and search page dictionary entries.
+
+<details>
+  <summary>Syntax:</summary>
+
+  <code>{{#pronunciation <i>format=string</i> <i>reading=string</i> <i>downstepPosition=integer</i> <i>[nasalPositions=array]</i> <i>[devoicePositions=array]</i>}}{{/pronunciation}}</code><br>
+
+  * _`format`_ <br>
+    The format of the HTML to generate. This can be any of the following values:
+    * `'text'`
+    * `'graph'`
+    * `'position'`
+  * _`reading`_ <br>
+    The kana reading of the term.
+  * _`downstepPosition`_ <br>
+    The mora position of the downstep in the reading.
+  * _`nasalPositions`_ _(optional)_ <br>
+    An array of indices of mora that have a nasal pronunciation.
+  * _`devoicePositions`_ _(optional)_ <br>
+    An array of indices of mora that are devoiced.
+</details>
+<details>
+  <summary>Example:</summary>
+
+  ```handlebars
+  {{~#pronunciation format='text' reading='よむ' downstepPosition=1~}}{{~/pronunciation~}}
   ```
 </details>
 

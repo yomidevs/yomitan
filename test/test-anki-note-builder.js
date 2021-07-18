@@ -44,6 +44,7 @@ async function createVM() {
         'js/data/anki-note-builder.js',
         'js/data/anki-util.js',
         'js/dom/sandbox/css-style-applier.js',
+        'js/display/sandbox/pronunciation-generator.js',
         'js/display/sandbox/structured-content-generator.js',
         'js/templates/sandbox/anki-template-renderer.js',
         'js/templates/sandbox/template-renderer.js',
@@ -234,6 +235,9 @@ async function getRenderResults(dictionaryEntries, type, mode, template, AnkiNot
             compactTags: false
         });
         if (!write) {
+            for (const error of errors) {
+                console.error(error);
+            }
             assert.strictEqual(errors.length, 0);
         }
         results.push(noteFields);
