@@ -16,23 +16,13 @@
  */
 
 /* globals
- * AnkiNoteDataCreator
- * CssStyleApplier
- * JapaneseUtil
- * TemplateRenderer
+ * AnkiTemplateRenderer
  * TemplateRendererFrameApi
  */
 
 (async () => {
-    const cssStyleApplier = new CssStyleApplier('/data/structured-content-style.json');
-    await cssStyleApplier.prepare();
-    const japaneseUtil = new JapaneseUtil(null);
-    const templateRenderer = new TemplateRenderer(japaneseUtil, cssStyleApplier);
-    const ankiNoteDataCreator = new AnkiNoteDataCreator(japaneseUtil);
-    templateRenderer.registerDataType('ankiNote', {
-        modifier: ({marker, commonData}) => ankiNoteDataCreator.create(marker, commonData),
-        composeData: (marker, commonData) => ({marker, commonData})
-    });
-    const templateRendererFrameApi = new TemplateRendererFrameApi(templateRenderer);
+    const ankiTemplateRenderer = new AnkiTemplateRenderer();
+    await ankiTemplateRenderer.prepare();
+    const templateRendererFrameApi = new TemplateRendererFrameApi(ankiTemplateRenderer.templateRenderer);
     templateRendererFrameApi.prepare();
 })();

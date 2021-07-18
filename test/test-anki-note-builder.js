@@ -45,6 +45,7 @@ async function createVM() {
         'js/data/anki-util.js',
         'js/dom/sandbox/css-style-applier.js',
         'js/display/sandbox/structured-content-generator.js',
+        'js/templates/sandbox/anki-template-renderer.js',
         'js/templates/sandbox/template-renderer.js',
         'js/templates/sandbox/template-renderer-media-provider.js',
         'lib/handlebars.min.js'
@@ -52,37 +53,28 @@ async function createVM() {
 
     const [
         JapaneseUtil,
-        TemplateRenderer,
         AnkiNoteBuilder,
-        CssStyleApplier
+        AnkiTemplateRenderer
     ] = vm.get([
         'JapaneseUtil',
-        'TemplateRenderer',
         'AnkiNoteBuilder',
-        'CssStyleApplier'
+        'AnkiTemplateRenderer'
     ]);
 
-    const ankiNoteDataCreator = vm.ankiNoteDataCreator;
     class TemplateRendererProxy {
         constructor() {
             this._preparePromise = null;
-            this._japaneseUtil = new JapaneseUtil(null);
-            this._cssStyleApplier = new CssStyleApplier('/data/structured-content-style.json');
-            this._templateRenderer = new TemplateRenderer(this._japaneseUtil, this._cssStyleApplier);
-            this._templateRenderer.registerDataType('ankiNote', {
-                modifier: ({marker, commonData}) => ankiNoteDataCreator.create(marker, commonData),
-                composeData: (marker, commonData) => ({marker, commonData})
-            });
+            this._ankiTemplateRenderer = new AnkiTemplateRenderer();
         }
 
         async render(template, data, type) {
             await this._prepare();
-            return await this._templateRenderer.render(template, data, type);
+            return await this._ankiTemplateRenderer.templateRenderer.render(template, data, type);
         }
 
         async renderMulti(items) {
             await this._prepare();
-            return await this._serializeMulti(this._templateRenderer.renderMulti(items));
+            return await this._serializeMulti(this._ankiTemplateRenderer.templateRenderer.renderMulti(items));
         }
 
         _prepare() {
@@ -93,7 +85,7 @@ async function createVM() {
         }
 
         async _prepareInternal() {
-            await this._cssStyleApplier.prepare();
+            await this._ankiTemplateRenderer.prepare();
         }
 
         _serializeError(error) {

@@ -38,10 +38,6 @@ class TranslatorVM extends DatabaseVM {
         return this._translator;
     }
 
-    get ankiNoteDataCreator() {
-        return this._ankiNoteDataCreator;
-    }
-
     async prepare(dictionaryDirectory, dictionaryName) {
         this.execute([
             'js/core.js',
