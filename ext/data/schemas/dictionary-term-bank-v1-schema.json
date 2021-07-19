@@ -21,7 +21,7 @@
             },
             {
                 "type": "string",
-                "description": "String of space-separated rule identifiers for the definition which is used to validate delinflection. Valid rule identifiers are: v1: ichidan verb; v5: godan verb; vs: suru verb; vk: kuru verb; adj-i: i-adjective. An empty string corresponds to words which aren't inflected, such as nouns."
+                "description": "String of space-separated rule identifiers for the definition which is used to validate delinflection. Valid rule identifiers are: v1: ichidan verb; v5: godan verb; vs: suru verb; vz: zuru verb; vk: kuru verb; adj-i: i-adjective. An empty string corresponds to words which aren't inflected, such as nouns."
             },
             {
                 "type": "number",
