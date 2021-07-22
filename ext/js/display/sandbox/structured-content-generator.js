@@ -91,7 +91,7 @@ class StructuredContentGenerator {
         const usedWidth = (
             hasPreferredWidth ?
             preferredWidth :
-            (hasPreferredHeight ? preferredHeight * invAspectRatio : width)
+            (hasPreferredHeight ? preferredHeight / invAspectRatio : width)
         );
 
         const node = this._createElement('a', 'gloss-image-link');
