@@ -16,10 +16,10 @@
  */
 
 :root {
-    --pitch-accent-annotation-color: #000000;
+    --pronunciation-annotation-color: #000000;
 }
 :root[data-theme=dark] {
-    --pitch-accent-annotation-color: #ffffff;
+    --pronunciation-annotation-color: #ffffff;
 }
 
 .pronunciation-downstep-notation {
@@ -34,7 +34,7 @@
     position: relative;
 }
 .pronunciation-mora-line {
-    border-color: var(--pitch-accent-annotation-color);
+    border-color: var(--pronunciation-annotation-color);
 }
 .pronunciation-mora[data-pitch=high]>.pronunciation-mora-line {
     display: block;
@@ -105,27 +105,27 @@
 .pronunciation-graph-line,
 .pronunciation-graph-line-tail {
     fill: none;
-    stroke: var(--pitch-accent-annotation-color);
+    stroke: var(--pronunciation-annotation-color);
     stroke-width: 5;
 }
 .pronunciation-graph-line-tail {
     stroke-dasharray: 5 5;
 }
 .pronunciation-graph-dot {
-    fill: var(--pitch-accent-annotation-color);
-    stroke: var(--pitch-accent-annotation-color);
+    fill: var(--pronunciation-annotation-color);
+    stroke: var(--pronunciation-annotation-color);
     stroke-width: 5;
 }
 .pronunciation-graph-dot-downstep1 {
     fill: none;
-    stroke: var(--pitch-accent-annotation-color);
+    stroke: var(--pronunciation-annotation-color);
     stroke-width: 5;
 }
 .pronunciation-graph-dot-downstep2 {
-    fill: var(--pitch-accent-annotation-color);
+    fill: var(--pronunciation-annotation-color);
 }
 .pronunciation-graph-triangle {
     fill: none;
-    stroke: var(--pitch-accent-annotation-color);
+    stroke: var(--pronunciation-annotation-color);
     stroke-width: 5;
 }

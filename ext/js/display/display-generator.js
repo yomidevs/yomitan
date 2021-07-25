@@ -51,7 +51,7 @@ class DisplayGenerator {
 
         const headwordsContainer = node.querySelector('.headword-list');
         const inflectionsContainer = node.querySelector('.inflection-list');
-        const pitchesContainer = node.querySelector('.pitch-accent-group-list');
+        const pitchesContainer = node.querySelector('.pronunciation-group-list');
         const frequencyGroupListContainer = node.querySelector('.frequency-group-list');
         const definitionsContainer = node.querySelector('.definition-list');
         const headwordTagsContainer = node.querySelector('.headword-list-tag-list');
@@ -72,8 +72,8 @@ class DisplayGenerator {
         node.dataset.format = type;
         node.dataset.headwordCount = `${headwords.length}`;
         node.dataset.definitionCount = `${definitions.length}`;
-        node.dataset.pitchAccentDictionaryCount = `${pitches.length}`;
-        node.dataset.pitchAccentCount = `${pitchCount}`;
+        node.dataset.pronunciationDictionaryCount = `${pitches.length}`;
+        node.dataset.pronunciationCount = `${pitchCount}`;
         node.dataset.uniqueTermCount = `${uniqueTerms.size}`;
         node.dataset.uniqueReadingCount = `${uniqueReadings.size}`;
         node.dataset.frequencyCount = `${frequencies.length}`;
@@ -242,9 +242,9 @@ class DisplayGenerator {
         node.dataset.frequency = DictionaryDataUtil.getTermFrequency(tags);
 
         const {wordClasses} = headword;
-        const pitchAccentCategories = this._getPitchAccentCategories(reading, pronunciations, wordClasses, headwordIndex);
-        if (pitchAccentCategories !== null) {
-            node.dataset.pitchAccentCategories = pitchAccentCategories;
+        const pronunciationCategories = this._getPronunciationCategories(reading, pronunciations, wordClasses, headwordIndex);
+        if (pronunciationCategories !== null) {
+            node.dataset.pronunciationCategories = pronunciationCategories;
         }
         if (wordClasses.length > 0) {
             node.dataset.wordClasses = wordClasses.join(' ');
@@ -435,13 +435,13 @@ class DisplayGenerator {
     _createPitches(details) {
         const {dictionary, pitches} = details;
 
-        const node = this._templates.instantiate('pitch-accent-group');
+        const node = this._templates.instantiate('pronunciation-group');
         node.dataset.dictionary = dictionary;
         node.dataset.pitchesMulti = 'true';
         node.dataset.pitchesCount = `${pitches.length}`;
 
-        const tag = this._createTag(this._createTagData(dictionary, 'pitch-accent-dictionary'));
-        node.querySelector('.pitch-accent-group-tag-list').appendChild(tag);
+        const tag = this._createTag(this._createTagData(dictionary, 'pronunciation-dictionary'));
+        node.querySelector('.pronunciation-group-tag-list').appendChild(tag);
 
         let hasTags = false;
         for (const {tags} of pitches) {
@@ -451,7 +451,7 @@ class DisplayGenerator {
             }
         }
 
-        const n = node.querySelector('.pitch-accent-list');
+        const n = node.querySelector('.pronunciation-list');
         n.dataset.hasTags = `${hasTags}`;
         this._appendMultiple(n, this._createPitch.bind(this), pitches);
 
@@ -463,17 +463,17 @@ class DisplayGenerator {
         const {reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} = details;
         const morae = jp.getKanaMorae(reading);
 
-        const node = this._templates.instantiate('pitch-accent');
+        const node = this._templates.instantiate('pronunciation');
 
-        node.dataset.pitchAccentPosition = `${position}`;
+        node.dataset.pitchAccentDownstepPosition = `${position}`;
         if (nasalPositions.length > 0) { node.dataset.nasalMoraPosition = nasalPositions.join(' '); }
         if (devoicePositions.length > 0) { node.dataset.devoiceMoraPosition = devoicePositions.join(' '); }
         node.dataset.tagCount = `${tags.length}`;
 
-        let n = node.querySelector('.pitch-accent-tag-list');
+        let n = node.querySelector('.pronunciation-tag-list');
         this._appendMultiple(n, this._createTag.bind(this), tags);
 
-        n = node.querySelector('.pitch-accent-disambiguation-list');
+        n = node.querySelector('.pronunciation-disambiguation-list');
         this._createPitchAccentDisambiguations(n, exclusiveTerms, exclusiveReadings);
 
         n = node.querySelector('.pronunciation-downstep-notation-container');
@@ -489,7 +489,7 @@ class DisplayGenerator {
     }
 
     _createPitchAccentDisambiguations(container, exclusiveTerms, exclusiveReadings) {
-        const templateName = 'pitch-accent-disambiguation';
+        const templateName = 'pronunciation-disambiguation';
         for (const term of exclusiveTerms) {
             const node = this._templates.instantiate(templateName);
             node.dataset.type = 'term';
@@ -668,7 +668,7 @@ class DisplayGenerator {
         }
     }
 
-    _getPitchAccentCategories(reading, pronunciations, wordClasses, headwordIndex) {
+    _getPronunciationCategories(reading, pronunciations, wordClasses, headwordIndex) {
         if (pronunciations.length === 0) { return null; }
         const isVerbOrAdjective = DictionaryDataUtil.isNonNounVerbOrAdjective(wordClasses);
         const categories = new Set();

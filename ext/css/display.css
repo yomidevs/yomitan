@@ -144,7 +144,7 @@
     --tag-frequency-background-color: #5cb85c;
     --tag-part-of-speech-background-color: #565656;
     --tag-search-background-color: #8a8a91;
-    --tag-pitch-accent-dictionary-background-color: #6640be;
+    --tag-pronunciation-dictionary-background-color: #6640be;
 
     --sidebar-background-color: #f8f9fa;
 
@@ -212,7 +212,7 @@
     --tag-frequency-background-color: #489148;
     --tag-part-of-speech-background-color: #565656;
     --tag-search-background-color: #69696e;
-    --tag-pitch-accent-dictionary-background-color: #6640be;
+    --tag-pronunciation-dictionary-background-color: #6640be;
 
     --sidebar-background-color: #282828;
 
@@ -807,8 +807,8 @@ button.action-button[data-icon=source-term]::before {
 .tag[data-category=search] {
     --tag-color: var(--tag-search-background-color);
 }
-.tag[data-category=pitch-accent-dictionary] {
-    --tag-color: var(--tag-pitch-accent-dictionary-background-color);
+.tag[data-category=pronunciation-dictionary] {
+    --tag-color: var(--tag-pronunciation-dictionary-background-color);
 }
 
 
@@ -825,7 +825,7 @@ button.action-button[data-icon=source-term]::before {
 }
 .entry[data-definition-count='0'] .entry-body-section[data-section-type=definitions],
 .entry[data-frequency-count='0'] .entry-body-section[data-section-type=frequencies],
-.entry[data-pitch-accent-count='0'] .entry-body-section[data-section-type=pitch-accents] {
+.entry[data-pronunciation-count='0'] .entry-body-section[data-section-type=pronunciations] {
     display: none;
 }
 
@@ -1422,60 +1422,60 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 
 
 /* Pitch accent styles */
-.pitch-accent-group-list {
+.pronunciation-group-list {
     margin: 0;
     padding: 0 0 0 var(--list-padding1);
     list-style-type: decimal;
 }
-.pitch-accent-group-list[data-count='0'],
-.pitch-accent-group-list[data-count='1'] {
+.pronunciation-group-list[data-count='0'],
+.pronunciation-group-list[data-count='1'] {
     padding-left: 0;
     list-style-type: none;
 }
-.pitch-accent-list {
+.pronunciation-list {
     margin: 0;
     padding: 0 0 0 var(--list-padding2);
     list-style-type: circle;
     display: block;
 }
-.pitch-accent-list[data-count='0'],
-.pitch-accent-list[data-count='1'] {
+.pronunciation-list[data-count='0'],
+.pronunciation-list[data-count='1'] {
     padding-left: 0;
     list-style-type: none;
     display: inline;
 }
-.pitch-accent-group::marker,
-.pitch-accent::marker {
+.pronunciation-group::marker,
+.pronunciation::marker {
     color: var(--text-color-light3);
 }
-.pitch-accent {
+.pronunciation {
     display: list-item;
     line-height: 1.5;
 }
-.pitch-accent-list[data-count='0'] .pitch-accent,
-.pitch-accent-list[data-count='1'] .pitch-accent {
+.pronunciation-list[data-count='0'] .pronunciation,
+.pronunciation-list[data-count='1'] .pronunciation {
     display: inline;
 }
-.pitch-accent-group-tag-list {
+.pronunciation-group-tag-list {
     margin-right: 0.375em;
 }
-.pitch-accent-disambiguation-list {
+.pronunciation-disambiguation-list {
     color: var(--text-color-light3);
     padding-right: var(--disambiguation-space);
 }
-.pitch-accent-disambiguation-list::before {
+.pronunciation-disambiguation-list::before {
     content: var(--disambiguation-prefix);
 }
-.pitch-accent-disambiguation-list::after {
+.pronunciation-disambiguation-list::after {
     content: var(--disambiguation-suffix);
 }
-.pitch-accent-disambiguation+.pitch-accent-disambiguation::before {
+.pronunciation-disambiguation+.pronunciation-disambiguation::before {
     content: var(--disambiguation-separator);
 }
-.pitch-accent-disambiguation-list[data-count='0'] {
+.pronunciation-disambiguation-list[data-count='0'] {
     display: none;
 }
-.pitch-accent-tag-list:not([data-count='0']) {
+.pronunciation-tag-list:not([data-count='0']) {
     margin-right: 0.375em;
 }
 .pronunciation-downstep-notation-container {
@@ -1943,29 +1943,29 @@ button.footer-notification-close-button {
     display: inline;
 }
 
-:root[data-show-pitch-accent-downstep-notation=true] .pitch-accent-disambiguation-list[data-term-count='0'],
-:root[data-show-pitch-accent-downstep-notation=true] .pitch-accent-disambiguation[data-type=reading] {
+:root[data-show-pronunciation-text=true] .pronunciation-disambiguation-list[data-term-count='0'],
+:root[data-show-pronunciation-text=true] .pronunciation-disambiguation[data-type=reading] {
     display: none;
 }
-:root[data-show-pitch-accent-downstep-notation=false] .pronunciation-text-container {
+:root[data-show-pronunciation-text=false] .pronunciation-text-container {
     display: none;
 }
-:root[data-show-pitch-accent-position-notation=false] .pronunciation-downstep-notation-container {
+:root[data-show-pronunciation-downstep-position=false] .pronunciation-downstep-notation-container {
     display: none;
 }
-:root[data-show-pitch-accent-graph=false] .pronunciation-graph-container {
+:root[data-show-pronunciation-graph=false] .pronunciation-graph-container {
     display: none;
 }
 
-:root[data-glossary-layout-mode=compact][data-show-pitch-accent-graph=false] .pitch-accent-list:not([data-has-tags=true]) {
+:root[data-glossary-layout-mode=compact][data-show-pronunciation-graph=false] .pronunciation-list:not([data-has-tags=true]) {
     display: inline;
     list-style: none;
     padding-left: 0;
 }
-:root[data-glossary-layout-mode=compact][data-show-pitch-accent-graph=false] .pitch-accent-list:not([data-has-tags=true]) .pitch-accent {
+:root[data-glossary-layout-mode=compact][data-show-pronunciation-graph=false] .pronunciation-list:not([data-has-tags=true]) .pronunciation {
     display: inline;
 }
-:root[data-glossary-layout-mode=compact][data-show-pitch-accent-graph=false] .pitch-accent-list:not([data-has-tags=true]) .pitch-accent:not(:first-child)::before {
+:root[data-glossary-layout-mode=compact][data-show-pronunciation-graph=false] .pronunciation-list:not([data-has-tags=true]) .pronunciation:not(:first-child)::before {
     white-space: pre-wrap;
     content: var(--compact-list-separator);
     display: inline;

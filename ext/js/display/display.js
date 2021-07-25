@@ -838,9 +838,9 @@ class Display extends EventDispatcher {
         data.frequencyDisplayMode = `${options.general.frequencyDisplayMode}`;
         data.termDisplayMode = `${options.general.termDisplayMode}`;
         data.enableSearchTags = `${options.scanning.enableSearchTags}`;
-        data.showPitchAccentDownstepNotation = `${options.general.showPitchAccentDownstepNotation}`;
-        data.showPitchAccentPositionNotation = `${options.general.showPitchAccentPositionNotation}`;
-        data.showPitchAccentGraph = `${options.general.showPitchAccentGraph}`;
+        data.showPronunciationText = `${options.general.showPitchAccentDownstepNotation}`;
+        data.showPronunciationDownstepPosition = `${options.general.showPitchAccentPositionNotation}`;
+        data.showPronunciationGraph = `${options.general.showPitchAccentGraph}`;
         data.debug = `${options.general.debugInfo}`;
         data.popupDisplayMode = `${options.general.popupDisplayMode}`;
         data.popupCurrentIndicatorMode = `${options.general.popupCurrentIndicatorMode}`;
