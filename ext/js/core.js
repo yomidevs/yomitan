@@ -23,12 +23,15 @@
 function serializeError(error) {
     try {
         if (typeof error === 'object' && error !== null) {
-            return {
+            const result = {
                 name: error.name,
                 message: error.message,
-                stack: error.stack,
-                data: error.data
+                stack: error.stack
             };
+            if (Object.prototype.hasOwnProperty.call(error, 'data')) {
+                result.data = error.data;
+            }
+            return result;
         }
     } catch (e) {
         // NOP
@@ -51,7 +54,9 @@ function deserializeError(serializedError) {
     const error = new Error(serializedError.message);
     error.name = serializedError.name;
     error.stack = serializedError.stack;
-    error.data = serializedError.data;
+    if (Object.prototype.hasOwnProperty.call(serializedError, 'data')) {
+        error.data = serializedError.data;
+    }
     return error;
 }
 
