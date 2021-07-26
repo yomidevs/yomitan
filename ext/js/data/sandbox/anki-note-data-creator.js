@@ -157,10 +157,10 @@ class AnkiNoteDataCreator {
     _getPitches(dictionaryEntry) {
         const results = [];
         if (dictionaryEntry.type === 'term') {
-            for (const {dictionary, pitches} of DictionaryDataUtil.getPitchAccentInfos(dictionaryEntry)) {
-                const pitches2 = [];
-                for (const {terms, reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} of pitches) {
-                    pitches2.push({
+            for (const {dictionary, pronunciations} of DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry)) {
+                const pitches = [];
+                for (const {terms, reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} of pronunciations) {
+                    pitches.push({
                         expressions: terms,
                         reading,
                         position,
@@ -171,7 +171,7 @@ class AnkiNoteDataCreator {
                         exclusiveReadings
                     });
                 }
-                results.push({dictionary, pitches: pitches2});
+                results.push({dictionary, pitches});
             }
         }
         return results;

@@ -90,7 +90,7 @@ class DictionaryDataUtil {
         return this._createFrequencyGroupsFromMap(map1);
     }
 
-    static getPitchAccentInfos(dictionaryEntry) {
+    static getGroupedPronunciations(dictionaryEntry) {
         const {headwords, pronunciations} = dictionaryEntry;
 
         const allTerms = new Set();
@@ -100,18 +100,18 @@ class DictionaryDataUtil {
             allReadings.add(reading);
         }
 
-        const pitchAccentInfoMap = new Map();
+        const groupedPronunciationsMap = new Map();
         for (const {headwordIndex, dictionary, pitches} of pronunciations) {
             const {term, reading} = headwords[headwordIndex];
-            let dictionaryPitchAccentInfoList = pitchAccentInfoMap.get(dictionary);
-            if (typeof dictionaryPitchAccentInfoList === 'undefined') {
-                dictionaryPitchAccentInfoList = [];
-                pitchAccentInfoMap.set(dictionary, dictionaryPitchAccentInfoList);
+            let dictionaryGroupedPronunciationList = groupedPronunciationsMap.get(dictionary);
+            if (typeof dictionaryGroupedPronunciationList === 'undefined') {
+                dictionaryGroupedPronunciationList = [];
+                groupedPronunciationsMap.set(dictionary, dictionaryGroupedPronunciationList);
             }
             for (const {position, nasalPositions, devoicePositions, tags} of pitches) {
-                let pitchAccentInfo = this._findExistingPitchAccentInfo(reading, position, nasalPositions, devoicePositions, tags, dictionaryPitchAccentInfoList);
-                if (pitchAccentInfo === null) {
-                    pitchAccentInfo = {
+                let groupedPronunciation = this._findExistingGroupedPronunciation(reading, position, nasalPositions, devoicePositions, tags, dictionaryGroupedPronunciationList);
+                if (groupedPronunciation === null) {
+                    groupedPronunciation = {
                         terms: new Set(),
                         reading,
                         position,
@@ -121,29 +121,29 @@ class DictionaryDataUtil {
                         exclusiveTerms: [],
                         exclusiveReadings: []
                     };
-                    dictionaryPitchAccentInfoList.push(pitchAccentInfo);
+                    dictionaryGroupedPronunciationList.push(groupedPronunciation);
                 }
-                pitchAccentInfo.terms.add(term);
+                groupedPronunciation.terms.add(term);
             }
         }
 
         const multipleReadings = (allReadings.size > 1);
-        for (const dictionaryPitchAccentInfoList of pitchAccentInfoMap.values()) {
-            for (const pitchAccentInfo of dictionaryPitchAccentInfoList) {
-                const {terms, reading, exclusiveTerms, exclusiveReadings} = pitchAccentInfo;
+        for (const dictionaryGroupedPronunciationList of groupedPronunciationsMap.values()) {
+            for (const groupedPronunciation of dictionaryGroupedPronunciationList) {
+                const {terms, reading, exclusiveTerms, exclusiveReadings} = groupedPronunciation;
                 if (!this._areSetsEqual(terms, allTerms)) {
                     exclusiveTerms.push(...this._getSetIntersection(terms, allTerms));
                 }
                 if (multipleReadings) {
                     exclusiveReadings.push(reading);
                 }
-                pitchAccentInfo.terms = [...terms];
+                groupedPronunciation.terms = [...terms];
             }
         }
 
         const results2 = [];
-        for (const [dictionary, pitches] of pitchAccentInfoMap.entries()) {
-            results2.push({dictionary, pitches});
+        for (const [dictionary, pronunciations2] of groupedPronunciationsMap.entries()) {
+            results2.push({dictionary, pronunciations: pronunciations2});
         }
         return results2;
     }
@@ -230,8 +230,8 @@ class DictionaryDataUtil {
         return results;
     }
 
-    static _findExistingPitchAccentInfo(reading, position, nasalPositions, devoicePositions, tags, pitchAccentInfoList) {
-        for (const pitchInfo of pitchAccentInfoList) {
+    static _findExistingGroupedPronunciation(reading, position, nasalPositions, devoicePositions, tags, groupedPronunciationList) {
+        for (const pitchInfo of groupedPronunciationList) {
             if (
                 pitchInfo.reading === reading &&
                 pitchInfo.position === position &&

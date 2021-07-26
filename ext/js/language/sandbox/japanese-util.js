@@ -239,26 +239,26 @@ const JapaneseUtil = (() => {
 
         // Mora functions
 
-        isMoraPitchHigh(moraIndex, pitchAccentPosition) {
-            switch (pitchAccentPosition) {
+        isMoraPitchHigh(moraIndex, pitchAccentDownstepPosition) {
+            switch (pitchAccentDownstepPosition) {
                 case 0: return (moraIndex > 0);
                 case 1: return (moraIndex < 1);
-                default: return (moraIndex > 0 && moraIndex < pitchAccentPosition);
+                default: return (moraIndex > 0 && moraIndex < pitchAccentDownstepPosition);
             }
         }
 
-        getPitchCategory(text, pitchAccentPosition, isVerbOrAdjective) {
-            if (pitchAccentPosition === 0) {
+        getPitchCategory(text, pitchAccentDownstepPosition, isVerbOrAdjective) {
+            if (pitchAccentDownstepPosition === 0) {
                 return 'heiban';
             }
             if (isVerbOrAdjective) {
-                return pitchAccentPosition > 0 ? 'kifuku' : null;
+                return pitchAccentDownstepPosition > 0 ? 'kifuku' : null;
             }
-            if (pitchAccentPosition === 1) {
+            if (pitchAccentDownstepPosition === 1) {
                 return 'atamadaka';
             }
-            if (pitchAccentPosition > 1) {
-                return pitchAccentPosition >= this.getKanaMoraCount(text) ? 'odaka' : 'nakadaka';
+            if (pitchAccentDownstepPosition > 1) {
+                return pitchAccentDownstepPosition >= this.getKanaMoraCount(text) ? 'odaka' : 'nakadaka';
             }
             return null;
         }

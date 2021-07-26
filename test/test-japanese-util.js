@@ -811,8 +811,8 @@ function testIsMoraPitchHigh() {
         [[3, 4], true]
     ];
 
-    for (const [[moraIndex, pitchAccentPosition], expected] of data) {
-        const actual = jp.isMoraPitchHigh(moraIndex, pitchAccentPosition);
+    for (const [[moraIndex, pitchAccentDownstepPosition], expected] of data) {
+        const actual = jp.isMoraPitchHigh(moraIndex, pitchAccentDownstepPosition);
         assert.strictEqual(actual, expected);
     }
 }
