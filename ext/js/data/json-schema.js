@@ -28,6 +28,9 @@ class JsonSchema {
         this._refCache = null;
         this._valueStack = [];
         this._schemaStack = [];
+        this._progress = null;
+        this._progressCounter = 0;
+        this._progressInterval = 1;
 
         this._schemaPush(null, null);
         this._valuePush(null, null);
@@ -39,6 +42,22 @@ class JsonSchema {
 
     get rootSchema() {
         return this._rootSchema;
+    }
+
+    get progress() {
+        return this._progress;
+    }
+
+    set progress(value) {
+        this._progress = value;
+    }
+
+    get progressInterval() {
+        return this._progressInterval;
+    }
+
+    set progressInterval(value) {
+        this._progressInterval = value;
     }
 
     createProxy(value) {
@@ -100,6 +119,44 @@ class JsonSchema {
         return Array.isArray(required) && required.includes(property);
     }
 
+    // Internal state functions for error construction and progress callback
+
+    getValueStack() {
+        const valueStack = [];
+        for (let i = 1, ii = this._valueStack.length; i < ii; ++i) {
+            const {value, path} = this._valueStack[i];
+            valueStack.push({value, path});
+        }
+        return valueStack;
+    }
+
+    getSchemaStack() {
+        const schemaStack = [];
+        for (let i = 1, ii = this._schemaStack.length; i < ii; ++i) {
+            const {schema, path} = this._schemaStack[i];
+            schemaStack.push({schema, path});
+        }
+        return schemaStack;
+    }
+
+    getValueStackLength() {
+        return this._valueStack.length - 1;
+    }
+
+    getValueStackItem(index) {
+        const {value, path} = this._valueStack[index + 1];
+        return {value, path};
+    }
+
+    getSchemaStackLength() {
+        return this._schemaStack.length - 1;
+    }
+
+    getSchemaStackItem(index) {
+        const {schema, path} = this._schemaStack[index + 1];
+        return {schema, path};
+    }
+
     // Stack
 
     _valuePush(value, path) {
@@ -123,21 +180,11 @@ class JsonSchema {
     // Private
 
     _createError(message) {
-        const valueStack = [];
-        for (let i = 1, ii = this._valueStack.length; i < ii; ++i) {
-            const {value, path} = this._valueStack[i];
-            valueStack.push({value, path});
-        }
-
-        const schemaStack = [];
-        for (let i = 1, ii = this._schemaStack.length; i < ii; ++i) {
-            const {schema, path} = this._schemaStack[i];
-            schemaStack.push({schema, path});
-        }
-
+        const valueStack = this.getValueStack();
+        const schemaStack = this.getSchemaStack();
         const error = new Error(message);
         error.value = valueStack[valueStack.length - 1].value;
-        error.schema = this._schema;
+        error.schema = schemaStack[schemaStack.length - 1].schema;
         error.valueStack = valueStack;
         error.schemaStack = schemaStack;
         return error;
@@ -347,6 +394,12 @@ class JsonSchema {
     }
 
     _validate(value) {
+        if (this._progress !== null) {
+            const counter = (this._progressCounter + 1) % this._progressInterval;
+            this._progressCounter = counter;
+            if (counter === 0) { this._progress(this); }
+        }
+
         const ref = this._schema.$ref;
         const schemaInfo = (typeof ref === 'string') ? this._getReference(ref) : null;
 
@@ -501,18 +554,16 @@ class JsonSchema {
     }
 
     _validateSingleSchema(value) {
+        const {type: schemaType, const: schemaConst, enum: schemaEnum} = this._schema;
         const type = this._getValueType(value);
-        const schemaType = this._schema.type;
         if (!this._isValueTypeAny(value, type, schemaType)) {
             throw this._createError(`Value type ${type} does not match schema type ${schemaType}`);
         }
 
-        const schemaConst = this._schema.const;
         if (typeof schemaConst !== 'undefined' && !this._valuesAreEqual(value, schemaConst)) {
             throw this._createError('Invalid constant value');
         }
 
-        const schemaEnum = this._schema.enum;
         if (Array.isArray(schemaEnum) && !this._valuesAreEqualAny(value, schemaEnum)) {
             throw this._createError('Invalid enum value');
         }
@@ -534,44 +585,38 @@ class JsonSchema {
     }
 
     _validateNumber(value) {
-        const {multipleOf} = this._schema;
+        const {multipleOf, minimum, exclusiveMinimum, maximum, exclusiveMaximum} = this._schema;
         if (typeof multipleOf === 'number' && Math.floor(value / multipleOf) * multipleOf !== value) {
             throw this._createError(`Number is not a multiple of ${multipleOf}`);
         }
 
-        const {minimum} = this._schema;
         if (typeof minimum === 'number' && value < minimum) {
             throw this._createError(`Number is less than ${minimum}`);
         }
 
-        const {exclusiveMinimum} = this._schema;
         if (typeof exclusiveMinimum === 'number' && value <= exclusiveMinimum) {
             throw this._createError(`Number is less than or equal to ${exclusiveMinimum}`);
         }
 
-        const {maximum} = this._schema;
         if (typeof maximum === 'number' && value > maximum) {
             throw this._createError(`Number is greater than ${maximum}`);
         }
 
-        const {exclusiveMaximum} = this._schema;
         if (typeof exclusiveMaximum === 'number' && value >= exclusiveMaximum) {
             throw this._createError(`Number is greater than or equal to ${exclusiveMaximum}`);
         }
     }
 
     _validateString(value) {
-        const {minLength} = this._schema;
+        const {minLength, maxLength, pattern} = this._schema;
         if (typeof minLength === 'number' && value.length < minLength) {
             throw this._createError('String length too short');
         }
 
-        const {maxLength} = this._schema;
         if (typeof maxLength === 'number' && value.length > maxLength) {
             throw this._createError('String length too long');
         }
 
-        const {pattern} = this._schema;
         if (typeof pattern === 'string') {
             let {patternFlags} = this._schema;
             if (typeof patternFlags !== 'string') { patternFlags = ''; }
@@ -590,14 +635,13 @@ class JsonSchema {
     }
 
     _validateArray(value) {
+        const {minItems, maxItems} = this._schema;
         const {length} = value;
 
-        const {minItems} = this._schema;
         if (typeof minItems === 'number' && length < minItems) {
             throw this._createError('Array length too short');
         }
 
-        const {maxItems} = this._schema;
         if (typeof maxItems === 'number' && length > maxItems) {
             throw this._createError('Array length too long');
         }
@@ -648,28 +692,28 @@ class JsonSchema {
     }
 
     _validateObject(value) {
-        const properties = new Set(Object.getOwnPropertyNames(value));
+        const {required, minProperties, maxProperties} = this._schema;
+        const properties = Object.getOwnPropertyNames(value);
+        const {length} = properties;
 
-        const {required} = this._schema;
         if (Array.isArray(required)) {
             for (const property of required) {
-                if (!properties.has(property)) {
+                if (!Object.prototype.hasOwnProperty.call(value, property)) {
                     throw this._createError(`Missing property ${property}`);
                 }
             }
         }
 
-        const {minProperties} = this._schema;
-        if (typeof minProperties === 'number' && properties.length < minProperties) {
+        if (typeof minProperties === 'number' && length < minProperties) {
             throw this._createError('Not enough object properties');
         }
 
-        const {maxProperties} = this._schema;
-        if (typeof maxProperties === 'number' && properties.length > maxProperties) {
+        if (typeof maxProperties === 'number' && length > maxProperties) {
             throw this._createError('Too many object properties');
         }
 
-        for (const property of properties) {
+        for (let i = 0; i < length; ++i) {
+            const property = properties[i];
             const schemaInfo = this._getObjectPropertySchemaInfo(property);
             if (schemaInfo === null) {
                 throw this._createError(`No schema found for ${property}`);
