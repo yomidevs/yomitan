@@ -64,8 +64,8 @@ class DictionaryImporterWorker {
     async _importDictionary(archiveContent, importDetails, onProgress) {
         const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
         try {
-            const dictionaryImporter = new DictionaryImporter(this._mediaLoader);
-            const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, importDetails, onProgress);
+            const dictionaryImporter = new DictionaryImporter(this._mediaLoader, onProgress);
+            const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, importDetails);
             return {
                 result,
                 errors: errors.map((error) => serializeError(error))

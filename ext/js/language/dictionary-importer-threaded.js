@@ -20,7 +20,11 @@
  */
 
 class DictionaryImporterThreaded {
-    importDictionary(archiveContent, details, onProgress) {
+    constructor(onProgress) {
+        this._onProgress = onProgress;
+    }
+
+    importDictionary(archiveContent, details) {
         return new Promise((resolve, reject) => {
             const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
             const worker = new Worker('/js/language/dictionary-importer-worker-main.js', {});
@@ -30,13 +34,13 @@ class DictionaryImporterThreaded {
                     case 'complete':
                         worker.removeEventListener('message', onMessage);
                         worker.terminate();
-                        this._onComplete(params, resolve, reject);
+                        this._onMessageComplete(params, resolve, reject);
                         break;
                     case 'progress':
-                        this._onProgress(params, onProgress);
+                        this._onMessageProgress(params);
                         break;
                     case 'getImageResolution':
-                        this._onGetImageResolution(params, worker, dictionaryImporterMediaLoader);
+                        this._onMessageGetImageResolution(params, worker, dictionaryImporterMediaLoader);
                         break;
                 }
             };
@@ -50,7 +54,7 @@ class DictionaryImporterThreaded {
 
     // Private
 
-    _onComplete(params, resolve, reject) {
+    _onMessageComplete(params, resolve, reject) {
         const {error} = params;
         if (typeof error !== 'undefined') {
             reject(deserializeError(error));
@@ -59,19 +63,13 @@ class DictionaryImporterThreaded {
         }
     }
 
-    _formatResult(data) {
-        const {result, errors} = data;
-        const errors2 = errors.map((error) => deserializeError(error));
-        return {result, errors: errors2};
-    }
-
-    _onProgress(params, onProgress) {
-        if (typeof onProgress !== 'function') { return; }
+    _onMessageProgress(params) {
+        if (typeof this._onProgress !== 'function') { return; }
         const {args} = params;
-        onProgress(...args);
+        this._onProgress(...args);
     }
 
-    async _onGetImageResolution(params, worker, dictionaryImporterMediaLoader) {
+    async _onMessageGetImageResolution(params, worker, dictionaryImporterMediaLoader) {
         const {id, mediaType, content} = params;
         let response;
         try {
@@ -81,5 +79,11 @@ class DictionaryImporterThreaded {
             response = {id, error: serializeError(e)};
         }
         worker.postMessage({action: 'getImageResolution.response', params: response});
+    }
+
+    _formatResult(data) {
+        const {result, errors} = data;
+        const errors2 = errors.map((error) => deserializeError(error));
+        return {result, errors: errors2};
     }
 }

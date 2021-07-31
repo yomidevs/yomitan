@@ -22,12 +22,12 @@
  */
 
 class DictionaryImporter {
-    constructor(mediaLoader) {
+    constructor(mediaLoader, onProgress) {
         this._mediaLoader = mediaLoader;
-        this._schemas = new Map();
+        this._onProgress = onProgress;
     }
 
-    async importDictionary(dictionaryDatabase, archiveContent, details, onProgress) {
+    async importDictionary(dictionaryDatabase, archiveContent, details) {
         if (!dictionaryDatabase) {
             throw new Error('Invalid database');
         }
@@ -35,7 +35,7 @@ class DictionaryImporter {
             throw new Error('Database is not ready');
         }
 
-        const hasOnProgress = (typeof onProgress === 'function');
+        const hasOnProgress = (typeof this._onProgress === 'function');
 
         // Read archive
         const archive = await JSZip.loadAsync(archiveContent);
@@ -143,7 +143,7 @@ class DictionaryImporter {
 
                 loadedCount += count;
                 if (hasOnProgress) {
-                    onProgress(total, loadedCount);
+                    this._onProgress(total, loadedCount);
                 }
             }
         };
@@ -178,17 +178,6 @@ class DictionaryImporter {
     }
 
     async _getSchema(fileName) {
-        let schemaPromise = this._schemas.get(fileName);
-        if (typeof schemaPromise !== 'undefined') {
-            return schemaPromise;
-        }
-
-        schemaPromise = this._createSchema(fileName);
-        this._schemas.set(fileName, schemaPromise);
-        return schemaPromise;
-    }
-
-    async _createSchema(fileName) {
         const schema = await this._fetchJsonAsset(fileName);
         return new JsonSchema(schema);
     }

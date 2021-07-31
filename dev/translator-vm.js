@@ -76,15 +76,14 @@ class TranslatorVM extends DatabaseVM {
 
         // Setup database
         const dictionaryImporterMediaLoader = new DatabaseVMDictionaryImporterMediaLoader();
-        const dictionaryImporter = new DictionaryImporter(dictionaryImporterMediaLoader);
+        const dictionaryImporter = new DictionaryImporter(dictionaryImporterMediaLoader, null);
         const dictionaryDatabase = new DictionaryDatabase();
         await dictionaryDatabase.prepare();
 
         const {errors} = await dictionaryImporter.importDictionary(
             dictionaryDatabase,
             testDictionaryContent,
-            {prefixWildcardsSupported: true},
-            () => {}
+            {prefixWildcardsSupported: true}
         );
 
         assert.deepStrictEqual(errors.length, 0);
