@@ -17,9 +17,7 @@
 
 /* global
  * DictionaryController
- * DictionaryDatabase
- * DictionaryImporter
- * DictionaryImporterMediaLoader
+ * DictionaryImporterThreaded
  */
 
 class DictionaryImportController {
@@ -183,22 +181,16 @@ class DictionaryImportController {
     }
 
     async _importDictionary(file, importDetails, onProgress) {
-        const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
-        try {
-            const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
-            const dictionaryImporter = new DictionaryImporter(dictionaryImporterMediaLoader);
-            const archiveContent = await this._readFile(file);
-            const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, importDetails, onProgress);
-            yomichan.api.triggerDatabaseUpdated('dictionary', 'import');
-            const errors2 = await this._addDictionarySettings(result.sequenced, result.title);
+        const dictionaryImporter = new DictionaryImporterThreaded();
+        const archiveContent = await this._readFile(file);
+        const {result, errors} = await dictionaryImporter.importDictionary(archiveContent, importDetails, onProgress);
+        yomichan.api.triggerDatabaseUpdated('dictionary', 'import');
+        const errors2 = await this._addDictionarySettings(result.sequenced, result.title);
 
-            if (errors.length > 0) {
-                const allErrors = [...errors, ...errors2];
-                allErrors.push(new Error(`Dictionary may not have been imported properly: ${allErrors.length} error${allErrors.length === 1 ? '' : 's'} reported.`));
-                this._showErrors(allErrors);
-            }
-        } finally {
-            dictionaryDatabase.close();
+        if (errors.length > 0) {
+            const allErrors = [...errors, ...errors2];
+            allErrors.push(new Error(`Dictionary may not have been imported properly: ${allErrors.length} error${allErrors.length === 1 ? '' : 's'} reported.`));
+            this._showErrors(allErrors);
         }
     }
 
@@ -309,12 +301,6 @@ class DictionaryImportController {
         for (const node of document.querySelectorAll('.dictionary-database-mutating-input')) {
             node.disabled = value;
         }
-    }
-
-    async _getPreparedDictionaryDatabase() {
-        const dictionaryDatabase = new DictionaryDatabase();
-        await dictionaryDatabase.prepare();
-        return dictionaryDatabase;
     }
 
     async _modifyGlobalSettings(targets) {

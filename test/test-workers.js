@@ -22,6 +22,13 @@ const {VM} = require('../dev/vm');
 const assert = require('assert');
 
 
+class StubClass {
+    prepare() {
+        // NOP
+    }
+}
+
+
 function loadEslint() {
     return JSON.parse(fs.readFileSync(path.join(__dirname, '..', '.eslintrc.json'), {encoding: 'utf8'}));
 }
@@ -87,9 +94,36 @@ function testServiceWorker() {
     assert.deepStrictEqual(swRules.files, expectedSwRulesFiles);
 }
 
+function testWorkers() {
+    testWorker(
+        'js/language/dictionary-importer-worker-main.js',
+        {DictionaryImporterWorker: StubClass}
+    );
+}
+
+function testWorker(scriptPath, fields) {
+    // Get script paths
+    const scripts = getImportedScripts(scriptPath, fields);
+
+    // Verify that eslint config lists files correctly
+    const expectedRulesFiles = filterScriptPaths(scripts);
+    const expectedRulesFilesSet = new Set(expectedRulesFiles);
+    const eslintConfig = loadEslint();
+    const rules = eslintConfig.overrides.find((item) => (
+        typeof item.env === 'object' &&
+        item.env !== null &&
+        item.env.worker === true
+    ));
+    assert.ok(typeof rules !== 'undefined');
+    assert.ok(Array.isArray(rules.files));
+    assert.deepStrictEqual(rules.files.filter((v) => expectedRulesFilesSet.has(v)), expectedRulesFiles);
+}
+
+
 function main() {
     try {
         testServiceWorker();
+        testWorkers();
     } catch (e) {
         console.error(e);
         process.exit(-1);

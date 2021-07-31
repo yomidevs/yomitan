@@ -223,6 +223,25 @@
         },
         {
             "files": [
+                "ext/js/core.js",
+                "ext/js/data/database.js",
+                "ext/js/data/json-schema.js",
+                "ext/js/general/cache-map.js",
+                "ext/js/language/dictionary-database.js",
+                "ext/js/language/dictionary-importer.js",
+                "ext/js/language/dictionary-importer-worker.js",
+                "ext/js/language/dictionary-importer-worker-media-loader.js",
+                "ext/js/media/media-util.js"
+            ],
+            "env": {
+                "browser": false,
+                "worker": true,
+                "es2017": true,
+                "webextensions": true
+            }
+        },
+        {
+            "files": [
                 "ext/js/**/*.js"
             ],
             "excludedFiles": [
