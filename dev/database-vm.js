@@ -30,63 +30,6 @@ const chrome = {
     }
 };
 
-class Image {
-    constructor() {
-        this._src = '';
-        this._loadCallbacks = [];
-    }
-
-    get src() {
-        return this._src;
-    }
-
-    set src(value) {
-        this._src = value;
-        this._delayTriggerLoad();
-    }
-
-    get naturalWidth() {
-        return 100;
-    }
-
-    get naturalHeight() {
-        return 100;
-    }
-
-    addEventListener(eventName, callback) {
-        if (eventName === 'load') {
-            this._loadCallbacks.push(callback);
-        }
-    }
-
-    removeEventListener(eventName, callback) {
-        if (eventName === 'load') {
-            const index = this._loadCallbacks.indexOf(callback);
-            if (index >= 0) {
-                this._loadCallbacks.splice(index, 1);
-            }
-        }
-    }
-
-    removeAttribute() {
-        // NOP
-    }
-
-    async _delayTriggerLoad() {
-        await Promise.resolve();
-        for (const callback of this._loadCallbacks) {
-            callback();
-        }
-    }
-}
-
-class Blob {
-    constructor(array, options) {
-        this._array = array;
-        this._options = options;
-    }
-}
-
 async function fetch(url2) {
     const extDir = path.join(__dirname, '..', 'ext');
     let filePath;
@@ -114,8 +57,6 @@ class DatabaseVM extends VM {
     constructor(globals={}) {
         super(Object.assign({
             chrome,
-            Image,
-            Blob,
             fetch,
             indexedDB: global.indexedDB,
             IDBKeyRange: global.IDBKeyRange,
@@ -127,6 +68,14 @@ class DatabaseVM extends VM {
     }
 }
 
+class DatabaseVMDictionaryImporterMediaLoader {
+    async getImageResolution() {
+        // Placeholder values
+        return {width: 100, height: 100};
+    }
+}
+
 module.exports = {
-    DatabaseVM
+    DatabaseVM,
+    DatabaseVMDictionaryImporterMediaLoader
 };

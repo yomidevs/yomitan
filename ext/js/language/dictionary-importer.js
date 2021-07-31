@@ -22,11 +22,12 @@
  */
 
 class DictionaryImporter {
-    constructor() {
+    constructor(mediaLoader) {
+        this._mediaLoader = mediaLoader;
         this._schemas = new Map();
     }
 
-    async importDictionary(dictionaryDatabase, archiveSource, details, onProgress) {
+    async importDictionary(dictionaryDatabase, archiveContent, details, onProgress) {
         if (!dictionaryDatabase) {
             throw new Error('Invalid database');
         }
@@ -37,7 +38,7 @@ class DictionaryImporter {
         const hasOnProgress = (typeof onProgress === 'function');
 
         // Read archive
-        const archive = await JSZip.loadAsync(archiveSource);
+        const archive = await JSZip.loadAsync(archiveContent);
 
         // Read and validate index
         const indexFileName = 'index.json';
@@ -469,7 +470,7 @@ class DictionaryImporter {
         let width;
         let height;
         try {
-            ({width, height} = await this._getImageResolution(mediaType, content));
+            ({width, height} = await this._mediaLoader.getImageResolution(mediaType, content));
         } catch (e) {
             throw createError('Could not load image');
         }
@@ -501,37 +502,5 @@ class DictionaryImporter {
             throw new Error(`Failed to fetch ${url}: ${response.status}`);
         }
         return await response.json();
-    }
-
-    /**
-     * Attempts to load an image using a base64 encoded content and a media type
-     * and returns its resolution.
-     * @param mediaType The media type for the image content.
-     * @param content The binary content for the image, encoded in base64.
-     * @returns A Promise which resolves with {width, height} on success,
-     *   otherwise an error is thrown.
-     */
-    _getImageResolution(mediaType, content) {
-        return new Promise((resolve, reject) => {
-            const image = new Image();
-            const eventListeners = new EventListenerCollection();
-            const cleanup = () => {
-                image.removeAttribute('src');
-                URL.revokeObjectURL(url);
-                eventListeners.removeAllEventListeners();
-            };
-            eventListeners.addEventListener(image, 'load', () => {
-                const {naturalWidth: width, naturalHeight: height} = image;
-                cleanup();
-                resolve({width, height});
-            }, false);
-            eventListeners.addEventListener(image, 'error', () => {
-                cleanup();
-                reject(new Error('Image failed to load'));
-            }, false);
-            const blob = MediaUtil.createBlobFromBase64Content(content, mediaType);
-            const url = URL.createObjectURL(blob);
-            image.src = url;
-        });
     }
 }

@@ -18,7 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
-const {DatabaseVM} = require('./database-vm');
+const {DatabaseVM, DatabaseVMDictionaryImporterMediaLoader} = require('./database-vm');
 const {createDictionaryArchive} = require('./util');
 
 function clone(value) {
@@ -75,7 +75,8 @@ class TranslatorVM extends DatabaseVM {
         const testDictionaryContent = await testDictionary.generateAsync({type: 'arraybuffer'});
 
         // Setup database
-        const dictionaryImporter = new DictionaryImporter();
+        const dictionaryImporterMediaLoader = new DatabaseVMDictionaryImporterMediaLoader();
+        const dictionaryImporter = new DictionaryImporter(dictionaryImporterMediaLoader);
         const dictionaryDatabase = new DictionaryDatabase();
         await dictionaryDatabase.prepare();
 

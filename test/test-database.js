@@ -18,7 +18,7 @@
 const path = require('path');
 const assert = require('assert');
 const {createDictionaryArchive, testMain} = require('../dev/util');
-const {DatabaseVM} = require('../dev/database-vm');
+const {DatabaseVM, DatabaseVMDictionaryImporterMediaLoader} = require('../dev/database-vm');
 
 
 const vm = new DatabaseVM();
@@ -38,6 +38,12 @@ const DictionaryDatabase = vm.get('DictionaryDatabase');
 function createTestDictionaryArchive(dictionary, dictionaryName) {
     const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', dictionary);
     return createDictionaryArchive(dictionaryDirectory, dictionaryName);
+}
+
+
+function createDictionaryImporter() {
+    const dictionaryImporterMediaLoader = new DatabaseVMDictionaryImporterMediaLoader();
+    return new DictionaryImporter(dictionaryImporterMediaLoader);
 }
 
 
@@ -125,7 +131,7 @@ async function testDatabase1() {
     ];
 
     // Setup database
-    const dictionaryImporter = new DictionaryImporter();
+    const dictionaryImporter = createDictionaryImporter();
     const dictionaryDatabase = new DictionaryDatabase();
     await dictionaryDatabase.prepare();
 
@@ -775,7 +781,7 @@ async function testDatabase2() {
     ]);
 
     // Setup database
-    const dictionaryImporter = new DictionaryImporter();
+    const dictionaryImporter = createDictionaryImporter();
     const dictionaryDatabase = new DictionaryDatabase();
 
     // Error: not prepared
@@ -817,7 +823,7 @@ async function testDatabase3() {
     ];
 
     // Setup database
-    const dictionaryImporter = new DictionaryImporter();
+    const dictionaryImporter = createDictionaryImporter();
     const dictionaryDatabase = new DictionaryDatabase();
     await dictionaryDatabase.prepare();
 

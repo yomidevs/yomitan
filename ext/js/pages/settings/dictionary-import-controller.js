@@ -19,6 +19,7 @@
  * DictionaryController
  * DictionaryDatabase
  * DictionaryImporter
+ * DictionaryImporterMediaLoader
  */
 
 class DictionaryImportController {
@@ -184,7 +185,8 @@ class DictionaryImportController {
     async _importDictionary(file, importDetails, onProgress) {
         const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
         try {
-            const dictionaryImporter = new DictionaryImporter();
+            const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
+            const dictionaryImporter = new DictionaryImporter(dictionaryImporterMediaLoader);
             const archiveContent = await this._readFile(file);
             const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, importDetails, onProgress);
             yomichan.api.triggerDatabaseUpdated('dictionary', 'import');

@@ -116,7 +116,7 @@ function deepStrictEqual(actual, expected) {
 }
 
 
-function createURLClass(urlMap) {
+function createURLClass() {
     const BaseURL = URL;
     const result = function URL(url) {
         const u = new BaseURL(url);
@@ -133,23 +133,13 @@ function createURLClass(urlMap) {
         this.searchParams = u.searchParams;
         this.username = u.username;
     };
-    result.createObjectURL = (object) => {
-        const id = crypto.randomBytes(16).toString('hex');
-        const url = `blob:${id}`;
-        urlMap.set(url, object);
-        return url;
-    };
-    result.revokeObjectURL = (url) => {
-        urlMap.delete(url);
-    };
     return result;
 }
 
 
 class VM {
     constructor(context={}) {
-        this._urlMap = new Map();
-        context.URL = createURLClass(this._urlMap);
+        context.URL = createURLClass();
         context.crypto = {
             getRandomValues: (array) => {
                 const buffer = crypto.randomBytes(array.byteLength);
@@ -204,10 +194,6 @@ class VM {
         }
 
         return single ? results[0] : results;
-    }
-
-    getUrlObject(url) {
-        return this._urlMap.get(url);
     }
 }
 
