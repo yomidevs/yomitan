@@ -18,6 +18,7 @@
 /* global
  * DictionaryController
  * OptionsUtil
+ * StringUtil
  */
 
 class BackupController {
@@ -317,17 +318,8 @@ class BackupController {
         return warnings;
     }
 
-    _utf8Decode(arrayBuffer) {
-        try {
-            return new TextDecoder('utf-8').decode(arrayBuffer);
-        } catch (e) {
-            const binaryString = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
-            return decodeURIComponent(escape(binaryString));
-        }
-    }
-
     async _importSettingsFile(file) {
-        const dataString = this._utf8Decode(await this._readFileArrayBuffer(file));
+        const dataString = StringUtil.arrayBufferUtf8Decode(await this._readFileArrayBuffer(file));
         const data = JSON.parse(dataString);
 
         // Type check

@@ -19,6 +19,7 @@
  * JsonSchema
  * NativeSimpleDOMParser
  * SimpleDOMParser
+ * StringUtil
  */
 
 class AudioDownloader {
@@ -257,7 +258,7 @@ class AudioDownloader {
             throw new Error('Could not retrieve audio');
         }
 
-        const data = this._arrayBufferToBase64(arrayBuffer);
+        const data = StringUtil.arrayBufferToBase64(arrayBuffer);
         const contentType = response.headers.get('Content-Type');
         return {data, contentType};
     }
@@ -286,10 +287,6 @@ class AudioDownloader {
             digest += byte.toString(16).padStart(2, '0');
         }
         return digest;
-    }
-
-    _arrayBufferToBase64(arrayBuffer) {
-        return btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
     }
 
     _createSimpleDOMParser(content) {
