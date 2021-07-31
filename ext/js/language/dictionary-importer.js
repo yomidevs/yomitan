@@ -434,15 +434,13 @@ class DictionaryImporter {
 
     async _getImageMedia(context, path, entry) {
         const {media} = context;
-        const {dictionary, reading} = entry;
+        const {dictionary} = entry;
 
-        let errorSource = entry.expression;
-        if (reading.length > 0) {
-            errorSource += ` (${reading})`;
-        }
-        errorSource += dictionary;
-
-        const createError = (message) => new Error(`${message} at path ${JSON.stringify(path)} for ${errorSource}`);
+        const createError = (message) => {
+            const {expression, reading} = entry;
+            const readingSource = reading.length > 0 ? ` (${reading})`: '';
+            return new Error(`${message} at path ${JSON.stringify(path)} for ${expression}${readingSource} in ${dictionary}`);
+        };
 
         // Check if already added
         let mediaData = media.get(path);
@@ -490,7 +488,7 @@ class DictionaryImporter {
     }
 
     async _fetchJsonAsset(url) {
-        const response = await fetch(chrome.runtime.getURL(url), {
+        const response = await fetch(url, {
             method: 'GET',
             mode: 'no-cors',
             cache: 'default',
