@@ -22,6 +22,15 @@ const {VM} = require('../dev/vm');
 const assert = require('assert');
 
 
+function loadEslint() {
+    return JSON.parse(fs.readFileSync(path.join(__dirname, '..', '.eslintrc.json'), {encoding: 'utf8'}));
+}
+
+function filterScriptPaths(scriptPaths) {
+    const extDirName = 'ext';
+    return scriptPaths.filter((src) => !src.startsWith('/lib/')).map((src) => `${extDirName}${src}`);
+}
+
 function getAllHtmlScriptPaths(fileName) {
     const domSource = fs.readFileSync(fileName, {encoding: 'utf8'});
     const dom = new JSDOM(domSource);
@@ -43,38 +52,44 @@ function convertBackgroundScriptsToServiceWorkerScripts(scripts) {
     scripts[index] = '/js/dom/simple-dom-parser.js';
 }
 
+function getImportedScripts(scriptPath, fields) {
+    const importedScripts = [];
+
+    const importScripts = (...scripts) => {
+        importedScripts.push(...scripts);
+    };
+
+    const vm = new VM(Object.assign({importScripts}, fields));
+    vm.context.self = vm.context;
+    vm.execute([scriptPath]);
+
+    return importedScripts;
+}
+
+function testServiceWorker() {
+    // Verify that sw.js scripts match background.html scripts
+    const extDir = path.join(__dirname, '..', 'ext');
+    const scripts = getAllHtmlScriptPaths(path.join(extDir, 'background.html'));
+    convertBackgroundScriptsToServiceWorkerScripts(scripts);
+    const importedScripts = getImportedScripts('sw.js', {});
+    assert.deepStrictEqual(scripts, importedScripts);
+
+    // Verify that eslint config lists files correctly
+    const expectedSwRulesFiles = filterScriptPaths(scripts);
+    const eslintConfig = loadEslint();
+    const swRules = eslintConfig.overrides.find((item) => (
+        typeof item.env === 'object' &&
+        item.env !== null &&
+        item.env.serviceworker === true
+    ));
+    assert.ok(typeof swRules !== 'undefined');
+    assert.ok(Array.isArray(swRules.files));
+    assert.deepStrictEqual(swRules.files, expectedSwRulesFiles);
+}
+
 function main() {
     try {
-        // Verify that sw.js scripts match background.html scripts
-        const rootDir = path.join(__dirname, '..');
-        const extDirName = 'ext';
-        const extDir = path.join(rootDir, extDirName);
-
-        const scripts = getAllHtmlScriptPaths(path.join(extDir, 'background.html'));
-        convertBackgroundScriptsToServiceWorkerScripts(scripts);
-        const importedScripts = [];
-
-        const importScripts = (...scripts2) => {
-            importedScripts.push(...scripts2);
-        };
-
-        const vm = new VM({importScripts});
-        vm.context.self = vm.context;
-        vm.execute(['sw.js']);
-
-        vm.assert.deepStrictEqual(scripts, importedScripts);
-
-        // Verify that eslint config lists files correctly
-        const expectedSwRulesFiles = scripts.filter((src) => !src.startsWith('/lib/')).map((src) => `${extDirName}${src}`);
-        const eslintConfig = JSON.parse(fs.readFileSync(path.join(rootDir, '.eslintrc.json'), {encoding: 'utf8'}));
-        const swRules = eslintConfig.overrides.find((item) => (
-            typeof item.env === 'object' &&
-            item.env !== null &&
-            item.env.serviceworker === true
-        ));
-        assert.ok(typeof swRules !== 'undefined');
-        assert.ok(Array.isArray(swRules.files));
-        assert.deepStrictEqual(swRules.files, expectedSwRulesFiles);
+        testServiceWorker();
     } catch (e) {
         console.error(e);
         process.exit(-1);
