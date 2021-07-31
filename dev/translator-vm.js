@@ -72,7 +72,7 @@ class TranslatorVM extends DatabaseVM {
         // Dictionary
         this._dictionaryName = dictionaryName;
         const testDictionary = createDictionaryArchive(dictionaryDirectory, dictionaryName);
-        const testDictionaryContent = await testDictionary.generateAsync({type: 'string'});
+        const testDictionaryContent = await testDictionary.generateAsync({type: 'arraybuffer'});
 
         // Setup database
         const dictionaryImporter = new DictionaryImporter();

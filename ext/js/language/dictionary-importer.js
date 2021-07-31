@@ -149,20 +149,18 @@ class DictionaryImporter {
         }
 
         // Extended data support
-        const extendedDataContext = {
-            archive,
-            media: new Map()
-        };
+        const requirements = [];
         for (const entry of termList) {
             const glossaryList = entry.glossary;
             for (let i = 0, ii = glossaryList.length; i < ii; ++i) {
                 const glossary = glossaryList[i];
                 if (typeof glossary !== 'object' || glossary === null) { continue; }
-                glossaryList[i] = await this._formatDictionaryTermGlossaryObject(glossary, extendedDataContext, entry);
+                glossaryList[i] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
             }
         }
 
-        const media = [...extendedDataContext.media.values()];
+        // Async requirements
+        const {media} = await this._resolveAsyncRequirements(requirements, archive);
 
         // Add dictionary
         const summary = this._createSummary(dictionaryTitle, version, index, {prefixWildcardsSupported});
@@ -305,62 +303,106 @@ class DictionaryImporter {
         return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
     }
 
-    async _formatDictionaryTermGlossaryObject(data, context, entry) {
+    _formatDictionaryTermGlossaryObject(data, entry, requirements) {
         switch (data.type) {
             case 'text':
                 return data.text;
             case 'image':
-                return await this._formatDictionaryTermGlossaryImage(data, context, entry);
+                return this._formatDictionaryTermGlossaryImage(data, entry, requirements);
             case 'structured-content':
-                return await this._formatStructuredContent(data, context, entry);
+                return this._formatStructuredContent(data, entry, requirements);
             default:
                 throw new Error(`Unhandled data type: ${data.type}`);
         }
     }
 
-    async _formatDictionaryTermGlossaryImage(data, context, entry) {
-        return await this._createImageData(data, context, entry, {type: 'image'});
+    _formatDictionaryTermGlossaryImage(data, entry, requirements) {
+        const target = {};
+        requirements.push({type: 'image', target, args: [data, entry]});
+        return target;
     }
 
-    async _formatStructuredContent(data, context, entry) {
-        const content = await this._prepareStructuredContent(data.content, context, entry);
+    _formatStructuredContent(data, entry, requirements) {
+        const content = this._prepareStructuredContent(data.content, entry, requirements);
         return {
             type: 'structured-content',
             content
         };
     }
 
-    async _prepareStructuredContent(content, context, entry) {
+    _prepareStructuredContent(content, entry, requirements) {
         if (typeof content === 'string' || !(typeof content === 'object' && content !== null)) {
             return content;
         }
         if (Array.isArray(content)) {
             for (let i = 0, ii = content.length; i < ii; ++i) {
-                content[i] = await this._prepareStructuredContent(content[i], context, entry);
+                content[i] = this._prepareStructuredContent(content[i], entry, requirements);
             }
             return content;
         }
         const {tag} = content;
         switch (tag) {
             case 'img':
-                return await this._prepareStructuredContentImage(content, context, entry);
+                return this._prepareStructuredContentImage(content, entry, requirements);
         }
         const childContent = content.content;
         if (typeof childContent !== 'undefined') {
-            content.content = await this._prepareStructuredContent(childContent, context, entry);
+            content.content = this._prepareStructuredContent(childContent, entry, requirements);
         }
         return content;
     }
 
-    async _prepareStructuredContentImage(content, context, entry) {
+    _prepareStructuredContentImage(content, entry, requirements) {
+        const target = {};
+        requirements.push({type: 'structured-content-image', target, args: [content, entry]});
+        return target;
+    }
+
+    async _resolveAsyncRequirements(requirements, archive) {
+        const media = new Map();
+        const context = {archive, media};
+
+        const promises = [];
+        for (const requirement of requirements) {
+            promises.push(this._resolveAsyncRequirement(context, requirement));
+        }
+
+        await Promise.all(promises);
+
+        return {
+            media: [...media.values()]
+        };
+    }
+
+    async _resolveAsyncRequirement(context, requirement) {
+        const {type, target, args} = requirement;
+        let result;
+        switch (type) {
+            case 'image':
+                result = await this._resolveDictionaryTermGlossaryImage(context, ...args);
+                break;
+            case 'structured-content-image':
+                result = await this._resolveStructuredContentImage(context, ...args);
+                break;
+            default:
+                return;
+        }
+        Object.assign(target, result);
+    }
+
+    async _resolveDictionaryTermGlossaryImage(context, data, entry) {
+        return await this._createImageData(context, data, entry, {type: 'image'});
+    }
+
+    async _resolveStructuredContentImage(context, content, entry) {
         const {verticalAlign, sizeUnits} = content;
-        const result = await this._createImageData(content, context, entry, {tag: 'img'});
+        const result = await this._createImageData(context, content, entry, {tag: 'img'});
         if (typeof verticalAlign === 'string') { result.verticalAlign = verticalAlign; }
         if (typeof sizeUnits === 'string') { result.sizeUnits = sizeUnits; }
         return result;
     }
 
-    async _createImageData(data, context, entry, attributes) {
+    async _createImageData(context, data, entry, attributes) {
         const {
             path,
             width: preferredWidth,
@@ -374,7 +416,7 @@ class DictionaryImporter {
             collapsed,
             collapsible
         } = data;
-        const {width, height} = await this._getImageMedia(path, context, entry);
+        const {width, height} = await this._getImageMedia(context, path, entry);
         const newData = Object.assign({}, attributes, {path, width, height});
         if (typeof preferredWidth === 'number') { newData.preferredWidth = preferredWidth; }
         if (typeof preferredHeight === 'number') { newData.preferredHeight = preferredHeight; }
@@ -389,7 +431,7 @@ class DictionaryImporter {
         return newData;
     }
 
-    async _getImageMedia(path, context, entry) {
+    async _getImageMedia(context, path, entry) {
         const {media} = context;
         const {dictionary, reading} = entry;
 

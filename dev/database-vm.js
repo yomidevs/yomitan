@@ -68,6 +68,10 @@ class Image {
         }
     }
 
+    removeAttribute() {
+        // NOP
+    }
+
     async _delayTriggerLoad() {
         await Promise.resolve();
         for (const callback of this._loadCallbacks) {

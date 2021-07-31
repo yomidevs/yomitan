@@ -86,7 +86,7 @@ function clearDatabase(timeout) {
 async function testDatabase1() {
     // Load dictionary data
     const testDictionary = createTestDictionaryArchive('valid-dictionary1');
-    const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
+    const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
     const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
 
     const title = testDictionaryIndex.title;
@@ -766,7 +766,7 @@ async function testFindTagForTitle1(database, title) {
 async function testDatabase2() {
     // Load dictionary data
     const testDictionary = createTestDictionaryArchive('valid-dictionary1');
-    const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
+    const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
     const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
 
     const title = testDictionaryIndex.title;
@@ -823,7 +823,7 @@ async function testDatabase3() {
 
     for (const invalidDictionary of invalidDictionaries) {
         const testDictionary = createTestDictionaryArchive(invalidDictionary);
-        const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
+        const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
 
         let error = null;
         try {

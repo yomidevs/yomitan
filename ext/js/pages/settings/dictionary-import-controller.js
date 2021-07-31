@@ -281,7 +281,7 @@ class DictionaryImportController {
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result);
             reader.onerror = () => reject(reader.error);
-            reader.readAsBinaryString(file);
+            reader.readAsArrayBuffer(file);
         });
     }
 
