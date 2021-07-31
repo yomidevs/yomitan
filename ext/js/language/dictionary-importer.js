@@ -42,7 +42,7 @@ class DictionaryImporter {
 
         // Read and validate index
         const indexFileName = 'index.json';
-        const indexFile = archive.files[indexFileName];
+        const indexFile = archive.file(indexFileName);
         if (!indexFile) {
             throw new Error('No dictionary index found in archive');
         }
@@ -65,80 +65,30 @@ class DictionaryImporter {
         }
 
         // Data format converters
-        const convertTermBankEntry = (entry) => {
-            if (version === 1) {
-                const [expression, reading, definitionTags, rules, score, ...glossary] = entry;
-                return {expression, reading, definitionTags, rules, score, glossary};
-            } else {
-                const [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
-                return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags};
-            }
-        };
-
-        const convertTermMetaBankEntry = (entry) => {
-            const [expression, mode, data] = entry;
-            return {expression, mode, data};
-        };
-
-        const convertKanjiBankEntry = (entry) => {
-            if (version === 1) {
-                const [character, onyomi, kunyomi, tags, ...meanings] = entry;
-                return {character, onyomi, kunyomi, tags, meanings};
-            } else {
-                const [character, onyomi, kunyomi, tags, meanings, stats] = entry;
-                return {character, onyomi, kunyomi, tags, meanings, stats};
-            }
-        };
-
-        const convertKanjiMetaBankEntry = (entry) => {
-            const [character, mode, data] = entry;
-            return {character, mode, data};
-        };
-
-        const convertTagBankEntry = (entry) => {
-            const [name, category, order, notes, score] = entry;
-            return {name, category, order, notes, score};
-        };
-
-        // Archive file reading
-        const readFileSequence = async (fileNameFormat, convertEntry, schema) => {
-            const results = [];
-            for (let i = 1; true; ++i) {
-                const fileName = fileNameFormat.replace(/\?/, `${i}`);
-                const file = archive.files[fileName];
-                if (!file) { break; }
-
-                const entries = JSON.parse(await file.async('string'));
-                this._validateJsonSchema(entries, schema, fileName);
-
-                for (let entry of entries) {
-                    entry = convertEntry(entry);
-                    entry.dictionary = dictionaryTitle;
-                    results.push(entry);
-                }
-            }
-            return results;
-        };
+        const convertTermBankEntry = (version === 1 ? this._convertTermBankEntryV1.bind(this) : this._convertTermBankEntryV3.bind(this));
+        const convertTermMetaBankEntry = this._convertTermMetaBankEntry.bind(this);
+        const convertKanjiBankEntry = (version === 1 ? this._convertKanjiBankEntryV1.bind(this) : this._convertKanjiBankEntryV3.bind(this));
+        const convertKanjiMetaBankEntry = this._convertKanjiMetaBankEntry.bind(this);
+        const convertTagBankEntry = this._convertTagBankEntry.bind(this);
 
         // Load schemas
         const dataBankSchemaPaths = this._getDataBankSchemaPaths(version);
         const dataBankSchemas = await Promise.all(dataBankSchemaPaths.map((path) => this._getSchema(path)));
 
-        // Load data
-        const termList      = await readFileSequence('term_bank_?.json',       convertTermBankEntry,      dataBankSchemas[0]);
-        const termMetaList  = await readFileSequence('term_meta_bank_?.json',  convertTermMetaBankEntry,  dataBankSchemas[1]);
-        const kanjiList     = await readFileSequence('kanji_bank_?.json',      convertKanjiBankEntry,     dataBankSchemas[2]);
-        const kanjiMetaList = await readFileSequence('kanji_meta_bank_?.json', convertKanjiMetaBankEntry, dataBankSchemas[3]);
-        const tagList       = await readFileSequence('tag_bank_?.json',        convertTagBankEntry,       dataBankSchemas[4]);
+        // Files
+        const termFiles      = this._getArchiveFiles(archive, 'term_bank_?.json');
+        const termMetaFiles  = this._getArchiveFiles(archive, 'term_meta_bank_?.json');
+        const kanjiFiles     = this._getArchiveFiles(archive, 'kanji_bank_?.json');
+        const kanjiMetaFiles = this._getArchiveFiles(archive, 'kanji_meta_bank_?.json');
+        const tagFiles       = this._getArchiveFiles(archive, 'tag_bank_?.json');
 
-        // Old tags
-        const indexTagMeta = index.tagMeta;
-        if (typeof indexTagMeta === 'object' && indexTagMeta !== null) {
-            for (const name of Object.keys(indexTagMeta)) {
-                const {category, order, notes, score} = indexTagMeta[name];
-                tagList.push({name, category, order, notes, score});
-            }
-        }
+        // Load data
+        const termList      = await this._readFileSequence(termFiles,      convertTermBankEntry,      dataBankSchemas[0], dictionaryTitle);
+        const termMetaList  = await this._readFileSequence(termMetaFiles,  convertTermMetaBankEntry,  dataBankSchemas[1], dictionaryTitle);
+        const kanjiList     = await this._readFileSequence(kanjiFiles,     convertKanjiBankEntry,     dataBankSchemas[2], dictionaryTitle);
+        const kanjiMetaList = await this._readFileSequence(kanjiMetaFiles, convertKanjiMetaBankEntry, dataBankSchemas[3], dictionaryTitle);
+        const tagList       = await this._readFileSequence(tagFiles,       convertTagBankEntry,       dataBankSchemas[4], dictionaryTitle);
+        this._addOldIndexTags(index, tagList, dictionaryTitle);
 
         // Prefix wildcard support
         const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
@@ -500,5 +450,75 @@ class DictionaryImporter {
             throw new Error(`Failed to fetch ${url}: ${response.status}`);
         }
         return await response.json();
+    }
+
+    _convertTermBankEntryV1(entry, dictionary) {
+        const [expression, reading, definitionTags, rules, score, ...glossary] = entry;
+        return {expression, reading, definitionTags, rules, score, glossary, dictionary};
+    }
+
+    _convertTermBankEntryV3(entry, dictionary) {
+        const [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
+        return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, dictionary};
+    }
+
+    _convertTermMetaBankEntry(entry, dictionary) {
+        const [expression, mode, data] = entry;
+        return {expression, mode, data, dictionary};
+    }
+
+    _convertKanjiBankEntryV1(entry, dictionary) {
+        const [character, onyomi, kunyomi, tags, ...meanings] = entry;
+        return {character, onyomi, kunyomi, tags, meanings, dictionary};
+    }
+
+    _convertKanjiBankEntryV3(entry, dictionary) {
+        const [character, onyomi, kunyomi, tags, meanings, stats] = entry;
+        return {character, onyomi, kunyomi, tags, meanings, stats, dictionary};
+    }
+
+    _convertKanjiMetaBankEntry(entry, dictionary) {
+        const [character, mode, data] = entry;
+        return {character, mode, data, dictionary};
+    }
+
+    _convertTagBankEntry(entry, dictionary) {
+        const [name, category, order, notes, score] = entry;
+        return {name, category, order, notes, score, dictionary};
+    }
+
+    _addOldIndexTags(index, results, dictionary) {
+        const {tagMeta} = index;
+        if (typeof tagMeta !== 'object' || tagMeta === null) { return; }
+        for (const name of Object.keys(tagMeta)) {
+            const {category, order, notes, score} = tagMeta[name];
+            results.push({name, category, order, notes, score, dictionary});
+        }
+    }
+
+    _getArchiveFiles(archive, fileNameFormat) {
+        const indexPosition = fileNameFormat.indexOf('?');
+        const prefix = fileNameFormat.substring(0, indexPosition);
+        const suffix = fileNameFormat.substring(indexPosition + 1);
+        const results = [];
+        for (let i = 1; true; ++i) {
+            const fileName = `${prefix}${i}${suffix}`;
+            const file = archive.file(fileName);
+            if (!file) { break; }
+            results.push(file);
+        }
+        return results;
+    }
+
+    async _readFileSequence(files, convertEntry, schema, dictionaryTitle) {
+        const results = [];
+        for (const file of files) {
+            const entries = JSON.parse(await file.async('string'));
+            this._validateJsonSchema(entries, schema, file.name);
+            for (const entry of entries) {
+                results.push(convertEntry(entry, dictionaryTitle));
+            }
+        }
+        return results;
     }
 }
