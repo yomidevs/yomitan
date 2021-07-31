@@ -24,7 +24,8 @@
 class DictionaryImporter {
     constructor(mediaLoader, onProgress) {
         this._mediaLoader = mediaLoader;
-        this._onProgress = onProgress;
+        this._onProgress = typeof onProgress === 'function' ? onProgress : () => {};
+        this._progressData = null;
     }
 
     async importDictionary(dictionaryDatabase, archiveContent, details) {
@@ -35,7 +36,7 @@ class DictionaryImporter {
             throw new Error('Database is not ready');
         }
 
-        const hasOnProgress = (typeof this._onProgress === 'function');
+        this._progressReset();
 
         // Read archive
         const archive = await JSZip.loadAsync(archiveContent);
@@ -72,6 +73,7 @@ class DictionaryImporter {
         const convertTagBankEntry = this._convertTagBankEntry.bind(this);
 
         // Load schemas
+        this._progressNextStep(0);
         const dataBankSchemaPaths = this._getDataBankSchemaPaths(version);
         const dataBankSchemas = await Promise.all(dataBankSchemaPaths.map((path) => this._getSchema(path)));
 
@@ -83,6 +85,7 @@ class DictionaryImporter {
         const tagFiles       = this._getArchiveFiles(archive, 'tag_bank_?.json');
 
         // Load data
+        this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
         const termList      = await this._readFileSequence(termFiles,      convertTermBankEntry,      dataBankSchemas[0], dictionaryTitle);
         const termMetaList  = await this._readFileSequence(termMetaFiles,  convertTermMetaBankEntry,  dataBankSchemas[1], dictionaryTitle);
         const kanjiList     = await this._readFileSequence(kanjiFiles,     convertKanjiBankEntry,     dataBankSchemas[2], dictionaryTitle);
@@ -100,17 +103,26 @@ class DictionaryImporter {
         }
 
         // Extended data support
+        this._progressNextStep(termList.length);
+        const formatProgressInterval = 1000;
         const requirements = [];
-        for (const entry of termList) {
+        for (let i = 0, ii = termList.length; i < ii; ++i) {
+            const entry = termList[i];
             const glossaryList = entry.glossary;
-            for (let i = 0, ii = glossaryList.length; i < ii; ++i) {
-                const glossary = glossaryList[i];
+            for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
+                const glossary = glossaryList[j];
                 if (typeof glossary !== 'object' || glossary === null) { continue; }
-                glossaryList[i] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
+                glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
+            }
+            if ((i % formatProgressInterval) === 0) {
+                this._progressData.index = i;
+                this._progress();
             }
         }
+        this._progress();
 
         // Async requirements
+        this._progressNextStep(requirements.length);
         const {media} = await this._resolveAsyncRequirements(requirements, archive);
 
         // Add dictionary
@@ -119,15 +131,8 @@ class DictionaryImporter {
         dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
 
         // Add data
+        this._progressNextStep(termList.length + termMetaList.length + kanjiList.length + kanjiMetaList.length + tagList.length);
         const errors = [];
-        const total = (
-            termList.length +
-            termMetaList.length +
-            kanjiList.length +
-            kanjiMetaList.length +
-            tagList.length
-        );
-        let loadedCount = 0;
         const maxTransactionLength = 1000;
 
         const bulkAdd = async (objectStoreName, entries) => {
@@ -141,10 +146,8 @@ class DictionaryImporter {
                     errors.push(e);
                 }
 
-                loadedCount += count;
-                if (hasOnProgress) {
-                    this._onProgress(total, loadedCount);
-                }
+                this._progressData.index += count;
+                this._progress();
             }
         };
 
@@ -155,7 +158,30 @@ class DictionaryImporter {
         await bulkAdd('tagMeta', tagList);
         await bulkAdd('media', media);
 
+        this._progress();
+
         return {result: summary, errors};
+    }
+
+    _progressReset() {
+        this._progressData = {
+            stepIndex: 0,
+            stepCount: 6,
+            index: 0,
+            count: 0
+        };
+        this._progress();
+    }
+
+    _progressNextStep(count) {
+        ++this._progressData.stepIndex;
+        this._progressData.index = 0;
+        this._progressData.count = count;
+        this._progress();
+    }
+
+    _progress() {
+        this._onProgress(this._progressData);
     }
 
     _createSummary(dictionaryTitle, version, index, details) {
@@ -328,6 +354,8 @@ class DictionaryImporter {
                 return;
         }
         Object.assign(target, result);
+        ++this._progressData.index;
+        this._progress();
     }
 
     async _resolveDictionaryTermGlossaryImage(context, data, entry) {
@@ -500,10 +528,31 @@ class DictionaryImporter {
     }
 
     async _readFileSequence(files, convertEntry, schema, dictionaryTitle) {
+        const progressData = this._progressData;
+        let count = 0;
+        let startIndex = 0;
+        if (typeof this._onProgress === 'function') {
+            schema.progressInterval = 1000;
+            schema.progress = (s) => {
+                const index = s.getValueStackLength() > 1 ? s.getValueStackItem(1).path : 0;
+                progressData.index = startIndex + (index / count);
+                this._progress();
+            };
+        }
+
         const results = [];
         for (const file of files) {
             const entries = JSON.parse(await file.async('string'));
+
+            count = Array.isArray(entries) ? Math.max(entries.length, 1) : 1;
+            startIndex = progressData.index;
+            this._progress();
+
             this._validateJsonSchema(entries, schema, file.name);
+
+            progressData.index = startIndex + 1;
+            this._progress();
+
             for (const entry of entries) {
                 results.push(convertEntry(entry, dictionaryTitle));
             }

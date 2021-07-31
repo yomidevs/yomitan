@@ -140,13 +140,28 @@ class DictionaryImportController {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported
             };
 
-            const onProgress = (total, current) => {
-                const percent = (current / total * 100.0);
+            let statusPrefix = '';
+            let stepIndex = -2;
+            const onProgress = (data) => {
+                const {stepIndex: stepIndex2, index, count} = data;
+                if (stepIndex !== stepIndex2) {
+                    stepIndex = stepIndex2;
+                    const labelText = `${statusPrefix} - Step ${stepIndex2 + 1} of ${data.stepCount}: ${this._getImportLabel(stepIndex2)}...`;
+                    for (const label of infoLabels) { label.textContent = labelText; }
+                }
+
+                const percent = count > 0 ? (index / count * 100.0) : 0.0;
                 const cssString = `${percent}%`;
-                const statusString = `${percent.toFixed(0)}%`;
+                const statusString = `${Math.floor(percent).toFixed(0)}%`;
                 for (const progressBar of progressBars) { progressBar.style.width = cssString; }
                 for (const label of statusLabels) { label.textContent = statusString; }
-                this._triggerStorageChanged();
+
+                switch (stepIndex2) {
+                    case -2: // Initialize
+                    case 5: // Data import
+                        this._triggerStorageChanged();
+                        break;
+                }
             };
 
             const fileCount = files.length;
@@ -156,10 +171,13 @@ class DictionaryImportController {
                     importInfo.textContent = `(${i + 1} of ${fileCount})`;
                 }
 
-                onProgress(1, 0);
-
-                const labelText = `Importing dictionary${fileCount > 1 ? ` (${i + 1} of ${fileCount})` : ''}...`;
-                for (const label of infoLabels) { label.textContent = labelText; }
+                statusPrefix = `Importing dictionary${fileCount > 1 ? ` (${i + 1} of ${fileCount})` : ''}`;
+                onProgress({
+                    stepIndex: -1,
+                    stepCount: 6,
+                    index: 0,
+                    count: 0
+                });
                 if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
 
                 await this._importDictionary(files[i], importDetails, onProgress);
@@ -177,6 +195,19 @@ class DictionaryImportController {
             this._setSpinnerVisible(false);
             this._setModifying(false);
             this._triggerStorageChanged();
+        }
+    }
+
+    _getImportLabel(stepIndex) {
+        switch (stepIndex) {
+            case -1:
+            case 0: return 'Loading dictionary';
+            case 1: return 'Loading schemas';
+            case 2: return 'Validating data';
+            case 3: return 'Processing data';
+            case 4: return 'Post-processing data';
+            case 5: return 'Importing data';
+            default: return '';
         }
     }
 
