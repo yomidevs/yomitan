@@ -111,6 +111,7 @@ class Display extends EventDispatcher {
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         this._elementOverflowController = new ElementOverflowController();
         this._displayAnki = new DisplayAnki(this, japaneseUtil);
+        this._popupVisible = false;
 
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
@@ -132,7 +133,8 @@ class Display extends EventDispatcher {
             ['clearAutoPlayTimer', {async: false, handler: this._onMessageClearAutoPlayTimer.bind(this)}],
             ['setCustomCss',       {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
             ['setContentScale',    {async: false, handler: this._onMessageSetContentScale.bind(this)}],
-            ['configure',          {async: true,  handler: this._onMessageConfigure.bind(this)}]
+            ['configure',          {async: true,  handler: this._onMessageConfigure.bind(this)}],
+            ['visibilityChanged',  {async: false, handler: this._onMessageVisibilityChanged.bind(this)}]
         ]);
         this.registerWindowMessageHandlers([
             ['extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
@@ -206,6 +208,10 @@ class Display extends EventDispatcher {
 
     get fullQuery() {
         return this._fullQuery;
+    }
+
+    get popupVisible() {
+        return this._popupVisible;
     }
 
     async prepare() {
@@ -518,6 +524,14 @@ class Display extends EventDispatcher {
         this._childrenSupported = childrenSupported;
         this._setContentScale(scale);
         await this.setOptionsContext(optionsContext);
+    }
+
+    _onMessageVisibilityChanged({value}) {
+        this._popupVisible = value;
+        if (!value) {
+            this._displayAudio.clearAutoPlayTimer();
+            this._displayAudio.stopAudio();
+        }
     }
 
     _onMessageExtensionUnloaded() {

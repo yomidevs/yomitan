@@ -38,6 +38,7 @@ class Popup extends EventDispatcher {
         this._injectPromise = null;
         this._injectPromiseComplete = false;
         this._visible = new DynamicProperty(false);
+        this._visibleValue = false;
         this._options = null;
         this._optionsContext = null;
         this._contentScale = 1.0;
@@ -441,7 +442,10 @@ class Popup extends EventDispatcher {
     }
 
     _onVisibleChange({value}) {
+        if (this._visibleValue === value) { return; }
+        this._visibleValue = value;
         this._frame.style.setProperty('visibility', value ? 'visible' : 'hidden', 'important');
+        this._invokeSafe('visibilityChanged', {value});
     }
 
     _focusParent() {
