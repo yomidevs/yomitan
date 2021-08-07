@@ -2164,6 +2164,61 @@ class Backend {
         });
     }
 
+    _injectScript(file, tabId, frameId) {
+        if (isObject(chrome.tabs) && typeof chrome.tabs.executeScript === 'function') {
+            return this._injectScriptMV2(file, tabId, frameId);
+        } else if (isObject(chrome.scripting) && typeof chrome.scripting.executeScript === 'function') {
+            return this._injectScriptMV3(file, tabId, frameId);
+        } else {
+            return Promise.reject(new Error('executeScript function not available'));
+        }
+    }
+
+    _injectScriptMV2(file, tabId, frameId) {
+        return new Promise((resolve, reject) => {
+            const details = {
+                allFrames: false,
+                frameId,
+                file,
+                matchAboutBlank: true,
+                runAt: 'document_start'
+            };
+            const callback = (results) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    const result = results[0];
+                    resolve({frameId, result});
+                }
+            };
+            chrome.tabs.executeScript(tabId, details, callback);
+        });
+    }
+
+    _injectScriptMV3(file, tabId, frameId) {
+        return new Promise((resolve, reject) => {
+            const details = {
+                files: [file],
+                target: {
+                    allFrames: false,
+                    frameIds: [frameId],
+                    tabId
+                }
+            };
+            const callback = (results) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    const {frameId: frameId2, result} = results[0];
+                    resolve({frameId: frameId2, result});
+                }
+            };
+            chrome.scripting.executeScript(details, callback);
+        });
+    }
+
     _getTabById(tabId) {
         return new Promise((resolve, reject) => {
             chrome.tabs.get(
@@ -2215,7 +2270,7 @@ class Backend {
         }
     }
 
-    _updateTabAccessibility(url, tab, frameId) {
+    async _updateTabAccessibility(url, tab, frameId) {
         let file = null;
 
         switch (new URL(url).hostname) {
@@ -2231,14 +2286,6 @@ class Backend {
 
         if (file === null) { return; }
 
-        const details = {
-            allFrames: false,
-            frameId,
-            file,
-            matchAboutBlank: true,
-            runAt: 'document_start'
-        };
-        const callback = () => this._checkLastError(chrome.runtime.lastError);
-        chrome.tabs.executeScript(tab.id, details, callback);
+        return await this._injectScript(file, tab.id, frameId);
     }
 }
