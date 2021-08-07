@@ -198,6 +198,16 @@ class Database {
         });
     }
 
+    persistData(objectStoreName) {
+        return new Promise((resolve, reject) => {
+            const transaction = this.transaction([objectStoreName], 'readonly');
+            const objectStore = transaction.objectStore(objectStoreName);
+            const cursor = objectStore.openCursor();
+            cursor.onerror = (e) => reject(e.target.error);
+            cursor.onsuccess = () => resolve();
+        });
+    }
+
     static deleteDatabase(databaseName) {
         return new Promise((resolve, reject) => {
             const request = indexedDB.deleteDatabase(databaseName);
