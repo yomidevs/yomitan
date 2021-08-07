@@ -37,6 +37,7 @@
             <a href="#!clipboard"        class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="clipboard"></span></span><span class="outline-item-label">Clipboard</span></a>
             <a href="#!shortcuts"        class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="keyboard"></span></span><span class="outline-item-label">Shortcuts</span></a>
             <a href="#!backup"           class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="backup"></span></span><span class="outline-item-label">Backup</span></a>
+            <a href="#!accessibility"    class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="accessibility"></span></span><span class="outline-item-label">Accessibility</span></a>
             <a href="#!security"         class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="lock"></span></span><span class="outline-item-label">Security</span></a>
         </div>
         <div class="sidebar-bottom">
@@ -1814,6 +1815,39 @@
                 </div>
             </div>
         </div></div>
+    </div>
+
+    <!-- Accessibility -->
+    <div class="heading-container advanced-only">
+        <div class="heading-container-icon"><span class="icon" data-icon="accessibility"></span></div>
+        <div class="heading-container-left"><h2 id="accessibility"><a href="#!accessibility">Accessibility</a></h2></div>
+    </div>
+    <div class="settings-group advanced-only">
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Force HTML-based rendering for Google Docs
+                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="accessibility.forceGoogleDocsHtmlRendering"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    Google Docs is moving from HTML-based rendering to
+                    <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas" target="_blank" rel="noopener noreferrer">canvas-based</a>
+                    rendering to display content<sup><a href="https://workspaceupdates.googleblog.com/2021/05/Google-Docs-Canvas-Based-Rendering-Update.html" target="_blank" rel="noopener noreferrer">[2]</a></sup>,
+                    which prevents Yomichan from being able to scan text.
+                    Enabling this option will force HTML-based rendering to be used.
+                </p>
+                <p>
+                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
     </div>
 
     <!-- Security -->

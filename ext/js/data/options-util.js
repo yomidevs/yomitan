@@ -462,7 +462,8 @@ class OptionsUtil {
             {async: true,  update: this._updateVersion10.bind(this)},
             {async: false, update: this._updateVersion11.bind(this)},
             {async: true,  update: this._updateVersion12.bind(this)},
-            {async: true,  update: this._updateVersion13.bind(this)}
+            {async: true,  update: this._updateVersion13.bind(this)},
+            {async: false, update: this._updateVersion14.bind(this)}
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -861,6 +862,17 @@ class OptionsUtil {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v13.handlebars');
         for (const profile of options.profiles) {
             profile.options.anki.duplicateScopeCheckAllModels = false;
+        }
+        return options;
+    }
+
+    _updateVersion14(options) {
+        // Version 14 changes:
+        //  Added accessibility options.
+        for (const profile of options.profiles) {
+            profile.options.accessibility = {
+                forceGoogleDocsHtmlRendering: false
+            };
         }
         return options;
     }

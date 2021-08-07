@@ -32,11 +32,14 @@
     },
     "content_scripts": [
         {
+            "run_at": "document_idle",
             "matches": [
                 "http://*/*",
                 "https://*/*",
                 "file://*/*"
             ],
+            "match_about_blank": true,
+            "all_frames": true,
             "js": [
                 "js/core.js",
                 "js/yomichan.js",
@@ -58,9 +61,20 @@
                 "js/language/text-scanner.js",
                 "js/script/dynamic-loader.js",
                 "js/app/content-script-main.js"
+            ]
+        },
+        {
+            "run_at": "document_start",
+            "matches": [
+                "http://*/*",
+                "https://*/*",
+                "file://*/*"
             ],
             "match_about_blank": true,
-            "all_frames": true
+            "all_frames": true,
+            "js": [
+                "js/document-start.js"
+            ]
         }
     ],
     "minimum_chrome_version": "57.0.0.0",

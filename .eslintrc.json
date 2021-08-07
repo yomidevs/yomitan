@@ -120,6 +120,7 @@
             "files": ["ext/**/*.js"],
             "excludedFiles": [
                 "ext/js/core.js",
+                "ext/js/document-start.js",
                 "ext/js/**/sandbox/**/*.js"
             ],
             "globals": {
@@ -146,6 +147,7 @@
             "files": ["ext/**/*.js"],
             "excludedFiles": [
                 "ext/js/core.js",
+                "ext/js/document-start.js",
                 "ext/js/yomichan.js",
                 "ext/js/**/sandbox/**/*.js"
             ],

@@ -503,6 +503,9 @@ function createProfileOptionsUpdatedTestData1() {
             enableSearchPageMonitor: false,
             autoSearchContent: true,
             maximumSearchLength: 1000
+        },
+        accessibility: {
+            forceGoogleDocsHtmlRendering: false
         }
     };
 }
@@ -590,7 +593,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 13,
+        version: 14,
         global: {
             database: {
                 prefixWildcardsSupported: false

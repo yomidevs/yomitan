@@ -124,7 +124,8 @@ class Backend {
             ['isTabSearchPopup',             {async: true,  contentScript: true,  handler: this._onApiIsTabSearchPopup.bind(this)}],
             ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}],
             ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}],
-            ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}]
+            ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
+            ['documentStart',                {async: false, contentScript: true,  handler: this._onDocumentStart.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -743,6 +744,12 @@ class Backend {
 
     _onApiTextHasJapaneseCharacters({text}) {
         return this._japaneseUtil.isStringPartiallyJapanese(text);
+    }
+
+    _onDocumentStart(params, sender) {
+        const {tab, frameId, url} = sender;
+        if (typeof url !== 'string' || typeof tab !== 'object' || tab === null) { return; }
+        this._updateTabAccessibility(url, tab, frameId);
     }
 
     // Command handlers
@@ -2206,5 +2213,32 @@ class Backend {
         } catch (e) {
             // NOP
         }
+    }
+
+    _updateTabAccessibility(url, tab, frameId) {
+        let file = null;
+
+        switch (new URL(url).hostname) {
+            case 'docs.google.com':
+                {
+                    const optionsContext = {depth: 0, url};
+                    const options = this._getProfileOptions(optionsContext);
+                    if (!options.accessibility.forceGoogleDocsHtmlRendering) { return; }
+                    file = 'js/accessibility/google-docs.js';
+                }
+                break;
+        }
+
+        if (file === null) { return; }
+
+        const details = {
+            allFrames: false,
+            frameId,
+            file,
+            matchAboutBlank: true,
+            runAt: 'document_start'
+        };
+        const callback = () => this._checkLastError(chrome.runtime.lastError);
+        chrome.tabs.executeScript(tab.id, details, callback);
     }
 }

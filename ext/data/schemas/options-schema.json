@@ -72,7 +72,8 @@
                             "anki",
                             "sentenceParsing",
                             "inputs",
-                            "clipboard"
+                            "clipboard",
+                            "accessibility"
                         ],
                         "properties": {
                             "general": {
@@ -1107,6 +1108,18 @@
                                         "type": "integer",
                                         "default": 1000,
                                         "minimum": 0
+                                    }
+                                }
+                            },
+                            "accessibility": {
+                                "type": "object",
+                                "required": [
+                                    "forceGoogleDocsHtmlRendering"
+                                ],
+                                "properties": {
+                                    "forceGoogleDocsHtmlRendering": {
+                                        "type": "boolean",
+                                        "default": false
                                     }
                                 }
                             }
