@@ -111,7 +111,7 @@ class Display extends EventDispatcher {
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         this._elementOverflowController = new ElementOverflowController();
         this._displayAnki = new DisplayAnki(this, japaneseUtil);
-        this._popupVisible = false;
+        this._frameVisible = (pageType === 'search');
 
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
@@ -210,8 +210,8 @@ class Display extends EventDispatcher {
         return this._fullQuery;
     }
 
-    get popupVisible() {
-        return this._popupVisible;
+    get frameVisible() {
+        return this._frameVisible;
     }
 
     async prepare() {
@@ -527,7 +527,7 @@ class Display extends EventDispatcher {
     }
 
     _onMessageVisibilityChanged({value}) {
-        this._popupVisible = value;
+        this._frameVisible = value;
         if (!value) {
             this._displayAudio.clearAutoPlayTimer();
             this._displayAudio.stopAudio();
