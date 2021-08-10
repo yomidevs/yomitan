@@ -77,7 +77,7 @@ class DisplayAudio {
     }
 
     setupEntriesComplete() {
-        if (!this._autoPlay || !this._display.popupVisible) { return; }
+        if (!this._autoPlay || !this._display.frameVisible) { return; }
 
         this.clearAutoPlayTimer();
 
