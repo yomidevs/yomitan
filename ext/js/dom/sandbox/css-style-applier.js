@@ -43,7 +43,15 @@ class CssStyleApplier {
      * Loads the data file for use.
      */
     async prepare() {
-        this._styleData = await this._fetchJsonAsset(this._styleDataUrl);
+        let styleData;
+        try {
+            styleData = await this._fetchJsonAsset(this._styleDataUrl);
+        } catch (e) {
+            console.error(e);
+        }
+        if (Array.isArray(styleData)) {
+            this._styleData = styleData;
+        }
     }
 
     /**
