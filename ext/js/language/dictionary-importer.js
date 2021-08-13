@@ -149,10 +149,6 @@ class DictionaryImporter {
                 this._progressData.index += count;
                 this._progress();
             }
-
-            // This function is required in order to make the added data persist after the worker is terminated.
-            // https://bugs.chromium.org/p/chromium/issues/detail?id=1237686
-            await dictionaryDatabase.persistData(objectStoreName);
         };
 
         await bulkAdd('terms', termList);

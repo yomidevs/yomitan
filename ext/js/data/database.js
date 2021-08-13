@@ -76,38 +76,30 @@ class Database {
                 return;
             }
 
-            const end = start + count;
-            let completedCount = 0;
-            const onError = (e) => reject(e.target.error);
-            const onSuccess = () => {
-                if (++completedCount >= count) {
-                    resolve();
-                }
-            };
-
             const transaction = this.transaction([objectStoreName], 'readwrite');
+            transaction.onerror = (e) => reject(e.target.error);
+            transaction.oncomplete = () => resolve();
             const objectStore = transaction.objectStore(objectStoreName);
-            for (let i = start; i < end; ++i) {
-                const request = objectStore.add(items[i]);
-                request.onerror = onError;
-                request.onsuccess = onSuccess;
+            for (let i = start, ii = start + count; i < ii; ++i) {
+                objectStore.add(items[i]);
             }
+            transaction.commit();
         });
     }
 
-    getAll(objectStoreOrIndex, query, resolve, reject, data) {
+    getAll(objectStoreOrIndex, query, onSuccess, onError, data) {
         if (typeof objectStoreOrIndex.getAll === 'function') {
-            this._getAllFast(objectStoreOrIndex, query, resolve, reject, data);
+            this._getAllFast(objectStoreOrIndex, query, onSuccess, onError, data);
         } else {
-            this._getAllUsingCursor(objectStoreOrIndex, query, resolve, reject, data);
+            this._getAllUsingCursor(objectStoreOrIndex, query, onSuccess, onError, data);
         }
     }
 
-    getAllKeys(objectStoreOrIndex, query, resolve, reject) {
-        if (typeof objectStoreOrIndex.getAll === 'function') {
-            this._getAllKeysFast(objectStoreOrIndex, query, resolve, reject);
+    getAllKeys(objectStoreOrIndex, query, onSuccess, onError) {
+        if (typeof objectStoreOrIndex.getAllKeys === 'function') {
+            this._getAllKeysFast(objectStoreOrIndex, query, onSuccess, onError);
         } else {
-            this._getAllKeysUsingCursor(objectStoreOrIndex, query, resolve, reject);
+            this._getAllKeysUsingCursor(objectStoreOrIndex, query, onSuccess, onError);
         }
     }
 
@@ -170,16 +162,20 @@ class Database {
     delete(objectStoreName, key) {
         return new Promise((resolve, reject) => {
             const transaction = this.transaction([objectStoreName], 'readwrite');
+            transaction.onerror = (e) => reject(e.target.error);
+            transaction.oncomplete = () => resolve();
             const objectStore = transaction.objectStore(objectStoreName);
-            const request = objectStore.delete(key);
-            request.onerror = (e) => reject(e.target.error);
-            request.onsuccess = () => resolve();
+            objectStore.delete(key);
+            transaction.commit();
         });
     }
 
     bulkDelete(objectStoreName, indexName, query, filterKeys=null, onProgress=null) {
         return new Promise((resolve, reject) => {
             const transaction = this.transaction([objectStoreName], 'readwrite');
+            transaction.onerror = (e) => reject(e.target.error);
+            transaction.oncomplete = () => resolve();
+
             const objectStore = transaction.objectStore(objectStoreName);
             const objectStoreOrIndex = indexName !== null ? objectStore.index(indexName) : objectStore;
 
@@ -188,23 +184,14 @@ class Database {
                     if (typeof filterKeys === 'function') {
                         keys = filterKeys(keys);
                     }
-                    this._bulkDeleteInternal(objectStore, keys, onProgress, resolve, reject);
+                    this._bulkDeleteInternal(objectStore, keys, onProgress);
+                    transaction.commit();
                 } catch (e) {
                     reject(e);
                 }
             };
 
             this.getAllKeys(objectStoreOrIndex, query, onGetKeys, reject);
-        });
-    }
-
-    persistData(objectStoreName) {
-        return new Promise((resolve, reject) => {
-            const transaction = this.transaction([objectStoreName], 'readonly');
-            const objectStore = transaction.objectStore(objectStoreName);
-            const cursor = objectStore.openCursor();
-            cursor.onerror = (e) => reject(e.target.error);
-            cursor.onsuccess = () => resolve();
         });
     }
 
@@ -266,77 +253,68 @@ class Database {
         return false;
     }
 
-    _getAllFast(objectStoreOrIndex, query, resolve, reject, data) {
+    _getAllFast(objectStoreOrIndex, query, onSuccess, onReject, data) {
         const request = objectStoreOrIndex.getAll(query);
-        request.onerror = (e) => reject(e.target.error, data);
-        request.onsuccess = (e) => resolve(e.target.result, data);
+        request.onerror = (e) => onReject(e.target.error, data);
+        request.onsuccess = (e) => onSuccess(e.target.result, data);
     }
 
-    _getAllUsingCursor(objectStoreOrIndex, query, resolve, reject, data) {
+    _getAllUsingCursor(objectStoreOrIndex, query, onSuccess, onReject, data) {
         const results = [];
         const request = objectStoreOrIndex.openCursor(query, 'next');
-        request.onerror = (e) => reject(e.target.error, data);
+        request.onerror = (e) => onReject(e.target.error, data);
         request.onsuccess = (e) => {
             const cursor = e.target.result;
             if (cursor) {
                 results.push(cursor.value);
                 cursor.continue();
             } else {
-                resolve(results, data);
+                onSuccess(results, data);
             }
         };
     }
 
-    _getAllKeysFast(objectStoreOrIndex, query, resolve, reject) {
+    _getAllKeysFast(objectStoreOrIndex, query, onSuccess, onError) {
         const request = objectStoreOrIndex.getAllKeys(query);
-        request.onerror = (e) => reject(e.target.error);
-        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => onError(e.target.error);
+        request.onsuccess = (e) => onSuccess(e.target.result);
     }
 
-    _getAllKeysUsingCursor(objectStoreOrIndex, query, resolve, reject) {
+    _getAllKeysUsingCursor(objectStoreOrIndex, query, onSuccess, onError) {
         const results = [];
         const request = objectStoreOrIndex.openKeyCursor(query, 'next');
-        request.onerror = (e) => reject(e.target.error);
+        request.onerror = (e) => onError(e.target.error);
         request.onsuccess = (e) => {
             const cursor = e.target.result;
             if (cursor) {
                 results.push(cursor.primaryKey);
                 cursor.continue();
             } else {
-                resolve(results);
+                onSuccess(results);
             }
         };
     }
 
-    _bulkDeleteInternal(objectStore, keys, onProgress, resolve, reject) {
+    _bulkDeleteInternal(objectStore, keys, onProgress) {
         const count = keys.length;
-        if (count === 0) {
-            resolve();
-            return;
-        }
+        if (count === 0) { return; }
 
         let completedCount = 0;
-        const hasProgress = (typeof onProgress === 'function');
-
-        const onError = (e) => reject(e.target.error);
         const onSuccess = () => {
             ++completedCount;
-            if (hasProgress) {
-                try {
-                    onProgress(completedCount, count);
-                } catch (e) {
-                    // NOP
-                }
-            }
-            if (completedCount >= count) {
-                resolve();
+            try {
+                onProgress(completedCount, count);
+            } catch (e) {
+                // NOP
             }
         };
 
+        const hasProgress = (typeof onProgress === 'function');
         for (const key of keys) {
             const request = objectStore.delete(key);
-            request.onerror = onError;
-            request.onsuccess = onSuccess;
+            if (hasProgress) {
+                request.onsuccess = onSuccess;
+            }
         }
     }
 }

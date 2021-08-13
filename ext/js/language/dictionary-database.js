@@ -317,10 +317,6 @@ class DictionaryDatabase {
         return this._db.bulkAdd(objectStoreName, items, start, count);
     }
 
-    persistData(objectStoreName) {
-        return this._db.persistData(objectStoreName);
-    }
-
     // Private
 
     _findMultiBulk(objectStoreName, indexNames, items, createQuery, predicate, createResult) {
