@@ -16,7 +16,7 @@
  */
 
 /* global
- * DictionaryImporterWorker
+ * DictionaryWorker
  */
 
 self.importScripts(
@@ -27,14 +27,14 @@ self.importScripts(
     '/js/general/cache-map.js',
     '/js/language/dictionary-database.js',
     '/js/language/dictionary-importer.js',
-    '/js/language/dictionary-importer-worker.js',
-    '/js/language/dictionary-importer-worker-media-loader.js',
+    '/js/language/dictionary-worker.js',
+    '/js/language/dictionary-worker-media-loader.js',
     '/js/media/media-util.js'
 );
 
 (() => {
     try {
-        const dictionaryImporterWorker = new DictionaryImporterWorker();
+        const dictionaryImporterWorker = new DictionaryWorker();
         dictionaryImporterWorker.prepare();
     } catch (e) {
         log.error(e);

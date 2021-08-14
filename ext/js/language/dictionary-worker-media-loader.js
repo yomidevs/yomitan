@@ -19,7 +19,7 @@
  * Class used for loading and validating media from a worker thread
  * during the dictionary import process.
  */
-class DictionaryImporterWorkerMediaLoader {
+class DictionaryWorkerMediaLoader {
     /**
      * Creates a new instance of the media loader.
      */

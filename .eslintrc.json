@@ -231,8 +231,8 @@
                 "ext/js/general/cache-map.js",
                 "ext/js/language/dictionary-database.js",
                 "ext/js/language/dictionary-importer.js",
-                "ext/js/language/dictionary-importer-worker.js",
-                "ext/js/language/dictionary-importer-worker-media-loader.js",
+                "ext/js/language/dictionary-worker.js",
+                "ext/js/language/dictionary-worker-media-loader.js",
                 "ext/js/media/media-util.js"
             ],
             "env": {
