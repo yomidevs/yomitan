@@ -16,7 +16,7 @@
  */
 
 /* global
- * DictionaryDatabase
+ * DictionaryDatabaseModifier
  */
 
 class DictionaryEntry {
@@ -679,19 +679,9 @@ class DictionaryController {
     }
 
     async _deleteDictionaryInternal(dictionaryTitle, onProgress) {
-        const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
-        try {
-            await dictionaryDatabase.deleteDictionary(dictionaryTitle, {rate: 1000}, onProgress);
-            yomichan.api.triggerDatabaseUpdated('dictionary', 'delete');
-        } finally {
-            dictionaryDatabase.close();
-        }
-    }
-
-    async _getPreparedDictionaryDatabase() {
-        const dictionaryDatabase = new DictionaryDatabase();
-        await dictionaryDatabase.prepare();
-        return dictionaryDatabase;
+        const dictionaryDatabaseModifier = new DictionaryDatabaseModifier();
+        await dictionaryDatabaseModifier.deleteDictionary(dictionaryTitle, onProgress);
+        yomichan.api.triggerDatabaseUpdated('dictionary', 'delete');
     }
 
     async _deleteDictionarySettings(dictionaryTitle) {

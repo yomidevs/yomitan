@@ -25,12 +25,22 @@ class DictionaryDatabaseModifier {
     }
 
     importDictionary(archiveContent, details, onProgress) {
-        return this._invoke('importDictionary', {details, archiveContent}, [archiveContent], onProgress);
+        return this._invoke(
+            'importDictionary',
+            {details, archiveContent},
+            [archiveContent],
+            onProgress,
+            this._formatimportDictionaryResult.bind(this)
+        );
+    }
+
+    deleteDictionary(dictionaryTitle, onProgress) {
+        return this._invoke('deleteDictionary', {dictionaryTitle}, [], onProgress);
     }
 
     // Private
 
-    _invoke(action, params, transfer, onProgress) {
+    _invoke(action, params, transfer, onProgress, formatResult) {
         return new Promise((resolve, reject) => {
             const worker = new Worker('/js/language/dictionary-worker-main.js', {});
             const details = {
@@ -39,7 +49,8 @@ class DictionaryDatabaseModifier {
                 resolve,
                 reject,
                 onMessage: null,
-                onProgress
+                onProgress,
+                formatResult
             };
             const onMessage = this._onMessage.bind(this, details);
             details.onMessage = onMessage;
@@ -54,15 +65,17 @@ class DictionaryDatabaseModifier {
         switch (action) {
             case 'complete':
                 {
-                    const {worker, resolve, reject, onMessage} = details;
+                    const {worker, resolve, reject, onMessage, formatResult} = details;
                     details.complete = true;
                     details.worker = null;
                     details.resolve = null;
                     details.reject = null;
                     details.onMessage = null;
+                    details.onProgress = null;
+                    details.formatResult = null;
                     worker.removeEventListener('message', onMessage);
                     worker.terminate();
-                    this._onMessageComplete(params, resolve, reject);
+                    this._onMessageComplete(params, resolve, reject, formatResult);
                 }
                 break;
             case 'progress':
@@ -74,12 +87,21 @@ class DictionaryDatabaseModifier {
         }
     }
 
-    _onMessageComplete(params, resolve, reject) {
+    _onMessageComplete(params, resolve, reject, formatResult) {
         const {error} = params;
         if (typeof error !== 'undefined') {
             reject(deserializeError(error));
         } else {
-            resolve(this._formatResult(params.result));
+            let {result} = params;
+            try {
+                if (typeof formatResult === 'function') {
+                    result = formatResult(result);
+                }
+            } catch (e) {
+                reject(e);
+                return;
+            }
+            resolve(result);
         }
     }
 
@@ -101,9 +123,8 @@ class DictionaryDatabaseModifier {
         worker.postMessage({action: 'getImageResolution.response', params: response});
     }
 
-    _formatResult(data) {
-        const {result, errors} = data;
-        const errors2 = errors.map((error) => deserializeError(error));
-        return {result, errors: errors2};
+    _formatimportDictionaryResult(result) {
+        result.errors = result.errors.map((error) => deserializeError(error));
+        return result;
     }
 }

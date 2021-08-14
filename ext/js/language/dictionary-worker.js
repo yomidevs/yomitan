@@ -36,7 +36,10 @@ class DictionaryWorker {
         const {action, params} = e.data;
         switch (action) {
             case 'importDictionary':
-                this._onImportDictionary(params);
+                this._onMessageWithProgress(params, this._importDictionary.bind(this));
+                break;
+            case 'deleteDictionary':
+                this._onMessageWithProgress(params, this._deleteDictionary.bind(this));
                 break;
             case 'getImageResolution.response':
                 this._mediaLoader.handleMessage(params);
@@ -44,7 +47,7 @@ class DictionaryWorker {
         }
     }
 
-    async _onImportDictionary({details, archiveContent}) {
+    async _onMessageWithProgress(params, handler) {
         const onProgress = (...args) => {
             self.postMessage({
                 action: 'progress',
@@ -53,7 +56,7 @@ class DictionaryWorker {
         };
         let response;
         try {
-            const result = await this._importDictionary(archiveContent, details, onProgress);
+            const result = await handler(params, onProgress);
             response = {result};
         } catch (e) {
             response = {error: serializeError(e)};
@@ -61,15 +64,24 @@ class DictionaryWorker {
         self.postMessage({action: 'complete', params: response});
     }
 
-    async _importDictionary(archiveContent, importDetails, onProgress) {
+    async _importDictionary({details, archiveContent}, onProgress) {
         const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
         try {
             const dictionaryImporter = new DictionaryImporter(this._mediaLoader, onProgress);
-            const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, importDetails);
+            const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
             return {
                 result,
                 errors: errors.map((error) => serializeError(error))
             };
+        } finally {
+            dictionaryDatabase.close();
+        }
+    }
+
+    async _deleteDictionary({dictionaryTitle}, onProgress) {
+        const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
+        try {
+            return await dictionaryDatabase.deleteDictionary(dictionaryTitle, {rate: 1000}, onProgress);
         } finally {
             dictionaryDatabase.close();
         }
