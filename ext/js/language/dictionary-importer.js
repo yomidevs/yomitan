@@ -125,13 +125,13 @@ class DictionaryImporter {
         this._progressNextStep(requirements.length);
         const {media} = await this._resolveAsyncRequirements(requirements, archive);
 
-        // Add dictionary
-        const summary = this._createSummary(dictionaryTitle, version, index, {prefixWildcardsSupported});
+        // Add dictionary descriptor
+        this._progressNextStep(termList.length + termMetaList.length + kanjiList.length + kanjiMetaList.length + tagList.length);
 
+        const summary = this._createSummary(dictionaryTitle, version, index, {prefixWildcardsSupported});
         dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
 
         // Add data
-        this._progressNextStep(termList.length + termMetaList.length + kanjiList.length + kanjiMetaList.length + tagList.length);
         const errors = [];
         const maxTransactionLength = 1000;
 
