@@ -1641,10 +1641,26 @@
   <g
      inkscape:groupmode="layer"
      id="layer53"
-     inkscape:label="Accessibility">
+     inkscape:label="Accessibility"
+     style="display:none">
     <path
        id="path1189"
        style="color:#000000;fill:#000000;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;-inkscape-stroke:none"
        d="M 8 1 A 1.5 1.5 0 0 0 6.5 2.5 A 1.5 1.5 0 0 0 8 4 A 1.5 1.5 0 0 0 9.5 2.5 A 1.5 1.5 0 0 0 8 1 z M 2.9296875 4.0019531 C 2.4975111 4.0322637 2.1340063 4.3374185 2.0292969 4.7578125 C 1.8952685 5.2939576 2.2215444 5.8371676 2.7578125 5.9707031 L 6 6.78125 C 6 6.78125 5.988306 8.9924546 5.75 10.058594 C 5.4674801 11.322537 4.3457031 13.574219 4.3457031 13.574219 C 4.1108364 14.073662 4.3250011 14.668952 4.8242188 14.904297 C 5.3236618 15.139164 5.9189521 14.924997 6.1542969 14.425781 L 8 10.503906 L 9.8457031 14.425781 C 10.081048 14.924999 10.676338 15.139164 11.175781 14.904297 C 11.674999 14.668952 11.889164 14.073662 11.654297 13.574219 C 11.654297 13.574219 10.53252 11.322537 10.25 10.058594 C 10.011694 8.9924545 10 6.78125 10 6.78125 L 13.242188 5.9707031 C 13.778455 5.8371674 14.104731 5.2939574 13.970703 4.7578125 C 13.865994 4.3374184 13.50249 4.0322635 13.070312 4.0019531 C 12.965355 3.9945731 12.859893 4.0038029 12.757812 4.0292969 C 12.757812 4.0292969 10.199108 4.5869948 8.875 4.75 C 8.2960373 4.8212734 7.7039627 4.8212736 7.125 4.75 C 5.8008919 4.5869948 3.2421875 4.0292969 3.2421875 4.0292969 C 3.140108 4.0037991 3.034644 3.994571 2.9296875 4.0019531 z " />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer53"
+     inkscape:label="Connection">
+    <g
+       id="g1369"
+       transform="matrix(0,-1,-1,0,16,16)">
+      <path
+         id="path1358"
+         style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+         d="M 5.25,2 C 4.576389,2 3.8960598,2.2228171 3.3710938,2.6894531 2.8461278,3.1560901 2.5,3.875 2.5,4.75 v 5.75 h 1 V 4.75 C 3.5,4.125 3.7163722,3.7189099 4.0351562,3.4355469 4.3539402,3.1521829 4.798611,3 5.25,3 5.701389,3 6.1460596,3.1521829 6.4648438,3.4355469 6.7836277,3.7189099 7,4.125 7,4.75 V 8.3300781 11.25 c 0,0.875 0.3461277,1.59391 0.8710938,2.060547 C 8.3960597,13.777183 9.0763889,14 9.75,14 10.423611,14 11.10394,13.777183 11.628906,13.310547 12.153872,12.84391 12.5,12.125 12.5,11.25 V 7.5 h -1 v 3.75 c 0,0.625 -0.216372,1.03109 -0.535156,1.314453 C 10.64606,12.847817 10.201389,13 9.75,13 9.2986111,13 8.8539404,12.847817 8.5351562,12.564453 8.2163723,12.28109 8,11.875 8,11.25 V 8.3300781 4.75 C 8,3.875 7.6538723,3.1560901 7.1289062,2.6894531 6.6039403,2.2228171 5.923611,2 5.25,2 Z M 12,2 C 10.628172,2 9.5,3.128172 9.5,4.5 9.5,5.871828 10.628172,7 12,7 13.371828,7 14.5,5.871828 14.5,4.5 14.5,3.128172 13.371828,2 12,2 Z m 0,1.5 c 0.561168,0 1,0.438832 1,1 0,0.561168 -0.438832,1 -1,1 -0.561168,0 -1,-0.438832 -1,-1 0,-0.561168 0.438832,-1 1,-1 z M 3,11 C 2.1715729,11 1.5,11.671573 1.5,12.5 1.5,13.328427 2.1715729,14 3,14 3.8284271,14 4.5,13.328427 4.5,12.5 4.5,11.671573 3.8284271,11 3,11 Z"
+         transform="matrix(0,-1,-1,0,16,16)"
+         sodipodi:nodetypes="ssccccsssscssssccccsssscssssssssssssssssss" />
+    </g>
   </g>
 </svg>
