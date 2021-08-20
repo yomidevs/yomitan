@@ -2618,22 +2618,22 @@
 <template id="scan-input-template"><div class="scan-input" data-show-advanced="false">
     <div class="scan-input-grid">
         <div class="scan-input-index-cell generic-list-index-prefix"></div>
-        <div class="scan-input-suffix-cell">
+        <div class="scan-input-menu-button-cell">
             <div class="input-height-icon-button-container">
                 <button class="icon-button scanning-input-menu-button" data-menu="scanning-inputs-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
             </div>
         </div>
 
         <div class="scan-input-prefix-cell" data-property="include"><span>Required inputs:</span></div>
-        <div class="scan-input-content-cell" data-property="include">
-            <input type="text" class="input-with-suffix-button scan-input-field" autocomplete="off" spellcheck="false" placeholder="No inputs" data-property="include">
-            <button class="input-suffix-button input-suffix-icon-button light-icon mouse-button" data-property="include"><span class="icon" data-icon="mouse"></span></button>
+        <div class="scan-input-content-cell input-group" data-property="include">
+            <input type="text" class="scan-input-field" autocomplete="off" spellcheck="false" placeholder="No inputs" data-property="include">
+            <button class="input-suffix input-suffix-icon-button light-icon mouse-button" data-property="include"><span class="icon" data-icon="mouse"></span></button>
         </div>
 
         <div class="scan-input-prefix-cell" data-property="exclude"><span>Excluded inputs:</span></div>
-        <div class="scan-input-content-cell" data-property="exclude">
-            <input type="text" class="input-with-suffix-button scan-input-field" autocomplete="off" spellcheck="false" placeholder="No inputs" data-property="exclude">
-            <button class="input-suffix-button input-suffix-icon-button light-icon mouse-button" data-property="exclude"><span class="icon" data-icon="mouse"></span></button>
+        <div class="scan-input-content-cell input-group" data-property="exclude">
+            <input type="text" class="scan-input-field" autocomplete="off" spellcheck="false" placeholder="No inputs" data-property="exclude">
+            <button class="input-suffix input-suffix-icon-button light-icon mouse-button" data-property="exclude"><span class="icon" data-icon="mouse"></span></button>
         </div>
 
         <div class="scan-input-prefix-cell scan-input-options-cell" data-property="types"><span>Input types:</span></div>
@@ -2971,9 +2971,9 @@
 
 <!-- Anki card templates -->
 <template id="anki-card-field-template"><div class="anki-card-field-name-container"><span class="anki-card-field-name"></span></div>
-<div class="anki-card-field-value-container">
-    <input type="text" class="anki-card-field-value input-with-suffix-button" autocomplete="off">
-    <button class="anki-card-field-value-menu-button input-suffix-button input-suffix-icon-button light-icon" data-menu-position="v-center left"><span class="icon" data-icon="material-down-arrow"></span></button>
+<div class="anki-card-field-value-container input-group">
+    <input type="text" class="anki-card-field-value" autocomplete="off">
+    <button class="anki-card-field-value-menu-button input-suffix input-suffix-icon-button light-icon" data-menu-position="v-center left"><span class="icon" data-icon="material-down-arrow"></span></button>
 </div></template>
 
 <template id="anki-card-terms-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
@@ -3008,9 +3008,9 @@
                 <div class="anki-card-templates-test-table-header">Card field</div>
                 <div></div>
                 <input type="text" id="anki-card-templates-test-text-input" class="form-control" value="読め" placeholder="Preview text" autocomplete="off" lang="ja">
-                <div class="anki-card-templates-test-input-container">
-                    <input type="text" class="input-with-suffix-button" id="anki-card-templates-test-field-input" value="{expression}" placeholder="{marker}" autocomplete="off" spellcheck="false">
-                    <button class="input-suffix-button input-suffix-icon-button light-icon" id="anki-card-templates-test-field-menu-button" data-menu="anki-card-all-field-menu" data-menu-position="below left"><span class="icon" data-icon="material-down-arrow"></span></button>
+                <div class="anki-card-templates-test-input-container input-group">
+                    <input type="text" id="anki-card-templates-test-field-input" value="{expression}" placeholder="{marker}" autocomplete="off" spellcheck="false">
+                    <button class="input-suffix input-suffix-icon-button light-icon" id="anki-card-templates-test-field-menu-button" data-menu="anki-card-all-field-menu" data-menu-position="below left"><span class="icon" data-icon="material-down-arrow"></span></button>
                 </div>
                 <button id="anki-card-templates-test-render-button">Test</button>
             </div>
@@ -3352,14 +3352,14 @@
     <div class="hotkey-list-item-input-label-cell">Input:</div>
     <div class="hotkey-list-item-input-cell">
         <input type="text" class="hotkey-list-item-input" autocomplete="off" spellcheck="false" placeholder="No input" data-property="include">
-        <div class="hotkey-list-item-enabled-button-container">
-            <button class="hotkey-list-item-enabled-button input-button input-with-suffix-button">
+        <div class="hotkey-list-item-enabled-button-container input-group">
+            <button class="hotkey-list-item-enabled-button input-button">
                 <label class="hotkey-list-item-enabled-button-label button-inner-label">
                     <span class="checkbox"><input type="checkbox" class="hotkey-list-item-enabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></span>
                     <span>Enabled</span>
                 </label>
             </button>
-            <button class="hotkey-list-item-scopes-button input-suffix-button input-suffix-icon-button light-icon" data-menu="hotkey-list-item-scopes-menu" data-menu-position="below left"><span class="icon" data-icon="material-down-arrow"></span></button>
+            <button class="hotkey-list-item-scopes-button input-suffix input-suffix-icon-button light-icon" data-menu="hotkey-list-item-scopes-menu" data-menu-position="below left"><span class="icon" data-icon="material-down-arrow"></span></button>
         </div>
     </div>
 

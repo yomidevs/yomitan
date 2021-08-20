@@ -23,6 +23,9 @@
     --font-size-small-no-units: 12;
     --font-size-small: calc(1em * var(--font-size-small-no-units) / var(--font-size-no-units));
 
+    --line-height-no-units: 20;
+    --line-height: calc(var(--line-height-no-units) / var(--font-size-no-units));
+
     --animation-duration: 0.125s;
     --animation-duration2: calc(var(--animation-duration) * 2);
 
@@ -44,6 +47,7 @@
     --material-arrow-dimension1: calc(5em / var(--font-size-no-units));
     --material-arrow-dimension2: calc(10em / var(--font-size-no-units));
 
+    --button-border-radius: 0.3em;
     --button-default-shadow-params: 0 0.0625em 0.125em 0;
 
     --thin-border-size: calc(1em / var(--font-size-no-units));
@@ -176,6 +180,26 @@
 
     --menu-item-hover-color: #333333;
     --menu-item-active-color: #444444;
+}
+
+
+/* Root styles */
+:root {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: var(--font-size);
+    line-height: var(--line-height);
+    height: 100%;
+}
+body {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    height: 100%;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    background-color: var(--background-color);
+    color: var(--text-color);
 }
 
 
@@ -666,7 +690,7 @@ label.radio {
 select {
     width: var(--input-width-large);
     height: var(--input-height);
-    line-height: var(--input-height);
+    line-height: var(--line-height);
     border: 0;
     border-radius: var(--input-border-radius);
     box-sizing: border-box;
@@ -693,7 +717,7 @@ input[type=text],
 input[type=number] {
     width: var(--input-width);
     height: var(--input-height);
-    line-height: var(--input-height);
+    line-height: var(--line-height);
     color: var(--text-color);
     font-size: var(--input-font-size);
     background-color: var(--input-background-color);
@@ -761,17 +785,61 @@ input[type=number][data-invalid=true]:focus {
     box-shadow: 0 0 0 calc(2em / var(--font-size-no-units)) var(--danger-color);
     outline: none;
 }
-input[type=text].input-with-suffix-button,
-input[type=number].input-with-suffix-button {
+input[type=text].code,
+input[type=number].code {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* Input groups */
+.input-group {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+}
+.input-group>input[type=text],
+.input-group>input[type=number],
+.input-group>button.input-button {
     flex: 1 1 auto;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     border-right-style: none;
     z-index: 1;
 }
-input[type=text].code,
-input[type=number].code {
-    font-family: 'Courier New', Courier, monospace;
+.input-suffix,
+button.input-suffix {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    border-radius: var(--input-border-radius);
+    border-style: none;
+    border-width: 0;
+    height: var(--input-height);
+    box-sizing: border-box;
+    padding: 0 0.5em;
+    position: relative;
+}
+.input-suffix:not(:first-child),
+button.input-suffix:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.input-suffix:not(:last-child),
+button.input-suffix:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.input-suffix:not(button) {
+    background-color: var(--input-background-color);
+}
+input[type=text]:invalid~.input-suffix:not(button),
+input[type=number]:invalid~.input-suffix:not(button),
+input[type=text][data-invalid=true]~.input-suffix:not(button),
+input[type=number][data-invalid=true]~.input-suffix:not(button) {
+    border-color: var(--danger-color);
+    border-width: var(--thin-border-size);
+    border-style: solid;
+    border-left-style: none;
+    border-right-style: none;
 }
 
 
@@ -818,7 +886,7 @@ button,
 
     border-width: var(--thin-border-size);
     border-style: solid;
-    border-radius: 0.3em;
+    border-radius: var(--button-border-radius);
     padding: var(--button-padding-vertical) var(--button-padding-horizontal);
     font-weight: bold;
     font-size: inherit;
@@ -979,48 +1047,31 @@ button.input-button {
     box-sizing: border-box;
     position: relative;
 }
-button.input-button.input-with-suffix-button {
-    flex: 1 1 auto;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border-right-style: none;
-    z-index: 1;
-}
 
 /* Input suffix button */
-button.input-suffix-button {
+button.input-suffix {
     --button-content-color: var(--button-default-icon-color);
     --button-border-color: var(--input-background-color);
     --button-background-color: var(--input-background-color);
     --button-hover-background-color: var(--input-background-color-dark);
     --button-active-background-color: var(--input-background-color-darker);
-
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-style: none;
-    border-width: 0;
-    height: var(--input-height);
-    line-height: var(--input-height);
-    box-sizing: border-box;
-    padding: 0 0.5em;
-    position: relative;
 }
-button.input-suffix-button.light-icon {
+button.input-suffix.light-icon {
     --button-content-color: var(--button-default-icon-color-light);
 }
-button.input-suffix-button.input-suffix-icon-button {
+button.input-suffix.input-suffix-icon-button {
     width: 2.125em;
 }
-button.input-suffix-button.input-suffix-icon-button>.icon {
+button.input-suffix.input-suffix-icon-button>.icon {
     display: block;
     width: 100%;
     height: 100%;
     background-color: var(--button-current-content-color);
 }
-input[type=text]:invalid+button.input-suffix-button,
-input[type=number]:invalid+button.input-suffix-button,
-input[type=text][data-invalid=true]+button.input-suffix-button,
-input[type=number][data-invalid=true]+button.input-suffix-button {
+input[type=text]:invalid~button.input-suffix,
+input[type=number]:invalid~button.input-suffix,
+input[type=text][data-invalid=true]~button.input-suffix,
+input[type=number][data-invalid=true]~button.input-suffix {
     --button-border-color: var(--danger-color);
     --button-hover-border-color: var(--danger-color);
     --button-active-border-color: var(--danger-color);

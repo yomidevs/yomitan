@@ -258,21 +258,8 @@
 :root[data-page-type=popup]:not([data-theme]) body {
     background-color: transparent;
 }
-:root {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: var(--font-size);
-    line-height: var(--line-height);
-    height: 100%;
-}
 body {
-    margin: 0;
-    border: 0;
-    padding: 0;
-    height: 100%;
     overflow: hidden;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    font-size: inherit;
 }
 ol, ul {
     margin-top: 0;

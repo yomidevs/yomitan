@@ -42,7 +42,6 @@
     --font-size-no-units: 14;
     --font-size: calc(1px * var(--font-size-no-units));
     --font-size-small: 12px;
-    --line-height-default: calc(20 / var(--font-size-no-units));
     --outline-item-height: 40px;
     --outline-item-icon-size: 32px;
     --input-short-width: calc(var(--input-width-large) / 2 - var(--padding) / 2);
@@ -101,19 +100,7 @@
 
 
 /* Common styles */
-:root {
-    height: 100%;
-}
 body {
-    background-color: var(--background-color);
-    margin: 0;
-    padding: 0;
-    border: none;
-    font-size: var(--font-size);
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    color: var(--text-color);
-    line-height: var(--line-height-default);
-    height: 100%;
     overflow: hidden;
 }
 p {
@@ -407,10 +394,10 @@ a.heading-link-light {
     align-items: center;
     width: 100%;
     height: var(--outline-item-height);
-    line-height: var(--outline-item-height);
     padding: 0 1.5em;
     cursor: pointer;
     transition: background-color var(--animation-duration) ease-in-out;
+    box-sizing: border-box;
 }
 .outline-item,
 .outline-item:hover {
@@ -423,6 +410,7 @@ a.heading-link-light {
     min-width: var(--outline-item-icon-size);
     min-height: var(--outline-item-icon-size);
     position: relative;
+    line-height: var(--outline-item-height);
 }
 .outline-item-left-warning-badge {
     position: absolute;
@@ -668,7 +656,7 @@ input[type=number].short-height,
 select.short-height {
     height: var(--input-short-height);
     margin-top: calc(var(--settings-group-right-max-height) - var(--input-short-height) - var(--font-size-small));
-    line-height: var(--input-short-height);
+    line-height: var(--line-height);
 }
 .settings-item-button-group-container {
     max-height: none;
@@ -1544,10 +1532,7 @@ select.profile-condition-operator {
     flex: 1 1 auto;
 }
 .anki-card-field-value-container {
-    display: flex;
-    flex-flow: row nowrap;
     width: 100%;
-    align-items: stretch;
     margin-top: 0.25em;
 }
 input.anki-card-field-value {
@@ -1597,10 +1582,7 @@ code.anki-field-marker {
     flex: 0 1 auto;
 }
 .anki-card-templates-test-input-container {
-    display: flex;
-    flex-flow: row nowrap;
     width: 100%;
-    align-items: stretch;
 }
 .anki-card-templates-test-container {
     flex: 0 1 auto;
@@ -1679,7 +1661,7 @@ code.anki-field-marker {
     padding: 0 var(--modal-padding-horizontal);
     box-sizing: border-box;
 }
-.scan-input-suffix-cell {
+.scan-input-menu-button-cell {
     grid-area: 1/4/2/5;
 }
 .scan-input-index-cell {
@@ -1697,10 +1679,7 @@ code.anki-field-marker {
     white-space: nowrap;
 }
 .scan-input-content-cell {
-    display: flex;
-    flex-flow: row nowrap;
     width: 100%;
-    align-items: stretch;
 }
 .scan-input-prefix-cell[data-property=include] {
     grid-area: 1/2/2/3;
@@ -2008,9 +1987,6 @@ input.sentence-termination-character-input2 {
     flex: 1 1 auto;
 }
 .hotkey-list-item-enabled-button-container {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: stretch;
     margin-left: 0.375em;
 }
 button.hotkey-list-item-enabled-button {
