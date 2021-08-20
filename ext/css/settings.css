@@ -390,6 +390,7 @@ a.heading-link-light {
     font-weight: normal;
     border-style: none;
     border-width: 0;
+    border-radius: 0;
     display: flex;
     align-items: center;
     width: 100%;
