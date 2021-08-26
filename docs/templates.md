@@ -821,8 +821,8 @@ Converts hiragana text to katakana.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#hiragana "よみちゃん ヨミちゃん ヨミチャン"}}{{/hiragana}}
-  {{#hiragana}}よみちゃん ヨミちゃん ヨミチャン{{/hiragana}}
+  {{#katakana "よみちゃん ヨミちゃん ヨミチャン"}}{{/katakana}}
+  {{#katakana}}よみちゃん ヨミちゃん ヨミチャン{{/katakana}}
   ```
 
   Output:
