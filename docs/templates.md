@@ -539,8 +539,8 @@ Returns the type of a value.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#typeof <i>value</i>}}{{/get}}</code><br>
-  <code>{{#typeof}}<i>value</i>{{/get}}</code><br>
+  <code>{{#typeof <i>value</i>}}{{/typeof}}</code><br>
+  <code>{{#typeof}}<i>value</i>{{/typeof}}</code><br>
 
   * _`value`_ <br>
     The value to check.
@@ -771,6 +771,64 @@ same as the system used for generating popup and search page dictionary entries.
 
   ```handlebars
   {{~#pronunciation format='text' reading='よむ' downstepPosition=1~}}{{~/pronunciation~}}
+  ```
+</details>
+
+
+### `hiragana`
+
+Converts katakana text to hiragana.
+
+<details>
+  <summary>Syntax:</summary>
+
+  <code>{{#hiragana <i>value</i>}}{{/hiragana}}</code><br>
+  <code>{{#hiragana}}<i>value</i>{{/hiragana}}</code><br>
+
+  * _`value`_ <br>
+    The text to convert.
+</details>
+<details>
+  <summary>Example:</summary>
+
+  ```handlebars
+  {{#hiragana "よみちゃん ヨミちゃん ヨミチャン"}}{{/hiragana}}
+  {{#hiragana}}よみちゃん ヨミちゃん ヨミチャン{{/hiragana}}
+  ```
+
+  Output:
+  ```html
+  よみちゃん よみちゃん よみちゃん
+  よみちゃん よみちゃん よみちゃん
+  ```
+</details>
+
+
+### `katakana`
+
+Converts hiragana text to katakana.
+
+<details>
+  <summary>Syntax:</summary>
+
+  <code>{{#katakana <i>text</i>}}{{/katakana}}</code><br>
+  <code>{{#katakana}}<i>text</i>{{/katakana}}</code><br>
+
+  * _`text`_ <br>
+    The text to convert.
+</details>
+<details>
+  <summary>Example:</summary>
+
+  ```handlebars
+  {{#hiragana "よみちゃん ヨミちゃん ヨミチャン"}}{{/hiragana}}
+  {{#hiragana}}よみちゃん ヨミちゃん ヨミチャン{{/hiragana}}
+  ```
+
+  Output:
+  ```html
+  ヨミチャン ヨミチャン ヨミチャン
+  ヨミチャン ヨミチャン ヨミチャン
   ```
 </details>
 

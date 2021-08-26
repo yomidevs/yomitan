@@ -87,7 +87,9 @@ class AnkiTemplateRenderer {
             ['formatGlossary',   this._formatGlossary.bind(this)],
             ['hasMedia',         this._hasMedia.bind(this)],
             ['getMedia',         this._getMedia.bind(this)],
-            ['pronunciation',    this._pronunciation.bind(this)]
+            ['pronunciation',    this._pronunciation.bind(this)],
+            ['hiragana',         this._hiragana.bind(this)],
+            ['katakana',         this._katakana.bind(this)]
         ]);
         this._templateRenderer.registerDataType('ankiNote', {
             modifier: ({marker, commonData}) => this._ankiNoteDataCreator.create(marker, commonData),
@@ -590,5 +592,17 @@ class AnkiTemplateRenderer {
             default:
                 return '';
         }
+    }
+
+    _hiragana(context, ...args) {
+        const ii = args.length - 1;
+        const value = (ii > 0 ? args[0] : args[ii].fn(context));
+        return this._japaneseUtil.convertKatakanaToHiragana(value);
+    }
+
+    _katakana(context, ...args) {
+        const ii = args.length - 1;
+        const value = (ii > 0 ? args[0] : args[ii].fn(context));
+        return this._japaneseUtil.convertHiraganaToKatakana(value);
     }
 }
