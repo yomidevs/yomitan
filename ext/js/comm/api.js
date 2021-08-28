@@ -120,10 +120,6 @@ class API {
         return this._invoke('getDictionaryInfo');
     }
 
-    getDictionaryCounts(dictionaryNames, getTotal) {
-        return this._invoke('getDictionaryCounts', {dictionaryNames, getTotal});
-    }
-
     purgeDatabase() {
         return this._invoke('purgeDatabase');
     }

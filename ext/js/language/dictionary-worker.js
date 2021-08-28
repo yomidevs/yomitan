@@ -38,6 +38,10 @@ class DictionaryWorker {
         return this._invoke('deleteDictionary', {dictionaryTitle}, [], onProgress);
     }
 
+    getDictionaryCounts(dictionaryNames, getTotal) {
+        return this._invoke('getDictionaryCounts', {dictionaryNames, getTotal}, [], null);
+    }
+
     // Private
 
     _invoke(action, params, transfer, onProgress, formatResult) {

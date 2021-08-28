@@ -111,7 +111,6 @@ class Backend {
             ['getZoom',                      {async: true,  contentScript: true,  handler: this._onApiGetZoom.bind(this)}],
             ['getDefaultAnkiFieldTemplates', {async: false, contentScript: true,  handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this)}],
             ['getDictionaryInfo',            {async: true,  contentScript: true,  handler: this._onApiGetDictionaryInfo.bind(this)}],
-            ['getDictionaryCounts',          {async: true,  contentScript: false, handler: this._onApiGetDictionaryCounts.bind(this)}],
             ['purgeDatabase',                {async: true,  contentScript: false, handler: this._onApiPurgeDatabase.bind(this)}],
             ['getMedia',                     {async: true,  contentScript: true,  handler: this._onApiGetMedia.bind(this)}],
             ['log',                          {async: false, contentScript: true,  handler: this._onApiLog.bind(this)}],
@@ -614,10 +613,6 @@ class Backend {
 
     async _onApiGetDictionaryInfo() {
         return await this._dictionaryDatabase.getDictionaryInfo();
-    }
-
-    async _onApiGetDictionaryCounts({dictionaryNames, getTotal}) {
-        return await this._dictionaryDatabase.getDictionaryCounts(dictionaryNames, getTotal);
     }
 
     async _onApiPurgeDatabase() {

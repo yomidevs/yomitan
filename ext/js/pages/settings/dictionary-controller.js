@@ -567,7 +567,7 @@ class DictionaryController {
 
             const token = this._databaseStateToken;
             const dictionaryTitles = this._dictionaryEntries.map(({dictionaryTitle}) => dictionaryTitle);
-            const {counts, total} = await yomichan.api.getDictionaryCounts(dictionaryTitles, true);
+            const {counts, total} = await new DictionaryWorker().getDictionaryCounts(dictionaryTitles, true);
             if (this._databaseStateToken !== token) { return; }
 
             for (let i = 0, ii = Math.min(counts.length, this._dictionaryEntries.length); i < ii; ++i) {

@@ -41,6 +41,9 @@ class DictionaryWorkerHandler {
             case 'deleteDictionary':
                 this._onMessageWithProgress(params, this._deleteDictionary.bind(this));
                 break;
+            case 'getDictionaryCounts':
+                this._onMessageWithProgress(params, this._getDictionaryCounts.bind(this));
+                break;
             case 'getImageResolution.response':
                 this._mediaLoader.handleMessage(params);
                 break;
@@ -82,6 +85,15 @@ class DictionaryWorkerHandler {
         const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
         try {
             return await dictionaryDatabase.deleteDictionary(dictionaryTitle, {rate: 1000}, onProgress);
+        } finally {
+            dictionaryDatabase.close();
+        }
+    }
+
+    async _getDictionaryCounts({dictionaryNames, getTotal}) {
+        const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
+        try {
+            return await dictionaryDatabase.getDictionaryCounts(dictionaryNames, getTotal);
         } finally {
             dictionaryDatabase.close();
         }
