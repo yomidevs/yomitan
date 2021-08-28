@@ -16,7 +16,7 @@
  */
 
 /* global
- * DictionaryDatabaseModifier
+ * DictionaryWorker
  */
 
 class DictionaryEntry {
@@ -679,8 +679,7 @@ class DictionaryController {
     }
 
     async _deleteDictionaryInternal(dictionaryTitle, onProgress) {
-        const dictionaryDatabaseModifier = new DictionaryDatabaseModifier();
-        await dictionaryDatabaseModifier.deleteDictionary(dictionaryTitle, onProgress);
+        await new DictionaryWorker().deleteDictionary(dictionaryTitle, onProgress);
         yomichan.api.triggerDatabaseUpdated('dictionary', 'delete');
     }
 

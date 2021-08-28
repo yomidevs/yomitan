@@ -16,80 +16,115 @@
  */
 
 /* global
- * DictionaryDatabase
- * DictionaryImporter
- * DictionaryWorkerMediaLoader
+ * DictionaryImporterMediaLoader
  */
 
 class DictionaryWorker {
     constructor() {
-        this._mediaLoader = new DictionaryWorkerMediaLoader();
+        this._dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
     }
 
-    prepare() {
-        self.addEventListener('message', this._onMessage.bind(this), false);
+    importDictionary(archiveContent, details, onProgress) {
+        return this._invoke(
+            'importDictionary',
+            {details, archiveContent},
+            [archiveContent],
+            onProgress,
+            this._formatimportDictionaryResult.bind(this)
+        );
+    }
+
+    deleteDictionary(dictionaryTitle, onProgress) {
+        return this._invoke('deleteDictionary', {dictionaryTitle}, [], onProgress);
     }
 
     // Private
 
-    _onMessage(e) {
+    _invoke(action, params, transfer, onProgress, formatResult) {
+        return new Promise((resolve, reject) => {
+            const worker = new Worker('/js/language/dictionary-worker-main.js', {});
+            const details = {
+                complete: false,
+                worker,
+                resolve,
+                reject,
+                onMessage: null,
+                onProgress,
+                formatResult
+            };
+            const onMessage = this._onMessage.bind(this, details);
+            details.onMessage = onMessage;
+            worker.addEventListener('message', onMessage);
+            worker.postMessage({action, params}, transfer);
+        });
+    }
+
+    _onMessage(details, e) {
+        if (details.complete) { return; }
         const {action, params} = e.data;
         switch (action) {
-            case 'importDictionary':
-                this._onMessageWithProgress(params, this._importDictionary.bind(this));
+            case 'complete':
+                {
+                    const {worker, resolve, reject, onMessage, formatResult} = details;
+                    details.complete = true;
+                    details.worker = null;
+                    details.resolve = null;
+                    details.reject = null;
+                    details.onMessage = null;
+                    details.onProgress = null;
+                    details.formatResult = null;
+                    worker.removeEventListener('message', onMessage);
+                    worker.terminate();
+                    this._onMessageComplete(params, resolve, reject, formatResult);
+                }
                 break;
-            case 'deleteDictionary':
-                this._onMessageWithProgress(params, this._deleteDictionary.bind(this));
+            case 'progress':
+                this._onMessageProgress(params, details.onProgress);
                 break;
-            case 'getImageResolution.response':
-                this._mediaLoader.handleMessage(params);
+            case 'getImageResolution':
+                this._onMessageGetImageResolution(params, details.worker);
                 break;
         }
     }
 
-    async _onMessageWithProgress(params, handler) {
-        const onProgress = (...args) => {
-            self.postMessage({
-                action: 'progress',
-                params: {args}
-            });
-        };
+    _onMessageComplete(params, resolve, reject, formatResult) {
+        const {error} = params;
+        if (typeof error !== 'undefined') {
+            reject(deserializeError(error));
+        } else {
+            let {result} = params;
+            try {
+                if (typeof formatResult === 'function') {
+                    result = formatResult(result);
+                }
+            } catch (e) {
+                reject(e);
+                return;
+            }
+            resolve(result);
+        }
+    }
+
+    _onMessageProgress(params, onProgress) {
+        if (typeof onProgress !== 'function') { return; }
+        const {args} = params;
+        onProgress(...args);
+    }
+
+    async _onMessageGetImageResolution(params, worker) {
+        const {id, mediaType, content} = params;
         let response;
         try {
-            const result = await handler(params, onProgress);
-            response = {result};
+            const result = await this._dictionaryImporterMediaLoader.getImageResolution(mediaType, content);
+            response = {id, result};
         } catch (e) {
-            response = {error: serializeError(e)};
+            response = {id, error: serializeError(e)};
         }
-        self.postMessage({action: 'complete', params: response});
+        worker.postMessage({action: 'getImageResolution.response', params: response});
     }
 
-    async _importDictionary({details, archiveContent}, onProgress) {
-        const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
-        try {
-            const dictionaryImporter = new DictionaryImporter(this._mediaLoader, onProgress);
-            const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
-            return {
-                result,
-                errors: errors.map((error) => serializeError(error))
-            };
-        } finally {
-            dictionaryDatabase.close();
-        }
-    }
-
-    async _deleteDictionary({dictionaryTitle}, onProgress) {
-        const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
-        try {
-            return await dictionaryDatabase.deleteDictionary(dictionaryTitle, {rate: 1000}, onProgress);
-        } finally {
-            dictionaryDatabase.close();
-        }
-    }
-
-    async _getPreparedDictionaryDatabase() {
-        const dictionaryDatabase = new DictionaryDatabase();
-        await dictionaryDatabase.prepare();
-        return dictionaryDatabase;
+    _formatimportDictionaryResult(result) {
+        result.errors = result.errors.map((error) => deserializeError(error));
+        return result;
     }
 }
