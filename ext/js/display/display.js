@@ -347,7 +347,8 @@ class Display extends EventDispatcher {
     }
 
     setContent(details) {
-        const {focus, history, params, state, content} = details;
+        const {focus, params, state, content} = details;
+        const historyMode = this._historyHasChanged ? details.historyMode : 'clear';
 
         if (focus) {
             window.focus();
@@ -359,12 +360,18 @@ class Display extends EventDispatcher {
         }
         const url = `${location.protocol}//${location.host}${location.pathname}?${urlSearchParams.toString()}`;
 
-        if (history && this._historyHasChanged) {
-            this._updateHistoryState();
-            this._history.pushState(state, content, url);
-        } else {
-            this._history.clear();
-            this._history.replaceState(state, content, url);
+        switch (historyMode) {
+            case 'clear':
+                this._history.clear();
+                this._history.replaceState(state, content, url);
+                break;
+            case 'overwrite':
+                this._history.replaceState(state, content, url);
+                break;
+            default: // 'new'
+                this._updateHistoryState();
+                this._history.pushState(state, content, url);
+                break;
         }
     }
 
@@ -430,7 +437,7 @@ class Display extends EventDispatcher {
         );
         const details = {
             focus: false,
-            history: false,
+            historyMode: 'clear',
             params: this._createSearchParams(type, query, false),
             state,
             content: {
@@ -638,14 +645,14 @@ class Display extends EventDispatcher {
     _onQueryParserSearch({type, dictionaryEntries, sentence, inputInfo: {eventType}, textSource, optionsContext}) {
         const query = textSource.text();
         const historyState = this._history.state;
-        const history = (
+        const historyMode = (
             eventType === 'click' ||
             !isObject(historyState) ||
             historyState.cause !== 'queryParser'
-        );
+        ) ? 'new' : 'overwrite';
         const details = {
             focus: false,
-            history,
+            historyMode,
             params: this._createSearchParams(type, query, false),
             state: {
                 sentence,
@@ -665,7 +672,7 @@ class Display extends EventDispatcher {
         if (this._contentType === type) { return; }
         const details = {
             focus: false,
-            history: false,
+            historyMode: 'clear',
             params: {type},
             state: {},
             content: {
@@ -725,7 +732,7 @@ class Display extends EventDispatcher {
             const dictionaryEntries = await yomichan.api.kanjiFind(query, optionsContext);
             const details = {
                 focus: false,
-                history: true,
+                historyMode: 'new',
                 params: this._createSearchParams('kanji', query, false),
                 state: {
                     focusEntry: 0,
@@ -1448,7 +1455,7 @@ class Display extends EventDispatcher {
         const documentTitle = document.title;
         const details = {
             focus: false,
-            history: true,
+            historyMode: 'new',
             params: {
                 type,
                 query,

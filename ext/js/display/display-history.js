@@ -112,7 +112,7 @@ class DisplayHistory extends EventDispatcher {
     }
 
     _triggerStateChanged(synthetic) {
-        this.trigger('stateChanged', {history: this, synthetic});
+        this.trigger('stateChanged', {synthetic});
     }
 
     _updateHistoryFromCurrent(replace) {

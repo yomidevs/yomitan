@@ -185,12 +185,12 @@ class SearchDisplayController {
         e.preventDefault();
         e.stopImmediatePropagation();
         this._display.blurElement(e.currentTarget);
-        this._search(true, true, true, null);
+        this._search(true, 'new', true, null);
     }
 
     _onSearch(e) {
         e.preventDefault();
-        this._search(true, true, true, null);
+        this._search(true, 'new', true, null);
     }
 
     _onCopy() {
@@ -205,7 +205,7 @@ class SearchDisplayController {
         }
         this._queryInput.value = text;
         this._updateSearchHeight(true);
-        this._search(animate, false, autoSearchContent, ['clipboard']);
+        this._search(animate, 'clear', autoSearchContent, ['clipboard']);
     }
 
     _onWanakanaEnableChange(e) {
@@ -362,7 +362,7 @@ class SearchDisplayController {
         });
     }
 
-    _search(animate, history, lookup, flags) {
+    _search(animate, historyMode, lookup, flags) {
         const query = this._queryInput.value;
         const depth = this._display.depth;
         const url = window.location.href;
@@ -373,7 +373,7 @@ class SearchDisplayController {
         }
         const details = {
             focus: false,
-            history,
+            historyMode,
             params: {
                 query
             },

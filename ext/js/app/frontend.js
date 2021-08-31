@@ -515,7 +515,7 @@ class Frontend {
         const {url} = optionsContext;
         const details = {
             focus,
-            history: false,
+            historyMode: 'clear',
             params: {
                 type,
                 query,
