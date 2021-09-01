@@ -126,7 +126,7 @@ class DictionaryImporter {
         const {media} = await this._resolveAsyncRequirements(requirements, archive);
 
         // Add dictionary descriptor
-        this._progressNextStep(termList.length + termMetaList.length + kanjiList.length + kanjiMetaList.length + tagList.length);
+        this._progressNextStep(termList.length + termMetaList.length + kanjiList.length + kanjiMetaList.length + tagList.length + media.length);
 
         const summary = this._createSummary(dictionaryTitle, version, index, {prefixWildcardsSupported});
         dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);

@@ -43,7 +43,14 @@ function createTestDictionaryArchive(dictionary, dictionaryName) {
 
 function createDictionaryImporter(onProgress) {
     const dictionaryImporterMediaLoader = new DatabaseVMDictionaryImporterMediaLoader();
-    return new DictionaryImporter(dictionaryImporterMediaLoader, onProgress);
+    return new DictionaryImporter(dictionaryImporterMediaLoader, (...args) => {
+        const {stepIndex, stepCount, index, count} = args[0];
+        assert.ok(stepIndex < stepCount);
+        assert.ok(index <= count);
+        if (typeof onProgress === 'function') {
+            onProgress(...args);
+        }
+    });
 }
 
 
