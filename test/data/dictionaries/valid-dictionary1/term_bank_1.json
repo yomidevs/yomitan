@@ -148,6 +148,22 @@
                         ]}
                     ]}
                 ]}
+            ]},
+            {"type": "structured-content", "content": [
+                "margin",
+                {
+                    "tag": "div",
+                    "style": {
+                        "marginTop": 1,
+                        "marginLeft": 1,
+                        "marginRight": 1,
+                        "marginBottom": 1
+                    },
+                    "content": [
+                        "inner"
+                    ]
+                },
+                "margin"
             ]}
         ],
         100, "P E1"

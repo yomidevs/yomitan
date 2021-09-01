@@ -216,7 +216,17 @@ class StructuredContentGenerator {
 
     _setStructuredContentElementStyle(node, contentStyle) {
         const {style} = node;
-        const {fontStyle, fontWeight, fontSize, textDecorationLine, verticalAlign} = contentStyle;
+        const {
+            fontStyle,
+            fontWeight,
+            fontSize,
+            textDecorationLine,
+            verticalAlign,
+            marginTop,
+            marginLeft,
+            marginRight,
+            marginBottom
+        } = contentStyle;
         if (typeof fontStyle === 'string') { style.fontStyle = fontStyle; }
         if (typeof fontWeight === 'string') { style.fontWeight = fontWeight; }
         if (typeof fontSize === 'string') { style.fontSize = fontSize; }
@@ -226,5 +236,9 @@ class StructuredContentGenerator {
         } else if (Array.isArray(textDecorationLine)) {
             style.textDecoration = textDecorationLine.join(' ');
         }
+        if (typeof marginTop === 'number') { style.marginTop = `${marginTop}em`; }
+        if (typeof marginLeft === 'number') { style.marginLeft = `${marginLeft}em`; }
+        if (typeof marginRight === 'number') { style.marginRight = `${marginRight}em`; }
+        if (typeof marginBottom === 'number') { style.marginBottom = `${marginBottom}em`; }
     }
 }

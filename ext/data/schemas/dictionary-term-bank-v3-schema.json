@@ -215,6 +215,22 @@
                     "type": "string",
                     "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"],
                     "default": "baseline"
+                },
+                "marginTop": {
+                    "type": "number",
+                    "default": 0
+                },
+                "marginLeft": {
+                    "type": "number",
+                    "default": 0
+                },
+                "marginRight": {
+                    "type": "number",
+                    "default": 0
+                },
+                "marginBottom": {
+                    "type": "number",
+                    "default": 0
                 }
             }
         }
