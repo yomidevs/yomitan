@@ -216,13 +216,14 @@ class DisplayAnki {
         if (typeof url !== 'string') {
             url = window.location.href;
         }
-        sentence = this._getValidSentenceData(sentence);
+        const {query, fullQuery} = this._display;
+        sentence = this._getValidSentenceData(sentence, query);
         return {
             url,
             sentence,
             documentTitle,
-            query: this._display.query,
-            fullQuery: this._display.fullQuery
+            query,
+            fullQuery
         };
     }
 
@@ -563,10 +564,14 @@ class DisplayAnki {
         return isTerms ? ['term-kanji', 'term-kana'] : ['kanji'];
     }
 
-    _getValidSentenceData(sentence) {
+    _getValidSentenceData(sentence, fallback) {
         let {text, offset} = (isObject(sentence) ? sentence : {});
-        if (typeof text !== 'string') { text = ''; }
-        if (typeof offset !== 'number') { offset = 0; }
+        if (typeof text !== 'string') {
+            text = fallback;
+            offset = 0;
+        } else {
+            if (typeof offset !== 'number') { offset = 0; }
+        }
         return {text, offset};
     }
 
