@@ -164,6 +164,21 @@
                     ]
                 },
                 "margin"
+            ]},
+            {"type": "structured-content", "content": [
+                "text 1 ",
+                {
+                    "tag": "span",
+                    "data": {
+                        "": "empty",
+                        "a": "b",
+                        "c": "d"
+                    },
+                    "content": [
+                        "text 2"
+                    ]
+                },
+                " text 3"
             ]}
         ],
         100, "P E1"

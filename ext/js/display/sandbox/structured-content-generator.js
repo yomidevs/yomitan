@@ -169,6 +169,16 @@ class StructuredContentGenerator {
         return this._document.createDocumentFragment();
     }
 
+    _setElementDataset(element, data) {
+        for (let [key, value] of Object.entries(data)) {
+            if (key.length > 0) {
+                key = `${key[0].toUpperCase()}${key.substring(1)}`;
+            }
+            key = `sc${key}`;
+            element.dataset[key] = value;
+        }
+    }
+
     _setImageData(node, image, imageBackground, url, unloaded) {
         if (url !== null) {
             image.src = url;
@@ -192,6 +202,8 @@ class StructuredContentGenerator {
 
     _createStructuredContentElement(tag, content, dictionary, type, hasChildren, hasStyle) {
         const node = this._createElement(tag, `gloss-sc-${tag}`);
+        const {data} = content;
+        if (typeof data === 'object' && data !== null) { this._setElementDataset(node, data); }
         switch (type) {
             case 'table-cell':
                 {

@@ -38,6 +38,7 @@ class AnkiTemplateRenderer {
     constructor() {
         this._structuredContentStyleApplier = new CssStyleApplier('/data/structured-content-style.json');
         this._pronunciationStyleApplier = new CssStyleApplier('/data/pronunciation-style.json');
+        this._structuredContentDatasetKeyIgnorePattern = /^sc([^a-z]|$)/;
         this._japaneseUtil = new JapaneseUtil(null);
         this._templateRenderer = new TemplateRenderer();
         this._ankiNoteDataCreator = new AnkiNoteDataCreator(this._japaneseUtil);
@@ -462,16 +463,24 @@ class AnkiTemplateRenderer {
         return element;
     }
 
-    _getHtml(node, styleApplier) {
+    _getStructuredContentHtml(node) {
+        return this._getHtml(node, this._structuredContentStyleApplier, this._structuredContentDatasetKeyIgnorePattern);
+    }
+
+    _getPronunciationHtml(node) {
+        return this._getHtml(node, this._pronunciationStyleApplier, null);
+    }
+
+    _getHtml(node, styleApplier, datasetKeyIgnorePattern) {
         const container = this._getTemporaryElement();
         container.appendChild(node);
-        this._normalizeHtml(container, styleApplier);
+        this._normalizeHtml(container, styleApplier, datasetKeyIgnorePattern);
         const result = container.innerHTML;
         container.textContent = '';
         return result;
     }
 
-    _normalizeHtml(root, styleApplier) {
+    _normalizeHtml(root, styleApplier, datasetKeyIgnorePattern) {
         const {ELEMENT_NODE, TEXT_NODE} = Node;
         const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
         const elements = [];
@@ -492,6 +501,7 @@ class AnkiTemplateRenderer {
         for (const element of elements) {
             const {dataset} = element;
             for (const key of Object.keys(dataset)) {
+                if (datasetKeyIgnorePattern !== null && datasetKeyIgnorePattern.test(key)) { continue; }
                 delete dataset[key];
             }
         }
@@ -541,13 +551,13 @@ class AnkiTemplateRenderer {
     _formatGlossaryImage(content, dictionary, data) {
         const structuredContentGenerator = this._createStructuredContentGenerator(data);
         const node = structuredContentGenerator.createDefinitionImage(content, dictionary);
-        return this._getHtml(node, this._structuredContentStyleApplier);
+        return this._getStructuredContentHtml(node);
     }
 
     _formatStructuredContent(content, dictionary, data) {
         const structuredContentGenerator = this._createStructuredContentGenerator(data);
         const node = structuredContentGenerator.createStructuredContent(content.content, dictionary);
-        return node !== null ? this._getHtml(node, this._structuredContentStyleApplier) : '';
+        return node !== null ? this._getStructuredContentHtml(node) : '';
     }
 
     _hasMedia(context, ...args) {
@@ -575,20 +585,11 @@ class AnkiTemplateRenderer {
 
         switch (format) {
             case 'text':
-                return this._getHtml(
-                    this._pronunciationGenerator.createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions),
-                    this._pronunciationStyleApplier
-                );
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions));
             case 'graph':
-                return this._getHtml(
-                    this._pronunciationGenerator.createPronunciationGraph(morae, downstepPosition),
-                    this._pronunciationStyleApplier
-                );
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationGraph(morae, downstepPosition));
             case 'position':
-                return this._getHtml(
-                    this._pronunciationGenerator.createPronunciationDownstepPosition(downstepPosition),
-                    this._pronunciationStyleApplier
-                );
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationDownstepPosition(downstepPosition));
             default:
                 return '';
         }
