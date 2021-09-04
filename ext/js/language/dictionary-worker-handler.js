@@ -44,7 +44,7 @@ class DictionaryWorkerHandler {
             case 'getDictionaryCounts':
                 this._onMessageWithProgress(params, this._getDictionaryCounts.bind(this));
                 break;
-            case 'getImageResolution.response':
+            case 'getImageDetails.response':
                 this._mediaLoader.handleMessage(params);
                 break;
         }

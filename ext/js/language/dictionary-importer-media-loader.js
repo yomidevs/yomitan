@@ -15,23 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * MediaUtil
- */
-
 /**
  * Class used for loading and validating media during the dictionary import process.
  */
 class DictionaryImporterMediaLoader {
     /**
-     * Attempts to load an image using a base64 encoded content and a media type
-     * and returns its resolution.
+     * Attempts to load an image using an ArrayBuffer and a media type to return details about it.
+     * @param content The binary content for the image, encoded as an ArrayBuffer.
      * @param mediaType The media type for the image content.
-     * @param content The binary content for the image, encoded in base64.
-     * @returns A Promise which resolves with {width, height} on success,
-     *   otherwise an error is thrown.
+     * @returns A Promise which resolves with {content, width, height} on success, otherwise an error is thrown.
      */
-    getImageResolution(mediaType, content) {
+    getImageDetails(content, mediaType, transfer) {
         return new Promise((resolve, reject) => {
             const image = new Image();
             const eventListeners = new EventListenerCollection();
@@ -42,14 +36,15 @@ class DictionaryImporterMediaLoader {
             };
             eventListeners.addEventListener(image, 'load', () => {
                 const {naturalWidth: width, naturalHeight: height} = image;
+                if (Array.isArray(transfer)) { transfer.push(content); }
                 cleanup();
-                resolve({width, height});
+                resolve({content, width, height});
             }, false);
             eventListeners.addEventListener(image, 'error', () => {
                 cleanup();
                 reject(new Error('Image failed to load'));
             }, false);
-            const blob = MediaUtil.createBlobFromBase64Content(content, mediaType);
+            const blob = new Blob([content], {type: mediaType});
             const url = URL.createObjectURL(blob);
             image.src = url;
         });

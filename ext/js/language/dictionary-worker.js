@@ -85,8 +85,8 @@ class DictionaryWorker {
             case 'progress':
                 this._onMessageProgress(params, details.onProgress);
                 break;
-            case 'getImageResolution':
-                this._onMessageGetImageResolution(params, details.worker);
+            case 'getImageDetails':
+                this._onMessageGetImageDetails(params, details.worker);
                 break;
         }
     }
@@ -115,16 +115,17 @@ class DictionaryWorker {
         onProgress(...args);
     }
 
-    async _onMessageGetImageResolution(params, worker) {
-        const {id, mediaType, content} = params;
+    async _onMessageGetImageDetails(params, worker) {
+        const {id, content, mediaType} = params;
+        const transfer = [];
         let response;
         try {
-            const result = await this._dictionaryImporterMediaLoader.getImageResolution(mediaType, content);
+            const result = await this._dictionaryImporterMediaLoader.getImageDetails(content, mediaType, transfer);
             response = {id, result};
         } catch (e) {
             response = {id, error: serializeError(e)};
         }
-        worker.postMessage({action: 'getImageResolution.response', params: response});
+        worker.postMessage({action: 'getImageDetails.response', params: response}, transfer);
     }
 
     _formatimportDictionaryResult(result) {

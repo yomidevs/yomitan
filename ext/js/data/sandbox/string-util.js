@@ -58,4 +58,19 @@ class StringUtil {
             return binary;
         }
     }
+
+    /**
+     * Converts a base64 string to an ArrayBuffer.
+     * @param content The binary content string encoded in base64.
+     * @returns A new `ArrayBuffer` object corresponding to the specified content.
+     */
+    static base64ToArrayBuffer(content) {
+        const binaryContent = atob(content);
+        const length = binaryContent.length;
+        const array = new Uint8Array(length);
+        for (let i = 0; i < length; ++i) {
+            array[i] = binaryContent.charCodeAt(i);
+        }
+        return array.buffer;
+    }
 }

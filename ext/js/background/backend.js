@@ -31,6 +31,7 @@
  * PermissionsUtil
  * ProfileConditionsUtil
  * RequestBuilder
+ * StringUtil
  * Translator
  * wanakana
  */
@@ -621,7 +622,7 @@ class Backend {
     }
 
     async _onApiGetMedia({targets}) {
-        return await this._dictionaryDatabase.getMedia(targets);
+        return await this._getNormalizedDictionaryDatabaseMedia(targets);
     }
 
     _onApiLog({error, level, context}) {
@@ -1847,7 +1848,7 @@ class Backend {
             detailsList.push(details);
             detailsMap.set(key, details);
         }
-        const mediaList = await this._dictionaryDatabase.getMedia(targets);
+        const mediaList = await this._getNormalizedDictionaryDatabaseMedia(targets);
 
         for (const media of mediaList) {
             const {dictionary, path} = media;
@@ -2282,5 +2283,16 @@ class Backend {
         if (file === null) { return; }
 
         return await this._injectScript(file, tab.id, frameId);
+    }
+
+    async _getNormalizedDictionaryDatabaseMedia(targets) {
+        const results = await this._dictionaryDatabase.getMedia(targets);
+        for (const item of results) {
+            const {content} = item;
+            if (content instanceof ArrayBuffer) {
+                item.content = StringUtil.arrayBufferToBase64(content);
+            }
+        }
+        return results;
     }
 }

@@ -45,21 +45,19 @@ class DictionaryWorkerMediaLoader {
     }
 
     /**
-     * Attempts to load an image using a base64 encoded content and a media type
-     * and returns its resolution.
+     * Attempts to load an image using an ArrayBuffer and a media type to return details about it.
+     * @param content The binary content for the image, encoded as an ArrayBuffer.
      * @param mediaType The media type for the image content.
-     * @param content The binary content for the image, encoded in base64.
-     * @returns A Promise which resolves with {width, height} on success,
-     *   otherwise an error is thrown.
+     * @returns A Promise which resolves with {content, width, height} on success, otherwise an error is thrown.
      */
-    getImageResolution(mediaType, content) {
+    getImageDetails(content, mediaType) {
         return new Promise((resolve, reject) => {
             const id = generateId(16);
             this._requests.set(id, {resolve, reject});
             self.postMessage({
-                action: 'getImageResolution',
-                params: {id, mediaType, content}
-            });
+                action: 'getImageDetails',
+                params: {id, content, mediaType}
+            }, [content]);
         });
     }
 }

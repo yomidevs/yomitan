@@ -69,9 +69,9 @@ class DatabaseVM extends VM {
 }
 
 class DatabaseVMDictionaryImporterMediaLoader {
-    async getImageResolution() {
+    async getImageDetails(content) {
         // Placeholder values
-        return {width: 100, height: 100};
+        return {content, width: 100, height: 100};
     }
 }
 
