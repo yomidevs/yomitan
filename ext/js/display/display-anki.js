@@ -255,7 +255,7 @@ class DisplayAnki {
         const displayTags = this._displayTags;
         const dictionaryEntryDetails = this._dictionaryEntryDetails;
         for (let i = 0, ii = dictionaryEntryDetails.length; i < ii; ++i) {
-            const allNoteIds = [];
+            let allNoteIds = null;
             for (const {mode, canAdd, noteIds, noteInfos, ankiError} of dictionaryEntryDetails[i].modeMap.values()) {
                 const button = this._adderButtonFind(i, mode);
                 if (button !== null) {
@@ -264,14 +264,15 @@ class DisplayAnki {
                 }
 
                 if (Array.isArray(noteIds) && noteIds.length > 0) {
-                    allNoteIds.push(...noteIds);
+                    if (allNoteIds === null) { allNoteIds = new Set(); }
+                    for (const noteId of noteIds) { allNoteIds.add(noteId); }
                 }
 
                 if (displayTags !== 'never' && Array.isArray(noteInfos)) {
                     this._setupTagsIndicator(i, noteInfos);
                 }
             }
-            this._updateViewNoteButton(i, allNoteIds, false);
+            this._updateViewNoteButton(i, allNoteIds !== null ? [...allNoteIds] : [], false);
         }
     }
 
