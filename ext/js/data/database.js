@@ -76,9 +76,7 @@ class Database {
                 return;
             }
 
-            const transaction = this.transaction([objectStoreName], 'readwrite');
-            transaction.onerror = (e) => reject(e.target.error);
-            transaction.oncomplete = () => resolve();
+            const transaction = this._readWriteTransaction([objectStoreName], resolve, reject);
             const objectStore = transaction.objectStore(objectStoreName);
             for (let i = start, ii = start + count; i < ii; ++i) {
                 objectStore.add(items[i]);
@@ -161,9 +159,7 @@ class Database {
 
     delete(objectStoreName, key) {
         return new Promise((resolve, reject) => {
-            const transaction = this.transaction([objectStoreName], 'readwrite');
-            transaction.onerror = (e) => reject(e.target.error);
-            transaction.oncomplete = () => resolve();
+            const transaction = this._readWriteTransaction([objectStoreName], resolve, reject);
             const objectStore = transaction.objectStore(objectStoreName);
             objectStore.delete(key);
             transaction.commit();
@@ -172,10 +168,7 @@ class Database {
 
     bulkDelete(objectStoreName, indexName, query, filterKeys=null, onProgress=null) {
         return new Promise((resolve, reject) => {
-            const transaction = this.transaction([objectStoreName], 'readwrite');
-            transaction.onerror = (e) => reject(e.target.error);
-            transaction.oncomplete = () => resolve();
-
+            const transaction = this._readWriteTransaction([objectStoreName], resolve, reject);
             const objectStore = transaction.objectStore(objectStoreName);
             const objectStoreOrIndex = indexName !== null ? objectStore.index(indexName) : objectStore;
 
@@ -316,5 +309,13 @@ class Database {
                 request.onsuccess = onSuccess;
             }
         }
+    }
+
+    _readWriteTransaction(storeNames, resolve, reject) {
+        const transaction = this.transaction(storeNames, 'readwrite');
+        transaction.onerror = (e) => reject(e.target.error);
+        transaction.onabort = () => reject(new Error('Transaction aborted'));
+        transaction.oncomplete = () => resolve();
+        return transaction;
     }
 }
