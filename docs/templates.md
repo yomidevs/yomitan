@@ -146,7 +146,8 @@ Uses a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScr
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#regexReplace <i>regex</i> <i>replacement</i> <i>[flags]</i>}}<i>text-to-modify</i>{{/regexReplace}}</code>
+  <code>{{#regexReplace <i>regex</i> <i>replacement</i> <i>[flags]</i>}}<i>text-to-modify</i>{{/regexReplace}}</code><br>
+  <code>{{#regexReplace <i>regex</i> <i>replacement</i> <i>[flags]</i> <i>[text-to-modify]...</i>}}{{/regexReplace}}</code><br>
 
   * _`regex`_ <br>
     The raw string used to create the regular expression. This value is passed to the [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/RegExp) constructor.
@@ -156,6 +157,7 @@ Uses a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScr
     Optional flags to pass to the [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/RegExp) constructor.
   * _`text-to-modify`_ <br>
     The text that the regular expression is applied to.
+    If multiple arguments are present, they are all concatenated.
 </details>
 <details>
   <summary>Example:</summary>
@@ -178,7 +180,8 @@ Uses a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScr
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#regexMatch <i>regex</i> <i>[flags]</i>}}<i>text-to-modify</i>{{/regexMatch}}</code>
+  <code>{{#regexMatch <i>regex</i> <i>[flags]</i>}}<i>text-to-modify</i>{{/regexMatch}}</code><br>
+  <code>{{#regexMatch <i>regex</i> <i>[flags]</i> <i>[text-to-modify]...</i>}}{{/regexMatch}}</code><br>
 
   * _`regex`_ <br>
     The raw string used to create the regular expression. This value is passed to the [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/RegExp) constructor.
@@ -186,6 +189,7 @@ Uses a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScr
     Optional flags to pass to the [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/RegExp) constructor.
   * _`text-to-modify`_ <br>
     The text that the regular expression is applied to.
+    If multiple arguments are present, they are all concatenated.
 </details>
 <details>
   <summary>Example:</summary>
