@@ -535,7 +535,7 @@ class Translator {
         const indexRemap = new Map();
         let oldIndex = 0;
         for (let i = 0, ii = headwords.length; i < ii; ++i) {
-            if (removeHeadwordIndices.has(i)) {
+            if (removeHeadwordIndices.has(oldIndex)) {
                 headwords.splice(i, 1);
                 --i;
                 --ii;
