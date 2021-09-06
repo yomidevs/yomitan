@@ -207,15 +207,20 @@ class AnkiTemplateRenderer {
 
     _regexReplace(context, ...args) {
         // Usage:
-        // {{#regexReplace regex string [flags]}}content{{/regexReplace}}
+        // {{#regexReplace regex string [flags] [content]...}}content{{/regexReplace}}
         // regex: regular expression string
         // string: string to replace
         // flags: optional flags for regular expression
         //   e.g. "i" for case-insensitive, "g" for replace all
-        let value = args[args.length - 1].fn(context);
-        if (args.length >= 3) {
+        const argCount = args.length - 1;
+        const options = args[argCount];
+        let value = options.fn(context);
+        if (argCount > 3) {
+            value = `${args.slice(3).join('')}${value}`;
+        }
+        if (argCount > 1) {
             try {
-                const flags = args.length > 3 ? args[2] : 'g';
+                const flags = argCount > 2 ? args[2] : 'g';
                 const regex = new RegExp(args[0], flags);
                 value = value.replace(regex, args[1]);
             } catch (e) {
@@ -227,14 +232,19 @@ class AnkiTemplateRenderer {
 
     _regexMatch(context, ...args) {
         // Usage:
-        // {{#regexMatch regex [flags]}}content{{/regexMatch}}
+        // {{#regexMatch regex [flags] [content]...}}content{{/regexMatch}}
         // regex: regular expression string
         // flags: optional flags for regular expression
         //   e.g. "i" for case-insensitive, "g" for match all
-        let value = args[args.length - 1].fn(context);
-        if (args.length >= 2) {
+        const argCount = args.length - 1;
+        const options = args[argCount];
+        let value = options.fn(context);
+        if (argCount > 2) {
+            value = `${args.slice(2).join('')}${value}`;
+        }
+        if (argCount > 0) {
             try {
-                const flags = args.length > 2 ? args[1] : '';
+                const flags = argCount > 1 ? args[1] : '';
                 const regex = new RegExp(args[0], flags);
                 const parts = [];
                 value.replace(regex, (g0) => parts.push(g0));
