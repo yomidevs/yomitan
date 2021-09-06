@@ -84,7 +84,7 @@ class DictionaryWorkerHandler {
     async _deleteDictionary({dictionaryTitle}, onProgress) {
         const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
         try {
-            return await dictionaryDatabase.deleteDictionary(dictionaryTitle, {rate: 1000}, onProgress);
+            return await dictionaryDatabase.deleteDictionary(dictionaryTitle, 1000, onProgress);
         } finally {
             dictionaryDatabase.close();
         }

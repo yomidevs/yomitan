@@ -139,22 +139,37 @@ class DictionaryDatabase {
         return result;
     }
 
-    async deleteDictionary(dictionaryName, progressSettings, onProgress) {
-        const targets = [
-            ['dictionaries', 'title'],
-            ['kanji', 'dictionary'],
-            ['kanjiMeta', 'dictionary'],
-            ['terms', 'dictionary'],
-            ['termMeta', 'dictionary'],
-            ['tagMeta', 'dictionary'],
-            ['media', 'dictionary']
+    async deleteDictionary(dictionaryName, progressRate, onProgress) {
+        if (typeof progressRate !== 'number') {
+            progressRate = 1;
+        }
+        if (typeof onProgress !== 'function') {
+            onProgress = () => {};
+        }
+
+        const targetGroups = [
+            [
+                ['kanji', 'dictionary'],
+                ['kanjiMeta', 'dictionary'],
+                ['terms', 'dictionary'],
+                ['termMeta', 'dictionary'],
+                ['tagMeta', 'dictionary'],
+                ['media', 'dictionary']
+            ],
+            [
+                ['dictionaries', 'title']
+            ]
         ];
 
-        const {rate} = progressSettings;
+        let storeCount = 0;
+        for (const targets of targetGroups) {
+            storeCount += targets.length;
+        }
+
         const progressData = {
             count: 0,
             processed: 0,
-            storeCount: targets.length,
+            storeCount,
             storesProcesed: 0
         };
 
@@ -167,18 +182,20 @@ class DictionaryDatabase {
         const onProgress2 = () => {
             const processed = progressData.processed + 1;
             progressData.processed = processed;
-            if ((processed % rate) === 0 || processed === progressData.count) {
+            if ((processed % progressRate) === 0 || processed === progressData.count) {
                 onProgress(progressData);
             }
         };
 
-        const promises = [];
-        for (const [objectStoreName, indexName] of targets) {
-            const query = IDBKeyRange.only(dictionaryName);
-            const promise = this._db.bulkDelete(objectStoreName, indexName, query, filterKeys, onProgress2);
-            promises.push(promise);
+        for (const targets of targetGroups) {
+            const promises = [];
+            for (const [objectStoreName, indexName] of targets) {
+                const query = IDBKeyRange.only(dictionaryName);
+                const promise = this._db.bulkDelete(objectStoreName, indexName, query, filterKeys, onProgress2);
+                promises.push(promise);
+            }
+            await Promise.all(promises);
         }
-        await Promise.all(promises);
     }
 
     findTermsBulk(termList, dictionaries, wildcard) {
