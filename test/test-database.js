@@ -147,7 +147,16 @@ async function testDatabase1() {
             revision: 'test',
             sequenced: true,
             version: 3,
-            prefixWildcardsSupported: true
+            importDate: 0,
+            prefixWildcardsSupported: true,
+            counts: {
+                kanji: {total: 2},
+                kanjiMeta: {total: 2, freq: 2},
+                media: {total: 4},
+                tagMeta: {total: 15},
+                termMeta: {total: 16, freq: 9, pitch: 7},
+                terms: {total: 20}
+            }
         };
 
         // Import data
@@ -158,6 +167,7 @@ async function testDatabase1() {
             testDictionarySource,
             {prefixWildcardsSupported: true}
         );
+        expectedSummary.importDate = result.importDate;
         vm.assert.deepStrictEqual(errors, []);
         vm.assert.deepStrictEqual(result, expectedSummary);
         assert.ok(progressEvent);
