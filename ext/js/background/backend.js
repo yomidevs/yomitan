@@ -125,7 +125,7 @@ class Backend {
             ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}],
             ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}],
             ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
-            ['documentStart',                {async: false, contentScript: true,  handler: this._onDocumentStart.bind(this)}]
+            ['documentStart',                {async: false, contentScript: true,  handler: this._onApiDocumentStart.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -742,7 +742,7 @@ class Backend {
         return this._japaneseUtil.isStringPartiallyJapanese(text);
     }
 
-    _onDocumentStart(params, sender) {
+    _onApiDocumentStart(params, sender) {
         const {tab, frameId, url} = sender;
         if (typeof url !== 'string' || typeof tab !== 'object' || tab === null) { return; }
         this._updateTabAccessibility(url, tab, frameId);
