@@ -84,16 +84,7 @@ function getSchemas() {
 }
 
 
-async function main() {
-    const dictionaryFileNames = process.argv.slice(2);
-    if (dictionaryFileNames.length === 0) {
-        console.log([
-            'Usage:',
-            '  node dictionary-validate <dictionary-file-names>...'
-        ].join('\n'));
-        return;
-    }
-
+async function testDictionaryFiles(dictionaryFileNames) {
     const schemas = getSchemas();
 
     for (const dictionaryFileName of dictionaryFileNames) {
@@ -114,10 +105,25 @@ async function main() {
 }
 
 
+async function main() {
+    const dictionaryFileNames = process.argv.slice(2);
+    if (dictionaryFileNames.length === 0) {
+        console.log([
+            'Usage:',
+            '  node dictionary-validate <dictionary-file-names>...'
+        ].join('\n'));
+        return;
+    }
+
+    await testDictionaryFiles(dictionaryFileNames);
+}
+
+
 if (require.main === module) { main(); }
 
 
 module.exports = {
     getSchemas,
-    validateDictionary
+    validateDictionary,
+    testDictionaryFiles
 };
