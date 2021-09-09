@@ -1261,6 +1261,9 @@ button.popup-menu-item {
     font-family: inherit;
     align-items: center;
 }
+button.popup-menu-item.popup-menu-item-bold {
+    font-weight: bold;
+}
 button.popup-menu-item:not([hidden]) {
     display: flex;
 }
