@@ -476,12 +476,16 @@ class DictionaryImporter {
     }
 
     _convertTermBankEntryV1(entry, dictionary) {
-        const [expression, reading, definitionTags, rules, score, ...glossary] = entry;
+        let [expression, reading, definitionTags, rules, score, ...glossary] = entry;
+        expression = this._normalizeTermOrReading(expression);
+        reading = this._normalizeTermOrReading(reading.length > 0 ? reading : expression);
         return {expression, reading, definitionTags, rules, score, glossary, dictionary};
     }
 
     _convertTermBankEntryV3(entry, dictionary) {
-        const [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
+        let [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
+        expression = this._normalizeTermOrReading(expression);
+        reading = this._normalizeTermOrReading(reading.length > 0 ? reading : expression);
         return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, dictionary};
     }
 
@@ -579,5 +583,13 @@ class DictionaryImporter {
             counts[key] = value;
         }
         return counts;
+    }
+
+    _normalizeTermOrReading(text) {
+        try {
+            return text.normalize('NFC');
+        } catch (e) {
+            return text;
+        }
     }
 }
