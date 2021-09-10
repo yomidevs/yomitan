@@ -433,10 +433,10 @@ class Translator {
                         groups: []
                     };
                     targetMap.set(key, target);
+                    termList.push({term, reading});
+                    targetList.push(target);
                 }
                 target.groups.push(group);
-                termList.push({term, reading});
-                targetList.push(target);
             }
         }
 
