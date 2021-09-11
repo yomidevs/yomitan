@@ -627,7 +627,7 @@ button.action-button[hidden] {
         -webkit-filter var(--animation-duration) linear,
         background-color var(--animation-duration) linear;
 }
-button.collapsible-action-button[hidden] {
+button.action-button-collapsible[hidden] {
     display: none;
 }
 button.action-button:disabled {
@@ -653,34 +653,18 @@ button.action-button:active {
     background-color: var(--action-button-active-color);
     box-shadow: none;
 }
-button.action-button[data-icon]::before {
-    content: '';
-    width: var(--action-button-size);
-    height: var(--action-button-size);
-    display: block;
-    background-color: transparent;
-    background-repeat: no-repeat;
-    background-size: contain;
-}
-button.action-button[data-icon=view-note]::before {
-    background-image: url('/images/view-note.svg');
-}
-button.action-button[data-icon=add-term-kanji]::before {
-    background-image: url('/images/add-term-kanji.svg');
-}
-button.action-button[data-icon=add-term-kana]::before {
-    background-image: url('/images/add-term-kana.svg');
-}
-button.action-button[data-icon=play-audio]::before {
-    background-image: url('/images/play-audio.svg');
-}
-button.action-button[data-icon=source-term]::before {
-    background-image: url('/images/source-term.svg');
-}
-.action-view-tags>.icon {
+.icon[data-icon=view-note]      { background-image: url('/images/view-note.svg'); }
+.icon[data-icon=add-term-kanji] { background-image: url('/images/add-term-kanji.svg'); }
+.icon[data-icon=add-term-kana]  { background-image: url('/images/add-term-kana.svg'); }
+.icon[data-icon=play-audio]     { background-image: url('/images/play-audio.svg'); }
+.icon[data-icon=source-term]    { background-image: url('/images/source-term.svg'); }
+.icon[data-icon=entry-current]  { background-image: url('/images/entry-current.svg'); }
+.action-icon {
     display: block;
     width: var(--action-button-size);
     height: var(--action-button-size);
+}
+.action-icon:not(.color-icon) {
     background-color: var(--text-color);
 }
 :root[data-result-output-mode=merge] .entry[data-type=term] .actions>button.action-button.action-play-audio {
@@ -1048,14 +1032,10 @@ button.action-button[data-icon=source-term]::before {
 :root:not([data-popup-current-indicator-mode=asterisk]) .entry-current-indicator-icon {
     display: none;
 }
-.entry-current-indicator-icon::before {
-    content: '';
+.entry-current-indicator-icon>.icon {
     width: var(--action-button-size);
     height: var(--action-button-size);
     display: block;
-    background-color: transparent;
-    background-repeat: no-repeat;
-    background-size: contain;
     background-image: url('/images/entry-current.svg');
 }
 

@@ -5,12 +5,12 @@
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header">
         <div class="actions">
-            <button class="action-button collapsible-action-button action-view-tags" hidden disabled><span class="icon" data-icon="tag"></span></button>
-            <button class="action-button action-view-note" hidden disabled data-icon="view-note" title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]' data-menu-position="left below h-cover v-cover"><div class="action-button-badge icon" hidden></div></button>
-            <button class="action-button action-add-note" hidden disabled data-icon="add-term-kanji" data-mode="term-kanji" title="Add expression" data-hotkey='["addNoteTermKanji","title","Add expression ({0})"]'></button>
-            <button class="action-button action-add-note" hidden disabled data-icon="add-term-kana" data-mode="term-kana" title="Add reading" data-hotkey='["addNoteTermKana","title","Add reading ({0})"]'></button>
-            <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover"><div class="action-button-badge icon" hidden></div></button>
-            <span class="entry-current-indicator-icon" title="Current entry"></span>
+            <button class="action-button action-button-collapsible action-view-tags" hidden disabled><span class="action-icon icon" data-icon="tag"></span></button>
+            <button class="action-button action-view-note" hidden disabled title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]' data-menu-position="left below h-cover v-cover"><span class="action-icon icon color-icon" data-icon="view-note"></span><span class="action-button-badge icon" hidden></span></button>
+            <button class="action-button action-add-note" hidden disabled data-mode="term-kanji" title="Add expression" data-hotkey='["addNoteTermKanji","title","Add expression ({0})"]'><span class="action-icon icon color-icon" data-icon="add-term-kanji"></span></button>
+            <button class="action-button action-add-note" hidden disabled data-mode="term-kana" title="Add reading" data-hotkey='["addNoteTermKana","title","Add reading ({0})"]'><span class="action-icon icon color-icon" data-icon="add-term-kana"></span></button>
+            <button class="action-button action-play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover"><span class="action-icon icon color-icon" data-icon="play-audio"></span><span class="action-button-badge icon" hidden></span></button>
+            <span class="entry-current-indicator-icon" title="Current entry"><span class="icon color-icon" data-icon="entry-current"></span></span>
         </div>
         <div class="headword-list"></div>
         <div class="headword-list-details">
@@ -42,7 +42,7 @@
         </span>
     </div>
     <div class="headword-details">
-        <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="right below h-cover v-cover"><div class="action-button-badge icon" hidden></div></button>
+        <button class="action-button action-play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="right below h-cover v-cover"><span class="action-icon icon color-icon" data-icon="play-audio"></span><span class="action-button-badge icon" hidden></span></button>
     </div>
 </div></template>
 <template id="definition-item-template" data-remove-whitespace-text="true"><li class="definition-item">
@@ -91,9 +91,9 @@
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header">
         <div class="actions">
-            <button class="action-button action-view-note" hidden disabled data-icon="view-note" title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]'></button>
-            <button class="action-button action-add-note" hidden disabled data-icon="add-term-kanji" data-mode="kanji" title="Add kanji" data-hotkey='["addNoteKanji","title","Add kanji ({0})"]'></button>
-            <span class="entry-current-indicator-icon" title="Current entry"></span>
+            <button class="action-button action-view-note" hidden disabled title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]'><span class="action-icon icon color-icon" data-icon="view-note"></span></button>
+            <button class="action-button action-add-note" hidden disabled data-mode="kanji" title="Add kanji" data-hotkey='["addNoteKanji","title","Add kanji ({0})"]'><span class="action-icon icon color-icon" data-icon="add-term-kanji"></span></button>
+            <span class="entry-current-indicator-icon" title="Current entry"><span class="icon color-icon" data-icon="entry-current"></span></span>
         </div>
         <div class="kanji-glyph-container">
             <span class="headword-current-indicator"></span>

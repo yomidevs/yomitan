@@ -228,6 +228,14 @@ body {
     mask-size: var(--icon-size);
     mask-image: var(--icon-image);
 }
+.icon.color-icon {
+    -webkit-mask-image: none;
+    mask-image: none;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: var(--icon-size);
+    background-image: var(--icon-image);
+}
 .icon[data-icon=none]                    { --icon-image: linear-gradient(transparent, transparent); }
 .icon[data-icon=profile]                 { --icon-image: url(/images/profile.svg); }
 .icon[data-icon=cog]                     { --icon-image: url(/images/cog.svg); }
