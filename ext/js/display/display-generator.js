@@ -232,12 +232,21 @@ class DisplayGenerator {
     // Private
 
     _createTermHeadword(headword, headwordIndex, pronunciations) {
-        const {term, reading, tags} = headword;
+        const {term, reading, tags, sources} = headword;
+
+        let isPrimaryAny = false;
+        for (const {isPrimary} of sources) {
+            if (isPrimary) {
+                isPrimaryAny = true;
+                break;
+            }
+        }
 
         const node = this._templates.instantiate('headword');
 
         const termContainer = node.querySelector('.headword-term');
 
+        node.dataset.isPrimary = `${isPrimaryAny}`;
         node.dataset.readingIsSame = `${reading === term}`;
         node.dataset.frequency = DictionaryDataUtil.getTermFrequency(tags);
 
