@@ -463,7 +463,8 @@ class OptionsUtil {
             {async: false, update: this._updateVersion11.bind(this)},
             {async: true,  update: this._updateVersion12.bind(this)},
             {async: true,  update: this._updateVersion13.bind(this)},
-            {async: false, update: this._updateVersion14.bind(this)}
+            {async: false, update: this._updateVersion14.bind(this)},
+            {async: false, update: this._updateVersion15.bind(this)}
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -873,6 +874,17 @@ class OptionsUtil {
             profile.options.accessibility = {
                 forceGoogleDocsHtmlRendering: false
             };
+        }
+        return options;
+    }
+
+    _updateVersion15(options) {
+        // Version 15 changes:
+        //  Added general.sortFrequencyDictionary.
+        //  Added general.sortFrequencyDictionaryOrder.
+        for (const profile of options.profiles) {
+            profile.options.general.sortFrequencyDictionary = null;
+            profile.options.general.sortFrequencyDictionaryOrder = 'descending';
         }
         return options;
     }

@@ -125,7 +125,8 @@ class Backend {
             ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}],
             ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}],
             ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
-            ['documentStart',                {async: false, contentScript: true,  handler: this._onApiDocumentStart.bind(this)}]
+            ['documentStart',                {async: false, contentScript: true,  handler: this._onApiDocumentStart.bind(this)}],
+            ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -746,6 +747,10 @@ class Backend {
         const {tab, frameId, url} = sender;
         if (typeof url !== 'string' || typeof tab !== 'object' || tab === null) { return; }
         this._updateTabAccessibility(url, tab, frameId);
+    }
+
+    async _onApiGetTermFrequencies({termReadingList, dictionaries}) {
+        return await this._translator.getTermFrequencies(termReadingList, dictionaries);
     }
 
     // Command handlers
@@ -1953,7 +1958,7 @@ class Backend {
         const {wildcard} = details;
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
-            general: {mainDictionary},
+            general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder},
             scanning: {alphanumeric},
             translation: {
                 convertHalfWidthCharacters,
@@ -1979,6 +1984,8 @@ class Backend {
         return {
             wildcard,
             mainDictionary,
+            sortFrequencyDictionary,
+            sortFrequencyDictionaryOrder,
             removeNonJapaneseCharacters: !alphanumeric,
             convertHalfWidthCharacters,
             convertNumericCharacters,

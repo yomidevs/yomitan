@@ -168,6 +168,10 @@ class API {
         return this._invoke('textHasJapaneseCharacters', {text});
     }
 
+    getTermFrequencies(termReadingList, dictionaries) {
+        return this._invoke('getTermFrequencies', {termReadingList, dictionaries});
+    }
+
     // Utilities
 
     _createActionPort(timeout=5000) {

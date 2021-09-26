@@ -249,6 +249,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -297,6 +298,7 @@
             "dictionaryPriority": 0,
             "id": 1,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               1
             ],
@@ -349,6 +351,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -397,6 +400,7 @@
             "dictionaryPriority": 0,
             "id": 2,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               2
             ],
@@ -468,6 +472,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -529,6 +534,7 @@
             "dictionaryPriority": 0,
             "id": 3,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -581,6 +587,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -642,6 +649,7 @@
             "dictionaryPriority": 0,
             "id": 5,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -694,6 +702,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -755,6 +764,7 @@
             "dictionaryPriority": 0,
             "id": 4,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -807,6 +817,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -868,6 +879,7 @@
             "dictionaryPriority": 0,
             "id": 6,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -920,6 +932,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -968,6 +981,7 @@
             "dictionaryPriority": 0,
             "id": 1,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               1
             ],
@@ -1020,6 +1034,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -1068,6 +1083,7 @@
             "dictionaryPriority": 0,
             "id": 2,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               2
             ],
@@ -1139,6 +1155,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -1200,6 +1217,7 @@
             "dictionaryPriority": 0,
             "id": 7,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -1274,6 +1292,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -1335,6 +1354,7 @@
             "dictionaryPriority": 0,
             "id": 9,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -1409,6 +1429,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -1470,6 +1491,7 @@
             "dictionaryPriority": 0,
             "id": 8,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -1544,6 +1566,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -1605,6 +1628,7 @@
             "dictionaryPriority": 0,
             "id": 10,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -1681,6 +1705,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -1742,6 +1767,7 @@
             "dictionaryPriority": 0,
             "id": 3,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -1796,6 +1822,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -1857,6 +1884,7 @@
             "dictionaryPriority": 0,
             "id": 5,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -1911,6 +1939,7 @@
           "masu stem"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -1972,6 +2001,7 @@
             "dictionaryPriority": 0,
             "id": 4,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -2026,6 +2056,7 @@
           "masu stem"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -2087,6 +2118,7 @@
             "dictionaryPriority": 0,
             "id": 6,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -2139,6 +2171,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -2187,6 +2220,7 @@
             "dictionaryPriority": 0,
             "id": 1,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               1
             ],
@@ -2239,6 +2273,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -2287,6 +2322,7 @@
             "dictionaryPriority": 0,
             "id": 2,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               2
             ],
@@ -2358,6 +2394,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -2419,6 +2456,7 @@
             "dictionaryPriority": 0,
             "id": 11,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               5
             ],
@@ -2467,6 +2505,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -2515,6 +2554,7 @@
             "dictionaryPriority": 0,
             "id": 1,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               1
             ],
@@ -2573,6 +2613,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -2621,6 +2662,7 @@
             "dictionaryPriority": 0,
             "id": 2,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               2
             ],
@@ -2692,6 +2734,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -2753,6 +2796,7 @@
             "dictionaryPriority": 0,
             "id": 3,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -2805,6 +2849,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -2866,6 +2911,7 @@
             "dictionaryPriority": 0,
             "id": 4,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -2924,6 +2970,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -2985,6 +3032,7 @@
             "dictionaryPriority": 0,
             "id": 5,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -3037,6 +3085,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -3098,6 +3147,7 @@
             "dictionaryPriority": 0,
             "id": 6,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -3156,6 +3206,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -3217,6 +3268,7 @@
             "dictionaryPriority": 0,
             "id": 7,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -3291,6 +3343,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -3352,6 +3405,7 @@
             "dictionaryPriority": 0,
             "id": 8,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -3428,6 +3482,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -3489,6 +3544,7 @@
             "dictionaryPriority": 0,
             "id": 3,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -3543,6 +3599,7 @@
           "masu stem"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -3604,6 +3661,7 @@
             "dictionaryPriority": 0,
             "id": 4,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -3662,6 +3720,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -3723,6 +3782,7 @@
             "dictionaryPriority": 0,
             "id": 9,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -3797,6 +3857,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -3858,6 +3919,7 @@
             "dictionaryPriority": 0,
             "id": 10,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -3934,6 +3996,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -3995,6 +4058,7 @@
             "dictionaryPriority": 0,
             "id": 5,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -4049,6 +4113,7 @@
           "masu stem"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -4110,6 +4175,7 @@
             "dictionaryPriority": 0,
             "id": 6,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -4168,6 +4234,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -4229,6 +4296,7 @@
             "dictionaryPriority": 0,
             "id": 11,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               5
             ],
@@ -4287,6 +4355,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -4321,6 +4390,7 @@
             "dictionaryPriority": 0,
             "id": 7,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -4340,6 +4410,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -4374,6 +4445,7 @@
             "dictionaryPriority": 0,
             "id": 9,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -4393,6 +4465,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -4427,6 +4500,7 @@
             "dictionaryPriority": 0,
             "id": 8,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -4446,6 +4520,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -4480,6 +4555,7 @@
             "dictionaryPriority": 0,
             "id": 10,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -4501,6 +4577,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -4535,6 +4612,7 @@
             "dictionaryPriority": 0,
             "id": 3,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -4556,6 +4634,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -4590,6 +4669,7 @@
             "dictionaryPriority": 0,
             "id": 5,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -4611,6 +4691,7 @@
           "masu stem"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -4645,6 +4726,7 @@
             "dictionaryPriority": 0,
             "id": 4,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -4666,6 +4748,7 @@
           "masu stem"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -4700,6 +4783,7 @@
             "dictionaryPriority": 0,
             "id": 6,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -4719,6 +4803,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -4753,6 +4838,7 @@
             "dictionaryPriority": 0,
             "id": 1,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               1
             ],
@@ -4772,6 +4858,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -4806,6 +4893,7 @@
             "dictionaryPriority": 0,
             "id": 2,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               2
             ],
@@ -4831,6 +4919,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -4905,6 +4994,7 @@
             "dictionaryPriority": 0,
             "id": 7,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -4939,6 +5029,7 @@
             "dictionaryPriority": 0,
             "id": 8,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -5013,6 +5104,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -5087,6 +5179,7 @@
             "dictionaryPriority": 0,
             "id": 9,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -5121,6 +5214,7 @@
             "dictionaryPriority": 0,
             "id": 10,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -5197,6 +5291,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -5271,6 +5366,7 @@
             "dictionaryPriority": 0,
             "id": 3,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -5305,6 +5401,7 @@
             "dictionaryPriority": 0,
             "id": 4,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -5359,6 +5456,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -5433,6 +5531,7 @@
             "dictionaryPriority": 0,
             "id": 5,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -5467,6 +5566,7 @@
             "dictionaryPriority": 0,
             "id": 6,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -5519,6 +5619,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -5567,6 +5668,7 @@
             "dictionaryPriority": 0,
             "id": 1,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               1
             ],
@@ -5619,6 +5721,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -5667,6 +5770,7 @@
             "dictionaryPriority": 0,
             "id": 2,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               2
             ],
@@ -5738,6 +5842,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 2,
@@ -5869,6 +5974,7 @@
             "dictionaryPriority": 0,
             "id": 7,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -5903,6 +6009,7 @@
             "dictionaryPriority": 0,
             "id": 9,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -5937,6 +6044,7 @@
             "dictionaryPriority": 0,
             "id": 8,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -5971,6 +6079,7 @@
             "dictionaryPriority": 0,
             "id": 10,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -6086,6 +6195,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 2,
@@ -6217,6 +6327,7 @@
             "dictionaryPriority": 0,
             "id": 3,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -6251,6 +6362,7 @@
             "dictionaryPriority": 0,
             "id": 5,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -6285,6 +6397,7 @@
             "dictionaryPriority": 0,
             "id": 4,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -6319,6 +6432,7 @@
             "dictionaryPriority": 0,
             "id": 6,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -6389,6 +6503,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -6437,6 +6552,7 @@
             "dictionaryPriority": 0,
             "id": 1,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               1
             ],
@@ -6489,6 +6605,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -6537,6 +6654,7 @@
             "dictionaryPriority": 0,
             "id": 2,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               2
             ],
@@ -6612,6 +6730,7 @@
           "polite past negative"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -6673,6 +6792,7 @@
             "dictionaryPriority": 0,
             "id": 7,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -6751,6 +6871,7 @@
           "polite past negative"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -6812,6 +6933,7 @@
             "dictionaryPriority": 0,
             "id": 9,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -6890,6 +7012,7 @@
           "polite past negative"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -6951,6 +7074,7 @@
             "dictionaryPriority": 0,
             "id": 8,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -7029,6 +7153,7 @@
           "polite past negative"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -7090,6 +7215,7 @@
             "dictionaryPriority": 0,
             "id": 10,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -7166,6 +7292,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -7227,6 +7354,7 @@
             "dictionaryPriority": 0,
             "id": 3,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -7281,6 +7409,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -7342,6 +7471,7 @@
             "dictionaryPriority": 0,
             "id": 5,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -7396,6 +7526,7 @@
           "masu stem"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -7457,6 +7588,7 @@
             "dictionaryPriority": 0,
             "id": 4,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -7511,6 +7643,7 @@
           "masu stem"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -7572,6 +7705,7 @@
             "dictionaryPriority": 0,
             "id": 6,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -7624,6 +7758,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -7672,6 +7807,7 @@
             "dictionaryPriority": 0,
             "id": 1,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               1
             ],
@@ -7724,6 +7860,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -7772,6 +7909,7 @@
             "dictionaryPriority": 0,
             "id": 2,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               2
             ],
@@ -7843,6 +7981,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -7904,6 +8043,7 @@
             "dictionaryPriority": 0,
             "id": 7,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -7978,6 +8118,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -8039,6 +8180,7 @@
             "dictionaryPriority": 0,
             "id": 9,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -8113,6 +8255,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -8174,6 +8317,7 @@
             "dictionaryPriority": 0,
             "id": 8,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -8248,6 +8392,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -8309,6 +8454,7 @@
             "dictionaryPriority": 0,
             "id": 10,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -8385,6 +8531,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -8446,6 +8593,7 @@
             "dictionaryPriority": 0,
             "id": 3,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -8500,6 +8648,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -8561,6 +8710,7 @@
             "dictionaryPriority": 0,
             "id": 5,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -8615,6 +8765,7 @@
           "masu stem"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -8676,6 +8827,7 @@
             "dictionaryPriority": 0,
             "id": 4,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -8730,6 +8882,7 @@
           "masu stem"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -8791,6 +8944,7 @@
             "dictionaryPriority": 0,
             "id": 6,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -8843,6 +8997,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -8891,6 +9046,7 @@
             "dictionaryPriority": 0,
             "id": 1,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               1
             ],
@@ -8943,6 +9099,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -8991,6 +9148,7 @@
             "dictionaryPriority": 0,
             "id": 2,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               2
             ],
@@ -9062,6 +9220,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -9123,6 +9282,7 @@
             "dictionaryPriority": 0,
             "id": 7,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -9197,6 +9357,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -9258,6 +9419,7 @@
             "dictionaryPriority": 0,
             "id": 9,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -9332,6 +9494,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -9393,6 +9556,7 @@
             "dictionaryPriority": 0,
             "id": 8,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -9467,6 +9631,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -9528,6 +9693,7 @@
             "dictionaryPriority": 0,
             "id": 10,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -9604,6 +9770,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -9665,6 +9832,7 @@
             "dictionaryPriority": 0,
             "id": 3,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -9719,6 +9887,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -9780,6 +9949,7 @@
             "dictionaryPriority": 0,
             "id": 5,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -9834,6 +10004,7 @@
           "masu stem"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -9895,6 +10066,7 @@
             "dictionaryPriority": 0,
             "id": 4,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -9949,6 +10121,7 @@
           "masu stem"
         ],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -10010,6 +10183,7 @@
             "dictionaryPriority": 0,
             "id": 6,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -10062,6 +10236,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -10110,6 +10285,7 @@
             "dictionaryPriority": 0,
             "id": 1,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               1
             ],
@@ -10162,6 +10338,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -10210,6 +10387,7 @@
             "dictionaryPriority": 0,
             "id": 2,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               2
             ],
@@ -10283,6 +10461,7 @@
           "masu stem"
         ],
         "score": 100,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -10344,6 +10523,7 @@
             "dictionaryPriority": 0,
             "id": 12,
             "score": 100,
+            "frequencyOrder": 0,
             "sequences": [
               6
             ],
@@ -10382,6 +10562,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 90,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -10443,6 +10624,7 @@
             "dictionaryPriority": 0,
             "id": 13,
             "score": 90,
+            "frequencyOrder": 0,
             "sequences": [
               7
             ],
@@ -10483,6 +10665,7 @@
           "polite past"
         ],
         "score": 100,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -10544,6 +10727,7 @@
             "dictionaryPriority": 0,
             "id": 12,
             "score": 100,
+            "frequencyOrder": 0,
             "sequences": [
               6
             ],
@@ -10582,6 +10766,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -10713,6 +10898,7 @@
             "dictionaryPriority": 0,
             "id": 7,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -10747,6 +10933,7 @@
             "dictionaryPriority": 0,
             "id": 9,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -10781,6 +10968,7 @@
             "dictionaryPriority": 0,
             "id": 8,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -10815,6 +11003,7 @@
             "dictionaryPriority": 0,
             "id": 10,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               4
             ],
@@ -10930,6 +11119,7 @@
           "masu stem"
         ],
         "score": 10,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
@@ -11061,6 +11251,7 @@
             "dictionaryPriority": 0,
             "id": 3,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -11095,6 +11286,7 @@
             "dictionaryPriority": 0,
             "id": 5,
             "score": 10,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -11129,6 +11321,7 @@
             "dictionaryPriority": 0,
             "id": 4,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -11163,6 +11356,7 @@
             "dictionaryPriority": 0,
             "id": 6,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               3
             ],
@@ -11239,6 +11433,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -11273,6 +11468,7 @@
             "dictionaryPriority": 0,
             "id": 15,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               9
             ],
@@ -11381,6 +11577,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -11415,6 +11612,7 @@
             "dictionaryPriority": 0,
             "id": 16,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               10
             ],
@@ -11471,6 +11669,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -11505,6 +11704,7 @@
             "dictionaryPriority": 0,
             "id": 17,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               11
             ],
@@ -11561,6 +11761,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -11595,6 +11796,7 @@
             "dictionaryPriority": 0,
             "id": 18,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               12
             ],
@@ -11651,6 +11853,7 @@
         "isPrimary": true,
         "inflections": [],
         "score": 1,
+        "frequencyOrder": 0,
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
@@ -11685,6 +11888,7 @@
             "dictionaryPriority": 0,
             "id": 19,
             "score": 1,
+            "frequencyOrder": 0,
             "sequences": [
               13
             ],

@@ -42,6 +42,7 @@
  * SentenceTerminationCharactersController
  * SettingsController
  * SettingsDisplayController
+ * SortFrequencyDictionaryController
  * StatusFooter
  * StorageController
  * TranslationTextReplacementsController
@@ -166,6 +167,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const collapsibleDictionaryController = new CollapsibleDictionaryController(settingsController);
         collapsibleDictionaryController.prepare();
+
+        const sortFrequencyDictionaryController = new SortFrequencyDictionaryController(settingsController);
+        sortFrequencyDictionaryController.prepare();
 
         await Promise.all(preparePromises);
 

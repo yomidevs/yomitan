@@ -116,7 +116,9 @@
                                     "popupActionBarVisibility",
                                     "popupActionBarLocation",
                                     "frequencyDisplayMode",
-                                    "termDisplayMode"
+                                    "termDisplayMode",
+                                    "sortFrequencyDictionary",
+                                    "sortFrequencyDictionaryOrder"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -284,6 +286,15 @@
                                         "type": "string",
                                         "enum": ["ruby", "ruby-and-reading", "term-and-reading"],
                                         "default": "ruby"
+                                    },
+                                    "sortFrequencyDictionary": {
+                                        "type": ["string", "null"],
+                                        "default": null
+                                    },
+                                    "sortFrequencyDictionaryOrder": {
+                                        "type": "string",
+                                        "enum": ["ascending", "descending"],
+                                        "default": "descending"
                                     }
                                 }
                             },

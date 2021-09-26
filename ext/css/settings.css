@@ -2259,9 +2259,13 @@ input[type=number].dictionary-priority {
 }
 .horizontal-flex.horizontal-flex-nowrap {
     flex-wrap: nowrap;
+    margin-left: 0;
 }
 .horizontal-flex>* {
     margin-left: 0.375em;
+}
+.horizontal-flex.horizontal-flex-nowrap>*:first-child {
+    margin-left: 0;
 }
 .horizontal-flex-fill {
     flex-grow: 1;

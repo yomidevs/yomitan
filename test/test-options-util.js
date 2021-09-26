@@ -302,7 +302,9 @@ function createProfileOptionsUpdatedTestData1() {
             popupActionBarVisibility: 'auto',
             popupActionBarLocation: 'top',
             frequencyDisplayMode: 'split-tags-grouped',
-            termDisplayMode: 'ruby'
+            termDisplayMode: 'ruby',
+            sortFrequencyDictionary: null,
+            sortFrequencyDictionaryOrder: 'descending'
         },
         audio: {
             enabled: true,
@@ -593,7 +595,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 14,
+        version: 15,
         global: {
             database: {
                 prefixWildcardsSupported: false

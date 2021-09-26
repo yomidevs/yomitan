@@ -14,6 +14,8 @@
         "default": {
             "wildcard": null,
             "mainDictionary": "${title}",
+            "sortFrequencyDictionary": null,
+            "sortFrequencyDictionaryOrder": "descending",
             "removeNonJapaneseCharacters": true,
             "convertHalfWidthCharacters": false,
             "convertNumericCharacters": false,

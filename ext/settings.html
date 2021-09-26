@@ -285,6 +285,73 @@
                 </div></div>
             </div>
         </div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Frequency sorting dictionary</div>
+                    <div class="settings-item-description">
+                        Sort results using a frequency dictionary.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <select id="sort-frequency-dictionary"></select>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    Enabling this option will sort search results using a specific dictionary.
+                    This can be beneficial when using multiple dictionaries which may not have
+                    consistent sorting information.
+                </p>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+            <div class="settings-item-children settings-item-children-group" id="sort-frequency-dictionary-order-container" hidden>
+                <div class="settings-item">
+                    <div class="settings-item-inner settings-item-inner-wrappable">
+                        <div class="settings-item-left">
+                            <div class="settings-item-label">
+                                Frequency sorting mode
+                                <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                            </div>
+                        </div>
+                        <div class="settings-item-right">
+                            <div class="horizontal-flex horizontal-flex-nowrap">
+                                <button class="low-emphasis" id="sort-frequency-dictionary-order-auto">Auto</button>
+                                <select id="sort-frequency-dictionary-order">
+                                    <option value="descending">Occurrence-based</option>
+                                    <option value="ascending">Rank-based</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-item-children more" hidden>
+                        <p>
+                            Dictionary frequency data can be represented in one of two ways:
+                        </p>
+                        <ul>
+                            <li>
+                                <em>Occurrence-based</em>, where the frequency corresponds to a number of occurrences.
+                                Large values indicate a more common term.
+                            </li>
+                            <li>
+                                <em>Rank-based</em>, where the frequency value corresponds to a ranking index.
+                                Smaller values indicate a more common term.
+                            </li>
+                        </ul>
+                        <p>
+                            The correct mode can be determined based on the contents of the dictionary;
+                            the <em>Auto</em> button attempts to auto-detect the correct value.
+                        </p>
+                        <p>
+                            <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Maximum number of results</div>
@@ -3516,6 +3583,7 @@
 <script src="/js/pages/settings/sentence-termination-characters-controller.js"></script>
 <script src="/js/pages/settings/settings-controller.js"></script>
 <script src="/js/pages/settings/settings-display-controller.js"></script>
+<script src="/js/pages/settings/sort-frequency-dictionary-controller.js"></script>
 <script src="/js/pages/settings/status-footer.js"></script>
 <script src="/js/pages/settings/storage-controller.js"></script>
 <script src="/js/pages/settings/translation-text-replacements-controller.js"></script>
