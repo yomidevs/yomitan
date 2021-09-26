@@ -866,7 +866,7 @@ class Translator {
                                     dictionaryIndex,
                                     dictionaryPriority,
                                     hasReading,
-                                    frequency
+                                    this._convertFrequency(frequency)
                                 ));
                             }
                         }
@@ -920,7 +920,7 @@ class Translator {
                             dictionaryIndex,
                             dictionaryPriority,
                             character,
-                            data
+                            this._convertFrequency(data)
                         ));
                     }
                     break;
@@ -969,6 +969,18 @@ class Translator {
             const i = v1.order - v2.order;
             return (i !== 0) ? i : stringComparer.compare(v1.content, v2.content);
         });
+    }
+
+    _convertFrequency(value) {
+        switch (typeof value) {
+            case 'number':
+                return value;
+            case 'string':
+                value = Number.parseFloat(value);
+                return Number.isFinite(value) ? value : 0;
+            default:
+                return 0;
+        }
     }
 
     // Helpers
