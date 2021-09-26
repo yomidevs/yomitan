@@ -33,7 +33,8 @@ function testIsCodePointKanji() {
     const data = [
         ['力方', true],
         ['\u53f1\u{20b9f}', true],
-        ['かたカタ々kata、。？,.?', false]
+        ['かたカタ々kata、。？,.?', false],
+        ['逸逸', true]
     ];
 
     for (const [characters, expected] of data) {
@@ -65,7 +66,8 @@ function testIsCodePointJapanese() {
     const data = [
         ['かたカタ力方々、。？', true],
         ['\u53f1\u{20b9f}', true],
-        ['kata,.?', false]
+        ['kata,.?', false],
+        ['逸逸', true]
     ];
 
     for (const [characters, expected] of data) {
@@ -109,7 +111,8 @@ function testIsStringPartiallyJapanese() {
         ['kata,.?', false],
         ['かたカタ力方々、。？invalid', true],
         ['\u53f1\u{20b9f}invalid', true],
-        ['kata,.?かた', true]
+        ['kata,.?かた', true],
+        ['逸逸', true]
     ];
 
     for (const [string, expected] of data) {
@@ -671,6 +674,21 @@ function testDistributeFurigana() {
             ['シック', 'シック・ビルしょうこうぐん'],
             [
                 {text: 'シック', reading: 'シック・ビルしょうこうぐん'}
+            ]
+        ],
+        // Kanji distribution tests
+        [
+            ['逸らす', 'そらす'],
+            [
+                {text: '逸', reading: 'そ'},
+                {text: 'らす', reading: ''}
+            ]
+        ],
+        [
+            ['逸らす', 'そらす'],
+            [
+                {text: '逸', reading: 'そ'},
+                {text: 'らす', reading: ''}
             ]
         ]
     ];
