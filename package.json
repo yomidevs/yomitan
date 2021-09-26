@@ -42,11 +42,11 @@
         "eslint-plugin-header": "^3.1.1",
         "eslint-plugin-no-unsanitized": "^3.1.5",
         "fake-indexeddb": "^3.1.3",
-        "html-validate": "^4.14.0",
+        "html-validate": "^4.14.1",
         "jsdom": "^16.7.0",
         "parse5": "^6.0.1",
         "stylelint": "^13.13.1",
         "stylelint-config-recommended": "^4.0.0",
-        "web-ext": "^6.2.0"
+        "web-ext": "^6.4.0"
     }
 }
