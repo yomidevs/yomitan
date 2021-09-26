@@ -587,10 +587,12 @@ class DictionaryImporter {
     }
 
     _normalizeTermOrReading(text) {
-        try {
-            return text.normalize('NFC');
-        } catch (e) {
-            return text;
-        }
+        // Note: this function should not perform String.normalize on the text,
+        // as it will characters in an undesirable way.
+        // Thus, this function is currently a no-op.
+        // Example:
+        // - '\u9038'.normalize('NFC') => '\u9038' (逸)
+        // - '\ufa67'.normalize('NFC') => '\u9038' (逸 => 逸)
+        return text;
     }
 }
