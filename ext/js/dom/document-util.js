@@ -311,6 +311,22 @@ class DocumentUtil {
         return !(browser === 'firefox' || browser === 'firefox-mobile') || os === 'mac';
     }
 
+    static isInputElementFocused() {
+        const element = document.activeElement;
+        if (element === null) { return false; }
+        const type = element.nodeName.toUpperCase();
+        switch (type) {
+            case 'INPUT':
+            case 'TEXTAREA':
+            case 'SELECT':
+                return true;
+            default:
+                return element.isContentEditable;
+        }
+    }
+
+    // Private
+
     static _getActiveButtons(event, array) {
         let {buttons} = event;
         if (typeof buttons === 'number' && buttons > 0) {
@@ -324,8 +340,6 @@ class DocumentUtil {
             }
         }
     }
-
-    // Private
 
     _setImposterStyle(style, propertyName, value) {
         style.setProperty(propertyName, value, 'important');

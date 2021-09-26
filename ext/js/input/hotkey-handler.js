@@ -153,11 +153,10 @@ class HotkeyHandler extends EventDispatcher {
     // Private
 
     _onKeyDown(e) {
-        const key = e.code;
-        const hotkeyInfo = this._hotkeys.get(key);
+        const hotkeyInfo = this._hotkeys.get(e.code);
         if (typeof hotkeyInfo !== 'undefined') {
             const eventModifiers = DocumentUtil.getActiveModifiers(e);
-            if (this._invokeHandlers(eventModifiers, hotkeyInfo)) {
+            if (this._invokeHandlers(eventModifiers, hotkeyInfo, e.key)) {
                 e.preventDefault();
                 return;
             }
@@ -165,9 +164,9 @@ class HotkeyHandler extends EventDispatcher {
         this.trigger('keydownNonHotkey', e);
     }
 
-    _invokeHandlers(modifiers, hotkeyInfo) {
+    _invokeHandlers(modifiers, hotkeyInfo, key) {
         for (const {modifiers: handlerModifiers, action, argument} of hotkeyInfo.handlers) {
-            if (!this._areSame(handlerModifiers, modifiers)) { continue; }
+            if (!this._areSame(handlerModifiers, modifiers) || !this._isHotkeyPermitted(modifiers, key)) { continue; }
 
             const actionHandler = this._actions.get(action);
             if (typeof actionHandler !== 'undefined') {
@@ -222,5 +221,17 @@ class HotkeyHandler extends EventDispatcher {
         } else {
             this._eventListeners.removeAllEventListeners();
         }
+    }
+
+    _isHotkeyPermitted(modifiers, key) {
+        return !(
+            (modifiers.length === 0 || (modifiers.length === 1 && modifiers[0] === 'shift')) &&
+            DocumentUtil.isInputElementFocused() &&
+            this._isKeyCharacterInput(key)
+        );
+    }
+
+    _isKeyCharacterInput(key) {
+        return key.length === 1;
     }
 }

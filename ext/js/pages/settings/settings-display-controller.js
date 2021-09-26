@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DocumentUtil
  * PopupMenu
  * SelectorObserver
  */
@@ -155,7 +156,7 @@ class SettingsDisplayController {
     _onKeyDown(e) {
         switch (e.code) {
             case 'Escape':
-                if (!this._isElementAnInput(document.activeElement)) {
+                if (!DocumentUtil.isInputElementFocused()) {
                     this._closeTopMenuOrModal();
                     e.preventDefault();
                 }
@@ -354,18 +355,6 @@ class SettingsDisplayController {
                 const indentLength = (Math.ceil((start - lineStart + 1) / indent.length) * indent.length - (start - lineStart));
                 document.execCommand('insertText', false, indent.substring(0, indentLength));
             }
-        }
-    }
-
-    _isElementAnInput(element) {
-        const type = element !== null ? element.nodeName.toUpperCase() : null;
-        switch (type) {
-            case 'INPUT':
-            case 'TEXTAREA':
-            case 'SELECT':
-                return true;
-            default:
-                return false;
         }
     }
 
