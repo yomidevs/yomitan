@@ -214,7 +214,7 @@ class AnkiTemplateRenderer {
         //   e.g. "i" for case-insensitive, "g" for replace all
         const argCount = args.length - 1;
         const options = args[argCount];
-        let value = options.fn(context);
+        let value = typeof options.fn === 'function' ? options.fn(context) : '';
         if (argCount > 3) {
             value = `${args.slice(3).join('')}${value}`;
         }
@@ -238,7 +238,7 @@ class AnkiTemplateRenderer {
         //   e.g. "i" for case-insensitive, "g" for match all
         const argCount = args.length - 1;
         const options = args[argCount];
-        let value = options.fn(context);
+        let value = typeof options.fn === 'function' ? options.fn(context) : '';
         if (argCount > 2) {
             value = `${args.slice(2).join('')}${value}`;
         }
