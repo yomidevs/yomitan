@@ -201,11 +201,12 @@ class DictionaryImporter {
             importDate: Date.now()
         };
 
-        const {author, url, description, attribution} = index;
+        const {author, url, description, attribution, frequencyMode} = index;
         if (typeof author === 'string') { summary.author = author; }
         if (typeof url === 'string') { summary.url = url; }
         if (typeof description === 'string') { summary.description = description; }
         if (typeof attribution === 'string') { summary.attribution = attribution; }
+        if (typeof frequencyMode === 'string') { summary.frequencyMode = frequencyMode; }
 
         Object.assign(summary, details);
 
