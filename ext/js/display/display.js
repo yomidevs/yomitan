@@ -72,7 +72,6 @@ class Display extends EventDispatcher {
         this._defaultTitle = document.title;
         this._titleMaxLength = 1000;
         this._query = '';
-        this._rawQuery = '';
         this._fullQuery = '';
         this._documentUtil = new DocumentUtil();
         this._progressIndicator = document.querySelector('#progress-indicator');
@@ -107,7 +106,6 @@ class Display extends EventDispatcher {
         this._tagNotification = null;
         this._footerNotificationContainer = document.querySelector('#content-footer');
         this._displayAudio = new DisplayAudio(this);
-        this._queryPostProcessor = null;
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         this._elementOverflowController = new ElementOverflowController();
         this._displayAnki = new DisplayAnki(this, japaneseUtil);
@@ -401,10 +399,6 @@ class Display extends EventDispatcher {
         }
     }
 
-    setQueryPostProcessor(func) {
-        this._queryPostProcessor = func;
-    }
-
     close() {
         switch (this._pageType) {
             case 'popup':
@@ -423,7 +417,7 @@ class Display extends EventDispatcher {
     searchLast() {
         const type = this._contentType;
         if (type === 'clear') { return; }
-        const query = this._rawQuery;
+        const query = this._query;
         const state = (
             this._historyHasState() ?
             clone(this._history.state) :
@@ -589,7 +583,6 @@ class Display extends EventDispatcher {
             this._historyHasChanged = true;
             this._contentType = type;
             this._query = '';
-            this._rawQuery = '';
             const eventArgs = {type, urlSearchParams, token};
 
             // Set content
@@ -597,16 +590,14 @@ class Display extends EventDispatcher {
                 case 'terms':
                 case 'kanji':
                     {
-                        let query = urlSearchParams.get('query');
+                        const query = urlSearchParams.get('query');
                         if (query === null) { break; }
 
                         this._query = query;
                         clear = false;
                         const isTerms = (type === 'terms');
-                        query = this._postProcessQuery(query);
-                        this._rawQuery = query;
                         let queryFull = urlSearchParams.get('full');
-                        queryFull = (queryFull !== null ? this._postProcessQuery(queryFull) : query);
+                        queryFull = (queryFull !== null ? queryFull : query);
                         const wildcardsEnabled = (urlSearchParams.get('wildcards') !== 'off');
                         const lookup = (urlSearchParams.get('lookup') !== 'false');
                         await this._setContentTermsOrKanji(token, isTerms, query, queryFull, lookup, wildcardsEnabled, eventArgs);
@@ -1537,11 +1528,6 @@ class Display extends EventDispatcher {
             return true;
         }
         return false;
-    }
-
-    _postProcessQuery(query) {
-        const queryPostProcessor = this._queryPostProcessor;
-        return typeof queryPostProcessor === 'function' ? queryPostProcessor(query) : query;
     }
 
     async _logDictionaryEntryData(index) {

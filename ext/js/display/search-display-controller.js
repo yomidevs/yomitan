@@ -72,7 +72,6 @@ class SearchDisplayController {
         this._display.autoPlayAudioDelay = 0;
         this._display.queryParserVisible = true;
         this._display.setHistorySettings({useBrowserHistory: true});
-        this._display.setQueryPostProcessor(this._postProcessQuery.bind(this));
 
         this._searchButton.addEventListener('click', this._onSearch.bind(this), false);
         this._wanakanaEnableCheckbox.addEventListener('change', this._onWanakanaEnableChange.bind(this));
@@ -407,17 +406,6 @@ class SearchDisplayController {
         if (shrink || scrollHeight >= currentHeight - 1) {
             node.style.height = `${scrollHeight}px`;
         }
-    }
-
-    _postProcessQuery(query) {
-        if (this._wanakanaEnabled) {
-            try {
-                query = this._japaneseUtil.convertToKana(query);
-            } catch (e) {
-                // NOP
-            }
-        }
-        return query;
     }
 
     _registerMessageHandlers(handlers) {
