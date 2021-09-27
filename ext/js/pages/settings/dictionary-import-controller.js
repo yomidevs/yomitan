@@ -204,8 +204,8 @@ class DictionaryImportController {
             case 0: return 'Loading dictionary';
             case 1: return 'Loading schemas';
             case 2: return 'Validating data';
-            case 3: return 'Processing data';
-            case 4: return 'Post-processing data';
+            case 3: return 'Formatting data';
+            case 4: return 'Importing media';
             case 5: return 'Importing data';
             default: return '';
         }
