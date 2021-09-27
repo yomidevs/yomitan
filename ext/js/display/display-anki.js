@@ -216,8 +216,8 @@ class DisplayAnki {
         if (typeof url !== 'string') {
             url = window.location.href;
         }
-        const {query, fullQuery} = this._display;
-        sentence = this._getValidSentenceData(sentence, query);
+        const {query, fullQuery, queryOffset} = this._display;
+        sentence = this._getValidSentenceData(sentence, fullQuery, queryOffset);
         return {
             url,
             sentence,
@@ -565,11 +565,11 @@ class DisplayAnki {
         return isTerms ? ['term-kanji', 'term-kana'] : ['kanji'];
     }
 
-    _getValidSentenceData(sentence, fallback) {
+    _getValidSentenceData(sentence, fallback, fallbackOffset) {
         let {text, offset} = (isObject(sentence) ? sentence : {});
         if (typeof text !== 'string') {
             text = fallback;
-            offset = 0;
+            offset = fallbackOffset;
         } else {
             if (typeof offset !== 'number') { offset = 0; }
         }

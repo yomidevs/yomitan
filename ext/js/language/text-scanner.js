@@ -17,7 +17,6 @@
 
 /* global
  * DocumentUtil
- * TextSourceElement
  */
 
 class TextScanner extends EventDispatcher {
@@ -345,7 +344,7 @@ class TextScanner extends EventDispatcher {
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
                 valid = true;
-            } else if (textSource instanceof TextSourceElement && await this._hasJapanese(textSource.fullContent)) {
+            } else if (textSource !== null && textSource.type === 'element' && await this._hasJapanese(textSource.fullContent)) {
                 dictionaryEntries = [];
                 sentence = {sentence: '', offset: 0};
                 type = 'terms';

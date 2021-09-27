@@ -29,6 +29,10 @@ class TextSourceRange {
         this._imposterSourceElement = imposterSourceElement;
     }
 
+    get type() {
+        return 'range';
+    }
+
     get range() {
         return this._range;
     }

@@ -24,6 +24,10 @@ class TextSourceElement {
         this._content = this._fullContent.substring(this._startOffset, this._endOffset);
     }
 
+    get type() {
+        return 'element';
+    }
+
     get element() {
         return this._element;
     }

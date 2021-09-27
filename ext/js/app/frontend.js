@@ -18,7 +18,6 @@
 /* global
  * DocumentUtil
  * TextScanner
- * TextSourceElement
  * TextSourceRange
  */
 
@@ -536,7 +535,7 @@ class Frontend {
                 }
             }
         };
-        if (textSource instanceof TextSourceElement && textSource.fullContent !== query) {
+        if (textSource.type === 'element' && textSource.fullContent !== query) {
             details.params.full = textSource.fullContent;
             details.params['full-visible'] = 'true';
         }

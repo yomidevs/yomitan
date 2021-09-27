@@ -117,6 +117,8 @@ class QueryParser extends EventDispatcher {
         }
         if (e.type === null) { return; }
 
+        e.sentenceOffset = this._getSentenceOffset(e.textSource);
+
         this.trigger('searched', e);
     }
 
@@ -208,29 +210,33 @@ class QueryParser extends EventDispatcher {
     }
 
     _createParseResult(data) {
+        let offset = 0;
         const fragment = document.createDocumentFragment();
         for (const term of data) {
             const termNode = document.createElement('span');
             termNode.className = 'query-parser-term';
+            termNode.dataset.offset = `${offset}`;
             for (const {text, reading} of term) {
                 if (reading.length === 0) {
                     termNode.appendChild(document.createTextNode(text));
                 } else {
                     const reading2 = this._convertReading(text, reading);
-                    termNode.appendChild(this._createSegment(text, reading2));
+                    termNode.appendChild(this._createSegment(text, reading2, offset));
                 }
+                offset += text.length;
             }
             fragment.appendChild(termNode);
         }
         return fragment;
     }
 
-    _createSegment(text, reading) {
+    _createSegment(text, reading, offset) {
         const segmentNode = document.createElement('ruby');
         segmentNode.className = 'query-parser-segment';
 
         const textNode = document.createElement('span');
         textNode.className = 'query-parser-segment-text';
+        textNode.dataset.offset = `${offset}`;
 
         const readingNode = document.createElement('rt');
         readingNode.className = 'query-parser-segment-reading';
@@ -263,6 +269,32 @@ class QueryParser extends EventDispatcher {
                 return '';
             default:
                 return reading;
+        }
+    }
+
+    _getSentenceOffset(textSource) {
+        if (textSource.type === 'range') {
+            const {range} = textSource;
+            const node = this._getParentElement(range.startContainer);
+            if (node !== null) {
+                const {offset} = node.dataset;
+                if (typeof offset === 'string') {
+                    const value = Number.parseInt(offset, 10);
+                    if (Number.isFinite(value)) {
+                        return Math.max(0, value) + range.startOffset;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    _getParentElement(node) {
+        const {ELEMENT_NODE} = Node;
+        while (true) {
+            node = node.parentNode;
+            if (node === null) { return null; }
+            if (node.nodeType === ELEMENT_NODE) { return node; }
         }
     }
 }
