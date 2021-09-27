@@ -130,11 +130,13 @@ function testConvertKatakanaToHiragana() {
         ['ヒラガナひらがな', 'ひらがなひらがな'],
         ['chikaraちからチカラ力', 'chikaraちからちから力'],
         ['katakana', 'katakana'],
-        ['hiragana', 'hiragana']
+        ['hiragana', 'hiragana'],
+        ['カーナー', 'かあなあ'],
+        ['カーナー', 'かーなー', true]
     ];
 
-    for (const [string, expected] of data) {
-        assert.strictEqual(jp.convertKatakanaToHiragana(string), expected);
+    for (const [string, expected, keepProlongedSoundMarks=false] of data) {
+        assert.strictEqual(jp.convertKatakanaToHiragana(string, keepProlongedSoundMarks), expected);
     }
 }
 

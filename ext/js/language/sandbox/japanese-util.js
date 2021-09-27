@@ -297,20 +297,27 @@ const JapaneseUtil = (() => {
             return this._wanakana !== null;
         }
 
-        convertKatakanaToHiragana(text) {
+        convertKatakanaToHiragana(text, keepProlongedSoundMarks=false) {
             let result = '';
             const offset = (HIRAGANA_CONVERSION_RANGE[0] - KATAKANA_CONVERSION_RANGE[0]);
             for (let char of text) {
                 const codePoint = char.codePointAt(0);
-                if (codePoint === KATAKANA_SMALL_KA_CODE_POINT || codePoint === KATAKANA_SMALL_KE_CODE_POINT) {
-                    // No change
-                } else if (codePoint === KANA_PROLONGED_SOUND_MARK_CODE_POINT) {
-                    if (result.length > 0) {
-                        const char2 = getProlongedHiragana(result[result.length - 1]);
-                        if (char2 !== null) { char = char2; }
-                    }
-                } else if (isCodePointInRange(codePoint, KATAKANA_CONVERSION_RANGE)) {
-                    char = String.fromCodePoint(codePoint + offset);
+                switch (codePoint) {
+                    case KATAKANA_SMALL_KA_CODE_POINT:
+                    case KATAKANA_SMALL_KE_CODE_POINT:
+                        // No change
+                        break;
+                    case KANA_PROLONGED_SOUND_MARK_CODE_POINT:
+                        if (!keepProlongedSoundMarks && result.length > 0) {
+                            const char2 = getProlongedHiragana(result[result.length - 1]);
+                            if (char2 !== null) { char = char2; }
+                        }
+                        break;
+                    default:
+                        if (isCodePointInRange(codePoint, KATAKANA_CONVERSION_RANGE)) {
+                            char = String.fromCodePoint(codePoint + offset);
+                        }
+                        break;
                 }
                 result += char;
             }

@@ -786,11 +786,14 @@ Converts katakana text to hiragana.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#hiragana <i>value</i>}}{{/hiragana}}</code><br>
-  <code>{{#hiragana}}<i>value</i>{{/hiragana}}</code><br>
+  <code>{{#hiragana <i>value</i> <i>[keepProlongedSoundMarks=true|false]</i>}}{{/hiragana}}</code><br>
+  <code>{{#hiragana <i>[keepProlongedSoundMarks=true|false]</i>}}<i>value</i>{{/hiragana}}</code><br>
 
   * _`value`_ <br>
     The text to convert.
+  * _`keepProlongedSoundMarks`_ _(optional)_ <br>
+    Whether or not the `ー` character should be kept or converted to a vowel character.
+    Defaults to `false` if not specified.
 </details>
 <details>
   <summary>Example:</summary>
@@ -798,12 +801,16 @@ Converts katakana text to hiragana.
   ```handlebars
   {{#hiragana "よみちゃん ヨミちゃん ヨミチャン"}}{{/hiragana}}
   {{#hiragana}}よみちゃん ヨミちゃん ヨミチャン{{/hiragana}}
+  {{#hiragana}}ローマ字{{/hiragana}}
+  {{#hiragana keepProlongedSoundMarks=true}}ローマ字{{/hiragana}}
   ```
 
   Output:
   ```html
   よみちゃん よみちゃん よみちゃん
   よみちゃん よみちゃん よみちゃん
+  ろうま字
+  ろーま字
   ```
 </details>
 

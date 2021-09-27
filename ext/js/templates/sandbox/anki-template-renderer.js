@@ -607,13 +607,16 @@ class AnkiTemplateRenderer {
 
     _hiragana(context, ...args) {
         const ii = args.length - 1;
-        const value = (ii > 0 ? args[0] : args[ii].fn(context));
-        return this._japaneseUtil.convertKatakanaToHiragana(value);
+        const options = args[ii];
+        const {keepProlongedSoundMarks} = options.hash;
+        const value = (ii > 0 ? args[0] : options.fn(context));
+        return this._japaneseUtil.convertKatakanaToHiragana(value, keepProlongedSoundMarks === true);
     }
 
     _katakana(context, ...args) {
         const ii = args.length - 1;
-        const value = (ii > 0 ? args[0] : args[ii].fn(context));
+        const options = args[ii];
+        const value = (ii > 0 ? args[0] : options.fn(context));
         return this._japaneseUtil.convertHiraganaToKatakana(value);
     }
 }
