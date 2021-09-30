@@ -68,6 +68,10 @@ class ScrollElement {
         this._animationRequestId = null;
     }
 
+    getRect() {
+        return this._node.getBoundingClientRect();
+    }
+
     // Private
 
     _onAnimationFrame(time) {

@@ -116,8 +116,8 @@ class Display extends EventDispatcher {
             ['close',             () => { this._onHotkeyClose(); }],
             ['nextEntry',         this._onHotkeyActionMoveRelative.bind(this, 1)],
             ['previousEntry',     this._onHotkeyActionMoveRelative.bind(this, -1)],
-            ['lastEntry',         () => { this._focusEntry(this._dictionaryEntries.length - 1, true); }],
-            ['firstEntry',        () => { this._focusEntry(0, true); }],
+            ['lastEntry',         () => { this._focusEntry(this._dictionaryEntries.length - 1, 0, true); }],
+            ['firstEntry',        () => { this._focusEntry(0, 0, true); }],
             ['historyBackward',   () => { this._sourceTermView(); }],
             ['historyForward',    () => { this._nextTermView(); }],
             ['playAudio',         () => { this._playAudioCurrent(); }],
@@ -756,7 +756,7 @@ class Display extends EventDispatcher {
     _onWheel(e) {
         if (e.altKey) {
             if (e.deltaY !== 0) {
-                this._focusEntry(this._index + (e.deltaY > 0 ? 1 : -1), true);
+                this._focusEntry(this._index + (e.deltaY > 0 ? 1 : -1), 0, true);
                 e.preventDefault();
             }
         } else if (e.shiftKey) {
@@ -997,7 +997,7 @@ class Display extends EventDispatcher {
             this._displayAnki.setupEntry(entry, i);
             container.appendChild(entry);
             if (focusEntry === i) {
-                this._focusEntry(i, false);
+                this._focusEntry(i, 0, false);
             }
 
             this._elementOverflowController.addElements(entry);
@@ -1112,15 +1112,21 @@ class Display extends EventDispatcher {
         }
 
         this._index = index;
-
-        return entry;
     }
 
-    _focusEntry(index, smooth) {
+    _focusEntry(index, definitionIndex, smooth) {
         index = Math.max(Math.min(index, this._dictionaryEntries.length - 1), 0);
 
-        const entry = this._entrySetCurrent(index);
-        let target = index === 0 || entry === null ? 0 : this._getElementTop(entry);
+        this._entrySetCurrent(index);
+
+        let node = (index >= 0 && index < this._dictionaryEntryNodes.length ? this._dictionaryEntryNodes[index] : null);
+        if (definitionIndex > 0) {
+            const definitionNodes = this._getDictionaryEntryDefinitionNodes(index);
+            if (definitionIndex < definitionNodes.length) {
+                node = definitionNodes[definitionIndex];
+            }
+        }
+        let target = (index === 0 && definitionIndex <= 0) || node === null ? 0 : this._getElementTop(node);
 
         if (this._navigationHeader !== null) {
             target -= this._navigationHeader.getBoundingClientRect().height;
@@ -1135,29 +1141,66 @@ class Display extends EventDispatcher {
     }
 
     _focusEntryWithDifferentDictionary(offset, smooth) {
-        const offsetSign = Math.sign(offset);
-        if (offsetSign === 0) { return false; }
+        const sign = Math.sign(offset);
+        if (sign === 0) { return false; }
 
         let index = this._index;
-        const dictionaryEntryCount = this._dictionaryEntries.length;
-        if (index < 0 || index >= dictionaryEntryCount) { return false; }
+        const count = Math.min(this._dictionaryEntries.length, this._dictionaryEntryNodes.length);
+        if (index < 0 || index >= count) { return false; }
 
-        const {dictionary} = this._dictionaryEntries[index];
-        for (let indexNext = index + offsetSign; indexNext >= 0 && indexNext < dictionaryEntryCount; indexNext += offsetSign) {
-            const {dictionaryNames} = this._dictionaryEntries[indexNext];
-            if (dictionaryNames.length > 1 || !dictionaryNames.includes(dictionary)) {
-                offset -= offsetSign;
-                if (Math.sign(offsetSign) !== offset) {
-                    index = indexNext;
+        const dictionaryEntry = this._dictionaryEntries[index];
+        const visibleDefinitionIndex = this._getDictionaryEntryVisibleDefinitionIndex(index, sign);
+        if (visibleDefinitionIndex === null) { return false; }
+
+        const {dictionary} = dictionaryEntry.definitions[visibleDefinitionIndex];
+        let focusDefinitionIndex = null;
+        for (let i = index; i >= 0 && i < count; i += sign) {
+            const {definitions} = this._dictionaryEntries[i];
+            const jj = definitions.length;
+            let j = (i === index ? visibleDefinitionIndex + sign : (sign > 0 ? 0 : jj - 1));
+            for (; j >= 0 && j < jj; j += sign) {
+                if (definitions[j].dictionary !== dictionary) {
+                    focusDefinitionIndex = j;
+                    index = i;
+                    i = -2; // Terminate outer loop
                     break;
                 }
             }
         }
 
-        if (index === this._index) { return false; }
+        if (focusDefinitionIndex === null) { return false; }
 
-        this._focusEntry(index, smooth);
+        this._focusEntry(index, focusDefinitionIndex, smooth);
         return true;
+    }
+
+    _getDictionaryEntryVisibleDefinitionIndex(index, sign) {
+        const {top: scrollTop, bottom: scrollBottom} = this._windowScroll.getRect();
+
+        const {definitions} = this._dictionaryEntries[index];
+        const nodes = this._getDictionaryEntryDefinitionNodes(index);
+        const definitionCount = Math.min(definitions.length, nodes.length);
+        if (definitionCount <= 0) { return null; }
+
+        let visibleIndex = null;
+        let visibleCoverage = 0;
+        for (let i = (sign > 0 ? 0 : definitionCount - 1); i >= 0 && i < definitionCount; i += sign) {
+            const {top, bottom} = nodes[i].getBoundingClientRect();
+            if (bottom <= scrollTop || top >= scrollBottom) { continue; }
+            const top2 = Math.max(scrollTop, Math.min(scrollBottom, top));
+            const bottom2 = Math.max(scrollTop, Math.min(scrollBottom, bottom));
+            const coverage = (bottom2 - top2) / (bottom - top);
+            if (coverage >= visibleCoverage) {
+                visibleCoverage = coverage;
+                visibleIndex = i;
+            }
+        }
+
+        return visibleIndex !== null ? visibleIndex : (sign > 0 ? definitionCount - 1 : 0);
+    }
+
+    _getDictionaryEntryDefinitionNodes(index) {
+        return this._dictionaryEntryNodes[index].querySelectorAll('.definition-item');
     }
 
     _sourceTermView() {
@@ -1529,7 +1572,7 @@ class Display extends EventDispatcher {
         let count = Number.parseInt(argument, 10);
         if (!Number.isFinite(count)) { count = 1; }
         count = Math.max(0, Math.floor(count));
-        this._focusEntry(this._index + count * sign, true);
+        this._focusEntry(this._index + count * sign, 0, true);
     }
 
     _onHotkeyActionPlayAudioFromSource(source) {
