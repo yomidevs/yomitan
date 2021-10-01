@@ -123,7 +123,7 @@ class PopupWindow extends EventDispatcher {
     }
 
     getFrameRect() {
-        return new DOMRect(0, 0, 0, 0);
+        return {x: 0, y: 0, width: 0, height: 0, valid: false};
     }
 
     async getFrameSize() {

@@ -408,7 +408,7 @@ class DocumentUtil {
             this._setImposterStyle(imposterStyle, 'width', `${width}px`);
             this._setImposterStyle(imposterStyle, 'height', `${height}px`);
         }
-        if (imposterRect.x !== elementRect.x || imposterRect.y !== elementRect.y) {
+        if (imposterRect.left !== elementRect.left || imposterRect.top !== elementRect.top) {
             left += (elementRect.left - imposterRect.left);
             top += (elementRect.top - imposterRect.top);
             this._setImposterStyle(imposterStyle, 'left', `${left}px`);

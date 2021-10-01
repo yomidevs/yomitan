@@ -104,13 +104,9 @@ class PopupProxy extends EventDispatcher {
 
     async showContent(details, displayDetails) {
         const {elementRect} = details;
-        if (typeof elementRect !== 'undefined') {
-            let {x, y, width, height} = elementRect;
-            if (this._frameOffsetForwarder !== null) {
-                await this._updateFrameOffset();
-                [x, y] = this._applyFrameOffset(x, y);
-            }
-            details.elementRect = {x, y, width, height};
+        if (typeof elementRect !== 'undefined' && this._frameOffsetForwarder !== null) {
+            await this._updateFrameOffset();
+            [elementRect.x, elementRect.y] = this._applyFrameOffset(elementRect.x, elementRect.y);
         }
         return await this._invokeSafe('showContent', {id: this._id, details, displayDetails});
     }
@@ -140,7 +136,7 @@ class PopupProxy extends EventDispatcher {
     }
 
     getFrameRect() {
-        return new DOMRect(0, 0, 0, 0);
+        return {x: 0, y: 0, width: 0, height: 0, valid: false};
     }
 
     getFrameSize() {

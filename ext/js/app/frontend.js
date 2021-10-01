@@ -543,12 +543,13 @@ class Frontend {
     }
 
     _showPopupContent(textSource, optionsContext, details=null) {
+        const {left, top, width, height} = textSource.getRect();
         this._lastShowPromise = (
             this._popup !== null ?
             this._popup.showContent(
                 {
                     optionsContext,
-                    elementRect: textSource.getRect(),
+                    elementRect: {x: left, y: top, width, height, valid: true},
                     writingMode: textSource.getWritingMode()
                 },
                 details

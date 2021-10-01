@@ -230,7 +230,7 @@ class PopupFactory {
 
         const {elementRect} = details;
         if (typeof elementRect !== 'undefined') {
-            details.elementRect = this._convertJsonRectToDOMRect(popup, elementRect);
+            [elementRect.x, elementRect.y] = this._convertPopupPointToRootPagePoint(popup, elementRect.x, elementRect.y);
         }
 
         return await popup.showContent(details, displayDetails);
@@ -281,17 +281,14 @@ class PopupFactory {
         return popup;
     }
 
-    _convertJsonRectToDOMRect(popup, jsonRect) {
-        const [x, y] = this._convertPopupPointToRootPagePoint(popup, jsonRect.x, jsonRect.y);
-        return new DOMRect(x, y, jsonRect.width, jsonRect.height);
-    }
-
     _convertPopupPointToRootPagePoint(popup, x, y) {
-        const parent = popup.parent;
+        const {parent} = popup;
         if (parent !== null) {
             const popupRect = parent.getFrameRect();
-            x += popupRect.x;
-            y += popupRect.y;
+            if (popupRect.valid) {
+                x += popupRect.x;
+                y += popupRect.y;
+            }
         }
         return [x, y];
     }
