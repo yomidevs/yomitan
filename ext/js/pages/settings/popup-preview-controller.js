@@ -26,6 +26,8 @@ class PopupPreviewController {
     }
 
     async prepare() {
+        if (new URLSearchParams(location.search).get('popup-preview') === 'false') { return; }
+
         this._frame = document.querySelector('#popup-preview-frame');
         this._customCss = document.querySelector('#custom-popup-css');
         this._customOuterCss = document.querySelector('#custom-popup-outer-css');
@@ -37,6 +39,8 @@ class PopupPreviewController {
         this._customOuterCss.addEventListener('settingChanged', this._onCustomOuterCssChange.bind(this), false);
         this._frame.addEventListener('load', this._onFrameLoad.bind(this), false);
         this._settingsController.on('optionsContextChanged', this._onOptionsContextChange.bind(this));
+
+        this._frame.src = '/popup-preview.html';
     }
 
     // Private
