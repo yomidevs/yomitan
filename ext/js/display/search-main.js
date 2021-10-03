@@ -17,6 +17,8 @@
 
 /* global
  * Display
+ * DisplayAnki
+ * DisplayAudio
  * DocumentFocusController
  * HotkeyHandler
  * JapaneseUtil
@@ -49,7 +51,13 @@
         const display = new Display(tabId, frameId, 'search', japaneseUtil, documentFocusController, hotkeyHandler);
         await display.prepare();
 
-        const searchDisplayController = new SearchDisplayController(tabId, frameId, display, japaneseUtil, searchPersistentStateController);
+        const displayAudio = new DisplayAudio(display);
+        displayAudio.prepare();
+
+        const displayAnki = new DisplayAnki(display, displayAudio, japaneseUtil);
+        displayAnki.prepare();
+
+        const searchDisplayController = new SearchDisplayController(tabId, frameId, display, displayAudio, japaneseUtil, searchPersistentStateController);
         await searchDisplayController.prepare();
 
         display.initializeState();

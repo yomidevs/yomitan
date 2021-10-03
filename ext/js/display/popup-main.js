@@ -17,6 +17,8 @@
 
 /* global
  * Display
+ * DisplayAnki
+ * DisplayAudio
  * DisplayProfileSelection
  * DisplayResizer
  * DocumentFocusController
@@ -40,6 +42,12 @@
 
         const display = new Display(tabId, frameId, 'popup', japaneseUtil, documentFocusController, hotkeyHandler);
         await display.prepare();
+
+        const displayAudio = new DisplayAudio(display);
+        displayAudio.prepare();
+
+        const displayAnki = new DisplayAnki(display, displayAudio, japaneseUtil);
+        displayAnki.prepare();
 
         const displayProfileSelection = new DisplayProfileSelection(display);
         displayProfileSelection.prepare();

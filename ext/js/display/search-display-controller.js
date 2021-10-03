@@ -21,10 +21,11 @@
  */
 
 class SearchDisplayController {
-    constructor(tabId, frameId, display, japaneseUtil, searchPersistentStateController) {
+    constructor(tabId, frameId, display, displayAudio, japaneseUtil, searchPersistentStateController) {
         this._tabId = tabId;
         this._frameId = frameId;
         this._display = display;
+        this._displayAudio = displayAudio;
         this._searchPersistentStateController = searchPersistentStateController;
         this._searchButton = document.querySelector('#search-button');
         this._queryInput = document.querySelector('#search-textbox');
@@ -56,7 +57,7 @@ class SearchDisplayController {
         yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
 
         this._display.on('optionsUpdated', this._onDisplayOptionsUpdated.bind(this));
-        this._display.on('contentUpdating', this._onContentUpdating.bind(this));
+        this._display.on('contentUpdateStart', this._onContentUpdateStart.bind(this));
 
         this._display.hotkeyHandler.registerActions([
             ['focusSearchBox', this._onActionFocusSearchBox.bind(this)]
@@ -69,7 +70,7 @@ class SearchDisplayController {
 
         this._updateClipboardMonitorEnabled();
 
-        this._display.autoPlayAudioDelay = 0;
+        this._displayAudio.autoPlayAudioDelay = 0;
         this._display.queryParserVisible = true;
         this._display.setHistorySettings({useBrowserHistory: true});
 
@@ -145,27 +146,27 @@ class SearchDisplayController {
         this._setWanakanaEnabled(enableWanakana);
     }
 
-    _onContentUpdating({type, content, source}) {
+    _onContentUpdateStart({type, query, content}) {
         let animate = false;
         let valid = false;
         switch (type) {
             case 'terms':
             case 'kanji':
                 animate = !!content.animate;
-                valid = (typeof source === 'string' && source.length > 0);
+                valid = (typeof query === 'string' && query.length > 0);
                 this._display.blurElement(this._queryInput);
                 break;
             case 'clear':
                 valid = false;
                 animate = true;
-                source = '';
+                query = '';
                 break;
         }
 
-        if (typeof source !== 'string') { source = ''; }
+        if (typeof query !== 'string') { query = ''; }
 
-        if (this._queryInput.value !== source) {
-            this._queryInput.value = source;
+        if (this._queryInput.value !== query) {
+            this._queryInput.value = query;
             this._updateSearchHeight(true);
         }
         this._setIntroVisible(!valid, animate);

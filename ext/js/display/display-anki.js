@@ -23,8 +23,9 @@
  */
 
 class DisplayAnki {
-    constructor(display, japaneseUtil) {
+    constructor(display, displayAudio, japaneseUtil) {
         this._display = display;
+        this._displayAudio = displayAudio;
         this._ankiFieldTemplates = null;
         this._ankiFieldTemplatesDefault = null;
         this._ankiNoteBuilder = new AnkiNoteBuilder({japaneseUtil});
@@ -70,28 +71,11 @@ class DisplayAnki {
             ['viewNote',          this._viewNoteForSelectedEntry.bind(this)]
         ]);
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
-    }
-
-    cleanupEntries() {
-        this._updateDictionaryEntryDetailsToken = null;
-        this._dictionaryEntryDetails = null;
-        this._hideAnkiNoteErrors(false);
-    }
-
-    setupEntriesBegin() {
-        this._noteContext = this._getNoteContext();
-    }
-
-    setupEntry(entry) {
-        this._addMultipleEventListeners(entry, '.action-view-tags', 'click', this._onShowTagsBind);
-        this._addMultipleEventListeners(entry, '.action-add-note', 'click', this._onNoteAddBind);
-        this._addMultipleEventListeners(entry, '.action-view-note', 'click', this._onViewNoteButtonClickBind);
-        this._addMultipleEventListeners(entry, '.action-view-note', 'contextmenu', this._onViewNoteButtonContextMenuBind);
-        this._addMultipleEventListeners(entry, '.action-view-note', 'menuClose', this._onViewNoteButtonMenuCloseBind);
-    }
-
-    setupEntriesComplete() {
-        this._updateDictionaryEntryDetails();
+        this._display.on('contentClear', this._onContentClear.bind(this));
+        this._display.on('contentUpdateStart', this._onContentUpdateStart.bind(this));
+        this._display.on('contentUpdateEntry', this._onContentUpdateEntry.bind(this));
+        this._display.on('contentUpdateComplete', this._onContentUpdateComplete.bind(this));
+        this._display.on('logDictionaryEntryData', this._onLogDictionaryEntryData.bind(this));
     }
 
     async getLogData(dictionaryEntry) {
@@ -171,6 +155,32 @@ class DisplayAnki {
         this._modeOptions.set('term-kana', terms);
 
         this._updateAnkiFieldTemplates(options);
+    }
+
+    _onContentClear() {
+        this._updateDictionaryEntryDetailsToken = null;
+        this._dictionaryEntryDetails = null;
+        this._hideAnkiNoteErrors(false);
+    }
+
+    _onContentUpdateStart() {
+        this._noteContext = this._getNoteContext();
+    }
+
+    _onContentUpdateEntry({element}) {
+        this._addMultipleEventListeners(element, '.action-view-tags', 'click', this._onShowTagsBind);
+        this._addMultipleEventListeners(element, '.action-add-note', 'click', this._onNoteAddBind);
+        this._addMultipleEventListeners(element, '.action-view-note', 'click', this._onViewNoteButtonClickBind);
+        this._addMultipleEventListeners(element, '.action-view-note', 'contextmenu', this._onViewNoteButtonContextMenuBind);
+        this._addMultipleEventListeners(element, '.action-view-note', 'menuClose', this._onViewNoteButtonMenuCloseBind);
+    }
+
+    _onContentUpdateComplete() {
+        this._updateDictionaryEntryDetails();
+    }
+
+    _onLogDictionaryEntryData({dictionaryEntry, promises}) {
+        promises.push(this.getLogData(dictionaryEntry));
     }
 
     _onNoteAdd(e) {
@@ -526,7 +536,7 @@ class DisplayAnki {
         const fields = Object.entries(modeOptions.fields);
         const contentOrigin = this._display.getContentOrigin();
         const details = this._ankiNoteBuilder.getDictionaryEntryDetailsForNote(dictionaryEntry);
-        const audioDetails = (details.type === 'term' ? this._display.getAnkiNoteMediaAudioDetails(details.term, details.reading) : null);
+        const audioDetails = (details.type === 'term' ? this._displayAudio.getAnkiNoteMediaAudioDetails(details.term, details.reading) : null);
         const optionsContext = this._display.getOptionsContext();
 
         const {note, errors, requirements: outputRequirements} = await this._ankiNoteBuilder.createNote({

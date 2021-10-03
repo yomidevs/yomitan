@@ -16,8 +16,6 @@
  */
 
 /* global
- * DisplayAnki
- * DisplayAudio
  * DisplayGenerator
  * DisplayHistory
  * DisplayNotification
@@ -106,10 +104,8 @@ class Display extends EventDispatcher {
         this._contentTextScanner = null;
         this._tagNotification = null;
         this._footerNotificationContainer = document.querySelector('#content-footer');
-        this._displayAudio = new DisplayAudio(this);
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         this._elementOverflowController = new ElementOverflowController();
-        this._displayAnki = new DisplayAnki(this, japaneseUtil);
         this._frameVisible = (pageType === 'search');
 
         this._hotkeyHandler.registerActions([
@@ -120,8 +116,6 @@ class Display extends EventDispatcher {
             ['firstEntry',        () => { this._focusEntry(0, 0, true); }],
             ['historyBackward',   () => { this._sourceTermView(); }],
             ['historyForward',    () => { this._nextTermView(); }],
-            ['playAudio',         () => { this._playAudioCurrent(); }],
-            ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)],
             ['copyHostSelection', () => this._copyHostSelection()],
             ['nextEntryDifferentDictionary',     () => { this._focusEntryWithDifferentDictionary(1, true); }],
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
@@ -129,7 +123,6 @@ class Display extends EventDispatcher {
         this.registerDirectMessageHandlers([
             ['setOptionsContext',  {async: false, handler: this._onMessageSetOptionsContext.bind(this)}],
             ['setContent',         {async: false, handler: this._onMessageSetContent.bind(this)}],
-            ['clearAutoPlayTimer', {async: false, handler: this._onMessageClearAutoPlayTimer.bind(this)}],
             ['setCustomCss',       {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
             ['setContentScale',    {async: false, handler: this._onMessageSetContentScale.bind(this)}],
             ['configure',          {async: true,  handler: this._onMessageConfigure.bind(this)}],
@@ -142,14 +135,6 @@ class Display extends EventDispatcher {
 
     get displayGenerator() {
         return this._displayGenerator;
-    }
-
-    get autoPlayAudioDelay() {
-        return this._displayAudio.autoPlayAudioDelay;
-    }
-
-    set autoPlayAudioDelay(value) {
-        this._displayAudio.autoPlayAudioDelay = value;
     }
 
     get queryParserVisible() {
@@ -230,8 +215,6 @@ class Display extends EventDispatcher {
         // Prepare
         await this._hotkeyHelpController.prepare();
         await this._displayGenerator.prepare();
-        this._displayAudio.prepare();
-        this._displayAnki.prepare();
         this._queryParser.prepare();
         this._history.prepare();
         this._optionToggleHotkeyHandler.prepare();
@@ -343,10 +326,6 @@ class Display extends EventDispatcher {
         this._updateContentTextScanner(options);
 
         this.trigger('optionsUpdated', {options});
-    }
-
-    clearAutoPlayTimer() {
-        this._displayAudio.clearAutoPlayTimer();
     }
 
     setContent(details) {
@@ -468,10 +447,6 @@ class Display extends EventDispatcher {
         return Number.isFinite(index) ? index : -1;
     }
 
-    getAnkiNoteMediaAudioDetails(term, reading) {
-        return this._displayAudio.getAnkiNoteMediaAudioDetails(term, reading);
-    }
-
     // Message handlers
 
     _onDirectMessage(data) {
@@ -511,10 +486,6 @@ class Display extends EventDispatcher {
         this.setContent(details);
     }
 
-    _onMessageClearAutoPlayTimer() {
-        this.clearAutoPlayTimer();
-    }
-
     _onMessageSetCustomCss({css}) {
         this.setCustomCss(css);
     }
@@ -534,10 +505,7 @@ class Display extends EventDispatcher {
 
     _onMessageVisibilityChanged({value}) {
         this._frameVisible = value;
-        if (!value) {
-            this._displayAudio.clearAutoPlayTimer();
-            this._displayAudio.stopAudio();
-        }
+        this.trigger('frameVisibilityChange', {value});
     }
 
     _onMessageExtensionUnloaded() {
@@ -568,9 +536,8 @@ class Display extends EventDispatcher {
             this._closeAllPopupMenus();
             this._eventListeners.removeAllEventListeners();
             this._mediaLoader.unloadAll();
-            this._displayAudio.cleanupEntries();
-            this._displayAnki.cleanupEntries();
             this._hideTagNotification(false);
+            this._triggerContentClear();
             this._dictionaryEntries = [];
             this._dictionaryEntryNodes = [];
             this._elementOverflowController.clearElements();
@@ -582,62 +549,25 @@ class Display extends EventDispatcher {
 
             const fullVisible = urlSearchParams.get('full-visible');
             this._queryParserVisibleOverride = (fullVisible === null ? null : (fullVisible !== 'false'));
-            this._updateQueryParser();
 
-            let clear = true;
             this._historyHasChanged = true;
             this._contentType = type;
-            this._query = '';
-            const eventArgs = {type, urlSearchParams, token};
 
             // Set content
             switch (type) {
                 case 'terms':
                 case 'kanji':
-                    {
-                        const query = urlSearchParams.get('query');
-                        if (query === null) { break; }
-
-                        this._query = query;
-                        clear = false;
-                        const isTerms = (type === 'terms');
-                        let queryFull = urlSearchParams.get('full');
-                        queryFull = (queryFull !== null ? queryFull : query);
-                        let queryOffset = urlSearchParams.get('offset');
-                        if (queryOffset !== null) {
-                            queryOffset = Number.parseInt(queryOffset, 10);
-                            if (!Number.isFinite(queryOffset)) { queryOffset = null; }
-                        }
-                        const wildcardsEnabled = (urlSearchParams.get('wildcards') !== 'off');
-                        const lookup = (urlSearchParams.get('lookup') !== 'false');
-                        await this._setContentTermsOrKanji(token, isTerms, query, queryFull, queryOffset, lookup, wildcardsEnabled, eventArgs);
-                    }
+                    await this._setContentTermsOrKanji(type, urlSearchParams, token);
                     break;
                 case 'unloaded':
-                    {
-                        clear = false;
-                        const {content} = this._history;
-                        eventArgs.content = content;
-                        this.trigger('contentUpdating', eventArgs);
-                        this._setContentExtensionUnloaded();
-                    }
+                    this._setContentExtensionUnloaded();
+                    break;
+                default:
+                    type = 'clear';
+                    this._contentType = type;
+                    this._clearContent();
                     break;
             }
-
-            // Clear
-            if (clear) {
-                type = 'clear';
-                this._contentType = type;
-                const {content} = this._history;
-                eventArgs.type = type;
-                eventArgs.content = content;
-                this.trigger('contentUpdating', eventArgs);
-                this._clearContent();
-            }
-
-            const stale = (this._setContentToken !== token);
-            eventArgs.stale = stale;
-            this.trigger('contentUpdated', eventArgs);
         } catch (e) {
             this.onError(e);
         }
@@ -874,8 +804,11 @@ class Display extends EventDispatcher {
         document.documentElement.dataset.theme = themeName;
     }
 
-    async _findDictionaryEntries(isTerms, source, wildcardsEnabled, optionsContext) {
-        if (isTerms) {
+    async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
+        if (isKanji) {
+            const dictionaryEntries = await yomichan.api.kanjiFind(source, optionsContext);
+            return dictionaryEntries;
+        } else {
             const findDetails = {};
             if (wildcardsEnabled) {
                 const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
@@ -891,13 +824,24 @@ class Display extends EventDispatcher {
 
             const {dictionaryEntries} = await yomichan.api.termsFind(source, findDetails, optionsContext);
             return dictionaryEntries;
-        } else {
-            const dictionaryEntries = await yomichan.api.kanjiFind(source, optionsContext);
-            return dictionaryEntries;
         }
     }
 
-    async _setContentTermsOrKanji(token, isTerms, query, queryFull, queryOffset, lookup, wildcardsEnabled, eventArgs) {
+    async _setContentTermsOrKanji(type, urlSearchParams, token) {
+        const lookup = (urlSearchParams.get('lookup') !== 'false');
+        const wildcardsEnabled = (urlSearchParams.get('wildcards') !== 'off');
+
+        // Set query
+        const query = urlSearchParams.get('query');
+        let queryFull = urlSearchParams.get('full');
+        queryFull = (queryFull !== null ? queryFull : query);
+        let queryOffset = urlSearchParams.get('offset');
+        if (queryOffset !== null) {
+            queryOffset = Number.parseInt(queryOffset, 10);
+            queryOffset = Number.isFinite(queryOffset) ? Math.max(0, Math.min(queryFull.length - query.length, queryOffset)) : null;
+        }
+        this._setQuery(query, queryFull, queryOffset);
+
         let {state, content} = this._history;
         let changeHistory = false;
         if (!isObject(content)) {
@@ -909,12 +853,7 @@ class Display extends EventDispatcher {
             changeHistory = true;
         }
 
-        let {
-            focusEntry=null,
-            scrollX=null,
-            scrollY=null,
-            optionsContext=null
-        } = state;
+        let {focusEntry, scrollX, scrollY, optionsContext} = state;
         if (typeof focusEntry !== 'number') { focusEntry = 0; }
         if (!(typeof optionsContext === 'object' && optionsContext !== null)) {
             optionsContext = this.getOptionsContext();
@@ -922,16 +861,9 @@ class Display extends EventDispatcher {
             changeHistory = true;
         }
 
-        if (queryOffset !== null) {
-            queryOffset = Math.max(0, Math.min(queryFull.length - query.length, queryOffset));
-        }
-
-        this._setFullQuery(queryFull, queryOffset);
-        this._setTitleText(query);
-
         let {dictionaryEntries} = content;
         if (!Array.isArray(dictionaryEntries)) {
-            dictionaryEntries = lookup && query.length > 0 ? await this._findDictionaryEntries(isTerms, query, wildcardsEnabled, optionsContext) : [];
+            dictionaryEntries = lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, wildcardsEnabled, optionsContext) : [];
             if (this._setContentToken !== token) { return; }
             content.dictionaryEntries = dictionaryEntries;
             changeHistory = true;
@@ -964,10 +896,6 @@ class Display extends EventDispatcher {
             this._replaceHistoryStateNoNavigate(state, content);
         }
 
-        eventArgs.source = query;
-        eventArgs.content = content;
-        this.trigger('contentUpdating', eventArgs);
-
         this._dictionaryEntries = dictionaryEntries;
 
         this._updateNavigation(this._history.hasPrevious(), this._history.hasNext());
@@ -976,7 +904,7 @@ class Display extends EventDispatcher {
         const container = this._container;
         container.textContent = '';
 
-        this._displayAnki.setupEntriesBegin();
+        this._triggerContentUpdateStart();
 
         for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
             if (i > 0) {
@@ -986,15 +914,14 @@ class Display extends EventDispatcher {
 
             const dictionaryEntry = dictionaryEntries[i];
             const entry = (
-                isTerms ?
+                dictionaryEntry.type === 'term' ?
                 this._displayGenerator.createTermEntry(dictionaryEntry) :
                 this._displayGenerator.createKanjiEntry(dictionaryEntry)
             );
             entry.dataset.index = `${i}`;
             this._dictionaryEntryNodes.push(entry);
             this._addEntryEventListeners(entry);
-            this._displayAudio.setupEntry(entry, i);
-            this._displayAnki.setupEntry(entry, i);
+            this._triggerContentUpdateEntry(dictionaryEntry, entry, i);
             container.appendChild(entry);
             if (focusEntry === i) {
                 this._focusEntry(i, 0, false);
@@ -1011,8 +938,7 @@ class Display extends EventDispatcher {
             this._windowScroll.to(x, y);
         }
 
-        this._displayAudio.setupEntriesComplete();
-        this._displayAnki.setupEntriesComplete();
+        this._triggerContentUpdateComplete();
     }
 
     _setContentExtensionUnloaded() {
@@ -1028,14 +954,18 @@ class Display extends EventDispatcher {
 
         this._updateNavigation(false, false);
         this._setNoContentVisible(false);
-        this._setTitleText('');
-        this._setFullQuery('', 0);
+        this._setQuery('', '', 0);
+
+        this._triggerContentUpdateStart();
+        this._triggerContentUpdateComplete();
     }
 
     _clearContent() {
         this._container.textContent = '';
-        this._setTitleText('');
-        this._setFullQuery('', 0);
+        this._setQuery('', '', 0);
+
+        this._triggerContentUpdateStart();
+        this._triggerContentUpdateComplete();
     }
 
     _setNoContentVisible(visible) {
@@ -1046,10 +976,12 @@ class Display extends EventDispatcher {
         }
     }
 
-    _setFullQuery(text, offset) {
-        this._fullQuery = text;
-        this._queryOffset = offset;
+    _setQuery(query, fullQuery, queryOffset) {
+        this._query = query;
+        this._fullQuery = fullQuery;
+        this._queryOffset = queryOffset;
         this._updateQueryParser();
+        this._setTitleText(query);
     }
 
     _updateQueryParser() {
@@ -1217,10 +1149,6 @@ class Display extends EventDispatcher {
         } else {
             return this._history.hasPrevious() && this._history.back();
         }
-    }
-
-    async _playAudioCurrent() {
-        await this._displayAudio.playAudio(this._index, 0);
     }
 
     _getEntry(index) {
@@ -1575,10 +1503,6 @@ class Display extends EventDispatcher {
         this._focusEntry(this._index + count * sign, 0, true);
     }
 
-    _onHotkeyActionPlayAudioFromSource(source) {
-        this._displayAudio.playAudio(this._index, 0, source);
-    }
-
     _closeAllPopupMenus() {
         for (const popupMenu of PopupMenu.openMenus) {
             popupMenu.close();
@@ -1598,9 +1522,32 @@ class Display extends EventDispatcher {
         const dictionaryEntry = this._dictionaryEntries[index];
         const result = {dictionaryEntry};
 
-        const result2 = await this._displayAnki.getLogData(dictionaryEntry);
-        Object.assign(result, result2);
+        const promises = [];
+        this.trigger('logDictionaryEntryData', {dictionaryEntry, promises});
+        if (promises.length > 0) {
+            for (const result2 of await Promise.all(promises)) {
+                Object.assign(result, result2);
+            }
+        }
 
         console.log(result);
+    }
+
+    _triggerContentClear() {
+        this.trigger('contentClear', {});
+    }
+
+    _triggerContentUpdateStart() {
+        let {content} = this._history;
+        if (typeof content !== 'object' || content === null) { content = {}; }
+        this.trigger('contentUpdateStart', {type: this._contentType, query: this._query, content});
+    }
+
+    _triggerContentUpdateEntry(dictionaryEntry, element, index) {
+        this.trigger('contentUpdateEntry', {dictionaryEntry, element, index});
+    }
+
+    _triggerContentUpdateComplete() {
+        this.trigger('contentUpdateComplete', {type: this._contentType});
     }
 }

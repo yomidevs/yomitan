@@ -56,47 +56,19 @@ class DisplayAudio {
 
     prepare() {
         this._audioSystem.prepare();
+        this._display.hotkeyHandler.registerActions([
+            ['playAudio',           this._onHotkeyActionPlayAudio.bind(this)],
+            ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)]
+        ]);
+        this._display.registerDirectMessageHandlers([
+            ['clearAutoPlayTimer', {async: false, handler: this._onMessageClearAutoPlayTimer.bind(this)}]
+        ]);
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
+        this._display.on('contentClear', this._onContentClear.bind(this));
+        this._display.on('contentUpdateEntry', this._onContentUpdateEntry.bind(this));
+        this._display.on('contentUpdateComplete', this._onContentUpdateComplete.bind(this));
+        this._display.on('frameVisibilityChange', this._onFrameVisibilityChange.bind(this));
         this._onOptionsUpdated({options: this._display.getOptions()});
-    }
-
-    cleanupEntries() {
-        this._entriesToken = {};
-        this._cache.clear();
-        this.clearAutoPlayTimer();
-        this._eventListeners.removeAllEventListeners();
-    }
-
-    setupEntry(entry, dictionaryEntryIndex) {
-        for (const button of entry.querySelectorAll('.action-play-audio')) {
-            const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
-            this._eventListeners.addEventListener(button, 'click', this._onAudioPlayButtonClick.bind(this, dictionaryEntryIndex, headwordIndex), false);
-            this._eventListeners.addEventListener(button, 'contextmenu', this._onAudioPlayButtonContextMenu.bind(this, dictionaryEntryIndex, headwordIndex), false);
-            this._eventListeners.addEventListener(button, 'menuClose', this._onAudioPlayMenuCloseClick.bind(this, dictionaryEntryIndex, headwordIndex), false);
-        }
-    }
-
-    setupEntriesComplete() {
-        if (!this._autoPlay || !this._display.frameVisible) { return; }
-
-        this.clearAutoPlayTimer();
-
-        const {dictionaryEntries} = this._display;
-        if (dictionaryEntries.length === 0) { return; }
-
-        const firstDictionaryEntries = dictionaryEntries[0];
-        if (firstDictionaryEntries.type === 'kanji') { return; }
-
-        const callback = () => {
-            this._autoPlayAudioTimer = null;
-            this.playAudio(0, 0);
-        };
-
-        if (this._autoPlayAudioDelay > 0) {
-            this._autoPlayAudioTimer = setTimeout(callback, this._autoPlayAudioDelay);
-        } else {
-            callback();
-        }
     }
 
     clearAutoPlayTimer() {
@@ -169,6 +141,64 @@ class DisplayAudio {
         data.audioEnabled = `${enabled && sources.length > 0}`;
 
         this._cache.clear();
+    }
+
+    _onContentClear() {
+        this._entriesToken = {};
+        this._cache.clear();
+        this.clearAutoPlayTimer();
+        this._eventListeners.removeAllEventListeners();
+    }
+
+    _onContentUpdateEntry({element, index}) {
+        for (const button of element.querySelectorAll('.action-play-audio')) {
+            const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
+            this._eventListeners.addEventListener(button, 'click', this._onAudioPlayButtonClick.bind(this, index, headwordIndex), false);
+            this._eventListeners.addEventListener(button, 'contextmenu', this._onAudioPlayButtonContextMenu.bind(this, index, headwordIndex), false);
+            this._eventListeners.addEventListener(button, 'menuClose', this._onAudioPlayMenuCloseClick.bind(this, index, headwordIndex), false);
+        }
+    }
+
+    _onContentUpdateComplete() {
+        if (!this._autoPlay || !this._display.frameVisible) { return; }
+
+        this.clearAutoPlayTimer();
+
+        const {dictionaryEntries} = this._display;
+        if (dictionaryEntries.length === 0) { return; }
+
+        const firstDictionaryEntries = dictionaryEntries[0];
+        if (firstDictionaryEntries.type === 'kanji') { return; }
+
+        const callback = () => {
+            this._autoPlayAudioTimer = null;
+            this.playAudio(0, 0);
+        };
+
+        if (this._autoPlayAudioDelay > 0) {
+            this._autoPlayAudioTimer = setTimeout(callback, this._autoPlayAudioDelay);
+        } else {
+            callback();
+        }
+    }
+
+    _onFrameVisibilityChange({value}) {
+        if (!value) {
+            this.clearAutoPlayTimer();
+            this.stopAudio();
+        }
+    }
+
+    _onHotkeyActionPlayAudio() {
+        this.playAudio(this._display.selectedIndex, 0);
+    }
+
+    _onHotkeyActionPlayAudioFromSource(source) {
+        this.playAudio(this._display.selectedIndex, 0, source);
+    }
+
+    _onMessageClearAutoPlayTimer() {
+        this.clearAutoPlayTimer();
     }
 
     _addAudioSourceInfo(type, url, voice, isInOptions, nameMap) {
