@@ -978,12 +978,14 @@ class Backend {
         const options = this._getProfileOptions({current: true});
         this._updateBadge();
 
+        const enabled = options.general.enable;
+
         this._anki.server = options.anki.server;
-        this._anki.enabled = options.anki.enable;
+        this._anki.enabled = options.anki.enable && enabled;
 
-        this._mecab.setEnabled(options.parsing.enableMecabParser);
+        this._mecab.setEnabled(options.parsing.enableMecabParser && enabled);
 
-        if (options.clipboard.enableBackgroundMonitor) {
+        if (options.clipboard.enableBackgroundMonitor && enabled) {
             this._clipboardMonitor.start();
         } else {
             this._clipboardMonitor.stop();
