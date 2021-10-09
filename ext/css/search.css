@@ -87,7 +87,7 @@ h1 {
     white-space: pre-wrap;
     z-index: 1;
 }
-#search-button {
+.search-button {
     flex: 0 0 auto;
     position: relative;
     width: 2.5em;
@@ -100,22 +100,22 @@ h1 {
     transition: background-color var(--animation-duration) ease-in-out;
     border-radius: 0;
 }
-#search-button:hover,
-#search-button:focus {
+.search-button:hover,
+.search-button:focus {
     background-color: var(--input-background-color-dark);
 }
-#search-button:focus:not(:focus-visible):not(:hover) {
+.search-button:focus:not(:focus-visible):not(:hover) {
     background-color: var(--input-background-color);
 }
-#search-button:focus-visible {
+.search-button:focus-visible {
     background-color: var(--input-background-color-dark);
 }
-#search-button:active,
-#search-button:active:focus {
+.search-button:active,
+.search-button:active:focus {
     background-color: var(--input-background-color-darker);
 }
 
-#search-button>.icon {
+.search-button>.icon {
     display: block;
     position: absolute;
     left: 0;

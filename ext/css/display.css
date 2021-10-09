@@ -568,7 +568,13 @@ button.sidebar-button.sidebar-button-highlight {
 
 
 /* Search page */
+.search-header {
+    display: flex;
+    flex-flow: column nowrap;
+    max-height: 100vh;
+}
 #query-parser-container {
+    overflow-y: auto;
     padding-left: var(--entry-horizontal-padding);
     padding-right: var(--entry-horizontal-padding);
     padding-bottom: 0.25em;
