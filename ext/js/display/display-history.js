@@ -92,11 +92,6 @@ class DisplayHistory extends EventDispatcher {
     }
 
     _go(forward) {
-        const target = forward ? this._current.next : this._current.previous;
-        if (target === null) {
-            return false;
-        }
-
         if (this._useBrowserHistory) {
             if (forward) {
                 history.forward();
@@ -104,6 +99,8 @@ class DisplayHistory extends EventDispatcher {
                 history.back();
             }
         } else {
+            const target = forward ? this._current.next : this._current.previous;
+            if (target === null) { return false; }
             this._current = target;
             this._updateHistoryFromCurrent(true);
         }

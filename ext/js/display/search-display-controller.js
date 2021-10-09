@@ -28,6 +28,7 @@ class SearchDisplayController {
         this._displayAudio = displayAudio;
         this._searchPersistentStateController = searchPersistentStateController;
         this._searchButton = document.querySelector('#search-button');
+        this._searchBackButton = document.querySelector('#search-back-button');
         this._queryInput = document.querySelector('#search-textbox');
         this._introElement = document.querySelector('#intro');
         this._clipboardMonitorEnableCheckbox = document.querySelector('#clipboard-monitor-enable');
@@ -75,6 +76,7 @@ class SearchDisplayController {
         this._display.setHistorySettings({useBrowserHistory: true});
 
         this._searchButton.addEventListener('click', this._onSearch.bind(this), false);
+        this._searchBackButton.addEventListener('click', this._onSearchBackButtonClick.bind(this), false);
         this._wanakanaEnableCheckbox.addEventListener('change', this._onWanakanaEnableChange.bind(this));
         window.addEventListener('copy', this._onCopy.bind(this));
         this._clipboardMonitor.on('change', this._onExternalSearchUpdate.bind(this));
@@ -146,15 +148,20 @@ class SearchDisplayController {
         this._setWanakanaEnabled(enableWanakana);
     }
 
-    _onContentUpdateStart({type, query, content}) {
+    _onContentUpdateStart({type, query}) {
         let animate = false;
         let valid = false;
+        let showBackButton = false;
         switch (type) {
             case 'terms':
             case 'kanji':
-                animate = !!content.animate;
-                valid = (typeof query === 'string' && query.length > 0);
-                this._display.blurElement(this._queryInput);
+                {
+                    const {content, state} = this._display.history;
+                    animate = (typeof content === 'object' && content !== null && content.animate === true);
+                    showBackButton = (typeof state === 'object' && state !== null && state.cause === 'queryParser');
+                    valid = (typeof query === 'string' && query.length > 0);
+                    this._display.blurElement(this._queryInput);
+                }
                 break;
             case 'clear':
                 valid = false;
@@ -164,6 +171,8 @@ class SearchDisplayController {
         }
 
         if (typeof query !== 'string') { query = ''; }
+
+        this._searchBackButton.hidden = !showBackButton;
 
         if (this._queryInput.value !== query) {
             this._queryInput.value = query;
@@ -191,6 +200,10 @@ class SearchDisplayController {
     _onSearch(e) {
         e.preventDefault();
         this._search(true, 'new', true, null);
+    }
+
+    _onSearchBackButtonClick() {
+        this._display.history.back();
     }
 
     _onCopy() {

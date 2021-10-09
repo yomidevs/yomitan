@@ -1538,9 +1538,7 @@ class Display extends EventDispatcher {
     }
 
     _triggerContentUpdateStart() {
-        let {content} = this._history;
-        if (typeof content !== 'object' || content === null) { content = {}; }
-        this.trigger('contentUpdateStart', {type: this._contentType, query: this._query, content});
+        this.trigger('contentUpdateStart', {type: this._contentType, query: this._query});
     }
 
     _triggerContentUpdateEntry(dictionaryEntry, element, index) {
