@@ -560,16 +560,16 @@ class Popup extends EventDispatcher {
         const verticalOffset = optionsGeneral.popupVerticalOffset2 * offsetScale;
 
         const [x, w] = this._getConstrainedPositionBinary(
-            elementRect.left - horizontalOffset,
-            elementRect.right + horizontalOffset,
+            elementRect.x - horizontalOffset,
+            elementRect.x + elementRect.width + horizontalOffset,
             width,
             viewport.left,
             viewport.right,
             preferRight
         );
         const [y, h, below] = this._getConstrainedPosition(
-            elementRect.bottom - verticalOffset,
-            elementRect.top + verticalOffset,
+            elementRect.y + elementRect.height - verticalOffset,
+            elementRect.y + verticalOffset,
             height,
             viewport.top,
             viewport.bottom,
