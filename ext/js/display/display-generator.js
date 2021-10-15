@@ -548,18 +548,15 @@ class DisplayGenerator {
 
         this._setTextContent(node.querySelector('.tag-label-content'), dictionary);
 
-        const frequency = values.join(', ');
-
         this._setTextContent(node.querySelector('.frequency-disambiguation-term'), term, 'ja');
         this._setTextContent(node.querySelector('.frequency-disambiguation-reading'), (reading !== null ? reading : ''), 'ja');
-        this._setTextContent(node.querySelector('.frequency-value'), frequency, 'ja');
+        this._populateFrequencyValueList(node.querySelector('.frequency-value-list'), values);
 
         node.dataset.term = term;
         node.dataset.reading = reading;
         node.dataset.hasReading = `${reading !== null}`;
         node.dataset.readingIsSame = `${reading === term}`;
         node.dataset.dictionary = dictionary;
-        node.dataset.frequency = `${frequency}`;
         node.dataset.details = dictionary;
 
         return node;
@@ -569,17 +566,48 @@ class DisplayGenerator {
         const {character, values} = details;
         const node = this._templates.instantiate('kanji-frequency-item');
 
-        const frequency = values.join(', ');
-
         this._setTextContent(node.querySelector('.tag-label-content'), dictionary);
-        this._setTextContent(node.querySelector('.frequency-value'), frequency, 'ja');
+        this._populateFrequencyValueList(node.querySelector('.frequency-value-list'), values);
 
         node.dataset.character = character;
         node.dataset.dictionary = dictionary;
-        node.dataset.frequency = `${frequency}`;
         node.dataset.details = dictionary;
 
         return node;
+    }
+
+    _populateFrequencyValueList(node, values) {
+        let fullFrequency = '';
+        for (let i = 0, ii = values.length; i < ii; ++i) {
+            const {frequency, displayValue} = values[i];
+            const frequencyString = `${frequency}`;
+            const text = displayValue !== null ? displayValue : frequency;
+
+            if (i > 0) {
+                const node2 = document.createElement('span');
+                node2.className = 'frequency-value';
+                node2.dataset.frequency = `${frequency}`;
+                node2.textContent = ', ';
+                node.appendChild(node2);
+                fullFrequency += ', ';
+            }
+
+            const node2 = document.createElement('span');
+            node2.className = 'frequency-value';
+            node2.dataset.frequency = frequencyString;
+            if (displayValue !== null) {
+                node2.dataset.displayValue = `${displayValue}`;
+                if (displayValue !== frequencyString) {
+                    node2.title = frequencyString;
+                }
+            }
+            this._setTextContent(node2, text, 'ja');
+            node.appendChild(node2);
+
+            fullFrequency += text;
+        }
+
+        node.dataset.frequency = fullFrequency;
     }
 
     _appendKanjiLinks(container, text) {

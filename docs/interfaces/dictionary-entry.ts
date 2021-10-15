@@ -181,7 +181,15 @@ namespace Translation {
         /**
          * The frequency for the character, as a number of occurrences or an overall rank.
          */
-        frequency: number | string;
+        frequency: number;
+        /**
+         * A display value to show to the user.
+         */
+        displayValue: string | null;
+        /**
+         * Whether or not the displayValue string was parsed to determine the frequency value.
+         */
+        displayValueParsed: boolean;
     }
 
     // Terms
@@ -400,7 +408,15 @@ namespace Translation {
         /**
          * The frequency for the term, as a number of occurrences or an overall rank.
          */
-        frequency: number | string;
+        frequency: number;
+        /**
+         * A display value to show to the user.
+         */
+        displayValue: string | null;
+        /**
+         * Whether or not the displayValue string was parsed to determine the frequency value.
+         */
+        displayValueParsed: boolean;
     }
 
     /**

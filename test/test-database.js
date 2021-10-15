@@ -151,10 +151,10 @@ async function testDatabase1() {
             prefixWildcardsSupported: true,
             counts: {
                 kanji: {total: 2},
-                kanjiMeta: {total: 2, freq: 2},
+                kanjiMeta: {total: 6, freq: 6},
                 media: {total: 4},
                 tagMeta: {total: 15},
-                termMeta: {total: 16, freq: 9, pitch: 7},
+                termMeta: {total: 38, freq: 31, pitch: 7},
                 terms: {total: 20}
             }
         };
@@ -182,8 +182,8 @@ async function testDatabase1() {
             true
         );
         vm.assert.deepStrictEqual(counts, {
-            counts: [{kanji: 2, kanjiMeta: 2, terms: 20, termMeta: 16, tagMeta: 15, media: 4}],
-            total: {kanji: 2, kanjiMeta: 2, terms: 20, termMeta: 16, tagMeta: 15, media: 4}
+            counts: [{kanji: 2, kanjiMeta: 6, terms: 20, termMeta: 38, tagMeta: 15, media: 4}],
+            total: {kanji: 2, kanjiMeta: 6, terms: 20, termMeta: 38, tagMeta: 15, media: 4}
         });
 
         // Test find* functions
@@ -569,9 +569,9 @@ async function testFindTermMetaBulk1(database, titles) {
                 }
             ],
             expectedResults: {
-                total: 3,
+                total: 11,
                 modes: [
-                    ['freq', 3]
+                    ['freq', 11]
                 ]
             }
         },
@@ -582,9 +582,9 @@ async function testFindTermMetaBulk1(database, titles) {
                 }
             ],
             expectedResults: {
-                total: 3,
+                total: 10,
                 modes: [
-                    ['freq', 3]
+                    ['freq', 10]
                 ]
             }
         },
@@ -595,9 +595,9 @@ async function testFindTermMetaBulk1(database, titles) {
                 }
             ],
             expectedResults: {
-                total: 5,
+                total: 12,
                 modes: [
-                    ['freq', 3],
+                    ['freq', 10],
                     ['pitch', 2]
                 ]
             }
@@ -687,9 +687,9 @@ async function testFindKanjiMetaBulk1(database, titles) {
                 }
             ],
             expectedResults: {
-                total: 1,
+                total: 3,
                 modes: [
-                    ['freq', 1]
+                    ['freq', 3]
                 ]
             }
         },
@@ -700,9 +700,9 @@ async function testFindKanjiMetaBulk1(database, titles) {
                 }
             ],
             expectedResults: {
-                total: 1,
+                total: 3,
                 modes: [
-                    ['freq', 1]
+                    ['freq', 3]
                 ]
             }
         },

@@ -48,7 +48,7 @@ class DictionaryDataUtil {
         const {headwords, frequencies} = dictionaryEntry;
 
         const map1 = new Map();
-        for (const {headwordIndex, dictionary, hasReading, frequency} of frequencies) {
+        for (const {headwordIndex, dictionary, hasReading, frequency, displayValue} of frequencies) {
             const {term, reading} = headwords[headwordIndex];
 
             let map2 = map1.get(dictionary);
@@ -61,18 +61,18 @@ class DictionaryDataUtil {
             const key = this._createMapKey([term, readingKey]);
             let frequencyData = map2.get(key);
             if (typeof frequencyData === 'undefined') {
-                frequencyData = {term, reading: readingKey, values: new Set()};
+                frequencyData = {term, reading: readingKey, values: new Map()};
                 map2.set(key, frequencyData);
             }
 
-            frequencyData.values.add(frequency);
+            frequencyData.values.set(this._createMapKey([frequency, displayValue]), {frequency, displayValue});
         }
         return this._createFrequencyGroupsFromMap(map1);
     }
 
     static groupKanjiFrequencies(frequencies) {
         const map1 = new Map();
-        for (const {dictionary, character, frequency} of frequencies) {
+        for (const {dictionary, character, frequency, displayValue} of frequencies) {
             let map2 = map1.get(dictionary);
             if (typeof map2 === 'undefined') {
                 map2 = new Map();
@@ -81,11 +81,11 @@ class DictionaryDataUtil {
 
             let frequencyData = map2.get(character);
             if (typeof frequencyData === 'undefined') {
-                frequencyData = {character, values: new Set()};
+                frequencyData = {character, values: new Map()};
                 map2.set(character, frequencyData);
             }
 
-            frequencyData.values.add(frequency);
+            frequencyData.values.set(this._createMapKey([frequency, displayValue]), {frequency, displayValue});
         }
         return this._createFrequencyGroupsFromMap(map1);
     }
@@ -222,7 +222,7 @@ class DictionaryDataUtil {
         for (const [dictionary, map2] of map.entries()) {
             const frequencies = [];
             for (const frequencyData of map2.values()) {
-                frequencyData.values = [...frequencyData.values];
+                frequencyData.values = [...frequencyData.values.values()];
                 frequencies.push(frequencyData);
             }
             results.push({dictionary, frequencies});
