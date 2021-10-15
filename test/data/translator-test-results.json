@@ -112,7 +112,29 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "character": "打",
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "character": "打",
+            "frequency": 0,
+            "displayValue": "three",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "character": "打",
+            "frequency": 5,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       }
@@ -230,7 +252,29 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "character": "込",
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "character": "込",
+            "frequency": 4,
+            "displayValue": "four (4)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "character": "込",
+            "frequency": 6,
+            "displayValue": "six",
+            "displayValueParsed": false
           }
         ]
       }
@@ -333,7 +377,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -341,8 +387,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 4
+            "frequency": 8,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fourteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 20,
+            "displayValue": "twenty (20)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 26,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -448,7 +551,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -456,8 +561,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 5
+            "frequency": 9,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fifteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 21,
+            "displayValue": "twenty-one (21)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 27,
+            "displayValue": "twenty-seven",
+            "displayValueParsed": false
           }
         ]
       }
@@ -569,7 +731,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -577,8 +741,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "sixteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -684,7 +894,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -692,8 +904,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "seventeen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": "twenty-nine",
+            "displayValueParsed": false
           }
         ]
       },
@@ -799,7 +1057,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -807,8 +1067,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -914,7 +1220,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -922,8 +1230,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -1016,7 +1370,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -1024,8 +1380,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 4
+            "frequency": 8,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fourteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 20,
+            "displayValue": "twenty (20)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 26,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -1131,7 +1544,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -1139,8 +1554,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 5
+            "frequency": 9,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fifteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 21,
+            "displayValue": "twenty-one (21)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 27,
+            "displayValue": "twenty-seven",
+            "displayValueParsed": false
           }
         ]
       }
@@ -1274,7 +1746,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -1282,8 +1756,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "eighteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -1411,7 +1931,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -1419,8 +1941,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "nineteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": "thirty-one",
+            "displayValueParsed": false
           }
         ]
       },
@@ -1548,7 +2116,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -1556,8 +2126,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -1685,7 +2301,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -1693,8 +2311,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -1802,7 +2466,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -1810,8 +2476,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "sixteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -1919,7 +2631,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -1927,8 +2641,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "seventeen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": "twenty-nine",
+            "displayValueParsed": false
           }
         ]
       },
@@ -2036,7 +2796,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -2044,8 +2806,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -2153,7 +2961,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -2161,8 +2971,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -2255,7 +3111,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -2263,8 +3121,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 4
+            "frequency": 8,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fourteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 20,
+            "displayValue": "twenty (20)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 26,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -2370,7 +3285,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -2378,8 +3295,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 5
+            "frequency": 9,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fifteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 21,
+            "displayValue": "twenty-one (21)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 27,
+            "displayValue": "twenty-seven",
+            "displayValueParsed": false
           }
         ]
       }
@@ -2589,7 +3563,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -2597,8 +3573,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 4
+            "frequency": 8,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fourteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 20,
+            "displayValue": "twenty (20)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 26,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       }
@@ -2710,7 +3743,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -2718,8 +3753,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 5
+            "frequency": 9,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fifteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 21,
+            "displayValue": "twenty-one (21)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 27,
+            "displayValue": "twenty-seven",
+            "displayValueParsed": false
           }
         ]
       }
@@ -2831,7 +3923,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -2839,8 +3933,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "sixteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -2946,7 +4086,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -2954,8 +4096,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       }
@@ -3067,7 +4255,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -3075,8 +4265,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "seventeen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": "twenty-nine",
+            "displayValueParsed": false
           }
         ]
       },
@@ -3182,7 +4418,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -3190,8 +4428,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       }
@@ -3325,7 +4609,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -3333,8 +4619,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "eighteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -3462,7 +4794,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -3470,8 +4804,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -3579,7 +4959,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -3587,8 +4969,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "sixteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -3696,7 +5124,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -3704,8 +5134,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       }
@@ -3839,7 +5315,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -3847,8 +5325,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "nineteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": "thirty-one",
+            "displayValueParsed": false
           }
         ]
       },
@@ -3976,7 +5500,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -3984,8 +5510,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -4093,7 +5665,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -4101,8 +5675,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "seventeen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": "twenty-nine",
+            "displayValueParsed": false
           }
         ]
       },
@@ -4210,7 +5830,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -4218,8 +5840,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       }
@@ -5086,7 +6754,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -5094,8 +6764,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "eighteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -5271,7 +6987,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -5279,8 +6997,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "nineteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": "thirty-one",
+            "displayValueParsed": false
           }
         ]
       },
@@ -5436,7 +7200,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -5444,8 +7210,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "sixteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -5601,7 +7413,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -5609,8 +7423,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "seventeen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": "twenty-nine",
+            "displayValueParsed": false
           }
         ]
       },
@@ -5703,7 +7563,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -5711,8 +7573,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 4
+            "frequency": 8,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fourteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 20,
+            "displayValue": "twenty (20)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 26,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -5818,7 +7737,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -5826,8 +7747,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 5
+            "frequency": 9,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fifteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 21,
+            "displayValue": "twenty-one (21)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 27,
+            "displayValue": "twenty-seven",
+            "displayValueParsed": false
           }
         ]
       }
@@ -6157,7 +8135,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 2,
@@ -6165,8 +8145,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "eighteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 8,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 10,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -6175,7 +8201,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 3,
@@ -6183,8 +8211,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 7,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "nineteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 9,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 11,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": "thirty-one",
+            "displayValueParsed": false
           }
         ]
       },
@@ -6467,7 +8541,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 2,
@@ -6475,8 +8551,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "sixteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 8,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 10,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -6485,7 +8607,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 3,
@@ -6493,8 +8617,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 7,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "seventeen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 9,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 11,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": "twenty-nine",
+            "displayValueParsed": false
           }
         ]
       },
@@ -6587,7 +8757,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -6595,8 +8767,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 4
+            "frequency": 8,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fourteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 20,
+            "displayValue": "twenty (20)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 26,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -6702,7 +8931,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -6710,8 +8941,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 5
+            "frequency": 9,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fifteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 21,
+            "displayValue": "twenty-one (21)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 27,
+            "displayValue": "twenty-seven",
+            "displayValueParsed": false
           }
         ]
       }
@@ -6849,7 +9137,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -6857,8 +9147,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "eighteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -6990,7 +9326,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -6998,8 +9336,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "nineteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": "thirty-one",
+            "displayValueParsed": false
           }
         ]
       },
@@ -7131,7 +9515,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -7139,8 +9525,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -7272,7 +9704,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -7280,8 +9714,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -7389,7 +9869,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -7397,8 +9879,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "sixteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -7506,7 +10034,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -7514,8 +10044,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "seventeen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": "twenty-nine",
+            "displayValueParsed": false
           }
         ]
       },
@@ -7623,7 +10199,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -7631,8 +10209,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -7740,7 +10364,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -7748,8 +10374,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -7842,7 +10514,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -7850,8 +10524,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 4
+            "frequency": 8,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fourteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 20,
+            "displayValue": "twenty (20)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 26,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -7957,7 +10688,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -7965,8 +10698,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 5
+            "frequency": 9,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fifteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 21,
+            "displayValue": "twenty-one (21)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 27,
+            "displayValue": "twenty-seven",
+            "displayValueParsed": false
           }
         ]
       }
@@ -8100,7 +10890,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -8108,8 +10900,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "eighteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -8237,7 +11075,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -8245,8 +11085,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "nineteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": "thirty-one",
+            "displayValueParsed": false
           }
         ]
       },
@@ -8374,7 +11260,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -8382,8 +11270,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -8511,7 +11445,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -8519,8 +11455,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -8628,7 +11610,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -8636,8 +11620,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "sixteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -8745,7 +11775,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -8753,8 +11785,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "seventeen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": "twenty-nine",
+            "displayValueParsed": false
           }
         ]
       },
@@ -8862,7 +11940,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -8870,8 +11950,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -8979,7 +12105,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -8987,8 +12115,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -9081,7 +12255,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -9089,8 +12265,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 4
+            "frequency": 8,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fourteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 20,
+            "displayValue": "twenty (20)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 26,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -9196,7 +12429,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -9204,8 +12439,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 5
+            "frequency": 9,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fifteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 21,
+            "displayValue": "twenty-one (21)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 27,
+            "displayValue": "twenty-seven",
+            "displayValueParsed": false
           }
         ]
       }
@@ -9339,7 +12631,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -9347,8 +12641,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "eighteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -9476,7 +12816,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -9484,8 +12826,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "nineteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": "thirty-one",
+            "displayValueParsed": false
           }
         ]
       },
@@ -9613,7 +13001,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -9621,8 +13011,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -9750,7 +13186,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -9758,8 +13196,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -9867,7 +13351,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -9875,8 +13361,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "sixteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -9984,7 +13516,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -9992,8 +13526,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "seventeen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": "twenty-nine",
+            "displayValueParsed": false
           }
         ]
       },
@@ -10101,7 +13681,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -10109,8 +13691,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -10218,7 +13846,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -10226,8 +13856,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -10320,7 +13996,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -10328,8 +14006,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 4
+            "frequency": 8,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fourteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 20,
+            "displayValue": "twenty (20)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 26,
+            "displayValue": null,
+            "displayValueParsed": false
           }
         ]
       },
@@ -10435,7 +14170,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 1
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -10443,8 +14180,65 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 5
+            "frequency": 9,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fifteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 21,
+            "displayValue": "twenty-one (21)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 27,
+            "displayValue": "twenty-seven",
+            "displayValueParsed": false
           }
         ]
       }
@@ -11081,7 +14875,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 2,
@@ -11089,8 +14885,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 8
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "eighteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 8,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 10,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -11099,7 +14941,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 3
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 3,
@@ -11107,8 +14951,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 9
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 7,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "nineteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 9,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 11,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": "thirty-one",
+            "displayValueParsed": false
           }
         ]
       },
@@ -11391,7 +15281,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 2,
@@ -11399,8 +15291,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 6
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "sixteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 8,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 10,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 1,
@@ -11409,7 +15347,9 @@
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
             "hasReading": false,
-            "frequency": 2
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
           },
           {
             "index": 3,
@@ -11417,8 +15357,54 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
             "hasReading": true,
-            "frequency": 7
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 7,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "seventeen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 9,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 11,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": "twenty-nine",
+            "displayValueParsed": false
           }
         ]
       }
