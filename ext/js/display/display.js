@@ -832,7 +832,8 @@ class Display extends EventDispatcher {
         const wildcardsEnabled = (urlSearchParams.get('wildcards') !== 'off');
 
         // Set query
-        const query = urlSearchParams.get('query');
+        let query = urlSearchParams.get('query');
+        if (query === null) { query = ''; }
         let queryFull = urlSearchParams.get('full');
         queryFull = (queryFull !== null ? queryFull : query);
         let queryOffset = urlSearchParams.get('offset');
