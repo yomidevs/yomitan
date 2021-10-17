@@ -107,6 +107,10 @@ class Display extends EventDispatcher {
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         this._elementOverflowController = new ElementOverflowController();
         this._frameVisible = (pageType === 'search');
+        this._onEntryClickBind = this._onEntryClick.bind(this);
+        this._onKanjiLookupBind = this._onKanjiLookup.bind(this);
+        this._onDebugLogClickBind = this._onDebugLogClick.bind(this);
+        this._onTagClickBind = this._onTagClick.bind(this);
 
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
@@ -1353,17 +1357,18 @@ class Display extends EventDispatcher {
         parent.removeChild(textarea);
     }
 
-    _addMultipleEventListeners(container, selector, ...args) {
-        for (const node of container.querySelectorAll(selector)) {
-            this._eventListeners.addEventListener(node, ...args);
-        }
-    }
-
     _addEntryEventListeners(entry) {
-        this._eventListeners.addEventListener(entry, 'click', this._onEntryClick.bind(this));
-        this._addMultipleEventListeners(entry, '.headword-kanji-link', 'click', this._onKanjiLookup.bind(this));
-        this._addMultipleEventListeners(entry, '.debug-log-link', 'click', this._onDebugLogClick.bind(this));
-        this._addMultipleEventListeners(entry, '.tag-label', 'click', this._onTagClick.bind(this));
+        const eventListeners = this._eventListeners;
+        eventListeners.addEventListener(entry, 'click', this._onEntryClickBind);
+        for (const node of entry.querySelectorAll('.headword-kanji-link')) {
+            eventListeners.addEventListener(node, 'click', this._onKanjiLookupBind);
+        }
+        for (const node of entry.querySelectorAll('.debug-log-link')) {
+            eventListeners.addEventListener(node, 'click', this._onDebugLogClickBind);
+        }
+        for (const node of entry.querySelectorAll('.tag-label')) {
+            eventListeners.addEventListener(node, 'click', this._onTagClickBind);
+        }
     }
 
     _updateContentTextScanner(options) {

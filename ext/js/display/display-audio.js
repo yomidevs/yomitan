@@ -44,6 +44,9 @@ class DisplayAudio {
             ['custom', 'Custom URL'],
             ['custom-json', 'Custom URL (JSON)']
         ]);
+        this._onAudioPlayButtonClickBind = this._onAudioPlayButtonClick.bind(this);
+        this._onAudioPlayButtonContextMenuBind = this._onAudioPlayButtonContextMenu.bind(this);
+        this._onAudioPlayMenuCloseClickBind = this._onAudioPlayMenuCloseClick.bind(this);
     }
 
     get autoPlayAudioDelay() {
@@ -150,12 +153,12 @@ class DisplayAudio {
         this._eventListeners.removeAllEventListeners();
     }
 
-    _onContentUpdateEntry({element, index}) {
-        for (const button of element.querySelectorAll('.action-play-audio')) {
-            const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
-            this._eventListeners.addEventListener(button, 'click', this._onAudioPlayButtonClick.bind(this, index, headwordIndex), false);
-            this._eventListeners.addEventListener(button, 'contextmenu', this._onAudioPlayButtonContextMenu.bind(this, index, headwordIndex), false);
-            this._eventListeners.addEventListener(button, 'menuClose', this._onAudioPlayMenuCloseClick.bind(this, index, headwordIndex), false);
+    _onContentUpdateEntry({element}) {
+        const eventListeners = this._eventListeners;
+        for (const button of element.querySelectorAll('.action-button[data-action=play-audio]')) {
+            eventListeners.addEventListener(button, 'click', this._onAudioPlayButtonClickBind, false);
+            eventListeners.addEventListener(button, 'contextmenu', this._onAudioPlayButtonContextMenuBind, false);
+            eventListeners.addEventListener(button, 'menuClose', this._onAudioPlayMenuCloseClickBind, false);
         }
     }
 
@@ -233,8 +236,12 @@ class DisplayAudio {
         this._audioSources.push(source);
     }
 
-    _onAudioPlayButtonClick(dictionaryEntryIndex, headwordIndex, e) {
+    _onAudioPlayButtonClick(e) {
         e.preventDefault();
+
+        const button = e.currentTarget;
+        const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
+        const dictionaryEntryIndex = this._display.getElementDictionaryEntryIndex(button);
 
         if (e.shiftKey) {
             this._showAudioMenu(e.currentTarget, dictionaryEntryIndex, headwordIndex);
@@ -243,13 +250,21 @@ class DisplayAudio {
         }
     }
 
-    _onAudioPlayButtonContextMenu(dictionaryEntryIndex, headwordIndex, e) {
+    _onAudioPlayButtonContextMenu(e) {
         e.preventDefault();
+
+        const button = e.currentTarget;
+        const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
+        const dictionaryEntryIndex = this._display.getElementDictionaryEntryIndex(button);
 
         this._showAudioMenu(e.currentTarget, dictionaryEntryIndex, headwordIndex);
     }
 
-    _onAudioPlayMenuCloseClick(dictionaryEntryIndex, headwordIndex, e) {
+    _onAudioPlayMenuCloseClick(e) {
+        const button = e.currentTarget;
+        const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
+        const dictionaryEntryIndex = this._display.getElementDictionaryEntryIndex(button);
+
         const {detail: {action, item, menu, shiftKey}} = e;
         switch (action) {
             case 'playAudioFromSource':
@@ -414,8 +429,8 @@ class DisplayAudio {
         const {dictionaryEntryNodes} = this._display;
         if (dictionaryEntryIndex >= 0 && dictionaryEntryIndex < dictionaryEntryNodes.length) {
             const node = dictionaryEntryNodes[dictionaryEntryIndex];
-            const button1 = (headwordIndex === 0 ? node.querySelector('.action-play-audio') : null);
-            const button2 = node.querySelector(`.headword:nth-of-type(${headwordIndex + 1}) .action-play-audio`);
+            const button1 = (headwordIndex === 0 ? node.querySelector('.action-button[data-action=play-audio]') : null);
+            const button2 = node.querySelector(`.headword:nth-of-type(${headwordIndex + 1}) .action-button[data-action=play-audio]`);
             if (button1 !== null) { results.push(button1); }
             if (button2 !== null) { results.push(button2); }
         }

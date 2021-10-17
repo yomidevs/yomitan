@@ -168,11 +168,18 @@ class DisplayAnki {
     }
 
     _onContentUpdateEntry({element}) {
-        this._addMultipleEventListeners(element, '.action-view-tags', 'click', this._onShowTagsBind);
-        this._addMultipleEventListeners(element, '.action-add-note', 'click', this._onNoteAddBind);
-        this._addMultipleEventListeners(element, '.action-view-note', 'click', this._onViewNoteButtonClickBind);
-        this._addMultipleEventListeners(element, '.action-view-note', 'contextmenu', this._onViewNoteButtonContextMenuBind);
-        this._addMultipleEventListeners(element, '.action-view-note', 'menuClose', this._onViewNoteButtonMenuCloseBind);
+        const eventListeners = this._eventListeners;
+        for (const node of element.querySelectorAll('.action-button[data-action=view-tags]')) {
+            eventListeners.addEventListener(node, 'click', this._onShowTagsBind);
+        }
+        for (const node of element.querySelectorAll('.action-button[data-action=add-note]')) {
+            eventListeners.addEventListener(node, 'click', this._onNoteAddBind);
+        }
+        for (const node of element.querySelectorAll('.action-button[data-action=view-note]')) {
+            eventListeners.addEventListener(node, 'click', this._onViewNoteButtonClickBind);
+            eventListeners.addEventListener(node, 'contextmenu', this._onViewNoteButtonContextMenuBind);
+            eventListeners.addEventListener(node, 'menuClose', this._onViewNoteButtonMenuCloseBind);
+        }
     }
 
     _onContentUpdateComplete() {
@@ -196,20 +203,14 @@ class DisplayAnki {
         this._showAnkiTagsNotification(tags);
     }
 
-    _addMultipleEventListeners(container, selector, ...args) {
-        for (const node of container.querySelectorAll(selector)) {
-            this._eventListeners.addEventListener(node, ...args);
-        }
-    }
-
     _adderButtonFind(index, mode) {
         const entry = this._getEntry(index);
-        return entry !== null ? entry.querySelector(`.action-add-note[data-mode="${mode}"]`) : null;
+        return entry !== null ? entry.querySelector(`.action-button[data-action=add-note][data-mode="${mode}"]`) : null;
     }
 
     _tagsIndicatorFind(index) {
         const entry = this._getEntry(index);
-        return entry !== null ? entry.querySelector('.action-view-tags') : null;
+        return entry !== null ? entry.querySelector('.action-button[data-action=view-tags]') : null;
     }
 
     _getEntry(index) {
@@ -672,7 +673,7 @@ class DisplayAnki {
 
     _getViewNoteButton(index) {
         const entry = this._getEntry(index);
-        return entry !== null ? entry.querySelector('.action-view-note') : null;
+        return entry !== null ? entry.querySelector('.action-button[data-action=view-note]') : null;
     }
 
     _viewNoteForSelectedEntry() {

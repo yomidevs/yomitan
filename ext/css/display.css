@@ -673,7 +673,7 @@ button.action-button:active {
 .action-icon:not(.color-icon) {
     background-color: var(--text-color);
 }
-:root[data-result-output-mode=merge] .entry[data-type=term] .actions>button.action-button.action-play-audio {
+:root[data-result-output-mode=merge] .entry[data-type=term] .actions>button.action-button[data-action=play-audio] {
     display: none;
 }
 .action-button-badge {
@@ -1061,12 +1061,12 @@ button.action-button:active {
 :root[data-result-output-mode=merge] .headword:hover .headword-details {
     visibility: visible;
 }
-:root[data-result-output-mode=merge] .headword-list .headword-details>.action-play-audio {
+:root[data-result-output-mode=merge] .headword-list .headword-details>.action-button[data-action=play-audio] {
     position: absolute;
     left: 0;
     bottom: 0.5em;
 }
-:root:not([data-result-output-mode=merge]) .headword-list .headword-details>.action-play-audio {
+:root:not([data-result-output-mode=merge]) .headword-list .headword-details>.action-button[data-action=play-audio] {
     display: none;
 }
 
@@ -1884,11 +1884,11 @@ button.footer-notification-close-button {
 :root:not([data-debug=true]) .debug-info {
     display: none;
 }
-:root[data-anki-enabled=false] .action-view-note,
-:root[data-anki-enabled=false] .action-add-note {
+:root[data-anki-enabled=false] .action-button[data-action=view-note],
+:root[data-anki-enabled=false] .action-button[data-action=add-note] {
     display: none;
 }
-:root[data-audio-enabled=false] .action-play-audio {
+:root[data-audio-enabled=false] .action-button[data-action=play-audio] {
     display: none;
 }
 :root[data-glossary-layout-mode=compact] .definition-tag-list,
