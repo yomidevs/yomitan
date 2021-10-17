@@ -25,6 +25,9 @@
             <span class="entry-current-indicator-icon" title="Current entry">
                 <span class="icon color-icon" data-icon="entry-current"></span>
             </span>
+            <button class="action-button action-button-collapsible" data-action="menu" data-menu-position="left below h-cover v-cover">
+                <span class="action-icon icon" data-icon="kebab-menu"></span>
+            </button>
         </div>
         <div class="headword-list"></div>
         <div class="headword-list-details">
@@ -43,7 +46,6 @@
             <ol class="entry-body-section-content definition-list"></ol>
         </div>
     </div>
-    <div class="debug-info"><a tabindex="0" class="debug-log-link">Log debug info to console</a></div>
 </div></template>
 <template id="headword-template" data-remove-whitespace-text="true"><div class="headword">
     <div class="headword-text-container">
@@ -117,6 +119,9 @@
             <span class="entry-current-indicator-icon" title="Current entry">
                 <span class="icon color-icon" data-icon="entry-current"></span>
             </span>
+            <button class="action-button action-button-collapsible" data-action="menu" data-menu-position="left below h-cover v-cover">
+                <span class="action-icon icon" data-icon="kebab-menu"></span>
+            </button>
         </div>
         <div class="kanji-glyph-container">
             <span class="headword-current-indicator"></span>
@@ -147,7 +152,6 @@
         <tr><th colspan="3">Dictionary Indices</th></tr>
         <tr><td colspan="3" class="kanji-dictionary-indices"></td></tr>
     </tbody></table>
-    <div class="debug-info"><a tabindex="0" class="debug-log-link">Log debug info to console</a></div>
 </div></template>
 <template id="kanji-info-table-template"><table class="kanji-info-table"><tbody class="kanji-info-table-body"></tbody></table></template>
 <template id="kanji-info-table-item-template"><tr class="kanji-info-table-item"><th class="kanji-info-table-item-header"></th><td class="kanji-info-table-item-value"></td></tr></template>
@@ -188,5 +192,7 @@
 </div></template>
 <template id="view-note-button-popup-menu-template"><div class="popup-menu-container scan-disable view-note-button-popup-menu" tabindex="-1" role="dialog"><div class="popup-menu popup-menu-auto-size"><div class="popup-menu-body"></div></div></div></template>
 <template id="view-note-button-popup-menu-item-template"><button class="popup-menu-item"><span class="popup-menu-item-label"></span></button></template>
+<template id="dictionary-entry-popup-menu-template"><div class="popup-menu-container scan-disable dictionary-entry-popup-menu" tabindex="-1" role="dialog"><div class="popup-menu popup-menu-auto-size"><div class="popup-menu-body"></div></div></div></template>
+<template id="dictionary-entry-popup-menu-item-template"><button class="popup-menu-item"><span class="popup-menu-item-label"></span></button></template>
 
 </body></html>

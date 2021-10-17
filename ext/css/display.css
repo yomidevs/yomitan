@@ -1881,7 +1881,7 @@ button.footer-notification-close-button {
     display: none;
 }
 
-:root:not([data-debug=true]) .debug-info {
+:root:not([data-debug=true]) .action-button[data-action=menu] {
     display: none;
 }
 :root[data-anki-enabled=false] .action-button[data-action=view-note],

@@ -107,10 +107,13 @@ class Display extends EventDispatcher {
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         this._elementOverflowController = new ElementOverflowController();
         this._frameVisible = (pageType === 'search');
+        this._menuContainer = document.querySelector('#popup-menus');
         this._onEntryClickBind = this._onEntryClick.bind(this);
         this._onKanjiLookupBind = this._onKanjiLookup.bind(this);
         this._onDebugLogClickBind = this._onDebugLogClick.bind(this);
         this._onTagClickBind = this._onTagClick.bind(this);
+        this._onMenuButtonClickBind = this._onMenuButtonClick.bind(this);
+        this._onMenuButtonMenuCloseBind = this._onMenuButtonMenuClose.bind(this);
 
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
@@ -762,6 +765,35 @@ class Display extends EventDispatcher {
         this._showTagNotification(e.currentTarget);
     }
 
+    _onMenuButtonClick(e) {
+        const node = e.currentTarget;
+
+        const menuContainerNode = this._displayGenerator.instantiateTemplate('dictionary-entry-popup-menu');
+        const menuBodyNode = menuContainerNode.querySelector('.popup-menu-body');
+
+        const addItem = (menuAction, label) => {
+            const item = this._displayGenerator.instantiateTemplate('dictionary-entry-popup-menu-item');
+            item.querySelector('.popup-menu-item-label').textContent = label;
+            item.dataset.menuAction = menuAction;
+            menuBodyNode.appendChild(item);
+        };
+
+        addItem('log-debug-info', 'Log debug info');
+
+        this._menuContainer.appendChild(menuContainerNode);
+        const popupMenu = new PopupMenu(node, menuContainerNode);
+        popupMenu.prepare();
+    }
+
+    _onMenuButtonMenuClose(e) {
+        const {currentTarget: node, detail: {action}} = e;
+        switch (action) {
+            case 'log-debug-info':
+                this._logDictionaryEntryData(this.getElementDictionaryEntryIndex(node));
+                break;
+        }
+    }
+
     _showTagNotification(tagNode) {
         tagNode = tagNode.parentNode;
         if (tagNode === null) { return; }
@@ -1363,11 +1395,12 @@ class Display extends EventDispatcher {
         for (const node of entry.querySelectorAll('.headword-kanji-link')) {
             eventListeners.addEventListener(node, 'click', this._onKanjiLookupBind);
         }
-        for (const node of entry.querySelectorAll('.debug-log-link')) {
-            eventListeners.addEventListener(node, 'click', this._onDebugLogClickBind);
-        }
         for (const node of entry.querySelectorAll('.tag-label')) {
             eventListeners.addEventListener(node, 'click', this._onTagClickBind);
+        }
+        for (const node of entry.querySelectorAll('.action-button[data-action=menu]')) {
+            eventListeners.addEventListener(node, 'click', this._onMenuButtonClickBind);
+            eventListeners.addEventListener(node, 'menuClose', this._onMenuButtonMenuCloseBind);
         }
     }
 
