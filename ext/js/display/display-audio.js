@@ -187,8 +187,9 @@ class DisplayAudio {
 
     _onFrameVisibilityChange({value}) {
         if (!value) {
+            // The auto-play timer is stopped, but any audio that has already started playing
+            // is not stopped, as this is a valid use case for some users.
             this.clearAutoPlayTimer();
-            this.stopAudio();
         }
     }
 
