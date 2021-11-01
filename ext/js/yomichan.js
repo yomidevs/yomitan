@@ -39,7 +39,13 @@ if ((() => {
     chrome = browser;
 }
 
+/**
+ * The Yomichan class is a core component through which various APIs are handled and invoked.
+ */
 class Yomichan extends EventDispatcher {
+    /**
+     * Creates a new instance. The instance should not be used until it has been fully prepare()'d.
+     */
     constructor() {
         super();
 
@@ -72,24 +78,44 @@ class Yomichan extends EventDispatcher {
         ]);
     }
 
-    // Public
-
+    /**
+     * Whether the current frame is the background page/service worker or not.
+     * @type {boolean}
+     */
     get isBackground() {
         return this._isBackground;
     }
 
+    /**
+     * Whether or not the extension is unloaded.
+     * @type {boolean}
+     */
     get isExtensionUnloaded() {
         return this._isExtensionUnloaded;
     }
 
+    /**
+     * Gets the API instance for communicating with the backend.
+     * This value will be null on the background page/service worker.
+     * @type {API}
+     */
     get api() {
         return this._api;
     }
 
+    /**
+     * Gets the CrossFrameAPI instance for communicating with different frames.
+     * This value will be null on the background page/service worker.
+     * @type {CrossFrameAPI}
+     */
     get crossFrame() {
         return this._crossFrame;
     }
 
+    /**
+     * Prepares the instance for use.
+     * @param {boolean} [isBackground=false] Assigns whether this instance is being used from the background page/service worker.
+     */
     async prepare(isBackground=false) {
         this._isBackground = isBackground;
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
@@ -107,11 +133,20 @@ class Yomichan extends EventDispatcher {
         }
     }
 
+    /**
+     * Sends a message to the backend indicating that the frame is ready and all script
+     * setup has completed.
+     */
     ready() {
         this._isReady = true;
         this.sendMessage({action: 'yomichanReady'});
     }
 
+    /**
+     * Checks whether or not a URL is an extension URL.
+     * @param {string} url The URL to check.
+     * @returns true if the URL is an extension URL, false otherwise.
+     */
     isExtensionUrl(url) {
         try {
             return url.startsWith(chrome.runtime.getURL('/'));
@@ -120,6 +155,11 @@ class Yomichan extends EventDispatcher {
         }
     }
 
+    /**
+     * Runs chrome.runtime.sendMessage() with additional exception handling events.
+     * @param {...*} args The arguments to be passed to chrome.runtime.sendMessage().
+     * @returns {void} The result of the chrome.runtime.sendMessage() call.
+     */
     sendMessage(...args) {
         try {
             return chrome.runtime.sendMessage(...args);
@@ -129,6 +169,11 @@ class Yomichan extends EventDispatcher {
         }
     }
 
+    /**
+     * Runs chrome.runtime.connect() with additional exception handling events.
+     * @param {...*} args The arguments to be passed to chrome.runtime.connect().
+     * @returns {Port} The resulting port.
+     */
     connect(...args) {
         try {
             return chrome.runtime.connect(...args);
@@ -138,6 +183,9 @@ class Yomichan extends EventDispatcher {
         }
     }
 
+    /**
+     * Runs chrome.runtime.connect() with additional exception handling events.
+     */
     triggerExtensionUnloaded() {
         this._isExtensionUnloaded = true;
         if (this._isTriggeringExtensionUnloaded) { return; }
@@ -200,4 +248,7 @@ class Yomichan extends EventDispatcher {
     }
 }
 
+/**
+ * The default Yomichan class instance.
+ */
 const yomichan = new Yomichan();

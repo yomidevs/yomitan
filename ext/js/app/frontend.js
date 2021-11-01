@@ -21,7 +21,26 @@
  * TextSourceRange
  */
 
+/**
+ * This is the main class responsible for scanning and handling webpage content.
+ */
 class Frontend {
+    /**
+     * Creates a new instance.
+     * @param {object} details
+     * @param {string} details.pageType The type of page, one of 'web', 'popup', or 'search'.
+     * @param {PopupFactory} details.popupFactory A PopupFactory instance to use for generating popups.
+     * @param {number} details.depth The nesting depth value of the popup.
+     * @param {number} details.tabId The tab ID of the host tab.
+     * @param {number} details.frameId The frame ID of the host frame.
+     * @param {?string} details.parentPopupId The popup ID of the parent popup if one exists, otherwise null.
+     * @param {?number} details.parentFrameId The frame ID of the parent popup if one exists, otherwise null.
+     * @param {boolean} details.useProxyPopup Whether or not proxy popups should be used.
+     * @param {boolean} details.canUseWindowPopup Whether or not window popups can be used.
+     * @param {boolean} details.allowRootFramePopupProxy Whether or not popups can be hosted in the root frame.
+     * @param {boolean} details.childrenSupported Whether popups can create child popups or not.
+     * @param {HotkeyHandler} details.hotkeyHandler A HotkeyHandler instance.
+     */
     constructor({
         pageType,
         popupFactory,
@@ -83,18 +102,33 @@ class Frontend {
         ]);
     }
 
+    /**
+     * Get whether or not the text selection can be cleared.
+     * @type {boolean}
+     */
     get canClearSelection() {
         return this._textScanner.canClearSelection;
     }
 
+    /**
+     * Set whether or not the text selection can be cleared.
+     * @param {boolean} value The new value to assign.
+     */
     set canClearSelection(value) {
         this._textScanner.canClearSelection = value;
     }
 
+    /**
+     * Gets the popup instance.
+     * @type {Popup}
+     */
     get popup() {
         return this._popup;
     }
 
+    /**
+     * Prepares the instance for use.
+     */
     async prepare() {
         await this.updateOptions();
         try {
@@ -135,20 +169,35 @@ class Frontend {
         this._signalFrontendReady();
     }
 
+    /**
+     * Set whether or not the instance is disabled.
+     * @param {boolean} disabled Whether or not the instance is disabled.
+     */
     setDisabledOverride(disabled) {
         this._disabledOverride = disabled;
         this._updateTextScannerEnabled();
     }
 
+    /**
+     * Set or clear an override options context object.
+     * @param {?object} optionsContext An options context object to use as the override, or `null` to clear the override.
+     */
     setOptionsContextOverride(optionsContext) {
         this._optionsContextOverride = optionsContext;
     }
 
+    /**
+     * Performs a new search on a specific source.
+     * @param {TextSourceRange|TextSourceElement} textSource The text source to search.
+     */
     async setTextSource(textSource) {
         this._textScanner.setCurrentTextSource(null);
         await this._textScanner.search(textSource);
     }
 
+    /**
+     * Updates the internal options representation.
+     */
     async updateOptions() {
         try {
             await this._updateOptionsInternal();
@@ -159,6 +208,10 @@ class Frontend {
         }
     }
 
+    /**
+     * Waits for the previous `showContent` call to be completed.
+     * @returns {Promise} A promise which is resolved when the previous `showContent` call has completed.
+     */
     showContentCompleted() {
         return this._lastShowPromise;
     }
