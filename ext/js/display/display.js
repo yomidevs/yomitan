@@ -552,7 +552,7 @@ class Display extends EventDispatcher {
             // Prepare
             const urlSearchParams = new URLSearchParams(location.search);
             let type = urlSearchParams.get('type');
-            if (type === null) { type = 'terms'; }
+            if (type === null && urlSearchParams.get('query') !== null) { type = 'terms'; }
 
             const fullVisible = urlSearchParams.get('full-visible');
             this._queryParserVisibleOverride = (fullVisible === null ? null : (fullVisible !== 'false'));
