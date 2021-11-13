@@ -83,6 +83,7 @@ class Frontend {
             searchTerms: true,
             searchKanji: true
         });
+        this._textScannerHasBeenEnabled = false;
         this._popupCache = new Map();
         this._popupEventListeners = new EventListenerCollection();
         this._updatePopupToken = null;
@@ -620,7 +621,12 @@ class Frontend {
         const enabled = (this._options !== null && this._options.general.enable && !this._disabledOverride);
         if (enabled === this._textScanner.isEnabled()) { return; }
         this._textScanner.setEnabled(enabled);
-        this._clearSelection(true);
+        if (this._textScannerHasBeenEnabled) {
+            this._clearSelection(true);
+        }
+        if (enabled) {
+            this._textScannerHasBeenEnabled = true;
+        }
     }
 
     _updateContentScale() {
