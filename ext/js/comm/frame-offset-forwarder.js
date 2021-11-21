@@ -37,24 +37,29 @@ class FrameOffsetForwarder {
             return [0, 0];
         }
 
-        const ancestorFrameIds = await this._frameAncestryHandler.getFrameAncestryInfo();
+        try {
+            const ancestorFrameIds = await this._frameAncestryHandler.getFrameAncestryInfo();
 
-        let childFrameId = this._frameId;
-        const promises = [];
-        for (const frameId of ancestorFrameIds) {
-            promises.push(yomichan.crossFrame.invoke(frameId, 'FrameOffsetForwarder.getChildFrameRect', {frameId: childFrameId}));
-            childFrameId = frameId;
+            let childFrameId = this._frameId;
+            const promises = [];
+            for (const frameId of ancestorFrameIds) {
+                promises.push(yomichan.crossFrame.invoke(frameId, 'FrameOffsetForwarder.getChildFrameRect', {frameId: childFrameId}));
+                childFrameId = frameId;
+            }
+
+            const results = await Promise.all(promises);
+
+            let x = 0;
+            let y = 0;
+            for (const result of results) {
+                if (result === null) { return null; }
+                x += result.x;
+                y += result.y;
+            }
+            return [x, y];
+        } catch (e) {
+            return null;
         }
-
-        const results = await Promise.all(promises);
-
-        let xOffset = 0;
-        let yOffset = 0;
-        for (const {x, y} of results) {
-            xOffset += x;
-            yOffset += y;
-        }
-        return [xOffset, yOffset];
     }
 
     // Private

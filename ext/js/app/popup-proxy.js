@@ -316,12 +316,7 @@ class PopupProxy extends EventDispatcher {
     async _updateFrameOffsetInner(now) {
         this._frameOffsetPromise = this._frameOffsetForwarder.getOffset();
         try {
-            let offset = null;
-            try {
-                offset = await this._frameOffsetPromise;
-            } catch (e) {
-                // NOP
-            }
+            const offset = await this._frameOffsetPromise;
             this._frameOffset = offset !== null ? offset : [0, 0];
             if (offset === null) {
                 this.trigger('offsetNotFound');
