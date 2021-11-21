@@ -68,8 +68,6 @@ class Popup extends EventDispatcher {
         this._fullscreenEventListeners = new EventListenerCollection();
     }
 
-    // Public properties
-
     /**
      * The ID of the popup.
      * @type {string}
@@ -142,8 +140,6 @@ class Popup extends EventDispatcher {
     get frameId() {
         return this._frameId;
     }
-
-    // Public functions
 
     /**
      * Prepares the popup for use.

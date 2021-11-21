@@ -37,8 +37,6 @@ class DictionaryDatabase {
         this._createMediaBind = this._createMedia.bind(this);
     }
 
-    // Public
-
     async prepare() {
         await this._db.open(
             this._dbName,

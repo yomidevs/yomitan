@@ -38,8 +38,6 @@ class PopupWindow extends EventDispatcher {
         this._popupTabId = null;
     }
 
-    // Public properties
-
     /**
      * The ID of the popup.
      * @type {string}
@@ -59,7 +57,7 @@ class PopupWindow extends EventDispatcher {
      * @type {Popup}
      */
     set parent(value) {
-        throw new Error('Not supported on PopupProxy');
+        throw new Error('Not supported on PopupWindow');
     }
 
     /**
@@ -77,7 +75,7 @@ class PopupWindow extends EventDispatcher {
      * @throws Throws an error, since this class doesn't support children.
      */
     set child(value) {
-        throw new Error('Not supported on PopupProxy');
+        throw new Error('Not supported on PopupWindow');
     }
 
     /**
@@ -113,16 +111,13 @@ class PopupWindow extends EventDispatcher {
         return this._frameId;
     }
 
-
-    // Public functions
-
     /**
      * Sets the options context for the popup.
      * @param {object} optionsContext The options context object.
      * @returns {Promise<void>}
      */
-    setOptionsContext(optionsContext, source) {
-        return this._invoke(false, 'setOptionsContext', {id: this._id, optionsContext, source});
+    setOptionsContext(optionsContext) {
+        return this._invoke(false, 'setOptionsContext', {id: this._id, optionsContext});
     }
 
     /**

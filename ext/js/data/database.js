@@ -21,8 +21,6 @@ class Database {
         this._isOpening = false;
     }
 
-    // Public
-
     async open(databaseName, version, structure) {
         if (this._db !== null) {
             throw new Error('Database already open');
