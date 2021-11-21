@@ -38,10 +38,10 @@ class PopupPreviewFrame {
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
         this._windowMessageHandlers = new Map([
-            ['setText',              this._onSetText.bind(this)],
-            ['setCustomCss',         this._setCustomCss.bind(this)],
-            ['setCustomOuterCss',    this._setCustomOuterCss.bind(this)],
-            ['updateOptionsContext', this._updateOptionsContext.bind(this)]
+            ['PopupPreviewFrame.setText',              this._onSetText.bind(this)],
+            ['PopupPreviewFrame.setCustomCss',         this._setCustomCss.bind(this)],
+            ['PopupPreviewFrame.setCustomOuterCss',    this._setCustomOuterCss.bind(this)],
+            ['PopupPreviewFrame.updateOptionsContext', this._updateOptionsContext.bind(this)]
         ]);
     }
 

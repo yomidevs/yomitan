@@ -161,7 +161,7 @@ class Popup extends EventDispatcher {
      */
     async setOptionsContext(optionsContext) {
         await this._setOptionsContext(optionsContext);
-        await this._invokeSafe('setOptionsContext', {optionsContext});
+        await this._invokeSafe('Display.setOptionsContext', {optionsContext});
     }
 
     /**
@@ -245,7 +245,7 @@ class Popup extends EventDispatcher {
         }
 
         if (displayDetails !== null) {
-            this._invokeSafe('setContent', {details: displayDetails});
+            this._invokeSafe('Display.setContent', {details: displayDetails});
         }
     }
 
@@ -254,14 +254,14 @@ class Popup extends EventDispatcher {
      * @param {string} css The CSS rules.
      */
     setCustomCss(css) {
-        this._invokeSafe('setCustomCss', {css});
+        this._invokeSafe('Display.setCustomCss', {css});
     }
 
     /**
      * Stops the audio auto-play timer, if one has started.
      */
     clearAutoPlayTimer() {
-        this._invokeSafe('clearAutoPlayTimer');
+        this._invokeSafe('Display.clearAutoPlayTimer');
     }
 
     /**
@@ -271,7 +271,7 @@ class Popup extends EventDispatcher {
     setContentScale(scale) {
         this._contentScale = scale;
         this._frame.style.fontSize = `${scale}px`;
-        this._invokeSafe('setContentScale', {scale});
+        this._invokeSafe('Display.setContentScale', {scale});
     }
 
     /**
@@ -411,7 +411,7 @@ class Popup extends EventDispatcher {
         await frameClient.connect(this._frame, this._targetOrigin, this._frameId, setupFrame);
 
         // Configure
-        await this._invokeSafe('configure', {
+        await this._invokeSafe('Display.configure', {
             depth: this._depth,
             parentPopupId: this._id,
             parentFrameId: this._frameId,
@@ -569,7 +569,7 @@ class Popup extends EventDispatcher {
         if (this._visibleValue === value) { return; }
         this._visibleValue = value;
         this._frame.style.setProperty('visibility', value ? 'visible' : 'hidden', 'important');
-        this._invokeSafe('visibilityChanged', {value});
+        this._invokeSafe('Display.visibilityChanged', {value});
     }
 
     _focusParent() {
@@ -627,7 +627,7 @@ class Popup extends EventDispatcher {
     }
 
     _onExtensionUnloaded() {
-        this._invokeWindow('extensionUnloaded');
+        this._invokeWindow('Display.extensionUnloaded');
     }
 
     _getFrameParentElement() {

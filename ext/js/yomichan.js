@@ -74,12 +74,12 @@ class Yomichan extends EventDispatcher {
         this._isBackendReadyPromiseResolve = resolve;
 
         this._messageHandlers = new Map([
-            ['isReady',         {async: false, handler: this._onMessageIsReady.bind(this)}],
-            ['backendReady',    {async: false, handler: this._onMessageBackendReady.bind(this)}],
-            ['getUrl',          {async: false, handler: this._onMessageGetUrl.bind(this)}],
-            ['optionsUpdated',  {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
-            ['databaseUpdated', {async: false, handler: this._onMessageDatabaseUpdated.bind(this)}],
-            ['zoomChanged',     {async: false, handler: this._onMessageZoomChanged.bind(this)}]
+            ['Yomichan.isReady',         {async: false, handler: this._onMessageIsReady.bind(this)}],
+            ['Yomichan.backendReady',    {async: false, handler: this._onMessageBackendReady.bind(this)}],
+            ['Yomichan.getUrl',          {async: false, handler: this._onMessageGetUrl.bind(this)}],
+            ['Yomichan.optionsUpdated',  {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
+            ['Yomichan.databaseUpdated', {async: false, handler: this._onMessageDatabaseUpdated.bind(this)}],
+            ['Yomichan.zoomChanged',     {async: false, handler: this._onMessageZoomChanged.bind(this)}]
         ]);
     }
 

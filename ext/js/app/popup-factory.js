@@ -43,21 +43,21 @@ class PopupFactory {
     prepare() {
         this._frameOffsetForwarder.prepare();
         yomichan.crossFrame.registerHandlers([
-            ['getOrCreatePopup',     {async: true,  handler: this._onApiGetOrCreatePopup.bind(this)}],
-            ['setOptionsContext',    {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
-            ['hide',                 {async: false, handler: this._onApiHide.bind(this)}],
-            ['isVisible',            {async: true,  handler: this._onApiIsVisibleAsync.bind(this)}],
-            ['setVisibleOverride',   {async: true,  handler: this._onApiSetVisibleOverride.bind(this)}],
-            ['clearVisibleOverride', {async: true,  handler: this._onApiClearVisibleOverride.bind(this)}],
-            ['containsPoint',        {async: true,  handler: this._onApiContainsPoint.bind(this)}],
-            ['showContent',          {async: true,  handler: this._onApiShowContent.bind(this)}],
-            ['setCustomCss',         {async: false, handler: this._onApiSetCustomCss.bind(this)}],
-            ['clearAutoPlayTimer',   {async: false, handler: this._onApiClearAutoPlayTimer.bind(this)}],
-            ['setContentScale',      {async: false, handler: this._onApiSetContentScale.bind(this)}],
-            ['updateTheme',          {async: false, handler: this._onApiUpdateTheme.bind(this)}],
-            ['setCustomOuterCss',    {async: false, handler: this._onApiSetCustomOuterCss.bind(this)}],
-            ['popup.getFrameSize',   {async: true,  handler: this._onApiGetFrameSize.bind(this)}],
-            ['popup.setFrameSize',   {async: true,  handler: this._onApiSetFrameSize.bind(this)}]
+            ['PopupFactory.getOrCreatePopup',     {async: true,  handler: this._onApiGetOrCreatePopup.bind(this)}],
+            ['PopupFactory.setOptionsContext',    {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
+            ['PopupFactory.hide',                 {async: false, handler: this._onApiHide.bind(this)}],
+            ['PopupFactory.isVisible',            {async: true,  handler: this._onApiIsVisibleAsync.bind(this)}],
+            ['PopupFactory.setVisibleOverride',   {async: true,  handler: this._onApiSetVisibleOverride.bind(this)}],
+            ['PopupFactory.clearVisibleOverride', {async: true,  handler: this._onApiClearVisibleOverride.bind(this)}],
+            ['PopupFactory.containsPoint',        {async: true,  handler: this._onApiContainsPoint.bind(this)}],
+            ['PopupFactory.showContent',          {async: true,  handler: this._onApiShowContent.bind(this)}],
+            ['PopupFactory.setCustomCss',         {async: false, handler: this._onApiSetCustomCss.bind(this)}],
+            ['PopupFactory.clearAutoPlayTimer',   {async: false, handler: this._onApiClearAutoPlayTimer.bind(this)}],
+            ['PopupFactory.setContentScale',      {async: false, handler: this._onApiSetContentScale.bind(this)}],
+            ['PopupFactory.updateTheme',          {async: false, handler: this._onApiUpdateTheme.bind(this)}],
+            ['PopupFactory.setCustomOuterCss',    {async: false, handler: this._onApiSetCustomOuterCss.bind(this)}],
+            ['PopupFactory.getFrameSize',         {async: true,  handler: this._onApiGetFrameSize.bind(this)}],
+            ['PopupFactory.setFrameSize',         {async: true,  handler: this._onApiSetFrameSize.bind(this)}]
         ]);
     }
 
@@ -149,7 +149,7 @@ class PopupFactory {
                 throw new Error('Invalid frameId');
             }
             const useFrameOffsetForwarder = (parentPopupId === null);
-            ({id, depth, frameId} = await yomichan.crossFrame.invoke(frameId, 'getOrCreatePopup', {
+            ({id, depth, frameId} = await yomichan.crossFrame.invoke(frameId, 'PopupFactory.getOrCreatePopup', {
                 id,
                 parentPopupId,
                 frameId,

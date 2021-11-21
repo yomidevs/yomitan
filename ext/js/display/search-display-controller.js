@@ -64,9 +64,9 @@ class SearchDisplayController {
             ['focusSearchBox', this._onActionFocusSearchBox.bind(this)]
         ]);
         this._registerMessageHandlers([
-            ['getMode', {async: false, handler: this._onMessageGetMode.bind(this)}],
-            ['setMode', {async: false, handler: this._onMessageSetMode.bind(this)}],
-            ['updateSearchQuery', {async: false, handler: this._onExternalSearchUpdate.bind(this)}]
+            ['SearchDisplayController.getMode',           {async: false, handler: this._onMessageGetMode.bind(this)}],
+            ['SearchDisplayController.setMode',           {async: false, handler: this._onMessageSetMode.bind(this)}],
+            ['SearchDisplayController.updateSearchQuery', {async: false, handler: this._onExternalSearchUpdate.bind(this)}]
         ]);
 
         this._updateClipboardMonitorEnabled();

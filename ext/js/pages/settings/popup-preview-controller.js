@@ -52,16 +52,16 @@ class PopupPreviewController {
     }
 
     _onCustomCssChange() {
-        this._invoke('setCustomCss', {css: this._customCss.value});
+        this._invoke('PopupPreviewFrame.setCustomCss', {css: this._customCss.value});
     }
 
     _onCustomOuterCssChange() {
-        this._invoke('setCustomOuterCss', {css: this._customOuterCss.value});
+        this._invoke('PopupPreviewFrame.setCustomOuterCss', {css: this._customOuterCss.value});
     }
 
     _onOptionsContextChange() {
         const optionsContext = this._settingsController.getOptionsContext();
-        this._invoke('updateOptionsContext', {optionsContext});
+        this._invoke('PopupPreviewFrame.updateOptionsContext', {optionsContext});
     }
 
     _invoke(action, params) {

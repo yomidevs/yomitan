@@ -128,7 +128,7 @@ class DisplayResizer {
         const {parentPopupId} = this._display;
         if (parentPopupId === null) { return; }
 
-        const size = await this._display.invokeParentFrame('popup.getFrameSize', {id: parentPopupId});
+        const size = await this._display.invokeParentFrame('PopupFactory.getFrameSize', {id: parentPopupId});
         if (this._token !== token) { return; }
         this._startSize = size;
     }
@@ -158,7 +158,7 @@ class DisplayResizer {
         height += y - this._startOffset.y;
         width = Math.max(Math.max(0, handleSize.width), width);
         height = Math.max(Math.max(0, handleSize.height), height);
-        await this._display.invokeParentFrame('popup.setFrameSize', {id: parentPopupId, width, height});
+        await this._display.invokeParentFrame('PopupFactory.setFrameSize', {id: parentPopupId, width, height});
     }
 
     _getTouch(touchList, identifier) {

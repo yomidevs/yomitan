@@ -117,7 +117,7 @@ class PopupWindow extends EventDispatcher {
      * @returns {Promise<void>}
      */
     setOptionsContext(optionsContext) {
-        return this._invoke(false, 'setOptionsContext', {id: this._id, optionsContext});
+        return this._invoke(false, 'Display.setOptionsContext', {id: this._id, optionsContext});
     }
 
     /**
@@ -174,7 +174,7 @@ class PopupWindow extends EventDispatcher {
      */
     async showContent(_details, displayDetails) {
         if (displayDetails === null) { return; }
-        await this._invoke(true, 'setContent', {id: this._id, details: displayDetails});
+        await this._invoke(true, 'Display.setContent', {id: this._id, details: displayDetails});
     }
 
     /**
@@ -182,14 +182,14 @@ class PopupWindow extends EventDispatcher {
      * @param {string} css The CSS rules.
      */
     setCustomCss(css) {
-        return this._invoke(false, 'setCustomCss', {id: this._id, css});
+        return this._invoke(false, 'Display.setCustomCss', {id: this._id, css});
     }
 
     /**
      * Stops the audio auto-play timer, if one has started.
      */
     clearAutoPlayTimer() {
-        return this._invoke(false, 'clearAutoPlayTimer', {id: this._id});
+        return this._invoke(false, 'Display.clearAutoPlayTimer', {id: this._id});
     }
 
     /**

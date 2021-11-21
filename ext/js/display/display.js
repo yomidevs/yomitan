@@ -128,15 +128,15 @@ class Display extends EventDispatcher {
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
         ]);
         this.registerDirectMessageHandlers([
-            ['setOptionsContext',  {async: false, handler: this._onMessageSetOptionsContext.bind(this)}],
-            ['setContent',         {async: false, handler: this._onMessageSetContent.bind(this)}],
-            ['setCustomCss',       {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
-            ['setContentScale',    {async: false, handler: this._onMessageSetContentScale.bind(this)}],
-            ['configure',          {async: true,  handler: this._onMessageConfigure.bind(this)}],
-            ['visibilityChanged',  {async: false, handler: this._onMessageVisibilityChanged.bind(this)}]
+            ['Display.setOptionsContext', {async: false, handler: this._onMessageSetOptionsContext.bind(this)}],
+            ['Display.setContent',        {async: false, handler: this._onMessageSetContent.bind(this)}],
+            ['Display.setCustomCss',      {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
+            ['Display.setContentScale',   {async: false, handler: this._onMessageSetContentScale.bind(this)}],
+            ['Display.configure',         {async: true,  handler: this._onMessageConfigure.bind(this)}],
+            ['Display.visibilityChanged', {async: false, handler: this._onMessageVisibilityChanged.bind(this)}]
         ]);
         this.registerWindowMessageHandlers([
-            ['extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
+            ['Display.extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
         ]);
     }
 
@@ -393,7 +393,7 @@ class Display extends EventDispatcher {
     close() {
         switch (this._pageType) {
             case 'popup':
-                this.invokeContentOrigin('closePopup');
+                this.invokeContentOrigin('Frontend.closePopup');
                 break;
             case 'search':
                 this._closeTab();
@@ -1359,7 +1359,7 @@ class Display extends EventDispatcher {
                 {
                     let text;
                     try {
-                        text = await this.invokeContentOrigin('getSelectionText');
+                        text = await this.invokeContentOrigin('Frontend.getSelectionText');
                     } catch (e) {
                         break;
                     }
@@ -1367,7 +1367,7 @@ class Display extends EventDispatcher {
                 }
                 break;
             default:
-                await this.invokeContentOrigin('copySelection');
+                await this.invokeContentOrigin('Frontend.copySelection');
                 break;
         }
     }

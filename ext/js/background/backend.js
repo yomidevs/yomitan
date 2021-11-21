@@ -227,8 +227,8 @@ class Backend {
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
 
-            this._sendMessageAllTabsIgnoreResponse('backendReady', {});
-            this._sendMessageIgnoreResponse({action: 'backendReady', params: {}});
+            this._sendMessageAllTabsIgnoreResponse('Yomichan.backendReady', {});
+            this._sendMessageIgnoreResponse({action: 'Yomichan.backendReady', params: {}});
         } catch (e) {
             log.error(e);
             throw e;
@@ -367,7 +367,7 @@ class Backend {
     }
 
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
-        this._sendMessageTabIgnoreResponse(tabId, {action: 'zoomChanged', params: {oldZoomFactor, newZoomFactor}});
+        this._sendMessageTabIgnoreResponse(tabId, {action: 'Yomichan.zoomChanged', params: {oldZoomFactor, newZoomFactor}});
     }
 
     _onPermissionsChanged() {
@@ -383,7 +383,7 @@ class Backend {
 
     _onApiRequestBackendReadySignal(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
-        const data = {action: 'backendReady', params: {}};
+        const data = {action: 'Yomichan.backendReady', params: {}};
         if (typeof sender.tab === 'undefined') {
             this._sendMessageIgnoreResponse(data);
             return false;
@@ -895,7 +895,7 @@ class Backend {
 
         await this._sendMessageTabPromise(
             tab.id,
-            {action: 'setMode', params: {mode: 'popup'}},
+            {action: 'SearchDisplayController.setMode', params: {mode: 'popup'}},
             {frameId: 0}
         );
 
@@ -909,7 +909,7 @@ class Backend {
             try {
                 const mode = await this._sendMessageTabPromise(
                     tab.id,
-                    {action: 'getMode', params: {}},
+                    {action: 'SearchDisplayController.getMode', params: {}},
                     {frameId: 0}
                 );
                 return mode === 'popup';
@@ -969,7 +969,7 @@ class Backend {
     _updateSearchQuery(tabId, text, animate) {
         return this._sendMessageTabPromise(
             tabId,
-            {action: 'updateSearchQuery', params: {text, animate}},
+            {action: 'SearchDisplayController.updateSearchQuery', params: {text, animate}},
             {frameId: 0}
         );
     }
@@ -991,7 +991,7 @@ class Backend {
             this._clipboardMonitor.stop();
         }
 
-        this._sendMessageAllTabsIgnoreResponse('optionsUpdated', {source});
+        this._sendMessageAllTabsIgnoreResponse('Yomichan.optionsUpdated', {source});
     }
 
     _getOptionsFull(useSchema=false) {
@@ -1425,7 +1425,7 @@ class Backend {
         try {
             const {url} = await this._sendMessageTabPromise(
                 tabId,
-                {action: 'getUrl', params: {}},
+                {action: 'Yomichan.getUrl', params: {}},
                 {frameId: 0}
             );
             if (typeof url === 'string') {
@@ -1582,7 +1582,7 @@ class Backend {
 
             chrome.runtime.onMessage.addListener(onMessage);
 
-            this._sendMessageTabPromise(tabId, {action: 'isReady'}, {frameId})
+            this._sendMessageTabPromise(tabId, {action: 'Yomichan.isReady'}, {frameId})
                 .then(
                     (value) => {
                         if (!value) { return; }
@@ -1685,7 +1685,7 @@ class Backend {
         let token = null;
         try {
             if (typeof tabId === 'number' && typeof frameId === 'number') {
-                const action = 'setAllVisibleOverride';
+                const action = 'Frontend.setAllVisibleOverride';
                 const params = {value: false, priority: 0, awaitFrame: true};
                 token = await this._sendMessageTabPromise(tabId, {action, params}, {frameId});
             }
@@ -1702,7 +1702,7 @@ class Backend {
             });
         } finally {
             if (token !== null) {
-                const action = 'clearAllVisibleOverride';
+                const action = 'Frontend.clearAllVisibleOverride';
                 const params = {token};
                 try {
                     await this._sendMessageTabPromise(tabId, {action, params}, {frameId});
@@ -1946,7 +1946,7 @@ class Backend {
 
     _triggerDatabaseUpdated(type, cause) {
         this._translator.clearDatabaseCaches();
-        this._sendMessageAllTabsIgnoreResponse('databaseUpdated', {type, cause});
+        this._sendMessageAllTabsIgnoreResponse('Yomichan.databaseUpdated', {type, cause});
     }
 
     async _saveOptions(source) {

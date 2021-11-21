@@ -129,7 +129,7 @@ class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     setOptionsContext(optionsContext) {
-        return this._invokeSafe('setOptionsContext', {id: this._id, optionsContext});
+        return this._invokeSafe('PopupFactory.setOptionsContext', {id: this._id, optionsContext});
     }
 
     /**
@@ -138,7 +138,7 @@ class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     hide(changeFocus) {
-        return this._invokeSafe('hide', {id: this._id, changeFocus});
+        return this._invokeSafe('PopupFactory.hide', {id: this._id, changeFocus});
     }
 
     /**
@@ -146,7 +146,7 @@ class PopupProxy extends EventDispatcher {
      * @returns {Promise<boolean>} `true` if the popup is visible, `false` otherwise.
      */
     isVisible() {
-        return this._invokeSafe('isVisible', {id: this._id}, false);
+        return this._invokeSafe('PopupFactory.isVisible', {id: this._id}, false);
     }
 
     /**
@@ -157,7 +157,7 @@ class PopupProxy extends EventDispatcher {
      *   or null if the override wasn't assigned.
      */
     setVisibleOverride(value, priority) {
-        return this._invokeSafe('setVisibleOverride', {id: this._id, value, priority}, null);
+        return this._invokeSafe('PopupFactory.setVisibleOverride', {id: this._id, value, priority}, null);
     }
 
     /**
@@ -166,7 +166,7 @@ class PopupProxy extends EventDispatcher {
      * @returns {Promise<boolean>} `true` if the override existed and was removed, `false` otherwise.
      */
     clearVisibleOverride(token) {
-        return this._invokeSafe('clearVisibleOverride', {id: this._id, token}, false);
+        return this._invokeSafe('PopupFactory.clearVisibleOverride', {id: this._id, token}, false);
     }
 
     /**
@@ -180,7 +180,7 @@ class PopupProxy extends EventDispatcher {
             await this._updateFrameOffset();
             [x, y] = this._applyFrameOffset(x, y);
         }
-        return await this._invokeSafe('containsPoint', {id: this._id, x, y}, false);
+        return await this._invokeSafe('PopupFactory.containsPoint', {id: this._id, x, y}, false);
     }
 
     /**
@@ -195,7 +195,7 @@ class PopupProxy extends EventDispatcher {
             await this._updateFrameOffset();
             [elementRect.x, elementRect.y] = this._applyFrameOffset(elementRect.x, elementRect.y);
         }
-        return await this._invokeSafe('showContent', {id: this._id, details, displayDetails});
+        return await this._invokeSafe('PopupFactory.showContent', {id: this._id, details, displayDetails});
     }
 
     /**
@@ -204,7 +204,7 @@ class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     setCustomCss(css) {
-        return this._invokeSafe('setCustomCss', {id: this._id, css});
+        return this._invokeSafe('PopupFactory.setCustomCss', {id: this._id, css});
     }
 
     /**
@@ -212,7 +212,7 @@ class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     clearAutoPlayTimer() {
-        return this._invokeSafe('clearAutoPlayTimer', {id: this._id});
+        return this._invokeSafe('PopupFactory.clearAutoPlayTimer', {id: this._id});
     }
 
     /**
@@ -221,7 +221,7 @@ class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     setContentScale(scale) {
-        return this._invokeSafe('setContentScale', {id: this._id, scale});
+        return this._invokeSafe('PopupFactory.setContentScale', {id: this._id, scale});
     }
 
     /**
@@ -238,7 +238,7 @@ class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     updateTheme() {
-        return this._invokeSafe('updateTheme', {id: this._id});
+        return this._invokeSafe('PopupFactory.updateTheme', {id: this._id});
     }
 
     /**
@@ -249,7 +249,7 @@ class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     setCustomOuterCss(css, useWebExtensionApi) {
-        return this._invokeSafe('setCustomOuterCss', {id: this._id, css, useWebExtensionApi});
+        return this._invokeSafe('PopupFactory.setCustomOuterCss', {id: this._id, css, useWebExtensionApi});
     }
 
     /**
@@ -266,7 +266,7 @@ class PopupProxy extends EventDispatcher {
      * @returns {Promise<{width: number, height: number, valid: boolean}>} The size and whether or not it is valid.
      */
     getFrameSize() {
-        return this._invokeSafe('popup.getFrameSize', {id: this._id}, {width: 0, height: 0, valid: false});
+        return this._invokeSafe('PopupFactory.getFrameSize', {id: this._id}, {width: 0, height: 0, valid: false});
     }
 
     /**
@@ -276,7 +276,7 @@ class PopupProxy extends EventDispatcher {
      * @returns {Promise<boolean>} `true` if the size assignment was successful, `false` otherwise.
      */
     setFrameSize(width, height) {
-        return this._invokeSafe('popup.setFrameSize', {id: this._id, width, height});
+        return this._invokeSafe('PopupFactory.setFrameSize', {id: this._id, width, height});
     }
 
     // Private

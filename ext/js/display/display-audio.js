@@ -64,7 +64,7 @@ class DisplayAudio {
             ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)]
         ]);
         this._display.registerDirectMessageHandlers([
-            ['clearAutoPlayTimer', {async: false, handler: this._onMessageClearAutoPlayTimer.bind(this)}]
+            ['Display.clearAutoPlayTimer', {async: false, handler: this._onMessageClearAutoPlayTimer.bind(this)}]
         ]);
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         this._display.on('contentClear', this._onContentClear.bind(this));
