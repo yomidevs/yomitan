@@ -1255,8 +1255,8 @@
         <div class="heading-description more" hidden>
             <p>
                 Yomichan is able to scan the sentence surrounding a term and parse individual words
-                of the query text on the search page.
-                This information can be added to Anki cards to provide additional context.
+                of the query on the <a href="/search.html" target="_blank" rel="noopener">search page</a>.
+                This information can also be added to Anki cards to provide additional context.
             </p>
             <p>
                 <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -1264,22 +1264,40 @@
         </div>
     </div>
     <div class="settings-group">
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Parse text using installed dictionaries</div>
-                <div class="settings-item-description">Words are scanned by automatically advancing in the sentence after a matching word.</div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Parse sentences using Yomichan's internal parser</div>
+                    <div class="settings-item-description">
+                        Sentence words are parsed using Yomichan's dictionaries.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="parsing.enableScanningParser"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
             </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="parsing.enableScanningParser"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    Yomichan's internal parser is a simple algorithm which can parse sentences using the installed dictionaries.
+                    It works by repeatedly detecting the longest term at the start of the sentence and advancing until no text remains.
+                    This provides decent results for the general case, but since grammatical structure is not taken into account,
+                    it can sometimes yield incorrect segmentation.
+                </p>
+                <p class="margin-above">
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
             </div>
-        </div></div>
+        </div>
         <div class="settings-item advanced-only">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-invalid-indicator"></div>
-                    <div class="settings-item-label">Parse text using <a href="https://en.wikipedia.org/wiki/MeCab" target="_blank" rel="noopener noreferrer">MeCab</a></div>
+                    <div class="settings-item-label">
+                        Parse sentences using <a href="https://en.wikipedia.org/wiki/MeCab" target="_blank" rel="noopener noreferrer">MeCab</a>
+                    </div>
                     <div class="settings-item-description">
-                        Requires a native component to be installed that Yomichan will connect to.
+                        Sentence words are parsed using a third-party program.
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                     </div>
                 </div>
@@ -1290,6 +1308,9 @@
             <div class="settings-item-children more" hidden>
                 <p>
                     MeCab is a third-party program which uses its own dictionaries and parsing algorithm to decompose sentences into individual words.
+                    MeCab may provide more accurate parsing results than Yomichan's internal parser.
+                </p>
+                <p>
                     In order for Yomichan to use it, both MeCab and a native messaging component must be installed.
                     A setup guide can be found <a href="https://github.com/siikamiika/yomichan-mecab-installer/blob/master/README.md" target="_blank" rel="noopener noreferrer">here</a>.
                 </p>
