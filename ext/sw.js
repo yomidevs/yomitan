@@ -24,6 +24,7 @@ self.importScripts(
     '/js/background/environment.js',
     '/js/background/profile-conditions-util.js',
     '/js/background/request-builder.js',
+    '/js/background/script-manager.js',
     '/js/comm/anki.js',
     '/js/comm/clipboard-monitor.js',
     '/js/comm/clipboard-reader.js',

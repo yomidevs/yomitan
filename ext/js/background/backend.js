@@ -31,6 +31,7 @@
  * PermissionsUtil
  * ProfileConditionsUtil
  * RequestBuilder
+ * ScriptManager
  * StringUtil
  * Translator
  * wanakana
@@ -67,6 +68,7 @@ class Backend {
             requestBuilder: this._requestBuilder
         });
         this._optionsUtil = new OptionsUtil();
+        this._scriptManager = new ScriptManager();
 
         this._searchPopupTabId = null;
         this._searchPopupTabCreatePromise = null;
@@ -559,8 +561,10 @@ class Backend {
         return Promise.resolve({tabId, frameId});
     }
 
-    _onApiInjectStylesheet({type, value}, sender) {
-        return this._injectStylesheet(type, value, sender);
+    async _onApiInjectStylesheet({type, value}, sender) {
+        const {frameId, tab} = sender;
+        if (!isObject(tab)) { throw new Error('Invalid tab'); }
+        return await this._scriptManager.injectStylesheet(type, value, tab.id, frameId);
     }
 
     async _onApiGetStylesheetContent({url}) {
@@ -746,7 +750,7 @@ class Backend {
     _onApiDocumentStart(params, sender) {
         const {tab, frameId, url} = sender;
         if (typeof url !== 'string' || typeof tab !== 'object' || tab === null) { return; }
-        this._updateTabAccessibility(url, tab, frameId);
+        this._updateTabAccessibility(url, tab.id, frameId);
     }
 
     async _onApiGetTermFrequencies({termReadingList, dictionaries}) {
@@ -2085,145 +2089,6 @@ class Backend {
         });
     }
 
-    _injectStylesheet(type, value, target) {
-        if (isObject(chrome.tabs) && typeof chrome.tabs.insertCSS === 'function') {
-            return this._injectStylesheetMV2(type, value, target);
-        } else if (isObject(chrome.scripting) && typeof chrome.scripting.insertCSS === 'function') {
-            return this._injectStylesheetMV3(type, value, target);
-        } else {
-            return Promise.reject(new Error('insertCSS function not available'));
-        }
-    }
-
-    _injectStylesheetMV2(type, value, target) {
-        return new Promise((resolve, reject) => {
-            if (!target.tab) {
-                reject(new Error('Invalid tab'));
-                return;
-            }
-
-            const tabId = target.tab.id;
-            const frameId = target.frameId;
-            const details = (
-                type === 'file' ?
-                {
-                    file: value,
-                    runAt: 'document_start',
-                    cssOrigin: 'author',
-                    allFrames: false,
-                    matchAboutBlank: true
-                } :
-                {
-                    code: value,
-                    runAt: 'document_start',
-                    cssOrigin: 'user',
-                    allFrames: false,
-                    matchAboutBlank: true
-                }
-            );
-            if (typeof frameId === 'number') {
-                details.frameId = frameId;
-            }
-
-            chrome.tabs.insertCSS(tabId, details, () => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    resolve();
-                }
-            });
-        });
-    }
-
-    _injectStylesheetMV3(type, value, target) {
-        return new Promise((resolve, reject) => {
-            if (!target.tab) {
-                reject(new Error('Invalid tab'));
-                return;
-            }
-
-            const tabId = target.tab.id;
-            const frameId = target.frameId;
-            const details = (
-                type === 'file' ?
-                {origin: chrome.scripting.StyleOrigin.AUTHOR, files: [value]} :
-                {origin: chrome.scripting.StyleOrigin.USER,   css: value}
-            );
-            details.target = {
-                tabId,
-                allFrames: false
-            };
-            if (typeof frameId === 'number') {
-                details.target.frameIds = [frameId];
-            }
-
-            chrome.scripting.insertCSS(details, () => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    resolve();
-                }
-            });
-        });
-    }
-
-    _injectScript(file, tabId, frameId) {
-        if (isObject(chrome.tabs) && typeof chrome.tabs.executeScript === 'function') {
-            return this._injectScriptMV2(file, tabId, frameId);
-        } else if (isObject(chrome.scripting) && typeof chrome.scripting.executeScript === 'function') {
-            return this._injectScriptMV3(file, tabId, frameId);
-        } else {
-            return Promise.reject(new Error('executeScript function not available'));
-        }
-    }
-
-    _injectScriptMV2(file, tabId, frameId) {
-        return new Promise((resolve, reject) => {
-            const details = {
-                allFrames: false,
-                frameId,
-                file,
-                matchAboutBlank: true,
-                runAt: 'document_start'
-            };
-            const callback = (results) => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    const result = results[0];
-                    resolve({frameId, result});
-                }
-            };
-            chrome.tabs.executeScript(tabId, details, callback);
-        });
-    }
-
-    _injectScriptMV3(file, tabId, frameId) {
-        return new Promise((resolve, reject) => {
-            const details = {
-                files: [file],
-                target: {
-                    allFrames: false,
-                    frameIds: [frameId],
-                    tabId
-                }
-            };
-            const callback = (results) => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    const {frameId: frameId2, result} = results[0];
-                    resolve({frameId: frameId2, result});
-                }
-            };
-            chrome.scripting.executeScript(details, callback);
-        });
-    }
-
     _getTabById(tabId) {
         return new Promise((resolve, reject) => {
             chrome.tabs.get(
@@ -2275,7 +2140,7 @@ class Backend {
         }
     }
 
-    async _updateTabAccessibility(url, tab, frameId) {
+    async _updateTabAccessibility(url, tabId, frameId) {
         let file = null;
 
         switch (new URL(url).hostname) {
@@ -2291,7 +2156,7 @@ class Backend {
 
         if (file === null) { return; }
 
-        return await this._injectScript(file, tab.id, frameId);
+        await this._scriptManager.injectScript(file, tabId, frameId);
     }
 
     async _getNormalizedDictionaryDatabaseMedia(targets) {
