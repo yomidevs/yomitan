@@ -97,7 +97,8 @@
     ],
     "optional_permissions": [
         "clipboardRead",
-        "nativeMessaging"
+        "nativeMessaging",
+        "webNavigation"
     ],
     "commands": {
         "toggleTextScanning": {

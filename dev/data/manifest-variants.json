@@ -98,7 +98,8 @@
         ],
         "optional_permissions": [
             "clipboardRead",
-            "nativeMessaging"
+            "nativeMessaging",
+            "webNavigation"
         ],
         "commands": {
             "toggleTextScanning": {
@@ -172,6 +173,7 @@
             "fileName": "yomichan-chrome-mv3.zip",
             "modifications": [
                 {"action": "set",    "path": ["manifest_version"], "value": 3},
+                {"action": "set",    "path": ["minimum_chrome_version"], "value": "96.0.0.0"},
                 {"action": "move",   "path": ["browser_action"], "newPath": ["action"]},
                 {"action": "delete", "path": ["background", "page"]},
                 {"action": "delete", "path": ["background", "persistent"]},
@@ -185,6 +187,7 @@
                 {"action": "remove", "path": ["permissions"], "item": "webRequestBlocking"},
                 {"action": "add",    "path": ["permissions"], "items": ["declarativeNetRequest", "scripting"]},
                 {"action": "set",    "path": ["host_permissions"], "value": ["<all_urls>"], "after": "optional_permissions"},
+                {"action": "remove", "path": ["optional_permissions"], "item": "webNavigation"},
                 {"action": "move",   "path": ["web_accessible_resources"], "newPath": ["web_accessible_resources_old"]},
                 {"action": "set",    "path": ["web_accessible_resources"], "value": [{"resources": [], "matches": ["<all_urls>"]}], "after": "web_accessible_resources_old"},
                 {"action": "move",   "path": ["web_accessible_resources_old"], "newPath": ["web_accessible_resources", 0, "resources"]}
