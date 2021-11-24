@@ -73,7 +73,7 @@
                 "match_about_blank": true,
                 "all_frames": true,
                 "js": [
-                    "js/document-start.js"
+                    "js/accessibility/google-docs.js"
                 ]
             }
         ],

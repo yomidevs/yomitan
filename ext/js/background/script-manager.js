@@ -106,9 +106,9 @@ class ScriptManager {
      * @param {string} id A unique identifier for the registration.
      * @param {object} details The script registration details.
      * @param {boolean} [details.allFrames] Same as `all_frames` in the `content_scripts` manifest key.
-     * @param {string[]} [details.css]
+     * @param {string[]} [details.css] List of CSS paths.
      * @param {string[]} [details.excludeMatches] Same as `exclude_matches` in the `content_scripts` manifest key.
-     * @param {string[]} [details.js]
+     * @param {string[]} [details.js] List of script paths.
      * @param {boolean} [details.matchAboutBlank] Same as `match_about_blank` in the `content_scripts` manifest key.
      * @param {string[]} details.matches Same as `matches` in the `content_scripts` manifest key.
      * @param {string} [details.urlMatches] Regex match pattern to use as a fallback
@@ -179,6 +179,31 @@ class ScriptManager {
             await registration.unregister();
         }
         return true;
+    }
+
+    /**
+     * Gets the optional permissions required to register a content script.
+     * @returns {string[]} An array of the required permissions, which may be empty.
+     */
+    getRequiredContentScriptRegistrationPermissions() {
+        if (
+            // Firefox
+            (
+                typeof browser === 'object' && browser !== null &&
+                isObject(browser.contentScripts) &&
+                typeof browser.contentScripts.register === 'function'
+            ) ||
+            // Chrome
+            (
+                isObject(chrome.scripting) &&
+                typeof chrome.scripting.registerContentScripts === 'function'
+            )
+        ) {
+            return [];
+        }
+
+        // Fallback
+        return ['webNavigation'];
     }
 
     // Private
@@ -333,8 +358,7 @@ class ScriptManager {
 
     _registerContentScriptFallback(id, details) {
         const {allFrames, css, js, matchAboutBlank, runAt, urlMatches} = details;
-        const urlRegex = new RegExp(urlMatches);
-        const details2 = {allFrames, css, js, matchAboutBlank, runAt, urlRegex};
+        const details2 = {allFrames, css, js, matchAboutBlank, runAt, urlRegex: null};
         let unregister;
         const webNavigationEvent = this._getWebNavigationEvent(runAt);
         if (isObject(webNavigationEvent)) {
@@ -356,6 +380,7 @@ class ScriptManager {
                 chrome.tabs.onUpdated.addListener(onTabUpdated, extraParameters);
             } catch (e) {
                 // Chrome
+                details2.urlRegex = new RegExp(urlMatches);
                 chrome.tabs.onUpdated.addListener(onTabUpdated);
             }
             unregister = () => chrome.tabs.onUpdated.removeListener(onTabUpdated);
@@ -378,7 +403,7 @@ class ScriptManager {
 
     async _injectContentScript(isWebNavigation, details, status, url, tabId, frameId) {
         const {urlRegex} = details;
-        if (typeof urlRegex !== 'undefined' && !urlRegex.test(url)) { return; }
+        if (urlRegex !== null && !urlRegex.test(url)) { return; }
 
         let {allFrames, css, js, matchAboutBlank, runAt} = details;
 

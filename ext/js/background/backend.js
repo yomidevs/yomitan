@@ -127,7 +127,6 @@ class Backend {
             ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}],
             ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}],
             ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
-            ['documentStart',                {async: false, contentScript: true,  handler: this._onApiDocumentStart.bind(this)}],
             ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
@@ -745,12 +744,6 @@ class Backend {
 
     _onApiTextHasJapaneseCharacters({text}) {
         return this._japaneseUtil.isStringPartiallyJapanese(text);
-    }
-
-    _onApiDocumentStart(params, sender) {
-        const {tab, frameId, url} = sender;
-        if (typeof url !== 'string' || typeof tab !== 'object' || tab === null) { return; }
-        this._updateTabAccessibility(url, tab.id, frameId);
     }
 
     async _onApiGetTermFrequencies({termReadingList, dictionaries}) {
@@ -2138,25 +2131,6 @@ class Backend {
         } catch (e) {
             // NOP
         }
-    }
-
-    async _updateTabAccessibility(url, tabId, frameId) {
-        let file = null;
-
-        switch (new URL(url).hostname) {
-            case 'docs.google.com':
-                {
-                    const optionsContext = {depth: 0, url};
-                    const options = this._getProfileOptions(optionsContext);
-                    if (!options.accessibility.forceGoogleDocsHtmlRendering) { return; }
-                    file = 'js/accessibility/google-docs.js';
-                }
-                break;
-        }
-
-        if (file === null) { return; }
-
-        await this._scriptManager.injectScript(file, tabId, frameId, false, true, 'document_start');
     }
 
     async _getNormalizedDictionaryDatabaseMedia(targets) {
