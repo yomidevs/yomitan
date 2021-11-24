@@ -182,6 +182,7 @@
             "files": [
                 "ext/js/core.js",
                 "ext/js/yomichan.js",
+                "ext/js/accessibility/accessibility-controller.js",
                 "ext/js/background/backend.js",
                 "ext/js/background/environment.js",
                 "ext/js/background/profile-conditions-util.js",

@@ -16,6 +16,7 @@
  */
 
 /* global
+ * AccessibilityController
  * AnkiConnect
  * AnkiUtil
  * AudioDownloader
@@ -69,6 +70,7 @@ class Backend {
         });
         this._optionsUtil = new OptionsUtil();
         this._scriptManager = new ScriptManager();
+        this._accessibilityController = new AccessibilityController(this._scriptManager);
 
         this._searchPopupTabId = null;
         this._searchPopupTabCreatePromise = null;
@@ -987,6 +989,8 @@ class Backend {
         } else {
             this._clipboardMonitor.stop();
         }
+
+        this._accessibilityController.update(this._getOptionsFull(false));
 
         this._sendMessageAllTabsIgnoreResponse('Yomichan.optionsUpdated', {source});
     }

@@ -20,6 +20,7 @@ self.importScripts(
     '/lib/wanakana.min.js',
     '/js/core.js',
     '/js/yomichan.js',
+    '/js/accessibility/accessibility-controller.js',
     '/js/background/backend.js',
     '/js/background/environment.js',
     '/js/background/profile-conditions-util.js',

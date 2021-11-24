@@ -63,18 +63,6 @@
                     "js/script/dynamic-loader.js",
                     "js/app/content-script-main.js"
                 ]
-            },
-            {
-                "run_at": "document_start",
-                "matches": [
-                    "http://docs.google.com/*",
-                    "https://docs.google.com/*"
-                ],
-                "match_about_blank": true,
-                "all_frames": true,
-                "js": [
-                    "js/accessibility/google-docs.js"
-                ]
             }
         ],
         "minimum_chrome_version": "57.0.0.0",
