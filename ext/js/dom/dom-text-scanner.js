@@ -543,7 +543,7 @@ class DOMTextScanner {
             case 'list': // list-item
             case 'table': // table, table-*
                 return true;
-            case 'ruby': // rubt-*
+            case 'ruby': // ruby-*
                 return (pos >= 0);
             default:
                 return false;
