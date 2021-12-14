@@ -39,8 +39,10 @@ class DocumentUtil {
                 case 'SELECT':
                     return new TextSourceElement(element);
                 case 'INPUT':
-                    imposterSourceElement = element;
-                    [imposter, imposterContainer] = this._createImposter(element, false);
+                    if (element.type === 'text') {
+                        imposterSourceElement = element;
+                        [imposter, imposterContainer] = this._createImposter(element, false);
+                    }
                     break;
                 case 'TEXTAREA':
                     imposterSourceElement = element;
