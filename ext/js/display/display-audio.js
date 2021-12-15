@@ -338,7 +338,7 @@ class DisplayAudio {
             if (valid) {
                 ({audio, source, subIndex} = info);
                 const sourceIndex = sources.indexOf(source);
-                title = `From source ${1 + sourceIndex}: ${source}`;
+                title = `From source ${1 + sourceIndex}: ${source.name}`;
             } else {
                 audio = this._audioSystem.getFallbackAudio();
                 title = 'Could not find audio';
