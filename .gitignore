@@ -1,3 +1,2 @@
-*.zip
 node_modules
-builds/
+builds
