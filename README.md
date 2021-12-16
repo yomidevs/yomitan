@@ -1,3 +1,12 @@
+<!-- +++
+Area = "projects"
+GitHub = "yomichan"
+Layout = "page"
+Tags = ["anki", "gpl license", "japanese", "web", "yomichan", "anki-connect", "extension"]
+Description = "Japanese pop-up dictionary extension for Chrome and Firefox."
+Collection = "ProjectsActive"
++++ -->
+
 # Yomichan
 
 Yomichan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
@@ -16,6 +25,11 @@ Yomichan provides advanced features not available in other browser-based diction
 *   Automatic note creation for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 *   Clean, modern code makes it easy for developers to [contribute](https://github.com/FooSoft/yomichan/blob/master/CONTRIBUTING.md) new features.
 
+[![Term definitions](img/ss-terms-thumb.png)](img/ss-terms.png)
+[![Kanji information](img/ss-kanji-thumb.png)](img/ss-kanji.png)
+[![Dictionary options](img/ss-dictionaries-thumb.png)](img/ss-dictionaries.png)
+[![Anki options](img/ss-anki-thumb.png)](img/ss-anki.png)
+
 ## Table of Contents
 
 *   [Installation](#installation)
@@ -28,26 +42,27 @@ Yomichan provides advanced features not available in other browser-based diction
 *   [Keyboard Shortcuts](#keyboard-shortcuts)
 *   [Frequently Asked Questions](#frequently-asked-questions)
 *   [Licenses](#licenses)
-*   [Screenshots](#screenshots)
+*   [Third-Party Libraries](#third-party-libraries)
 
 ## Installation
 
 Yomichan comes in two flavors: *stable* and *testing*. Over the years, this extension has evolved to contain many
-complex features which have become increasingly difficult to test across different browsers, versions, and
-environments. New changes are initially introduced into the *testing* version, and after some time spent ensuring
-that they are relatively bug free, they will be promoted to the *stable* version. If you are technically savvy and don't mind
+complex features which have become increasingly difficult to test across different browsers, versions, and environments.
+New changes are initially introduced into the *testing* version, and after some time spent ensuring that they are
+relatively bug free, they will be promoted to the *stable* version. If you are technically savvy and don't mind
 submitting issues on GitHub, try the *testing* version; otherwise, the *stable* version will be your best bet.
 
 *   **Google Chrome**
-    ([stable](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami) or [testing](https://chrome.google.com/webstore/detail/yomichan-testing/bcknnfebhefllbjhagijobjklocakpdm))
-
-    [![](https://foosoft.net/projects/yomichan/img/chrome-web-store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
+    ([stable](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami) or [testing](https://chrome.google.com/webstore/detail/yomichan-testing/bcknnfebhefllbjhagijobjklocakpdm)) \
+    [![](img/chrome-web-store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
 
 *   **Mozilla Firefox**
-    ([stable](https://addons.mozilla.org/en-US/firefox/addon/yomichan/) or [testing](https://foosoft.net/projects/yomichan/dl/yomichan_testing.xpi))
-
-    [![](https://foosoft.net/projects/yomichan/img/firefox-marketplace.png)](https://addons.mozilla.org/en-US/firefox/addon/yomichan/)
-
+    ([stable](https://addons.mozilla.org/en-US/firefox/addon/yomichan/) or [testing](https://github.com/FooSoft/yomichan/releases)<sup>*</sup>) \
+    [![](img/firefox-marketplace.png)](https://addons.mozilla.org/en-US/firefox/addon/yomichan/) \
+    <sup>*</sup>Unlike Chrome, Firefox does not allow extensions meant for testing to be hosted in the marketplace.
+    You will have to download a desired version and side-load it yourself. You only need to do this once and will get
+    updates automatically.
+ 
 ## Dictionaries
 
 There are several free Japanese dictionaries available for Yomichan, with two of them having glossaries available in
@@ -55,38 +70,38 @@ different languages. You must download and import the dictionaries you wish to u
 definition lookups. If you have proprietary EPWING dictionaries that you would like to use, check the [Yomichan
 Import](https://foosoft.net/projects/yomichan-import) page to learn how to convert and import them into Yomichan.
 
-Be aware that the non-English dictionaries contain fewer entries than their English counterparts. Even if your
-primary language is not English, you may consider also importing the English version for better coverage.
+Be aware that the non-English dictionaries contain fewer entries than their English counterparts. Even if your primary
+language is not English, you may consider also importing the English version for better coverage.
 
 *   **[JMdict](https://www.edrdg.org/jmdict/edict_doc.html)** (Japanese vocabulary)
-    *   [jmdict\_dutch.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_dutch.zip)
-    *   [jmdict\_english.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_english.zip)
-    *   [jmdict\_french.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_french.zip)
-    *   [jmdict\_german.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_german.zip)
-    *   [jmdict\_hungarian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_hungarian.zip)
-    *   [jmdict\_russian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_russian.zip)
-    *   [jmdict\_slovenian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_slovenian.zip)
-    *   [jmdict\_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_spanish.zip)
-    *   [jmdict\_swedish.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_swedish.zip)
+    *   [jmdict\_dutch.zip](dl/dict/jmdict_dutch.zip)
+    *   [jmdict\_english.zip](dl/dict/jmdict_english.zip)
+    *   [jmdict\_french.zip](dl/dict/jmdict_french.zip)
+    *   [jmdict\_german.zip](dl/dict/jmdict_german.zip)
+    *   [jmdict\_hungarian.zip](dl/dict/jmdict_hungarian.zip)
+    *   [jmdict\_russian.zip](dl/dict/jmdict_russian.zip)
+    *   [jmdict\_slovenian.zip](dl/dict/jmdict_slovenian.zip)
+    *   [jmdict\_spanish.zip](dl/dict/jmdict_spanish.zip)
+    *   [jmdict\_swedish.zip](dl/dict/jmdict_swedish.zip)
 *   **[JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese names)
-    *   [jmnedict.zip](https://foosoft.net/projects/yomichan/dl/dict/jmnedict.zip)
+    *   [jmnedict.zip](dl/dict/jmnedict.zip)
 *   **[KireiCake](https://kireicake.com/rikaicakes/)** (Japanese slang)
-    *   [kireicake.zip](https://foosoft.net/projects/yomichan/dl/dict/kireicake.zip)
+    *   [kireicake.zip](dl/dict/kireicake.zip)
 *   **[KANJIDIC](http://nihongo.monash.edu/kanjidic2/index.html)** (Japanese kanji)
-    *   [kanjidic\_english.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_english.zip)
-    *   [kanjidic\_french.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_french.zip)
-    *   [kanjidic\_portuguese.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_portuguese.zip)
-    *   [kanjidic\_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_spanish.zip)
+    *   [kanjidic\_english.zip](dl/dict/kanjidic_english.zip)
+    *   [kanjidic\_french.zip](dl/dict/kanjidic_french.zip)
+    *   [kanjidic\_portuguese.zip](dl/dict/kanjidic_portuguese.zip)
+    *   [kanjidic\_spanish.zip](dl/dict/kanjidic_spanish.zip)
 *   **[Innocent Corpus](https://web.archive.org/web/20190309073023/https://forum.koohii.com/thread-9459.html#pid168613)** (Term and kanji frequencies across 5000+ novels)
-    *   [innocent\_corpus.zip](https://foosoft.net/projects/yomichan/dl/dict/innocent_corpus.zip)
+    *   [innocent\_corpus.zip](dl/dict/innocent_corpus.zip)
 *   **[Kanjium](https://github.com/mifunetoshiro/kanjium)** (Pitch dictionary, see [related project page](https://github.com/toasted-nutbread/yomichan-pitch-accent-dictionary) for details)
-    *   [kanjium_pitch_accents.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjium_pitch_accents.zip)
+    *   [kanjium_pitch_accents.zip](dl/dict/kanjium_pitch_accents.zip)
 
 ## Basic Usage
 
 1.  Click the <img src="ext/images/yomichan-icon.svg" alt="" width="16" height="16"> _Yomichan_ button in the browser bar to open the quick-actions popup.
 
-    <a href="resources/images/browser-action-popup1.png"><img src="resources/images/browser-action-popup1.png" width="103" height="100"></a>
+    <img src="resources/images/browser-action-popup1.png" alt="">
 
     *   The <img src="ext/images/cog.svg" alt="" width="16" height="16"> _cog_ button will open the Settings page.
     *   The <img src="ext/images/magnifying-glass.svg" alt="" width="16" height="16"> _magnifying glass_ button will open the Search page.
@@ -97,13 +112,13 @@ primary language is not English, you may consider also importing the English ver
     or enabled, Yomichan will warn you that it is not ready for use by displaying an orange exclamation mark over its
     icon. This exclamation mark will disappear once you have installed and enabled at least one dictionary.
 
-    <a href="resources/images/settings-dictionaries-popup.png"><img src="resources/images/settings-dictionaries-popup-thumb.png" width="128" height="86"></a>
+    <img src="resources/images/settings-dictionaries-popup.png" alt="">
 
 3.  Webpage text can be scanned by moving the cursor while holding a modifier key, which is <kbd>Shift</kbd>
     by default. If definitions are found for the text at the cursor position, a popup window containing term definitions
     will open. This window can be dismissed by clicking anywhere outside of it.
 
-    <a href="resources/images/search-popup-terms.png"><img src="resources/images/search-popup-terms-thumb.png" width="128" height="95"></a>
+    <img src="resources/images/search-popup-terms.png" alt="">
 
 4.  Click on the <img src="ext/images/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is
     not available, you will hear a short click instead. You can configure the sources used to retrieve audio samples in
@@ -112,7 +127,7 @@ primary language is not English, you may consider also importing the English ver
 5.  Click on individual kanji in the term definition results to view additional information about those characters,
     including stroke order diagrams, readings, meanings, as well as other useful data.
 
-    <a href="resources/images/search-popup-kanji.png"><img src="resources/images/search-popup-kanji-thumb.png" width="103" height="128"></a>
+    <img src="resources/images/search-popup-kanji.png" alt="">
 
 ## Custom Dictionaries
 
@@ -125,7 +140,7 @@ Unfortunately, as most of the dictionaries released in this format are proprieta
 Yomichan. Instead, you will need to procure these dictionaries yourself and import them using [Yomichan
 Import](https://foosoft.net/projects/yomichan-import). Check the project page for additional details.
 
-[![Pocket EPWING dictionaries](https://foosoft.net/projects/yomichan/img/epwing-devices-thumb.png)](https://foosoft.net/projects/yomichan/img/epwing-devices.jpg)
+![Pocket EPWING dictionaries](img/epwing-devices.jpg)
 
 ## Anki Integration
 
@@ -218,8 +233,8 @@ be able to create a flashcard for <ruby>箸<rt>はし</rt></ruby> because they s
 Once Yomichan is configured, it becomes trivial to create new flashcards with a single click. You will see the following
 icons next to term definitions:
 
-*   Clicking ![](https://foosoft.net/projects/yomichan/img/btn-add-expression.png) adds the current expression as kanji (e.g. 食べる).
-*   Clicking ![](https://foosoft.net/projects/yomichan/img/btn-add-reading.png) adds the current expression as hiragana or katakana (e.g. たべる).
+*   Clicking ![](img/btn-add-expression.png) adds the current expression as kanji (e.g. 食べる).
+*   Clicking ![](img/btn-add-reading.png) adds the current expression as hiragana or katakana (e.g. たべる).
 
 Below are some troubleshooting tips you can try if you are unable to create new flashcards:
 
@@ -327,19 +342,17 @@ new languages will be declined, allowing Yomichan's focus to remain Japanese-cen
 
 Required licensing notices for this project follow below:
 
-*   **EDRDG License**
-
+*   **EDRDG License** \
     This package uses the [EDICT](https://www.edrdg.org/jmdict/edict.html) and
     [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project) dictionary files. These files are the property of
     the [Electronic Dictionary Research and Development Group](https://www.edrdg.org/), and are used in conformance with
     the Group's [license](https://www.edrdg.org/edrdg/licence.html).
 
-*   **Kanjium License**
-
+*   **Kanjium License** \
     The pitch accent notation, verb particle data, phonetics, homonyms and other additions or modifications to EDICT,
     KANJIDIC or KRADFILE were provided by Uros Ozvatic through his free database.
 
-### Third-Party Libraries
+## Third-Party Libraries
 
 Yomichan uses several third-party libraries to function. Below are links to homepages, snapshots, and licenses of the exact
 versions packaged.
@@ -348,10 +361,3 @@ versions packaged.
 *   JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://github.com/Stuk/jszip/blob/v3.7.1/dist/jszip.min.js) - [license](https://github.com/Stuk/jszip/blob/v3.7.1/LICENSE.markdown)
 *   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://unpkg.com/wanakana@4.0.2/umd/wanakana.min.js) - [license](https://github.com/WaniKani/WanaKana/blob/4.0.2/LICENSE)
 *   parse5: [homepage](https://github.com/inikulin/parse5) - [snapshot](https://github.com/inikulin/parse5/tree/v6.0.1/packages/parse5) - [license](https://github.com/inikulin/parse5/blob/v6.0.1/LICENSE) _(Only used in MV3 build)_
-
-## Screenshots
-
-[![Term definitions](https://foosoft.net/projects/yomichan/img/ss-terms-thumb.png)](https://foosoft.net/projects/yomichan/img/ss-terms.png)
-[![Kanji information](https://foosoft.net/projects/yomichan/img/ss-kanji-thumb.png)](https://foosoft.net/projects/yomichan/img/ss-kanji.png)
-[![Dictionary options](https://foosoft.net/projects/yomichan/img/ss-dictionaries-thumb.png)](https://foosoft.net/projects/yomichan/img/ss-dictionaries.png)
-[![Anki options](https://foosoft.net/projects/yomichan/img/ss-anki-thumb.png)](https://foosoft.net/projects/yomichan/img/ss-anki.png)

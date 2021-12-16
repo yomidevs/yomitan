@@ -1,0 +1,102 @@
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#if tags~}}({{#each tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}) {{/if~}}
+    {{~/unless~}}
+    {{~#if glossary.[1]~}}
+        {{#each glossary}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}
+    {{~else~}}
+        {{glossary.[0]}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "audio"}}{{/inline}}
+
+{{#*inline "character"}}
+    {{~definition.character~}}
+{{/inline}}
+
+{{#*inline "dictionary"}}
+    {{~definition.dictionary~}}
+{{/inline}}
+
+{{#*inline "expression"}}
+    {{~#if modeTermKana~}}
+        {{~#if definition.reading~}}
+            {{definition.reading}}
+        {{~else~}}
+            {{definition.expression}}
+        {{~/if~}}
+    {{~else~}}
+        {{definition.expression}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "furigana"}}
+    {{#furigana}}{{{definition}}}{{/furigana}}
+{{/inline}}
+
+{{#*inline "furigana-plain"}}
+    {{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
+{{/inline}}
+
+{{#*inline "glossary"}}
+    {{~#if modeKanji~}}
+        {{~#if definition.glossary.[1]~}}
+            {{#each definition.glossary}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}
+        {{~else~}}
+            {{definition.glossary.[0]}}
+        {{~/if~}}
+    {{~else~}}
+        {{~#if group~}}
+            {{~#if definition.definitions.[1]~}}
+                {{#each definition.definitions}} * {{> glossary-single brief=../brief}}{{/each}}
+            {{~else~}}
+                {{~> glossary-single definition.definitions.[0] brief=brief~}}
+            {{~/if~}}
+        {{~else~}}
+            {{~> glossary-single definition brief=brief~}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "glossary-brief"}}
+    {{~> glossary brief=true ~}}
+{{/inline}}
+
+{{#*inline "kunyomi"}}
+    {{~#each definition.kunyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each~}}
+{{/inline}}
+
+{{#*inline "onyomi"}}
+    {{~#each definition.onyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each~}}
+{{/inline}}
+
+{{#*inline "reading"}}
+    {{~#unless modeTermKana}}{{definition.reading}}{{/unless~}}
+{{/inline}}
+
+{{#*inline "sentence"}}
+    {{~#if definition.cloze}}{{definition.cloze.sentence}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-prefix"}}
+    {{~#if definition.cloze}}{{definition.cloze.prefix}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-body"}}
+    {{~#if definition.cloze}}{{definition.cloze.body}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-suffix"}}
+    {{~#if definition.cloze}}{{definition.cloze.suffix}}{{/if~}}
+{{/inline}}
+
+{{#*inline "tags"}}
+    {{~#each definition.tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each~}}
+{{/inline}}
+
+{{#*inline "url"}}
+    {{definition.url}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}
