@@ -234,12 +234,7 @@ class Translator {
             return {dictionaryEntries: [], originalTextLength: 0};
         }
 
-        const {matchType} = options;
-        const deinflections = await (
-            matchType && matchType !== 'exact' ?
-            this._findTermsWildcard(text, enabledDictionaryMap, matchType) :
-            this._findTermDeinflections(text, enabledDictionaryMap, options)
-        );
+        const deinflections = await this._findTermsInternal2(text, enabledDictionaryMap, options);
 
         let originalTextLength = 0;
         const dictionaryEntries = [];
@@ -259,17 +254,13 @@ class Translator {
         return {dictionaryEntries, originalTextLength};
     }
 
-    async _findTermsWildcard(text, enabledDictionaryMap, matchType) {
-        const databaseEntries = await this._database.findTermsBulk([text], enabledDictionaryMap, matchType);
-        return databaseEntries.length > 0 ? [this._createDeinflection(text, text, text, 0, [], databaseEntries)] : [];
-    }
-
-    async _findTermDeinflections(text, enabledDictionaryMap, options) {
-        const deinflections = this._getAllDeinflections(text, options);
-
-        if (deinflections.length === 0) {
-            return [];
-        }
+    async _findTermsInternal2(text, enabledDictionaryMap, options) {
+        const deinflections = (
+            options.deinflect ?
+            this._getAllDeinflections(text, options) :
+            [this._createDeinflection(text, text, text, 0, [], [])]
+        );
+        if (deinflections.length === 0) { return []; }
 
         const uniqueDeinflectionTerms = [];
         const uniqueDeinflectionArrays = [];
@@ -286,7 +277,8 @@ class Translator {
             deinflectionArray.push(deinflection);
         }
 
-        const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, null);
+        const {matchType} = options;
+        const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
 
         for (const databaseEntry of databaseEntries) {
             const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);

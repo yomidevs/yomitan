@@ -12,7 +12,8 @@
             ]
         },
         "default": {
-            "wildcard": null,
+            "matchType": "exact",
+            "deinflect": true,
             "mainDictionary": "${title}",
             "sortFrequencyDictionary": null,
             "sortFrequencyDictionaryOrder": "descending",

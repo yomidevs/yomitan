@@ -851,8 +851,10 @@ class Display extends EventDispatcher {
                 if (match !== null) {
                     if (match[1]) {
                         findDetails.matchType = 'suffix';
+                        findDetails.deinflect = false;
                     } else if (match[3]) {
                         findDetails.matchType = 'prefix';
+                        findDetails.deinflect = false;
                     }
                     source = match[2];
                 }
