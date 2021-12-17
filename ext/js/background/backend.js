@@ -1080,7 +1080,8 @@ class Backend {
         const jp = this._japaneseUtil;
         const mode = 'simple';
         const options = this._getProfileOptions(optionsContext);
-        const findTermsOptions = this._getTranslatorFindTermsOptions(mode, {wildcard: null}, options);
+        const details = {matchType: 'exact'};
+        const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
         const results = [];
         let previousUngroupedSegment = null;
         let i = 0;
@@ -1958,7 +1959,8 @@ class Backend {
     }
 
     _getTranslatorFindTermsOptions(mode, details, options) {
-        const {wildcard} = details;
+        let {matchType} = details;
+        if (typeof matchType !== 'string') { matchType = 'exact'; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
             general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder},
@@ -1985,7 +1987,7 @@ class Backend {
             excludeDictionaryDefinitions.add(mainDictionary);
         }
         return {
-            wildcard,
+            matchType,
             mainDictionary,
             sortFrequencyDictionary,
             sortFrequencyDictionaryOrder,

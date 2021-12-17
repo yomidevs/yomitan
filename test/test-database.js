@@ -218,15 +218,15 @@ async function testFindTermsBulkTest1(database, titles) {
         {
             inputs: [
                 {
-                    wildcard: null,
+                    matchType: null,
                     termList: ['打', '打つ', '打ち込む']
                 },
                 {
-                    wildcard: null,
+                    matchType: null,
                     termList: ['だ', 'ダース', 'うつ', 'ぶつ', 'うちこむ', 'ぶちこむ']
                 },
                 {
-                    wildcard: 'suffix',
+                    matchType: 'prefix',
                     termList: ['打']
                 }
             ],
@@ -250,7 +250,7 @@ async function testFindTermsBulkTest1(database, titles) {
         {
             inputs: [
                 {
-                    wildcard: null,
+                    matchType: null,
                     termList: ['込む']
                 }
             ],
@@ -263,7 +263,7 @@ async function testFindTermsBulkTest1(database, titles) {
         {
             inputs: [
                 {
-                    wildcard: 'prefix',
+                    matchType: 'suffix',
                     termList: ['込む']
                 }
             ],
@@ -281,7 +281,7 @@ async function testFindTermsBulkTest1(database, titles) {
         {
             inputs: [
                 {
-                    wildcard: null,
+                    matchType: null,
                     termList: []
                 }
             ],
@@ -294,8 +294,8 @@ async function testFindTermsBulkTest1(database, titles) {
     ];
 
     for (const {inputs, expectedResults} of data) {
-        for (const {termList, wildcard} of inputs) {
-            const results = await database.findTermsBulk(termList, titles, wildcard);
+        for (const {termList, matchType} of inputs) {
+            const results = await database.findTermsBulk(termList, titles, matchType);
             assert.strictEqual(results.length, expectedResults.total);
             for (const [term, count] of expectedResults.terms) {
                 assert.strictEqual(countDictionaryDatabaseEntriesWithTerm(results, term), count);

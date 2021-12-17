@@ -63,7 +63,7 @@ class Translator {
      * @param options An object using the following structure:
      * ```
      *   {
-     *     wildcard: (enum: null, 'prefix', 'suffix'),
+     *     matchType: (enum: 'exact', 'prefix', 'suffix'),
      *     mainDictionary: (string),
      *     sortFrequencyDictionary: (null or string),
      *     sortFrequencyDictionaryOrder: (enum: 'ascending', 'descending'),
@@ -227,7 +227,6 @@ class Translator {
     // Find terms internal implementation
 
     async _findTermsInternal(text, enabledDictionaryMap, options) {
-        const {wildcard} = options;
         if (options.removeNonJapaneseCharacters) {
             text = this._getJapaneseOnlyText(text);
         }
@@ -235,9 +234,10 @@ class Translator {
             return {dictionaryEntries: [], originalTextLength: 0};
         }
 
+        const {matchType} = options;
         const deinflections = await (
-            wildcard ?
-            this._findTermsWildcard(text, enabledDictionaryMap, wildcard) :
+            matchType && matchType !== 'exact' ?
+            this._findTermsWildcard(text, enabledDictionaryMap, matchType) :
             this._findTermDeinflections(text, enabledDictionaryMap, options)
         );
 
@@ -259,8 +259,8 @@ class Translator {
         return {dictionaryEntries, originalTextLength};
     }
 
-    async _findTermsWildcard(text, enabledDictionaryMap, wildcard) {
-        const databaseEntries = await this._database.findTermsBulk([text], enabledDictionaryMap, wildcard);
+    async _findTermsWildcard(text, enabledDictionaryMap, matchType) {
+        const databaseEntries = await this._database.findTermsBulk([text], enabledDictionaryMap, matchType);
         return databaseEntries.length > 0 ? [this._createDeinflection(text, text, text, 0, [], databaseEntries)] : [];
     }
 

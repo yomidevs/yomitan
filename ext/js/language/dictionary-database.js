@@ -196,7 +196,7 @@ class DictionaryDatabase {
         }
     }
 
-    findTermsBulk(termList, dictionaries, wildcard) {
+    findTermsBulk(termList, dictionaries, matchType) {
         const visited = new Set();
         const predicate = (row) => {
             if (!dictionaries.has(row.dictionary)) { return false; }
@@ -206,17 +206,17 @@ class DictionaryDatabase {
             return true;
         };
 
-        const indexNames = (wildcard === 'prefix') ? ['expressionReverse', 'readingReverse'] : ['expression', 'reading'];
+        const indexNames = (matchType === 'suffix') ? ['expressionReverse', 'readingReverse'] : ['expression', 'reading'];
 
         let createQuery;
-        switch (wildcard) {
-            case 'suffix':
+        switch (matchType) {
+            case 'prefix':
                 createQuery = this._createBoundQuery1;
                 break;
-            case 'prefix':
+            case 'suffix':
                 createQuery = this._createBoundQuery2;
                 break;
-            default:
+            default: // 'exact'
                 createQuery = this._createOnlyQuery1;
                 break;
         }

@@ -850,9 +850,9 @@ class Display extends EventDispatcher {
                 const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
                 if (match !== null) {
                     if (match[1]) {
-                        findDetails.wildcard = 'prefix';
+                        findDetails.matchType = 'suffix';
                     } else if (match[3]) {
-                        findDetails.wildcard = 'suffix';
+                        findDetails.matchType = 'prefix';
                     }
                     source = match[2];
                 }
