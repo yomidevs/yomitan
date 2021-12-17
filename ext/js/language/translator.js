@@ -1114,8 +1114,8 @@ class Translator {
         return {dictionary, tagNames};
     }
 
-    _createSource(originalText, transformedText, deinflectedText, isPrimary) {
-        return {originalText, transformedText, deinflectedText, isPrimary};
+    _createSource(originalText, transformedText, deinflectedText, matchType, matchSource, isPrimary) {
+        return {originalText, transformedText, deinflectedText, matchType, matchSource, isPrimary};
     }
 
     _createTermHeadword(index, term, reading, sources, tags, wordClasses) {
@@ -1166,11 +1166,11 @@ class Translator {
     }
 
     _createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, isPrimary, enabledDictionaryMap) {
-        const {term, reading: rawReading, definitionTags, termTags, definitions, score, dictionary, id, sequence: rawSequence, rules} = databaseEntry;
+        const {matchType, matchSource, term, reading: rawReading, definitionTags, termTags, definitions, score, dictionary, id, sequence: rawSequence, rules} = databaseEntry;
         const reading = (rawReading.length > 0 ? rawReading : term);
         const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const sourceTermExactMatchCount = (isPrimary && deinflectedText === term ? 1 : 0);
-        const source = this._createSource(originalText, transformedText, deinflectedText, isPrimary);
+        const source = this._createSource(originalText, transformedText, deinflectedText, matchType, matchSource, isPrimary);
         const maxTransformedTextLength = transformedText.length;
         const hasSequence = (rawSequence >= 0);
         const sequence = hasSequence ? rawSequence : -1;
@@ -1239,9 +1239,9 @@ class Translator {
         const headwordsArray = [...headwords.values()];
 
         let sourceTermExactMatchCount = 0;
-        for (const {term, sources} of headwordsArray) {
-            for (const {deinflectedText, isPrimary: isPrimary2} of sources) {
-                if (isPrimary2 && deinflectedText === term) {
+        for (const {sources} of headwordsArray) {
+            for (const source of sources) {
+                if (source.isPrimary && source.matchSource === 'term') {
                     ++sourceTermExactMatchCount;
                     break;
                 }
@@ -1278,13 +1278,15 @@ class Translator {
             return;
         }
         for (const newSource of newSources) {
-            const {originalText, transformedText, deinflectedText, isPrimary} = newSource;
+            const {originalText, transformedText, deinflectedText, matchType, matchSource, isPrimary} = newSource;
             let has = false;
             for (const source of sources) {
                 if (
                     source.deinflectedText === deinflectedText &&
                     source.transformedText === transformedText &&
-                    source.originalText === originalText
+                    source.originalText === originalText &&
+                    source.matchType === matchType &&
+                    source.matchSource === matchSource
                 ) {
                     if (isPrimary) { source.isPrimary = true; }
                     has = true;

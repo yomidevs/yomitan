@@ -436,6 +436,16 @@ namespace Translation {
          */
         deinflectedText: string;
         /**
+         * How the deinflected text matches the value from the database.
+         * Value can be one of: 'exact', 'prefix', 'suffix'
+         */
+        matchType: string;
+        /**
+         * Which field was used to match the database entry.
+         * Value can be one of: 'term', 'reading', 'sequence'
+         */
+        matchSource: string;
+        /**
          * Whether or not this source is a primary source. Primary sources are derived from the
          * original search text, while non-primary sources originate from related terms.
          */

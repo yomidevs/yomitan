@@ -308,6 +308,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -469,6 +471,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -649,6 +653,8 @@
                 "originalText": "打つ",
                 "transformedText": "打つ",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -812,6 +818,8 @@
                 "originalText": "打つ",
                 "transformedText": "打つ",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -975,6 +983,8 @@
                 "originalText": "打つ",
                 "transformedText": "打つ",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -1138,6 +1148,8 @@
                 "originalText": "打つ",
                 "transformedText": "打つ",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -1301,6 +1313,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -1462,6 +1476,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -1642,6 +1658,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -1827,6 +1845,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -2012,6 +2032,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -2197,6 +2219,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -2384,6 +2408,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -2549,6 +2575,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -2714,6 +2742,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -2879,6 +2909,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -3042,6 +3074,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -3203,6 +3237,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -3383,6 +3419,8 @@
                 "originalText": "画像",
                 "transformedText": "画像",
                 "deinflectedText": "画像",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -3494,6 +3532,8 @@
                 "originalText": "だ",
                 "transformedText": "だ",
                 "deinflectedText": "だ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -3661,6 +3701,8 @@
                 "originalText": "ダース",
                 "transformedText": "ダース",
                 "deinflectedText": "ダース",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -3841,6 +3883,8 @@
                 "originalText": "うつ",
                 "transformedText": "うつ",
                 "deinflectedText": "うつ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -4004,6 +4048,8 @@
                 "originalText": "うつ",
                 "transformedText": "うつ",
                 "deinflectedText": "うつ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -4173,6 +4219,8 @@
                 "originalText": "ぶつ",
                 "transformedText": "ぶつ",
                 "deinflectedText": "ぶつ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -4336,6 +4384,8 @@
                 "originalText": "ぶつ",
                 "transformedText": "ぶつ",
                 "deinflectedText": "ぶつ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -4505,6 +4555,8 @@
                 "originalText": "うちこむ",
                 "transformedText": "うちこむ",
                 "deinflectedText": "うちこむ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -4690,6 +4742,8 @@
                 "originalText": "うちこむ",
                 "transformedText": "うちこむ",
                 "deinflectedText": "うちこむ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -4877,6 +4931,8 @@
                 "originalText": "うち",
                 "transformedText": "うち",
                 "deinflectedText": "うつ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -5042,6 +5098,8 @@
                 "originalText": "うち",
                 "transformedText": "うち",
                 "deinflectedText": "うつ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -5211,6 +5269,8 @@
                 "originalText": "ぶちこむ",
                 "transformedText": "ぶちこむ",
                 "deinflectedText": "ぶちこむ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -5396,6 +5456,8 @@
                 "originalText": "ぶちこむ",
                 "transformedText": "ぶちこむ",
                 "deinflectedText": "ぶちこむ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -5583,6 +5645,8 @@
                 "originalText": "ぶち",
                 "transformedText": "ぶち",
                 "deinflectedText": "ぶつ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -5748,6 +5812,8 @@
                 "originalText": "ぶち",
                 "transformedText": "ぶち",
                 "deinflectedText": "ぶつ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -5917,6 +5983,8 @@
                 "originalText": "がぞう",
                 "transformedText": "がぞう",
                 "deinflectedText": "がぞう",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -6038,6 +6106,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -6093,6 +6163,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -6148,6 +6220,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -6203,6 +6277,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -6260,6 +6336,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -6317,6 +6395,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -6374,6 +6454,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -6431,6 +6513,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -6486,6 +6570,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -6541,6 +6627,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -6602,6 +6690,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -6835,6 +6925,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -7070,6 +7162,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -7283,6 +7377,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -7494,6 +7590,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -7655,6 +7753,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -7835,6 +7935,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -7892,6 +7994,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -8284,6 +8388,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -8341,6 +8447,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -8688,6 +8796,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -8849,6 +8959,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -9033,6 +9145,8 @@
                 "originalText": "打ち込んでいませんでした",
                 "transformedText": "打ち込んでいませんでした",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -9222,6 +9336,8 @@
                 "originalText": "打ち込んでいませんでした",
                 "transformedText": "打ち込んでいませんでした",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -9411,6 +9527,8 @@
                 "originalText": "打ち込んでいませんでした",
                 "transformedText": "打ち込んでいませんでした",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -9600,6 +9718,8 @@
                 "originalText": "打ち込んでいませんでした",
                 "transformedText": "打ち込んでいませんでした",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -9787,6 +9907,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -9952,6 +10074,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -10117,6 +10241,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -10282,6 +10408,8 @@
                 "originalText": "打ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -10445,6 +10573,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -10606,6 +10736,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -10786,6 +10918,8 @@
                 "originalText": "打(う)ち込(こ)む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -10971,6 +11105,8 @@
                 "originalText": "打(う)ち込(こ)む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -11156,6 +11292,8 @@
                 "originalText": "打(う)ち込(こ)む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -11341,6 +11479,8 @@
                 "originalText": "打(う)ち込(こ)む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -11528,6 +11668,8 @@
                 "originalText": "打(う)ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -11693,6 +11835,8 @@
                 "originalText": "打(う)ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -11858,6 +12002,8 @@
                 "originalText": "打(う)ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -12023,6 +12169,8 @@
                 "originalText": "打(う)ち",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -12186,6 +12334,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -12347,6 +12497,8 @@
                 "originalText": "打",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -12527,6 +12679,8 @@
                 "originalText": "(打)(ち)(込)(む)",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -12712,6 +12866,8 @@
                 "originalText": "(打)(ち)(込)(む)",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -12897,6 +13053,8 @@
                 "originalText": "(打)(ち)(込)(む)",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -13082,6 +13240,8 @@
                 "originalText": "(打)(ち)(込)(む)",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -13269,6 +13429,8 @@
                 "originalText": "(打)(ち)",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -13434,6 +13596,8 @@
                 "originalText": "(打)(ち)",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -13599,6 +13763,8 @@
                 "originalText": "(打)(ち)",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -13764,6 +13930,8 @@
                 "originalText": "(打)(ち)",
                 "transformedText": "打ち",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -13927,6 +14095,8 @@
                 "originalText": "(打)",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -14088,6 +14258,8 @@
                 "originalText": "(打)",
                 "transformedText": "打",
                 "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -14270,6 +14442,8 @@
                 "originalText": "test",
                 "transformedText": "よみ",
                 "deinflectedText": "よむ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -14371,6 +14545,8 @@
                 "originalText": "つtest",
                 "transformedText": "つよみ",
                 "deinflectedText": "つよみ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -14474,6 +14650,8 @@
                 "originalText": "testました",
                 "transformedText": "よみました",
                 "deinflectedText": "よむ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -14575,6 +14753,8 @@
                 "originalText": "うちこむ",
                 "transformedText": "うちこむ",
                 "deinflectedText": "うちこむ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -14632,6 +14812,8 @@
                 "originalText": "打ち込む",
                 "transformedText": "打ち込む",
                 "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "sequence",
                 "isPrimary": false
               }
             ],
@@ -15024,6 +15206,8 @@
                 "originalText": "うち",
                 "transformedText": "うち",
                 "deinflectedText": "うつ",
+                "matchType": "exact",
+                "matchSource": "reading",
                 "isPrimary": true
               }
             ],
@@ -15081,6 +15265,8 @@
                 "originalText": "打つ",
                 "transformedText": "打つ",
                 "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "sequence",
                 "isPrimary": false
               }
             ],
@@ -15434,6 +15620,8 @@
                 "originalText": "お手前",
                 "transformedText": "お手前",
                 "deinflectedText": "お手前",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -15578,6 +15766,8 @@
                 "originalText": "番号",
                 "transformedText": "番号",
                 "deinflectedText": "番号",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -15670,6 +15860,8 @@
                 "originalText": "中腰",
                 "transformedText": "中腰",
                 "deinflectedText": "中腰",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -15762,6 +15954,8 @@
                 "originalText": "所業",
                 "transformedText": "所業",
                 "deinflectedText": "所業",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],
@@ -15854,6 +16048,8 @@
                 "originalText": "土木工事",
                 "transformedText": "土木工事",
                 "deinflectedText": "土木工事",
+                "matchType": "exact",
+                "matchSource": "term",
                 "isPrimary": true
               }
             ],

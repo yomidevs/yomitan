@@ -30,7 +30,8 @@ class DictionaryDatabase {
         this._createOnlyQuery4 = (item) => IDBKeyRange.only(item.path);
         this._createBoundQuery1 = (item) => IDBKeyRange.bound(item, `${item}\uffff`, false, false);
         this._createBoundQuery2 = (item) => { item = stringReverse(item); return IDBKeyRange.bound(item, `${item}\uffff`, false, false); };
-        this._createTermBind = this._createTerm.bind(this);
+        this._createTermBind1 = this._createTerm.bind(this, 'term', 'exact');
+        this._createTermBind2 = this._createTerm.bind(this, 'sequence', 'exact');
         this._createTermMetaBind = this._createTermMeta.bind(this);
         this._createKanjiBind = this._createKanji.bind(this);
         this._createKanjiMetaBind = this._createKanjiMeta.bind(this);
@@ -208,7 +209,7 @@ class DictionaryDatabase {
 
         const indexNames = (matchType === 'suffix') ? ['expressionReverse', 'readingReverse'] : ['expression', 'reading'];
 
-        let createQuery;
+        let createQuery = this._createOnlyQuery1;
         switch (matchType) {
             case 'prefix':
                 createQuery = this._createBoundQuery1;
@@ -216,22 +217,21 @@ class DictionaryDatabase {
             case 'suffix':
                 createQuery = this._createBoundQuery2;
                 break;
-            default: // 'exact'
-                createQuery = this._createOnlyQuery1;
-                break;
         }
 
-        return this._findMultiBulk('terms', indexNames, termList, createQuery, predicate, this._createTermBind);
+        const createResult = this._createTermGeneric.bind(this, matchType);
+
+        return this._findMultiBulk('terms', indexNames, termList, createQuery, predicate, createResult);
     }
 
     findTermsExactBulk(termList, dictionaries) {
         const predicate = (row, item) => (row.reading === item.reading && dictionaries.has(row.dictionary));
-        return this._findMultiBulk('terms', ['expression'], termList, this._createOnlyQuery3, predicate, this._createTermBind);
+        return this._findMultiBulk('terms', ['expression'], termList, this._createOnlyQuery3, predicate, this._createTermBind1);
     }
 
     findTermsBySequenceBulk(items) {
         const predicate = (row, item) => (row.dictionary === item.dictionary);
-        return this._findMultiBulk('terms', ['sequence'], items, this._createOnlyQuery2, predicate, this._createTermBind);
+        return this._findMultiBulk('terms', ['sequence'], items, this._createOnlyQuery2, predicate, this._createTermBind2);
     }
 
     findTermMetaBulk(termList, dictionaries) {
@@ -352,10 +352,10 @@ class DictionaryDatabase {
             }
             let completeCount = 0;
             const requiredCompleteCount = itemCount * indexCount;
-            const onGetAll = (rows, {item, itemIndex}) => {
+            const onGetAll = (rows, data) => {
                 for (const row of rows) {
-                    if (predicate(row, item)) {
-                        results.push(createResult(row, itemIndex));
+                    if (predicate(row, data.item)) {
+                        results.push(createResult(row, data));
                     }
                 }
                 if (++completeCount >= requiredCompleteCount) {
@@ -366,7 +366,7 @@ class DictionaryDatabase {
                 const item = items[i];
                 const query = createQuery(item);
                 for (let j = 0; j < indexCount; ++j) {
-                    this._db.getAll(indexList[j], query, onGetAll, reject, {item, itemIndex: i});
+                    this._db.getAll(indexList[j], query, onGetAll, reject, {item, itemIndex: i, indexIndex: j});
                 }
             }
         });
@@ -399,23 +399,35 @@ class DictionaryDatabase {
         });
     }
 
-    _createTerm(row, index) {
+    _createTermGeneric(matchType, row, data) {
+        const matchSourceIsTerm = (data.indexIndex === 0);
+        const matchSource = (matchSourceIsTerm ? 'term' : 'reading');
+        if ((matchSourceIsTerm ? row.expression : row.reading) === data.item) {
+            matchType = 'exact';
+        }
+        return this._createTerm(matchSource, matchType, row, data);
+    }
+
+    _createTerm(matchSource, matchType, row, {itemIndex: index}) {
+        const {sequence} = row;
         return {
             index,
+            matchType,
+            matchSource,
             term: row.expression,
             reading: row.reading,
-            definitionTags: this._splitField(row.definitionTags || row.tags || ''),
-            termTags: this._splitField(row.termTags || ''),
+            definitionTags: this._splitField(row.definitionTags || row.tags),
+            termTags: this._splitField(row.termTags),
             rules: this._splitField(row.rules),
             definitions: row.glossary,
             score: row.score,
             dictionary: row.dictionary,
             id: row.id,
-            sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
+            sequence: typeof sequence === 'number' ? sequence : -1
         };
     }
 
-    _createKanji(row, index) {
+    _createKanji(row, {itemIndex: index}) {
         return {
             index,
             character: row.character,
@@ -428,19 +440,19 @@ class DictionaryDatabase {
         };
     }
 
-    _createTermMeta({expression: term, mode, data, dictionary}, index) {
+    _createTermMeta({expression: term, mode, data, dictionary}, {itemIndex: index}) {
         return {term, mode, data, dictionary, index};
     }
 
-    _createKanjiMeta({character, mode, data, dictionary}, index) {
+    _createKanjiMeta({character, mode, data, dictionary}, {itemIndex: index}) {
         return {character, mode, data, dictionary, index};
     }
 
-    _createMedia(row, index) {
+    _createMedia(row, {itemIndex: index}) {
         return Object.assign({}, row, {index});
     }
 
     _splitField(field) {
-        return field.length === 0 ? [] : field.split(' ');
+        return typeof field === 'string' && field.length > 0 ? field.split(' ') : [];
     }
 }

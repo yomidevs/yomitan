@@ -64,9 +64,14 @@ class DisplayGenerator {
 
         const uniqueTerms = new Set();
         const uniqueReadings = new Set();
-        for (const {term, reading} of headwords) {
+        const primaryMatchTypes = new Set();
+        for (const {term, reading, sources} of headwords) {
             uniqueTerms.add(term);
             uniqueReadings.add(reading);
+            for (const {matchType, isPrimary} of sources) {
+                if (!isPrimary) { continue; }
+                primaryMatchTypes.add(matchType);
+            }
         }
 
         node.dataset.format = type;
@@ -78,6 +83,7 @@ class DisplayGenerator {
         node.dataset.uniqueReadingCount = `${uniqueReadings.size}`;
         node.dataset.frequencyCount = `${frequencies.length}`;
         node.dataset.groupedFrequencyCount = `${groupedFrequencies.length}`;
+        node.dataset.primaryMatchTypes = [...primaryMatchTypes].join(' ');
 
         for (let i = 0, ii = headwords.length; i < ii; ++i) {
             const node2 = this._createTermHeadword(headwords[i], i, pronunciations);
@@ -235,11 +241,14 @@ class DisplayGenerator {
         const {term, reading, tags, sources} = headword;
 
         let isPrimaryAny = false;
-        for (const {isPrimary} of sources) {
+        const matchTypes = new Set();
+        const matchSources = new Set();
+        for (const {matchType, matchSource, isPrimary} of sources) {
             if (isPrimary) {
                 isPrimaryAny = true;
-                break;
             }
+            matchTypes.add(matchType);
+            matchSources.add(matchSource);
         }
 
         const node = this._templates.instantiate('headword');
@@ -249,6 +258,8 @@ class DisplayGenerator {
         node.dataset.isPrimary = `${isPrimaryAny}`;
         node.dataset.readingIsSame = `${reading === term}`;
         node.dataset.frequency = DictionaryDataUtil.getTermFrequency(tags);
+        node.dataset.matchTypes = [...matchTypes].join(' ');
+        node.dataset.matchSources = [...matchSources].join(' ');
 
         const {wordClasses} = headword;
         const pronunciationCategories = this._getPronunciationCategories(reading, pronunciations, wordClasses, headwordIndex);
