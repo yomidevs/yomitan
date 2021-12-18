@@ -19,15 +19,23 @@ namespace Translation {
     // Common
 
     /**
+     * Enum representing the type of a `DictionaryEntry`.
+     * `'kanji'` corresponds to a KanjiDictionaryEntry.
+     * `'term'` corresponds to a TermDictionaryEntry.
+     */
+    export enum DictionaryEntryType {
+        Kanji = 'kanji',
+        Term = 'term',
+    }
+
+    /**
      * A generic dictionary entry which is used as the base interface.
      */
     export interface DictionaryEntry {
         /**
-         * A string corresponding to the type of the entry.
-         * `'kanji'` corresponds to a KanjiDictionaryEntry.
-         * `'term'` corresponds to a TermDictionaryEntry.
+         * The type of the entry.
          */
-        type: string;
+        type: DictionaryEntryType;
     }
 
     /**
@@ -71,7 +79,7 @@ namespace Translation {
 
     /**
      * A dictionary entry for a kanji character.
-     * `DictionaryEntry.type` is always `'kanji'`.
+     * `DictionaryEntry.type` is always `DictionaryEntryType.Kanji`.
      */
     export interface KanjiDictionaryEntry extends DictionaryEntry {
         /**
@@ -196,7 +204,7 @@ namespace Translation {
 
     /**
      * A dictionary entry for a term or group of terms.
-     * `DictionaryEntry.type` is always `'term'`.
+     * `DictionaryEntry.type` is always `DictionaryEntryType.Term`.
      */
     export interface TermDictionaryEntry extends DictionaryEntry {
         /**
@@ -363,11 +371,11 @@ namespace Translation {
          */
         position: number;
         /**
-         * Positions of moras that have a .
+         * Positions of morae with a nasal sound.
          */
         nasalPositions: number[];
         /**
-         * Position of the downstep, as a number of mora.
+         * Positions of morae with a devoiced sound.
          */
         devoicePositions: [];
         /**
@@ -420,6 +428,24 @@ namespace Translation {
     }
 
     /**
+     * Enum representing how the search term relates to the final term.
+     */
+     export enum TermSourceMatchType {
+        Exact = 'exact',
+        Prefix = 'prefix',
+        Suffix = 'suffix',
+    }
+
+    /**
+     * Enum representing what database field was used to match the source term.
+     */
+    export enum TermSourceMatchSource {
+        Term = 'term',
+        Reading = 'reading',
+        Sequence = 'sequence',
+    }
+
+    /**
      * Source information represents how the original text was transformed to get to the final term.
      */
     export interface TermSource {
@@ -437,14 +463,12 @@ namespace Translation {
         deinflectedText: string;
         /**
          * How the deinflected text matches the value from the database.
-         * Value can be one of: 'exact', 'prefix', 'suffix'
          */
-        matchType: string;
+        matchType: TermSourceMatchType;
         /**
          * Which field was used to match the database entry.
-         * Value can be one of: 'term', 'reading', 'sequence'
          */
-        matchSource: string;
+        matchSource: TermSourceMatchSource;
         /**
          * Whether or not this source is a primary source. Primary sources are derived from the
          * original search text, while non-primary sources originate from related terms.
