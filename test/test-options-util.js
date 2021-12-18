@@ -344,6 +344,7 @@ function createProfileOptionsUpdatedTestData1() {
             layoutAwareScan: false,
             hideDelay: 0,
             pointerEventsEnabled: false,
+            matchTypePrefix: false,
             preventMiddleMouse: {
                 onWebPages: false,
                 onPopupPages: false,
@@ -595,7 +596,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 15,
+        version: 16,
         global: {
             database: {
                 prefixWildcardsSupported: false

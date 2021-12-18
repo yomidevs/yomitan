@@ -61,6 +61,7 @@ class TextScanner extends EventDispatcher {
         this._scanLength = 1;
         this._layoutAwareScan = false;
         this._preventMiddleMouse = false;
+        this._matchTypePrefix = false;
         this._sentenceScanExtent = 0;
         this._sentenceTerminateAtNewlines = true;
         this._sentenceTerminatorMap = new Map();
@@ -155,7 +156,8 @@ class TextScanner extends EventDispatcher {
         scanLength,
         layoutAwareScan,
         preventMiddleMouse,
-        sentenceParsingOptions
+        sentenceParsingOptions,
+        matchTypePrefix
     }) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map(({
@@ -209,6 +211,9 @@ class TextScanner extends EventDispatcher {
         }
         if (typeof preventMiddleMouse === 'boolean') {
             this._preventMiddleMouse = preventMiddleMouse;
+        }
+        if (typeof matchTypePrefix === 'boolean') {
+            this._matchTypePrefix = matchTypePrefix;
         }
         if (typeof sentenceParsingOptions === 'object' && sentenceParsingOptions !== null) {
             const {scanExtent, terminationCharacterMode, terminationCharacters} = sentenceParsingOptions;
@@ -854,7 +859,9 @@ class TextScanner extends EventDispatcher {
         const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
-        const {dictionaryEntries, originalTextLength} = await yomichan.api.termsFind(searchText, {}, optionsContext);
+        const details = {};
+        if (this._matchTypePrefix) { details.matchType = 'prefix'; }
+        const {dictionaryEntries, originalTextLength} = await yomichan.api.termsFind(searchText, details, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(originalTextLength, layoutAwareScan);

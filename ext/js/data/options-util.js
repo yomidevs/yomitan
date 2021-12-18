@@ -464,7 +464,8 @@ class OptionsUtil {
             {async: true,  update: this._updateVersion12.bind(this)},
             {async: true,  update: this._updateVersion13.bind(this)},
             {async: false, update: this._updateVersion14.bind(this)},
-            {async: false, update: this._updateVersion15.bind(this)}
+            {async: false, update: this._updateVersion15.bind(this)},
+            {async: false, update: this._updateVersion16.bind(this)}
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -885,6 +886,15 @@ class OptionsUtil {
         for (const profile of options.profiles) {
             profile.options.general.sortFrequencyDictionary = null;
             profile.options.general.sortFrequencyDictionaryOrder = 'descending';
+        }
+        return options;
+    }
+
+    _updateVersion16(options) {
+        // Version 16 changes:
+        //  Added scanning.matchTypePrefix.
+        for (const profile of options.profiles) {
+            profile.options.scanning.matchTypePrefix = false;
         }
         return options;
     }

@@ -325,6 +325,7 @@ class Display extends EventDispatcher {
                 scanLength: scanningOptions.length,
                 layoutAwareScan: scanningOptions.layoutAwareScan,
                 preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery,
+                matchTypePrefix: false,
                 sentenceParsingOptions
             }
         });

@@ -397,6 +397,7 @@ class Frontend {
             pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
             scanLength: scanningOptions.length,
             layoutAwareScan: scanningOptions.layoutAwareScan,
+            matchTypePrefix: scanningOptions.matchTypePrefix,
             preventMiddleMouse,
             sentenceParsingOptions
         });

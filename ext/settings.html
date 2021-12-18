@@ -484,6 +484,32 @@
                 <label class="toggle"><input type="checkbox" data-setting="scanning.deepDomScan"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Wildcard scanning</div>
+                    <div class="settings-item-description">
+                        Enable suffix wildcard when looking up scanned webpage text.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="scanning.matchTypePrefix"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    Rather than searching for the source text exactly, the text will only be required to be a prefix of an existing term.
+                    For example, scanning 読み will effectively search for 読み*, which may bring up additional results such as 読み方.
+                </p>
+                <p class="danger-text">
+                    This will likely cause scanning and lookup to be slower, and the results may not be as relevant.
+                </p>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
         <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Text scan length</div>

@@ -435,7 +435,8 @@
                                     "enableOnPopupExpressions",
                                     "enableOnSearchPage",
                                     "enableSearchTags",
-                                    "layoutAwareScan"
+                                    "layoutAwareScan",
+                                    "matchTypePrefix"
                                 ],
                                 "properties": {
                                     "inputs": {
@@ -656,6 +657,10 @@
                                         "default": false
                                     },
                                     "layoutAwareScan": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "matchTypePrefix": {
                                         "type": "boolean",
                                         "default": false
                                     }
