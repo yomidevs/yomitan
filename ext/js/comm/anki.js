@@ -174,6 +174,9 @@ class AnkiConnect {
                 mode: 'cors',
                 cache: 'default',
                 credentials: 'omit',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 redirect: 'follow',
                 referrerPolicy: 'no-referrer',
                 body: JSON.stringify({action, params, version: this._localVersion})
