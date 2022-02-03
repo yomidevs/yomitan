@@ -1019,7 +1019,11 @@
                                             {"enabled": true, "character1": "。", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
                                             {"enabled": true, "character1": "！", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
                                             {"enabled": true, "character1": "？", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
-                                            {"enabled": true, "character1": "…", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true}
+                                            {"enabled": true, "character1": "…", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
+                                            {"enabled": true, "character1": "︒", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
+                                            {"enabled": true, "character1": "︕", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
+                                            {"enabled": true, "character1": "︖", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
+                                            {"enabled": true, "character1": "︙", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true}
                                         ]
                                     }
                                 }

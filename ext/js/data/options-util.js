@@ -465,7 +465,8 @@ class OptionsUtil {
             {async: true,  update: this._updateVersion13.bind(this)},
             {async: false, update: this._updateVersion14.bind(this)},
             {async: false, update: this._updateVersion15.bind(this)},
-            {async: false, update: this._updateVersion16.bind(this)}
+            {async: false, update: this._updateVersion16.bind(this)},
+            {async: false, update: this._updateVersion17.bind(this)}
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -895,6 +896,31 @@ class OptionsUtil {
         //  Added scanning.matchTypePrefix.
         for (const profile of options.profiles) {
             profile.options.scanning.matchTypePrefix = false;
+        }
+        return options;
+    }
+
+    _updateVersion17(options) {
+        // Version 17 changes:
+        //  Added vertical sentence punctuation to terminationCharacters.
+        const additions = ['︒', '︕', '︖', '︙'];
+        for (const profile of options.profiles) {
+            const {terminationCharacters} = profile.options.sentenceParsing;
+            const newAdditions = [];
+            for (const character of additions) {
+                if (terminationCharacters.findIndex((value) => (value.character1 === character && value.character2 === null)) < 0) {
+                    newAdditions.push(character);
+                }
+            }
+            for (const character of newAdditions) {
+                terminationCharacters.push({
+                    enabled: true,
+                    character1: character,
+                    character2: null,
+                    includeCharacterAtStart: false,
+                    includeCharacterAtEnd: true
+                });
+            }
         }
         return options;
     }
