@@ -8,7 +8,6 @@
         "string-quotes": "single",
         "color-named": "never",
         "declaration-no-important": true,
-        "function-calc-no-invalid": true,
         "function-calc-no-unspaced-operator": true,
         "string-no-newline": true,
         "unit-no-unknown": true,
@@ -25,7 +24,12 @@
         "number-leading-zero": "always",
         "number-no-trailing-zeros": true,
         "unit-case": "lower",
-        "value-keyword-case": "lower",
+        "value-keyword-case": [
+            "lower",
+            {
+                "camelCaseSvgKeywords": true
+            }
+        ],
         "property-case": "lower",
         "indentation": 4,
         "max-empty-lines": 2,
