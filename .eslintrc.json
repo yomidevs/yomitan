@@ -89,7 +89,7 @@
 
         "header/header": ["error", "block", [
             "",
-            {"pattern": " \\* Copyright \\(C\\) (\\d+-)?2021  Yomichan Authors"},
+            {"pattern": " \\* Copyright \\(C\\) (\\d+-)?2022  Yomichan Authors"},
             " *",
             " * This program is free software: you can redistribute it and/or modify",
             " * it under the terms of the GNU General Public License as published by",
