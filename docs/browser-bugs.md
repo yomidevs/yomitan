@@ -96,3 +96,8 @@ This page lists several of the browser bugs that have affected Yomichan over the
 * **Browser**: Firefox
 * **Date**: 2021-08-16
 * **Links**: [Report](https://bugzilla.mozilla.org/show_bug.cgi?id=1726068)
+
+## Touch events report incorrect clientX on wide pages with writing-mode:vertical-rl
+* **Browser**: Chrome
+* **Date**: 2022-01-31
+* **Links**: [Report](https://bugs.chromium.org/p/chromium/issues/detail?id=1292815)
