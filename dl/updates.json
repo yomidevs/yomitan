@@ -5,6 +5,10 @@
                 {
                     "version": "21.10.31.1",
                     "update_link": "https://github.com/FooSoft/yomichan/releases/download/21.10.31.1/yomichan_testing-21.10.31.1-an+fx.xpi"
+                },
+                {
+                    "version": "22.2.2.0",
+                    "update_link": "https://github.com/FooSoft/yomichan/releases/download/22.2.2.0/yomichan_testing-22.2.2.0-an+fx.xpi"
                 }
             ]
         }
