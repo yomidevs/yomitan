@@ -243,7 +243,7 @@ class AnkiNoteDataCreator {
 
     _getKanjiFrequencies(dictionaryEntry) {
         const results = [];
-        for (const {index, dictionary, dictionaryIndex, dictionaryPriority, character, frequency, displayValue, displayValueParsed} of dictionaryEntry.frequencies) {
+        for (const {index, dictionary, dictionaryIndex, dictionaryPriority, character, frequency, displayValue} of dictionaryEntry.frequencies) {
             results.push({
                 index,
                 dictionary,
@@ -252,7 +252,7 @@ class AnkiNoteDataCreator {
                     priority: dictionaryPriority
                 },
                 character,
-                frequency: displayValueParsed ? displayValue : frequency
+                frequency: displayValue !== null ? displayValue : frequency
             });
         }
         return results;
@@ -374,7 +374,7 @@ class AnkiNoteDataCreator {
     _getTermFrequencies(dictionaryEntry) {
         const results = [];
         const {headwords} = dictionaryEntry;
-        for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, hasReading, frequency, displayValue, displayValueParsed} of dictionaryEntry.frequencies) {
+        for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, hasReading, frequency, displayValue} of dictionaryEntry.frequencies) {
             const {term, reading} = headwords[headwordIndex];
             results.push({
                 index: results.length,
@@ -387,7 +387,7 @@ class AnkiNoteDataCreator {
                 expression: term,
                 reading,
                 hasReading,
-                frequency: displayValueParsed ? displayValue : frequency
+                frequency: displayValue !== null ? displayValue : frequency
             });
         }
         return results;
@@ -459,7 +459,7 @@ class AnkiNoteDataCreator {
     _getTermExpressionFrequencies(dictionaryEntry, i) {
         const results = [];
         const {headwords, frequencies} = dictionaryEntry;
-        for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, hasReading, frequency, displayValue, displayValueParsed} of frequencies) {
+        for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, hasReading, frequency, displayValue} of frequencies) {
             if (headwordIndex !== i) { continue; }
             const {term, reading} = headwords[headwordIndex];
             results.push({
@@ -473,7 +473,7 @@ class AnkiNoteDataCreator {
                 expression: term,
                 reading,
                 hasReading,
-                frequency: displayValueParsed ? displayValue : frequency
+                frequency: displayValue !== null ? displayValue : frequency
             });
         }
         return results;

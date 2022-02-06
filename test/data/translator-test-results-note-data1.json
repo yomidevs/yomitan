@@ -290,7 +290,7 @@
                 "priority": 0
               },
               "character": "込",
-              "frequency": 6
+              "frequency": "six"
             }
           ],
           "url": "url:",
@@ -763,7 +763,7 @@
                   "expression": "打",
                   "reading": "ダース",
                   "hasReading": true,
-                  "frequency": 27
+                  "frequency": "twenty-seven"
                 }
               ],
               "pitches": [],
@@ -904,7 +904,7 @@
               "expression": "打",
               "reading": "ダース",
               "hasReading": true,
-              "frequency": 27
+              "frequency": "twenty-seven"
             }
           ],
           "pitches": [],
@@ -1381,7 +1381,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -1513,7 +1513,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -2601,7 +2601,7 @@
                   "expression": "打",
                   "reading": "ダース",
                   "hasReading": true,
-                  "frequency": 27
+                  "frequency": "twenty-seven"
                 }
               ],
               "pitches": [],
@@ -2742,7 +2742,7 @@
               "expression": "打",
               "reading": "ダース",
               "hasReading": true,
-              "frequency": 27
+              "frequency": "twenty-seven"
             }
           ],
           "pitches": [],
@@ -2863,7 +2863,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -3025,7 +3025,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -3257,7 +3257,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -3309,7 +3309,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -3419,7 +3419,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -3471,7 +3471,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -4799,7 +4799,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -4931,7 +4931,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -6023,7 +6023,7 @@
                   "expression": "打",
                   "reading": "ダース",
                   "hasReading": true,
-                  "frequency": 27
+                  "frequency": "twenty-seven"
                 }
               ],
               "pitches": [],
@@ -6164,7 +6164,7 @@
               "expression": "打",
               "reading": "ダース",
               "hasReading": true,
-              "frequency": 27
+              "frequency": "twenty-seven"
             }
           ],
           "pitches": [],
@@ -6802,7 +6802,7 @@
                   "expression": "打",
                   "reading": "ダース",
                   "hasReading": true,
-                  "frequency": 27
+                  "frequency": "twenty-seven"
                 }
               ],
               "pitches": [],
@@ -6943,7 +6943,7 @@
               "expression": "打",
               "reading": "ダース",
               "hasReading": true,
-              "frequency": 27
+              "frequency": "twenty-seven"
             }
           ],
           "pitches": [],
@@ -7729,7 +7729,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -7861,7 +7861,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -8290,7 +8290,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -8452,7 +8452,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -9695,7 +9695,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -9747,7 +9747,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -9857,7 +9857,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -9909,7 +9909,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -10537,7 +10537,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -10669,7 +10669,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -11271,7 +11271,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -11467,7 +11467,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -11688,7 +11688,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -11740,7 +11740,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -11884,7 +11884,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -11936,7 +11936,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -12496,7 +12496,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -12662,7 +12662,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -13128,7 +13128,7 @@
                   "expression": "打",
                   "reading": "ダース",
                   "hasReading": true,
-                  "frequency": 27
+                  "frequency": "twenty-seven"
                 }
               ],
               "pitches": [],
@@ -13275,7 +13275,7 @@
               "expression": "打",
               "reading": "ダース",
               "hasReading": true,
-              "frequency": 27
+              "frequency": "twenty-seven"
             }
           ],
           "pitches": [],
@@ -13401,7 +13401,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -13560,7 +13560,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -13612,7 +13612,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -13777,7 +13777,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -13855,7 +13855,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 8,
@@ -13907,7 +13907,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -14317,7 +14317,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -14582,7 +14582,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -15045,7 +15045,7 @@
                   "expression": "打",
                   "reading": "ダース",
                   "hasReading": true,
-                  "frequency": 27
+                  "frequency": "twenty-seven"
                 }
               ],
               "pitches": [],
@@ -15182,7 +15182,7 @@
               "expression": "打",
               "reading": "ダース",
               "hasReading": true,
-              "frequency": 27
+              "frequency": "twenty-seven"
             }
           ],
           "pitches": [],
@@ -15301,7 +15301,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -15463,7 +15463,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -15699,7 +15699,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -15751,7 +15751,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -15861,7 +15861,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -15913,7 +15913,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -17249,7 +17249,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -17381,7 +17381,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -18473,7 +18473,7 @@
                   "expression": "打",
                   "reading": "ダース",
                   "hasReading": true,
-                  "frequency": 27
+                  "frequency": "twenty-seven"
                 }
               ],
               "pitches": [],
@@ -18614,7 +18614,7 @@
               "expression": "打",
               "reading": "ダース",
               "hasReading": true,
-              "frequency": 27
+              "frequency": "twenty-seven"
             }
           ],
           "pitches": [],
@@ -18735,7 +18735,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -18897,7 +18897,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -19129,7 +19129,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -19181,7 +19181,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -19291,7 +19291,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -19343,7 +19343,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -20671,7 +20671,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -20803,7 +20803,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -21895,7 +21895,7 @@
                   "expression": "打",
                   "reading": "ダース",
                   "hasReading": true,
-                  "frequency": 27
+                  "frequency": "twenty-seven"
                 }
               ],
               "pitches": [],
@@ -22036,7 +22036,7 @@
               "expression": "打",
               "reading": "ダース",
               "hasReading": true,
-              "frequency": 27
+              "frequency": "twenty-seven"
             }
           ],
           "pitches": [],
@@ -22157,7 +22157,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -22319,7 +22319,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -22551,7 +22551,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -22603,7 +22603,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -22713,7 +22713,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -22765,7 +22765,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -24093,7 +24093,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -24225,7 +24225,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -25317,7 +25317,7 @@
                   "expression": "打",
                   "reading": "ダース",
                   "hasReading": true,
-                  "frequency": 27
+                  "frequency": "twenty-seven"
                 }
               ],
               "pitches": [],
@@ -25458,7 +25458,7 @@
               "expression": "打",
               "reading": "ダース",
               "hasReading": true,
-              "frequency": 27
+              "frequency": "twenty-seven"
             }
           ],
           "pitches": [],
@@ -26044,7 +26044,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -26203,7 +26203,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -26255,7 +26255,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -26420,7 +26420,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -26498,7 +26498,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 8,
@@ -26550,7 +26550,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -26960,7 +26960,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -27225,7 +27225,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
