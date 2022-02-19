@@ -290,22 +290,6 @@ one of the following solutions should work for you:
     feature to reset your user profile. It appears that the Firefox profile system can corrupt itself preventing
     IndexedDB from being accessible to Yomichan.
 
-**Why does the kanji results page display "No data found" for several fields?**
-
-You are using data from the KANJIDIC dictionary that was exported for an earlier version of Yomichan. It does not
-contain the additional information which newer versions of Yomichan expect. Unfortunately, since major browser
-implementations of IndexedDB do not provide reliable means for selective bulk data deletion, you will need to purge
-your database and install the latest version of the KANJIDIC to see additional information about characters.
-
-**Can I still create cards without HTML formatting? The option for it is gone!**
-
-Developing Yomichan is a constant balance between including useful features and keeping complexity at a minimum.
-With the new user-editable card template system, it is possible to create text-only cards without having to double
-the number of field templates in the extension itself. If you would like to stop HTML tags from being added to your
-cards, simply copy the contents of the [text-only field template](https://foosoft.net/projects/yomichan/dl/fields.txt)
-into the template box on the Anki settings page (make sure you have the *Show advanced options* checkbox ticked),
-making sure to replace the existing values.
-
 **Will you add support for online dictionaries?**
 
 Online dictionaries will not be implemented because it is not possible to support them in a robust way. In order to
