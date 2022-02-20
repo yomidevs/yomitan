@@ -183,7 +183,7 @@ class AnkiConnect {
             });
         } catch (e) {
             const error = new Error('Anki connection failure');
-            error.data = {action, params};
+            error.data = {action, params, originalError: e};
             throw error;
         }
 
@@ -200,7 +200,7 @@ class AnkiConnect {
             result = JSON.parse(responseText);
         } catch (e) {
             const error = new Error('Invalid Anki response');
-            error.data = {action, params, status: response.status, responseText};
+            error.data = {action, params, status: response.status, responseText, originalError: e};
             throw error;
         }
 

@@ -43,6 +43,7 @@ class AnkiController {
         this._ankiErrorMessageDetailsToggle = null;
         this._ankiErrorInvalidResponseInfo = null;
         this._ankiCardPrimary = null;
+        this._ankiError = null;
         this._validateFieldsToken = null;
     }
 
@@ -69,6 +70,8 @@ class AnkiController {
         for (const input of ankiCardPrimaryTypeRadios) {
             input.addEventListener('change', this._onAnkiCardPrimaryTypeRadioChange.bind(this), false);
         }
+
+        document.querySelector('#anki-error-log').addEventListener('click', this._onAnkiErrorLogLinkClick.bind(this));
 
         const options = await this._settingsController.getOptions();
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
@@ -184,6 +187,11 @@ class AnkiController {
         this._setAnkiCardPrimaryType(node.dataset.value, node.dataset.ankiCardMenu);
     }
 
+    _onAnkiErrorLogLinkClick() {
+        if (this._ankiError === null) { return; }
+        console.log({error: this._ankiError});
+    }
+
     _setAnkiCardPrimaryType(ankiCardType, ankiCardMenu) {
         if (this._ankiCardPrimary === null) { return; }
         this._ankiCardPrimary.dataset.ankiCardType = ankiCardType;
@@ -296,9 +304,12 @@ class AnkiController {
         this._ankiErrorMessageNode.textContent = (this._ankiConnect.enabled ? 'Connected' : 'Not enabled');
         this._ankiErrorMessageNode.classList.remove('danger-text');
         this._ankiErrorMessageDetailsNode.textContent = '';
+        this._ankiError = null;
     }
 
     _showAnkiError(error) {
+        this._ankiError = error;
+
         let errorString = typeof error === 'object' && error !== null ? error.message : null;
         if (!errorString) { errorString = `${error}`; }
         if (!/[.!?]$/.test(errorString)) { errorString += '.'; }
