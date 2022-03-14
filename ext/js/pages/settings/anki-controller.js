@@ -677,9 +677,11 @@ class AnkiCardController {
 
         const markers = this._ankiController.getFieldMarkers(cardType);
         const markerAliases = new Map([
+            ['expression', ['phrase', 'term', 'word']],
             ['glossary', ['definition', 'meaning']],
             ['audio', ['sound']],
-            ['dictionary', ['dict']]
+            ['dictionary', ['dict']],
+            ['pitch-accents', ['pitch']]
         ]);
 
         const hyphenPattern = /-/g;
