@@ -113,17 +113,24 @@ class ClipboardReader {
             typeof navigator.clipboard !== 'undefined' &&
             typeof navigator.clipboard.read === 'function'
         ) {
-            // This function is behind the Firefox flag: dom.events.asyncClipboard.dataTransfer
-            let files;
+            // This function is behind the Firefox flag: dom.events.asyncClipboard.read
+            // See: https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read#browser_compatibility
+            let items;
             try {
-                ({files} = await navigator.clipboard.read());
+                items = await navigator.clipboard.read();
             } catch (e) {
                 return null;
             }
 
-            for (const file of files) {
-                if (MediaUtil.getFileExtensionFromImageMediaType(file.type) !== null) {
-                    return await this._readFileAsDataURL(file);
+            for (const item of items) {
+                for (const type of item.types) {
+                    if (!MediaUtil.getFileExtensionFromImageMediaType(type)) { continue; }
+                    try {
+                        const blob = await item.getType(type);
+                        return await this._readFileAsDataURL(blob);
+                    } catch (e) {
+                        // NOP
+                    }
                 }
             }
             return null;
