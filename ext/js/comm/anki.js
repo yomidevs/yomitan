@@ -105,12 +105,19 @@ class AnkiConnect {
         return await this.guiBrowse(`nid:${noteId}`);
     }
 
-    async storeMediaFile(fileName, dataBase64) {
+    /**
+     * Stores a file with the specified base64-encoded content inside Anki's media folder.
+     * @param {string} fileName The name of the file.
+     * @param {string} content The base64-encoded content of the file.
+     * @returns {?string} The actual file name used to store the file, which may be different; or `null` if the file was not stored.
+     * @throws {Error} An error is thrown is this object is not enabled.
+     */
+    async storeMediaFile(fileName, content) {
         if (!this._enabled) {
             throw new Error('AnkiConnect not enabled');
         }
         await this._checkVersion();
-        return await this._invoke('storeMediaFile', {filename: fileName, data: dataBase64});
+        return await this._invoke('storeMediaFile', {filename: fileName, data: content});
     }
 
     async findNoteIds(notes) {

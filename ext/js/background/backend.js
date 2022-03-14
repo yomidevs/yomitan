@@ -1806,7 +1806,7 @@ class Backend {
         if (extension === null) { extension = '.mp3'; }
         let fileName = this._generateAnkiNoteMediaFileName('yomichan_audio', extension, timestamp, definitionDetails);
         fileName = fileName.replace(/\]/g, '');
-        await ankiConnect.storeMediaFile(fileName, data);
+        fileName = await ankiConnect.storeMediaFile(fileName, data);
 
         return fileName;
     }
@@ -1821,8 +1821,8 @@ class Backend {
             throw new Error('Unknown media type for screenshot image');
         }
 
-        const fileName = this._generateAnkiNoteMediaFileName('yomichan_browser_screenshot', extension, timestamp, definitionDetails);
-        await ankiConnect.storeMediaFile(fileName, data);
+        let fileName = this._generateAnkiNoteMediaFileName('yomichan_browser_screenshot', extension, timestamp, definitionDetails);
+        fileName = await ankiConnect.storeMediaFile(fileName, data);
 
         return fileName;
     }
@@ -1839,8 +1839,8 @@ class Backend {
             throw new Error('Unknown media type for clipboard image');
         }
 
-        const fileName = this._generateAnkiNoteMediaFileName('yomichan_clipboard_image', extension, timestamp, definitionDetails);
-        await ankiConnect.storeMediaFile(fileName, data);
+        let fileName = this._generateAnkiNoteMediaFileName('yomichan_clipboard_image', extension, timestamp, definitionDetails);
+        fileName = await ankiConnect.storeMediaFile(fileName, data);
 
         return fileName;
     }
@@ -1877,7 +1877,7 @@ class Backend {
                 const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
                 fileName = this._generateAnkiNoteMediaFileName(`yomichan_dictionary_media_${i + 1}`, extension, timestamp, definitionDetails);
                 try {
-                    await ankiConnect.storeMediaFile(fileName, content);
+                    fileName = await ankiConnect.storeMediaFile(fileName, content);
                 } catch (e) {
                     errors.push(e);
                     fileName = null;
