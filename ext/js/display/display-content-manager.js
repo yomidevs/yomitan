@@ -19,7 +19,7 @@
  * StringUtil
  */
 
-class MediaLoader {
+class DisplayContentManager {
     constructor() {
         this._token = {};
         this._mediaCache = new Map();

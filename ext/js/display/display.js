@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DisplayContentManager
  * DisplayGenerator
  * DisplayHistory
  * DisplayNotification
@@ -24,7 +25,6 @@
  * FrameEndpoint
  * Frontend
  * HotkeyHelpController
- * MediaLoader
  * OptionToggleHotkeyHandler
  * PopupFactory
  * PopupMenu
@@ -52,11 +52,11 @@ class Display extends EventDispatcher {
         this._styleNode = null;
         this._eventListeners = new EventListenerCollection();
         this._setContentToken = null;
-        this._mediaLoader = new MediaLoader();
+        this._contentManager = new DisplayContentManager();
         this._hotkeyHelpController = new HotkeyHelpController();
         this._displayGenerator = new DisplayGenerator({
             japaneseUtil,
-            mediaLoader: this._mediaLoader,
+            contentManager: this._contentManager,
             hotkeyHelpController: this._hotkeyHelpController
         });
         this._messageHandlers = new Map();
@@ -543,7 +543,7 @@ class Display extends EventDispatcher {
             this._closePopups();
             this._closeAllPopupMenus();
             this._eventListeners.removeAllEventListeners();
-            this._mediaLoader.unloadAll();
+            this._contentManager.unloadAll();
             this._hideTagNotification(false);
             this._triggerContentClear();
             this._dictionaryEntries = [];

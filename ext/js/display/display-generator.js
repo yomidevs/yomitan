@@ -23,12 +23,12 @@
  */
 
 class DisplayGenerator {
-    constructor({japaneseUtil, mediaLoader, hotkeyHelpController=null}) {
+    constructor({japaneseUtil, contentManager, hotkeyHelpController=null}) {
         this._japaneseUtil = japaneseUtil;
-        this._mediaLoader = mediaLoader;
+        this._contentManager = contentManager;
         this._hotkeyHelpController = hotkeyHelpController;
         this._templates = null;
-        this._structuredContentGenerator = new StructuredContentGenerator(this._mediaLoader, document);
+        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document);
         this._pronunciationGenerator = new PronunciationGenerator(japaneseUtil);
     }
 

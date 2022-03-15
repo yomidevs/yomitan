@@ -16,8 +16,8 @@
  */
 
 class StructuredContentGenerator {
-    constructor(mediaLoader, document) {
-        this._mediaLoader = mediaLoader;
+    constructor(contentManager, document) {
+        this._contentManager = contentManager;
         this._document = document;
     }
 
@@ -141,8 +141,8 @@ class StructuredContentGenerator {
 
         aspectRatioSizer.style.paddingTop = `${invAspectRatio * 100.0}%`;
 
-        if (this._mediaLoader !== null) {
-            this._mediaLoader.loadMedia(
+        if (this._contentManager !== null) {
+            this._contentManager.loadMedia(
                 path,
                 dictionary,
                 (url) => this._setImageData(node, image, imageBackground, url, false),
