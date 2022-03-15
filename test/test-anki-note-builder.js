@@ -47,6 +47,7 @@ async function createVM() {
         'js/display/sandbox/pronunciation-generator.js',
         'js/display/sandbox/structured-content-generator.js',
         'js/templates/sandbox/anki-template-renderer.js',
+        'js/templates/sandbox/anki-template-renderer-content-manager.js',
         'js/templates/sandbox/template-renderer.js',
         'js/templates/sandbox/template-renderer-media-provider.js',
         'lib/handlebars.min.js'

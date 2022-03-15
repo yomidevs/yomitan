@@ -17,6 +17,7 @@
 
 /* global
  * AnkiNoteDataCreator
+ * AnkiTemplateRendererContentManager
  * CssStyleApplier
  * DictionaryDataUtil
  * Handlebars
@@ -534,16 +535,10 @@ class AnkiTemplateRenderer {
     }
 
     _createStructuredContentGenerator(data) {
-        const mediaLoader = {
-            loadMedia: async (path, dictionary, onLoad, onUnload) => {
-                const imageUrl = this._mediaProvider.getMedia(data, ['dictionaryMedia', path], {dictionary, format: 'fileName', default: null});
-                if (imageUrl !== null) {
-                    onLoad(imageUrl);
-                    this._cleanupCallbacks.push(() => onUnload(true));
-                }
-            }
-        };
-        return new StructuredContentGenerator(mediaLoader, document);
+        const contentManager = new AnkiTemplateRendererContentManager(this._mediaProvider, data);
+        const instance = new StructuredContentGenerator(contentManager, document);
+        this._cleanupCallbacks.push(() => contentManager.unloadAll());
+        return instance;
     }
 
     _formatGlossary(context, dictionary, options) {
