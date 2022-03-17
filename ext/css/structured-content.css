@@ -198,6 +198,21 @@
 }
 
 
+/* Links */
+.gloss-link-text {
+    vertical-align: middle;
+}
+.gloss-link-external-icon {
+    display: inline-block;
+    vertical-align: middle;
+    width: calc(16em / var(--font-size-no-units));
+    height: calc(16em / var(--font-size-no-units));
+    margin-left: 0.25em;
+    background-color: var(--link-color);
+    position: relative;
+}
+
+
 /* Structured content glossary styles */
 .gloss-sc-table-container {
     display: block;

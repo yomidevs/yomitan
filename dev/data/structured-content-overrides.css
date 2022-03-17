@@ -54,3 +54,10 @@
     border-width: 1px;
     border-color: currentColor;
 }
+.gloss-link-text {
+    /* remove-rule */
+}
+.gloss-link-external-icon {
+    display: none;
+    /* remove-property background-color vertical-align width height margin-left background-color position */
+}

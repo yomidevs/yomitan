@@ -59,6 +59,8 @@ class StructuredContentGenerator {
                 return this._createStructuredContentElement(tag, content, dictionary, 'simple', true, true);
             case 'img':
                 return this.createDefinitionImage(content, dictionary);
+            case 'a':
+                return this._createLinkElement(content, dictionary);
         }
         return null;
     }
@@ -252,5 +254,31 @@ class StructuredContentGenerator {
         if (typeof marginLeft === 'number') { style.marginLeft = `${marginLeft}em`; }
         if (typeof marginRight === 'number') { style.marginRight = `${marginRight}em`; }
         if (typeof marginBottom === 'number') { style.marginBottom = `${marginBottom}em`; }
+    }
+
+    _createLinkElement(content, dictionary) {
+        let {href} = content;
+        const internal = href.startsWith('?');
+        if (internal) {
+            href = `${location.protocol}//${location.host}/search.html${href.length > 1 ? href : ''}`;
+        }
+
+        const node = this._createElement('a', 'gloss-link');
+        node.dataset.external = `${!internal}`;
+
+        const text = this._createElement('span', 'gloss-link-text');
+        node.appendChild(text);
+
+        const child = this.createStructuredContent(content.content, dictionary);
+        if (child !== null) { text.appendChild(child); }
+
+        if (!internal) {
+            const icon = this._createElement('span', 'gloss-link-external-icon icon');
+            icon.dataset.icon = 'external-link';
+            node.appendChild(icon);
+        }
+
+        this._contentManager.prepareLink(node, href, internal);
+        return node;
     }
 }

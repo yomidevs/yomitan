@@ -90,8 +90,9 @@ function generateRules(cssFile, overridesCssFile) {
     const stylesheet1 = css.parse(content1, {}).stylesheet;
     const stylesheet2 = css.parse(content2, {}).stylesheet;
 
-    const removePropertyPattern = /^remove-property\s+([a-zA-Z0-9-]+)$/;
+    const removePropertyPattern = /^remove-property\s+([\w\W]+)$/;
     const removeRulePattern = /^remove-rule$/;
+    const propertySeparator = /\s+/;
 
     const rules = [];
 
@@ -139,10 +140,11 @@ function generateRules(cssFile, overridesCssFile) {
                         const comment = declaration.comment.trim();
                         let m;
                         if ((m = removePropertyPattern.exec(comment)) !== null) {
-                            const property = m[1];
-                            const removeCount = removeProperty(rules[index].styles, property, removedProperties);
-                            if (removeCount === 0) { throw new Error(`Property removal is unnecessary; ${property} does not exist`); }
-                        } else if ((m = removeRulePattern.exec(comment)) !== null) {
+                            for (const property of m[1].split(propertySeparator)) {
+                                const removeCount = removeProperty(rules[index].styles, property, removedProperties);
+                                if (removeCount === 0) { throw new Error(`Property removal is unnecessary; ${property} does not exist`); }
+                            }
+                        } else if (removeRulePattern.test(comment)) {
                             rules.splice(index, 1);
                         }
                     }

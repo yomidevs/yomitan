@@ -37,11 +37,14 @@
 class DisplayContentManager {
     /**
      * Creates a new instance of the class.
+     * @param {Display} display The display instance that owns this object.
      */
-    constructor() {
+    constructor(display) {
+        this._display = display;
         this._token = {};
         this._mediaCache = new Map();
         this._loadMediaData = [];
+        this._eventListeners = new EventListenerCollection();
     }
 
     /**
@@ -77,6 +80,23 @@ class DisplayContentManager {
         this._mediaCache.clear();
 
         this._token = {};
+
+        this._eventListeners.removeAllEventListeners();
+    }
+
+    /**
+     * Sets up attributes and events for a link element.
+     * @param {Element} element The link element.
+     * @param {string} href The URL.
+     * @param {boolean} internal Whether or not the URL is an internal or external link.
+     */
+    prepareLink(element, href, internal) {
+        element.href = href;
+        if (!internal) {
+            element.target = '_blank';
+            element.rel = 'noreferrer noopener';
+        }
+        this._eventListeners.addEventListener(element, 'click', this._onLinkClick.bind(this));
     }
 
     async _loadMedia(path, dictionary, onLoad, onUnload) {
@@ -126,5 +146,29 @@ class DisplayContentManager {
             cachedData.url = url;
         }
         return cachedData;
+    }
+
+    _onLinkClick(e) {
+        const {href} = e.currentTarget;
+        if (typeof href !== 'string') { return; }
+
+        const baseUrl = new URL(location.href);
+        const url = new URL(href, baseUrl);
+        const internal = (url.protocol === baseUrl.protocol && url.host === baseUrl.host);
+        if (!internal) { return; }
+
+        e.preventDefault();
+
+        const params = {};
+        for (const [key, value] of url.searchParams.entries()) {
+            params[key] = value;
+        }
+        this._display.setContent({
+            historyMode: 'new',
+            focus: false,
+            params,
+            state: null,
+            content: null
+        });
     }
 }

@@ -25,11 +25,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="32"
-     inkscape:cx="4.203125"
-     inkscape:cy="5.734375"
+     inkscape:zoom="16"
+     inkscape:cx="-1.03125"
+     inkscape:cy="3.84375"
      inkscape:document-units="px"
-     inkscape:current-layer="layer53"
+     inkscape:current-layer="layer54"
      showgrid="true"
      units="px"
      inkscape:snap-center="true"
@@ -566,7 +566,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1650,8 +1649,9 @@
   </g>
   <g
      inkscape:groupmode="layer"
-     id="layer53"
-     inkscape:label="Connection">
+     id="g268"
+     inkscape:label="Connection"
+     style="display:none">
     <g
        id="g1369"
        transform="matrix(0,-1,-1,0,16,16)">
@@ -1662,5 +1662,15 @@
          transform="matrix(0,-1,-1,0,16,16)"
          sodipodi:nodetypes="ssccccsssscssssccccsssscssssssssssssssssss" />
     </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer54"
+     inkscape:label="External Link"
+     style="display:inline">
+    <path
+       id="rect1109"
+       style="fill:#000000;stroke-linecap:round;stroke-opacity:0.387097;fill-opacity:1"
+       d="M 8.25 2 L 10.5 4 L 6.5 8 L 8 9.5 L 12 5.5 L 14 7.75 L 14 2 L 8.25 2 z M 2 4 L 2 14 L 12 14 L 12 7 L 10 9 L 10 12 L 4 12 L 4 6 L 7 6 L 9 4 L 2 4 z " />
   </g>
 </svg>

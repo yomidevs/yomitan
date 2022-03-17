@@ -185,6 +185,29 @@
                                     "enum": ["px", "em"]
                                 }
                             }
+                        },
+                        {
+                            "type": "object",
+                            "description": "Link tag.",
+                            "required": [
+                                "tag",
+                                "href"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "tag": {
+                                    "type": "string",
+                                    "const": "a"
+                                },
+                                "content": {
+                                    "$ref": "#/definitions/structuredContent"
+                                },
+                                "href": {
+                                    "type": "string",
+                                    "description": "The URL for the link. URLs starting with a ? are treated as internal links to other dictionary content.",
+                                    "pattern": "^(?:https?:|\\?)[\\w\\W]*"
+                                }
+                            }
                         }
                     ]
                 }

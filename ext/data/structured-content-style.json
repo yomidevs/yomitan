@@ -294,6 +294,12 @@
         ]
     },
     {
+        "selectors": [".gloss-link-external-icon"],
+        "styles": [
+            ["display", "none"]
+        ]
+    },
+    {
         "selectors": [".gloss-sc-table-container"],
         "styles": [
             ["display", "block"]

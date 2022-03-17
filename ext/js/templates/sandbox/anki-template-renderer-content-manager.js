@@ -69,4 +69,14 @@ class AnkiTemplateRendererContentManager {
         }
         this._onUnloadCallbacks = [];
     }
+
+    /**
+     * Sets up attributes and events for a link element.
+     * @param {Element} element The link element.
+     * @param {string} href The URL.
+     * @param {boolean} internal Whether or not the URL is an internal or external link.
+     */
+    prepareLink(element, href, internal) {
+        element.href = internal ? '#' : href;
+    }
 }

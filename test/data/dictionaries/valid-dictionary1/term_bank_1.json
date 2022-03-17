@@ -179,6 +179,31 @@
                     ]
                 },
                 " text 3"
+            ]},
+            {"type": "structured-content", "content": [
+                {
+                    "tag": "a",
+                    "href": "?",
+                    "content": [
+                        "internal link 1"
+                    ]
+                },
+                " ",
+                {
+                    "tag": "a",
+                    "href": "?query=よみ&wildcards=off",
+                    "content": [
+                        "internal link 2"
+                    ]
+                },
+                " ",
+                {
+                    "tag": "a",
+                    "href": "https://foosoft.net/projects/yomichan/",
+                    "content": [
+                        "external link"
+                    ]
+                }
             ]}
         ],
         100, "P E1"
