@@ -2349,6 +2349,29 @@ input[type=number].dictionary-priority {
     word-break: break-all;
 }
 
+.input-prevention-option-list {
+    margin-top: 0.375em;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    width: 100%;
+    padding-left: 0.5em;
+    box-sizing: border-box;
+}
+.input-prevention-option-list-item {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    width: 100%;
+}
+.input-prevention-option-list-item>:first-child {
+    flex: 0 0 auto;
+}
+.input-prevention-option-list-item>:not(:first-child) {
+    margin-left: 0.375em;
+    flex: 1 1 auto;
+}
+
 
 /* Environment-specific display */
 :root[data-browser=unknown] [data-show-for-browser],
