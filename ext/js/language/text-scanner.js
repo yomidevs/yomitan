@@ -748,19 +748,20 @@ class TextScanner extends EventDispatcher {
     }
 
     _hookEvents() {
+        const capture = true;
         let eventListenerInfos;
         if (this._searchOnClickOnly) {
-            eventListenerInfos = this._getMouseClickOnlyEventListeners();
+            eventListenerInfos = this._getMouseClickOnlyEventListeners(capture);
         } else if (this._arePointerEventsSupported()) {
-            eventListenerInfos = this._getPointerEventListeners();
+            eventListenerInfos = this._getPointerEventListeners(capture);
         } else {
-            eventListenerInfos = this._getMouseEventListeners();
+            eventListenerInfos = this._getMouseEventListeners(capture);
             if (this._touchInputEnabled) {
-                eventListenerInfos.push(...this._getTouchEventListeners());
+                eventListenerInfos.push(...this._getTouchEventListeners(capture));
             }
         }
         if (this._searchOnClick) {
-            eventListenerInfos.push(...this._getMouseClickOnlyEventListeners2());
+            eventListenerInfos.push(...this._getMouseClickOnlyEventListeners2(capture));
         }
 
         for (const args of eventListenerInfos) {
@@ -768,57 +769,57 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    _getPointerEventListeners() {
+    _getPointerEventListeners(capture) {
         return [
-            [this._node, 'pointerover', this._onPointerOver.bind(this)],
-            [this._node, 'pointerdown', this._onPointerDown.bind(this)],
-            [this._node, 'pointermove', this._onPointerMove.bind(this)],
-            [this._node, 'pointerup', this._onPointerUp.bind(this)],
-            [this._node, 'pointercancel', this._onPointerCancel.bind(this)],
-            [this._node, 'pointerout', this._onPointerOut.bind(this)],
-            [this._node, 'touchmove', this._onTouchMovePreventScroll.bind(this), {passive: false}],
-            [this._node, 'mousedown', this._onMouseDown.bind(this)],
-            [this._node, 'click', this._onClick.bind(this)],
-            [this._node, 'auxclick', this._onAuxClick.bind(this)]
+            [this._node, 'pointerover', this._onPointerOver.bind(this), capture],
+            [this._node, 'pointerdown', this._onPointerDown.bind(this), capture],
+            [this._node, 'pointermove', this._onPointerMove.bind(this), capture],
+            [this._node, 'pointerup', this._onPointerUp.bind(this), capture],
+            [this._node, 'pointercancel', this._onPointerCancel.bind(this), capture],
+            [this._node, 'pointerout', this._onPointerOut.bind(this), capture],
+            [this._node, 'touchmove', this._onTouchMovePreventScroll.bind(this), {passive: false, capture}],
+            [this._node, 'mousedown', this._onMouseDown.bind(this), capture],
+            [this._node, 'click', this._onClick.bind(this), capture],
+            [this._node, 'auxclick', this._onAuxClick.bind(this), capture]
         ];
     }
 
-    _getMouseEventListeners() {
+    _getMouseEventListeners(capture) {
         return [
-            [this._node, 'mousedown', this._onMouseDown.bind(this)],
-            [this._node, 'mousemove', this._onMouseMove.bind(this)],
-            [this._node, 'mouseover', this._onMouseOver.bind(this)],
-            [this._node, 'mouseout', this._onMouseOut.bind(this)],
-            [this._node, 'click', this._onClick.bind(this)]
+            [this._node, 'mousedown', this._onMouseDown.bind(this), capture],
+            [this._node, 'mousemove', this._onMouseMove.bind(this), capture],
+            [this._node, 'mouseover', this._onMouseOver.bind(this), capture],
+            [this._node, 'mouseout', this._onMouseOut.bind(this), capture],
+            [this._node, 'click', this._onClick.bind(this), capture]
         ];
     }
 
-    _getTouchEventListeners() {
+    _getTouchEventListeners(capture) {
         return [
-            [this._node, 'auxclick', this._onAuxClick.bind(this)],
-            [this._node, 'touchstart', this._onTouchStart.bind(this)],
-            [this._node, 'touchend', this._onTouchEnd.bind(this)],
-            [this._node, 'touchcancel', this._onTouchCancel.bind(this)],
-            [this._node, 'touchmove', this._onTouchMove.bind(this), {passive: false}],
-            [this._node, 'contextmenu', this._onContextMenu.bind(this)]
+            [this._node, 'auxclick', this._onAuxClick.bind(this), capture],
+            [this._node, 'touchstart', this._onTouchStart.bind(this), capture],
+            [this._node, 'touchend', this._onTouchEnd.bind(this), capture],
+            [this._node, 'touchcancel', this._onTouchCancel.bind(this), capture],
+            [this._node, 'touchmove', this._onTouchMove.bind(this), {passive: false, capture}],
+            [this._node, 'contextmenu', this._onContextMenu.bind(this), capture]
         ];
     }
 
-    _getMouseClickOnlyEventListeners() {
+    _getMouseClickOnlyEventListeners(capture) {
         return [
-            [this._node, 'click', this._onClick.bind(this)]
+            [this._node, 'click', this._onClick.bind(this), capture]
         ];
     }
 
-    _getMouseClickOnlyEventListeners2() {
+    _getMouseClickOnlyEventListeners2(capture) {
         const {documentElement} = document;
         const entries = [
             [document, 'selectionchange', this._onSelectionChange.bind(this)]
         ];
         if (documentElement !== null) {
-            entries.push([documentElement, 'mousedown', this._onSearchClickMouseDown.bind(this)]);
+            entries.push([documentElement, 'mousedown', this._onSearchClickMouseDown.bind(this), capture]);
             if (this._touchInputEnabled) {
-                entries.push([documentElement, 'touchstart', this._onSearchClickTouchStart.bind(this)]);
+                entries.push([documentElement, 'touchstart', this._onSearchClickTouchStart.bind(this), capture]);
             }
         }
         return entries;
