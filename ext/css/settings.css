@@ -28,7 +28,6 @@
     --shadow-left: -1px 0 4px 0 var(--shadow-color), -2px 0 2px 0 var(--shadow-color);
     --shadow-right: 1px 0 4px 0 var(--shadow-color), 2px 0 2px 0 var(--shadow-color);
     --settings-group-horizontal-margin: 0;
-    --settings-group-inner-vertical-margin: 0.75em;
     --settings-group-inner-vertical-padding: 0.85em;
     --settings-group-inner-horizontal-padding: 1.5em;
     --settings-group-inner-horizontal-padding-half: calc(var(--settings-group-inner-horizontal-padding) * 0.5);
@@ -505,10 +504,9 @@ a.heading-link-light {
     width: 100%;
 }
 .settings-item-inner {
-    margin-top: var(--settings-group-inner-vertical-margin);
     display: flex;
     flex-flow: row nowrap;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-content: stretch;
     width: 100%;
 }
@@ -516,7 +514,6 @@ a.heading-link-light {
     flex-wrap: var(--settings-group-wrap);
 }
 .settings-item-left {
-    margin-top: calc(var(--settings-group-inner-vertical-margin) * -1);
     padding: var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding-half) var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding);
     flex: 1 1 auto;
     align-self: center;
@@ -526,7 +523,6 @@ a.heading-link-light {
     padding-right: var(--settings-group-inner-horizontal-padding);
 }
 .settings-item-right {
-    margin-top: calc(var(--settings-group-inner-vertical-margin) * -1);
     padding: var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding) var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding-half);
     flex: 0 1 auto;
     align-self: stretch;
