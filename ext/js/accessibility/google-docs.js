@@ -45,13 +45,45 @@
 
     if (!options.accessibility.forceGoogleDocsHtmlRendering) { return; }
 
+    /* eslint-disable */
+    const inject = () => {
+        const start = Date.now();
+        const maxDuration = 10000;
+        const updateDocData = () => {
+            const target = window._docs_flag_initialData;
+            if (typeof target === 'object' && target !== null) {
+                try {
+                    target['kix-awcp'] = true;
+                } catch (e) {
+                    // NOP
+                }
+            } else if (Date.now() - start < maxDuration) {
+                setTimeout(updateDocData, 0);
+            }
+        };
+        const params = new URLSearchParams(location.search);
+        if (params.get('mode') !== 'html') {
+            const url = new URL(location.href);
+            params.set('mode', 'html');
+            url.search = params.toString();
+            try {
+                history.replaceState(history.state, '', url.toString());
+            } catch (e) {
+                // Ignore
+            }
+        }
+        window._docs_force_html_by_ext = true;
+        updateDocData();
+    };
+    /* eslint-enable */
+
     let parent = document.head;
     if (parent === null) {
         parent = document.documentElement;
         if (parent === null) { return; }
     }
     const script = document.createElement('script');
-    script.textContent = 'window._docs_force_html_by_ext = true;';
+    script.textContent = `(${inject.toString()})();`;
     parent.appendChild(script);
     parent.removeChild(script);
 })();
