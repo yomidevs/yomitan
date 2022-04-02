@@ -65,6 +65,9 @@
     --warning-color-light: #edc75e;
     --dim-background-color: rgba(0, 0, 0, 0.5);
     --content-dimmer-color: rgba(0, 0, 0, 0.1);
+    --advanced-color: #6640be;
+    --advanced-color-lighter: hsl(258, 50%, 75%);
+    --advanced-color-transparent25: rgba(102, 64, 190, 0.5);
 
     --modal-padding-horizontal: 1em;
     --modal-padding-vertical: 0.625em;
@@ -496,6 +499,9 @@ a.heading-link-light {
 .settings-group.settings-group-top-margin {
     margin-top: 1.0125em;
 }
+.settings-item {
+    position: relative;
+}
 .settings-item:not([hidden]) {
     display: block;
 }
@@ -672,6 +678,24 @@ select.short-height {
     flex: 0 1 auto;
     padding-top: var(--padding);
     padding-right: var(--padding);
+}
+
+
+/* Advanced settings */
+.settings-group.advanced-only>.settings-item::after,
+.settings-item.advanced-only::after {
+    content: '';
+    background-color: var(--advanced-color-lighter);
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 0.25em;
+}
+.advanced-toggle {
+    --accent-color: var(--advanced-color);
+    --accent-color-lighter: var(--advanced-color-lighter);
+    --accent-color-transparent25: var(--advanced-color-transparent25);
 }
 
 
