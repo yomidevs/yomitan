@@ -18,6 +18,7 @@
 /* global
  * DocumentUtil
  * FrameClient
+ * ThemeController
  * dynamicLoader
  */
 
@@ -64,6 +65,8 @@ class Popup extends EventDispatcher {
 
         this._container = this._frame;
         this._shadow = null;
+
+        this._themeController = new ThemeController(this._frame);
 
         this._fullscreenEventListeners = new EventListenerCollection();
     }
@@ -153,6 +156,7 @@ class Popup extends EventDispatcher {
         this._visible.on('change', this._onVisibleChange.bind(this));
         yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         this._onVisibleChange({value: this.isVisibleSync()});
+        this._themeController.prepare();
     }
 
     /**
@@ -286,11 +290,8 @@ class Popup extends EventDispatcher {
      * Updates the outer theme of the popup.
      * @returns {Promise<void>}
      */
-    updateTheme() {
-        const {popupTheme, popupOuterTheme} = this._options.general;
-        this._frame.dataset.theme = popupTheme;
-        this._frame.dataset.outerTheme = popupOuterTheme;
-        this._frame.dataset.siteColor = this._getSiteColor();
+    async updateTheme() {
+        this._themeController.updateTheme();
     }
 
     /**
@@ -588,19 +589,6 @@ class Popup extends EventDispatcher {
         }
     }
 
-    _getSiteColor() {
-        const color = [255, 255, 255];
-        const {documentElement, body} = document;
-        if (documentElement !== null) {
-            this._addColor(color, window.getComputedStyle(documentElement).backgroundColor);
-        }
-        if (body !== null) {
-            this._addColor(color, window.getComputedStyle(body).backgroundColor);
-        }
-        const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
-        return dark ? 'dark' : 'light';
-    }
-
     async _invoke(action, params={}) {
         const contentWindow = this._frame.contentWindow;
         if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
@@ -761,34 +749,6 @@ class Popup extends EventDispatcher {
         return [position, size, after];
     }
 
-    _addColor(target, cssColor) {
-        if (typeof cssColor !== 'string') { return; }
-
-        const color = this._getColorInfo(cssColor);
-        if (color === null) { return; }
-
-        const a = color[3];
-        if (a <= 0.0) { return; }
-
-        const aInv = 1.0 - a;
-        for (let i = 0; i < 3; ++i) {
-            target[i] = target[i] * aInv + color[i] * a;
-        }
-    }
-
-    _getColorInfo(cssColor) {
-        const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)\s*$/.exec(cssColor);
-        if (m === null) { return null; }
-
-        const m4 = m[4];
-        return [
-            Number.parseInt(m[1], 10),
-            Number.parseInt(m[2], 10),
-            Number.parseInt(m[3], 10),
-            m4 ? Math.max(0.0, Math.min(1.0, Number.parseFloat(m4))) : 1.0
-        ];
-    }
-
     _getViewport(useVisualViewport) {
         const visualViewport = window.visualViewport;
         if (visualViewport !== null && typeof visualViewport === 'object') {
@@ -825,6 +785,9 @@ class Popup extends EventDispatcher {
     async _setOptionsContext(optionsContext) {
         this._optionsContext = optionsContext;
         this._options = await yomichan.api.optionsGet(optionsContext);
+        const {general} = this._options;
+        this._themeController.theme = general.popupTheme;
+        this._themeController.outerTheme = general.popupOuterTheme;
         this.updateTheme();
     }
 

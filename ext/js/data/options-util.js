@@ -466,7 +466,8 @@ class OptionsUtil {
             {async: false, update: this._updateVersion14.bind(this)},
             {async: false, update: this._updateVersion15.bind(this)},
             {async: false, update: this._updateVersion16.bind(this)},
-            {async: false, update: this._updateVersion17.bind(this)}
+            {async: false, update: this._updateVersion17.bind(this)},
+            {async: false, update: this._updateVersion18.bind(this)}
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -920,6 +921,24 @@ class OptionsUtil {
                     includeCharacterAtStart: false,
                     includeCharacterAtEnd: true
                 });
+            }
+        }
+        return options;
+    }
+
+    _updateVersion18(options) {
+        // Version 18 changes:
+        //  general.popupTheme's 'default' value changed to 'light'
+        //  general.popupOuterTheme's 'default' value changed to 'light'
+        //  general.popupOuterTheme's 'auto' value changed to 'site'
+        for (const profile of options.profiles) {
+            const {general} = profile.options;
+            if (general.popupTheme === 'default') {
+                general.popupTheme = 'light';
+            }
+            switch (general.popupOuterTheme) {
+                case 'default': general.popupOuterTheme = 'light'; break;
+                case 'auto': general.popupOuterTheme = 'site'; break;
             }
         }
         return options;

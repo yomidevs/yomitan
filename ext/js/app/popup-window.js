@@ -212,7 +212,7 @@ class PopupWindow extends EventDispatcher {
     /**
      * Updates the outer theme of the popup.
      */
-    updateTheme() {
+    async updateTheme() {
         // NOP
     }
 

@@ -309,25 +309,25 @@ a {
 
 
 /* Scrollbars */
-:root:not([data-theme=default]) .scrollbar {
+:root:not([data-theme=light]) .scrollbar {
     scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
 }
-:root:not([data-theme=default]) .scrollbar::-webkit-scrollbar {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar {
     width: auto;
 }
-:root:not([data-theme=default]) .scrollbar::-webkit-scrollbar-button {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-button {
     height: 0;
 }
-:root:not([data-theme=default]) .scrollbar::-webkit-scrollbar-thumb {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb-color);
 }
-:root:not([data-theme=default]) .scrollbar::-webkit-scrollbar-track {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track {
     background-color: var(--scrollbar-thumb-color);
 }
-:root:not([data-theme=default]) .scrollbar::-webkit-scrollbar-track-piece {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track-piece {
     background-color: var(--scrollbar-track-color);
 }
-:root:not([data-theme=default]) .scrollbar::-webkit-scrollbar-corner {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-corner {
     background-color: var(--scrollbar-track-color);
 }
 :root .scrollbar-inverse {

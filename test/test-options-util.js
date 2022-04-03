@@ -286,8 +286,8 @@ function createProfileOptionsUpdatedTestData1() {
             compactTags: false,
             glossaryLayoutMode: 'default',
             mainDictionary: '',
-            popupTheme: 'default',
-            popupOuterTheme: 'default',
+            popupTheme: 'light',
+            popupOuterTheme: 'light',
             customPopupCss: '',
             customPopupOuterCss: '',
             enableWanakana: true,
@@ -600,7 +600,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 17,
+        version: 18,
         global: {
             database: {
                 prefixWildcardsSupported: false

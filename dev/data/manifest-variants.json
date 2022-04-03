@@ -49,6 +49,7 @@
                     "js/app/popup-factory.js",
                     "js/app/popup-proxy.js",
                     "js/app/popup-window.js",
+                    "js/app/theme-controller.js",
                     "js/comm/api.js",
                     "js/comm/cross-frame-api.js",
                     "js/comm/frame-ancestry-handler.js",

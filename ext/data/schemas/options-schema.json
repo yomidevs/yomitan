@@ -214,12 +214,12 @@
                                     },
                                     "popupTheme": {
                                         "type": "string",
-                                        "enum": ["default", "dark"],
+                                        "enum": ["light", "dark", "browser"],
                                         "default": "default"
                                     },
                                     "popupOuterTheme": {
                                         "type": "string",
-                                        "enum": ["default", "dark", "auto"],
+                                        "enum": ["light", "dark", "browser", "site"],
                                         "default": "default"
                                     },
                                     "customPopupCss": {

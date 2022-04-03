@@ -31,8 +31,7 @@ iframe.yomichan-popup[data-theme=dark] {
     background-color: #1e1e1e;
     border-color: #666666;
 }
-iframe.yomichan-popup[data-outer-theme=dark],
-iframe.yomichan-popup[data-outer-theme=auto][data-site-color=dark] {
+iframe.yomichan-popup[data-outer-theme=dark] {
     box-shadow: 0 0 10em rgba(255, 255, 255, 0.5);
 }
 iframe.yomichan-popup[data-popup-display-mode=full-width] {

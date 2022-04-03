@@ -31,6 +31,7 @@
  * QueryParser
  * ScrollElement
  * TextScanner
+ * ThemeController
  * dynamicLoader
  */
 
@@ -114,6 +115,7 @@ class Display extends EventDispatcher {
         this._onTagClickBind = this._onTagClick.bind(this);
         this._onMenuButtonClickBind = this._onMenuButtonClick.bind(this);
         this._onMenuButtonMenuCloseBind = this._onMenuButtonMenuClose.bind(this);
+        this._themeController = new ThemeController(document.documentElement);
 
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
@@ -210,6 +212,10 @@ class Display extends EventDispatcher {
     }
 
     async prepare() {
+        // Theme
+        this._themeController.siteTheme = 'light';
+        this._themeController.prepare();
+
         // State setup
         const {documentElement} = document;
         const {browser} = await yomichan.api.getEnvironmentInfo();
@@ -302,8 +308,7 @@ class Display extends EventDispatcher {
 
         this._updateHotkeys(options);
         this._updateDocumentOptions(options);
-        this._updateTheme(options.general.popupTheme);
-        this.setCustomCss(options.general.customPopupCss);
+        this._setTheme(options);
         this._hotkeyHelpController.setOptions(options);
         this._displayGenerator.updateHotkeys();
         this._hotkeyHelpController.setupNode(document.documentElement);
@@ -837,8 +842,13 @@ class Display extends EventDispatcher {
         data.popupActionBarLocation = `${options.general.popupActionBarLocation}`;
     }
 
-    _updateTheme(themeName) {
-        document.documentElement.dataset.theme = themeName;
+    _setTheme(options) {
+        const {general} = options;
+        const {popupTheme} = general;
+        this._themeController.theme = popupTheme;
+        this._themeController.outerTheme = general.popupOuterTheme;
+        this._themeController.updateTheme();
+        this.setCustomCss(general.customPopupCss);
     }
 
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
