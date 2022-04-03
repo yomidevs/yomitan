@@ -51,10 +51,24 @@ class Popup extends EventDispatcher {
         this._injectPromiseComplete = false;
         this._visible = new DynamicProperty(false);
         this._visibleValue = false;
-        this._options = null;
         this._optionsContext = null;
         this._contentScale = 1.0;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
+
+        this._optionsAssigned = false;
+        this._initialWidth = 400;
+        this._initialHeight = 250;
+        this._horizontalOffset = 0;
+        this._verticalOffset = 10;
+        this._horizontalOffset2 = 10;
+        this._verticalOffset2 = 0;
+        this._verticalTextPosition = 'before';
+        this._horizontalTextPosition = 'below';
+        this._displayMode = 'default';
+        this._scaleRelativeToVisualViewport = true;
+        this._useSecureFrameUrl = true;
+        this._useShadowDom = true;
+        this._customOuterCss = '';
 
         this._frameSizeContentScale = null;
         this._frameClient = null;
@@ -237,7 +251,7 @@ class Popup extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async showContent(details, displayDetails) {
-        if (this._options === null) { throw new Error('Options not assigned'); }
+        if (!this._optionsAssigned) { throw new Error('Options not assigned'); }
 
         const {optionsContext, elementRect, writingMode} = details;
         if (optionsContext !== null) {
@@ -379,13 +393,13 @@ class Popup extends EventDispatcher {
     }
 
     async _injectInner2() {
-        if (this._options === null) {
+        if (!this._optionsAssigned) {
             throw new Error('Options not initialized');
         }
 
-        const {useSecurePopupFrameUrl, usePopupShadowDom} = this._options.general;
+        const useSecurePopupFrameUrl = this._useSecureFrameUrl;
 
-        await this._setUpContainer(usePopupShadowDom);
+        await this._setUpContainer(this._useShadowDom);
 
         const setupFrame = (frame) => {
             frame.removeAttribute('src');
@@ -470,7 +484,7 @@ class Popup extends EventDispatcher {
         }
 
         try {
-            await this.setCustomOuterCss(this._options.general.customPopupOuterCss, true);
+            await this.setCustomOuterCss(this._customOuterCss, true);
         } catch (e) {
             // NOP
         }
@@ -513,34 +527,31 @@ class Popup extends EventDispatcher {
         const injected = await this._inject();
         if (!injected) { return; }
 
-        const optionsGeneral = this._options.general;
-        const {popupDisplayMode} = optionsGeneral;
         const frame = this._frame;
         const frameRect = frame.getBoundingClientRect();
 
-        const viewport = this._getViewport(optionsGeneral.popupScaleRelativeToVisualViewport);
+        const viewport = this._getViewport(this._scaleRelativeToVisualViewport);
         const scale = this._contentScale;
         const scaleRatio = this._frameSizeContentScale === null ? 1.0 : scale / this._frameSizeContentScale;
         this._frameSizeContentScale = scale;
         const getPositionArgs = [
             elementRect,
-            Math.max(frameRect.width * scaleRatio, optionsGeneral.popupWidth * scale),
-            Math.max(frameRect.height * scaleRatio, optionsGeneral.popupHeight * scale),
+            Math.max(frameRect.width * scaleRatio, this._initialWidth * scale),
+            Math.max(frameRect.height * scaleRatio, this._initialHeight * scale),
             viewport,
             scale,
-            optionsGeneral,
             writingMode
         ];
         let [x, y, width, height, below] = (
-            writingMode === 'horizontal-tb' || optionsGeneral.popupVerticalTextPosition === 'default' ?
+            writingMode === 'horizontal-tb' || this._verticalTextPosition === 'default' ?
             this._getPositionForHorizontalText(...getPositionArgs) :
             this._getPositionForVerticalText(...getPositionArgs)
         );
 
-        frame.dataset.popupDisplayMode = popupDisplayMode;
+        frame.dataset.popupDisplayMode = this._displayMode;
         frame.dataset.below = `${below}`;
 
-        if (popupDisplayMode === 'full-width') {
+        if (this._displayMode === 'full-width') {
             x = viewport.left;
             y = below ? viewport.bottom - height : viewport.top;
             width = viewport.right - viewport.left;
@@ -641,10 +652,10 @@ class Popup extends EventDispatcher {
         return fullscreenElement;
     }
 
-    _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale, optionsGeneral) {
-        const preferBelow = (optionsGeneral.popupHorizontalTextPosition === 'below');
-        const horizontalOffset = optionsGeneral.popupHorizontalOffset * offsetScale;
-        const verticalOffset = optionsGeneral.popupVerticalOffset * offsetScale;
+    _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale) {
+        const preferBelow = (this._horizontalTextPosition === 'below');
+        const horizontalOffset = this._horizontalOffset * offsetScale;
+        const verticalOffset = this._verticalOffset * offsetScale;
 
         const [x, w] = this._getConstrainedPosition(
             elementRect.x + elementRect.width - horizontalOffset,
@@ -665,10 +676,10 @@ class Popup extends EventDispatcher {
         return [x, y, w, h, below];
     }
 
-    _getPositionForVerticalText(elementRect, width, height, viewport, offsetScale, optionsGeneral, writingMode) {
-        const preferRight = this._isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
-        const horizontalOffset = optionsGeneral.popupHorizontalOffset2 * offsetScale;
-        const verticalOffset = optionsGeneral.popupVerticalOffset2 * offsetScale;
+    _getPositionForVerticalText(elementRect, width, height, viewport, offsetScale, writingMode) {
+        const preferRight = this._isVerticalTextPopupOnRight(this._verticalTextPosition, writingMode);
+        const horizontalOffset = this._horizontalOffset2 * offsetScale;
+        const verticalOffset = this._verticalOffset2 * offsetScale;
 
         const [x, w] = this._getConstrainedPositionBinary(
             elementRect.x - horizontalOffset,
@@ -784,10 +795,24 @@ class Popup extends EventDispatcher {
 
     async _setOptionsContext(optionsContext) {
         this._optionsContext = optionsContext;
-        this._options = await yomichan.api.optionsGet(optionsContext);
-        const {general} = this._options;
+        const options = await yomichan.api.optionsGet(optionsContext);
+        const {general} = options;
         this._themeController.theme = general.popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;
+        this._initialWidth = general.popupWidth;
+        this._initialHeight = general.popupHeight;
+        this._horizontalOffset = general.popupHorizontalOffset;
+        this._verticalOffset = general.popupVerticalOffset;
+        this._horizontalOffset2 = general.popupHorizontalOffset2;
+        this._verticalOffset2 = general.popupVerticalOffset2;
+        this._verticalTextPosition = general.popupVerticalTextPosition;
+        this._horizontalTextPosition = general.popupHorizontalTextPosition;
+        this._displayMode = general.popupDisplayMode;
+        this._scaleRelativeToVisualViewport = general.popupScaleRelativeToVisualViewport;
+        this._useSecureFrameUrl = general.useSecurePopupFrameUrl;
+        this._useShadowDom = general.usePopupShadowDom;
+        this._customOuterCss = general.customPopupOuterCss;
+        this._optionsAssigned = true;
         this.updateTheme();
     }
 
