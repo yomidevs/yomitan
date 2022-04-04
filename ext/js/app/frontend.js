@@ -343,6 +343,10 @@ class Frontend {
 
     _onPopupFramePointerOut() {
         this._isPointerOverPopup = false;
+        const scanningOptions = this._options.scanning;
+        if (scanningOptions.hidePopupOnCursorExit) {
+            this._clearSelectionDelayed(scanningOptions.hidePopupOnCursorExitDelay, false);
+        }
     }
 
     _clearSelection(passive) {

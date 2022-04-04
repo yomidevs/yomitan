@@ -931,6 +931,8 @@ class OptionsUtil {
         //  general.popupTheme's 'default' value changed to 'light'
         //  general.popupOuterTheme's 'default' value changed to 'light'
         //  general.popupOuterTheme's 'auto' value changed to 'site'
+        //  Added scanning.hidePopupOnCursorExit.
+        //  Added scanning.hidePopupOnCursorExitDelay.
         for (const profile of options.profiles) {
             const {general} = profile.options;
             if (general.popupTheme === 'default') {
@@ -940,6 +942,8 @@ class OptionsUtil {
                 case 'default': general.popupOuterTheme = 'light'; break;
                 case 'auto': general.popupOuterTheme = 'site'; break;
             }
+            profile.options.scanning.hidePopupOnCursorExit = false;
+            profile.options.scanning.hidePopupOnCursorExitDelay = profile.options.scanning.hideDelay;
         }
         return options;
     }

@@ -436,7 +436,9 @@
                                     "enableOnSearchPage",
                                     "enableSearchTags",
                                     "layoutAwareScan",
-                                    "matchTypePrefix"
+                                    "matchTypePrefix",
+                                    "hidePopupOnCursorExit",
+                                    "hidePopupOnCursorExitDelay"
                                 ],
                                 "properties": {
                                     "inputs": {
@@ -663,6 +665,15 @@
                                     "matchTypePrefix": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "hidePopupOnCursorExit": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "hidePopupOnCursorExitDelay": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "default": 0
                                     }
                                 }
                             },
