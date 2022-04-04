@@ -101,3 +101,8 @@ This page lists several of the browser bugs that have affected Yomichan over the
 * **Browser**: Chrome
 * **Date**: 2022-01-31
 * **Links**: [Report](https://bugs.chromium.org/p/chromium/issues/detail?id=1292815)
+
+## Chrome extensions can't auto-play media from an embedded extension frame
+* **Browser**: Chrome
+* **Date**: 2022-04-03
+* **Links**: [Demo](https://github.com/toasted-nutbread/chrome-extension-audio-autoplay-bug), [Report](https://bugs.chromium.org/p/chromium/issues/detail?id=1312816)
