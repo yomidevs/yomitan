@@ -22,6 +22,8 @@
 class SimpleDOMParser {
     constructor(content) {
         this._document = parse5.parse(content);
+        // eslint-disable-next-line no-control-regex
+        this._patternHtmlWhitespace = /[\t\r\n\x0C ]+/g;
     }
 
     getElementById(id, root=null) {
@@ -54,11 +56,10 @@ class SimpleDOMParser {
 
     getElementsByClassName(className, root=null) {
         const results = [];
-        const classNamePattern = new RegExp(`(^|\\s)${escapeRegExp(className)}(\\s|$)`);
         for (const node of this._allNodes(root)) {
             if (typeof node.tagName === 'string') {
                 const nodeClassName = this.getAttribute(node, 'class');
-                if (nodeClassName !== null && classNamePattern.test(nodeClassName)) {
+                if (nodeClassName !== null && this._hasToken(nodeClassName, className)) {
                     results.push(node);
                 }
             }
@@ -112,6 +113,19 @@ class SimpleDOMParser {
                     nodeQueue.push(childNodes[i]);
                 }
             }
+        }
+    }
+
+    _hasToken(tokenListString, token) {
+        let start = 0;
+        const pattern = this._patternHtmlWhitespace;
+        pattern.lastIndex = 0;
+        while (true) {
+            const match = pattern.exec(tokenListString);
+            const end = match === null ? tokenListString.length : match.index;
+            if (end > start && tokenListString.substring(start, end) === token) { return true; }
+            if (match === null) { return false; }
+            start = end + match[0].length;
         }
     }
 }

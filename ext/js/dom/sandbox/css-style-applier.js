@@ -21,6 +21,14 @@
  */
 class CssStyleApplier {
     /**
+     * @typedef {object} CssRule
+     * @property {string} selectors A CSS selector string representing one or more selectors.
+     * @property {[string, string][]} styles A list of CSS property and value pairs.
+     * @property {string} styles[][0] The CSS property.
+     * @property {string} styles[][1] The CSS value.
+     */
+
+    /**
      * Creates a new instance of the class.
      * @param styleDataUrl The local URL to the JSON file continaing the style rules.
      *   The style rules should be of the format:
@@ -37,6 +45,9 @@ class CssStyleApplier {
         this._styleDataUrl = styleDataUrl;
         this._styleData = [];
         this._cachedRules = new Map();
+        // eslint-disable-next-line no-control-regex
+        this._patternHtmlWhitespace = /[\t\r\n\x0C ]+/g;
+        this._patternClassNameCharacter = /[0-9a-zA-Z-_]/;
     }
 
     /**
@@ -65,7 +76,7 @@ class CssStyleApplier {
             const className = element.getAttribute('class');
             if (className.length === 0) { continue; }
             let cssTextNew = '';
-            for (const {selectorText, styles} of this._getRulesForClass(className)) {
+            for (const {selectorText, styles} of this._getCandidateCssRulesForClass(className)) {
                 if (!element.matches(selectorText)) { continue; }
                 cssTextNew += this._getCssText(styles);
             }
@@ -99,17 +110,22 @@ class CssStyleApplier {
         return await response.json();
     }
 
-    _getRulesForClass(className) {
+    /**
+     * Gets an array of candidate CSS rules which might match a specific class.
+     * @param {string} className A whitespace-separated list of classes.
+     * @returns {CssRule[]} An array of candidate CSS rules.
+     */
+    _getCandidateCssRulesForClass(className) {
         let rules = this._cachedRules.get(className);
         if (typeof rules !== 'undefined') { return rules; }
 
         rules = [];
         this._cachedRules.set(className, rules);
 
-        const classNamePattern = new RegExp(`.${className}(?![0-9a-zA-Z-])`, '');
+        const classList = this._getTokens(className);
         for (const {selectors, styles} of this._styleData) {
             const selectorText = selectors.join(',');
-            if (!classNamePattern.test(selectorText)) { continue; }
+            if (!this._selectorMatches(selectorText, classList)) { continue; }
             rules.push({selectorText, styles});
         }
 
@@ -122,5 +138,34 @@ class CssStyleApplier {
             cssText += `${property}:${value};`;
         }
         return cssText;
+    }
+
+    _selectorMatches(selectorText, classList) {
+        const pattern = this._patternClassNameCharacter;
+        for (const item of classList) {
+            const prefixedItem = `.${item}`;
+            let start = 0;
+            while (true) {
+                const index = selectorText.indexOf(prefixedItem, start);
+                if (index < 0) { break; }
+                start = index + prefixedItem.length;
+                if (start >= selectorText.length || !pattern.test(selectorText[start])) { return true; }
+            }
+        }
+        return false;
+    }
+
+    _getTokens(tokenListString) {
+        let start = 0;
+        const pattern = this._patternHtmlWhitespace;
+        pattern.lastIndex = 0;
+        const result = [];
+        while (true) {
+            const match = pattern.exec(tokenListString);
+            const end = match === null ? tokenListString.length : match.index;
+            if (end > start) { result.push(tokenListString.substring(start, end)); }
+            if (match === null) { return result; }
+            start = end + match[0].length;
+        }
     }
 }
