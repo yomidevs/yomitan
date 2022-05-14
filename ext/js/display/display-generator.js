@@ -28,7 +28,7 @@ class DisplayGenerator {
         this._contentManager = contentManager;
         this._hotkeyHelpController = hotkeyHelpController;
         this._templates = null;
-        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document);
+        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, japaneseUtil, document);
         this._pronunciationGenerator = new PronunciationGenerator(japaneseUtil);
     }
 
@@ -347,11 +347,8 @@ class DisplayGenerator {
 
     _createTermDefinitionEntryStructuredContent(content, dictionary) {
         const node = this._templates.instantiate('gloss-item');
-        const child = this._structuredContentGenerator.createStructuredContent(content, dictionary);
-        if (child !== null) {
-            const contentContainer = node.querySelector('.gloss-content');
-            contentContainer.appendChild(child);
-        }
+        const contentContainer = node.querySelector('.gloss-content');
+        this._structuredContentGenerator.appendStructuredContent(contentContainer, content, dictionary);
         return node;
     }
 

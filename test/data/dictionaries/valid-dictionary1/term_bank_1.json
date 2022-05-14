@@ -243,6 +243,7 @@
                 ]}
             ]},
             {"type": "structured-content", "content": [
+                {"tag": "div", "style": {"fontSize": "xxx-large"}, "content": "直次茶冷 (auto lang)"},
                 {"tag": "div", "lang": "?????", "style": {"fontSize": "xxx-large"}, "content": "直次茶冷 (invalid lang)"},
                 {"tag": "div", "lang": "ja-JP", "style": {"fontSize": "xxx-large"}, "content": "直次茶冷 (lang=ja-JP)"},
                 {"tag": "div", "lang": "zh-CN", "style": {"fontSize": "xxx-large"}, "content": "直次茶冷 (lang=zh-CN)"},

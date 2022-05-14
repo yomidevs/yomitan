@@ -16,56 +16,21 @@
  */
 
 class StructuredContentGenerator {
-    constructor(contentManager, document) {
+    constructor(contentManager, japaneseUtil, document) {
         this._contentManager = contentManager;
+        this._japaneseUtil = japaneseUtil;
         this._document = document;
     }
 
+    appendStructuredContent(node, content, dictionary) {
+        node.classList.add('structured-content');
+        this._appendStructuredContent(node, content, dictionary, null);
+    }
+
     createStructuredContent(content, dictionary) {
-        if (typeof content === 'string') {
-            return this._createTextNode(content);
-        }
-        if (!(typeof content === 'object' && content !== null)) {
-            return null;
-        }
-        if (Array.isArray(content)) {
-            const fragment = this._createDocumentFragment();
-            for (const item of content) {
-                const child = this.createStructuredContent(item, dictionary);
-                if (child !== null) { fragment.appendChild(child); }
-            }
-            return fragment;
-        }
-        const {tag} = content;
-        switch (tag) {
-            case 'br':
-                return this._createStructuredContentElement(tag, content, dictionary, 'simple', false, false);
-            case 'ruby':
-            case 'rt':
-            case 'rp':
-                return this._createStructuredContentElement(tag, content, dictionary, 'simple', true, false);
-            case 'table':
-                return this._createStructuredContentTableElement(tag, content, dictionary);
-            case 'thead':
-            case 'tbody':
-            case 'tfoot':
-            case 'tr':
-                return this._createStructuredContentElement(tag, content, dictionary, 'table', true, false);
-            case 'th':
-            case 'td':
-                return this._createStructuredContentElement(tag, content, dictionary, 'table-cell', true, true);
-            case 'div':
-            case 'span':
-            case 'ol':
-            case 'ul':
-            case 'li':
-                return this._createStructuredContentElement(tag, content, dictionary, 'simple', true, true);
-            case 'img':
-                return this.createDefinitionImage(content, dictionary);
-            case 'a':
-                return this._createLinkElement(content, dictionary);
-        }
-        return null;
+        const node = this._createElement('span', 'structured-content');
+        this._appendStructuredContent(node, content, dictionary, null);
+        return node;
     }
 
     createDefinitionImage(data, dictionary) {
@@ -160,6 +125,31 @@ class StructuredContentGenerator {
 
     // Private
 
+    _appendStructuredContent(container, content, dictionary, language) {
+        if (typeof content === 'string') {
+            if (content.length > 0) {
+                container.appendChild(this._createTextNode(content));
+                if (language === null && this._japaneseUtil.isStringPartiallyJapanese(content)) {
+                    container.lang = 'ja';
+                }
+            }
+            return;
+        }
+        if (!(typeof content === 'object' && content !== null)) {
+            return;
+        }
+        if (Array.isArray(content)) {
+            for (const item of content) {
+                this._appendStructuredContent(container, item, dictionary, language);
+            }
+            return;
+        }
+        const node = this._createStructuredContentGenericElement(content, dictionary, language);
+        if (node !== null) {
+            container.appendChild(node);
+        }
+    }
+
     _createElement(tagName, className) {
         const node = this._document.createElement(tagName);
         node.className = className;
@@ -168,10 +158,6 @@ class StructuredContentGenerator {
 
     _createTextNode(data) {
         return this._document.createTextNode(data);
-    }
-
-    _createDocumentFragment() {
-        return this._document.createDocumentFragment();
     }
 
     _setElementDataset(element, data) {
@@ -198,18 +184,54 @@ class StructuredContentGenerator {
         }
     }
 
-    _createStructuredContentTableElement(tag, content, dictionary) {
+    _createStructuredContentGenericElement(content, dictionary, language) {
+        const {tag} = content;
+        switch (tag) {
+            case 'br':
+                return this._createStructuredContentElement(tag, content, dictionary, language, 'simple', false, false);
+            case 'ruby':
+            case 'rt':
+            case 'rp':
+                return this._createStructuredContentElement(tag, content, dictionary, language, 'simple', true, false);
+            case 'table':
+                return this._createStructuredContentTableElement(tag, content, dictionary, language);
+            case 'thead':
+            case 'tbody':
+            case 'tfoot':
+            case 'tr':
+                return this._createStructuredContentElement(tag, content, dictionary, language, 'table', true, false);
+            case 'th':
+            case 'td':
+                return this._createStructuredContentElement(tag, content, dictionary, language, 'table-cell', true, true);
+            case 'div':
+            case 'span':
+            case 'ol':
+            case 'ul':
+            case 'li':
+                return this._createStructuredContentElement(tag, content, dictionary, language, 'simple', true, true);
+            case 'img':
+                return this.createDefinitionImage(content, dictionary);
+            case 'a':
+                return this._createLinkElement(content, dictionary, language);
+        }
+        return null;
+    }
+
+    _createStructuredContentTableElement(tag, content, dictionary, language) {
         const container = this._createElement('div', 'gloss-sc-table-container');
-        const table = this._createStructuredContentElement(tag, content, dictionary, 'table', true, false);
+        const table = this._createStructuredContentElement(tag, content, dictionary, language, 'table', true, false);
         container.appendChild(table);
         return container;
     }
 
-    _createStructuredContentElement(tag, content, dictionary, type, hasChildren, hasStyle) {
+    _createStructuredContentElement(tag, content, dictionary, language, type, hasChildren, hasStyle) {
         const node = this._createElement(tag, `gloss-sc-${tag}`);
         const {data, lang} = content;
         if (typeof data === 'object' && data !== null) { this._setElementDataset(node, data); }
-        if (typeof lang === 'string') { node.lang = lang; }
+        if (typeof lang === 'string') {
+            node.lang = lang;
+            language = lang;
+        }
         switch (type) {
             case 'table-cell':
                 {
@@ -226,8 +248,7 @@ class StructuredContentGenerator {
             }
         }
         if (hasChildren) {
-            const child = this.createStructuredContent(content.content, dictionary);
-            if (child !== null) { node.appendChild(child); }
+            this._appendStructuredContent(node, content.content, dictionary, language);
         }
         return node;
     }
@@ -262,7 +283,7 @@ class StructuredContentGenerator {
         if (typeof listStyleType === 'string') { style.listStyleType = listStyleType; }
     }
 
-    _createLinkElement(content, dictionary) {
+    _createLinkElement(content, dictionary, language) {
         let {href} = content;
         const internal = href.startsWith('?');
         if (internal) {
@@ -276,10 +297,12 @@ class StructuredContentGenerator {
         node.appendChild(text);
 
         const {lang} = content;
-        if (typeof lang === 'string') { node.lang = lang; }
+        if (typeof lang === 'string') {
+            node.lang = lang;
+            language = lang;
+        }
 
-        const child = this.createStructuredContent(content.content, dictionary);
-        if (child !== null) { text.appendChild(child); }
+        this._appendStructuredContent(text, content.content, dictionary, language);
 
         if (!internal) {
             const icon = this._createElement('span', 'gloss-link-external-icon icon');

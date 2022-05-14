@@ -536,7 +536,7 @@ class AnkiTemplateRenderer {
 
     _createStructuredContentGenerator(data) {
         const contentManager = new AnkiTemplateRendererContentManager(this._mediaProvider, data);
-        const instance = new StructuredContentGenerator(contentManager, document);
+        const instance = new StructuredContentGenerator(contentManager, this._japaneseUtil, document);
         this._cleanupCallbacks.push(() => contentManager.unloadAll());
         return instance;
     }
