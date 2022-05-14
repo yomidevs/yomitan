@@ -34,7 +34,8 @@ async function createVM() {
     const vm = new TranslatorVM({
         Node,
         NodeFilter,
-        document
+        document,
+        location: new URL('https://yomichan.test/')
     });
 
     const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', 'valid-dictionary1');

@@ -16117,5 +16117,116 @@
         "frequencies": []
       }
     ]
+  },
+  {
+    "name": "Structured content test",
+    "originalTextLength": 2,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflections": [],
+        "score": 35,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxTransformedTextLength": 2,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "構造",
+            "reading": "こうぞう",
+            "sources": [
+              {
+                "originalText": "構造",
+                "transformedText": "構造",
+                "deinflectedText": "構造",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [
+              {
+                "name": "E1",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "example tag 1"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              },
+              {
+                "name": "P",
+                "category": "popular",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "popular term"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 21,
+            "score": 35,
+            "frequencyOrder": 0,
+            "sequences": [
+              101
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "kouzou definition 1",
+              {
+                "type": "structured-content",
+                "content": "kouzou definition 2"
+              },
+              {
+                "type": "structured-content",
+                "content": "kouzou definition 3 (構造)"
+              }
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      }
+    ]
   }
 ]

@@ -2711,5 +2711,40 @@
         "url": "<a href=\"url:\">url:</a>"
       }
     ]
+  },
+  {
+    "name": "Structured content test",
+    "results": [
+      {
+        "audio": "",
+        "clipboard-image": "",
+        "clipboard-text": "",
+        "cloze-body": "構造",
+        "cloze-prefix": "cloze-prefix",
+        "cloze-suffix": "cloze-suffix",
+        "conjugation": "",
+        "dictionary": "Test Dictionary 2",
+        "document-title": "title",
+        "expression": "構造",
+        "frequencies": "",
+        "furigana": "<ruby>構造<rt>こうぞう</rt></ruby>",
+        "furigana-plain": "構造[こうぞう]",
+        "glossary": "<div style=\"text-align: left;\"><i>(n, Test Dictionary 2)</i> <ul><li>kouzou definition 1</li><li><span>kouzou definition 2</span></li><li><span lang=\"ja\">kouzou definition 3 (構造)</span></li></ul></div>",
+        "glossary-brief": "<div style=\"text-align: left;\"><ul><li>kouzou definition 1</li><li><span>kouzou definition 2</span></li><li><span lang=\"ja\">kouzou definition 3 (構造)</span></li></ul></div>",
+        "glossary-no-dictionary": "<div style=\"text-align: left;\"><i>(n)</i> <ul><li>kouzou definition 1</li><li><span>kouzou definition 2</span></li><li><span lang=\"ja\">kouzou definition 3 (構造)</span></li></ul></div>",
+        "part-of-speech": "Noun",
+        "pitch-accents": "No pitch accent data",
+        "pitch-accent-graphs": "No pitch accent data",
+        "pitch-accent-positions": "No pitch accent data",
+        "reading": "こうぞう",
+        "screenshot": "",
+        "search-query": "fullQuery",
+        "selection-text": "",
+        "sentence": "cloze-prefix構造cloze-suffix",
+        "sentence-furigana": "cloze-prefix構造cloze-suffix",
+        "tags": "n",
+        "url": "<a href=\"url:\">url:</a>"
+      }
+    ]
   }
 ]

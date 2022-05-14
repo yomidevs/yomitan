@@ -328,6 +328,13 @@
             "mode": "split",
             "text": "土木工事",
             "options": "default"
+        },
+        {
+            "name": "Structured content test",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "構造",
+            "options": "default"
         }
     ]
 }

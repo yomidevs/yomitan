@@ -28213,5 +28213,155 @@
         "media": {}
       }
     ]
+  },
+  {
+    "name": "Structured content test",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 21,
+          "source": "構造",
+          "rawSource": "構造",
+          "sourceTerm": "構造",
+          "reasons": [],
+          "score": 35,
+          "isPrimary": true,
+          "sequence": 101,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "構造",
+          "reading": "こうぞう",
+          "expressions": [
+            {
+              "sourceTerm": "構造",
+              "expression": "構造",
+              "reading": "こうぞう",
+              "termTags": [
+                {
+                  "name": "E1",
+                  "category": "default",
+                  "notes": "example tag 1",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                },
+                {
+                  "name": "P",
+                  "category": "popular",
+                  "notes": "popular term",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                }
+              ],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "構造",
+                  "furigana": "こうぞう"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "kouzou definition 1",
+            {
+              "type": "structured-content",
+              "content": "kouzou definition 2"
+            },
+            {
+              "type": "structured-content",
+              "content": "kouzou definition 3 (構造)"
+            }
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [
+            {
+              "name": "E1",
+              "category": "default",
+              "notes": "example tag 1",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            },
+            {
+              "name": "P",
+              "category": "popular",
+              "notes": "popular term",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "frequencies": [],
+          "pitches": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "構造",
+              "furigana": "こうぞう"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "構造"
+        ],
+        "uniqueReadings": [
+          "こうぞう"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
   }
 ]

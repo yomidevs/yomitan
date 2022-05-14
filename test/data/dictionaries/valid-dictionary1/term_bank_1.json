@@ -307,5 +307,14 @@
             ]}
         ],
         100, "P E1"
+    ],
+    [
+        "構造", "こうぞう", "n", "n", 35,
+        [
+            "kouzou definition 1",
+            {"type": "structured-content", "content": "kouzou definition 2"},
+            {"type": "structured-content", "content": "kouzou definition 3 (構造)"}
+        ],
+        101, "P E1"
     ]
 ]
