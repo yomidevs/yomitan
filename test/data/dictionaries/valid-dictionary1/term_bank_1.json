@@ -204,6 +204,105 @@
                         "external link"
                     ]
                 }
+            ]},
+            {"type": "structured-content", "content": [
+                {"tag": "ul", "content": [
+                    {"tag": "li", "content": "Unordered list item 1"},
+                    {"tag": "li", "content": "Unordered list item 2"},
+                    {"tag": "li", "content": "Unordered list item 3"}
+                ]}
+            ]},
+            {"type": "structured-content", "content": [
+                {"tag": "ol", "content": [
+                    {"tag": "li", "content": "Ordered list item 1"},
+                    {"tag": "li", "content": "Ordered list item 2"},
+                    {"tag": "li", "content": "Ordered list item 3"}
+                ]}
+            ]},
+            {"type": "structured-content", "content": [
+                {"tag": "ol", "style": {"listStyleType": "hiragana-iroha"}, "content": [
+                    {"tag": "li", "content": "List item i"},
+                    {"tag": "li", "content": "List item ro"},
+                    {"tag": "li", "content": "List item ha"}
+                ]}
+            ]},
+            {"type": "structured-content", "content": [
+                {"tag": "ul", "content": [
+                    {"tag": "li", "style": {"listStyleType": "'⇄'"}, "content": ["【", {"tag": "a", "href": "?query=よみ&wildcards=off", "content": ["Antonym"]}, "】"]},
+                    {"tag": "li", "style": {"listStyleType": "'🔄'"}, "content": ["【", {"tag": "a", "href": "?query=よみ&wildcards=off", "content": ["References and is referenced by"]}, "】"]},
+                    {"tag": "li", "style": {"listStyleType": "'➡'"}, "content": ["【", {"tag": "a", "href": "?query=よみ&wildcards=off", "content": ["References"]}, "】"]},
+                    {"tag": "li", "style": {"listStyleType": "'⬅'"}, "content": ["【", {"tag": "a", "href": "?query=よみ&wildcards=off", "content": ["Referenced by"]}, "】"]}
+                ]}
+            ]},
+            {"type": "structured-content", "content": [
+                {"tag": "ol", "content": [
+                    {"tag": "li", "style": {"listStyleType": "'①'"}, "content": "まるいち"},
+                    {"tag": "li", "style": {"listStyleType": "'②'"}, "content": "まるに"},
+                    {"tag": "li", "style": {"listStyleType": "'③'"}, "content": "まるさん"},
+                    {"tag": "li", "style": {"listStyleType": "'④'"}, "content": "まるよん"}
+                ]}
+            ]},
+            {"type": "structured-content", "content": [
+                {"tag": "div", "lang": "?????", "style": {"fontSize": "xxx-large"}, "content": "直次茶冷 (invalid lang)"},
+                {"tag": "div", "lang": "ja-JP", "style": {"fontSize": "xxx-large"}, "content": "直次茶冷 (lang=ja-JP)"},
+                {"tag": "div", "lang": "zh-CN", "style": {"fontSize": "xxx-large"}, "content": "直次茶冷 (lang=zh-CN)"},
+                {"tag": "div", "lang": "zh-TW", "style": {"fontSize": "xxx-large"}, "content": "直次茶冷 (lang=zh-TW)"}
+            ]},
+            {"type": "structured-content", "content": [
+                {"tag": "ul", "style": {"listStyleType": "japanese-formal"}, "content": [
+                    {"tag": "li", "content": ["【", {"tag": "a", "href": "?query=直次茶冷&wildcards=off", "content": "直次茶冷"}, "】(default)"]},
+                    {"tag": "li", "content": ["【", {"tag": "a", "href": "?query=直次茶冷&wildcards=off", "content": "直次茶冷", "lang": "ja"}, "】(lang=ja)"]},
+                    {"tag": "li", "content": ["【", {"tag": "a", "href": "?query=直次茶冷&wildcards=off", "content": "直次茶冷", "lang": "zh-CN"}, "】(lang=zh-CN)"]},
+                    {"tag": "li", "content": ["【", {"tag": "a", "href": "?query=直次茶冷&wildcards=off", "content": "直次茶冷", "lang": "zh-TW"}, "】(lang=zh-TW)"]}
+                ]}
+            ]},
+            {"type": "structured-content", "content": [
+                {"tag": "table", "lang": "", "content": [
+                    {"tag": "thead", "content": [
+                        {"tag": "tr", "content": [
+                            {"tag": "th", "content": "JP"},
+                            {"tag": "th", "content": "SC"},
+                            {"tag": "th", "content": "TC"},
+                            {"tag": "th", "content": "??"}
+                        ]}
+                    ]},
+                    {"tag": "tbody", "content": [
+                        {"tag": "tr", "content": [
+                            {"tag": "td", "lang": "ja-JP", "content": "直次茶冷"},
+                            {"tag": "td", "lang": "zh-CN", "content": "直次茶冷"},
+                            {"tag": "td", "lang": "zh-TW", "content": "直次茶冷"},
+                            {"tag": "td", "content": "直次茶冷"}
+                        ]}
+                    ]}
+                ]}
+            ]},
+            {"type": "structured-content", "content": [
+                {"tag": "table", "lang": "ja", "content": [
+                    {"tag": "thead", "content": [
+                        {"tag": "tr", "content": [
+                            {"tag": "th", "content": "lang=ja applied to whole table"}
+                        ]}
+                    ]},
+                    {"tag": "tbody", "content": [
+                        {"tag": "tr", "content": [
+                            {"tag": "td", "content": "直次茶冷"}
+                        ]}
+                    ]}
+                ]}
+            ]},
+            {"type": "structured-content", "content": [
+                {"tag": "table", "lang": "zh-CN", "content": [
+                    {"tag": "thead", "content": [
+                        {"tag": "tr", "content": [
+                            {"tag": "th", "content": "lang=zh-CN applied to whole table"}
+                        ]}
+                    ]},
+                    {"tag": "tbody", "content": [
+                        {"tag": "tr", "content": [
+                            {"tag": "td", "content": "直次茶冷"}
+                        ]}
+                    ]}
+                ]}
             ]}
         ],
         100, "P E1"

@@ -56,6 +56,9 @@ class StructuredContentGenerator {
                 return this._createStructuredContentElement(tag, content, dictionary, 'table-cell', true, true);
             case 'div':
             case 'span':
+            case 'ol':
+            case 'ul':
+            case 'li':
                 return this._createStructuredContentElement(tag, content, dictionary, 'simple', true, true);
             case 'img':
                 return this.createDefinitionImage(content, dictionary);
@@ -204,8 +207,9 @@ class StructuredContentGenerator {
 
     _createStructuredContentElement(tag, content, dictionary, type, hasChildren, hasStyle) {
         const node = this._createElement(tag, `gloss-sc-${tag}`);
-        const {data} = content;
+        const {data, lang} = content;
         if (typeof data === 'object' && data !== null) { this._setElementDataset(node, data); }
+        if (typeof lang === 'string') { node.lang = lang; }
         switch (type) {
             case 'table-cell':
                 {
@@ -239,7 +243,8 @@ class StructuredContentGenerator {
             marginTop,
             marginLeft,
             marginRight,
-            marginBottom
+            marginBottom,
+            listStyleType
         } = contentStyle;
         if (typeof fontStyle === 'string') { style.fontStyle = fontStyle; }
         if (typeof fontWeight === 'string') { style.fontWeight = fontWeight; }
@@ -254,6 +259,7 @@ class StructuredContentGenerator {
         if (typeof marginLeft === 'number') { style.marginLeft = `${marginLeft}em`; }
         if (typeof marginRight === 'number') { style.marginRight = `${marginRight}em`; }
         if (typeof marginBottom === 'number') { style.marginBottom = `${marginBottom}em`; }
+        if (typeof listStyleType === 'string') { style.listStyleType = listStyleType; }
     }
 
     _createLinkElement(content, dictionary) {
@@ -268,6 +274,9 @@ class StructuredContentGenerator {
 
         const text = this._createElement('span', 'gloss-link-text');
         node.appendChild(text);
+
+        const {lang} = content;
+        if (typeof lang === 'string') { node.lang = lang; }
 
         const child = this.createStructuredContent(content.content, dictionary);
         if (child !== null) { text.appendChild(child); }

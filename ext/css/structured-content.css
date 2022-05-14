@@ -235,3 +235,21 @@
     padding: 0.25em;
     vertical-align: top;
 }
+.gloss-sc-ol,
+.gloss-sc-ul {
+    padding-left: var(--list-padding2);
+}
+:root[data-glossary-layout-mode=compact] .gloss-sc-ul[data-sc-content=glossary] {
+    display: inline;
+    list-style: none;
+    padding-left: 0;
+}
+:root[data-glossary-layout-mode=compact] .gloss-sc-ul[data-sc-content=glossary] .gloss-sc-li {
+    display: inline;
+}
+:root[data-glossary-layout-mode=compact] .gloss-sc-ul[data-sc-content=glossary] .gloss-sc-li:not(:first-child)::before {
+    white-space: pre-wrap;
+    content: var(--compact-list-separator);
+    display: inline;
+    color: var(--text-color-light3);
+}
