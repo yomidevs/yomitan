@@ -166,7 +166,11 @@ class StructuredContentGenerator {
                 key = `${key[0].toUpperCase()}${key.substring(1)}`;
             }
             key = `sc${key}`;
-            element.dataset[key] = value;
+            try {
+                element.dataset[key] = value;
+            } catch (e) {
+                // DOMException if key is malformed
+            }
         }
     }
 
