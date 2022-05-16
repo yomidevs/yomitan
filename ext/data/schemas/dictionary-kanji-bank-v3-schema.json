@@ -2,10 +2,11 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "array",
     "description": "Data file containing kanji information.",
-    "additionalItems": {
+    "items": {
         "type": "array",
         "description": "Information about a single kanji character.",
         "minItems": 6,
+        "additionalItems": false,
         "items": [
             {
                 "type": "string",

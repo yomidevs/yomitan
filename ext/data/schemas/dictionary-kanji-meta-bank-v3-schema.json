@@ -26,10 +26,11 @@
     },
     "type": "array",
     "description": "Custom metadata for kanji characters.",
-    "additionalItems": {
+    "items": {
         "type": "array",
         "description": "Metadata about a single kanji character.",
         "minItems": 3,
+        "additionalItems": false,
         "items": [
             {
                 "type": "string",

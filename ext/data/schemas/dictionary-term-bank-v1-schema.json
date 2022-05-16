@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "array",
     "description": "Data file containing term information.",
-    "additionalItems": {
+    "items": {
         "type": "array",
         "description": "Information about a single term.",
         "minItems": 5,

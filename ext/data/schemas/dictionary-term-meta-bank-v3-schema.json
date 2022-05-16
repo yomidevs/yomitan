@@ -26,10 +26,11 @@
     },
     "type": "array",
     "description": "Custom metadata for terms.",
-    "additionalItems": {
+    "items": {
         "type": "array",
         "description": "Metadata about a single term.",
         "minItems": 3,
+        "additionalItems": false,
         "items": [
             {
                 "type": "string",
@@ -97,7 +98,7 @@
                             "pitches": {
                                 "type": "array",
                                 "description": "List of different pitch accent information for the term and reading combination.",
-                                "additionalItems": {
+                                "items": {
                                     "type": "object",
                                     "required": [
                                         "position"

@@ -302,10 +302,11 @@
     },
     "type": "array",
     "description": "Data file containing term information.",
-    "additionalItems": {
+    "items": {
         "type": "array",
         "description": "Information about a single term.",
         "minItems": 8,
+        "additionalItems": false,
         "items": [
             {
                 "type": "string",
