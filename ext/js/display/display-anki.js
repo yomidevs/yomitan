@@ -668,7 +668,16 @@ class DisplayAnki {
 
     _getNodeNoteIds(node) {
         const {noteIds} = node.dataset;
-        return typeof noteIds === 'string' && noteIds.length > 0 ? noteIds.split(' ') : [];
+        const results = [];
+        if (typeof noteIds === 'string' && noteIds.length > 0) {
+            for (const noteId of noteIds.split(' ')) {
+                const noteIdInt = Number.parseInt(noteId, 10);
+                if (Number.isFinite(noteIdInt)) {
+                    results.push(noteIdInt);
+                }
+            }
+        }
+        return results;
     }
 
     _getViewNoteButton(index) {
