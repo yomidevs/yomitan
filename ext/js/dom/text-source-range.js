@@ -94,6 +94,10 @@ class TextSourceRange {
         return this._range.getBoundingClientRect();
     }
 
+    getRects() {
+        return this._range.getClientRects();
+    }
+
     getWritingMode() {
         return TextSourceRange.getElementWritingMode(TextSourceRange.getParentElement(this._range.startContainer));
     }

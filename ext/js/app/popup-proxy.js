@@ -40,7 +40,8 @@ class PopupProxy extends EventDispatcher {
         this._frameId = frameId;
         this._frameOffsetForwarder = frameOffsetForwarder;
 
-        this._frameOffset = [0, 0];
+        this._frameOffsetX = 0;
+        this._frameOffsetY = 0;
         this._frameOffsetPromise = null;
         this._frameOffsetUpdatedAt = null;
         this._frameOffsetExpireTimeout = 1000;
@@ -178,22 +179,28 @@ class PopupProxy extends EventDispatcher {
     async containsPoint(x, y) {
         if (this._frameOffsetForwarder !== null) {
             await this._updateFrameOffset();
-            [x, y] = this._applyFrameOffset(x, y);
+            x += this._frameOffsetX;
+            y += this._frameOffsetY;
         }
         return await this._invokeSafe('PopupFactory.containsPoint', {id: this._id, x, y}, false);
     }
 
     /**
      * Shows and updates the positioning and content of the popup.
-     * @param {{optionsContext: object, elementRect: {x: number, y: number, width: number, height: number}, writingMode: string}} details Settings for the outer popup.
-     * @param {object} displayDetails The details parameter passed to `Display.setContent`; see that function for details.
+     * @param {Popup.ContentDetails} details Settings for the outer popup.
+     * @param {Display.ContentDetails} displayDetails The details parameter passed to `Display.setContent`.
      * @returns {Promise<void>}
      */
     async showContent(details, displayDetails) {
-        const {elementRect} = details;
-        if (typeof elementRect !== 'undefined' && this._frameOffsetForwarder !== null) {
+        if (this._frameOffsetForwarder !== null) {
+            const {sourceRects} = details;
             await this._updateFrameOffset();
-            [elementRect.x, elementRect.y] = this._applyFrameOffset(elementRect.x, elementRect.y);
+            for (const sourceRect of sourceRects) {
+                sourceRect.left += this._frameOffsetX;
+                sourceRect.top += this._frameOffsetY;
+                sourceRect.right += this._frameOffsetX;
+                sourceRect.bottom += this._frameOffsetY;
+            }
         }
         return await this._invokeSafe('PopupFactory.showContent', {id: this._id, details, displayDetails});
     }
@@ -254,11 +261,11 @@ class PopupProxy extends EventDispatcher {
 
     /**
      * Gets the rectangle of the DOM frame, synchronously.
-     * @returns {{x: number, y: number, width: number, height: number, valid: boolean}} The rect.
+     * @returns {Popup.ValidRect} The rect.
      *   `valid` is `false` for `PopupProxy`, since the DOM node is hosted in a different frame.
      */
     getFrameRect() {
-        return {x: 0, y: 0, width: 0, height: 0, valid: false};
+        return {left: 0, top: 0, right: 0, bottom: 0, valid: false};
     }
 
     /**
@@ -317,8 +324,12 @@ class PopupProxy extends EventDispatcher {
         this._frameOffsetPromise = this._frameOffsetForwarder.getOffset();
         try {
             const offset = await this._frameOffsetPromise;
-            this._frameOffset = offset !== null ? offset : [0, 0];
-            if (offset === null) {
+            if (offset !== null) {
+                this._frameOffsetX = offset[0];
+                this._frameOffsetY = offset[1];
+            } else {
+                this._frameOffsetX = 0;
+                this._frameOffsetY = 0;
                 this.trigger('offsetNotFound');
                 return;
             }
@@ -328,10 +339,5 @@ class PopupProxy extends EventDispatcher {
         } finally {
             this._frameOffsetPromise = null;
         }
-    }
-
-    _applyFrameOffset(x, y) {
-        const [offsetX, offsetY] = this._frameOffset;
-        return [x + offsetX, y + offsetY];
     }
 }

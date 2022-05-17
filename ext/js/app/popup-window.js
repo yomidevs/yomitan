@@ -168,8 +168,8 @@ class PopupWindow extends EventDispatcher {
 
     /**
      * Shows and updates the positioning and content of the popup.
-     * @param {{optionsContext: object, elementRect: {x: number, y: number, width: number, height: number}, writingMode: string}} details Settings for the outer popup.
-     * @param {object} displayDetails The details parameter passed to `Display.setContent`; see that function for details.
+     * @param {Popup.ContentDetails} details Settings for the outer popup.
+     * @param {Display.ContentDetails} displayDetails The details parameter passed to `Display.setContent`.
      * @returns {Promise<void>}
      */
     async showContent(_details, displayDetails) {
@@ -229,11 +229,11 @@ class PopupWindow extends EventDispatcher {
 
     /**
      * Gets the rectangle of the DOM frame, synchronously.
-     * @returns {{x: number, y: number, width: number, height: number, valid: boolean}} The rect.
+     * @returns {Popup.ValidRect} The rect.
      *   `valid` is `false` for `PopupProxy`, since the DOM node is hosted in a different frame.
      */
     getFrameRect() {
-        return {x: 0, y: 0, width: 0, height: 0, valid: false};
+        return {left: 0, top: 0, right: 0, bottom: 0, valid: false};
     }
 
     /**

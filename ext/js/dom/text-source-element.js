@@ -94,6 +94,10 @@ class TextSourceElement {
         return this._element.getBoundingClientRect();
     }
 
+    getRects() {
+        return this.getClientRects();
+    }
+
     getWritingMode() {
         return 'horizontal-tb';
     }

@@ -36,6 +36,11 @@
  */
 
 class Display extends EventDispatcher {
+    /**
+     * Information about how popup content should be shown, specifically related to the inner popup content.
+     * @typedef {object} ContentDetails
+     */
+
     constructor(tabId, frameId, pageType, japaneseUtil, documentFocusController, hotkeyHandler) {
         super();
         this._tabId = tabId;
@@ -341,6 +346,10 @@ class Display extends EventDispatcher {
         this.trigger('optionsUpdated', {options});
     }
 
+    /**
+     * Updates the content of the display.
+     * @param {ContentDetails} details
+     */
     setContent(details) {
         const {focus, params, state, content} = details;
         const historyMode = this._historyHasChanged ? details.historyMode : 'clear';

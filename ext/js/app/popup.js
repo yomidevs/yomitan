@@ -27,6 +27,44 @@
  */
 class Popup extends EventDispatcher {
     /**
+     * Information about how popup content should be shown, specifically related to the outer popup frame.
+     * @typedef {object} ContentDetails
+     * @property {?object} optionsContext The options context for the content to show.
+     * @property {Rect[]} sourceRects The rectangles of the source content.
+     * @property {'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | 'sideways-lr'} writingMode The normalized CSS writing-mode value of the source content.
+     */
+
+    /**
+     * A rectangle representing a DOM region, similar to DOMRect.
+     * @typedef {object} Rect
+     * @property {number} left The left position of the rectangle.
+     * @property {number} top The top position of the rectangle.
+     * @property {number} right The right position of the rectangle.
+     * @property {number} bottom The bottom position of the rectangle.
+     */
+
+    /**
+     * A rectangle representing a DOM region, similar to DOMRect but with a `valid` property.
+     * @typedef {object} ValidRect
+     * @property {number} left The left position of the rectangle.
+     * @property {number} top The top position of the rectangle.
+     * @property {number} right The right position of the rectangle.
+     * @property {number} bottom The bottom position of the rectangle.
+     * @property {boolean} valid Whether or not the rectangle is valid.
+     */
+
+    /**
+     * A rectangle representing a DOM region for placing the popup frame.
+     * @typedef {object} SizeRect
+     * @property {number} left The left position of the rectangle.
+     * @property {number} top The top position of the rectangle.
+     * @property {number} width The width of the rectangle.
+     * @property {number} height The height of the rectangle.
+     * @property {boolean} after Whether or not the rectangle is positioned to the right of the source rectangle.
+     * @property {boolean} below Whether or not the rectangle is positioned below the source rectangle.
+     */
+
+    /**
      * Creates a new instance.
      * @param {object} details
      * @param {string} details.id The ID of the popup.
@@ -63,8 +101,9 @@ class Popup extends EventDispatcher {
         this._horizontalOffset2 = 10;
         this._verticalOffset2 = 0;
         this._verticalTextPosition = 'before';
-        this._horizontalTextPosition = 'below';
+        this._horizontalTextPositionBelow = true;
         this._displayMode = 'default';
+        this._displayModeIsFullWidth = false;
         this._scaleRelativeToVisualViewport = true;
         this._useSecureFrameUrl = true;
         this._useShadowDom = true;
@@ -237,7 +276,7 @@ class Popup extends EventDispatcher {
     async containsPoint(x, y) {
         for (let popup = this; popup !== null && popup.isVisibleSync(); popup = popup.child) {
             const rect = popup.getFrameRect();
-            if (rect.valid && x >= rect.x && y >= rect.y && x < rect.x + rect.width && y < rect.y + rect.height) {
+            if (rect.valid && x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
                 return true;
             }
         }
@@ -246,21 +285,19 @@ class Popup extends EventDispatcher {
 
     /**
      * Shows and updates the positioning and content of the popup.
-     * @param {{optionsContext: object, elementRect: {x: number, y: number, width: number, height: number}, writingMode: string}} details Settings for the outer popup.
-     * @param {object} displayDetails The details parameter passed to `Display.setContent`; see that function for details.
+     * @param {ContentDetails} details Settings for the outer popup.
+     * @param {Display.ContentDetails} displayDetails The details parameter passed to `Display.setContent`.
      * @returns {Promise<void>}
      */
     async showContent(details, displayDetails) {
         if (!this._optionsAssigned) { throw new Error('Options not assigned'); }
 
-        const {optionsContext, elementRect, writingMode} = details;
+        const {optionsContext, sourceRects, writingMode} = details;
         if (optionsContext !== null) {
             await this._setOptionsContextIfDifferent(optionsContext);
         }
 
-        if (typeof elementRect !== 'undefined' && typeof writingMode !== 'undefined') {
-            await this._show(elementRect, writingMode);
-        }
+        await this._show(sourceRects, writingMode);
 
         if (displayDetails !== null) {
             this._invokeSafe('Display.setContent', {details: displayDetails});
@@ -327,12 +364,12 @@ class Popup extends EventDispatcher {
 
     /**
      * Gets the rectangle of the DOM frame, synchronously.
-     * @returns {{x: number, y: number, width: number, height: number, valid: boolean}} The rect.
+     * @returns {ValidRect} The rect.
      *   `valid` is `false` for `PopupProxy`, since the DOM node is hosted in a different frame.
      */
     getFrameRect() {
-        const {left, top, width, height} = this._frame.getBoundingClientRect();
-        return {x: left, y: top, width, height, valid: true};
+        const {left, top, right, bottom} = this._frame.getBoundingClientRect();
+        return {left, top, right, bottom, valid: true};
     }
 
     /**
@@ -523,42 +560,25 @@ class Popup extends EventDispatcher {
         }
     }
 
-    async _show(elementRect, writingMode) {
+    async _show(sourceRects, writingMode) {
         const injected = await this._inject();
         if (!injected) { return; }
 
-        const frame = this._frame;
-        const frameRect = frame.getBoundingClientRect();
-
         const viewport = this._getViewport(this._scaleRelativeToVisualViewport);
-        const scale = this._contentScale;
-        const scaleRatio = this._frameSizeContentScale === null ? 1.0 : scale / this._frameSizeContentScale;
-        this._frameSizeContentScale = scale;
-        const getPositionArgs = [
-            elementRect,
-            Math.max(frameRect.width * scaleRatio, this._initialWidth * scale),
-            Math.max(frameRect.height * scaleRatio, this._initialHeight * scale),
-            viewport,
-            scale,
-            writingMode
-        ];
-        let [x, y, width, height, below] = (
-            writingMode === 'horizontal-tb' || this._verticalTextPosition === 'default' ?
-            this._getPositionForHorizontalText(...getPositionArgs) :
-            this._getPositionForVerticalText(...getPositionArgs)
-        );
+        let {left, top, width, height, after, below} = this._getPosition(sourceRects, writingMode, viewport);
 
-        frame.dataset.popupDisplayMode = this._displayMode;
-        frame.dataset.below = `${below}`;
-
-        if (this._displayMode === 'full-width') {
-            x = viewport.left;
-            y = below ? viewport.bottom - height : viewport.top;
+        if (this._displayModeIsFullWidth) {
+            left = viewport.left;
+            top = below ? viewport.bottom - height : viewport.top;
             width = viewport.right - viewport.left;
         }
 
-        frame.style.left = `${x}px`;
-        frame.style.top = `${y}px`;
+        const frame = this._frame;
+        frame.dataset.popupDisplayMode = this._displayMode;
+        frame.dataset.after = `${after}`;
+        frame.dataset.below = `${below}`;
+        frame.style.left = `${left}px`;
+        frame.style.top = `${top}px`;
         this._setFrameSize(width, height);
 
         this._setVisible(true);
@@ -652,52 +672,97 @@ class Popup extends EventDispatcher {
         return fullscreenElement;
     }
 
-    _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale) {
-        const preferBelow = (this._horizontalTextPosition === 'below');
-        const horizontalOffset = this._horizontalOffset * offsetScale;
-        const verticalOffset = this._verticalOffset * offsetScale;
+    /**
+     * @param {Rect[]} sourceRects
+     * @param {string} writingMode
+     * @returns {SizeRect}
+     */
+    _getPosition(sourceRects, writingMode, viewport) {
+        const scale = this._contentScale;
+        const scaleRatio = this._frameSizeContentScale === null ? 1.0 : scale / this._frameSizeContentScale;
+        this._frameSizeContentScale = scale;
+        const frameRect = this._frame.getBoundingClientRect();
+        const frameWidth = Math.max(frameRect.width * scaleRatio, this._initialWidth * scale);
+        const frameHeight = Math.max(frameRect.height * scaleRatio, this._initialHeight * scale);
 
-        const [x, w] = this._getConstrainedPosition(
-            elementRect.x + elementRect.width - horizontalOffset,
-            elementRect.x + horizontalOffset,
-            width,
+        const horizontal = (writingMode === 'horizontal-tb' || this._verticalTextPosition === 'default');
+        let preferAfter;
+        let horizontalOffset;
+        let verticalOffset;
+        if (horizontal) {
+            preferAfter = this._horizontalTextPositionBelow;
+            horizontalOffset = this._horizontalOffset;
+            verticalOffset = this._verticalOffset;
+        } else {
+            preferAfter = this._isVerticalTextPopupOnRight(this._verticalTextPosition, writingMode);
+            horizontalOffset = this._horizontalOffset2;
+            verticalOffset = this._verticalOffset2;
+        }
+        horizontalOffset *= scale;
+        verticalOffset *= scale;
+
+        let best = null;
+        const sourceRectsLength = sourceRects.length;
+        for (let i = 0, ii = (sourceRectsLength > 1 ? sourceRectsLength : 0); i <= ii; ++i) {
+            const sourceRect = i < sourceRectsLength ? sourceRects[i] : this._getBoundingSourceRect(sourceRects);
+            const result = (
+                horizontal ?
+                this._getPositionForHorizontalText(sourceRect, frameWidth, frameHeight, viewport, horizontalOffset, verticalOffset, preferAfter) :
+                this._getPositionForVerticalText(sourceRect, frameWidth, frameHeight, viewport, horizontalOffset, verticalOffset, preferAfter)
+            );
+            if (i < ii && this._isOverlapping(result, sourceRects, i)) { continue; }
+            if (best === null || result.height > best.height) {
+                best = result;
+                if (result.height >= frameHeight) { break; }
+            }
+        }
+        return best;
+    }
+
+    /**
+     * @returns {SizeRect}
+     */
+    _getPositionForHorizontalText(sourceRect, frameWidth, frameHeight, viewport, horizontalOffset, verticalOffset, preferBelow) {
+        const [left, width, after] = this._getConstrainedPosition(
+            sourceRect.right - horizontalOffset,
+            sourceRect.left + horizontalOffset,
+            frameWidth,
             viewport.left,
             viewport.right,
             true
         );
-        const [y, h, below] = this._getConstrainedPositionBinary(
-            elementRect.y - verticalOffset,
-            elementRect.y + elementRect.height + verticalOffset,
-            height,
+        const [top, height, below] = this._getConstrainedPositionBinary(
+            sourceRect.top - verticalOffset,
+            sourceRect.bottom + verticalOffset,
+            frameHeight,
             viewport.top,
             viewport.bottom,
             preferBelow
         );
-        return [x, y, w, h, below];
+        return {left, top, width, height, after, below};
     }
 
-    _getPositionForVerticalText(elementRect, width, height, viewport, offsetScale, writingMode) {
-        const preferRight = this._isVerticalTextPopupOnRight(this._verticalTextPosition, writingMode);
-        const horizontalOffset = this._horizontalOffset2 * offsetScale;
-        const verticalOffset = this._verticalOffset2 * offsetScale;
-
-        const [x, w] = this._getConstrainedPositionBinary(
-            elementRect.x - horizontalOffset,
-            elementRect.x + elementRect.width + horizontalOffset,
-            width,
+    /**
+     * @returns {SizeRect}
+     */
+    _getPositionForVerticalText(sourceRect, frameWidth, frameHeight, viewport, horizontalOffset, verticalOffset, preferRight) {
+        const [left, width, after] = this._getConstrainedPositionBinary(
+            sourceRect.left - horizontalOffset,
+            sourceRect.right + horizontalOffset,
+            frameWidth,
             viewport.left,
             viewport.right,
             preferRight
         );
-        const [y, h, below] = this._getConstrainedPosition(
-            elementRect.y + elementRect.height - verticalOffset,
-            elementRect.y + verticalOffset,
-            height,
+        const [top, height, below] = this._getConstrainedPosition(
+            sourceRect.bottom - verticalOffset,
+            sourceRect.top + verticalOffset,
+            frameHeight,
             viewport.top,
             viewport.bottom,
             true
         );
-        return [x, y, w, h, below];
+        return {left, top, width, height, after, below};
     }
 
     _isVerticalTextPopupOnRight(positionPreference, writingMode) {
@@ -706,10 +771,9 @@ class Popup extends EventDispatcher {
                 return !this._isWritingModeLeftToRight(writingMode);
             case 'after':
                 return this._isWritingModeLeftToRight(writingMode);
-            case 'left':
-                return false;
             case 'right':
                 return true;
+            // case 'left':
             default:
                 return false;
         }
@@ -806,8 +870,9 @@ class Popup extends EventDispatcher {
         this._horizontalOffset2 = general.popupHorizontalOffset2;
         this._verticalOffset2 = general.popupVerticalOffset2;
         this._verticalTextPosition = general.popupVerticalTextPosition;
-        this._horizontalTextPosition = general.popupHorizontalTextPosition;
+        this._horizontalTextPositionBelow = (this._verticalTextPosition === 'below');
         this._displayMode = general.popupDisplayMode;
+        this._displayModeIsFullWidth = (this._displayMode === 'full-width');
         this._scaleRelativeToVisualViewport = general.popupScaleRelativeToVisualViewport;
         this._useSecureFrameUrl = general.useSecurePopupFrameUrl;
         this._useShadowDom = general.usePopupShadowDom;
@@ -819,5 +884,50 @@ class Popup extends EventDispatcher {
     async _setOptionsContextIfDifferent(optionsContext) {
         if (deepEqual(this._optionsContext, optionsContext)) { return; }
         await this._setOptionsContext(optionsContext);
+    }
+
+    /**
+     * @param {Rect[]} sourceRects
+     * @returns {Rect}
+     */
+    _getBoundingSourceRect(sourceRects) {
+        switch (sourceRects.length) {
+            case 0: return {left: 0, top: 0, right: 0, bottom: 0};
+            case 1: return sourceRects[0];
+        }
+        let {left, top, right, bottom} = sourceRects[0];
+        for (let i = 1, ii = sourceRects.length; i < ii; ++i) {
+            const sourceRect = sourceRects[i];
+            left = Math.min(left, sourceRect.left);
+            top = Math.min(top, sourceRect.top);
+            right = Math.max(right, sourceRect.right);
+            bottom = Math.max(bottom, sourceRect.bottom);
+        }
+        return {left, top, right, bottom};
+    }
+
+    /**
+     * @param {SizeRect} sizeRect
+     * @param {Rect[]} sourceRects
+     * @param {number} ignoreIndex
+     * @returns {boolean}
+     */
+    _isOverlapping(sizeRect, sourceRects, ignoreIndex) {
+        const {left, top} = sizeRect;
+        const right = left + sizeRect.width;
+        const bottom = top + sizeRect.height;
+        for (let i = 0, ii = sourceRects.length; i < ii; ++i) {
+            if (i === ignoreIndex) { continue; }
+            const sourceRect = sourceRects[i];
+            if (
+                left < sourceRect.right &&
+                right > sourceRect.left &&
+                top < sourceRect.bottom &&
+                bottom > sourceRect.top
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 }

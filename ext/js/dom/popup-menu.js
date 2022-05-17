@@ -154,8 +154,8 @@ class PopupMenu extends EventDispatcher {
 
         // Position
         const menu = this._node;
-        const fullRect = this._containerNode.getBoundingClientRect();
-        const sourceRect = this._sourceElement.getBoundingClientRect();
+        const containerNodeRect = this._containerNode.getBoundingClientRect();
+        const sourceElementRect = this._sourceElement.getBoundingClientRect();
         const menuRect = menu.getBoundingClientRect();
         let top = menuRect.top;
         let bottom = menuRect.bottom;
@@ -166,19 +166,19 @@ class PopupMenu extends EventDispatcher {
         }
 
         let x = (
-            sourceRect.left +
-            sourceRect.width * ((-horizontal * horizontalCover + 1) * 0.5) +
+            sourceElementRect.left +
+            sourceElementRect.width * ((-horizontal * horizontalCover + 1) * 0.5) +
             menuRect.width * ((-horizontal + 1) * -0.5)
         );
         let y = (
-            sourceRect.top +
+            sourceElementRect.top +
             (menuRect.top - top) +
-            sourceRect.height * ((-vertical * verticalCover + 1) * 0.5) +
+            sourceElementRect.height * ((-vertical * verticalCover + 1) * 0.5) +
             (bottom - top) * ((-vertical + 1) * -0.5)
         );
 
-        x = Math.max(0.0, Math.min(fullRect.width - menuRect.width, x));
-        y = Math.max(0.0, Math.min(fullRect.height - menuRect.height, y));
+        x = Math.max(0.0, Math.min(containerNodeRect.width - menuRect.width, x));
+        y = Math.max(0.0, Math.min(containerNodeRect.height - menuRect.height, y));
 
         menu.style.left = `${x}px`;
         menu.style.top = `${y}px`;

@@ -565,7 +565,7 @@ class Frontend {
             textSource = this._textScanner.getCurrentTextSource();
             if (textSource === null) { return; }
         }
-        this._showPopupContent(textSource, null);
+        this._showPopupContent(textSource, null, null);
     }
 
     _showContent(textSource, focus, dictionaryEntries, type, sentence, documentTitle, optionsContext) {
@@ -601,14 +601,17 @@ class Frontend {
         this._showPopupContent(textSource, optionsContext, details);
     }
 
-    _showPopupContent(textSource, optionsContext, details=null) {
-        const {left, top, width, height} = textSource.getRect();
+    _showPopupContent(textSource, optionsContext, details) {
+        const sourceRects = [];
+        for (const {left, top, right, bottom} of textSource.getRects()) {
+            sourceRects.push({left, top, right, bottom});
+        }
         this._lastShowPromise = (
             this._popup !== null ?
             this._popup.showContent(
                 {
                     optionsContext,
-                    elementRect: {x: left, y: top, width, height, valid: true},
+                    sourceRects,
                     writingMode: textSource.getWritingMode()
                 },
                 details
@@ -661,7 +664,7 @@ class Frontend {
             this._popup !== null &&
             await this._popup.isVisible()
         ) {
-            this._showPopupContent(textSource, null);
+            this._showPopupContent(textSource, null, null);
         }
     }
 
