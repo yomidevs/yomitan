@@ -19,21 +19,47 @@ const fs = require('fs');
 const path = require('path');
 const browserify = require('browserify');
 
-async function main() {
-    const extLibPath = path.join(__dirname, '..', 'ext', 'lib');
+async function buildParse5() {
     const parse5Path = require.resolve('parse5');
-
-    const content = await new Promise((resolve, reject) => {
-        browserify([parse5Path], {standalone: 'parse5', debug: true}).bundle((error, result) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(result);
-            }
+    const cwd = process.cwd();
+    try {
+        const baseDir = path.dirname(parse5Path);
+        process.chdir(baseDir); // This is necessary to ensure relative source map file names are consistent
+        return await new Promise((resolve, reject) => {
+            browserify({
+                entries: [parse5Path],
+                standalone: 'parse5',
+                debug: true,
+                baseDir
+            }).bundle((error, result) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
         });
-    });
-
-    fs.writeFileSync(path.join(extLibPath, 'parse5.js'), content);
+    } finally {
+        process.chdir(cwd);
+    }
 }
 
-main();
+function getBuildTargets() {
+    const extLibPath = path.join(__dirname, '..', 'ext', 'lib');
+    return [
+        {path: path.join(extLibPath, 'parse5.js'), build: buildParse5}
+    ];
+}
+
+async function main() {
+    for (const {path: path2, build} of getBuildTargets()) {
+        const content = await build();
+        fs.writeFileSync(path2, content);
+    }
+}
+
+if (require.main === module) { main(); }
+
+module.exports = {
+    getBuildTargets
+};

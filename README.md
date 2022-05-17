@@ -62,7 +62,7 @@ submitting issues on GitHub, try the *testing* version; otherwise, the *stable* 
     <sup>*</sup>Unlike Chrome, Firefox does not allow extensions meant for testing to be hosted in the marketplace.
     You will have to download a desired version and side-load it yourself. You only need to do this once and will get
     updates automatically.
- 
+
 ## Dictionaries
 
 There are several free Japanese dictionaries available for Yomichan, with two of them having glossaries available in
@@ -344,4 +344,4 @@ versions packaged.
 *   Handlebars: [homepage](https://handlebarsjs.com/) - [snapshot](https://s3.amazonaws.com/builds.handlebarsjs.com/handlebars.min-v4.7.7.js) - [license](https://github.com/handlebars-lang/handlebars.js/blob/v4.7.7/LICENSE)
 *   JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://github.com/Stuk/jszip/blob/v3.7.1/dist/jszip.min.js) - [license](https://github.com/Stuk/jszip/blob/v3.7.1/LICENSE.markdown)
 *   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://unpkg.com/wanakana@4.0.2/umd/wanakana.min.js) - [license](https://github.com/WaniKani/WanaKana/blob/4.0.2/LICENSE)
-*   parse5: [homepage](https://github.com/inikulin/parse5) - [snapshot](https://github.com/inikulin/parse5/tree/v6.0.1/packages/parse5) - [license](https://github.com/inikulin/parse5/blob/v6.0.1/LICENSE) _(Only used in MV3 build)_
+*   parse5: [homepage](https://github.com/inikulin/parse5) - [snapshot](https://github.com/inikulin/parse5/tree/v7.0.0/packages/parse5) - [license](https://github.com/inikulin/parse5/blob/v7.0.0/LICENSE) _(Only used in MV3 build)_
