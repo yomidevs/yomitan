@@ -19,15 +19,7 @@ const fs = require('fs');
 const path = require('path');
 const {performance} = require('perf_hooks');
 const {JSZip} = require('./util');
-const {VM} = require('./vm');
-
-const vm = new VM();
-vm.execute([
-    'js/core.js',
-    'js/general/cache-map.js',
-    'js/data/json-schema.js'
-]);
-const JsonSchema = vm.get('JsonSchema');
+const {createJsonSchema} = require('./schema-validate');
 
 
 function readSchema(relativeFileName) {
@@ -37,7 +29,14 @@ function readSchema(relativeFileName) {
 }
 
 
-async function validateDictionaryBanks(zip, fileNameFormat, schema) {
+async function validateDictionaryBanks(mode, zip, fileNameFormat, schema) {
+    let jsonSchema;
+    try {
+        jsonSchema = createJsonSchema(mode, schema);
+    } catch (e) {
+        e.message += `\n(in file ${fileNameFormat})}`;
+        throw e;
+    }
     let index = 1;
     while (true) {
         const fileName = fileNameFormat.replace(/\?/, index);
@@ -46,14 +45,20 @@ async function validateDictionaryBanks(zip, fileNameFormat, schema) {
         if (!file) { break; }
 
         const data = JSON.parse(await file.async('string'));
-        new JsonSchema(schema).validate(data);
+        try {
+            jsonSchema.validate(data);
+        } catch (e) {
+            e.message += `\n(in file ${fileName})}`;
+            throw e;
+        }
 
         ++index;
     }
 }
 
-async function validateDictionary(archive, schemas) {
-    const indexFile = archive.files['index.json'];
+async function validateDictionary(mode, archive, schemas) {
+    const fileName = 'index.json';
+    const indexFile = archive.files[fileName];
     if (!indexFile) {
         throw new Error('No dictionary index found in archive');
     }
@@ -61,13 +66,19 @@ async function validateDictionary(archive, schemas) {
     const index = JSON.parse(await indexFile.async('string'));
     const version = index.format || index.version;
 
-    new JsonSchema(schemas.index).validate(index);
+    try {
+        const jsonSchema = createJsonSchema(mode, schemas.index);
+        jsonSchema.validate(index);
+    } catch (e) {
+        e.message += `\n(in file ${fileName})}`;
+        throw e;
+    }
 
-    await validateDictionaryBanks(archive, 'term_bank_?.json', version === 1 ? schemas.termBankV1 : schemas.termBankV3);
-    await validateDictionaryBanks(archive, 'term_meta_bank_?.json', schemas.termMetaBankV3);
-    await validateDictionaryBanks(archive, 'kanji_bank_?.json', version === 1 ? schemas.kanjiBankV1 : schemas.kanjiBankV3);
-    await validateDictionaryBanks(archive, 'kanji_meta_bank_?.json', schemas.kanjiMetaBankV3);
-    await validateDictionaryBanks(archive, 'tag_bank_?.json', schemas.tagBankV3);
+    await validateDictionaryBanks(mode, archive, 'term_bank_?.json', version === 1 ? schemas.termBankV1 : schemas.termBankV3);
+    await validateDictionaryBanks(mode, archive, 'term_meta_bank_?.json', schemas.termMetaBankV3);
+    await validateDictionaryBanks(mode, archive, 'kanji_bank_?.json', version === 1 ? schemas.kanjiBankV1 : schemas.kanjiBankV3);
+    await validateDictionaryBanks(mode, archive, 'kanji_meta_bank_?.json', schemas.kanjiMetaBankV3);
+    await validateDictionaryBanks(mode, archive, 'tag_bank_?.json', schemas.tagBankV3);
 }
 
 function getSchemas() {
@@ -84,7 +95,7 @@ function getSchemas() {
 }
 
 
-async function testDictionaryFiles(dictionaryFileNames) {
+async function testDictionaryFiles(mode, dictionaryFileNames) {
     const schemas = getSchemas();
 
     for (const dictionaryFileName of dictionaryFileNames) {
@@ -93,7 +104,7 @@ async function testDictionaryFiles(dictionaryFileNames) {
             console.log(`Validating ${dictionaryFileName}...`);
             const source = fs.readFileSync(dictionaryFileName);
             const archive = await JSZip.loadAsync(source);
-            await validateDictionary(archive, schemas);
+            await validateDictionary(mode, archive, schemas);
             const end = performance.now();
             console.log(`No issues detected (${((end - start) / 1000).toFixed(2)}s)`);
         } catch (e) {
@@ -110,12 +121,18 @@ async function main() {
     if (dictionaryFileNames.length === 0) {
         console.log([
             'Usage:',
-            '  node dictionary-validate <dictionary-file-names>...'
+            '  node dictionary-validate [--ajv] <dictionary-file-names>...'
         ].join('\n'));
         return;
     }
 
-    await testDictionaryFiles(dictionaryFileNames);
+    let mode = null;
+    if (dictionaryFileNames[0] === '--ajv') {
+        mode = 'ajv';
+        dictionaryFileNames.splice(0, 1);
+    }
+
+    await testDictionaryFiles(mode, dictionaryFileNames);
 }
 
 

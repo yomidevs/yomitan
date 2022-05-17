@@ -27,15 +27,47 @@ vm.execute([
 ]);
 const JsonSchema = vm.get('JsonSchema');
 
+class JsonSchemaAjv {
+    constructor(schema) {
+        const Ajv = require('ajv');
+        const ajv = new Ajv({
+            meta: false,
+            strictTuples: false,
+            allowUnionTypes: true
+        });
+        ajv.addMetaSchema(require('ajv/dist/refs/json-schema-draft-07.json'));
+        this._validate = ajv.compile(schema);
+    }
+
+    validate(data) {
+        if (this._validate(data)) { return; }
+        const {errors} = this._validate(data);
+        const message = errors.map((e) => e.toString()).join('\n');
+        throw new Error(message);
+    }
+}
+
+function createJsonSchema(mode, schema) {
+    switch (mode) {
+        case 'ajv': return new JsonSchemaAjv(schema);
+        default: return new JsonSchema(schema);
+    }
+}
 
 function main() {
     const args = process.argv.slice(2);
     if (args.length < 2) {
         console.log([
             'Usage:',
-            '  node schema-validate <schema-file-name> <data-file-names>...'
+            '  node schema-validate [--ajv] <schema-file-name> <data-file-names>...'
         ].join('\n'));
         return;
+    }
+
+    let mode = null;
+    if (args[0] === '--ajv') {
+        mode = 'ajv';
+        args.splice(0, 1);
     }
 
     const schemaSource = fs.readFileSync(args[0], {encoding: 'utf8'});
@@ -47,7 +79,7 @@ function main() {
             console.log(`Validating ${dataFileName}...`);
             const dataSource = fs.readFileSync(dataFileName, {encoding: 'utf8'});
             const data = JSON.parse(dataSource);
-            new JsonSchema(schema).validate(data);
+            createJsonSchema(mode, schema).validate(data);
             const end = performance.now();
             console.log(`No issues detected (${((end - start) / 1000).toFixed(2)}s)`);
         } catch (e) {
@@ -60,3 +92,8 @@ function main() {
 
 
 if (require.main === module) { main(); }
+
+
+module.exports = {
+    createJsonSchema
+};

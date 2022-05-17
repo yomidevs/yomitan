@@ -44,7 +44,7 @@ async function main() {
 
         let error = null;
         try {
-            await dictionaryValidate.validateDictionary(archive, schemas);
+            await dictionaryValidate.validateDictionary(null, archive, schemas);
         } catch (e) {
             error = e;
         }
