@@ -870,7 +870,7 @@ class Popup extends EventDispatcher {
         this._horizontalOffset2 = general.popupHorizontalOffset2;
         this._verticalOffset2 = general.popupVerticalOffset2;
         this._verticalTextPosition = general.popupVerticalTextPosition;
-        this._horizontalTextPositionBelow = (this._verticalTextPosition === 'below');
+        this._horizontalTextPositionBelow = (general.popupHorizontalTextPosition === 'below');
         this._displayMode = general.popupDisplayMode;
         this._displayModeIsFullWidth = (this._displayMode === 'full-width');
         this._scaleRelativeToVisualViewport = general.popupScaleRelativeToVisualViewport;
