@@ -44,7 +44,7 @@ class DOMTextScanner {
 
     /**
      * Gets the current node being scanned.
-     * @returns A DOM Node.
+     * @type {Node}
      */
     get node() {
         return this._node;
@@ -53,7 +53,7 @@ class DOMTextScanner {
     /**
      * Gets the current offset corresponding to the node being scanned.
      * This value is only applicable for text nodes.
-     * @returns An integer.
+     * @type {number}
      */
     get offset() {
         return this._offset;
@@ -62,7 +62,7 @@ class DOMTextScanner {
     /**
      * Gets the remaining number of characters that weren't scanned in the last seek() call.
      * This value is usually 0 unless the end of the document was reached.
-     * @returns An integer.
+     * @type {number}
      */
     get remainder() {
         return this._remainder;
@@ -70,7 +70,7 @@ class DOMTextScanner {
 
     /**
      * Gets the accumulated content string resulting from calls to seek().
-     * @returns A string.
+     * @type {string}
      */
     get content() {
         return this._content;
@@ -78,11 +78,11 @@ class DOMTextScanner {
 
     /**
      * Seeks a given length in the document and accumulates the text content.
-     * @param length A positive or negative integer corresponding to how many characters
+     * @param {number} length A positive or negative integer corresponding to how many characters
      *   should be added to content. Content is only added to the accumulation string,
      *   never removed, so mixing seek calls with differently signed length values
      *   may give unexpected results.
-     * @returns this
+     * @returns {DOMTextScanner} this
      */
     seek(length) {
         const forward = (length >= 0);
@@ -114,7 +114,7 @@ class DOMTextScanner {
             } else if (nodeType === ELEMENT_NODE) {
                 lastNode = node;
                 this._offset = 0;
-                [enterable, newlines] = DOMTextScanner.getElementSeekInfo(node);
+                ({enterable, newlines} = DOMTextScanner.getElementSeekInfo(node));
                 if (newlines > this._newlines && generateLayoutContent) {
                     this._newlines = newlines;
                 }
@@ -125,7 +125,7 @@ class DOMTextScanner {
 
             for (const exitedNode of exitedNodes) {
                 if (exitedNode.nodeType !== ELEMENT_NODE) { continue; }
-                newlines = DOMTextScanner.getElementSeekInfo(exitedNode)[1];
+                ({newlines} = DOMTextScanner.getElementSeekInfo(exitedNode));
                 if (newlines > this._newlines && generateLayoutContent) {
                     this._newlines = newlines;
                 }
@@ -144,18 +144,14 @@ class DOMTextScanner {
 
     /**
      * Seeks forward in a text node.
-     * @param textNode The text node to use.
-     * @param resetOffset Whether or not the text offset should be reset.
-     * @returns true if scanning should continue, or false if the scan length has been reached.
+     * @param {Text} textNode The text node to use.
+     * @param {boolean} resetOffset Whether or not the text offset should be reset.
+     * @returns {boolean} `true` if scanning should continue, or `false` if the scan length has been reached.
      */
     _seekTextNodeForward(textNode, resetOffset) {
         const nodeValue = textNode.nodeValue;
         const nodeValueLength = nodeValue.length;
-        const [preserveNewlines, preserveWhitespace] = (
-            this._forcePreserveWhitespace ?
-            [true, true] :
-            DOMTextScanner.getWhitespaceSettings(textNode)
-        );
+        const {preserveNewlines, preserveWhitespace} = this._getWhitespaceSettings(textNode);
 
         let lineHasWhitespace = this._lineHasWhitespace;
         let lineHasContent = this._lineHasContent;
@@ -234,18 +230,14 @@ class DOMTextScanner {
      * - offset is decremented before getting the character.
      * - offset is reverted by incrementing instead of decrementing.
      * - content string is prepended instead of appended.
-     * @param textNode The text node to use.
-     * @param resetOffset Whether or not the text offset should be reset.
-     * @returns true if scanning should continue, or false if the scan length has been reached.
+     * @param {Text} textNode The text node to use.
+     * @param {boolean} resetOffset Whether or not the text offset should be reset.
+     * @returns {boolean} `true` if scanning should continue, or `false` if the scan length has been reached.
      */
     _seekTextNodeBackward(textNode, resetOffset) {
         const nodeValue = textNode.nodeValue;
         const nodeValueLength = nodeValue.length;
-        const [preserveNewlines, preserveWhitespace] = (
-            this._forcePreserveWhitespace ?
-            [true, true] :
-            DOMTextScanner.getWhitespaceSettings(textNode)
-        );
+        const {preserveNewlines, preserveWhitespace} = this._getWhitespaceSettings(textNode);
 
         let lineHasWhitespace = this._lineHasWhitespace;
         let lineHasContent = this._lineHasContent;
@@ -315,15 +307,41 @@ class DOMTextScanner {
         return (remainder > 0);
     }
 
+    /**
+     * Gets information about how whitespace characters are treated.
+     * @param {Text} textNode The text node to check.
+     * @returns {{preserveNewlines: boolean, preserveWhitespace: boolean}} Information about the whitespace.
+     *   The value of `preserveNewlines` indicates whether or not newline characters are treated as line breaks.
+     *   The value of `preserveWhitespace` indicates whether or not sequences of whitespace characters are collapsed.
+     */
+    _getWhitespaceSettings(textNode) {
+        if (this._forcePreserveWhitespace) {
+            return {preserveNewlines: true, preserveWhitespace: true};
+        }
+        const element = DOMTextScanner.getParentElement(textNode);
+        if (element !== null) {
+            const style = window.getComputedStyle(element);
+            switch (style.whiteSpace) {
+                case 'pre':
+                case 'pre-wrap':
+                case 'break-spaces':
+                    return {preserveNewlines: true, preserveWhitespace: true};
+                case 'pre-line':
+                    return {preserveNewlines: true, preserveWhitespace: false};
+            }
+        }
+        return {preserveNewlines: false, preserveWhitespace: false};
+    }
+
     // Static helpers
 
     /**
      * Gets the next node in the document for a specified scanning direction.
-     * @param node The current DOM Node.
-     * @param forward Whether to scan forward in the document or backward.
-     * @param visitChildren Whether the children of the current node should be visited.
-     * @param exitedNodes An array which stores nodes which were exited.
-     * @returns The next node in the document, or null if there is no next node.
+     * @param {Node} node The current DOM Node.
+     * @param {boolean} forward Whether to scan forward in the document or backward.
+     * @param {boolean} visitChildren Whether the children of the current node should be visited.
+     * @param {Node[]} exitedNodes An array which stores nodes which were exited.
+     * @returns {?Node} The next node in the document, or `null` if there is no next node.
      */
     static getNextNode(node, forward, visitChildren, exitedNodes) {
         let next = visitChildren ? (forward ? node.firstChild : node.lastChild) : null;
@@ -345,8 +363,8 @@ class DOMTextScanner {
 
     /**
      * Gets the parent element of a given Node.
-     * @param node The node to check.
-     * @returns The parent element if one exists, otherwise null.
+     * @param {Node} node The node to check.
+     * @returns {?Node} The parent element if one exists, otherwise `null`.
      */
     static getParentElement(node) {
         while (node !== null && node.nodeType !== Node.ELEMENT_NODE) {
@@ -359,8 +377,8 @@ class DOMTextScanner {
      * Gets the parent <ruby> element of a given node, if one exists. For efficiency purposes,
      * this only checks the immediate parent elements and does not check all ancestors, so
      * there are cases where the node may be in a ruby element but it is not returned.
-     * @param node The node to check.
-     * @returns A <ruby> node if the input node is contained in one, otherwise null.
+     * @param {Node} node The node to check.
+     * @returns {?HTMLElement} A <ruby> node if the input node is contained in one, otherwise `null`.
      */
     static getParentRubyElement(node) {
         node = DOMTextScanner.getParentElement(node);
@@ -374,9 +392,10 @@ class DOMTextScanner {
     }
 
     /**
-     * @returns [enterable: boolean, newlines: integer]
-     *   The enterable value indicates whether the content of this node should be entered.
-     *   The newlines value corresponds to the number of newline characters that should be added.
+     * Gets seek information about an element.
+     * @returns {{enterable: boolean, newlines: number}} The seek information.
+     *   The `enterable` value indicates whether the content of this node should be entered.
+     *   The `newlines` value corresponds to the number of newline characters that should be added.
      *     1 newline corresponds to a simple new line in the layout.
      *     2 newlines corresponds to a significant visual distinction since the previous content.
      */
@@ -387,9 +406,9 @@ class DOMTextScanner {
             case 'RT':
             case 'SCRIPT':
             case 'STYLE':
-                return [false, 0];
+                return {enterable: false, newlines: 0};
             case 'BR':
-                return [false, 1];
+                return {enterable: false, newlines: 1};
             case 'TEXTAREA':
             case 'INPUT':
             case 'BUTTON':
@@ -418,36 +437,13 @@ class DOMTextScanner {
             }
         }
 
-        return [enterable, newlines];
-    }
-
-    /**
-     * Gets information about how whitespace characters are treated.
-     * @param textNode The Text node to check.
-     * @returns [preserveNewlines: boolean, preserveWhitespace: boolean]
-     *   The value of preserveNewlines indicates whether or not newline characters are treated as line breaks.
-     *   The value of preserveWhitespace indicates whether or not sequences of whitespace characters are collapsed.
-     */
-    static getWhitespaceSettings(textNode) {
-        const element = DOMTextScanner.getParentElement(textNode);
-        if (element !== null) {
-            const style = window.getComputedStyle(element);
-            switch (style.whiteSpace) {
-                case 'pre':
-                case 'pre-wrap':
-                case 'break-spaces':
-                    return [true, true];
-                case 'pre-line':
-                    return [true, false];
-            }
-        }
-        return [false, false];
+        return {enterable, newlines};
     }
 
     /**
      * Gets attributes for the specified character.
-     * @param character A string containing a single character.
-     * @returns An integer representing the attributes of the character.
+     * @param {string} character A string containing a single character.
+     * @returns {number} An integer representing the attributes of the character.
      *   0: Character should be ignored.
      *   1: Character is collapsible whitespace.
      *   2: Character should be added to the content.
@@ -472,9 +468,9 @@ class DOMTextScanner {
 
     /**
      * Checks whether a given style is visible or not.
-     * This function does not check style.display === 'none'.
-     * @param style An object implementing the CSSStyleDeclaration interface.
-     * @returns true if the style should result in an element being visible, otherwise false.
+     * This function does not check `style.display === 'none'`.
+     * @param {CSSStyleDeclaration} style An object implementing the CSSStyleDeclaration interface.
+     * @returns {boolean} `true` if the style should result in an element being visible, otherwise `false`.
      */
     static isStyleVisible(style) {
         return !(
@@ -493,8 +489,8 @@ class DOMTextScanner {
 
     /**
      * Checks whether a given style is selectable or not.
-     * @param style An object implementing the CSSStyleDeclaration interface.
-     * @returns true if the style is selectable, otherwise false.
+     * @param {CSSStyleDeclaration} style An object implementing the CSSStyleDeclaration interface.
+     * @returns {boolean} `true` if the style is selectable, otherwise `false`.
      */
     static isStyleSelectable(style) {
         return !(
@@ -507,8 +503,8 @@ class DOMTextScanner {
 
     /**
      * Checks whether a CSS color is transparent or not.
-     * @param cssColor A CSS color string, expected to be encoded in rgb(a) form.
-     * @returns true if the color is transparent, otherwise false.
+     * @param {string} cssColor A CSS color string, expected to be encoded in rgb(a) form.
+     * @returns {false} `true` if the color is transparent, otherwise `false`.
      */
     static isCSSColorTransparent(cssColor) {
         return (
@@ -520,8 +516,8 @@ class DOMTextScanner {
 
     /**
      * Checks whether a CSS display value will cause a layout change for text.
-     * @param cssDisplay A CSS string corresponding to the value of the display property.
-     * @returns true if the layout is changed by this value, otherwise false.
+     * @param {string} cssDisplay A CSS string corresponding to the value of the display property.
+     * @returns {boolean} `true` if the layout is changed by this value, otherwise `false`.
      */
     static doesCSSDisplayChangeLayout(cssDisplay) {
         let pos = cssDisplay.indexOf(' ');
