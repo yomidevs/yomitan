@@ -25,6 +25,14 @@ class DisplayNotification {
         this._closeTimer = null;
     }
 
+    get container() {
+        return this._container;
+    }
+
+    get node() {
+        return this._node;
+    }
+
     open() {
         if (!this.isClosed()) { return; }
 

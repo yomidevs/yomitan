@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DisplayNotification
- */
-
 class OptionToggleHotkeyHandler {
     constructor(display) {
         this._display = display;
@@ -126,9 +122,8 @@ class OptionToggleHotkeyHandler {
 
     _showNotification(message, autoClose) {
         if (this._notification === null) {
-            const node = this._display.displayGenerator.createEmptyFooterNotification();
-            node.addEventListener('click', this._onNotificationClick.bind(this), false);
-            this._notification = new DisplayNotification(this._display.notificationContainer, node);
+            this._notification = this._display.createNotification(false);
+            this._notification.node.addEventListener('click', this._onNotificationClick.bind(this), false);
         }
 
         this._notification.setContent(message);

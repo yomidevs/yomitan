@@ -18,7 +18,6 @@
 /* global
  * AnkiNoteBuilder
  * AnkiUtil
- * DisplayNotification
  * PopupMenu
  */
 
@@ -29,9 +28,9 @@ class DisplayAnki {
         this._ankiFieldTemplates = null;
         this._ankiFieldTemplatesDefault = null;
         this._ankiNoteBuilder = new AnkiNoteBuilder({japaneseUtil});
-        this._ankiNoteNotification = null;
-        this._ankiNoteNotificationEventListeners = null;
-        this._ankiTagNotification = null;
+        this._errorNotification = null;
+        this._errorNotificationEventListeners = null;
+        this._tagsNotification = null;
         this._updateAdderButtonsPromise = Promise.resolve();
         this._updateDictionaryEntryDetailsToken = null;
         this._eventListeners = new EventListenerCollection();
@@ -160,7 +159,7 @@ class DisplayAnki {
     _onContentClear() {
         this._updateDictionaryEntryDetailsToken = null;
         this._dictionaryEntryDetails = null;
-        this._hideAnkiNoteErrors(false);
+        this._hideErrorNotification(false);
     }
 
     _onContentUpdateStart() {
@@ -200,7 +199,7 @@ class DisplayAnki {
     _onShowTags(e) {
         e.preventDefault();
         const tags = e.currentTarget.title;
-        this._showAnkiTagsNotification(tags);
+        this._showTagsNotification(tags);
     }
 
     _adderButtonFind(index, mode) {
@@ -312,17 +311,14 @@ class DisplayAnki {
         }
     }
 
-    _showAnkiTagsNotification(message) {
-        if (this._ankiTagNotification === null) {
-            const node = this._display.displayGenerator.createEmptyFooterNotification();
-            node.classList.add('click-scannable');
-            this._ankiTagNotification = new DisplayNotification(this._display.notificationContainer, node);
+    _showTagsNotification(message) {
+        if (this._tagsNotification === null) {
+            this._tagsNotification = this._display.createNotification(true);
         }
 
-        this._ankiTagNotification.setContent(message);
-        this._ankiTagNotification.open();
+        this._tagsNotification.setContent(message);
+        this._tagsNotification.open();
     }
-
 
     _tryAddAnkiNoteForSelectedEntry(mode) {
         const index = this._display.selectedIndex;
@@ -349,7 +345,7 @@ class DisplayAnki {
         const button = this._adderButtonFind(dictionaryEntryIndex, mode);
         if (button === null || button.disabled) { return; }
 
-        this._hideAnkiNoteErrors(true);
+        this._hideErrorNotification(true);
 
         const allErrors = [];
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
@@ -393,9 +389,9 @@ class DisplayAnki {
         }
 
         if (allErrors.length > 0) {
-            this._showAnkiNoteErrors(allErrors);
+            this._showErrorNotification(allErrors);
         } else {
-            this._hideAnkiNoteErrors(true);
+            this._hideErrorNotification(true);
         }
     }
 
@@ -422,32 +418,31 @@ class DisplayAnki {
         return error;
     }
 
-    _showAnkiNoteErrors(errors) {
-        if (this._ankiNoteNotificationEventListeners !== null) {
-            this._ankiNoteNotificationEventListeners.removeAllEventListeners();
+    _showErrorNotification(errors) {
+        if (this._errorNotificationEventListeners !== null) {
+            this._errorNotificationEventListeners.removeAllEventListeners();
         }
 
-        if (this._ankiNoteNotification === null) {
-            const node = this._display.displayGenerator.createEmptyFooterNotification();
-            this._ankiNoteNotification = new DisplayNotification(this._display.notificationContainer, node);
-            this._ankiNoteNotificationEventListeners = new EventListenerCollection();
+        if (this._errorNotification === null) {
+            this._errorNotification = this._display.createNotification(false);
+            this._errorNotificationEventListeners = new EventListenerCollection();
         }
 
         const content = this._display.displayGenerator.createAnkiNoteErrorsNotificationContent(errors);
         for (const node of content.querySelectorAll('.anki-note-error-log-link')) {
-            this._ankiNoteNotificationEventListeners.addEventListener(node, 'click', () => {
+            this._errorNotificationEventListeners.addEventListener(node, 'click', () => {
                 console.log({ankiNoteErrors: errors});
             }, false);
         }
 
-        this._ankiNoteNotification.setContent(content);
-        this._ankiNoteNotification.open();
+        this._errorNotification.setContent(content);
+        this._errorNotification.open();
     }
 
-    _hideAnkiNoteErrors(animate) {
-        if (this._ankiNoteNotification === null) { return; }
-        this._ankiNoteNotification.close(animate);
-        this._ankiNoteNotificationEventListeners.removeAllEventListeners();
+    _hideErrorNotification(animate) {
+        if (this._errorNotification === null) { return; }
+        this._errorNotification.close(animate);
+        this._errorNotificationEventListeners.removeAllEventListeners();
     }
 
     async _updateAnkiFieldTemplates(options) {

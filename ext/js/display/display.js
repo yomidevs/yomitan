@@ -231,10 +231,6 @@ class Display extends EventDispatcher {
         return this._parentPopupId;
     }
 
-    get notificationContainer() {
-        return this._footerNotificationContainer;
-    }
-
     get selectedIndex() {
         return this._index;
     }
@@ -510,6 +506,19 @@ class Display extends EventDispatcher {
         if (node === null) { return -1; }
         const index = parseInt(node.dataset.index, 10);
         return Number.isFinite(index) ? index : -1;
+    }
+
+    /**
+     * Creates a new notification.
+     * @param {boolean} scannable Whether or not the notification should permit its content to be scanned.
+     * @returns {DisplayNotification} A new notification instance.
+     */
+    createNotification(scannable) {
+        const node = this._displayGenerator.createEmptyFooterNotification();
+        if (scannable) {
+            node.classList.add('click-scannable');
+        }
+        return new DisplayNotification(this._footerNotificationContainer, node);
     }
 
     // Message handlers
@@ -857,9 +866,7 @@ class Display extends EventDispatcher {
         if (tagNode === null) { return; }
 
         if (this._tagNotification === null) {
-            const node = this._displayGenerator.createEmptyFooterNotification();
-            node.classList.add('click-scannable');
-            this._tagNotification = new DisplayNotification(this._footerNotificationContainer, node);
+            this._tagNotification = this.createNotification(true);
         }
 
         const index = this.getElementDictionaryEntryIndex(tagNode);
