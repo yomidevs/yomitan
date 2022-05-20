@@ -27,8 +27,9 @@
 class Translator {
     /**
      * Creates a new Translator instance.
-     * @param japaneseUtil An instance of JapaneseUtil.
-     * @param database An instance of DictionaryDatabase.
+     * @param {object} details The details for the class.
+     * @param {JapaneseUtil} details.japaneseUtil An instance of JapaneseUtil.
+     * @param {DictionaryDatabase} details.database An instance of DictionaryDatabase.
      */
     constructor({japaneseUtil, database}) {
         this._japaneseUtil = japaneseUtil;
@@ -42,7 +43,7 @@ class Translator {
     /**
      * Initializes the instance for use. The public API should not be used until
      * this function has been called.
-     * @param deinflectionReasons The raw deinflections reasons data that the Deinflector uses.
+     * @param {object} deinflectionReasons The raw deinflections reasons data that the Deinflector uses.
      */
     prepare(deinflectionReasons) {
         this._deinflector = new Deinflector(deinflectionReasons);
@@ -57,42 +58,11 @@ class Translator {
 
     /**
      * Finds term definitions for the given text.
-     * @param mode The mode to use for finding terms, which determines the format of the resulting array.
+     * @param {string} mode The mode to use for finding terms, which determines the format of the resulting array.
      *   One of: 'group', 'merge', 'split', 'simple'
-     * @param text The text to find terms for.
-     * @param options An object using the following structure:
-     * ```
-     *   {
-     *     matchType: (enum: 'exact', 'prefix', 'suffix'),
-     *     mainDictionary: (string),
-     *     sortFrequencyDictionary: (null or string),
-     *     sortFrequencyDictionaryOrder: (enum: 'ascending', 'descending'),
-     *     removeNonJapaneseCharacters: (boolean),
-     *     convertHalfWidthCharacters: (enum: 'false', 'true', 'variant'),
-     *     convertNumericCharacters: (enum: 'false', 'true', 'variant'),
-     *     convertAlphabeticCharacters: (enum: 'false', 'true', 'variant'),
-     *     convertHiraganaToKatakana: (enum: 'false', 'true', 'variant'),
-     *     convertKatakanaToHiragana: (enum: 'false', 'true', 'variant'),
-     *     collapseEmphaticSequences: (enum: 'false', 'true', 'full'),
-     *     textReplacements: [
-     *       (null or [
-     *         {pattern: (RegExp), replacement: (string)}
-     *         ...
-     *       ])
-     *       ...
-     *     ],
-     *     enabledDictionaryMap: (Map of [
-     *       (string),
-     *       {
-     *         index: (number),
-     *         priority: (number),
-     *         allowSecondarySearches: (boolean)
-     *       }
-     *     ]),
-     *     excludeDictionaryDefinitions: (Set of (string) or null)
-     *   }
-     * ```
-     * @returns An object of the structure `{dictionaryEntries, originalTextLength}`.
+     * @param {string} text The text to find terms for.
+     * @param {Translation.FindTermsOptions} options A object describing settings about the lookup.
+     * @returns {{dictionaryEntries: Translation.TermDictionaryEntry[], originalTextLength: number}} An object containing dictionary entries and the length of the original source text.
      */
     async findTerms(mode, text, options) {
         const {enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder} = options;
@@ -136,20 +106,11 @@ class Translator {
 
     /**
      * Finds kanji definitions for the given text.
-     * @param text The text to find kanji definitions for. This string can be of any length,
+     * @param {string} text The text to find kanji definitions for. This string can be of any length,
      *   but is typically just one character, which is a single kanji. If the string is multiple
      *   characters long, each character will be searched in the database.
-     * @param options An object using the following structure:
-     *   {
-     *     enabledDictionaryMap: (Map of [
-     *       (string),
-     *       {
-     *         index: (number),
-     *         priority: (number)
-     *       }
-     *     ])
-     *   }
-     * @returns An array of definitions. See the _createKanjiDefinition() function for structure details.
+     * @param {Translation.FindKanjiOptions} options A object describing settings about the lookup.
+     * @returns {Translation.KanjiDictionaryEntry[]} An array of definitions. See the _createKanjiDefinition() function for structure details.
      */
     async findKanji(text, options) {
         const {enabledDictionaryMap} = options;
@@ -185,11 +146,10 @@ class Translator {
     /**
      * Gets a list of frequency information for a given list of term-reading pairs
      * and a list of dictionaries.
-     * @param termReadingList An array of `{term, reading}` pairs. If reading is null,
+     * @param {{term: string, reading: string|null}[]} termReadingList An array of `{term, reading}` pairs. If reading is null,
      *   the reading won't be compared.
-     * @param dictionaries An array of dictionary names.
-     * @returns An array of objects with the format
-     *   `{term, reading, dictionary, hasReading, frequency}`.
+     * @param {Iterable<string>} dictionaries An array of dictionary names.
+     * @returns {TermFrequency[]} An array of term frequencies.
      */
     async getTermFrequencies(termReadingList, dictionaries) {
         const dictionarySet = new Set();

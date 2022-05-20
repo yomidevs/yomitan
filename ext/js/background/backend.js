@@ -1958,6 +1958,13 @@ class Backend {
         this._applyOptions(source);
     }
 
+    /**
+     * Creates an options object for use with `Translator.findTerms`.
+     * @param {string} mode The display mode for the dictionary entries.
+     * @param {{matchType: string, deinflect: boolean}} details Custom info for finding terms.
+     * @param {object} options The options.
+     * @returns {FindTermsOptions} An options object.
+     */
     _getTranslatorFindTermsOptions(mode, details, options) {
         let {matchType, deinflect} = details;
         if (typeof matchType !== 'string') { matchType = 'exact'; }
@@ -2006,6 +2013,11 @@ class Backend {
         };
     }
 
+    /**
+     * Creates an options object for use with `Translator.findKanji`.
+     * @param {object} options The options.
+     * @returns {FindKanjiOptions} An options object.
+     */
     _getTranslatorFindKanjiOptions(options) {
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         return {enabledDictionaryMap};
