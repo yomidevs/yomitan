@@ -66,7 +66,7 @@ class Popup extends EventDispatcher {
 
     /**
      * Creates a new instance.
-     * @param {object} details
+     * @param {object} details The details used to construct the new instance.
      * @param {string} details.id The ID of the popup.
      * @param {number} details.depth The depth of the popup.
      * @param {number} details.frameId The ID of the host frame.
@@ -673,9 +673,11 @@ class Popup extends EventDispatcher {
     }
 
     /**
-     * @param {Rect[]} sourceRects
-     * @param {string} writingMode
-     * @returns {SizeRect}
+     * Computes the position where the popup should be placed relative to the source content.
+     * @param {Rect[]} sourceRects The rectangles of the source content.
+     * @param {string} writingMode The CSS writing mode of the source text.
+     * @param {Rect} viewport The viewport that the popup can be placed within.
+     * @returns {SizeRect} The calculated rectangle for where to position the popup.
      */
     _getPosition(sourceRects, writingMode, viewport) {
         const scale = this._contentScale;
@@ -720,7 +722,15 @@ class Popup extends EventDispatcher {
     }
 
     /**
-     * @returns {SizeRect}
+     * Computes the position where the popup should be placed for horizontal text.
+     * @param {Rect} sourceRect The rectangle of the source content.
+     * @param {number} frameWidth The preferred width of the frame.
+     * @param {number} frameHeight The preferred height of the frame.
+     * @param {Rect} viewport The viewport that the frame can be placed within.
+     * @param {number} horizontalOffset The horizontal offset from the source rect that the popup will be placed.
+     * @param {number} verticalOffset The vertical offset from the source rect that the popup will be placed.
+     * @param {boolean} preferBelow Whether or not the popup is preferred to be placed below the source content.
+     * @returns {SizeRect} The calculated rectangle for where to position the popup.
      */
     _getPositionForHorizontalText(sourceRect, frameWidth, frameHeight, viewport, horizontalOffset, verticalOffset, preferBelow) {
         const [left, width, after] = this._getConstrainedPosition(
@@ -743,7 +753,15 @@ class Popup extends EventDispatcher {
     }
 
     /**
-     * @returns {SizeRect}
+     * Computes the position where the popup should be placed for vertical text.
+     * @param {Rect} sourceRect The rectangle of the source content.
+     * @param {number} frameWidth The preferred width of the frame.
+     * @param {number} frameHeight The preferred height of the frame.
+     * @param {Rect} viewport The viewport that the frame can be placed within.
+     * @param {number} horizontalOffset The horizontal offset from the source rect that the popup will be placed.
+     * @param {number} verticalOffset The vertical offset from the source rect that the popup will be placed.
+     * @param {boolean} preferRight Whether or not the popup is preferred to be placed to the right of the source content.
+     * @returns {SizeRect} The calculated rectangle for where to position the popup.
      */
     _getPositionForVerticalText(sourceRect, frameWidth, frameHeight, viewport, horizontalOffset, verticalOffset, preferRight) {
         const [left, width, after] = this._getConstrainedPositionBinary(
@@ -824,6 +842,11 @@ class Popup extends EventDispatcher {
         return [position, size, after];
     }
 
+    /**
+     * Gets the visual viewport.
+     * @param {boolean} useVisualViewport Whether or not the `window.visualViewport` should be used.
+     * @returns {Rect} The rectangle of the visual viewport.
+     */
     _getViewport(useVisualViewport) {
         const visualViewport = window.visualViewport;
         if (visualViewport !== null && typeof visualViewport === 'object') {
@@ -887,8 +910,9 @@ class Popup extends EventDispatcher {
     }
 
     /**
-     * @param {Rect[]} sourceRects
-     * @returns {Rect}
+     * Computes the bounding rectangle for a set of rectangles.
+     * @param {Rect[]} sourceRects An array of rectangles.
+     * @returns {Rect} The bounding rectangle for all of the source rectangles.
      */
     _getBoundingSourceRect(sourceRects) {
         switch (sourceRects.length) {
@@ -907,10 +931,11 @@ class Popup extends EventDispatcher {
     }
 
     /**
-     * @param {SizeRect} sizeRect
-     * @param {Rect[]} sourceRects
-     * @param {number} ignoreIndex
-     * @returns {boolean}
+     * Checks whether or not a rectangle is overlapping any other rectangles.
+     * @param {SizeRect} sizeRect The rectangles to check for overlaps.
+     * @param {Rect[]} sourceRects The list of rectangles to compare against.
+     * @param {number} ignoreIndex The index of an item in `sourceRects` to ignore.
+     * @returns {boolean} `true` if `sizeRect` overlaps any one of `sourceRects`, excluding `sourceRects[ignoreIndex]`; `false` otherwise.
      */
     _isOverlapping(sizeRect, sourceRects, ignoreIndex) {
         const {left, top} = sizeRect;

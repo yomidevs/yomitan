@@ -20,8 +20,8 @@ const assert = require('assert');
 
 /**
  * This function patches the following bug:
- * * https://github.com/jsdom/jsdom/issues/3211
- * * https://github.com/dperini/nwsapi/issues/48
+ * - https://github.com/jsdom/jsdom/issues/3211
+ * - https://github.com/dperini/nwsapi/issues/48
  */
 function patchNwsapi() {
     const nwsapiPath = require.resolve('nwsapi');

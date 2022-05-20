@@ -53,6 +53,7 @@ class AnkiTemplateRenderer {
 
     /**
      * Gets the generic TemplateRenderer instance.
+     * @type {TemplateRenderer}
      */
     get templateRenderer() {
         return this._templateRenderer;

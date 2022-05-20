@@ -250,7 +250,7 @@ function generateId(length) {
 
 /**
  * Creates an unresolved promise that can be resolved later, outside the promise's executor function.
- * @returns {{promise: Promise, resolve: function, reject: function}} An object `{promise, resolve, reject}`, containing the promise and the resolve/reject functions.
+ * @returns {{promise: Promise, resolve: Function, reject: Function}} An object `{promise, resolve, reject}`, containing the promise and the resolve/reject functions.
  */
 function deferPromise() {
     let resolve;
@@ -349,15 +349,15 @@ function promiseAnimationFrame(timeout=null) {
 /**
  * Invokes a standard message handler. This function is used to react and respond
  * to communication messages within the extension.
- * @param {object} details
- * @param {function} details.handler A handler function which is passed `params` and `...extraArgs` as arguments.
+ * @param {object} details Details about how to handle messages.
+ * @param {Function} details.handler A handler function which is passed `params` and `...extraArgs` as arguments.
  * @param {boolean|string} details.async Whether or not the handler is async or not. Values include `false`, `true`, or `'dynamic'`.
  *   When the value is `'dynamic'`, the handler should return an object of the format `{async: boolean, result: any}`.
  * @param {object} params Information which was passed with the original message.
- * @param {function} callback A callback function which is invoked after the handler has completed. The value passed
+ * @param {Function} callback A callback function which is invoked after the handler has completed. The value passed
  *   to the function is in the format:
- *   * `{result: any}` if the handler invoked successfully.
- *   * `{error: object}` if the handler thew an error. The error is serialized.
+ *   - `{result: any}` if the handler invoked successfully.
+ *   - `{error: object}` if the handler thew an error. The error is serialized.
  * @param {...*} extraArgs Additional arguments which are passed to the `handler` function.
  * @returns {boolean} `true` if the function is invoked asynchronously, `false` otherwise.
  */
@@ -413,7 +413,7 @@ class EventDispatcher {
     /**
      * Adds a single event listener to a specific event.
      * @param {string} eventName The string representing the event's name.
-     * @param {function} callback The event listener callback to add.
+     * @param {Function} callback The event listener callback to add.
      */
     on(eventName, callback) {
         let callbacks = this._eventMap.get(eventName);
@@ -427,7 +427,7 @@ class EventDispatcher {
     /**
      * Removes a single event listener from a specific event.
      * @param {string} eventName The string representing the event's name.
-     * @param {function} callback The event listener callback to add.
+     * @param {Function} callback The event listener callback to add.
      * @returns {boolean} `true` if the callback was removed, `false` otherwise.
      */
     off(eventName, callback) {
@@ -482,6 +482,7 @@ class EventListenerCollection {
      * @param {string} type The type of event listener, which can be 'addEventListener', 'addListener', or 'on'.
      * @param {object} object The object to add the event listener to.
      * @param {...*} args The argument array passed to the object's event listener adding function.
+     * @returns {void}
      * @throws An error if type is not an expected value.
      */
     addGeneric(type, object, ...args) {
@@ -539,8 +540,6 @@ class EventListenerCollection {
                 case 'off':
                     object.off(...args);
                     break;
-                default:
-                    throw new Error(`Unknown remove function: ${removeFunctionName}`);
             }
         }
         this._eventListeners = [];

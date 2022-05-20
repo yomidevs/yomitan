@@ -150,16 +150,17 @@ class Yomichan extends EventDispatcher {
     /**
      * Checks whether or not a URL is an extension URL.
      * @param {string} url The URL to check.
-     * @returns true if the URL is an extension URL, false otherwise.
+     * @returns {boolean} `true` if the URL is an extension URL, `false` otherwise.
      */
     isExtensionUrl(url) {
         return this._extensionUrlBase !== null && url.startsWith(this._extensionUrlBase);
     }
 
     /**
-     * Runs chrome.runtime.sendMessage() with additional exception handling events.
-     * @param {...*} args The arguments to be passed to chrome.runtime.sendMessage().
-     * @returns {void} The result of the chrome.runtime.sendMessage() call.
+     * Runs `chrome.runtime.sendMessage()` with additional exception handling events.
+     * @param {...*} args The arguments to be passed to `chrome.runtime.sendMessage()`.
+     * @returns {void} The result of the `chrome.runtime.sendMessage()` call.
+     * @throws {Error} Errors thrown by `chrome.runtime.sendMessage()` are re-thrown.
      */
     sendMessage(...args) {
         try {
@@ -171,9 +172,10 @@ class Yomichan extends EventDispatcher {
     }
 
     /**
-     * Runs chrome.runtime.connect() with additional exception handling events.
-     * @param {...*} args The arguments to be passed to chrome.runtime.connect().
+     * Runs `chrome.runtime.connect()` with additional exception handling events.
+     * @param {...*} args The arguments to be passed to `chrome.runtime.connect()`.
      * @returns {Port} The resulting port.
+     * @throws {Error} Errors thrown by `chrome.runtime.connect()` are re-thrown.
      */
     connect(...args) {
         try {

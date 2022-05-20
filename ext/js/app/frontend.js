@@ -27,7 +27,7 @@
 class Frontend {
     /**
      * Creates a new instance.
-     * @param {object} details
+     * @param {object} details Details about how to set up the instance.
      * @param {string} details.pageType The type of page, one of 'web', 'popup', or 'search'.
      * @param {PopupFactory} details.popupFactory A PopupFactory instance to use for generating popups.
      * @param {number} details.depth The nesting depth value of the popup.

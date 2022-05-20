@@ -174,7 +174,7 @@ class ThemeController {
 
     /**
      * Adds the value of a CSS color to an accumulation target.
-     * @param {[number, number, number]} target The target color buffer to accumulate into.
+     * @param {number[]} target The target color buffer to accumulate into, as an array of [r, g, b].
      * @param {string|*} cssColor The CSS color value to add to the target. If this value is not a string,
      *   the target will not be modified.
      */
@@ -196,7 +196,7 @@ class ThemeController {
     /**
      * Decomposes a CSS color string into its RGBA values.
      * @param {string} cssColor The color value to decompose. This value is expected to be in the form RGB(r, g, b) or RGBA(r, g, b, a).
-     * @returns {?[number, number, number, number]} The color and alpha values. The color component values range from [0, 255], and the alpha ranges from [0, 1].
+     * @returns {?number[]} The color and alpha values as [r, g, b, a]. The color component values range from [0, 255], and the alpha ranges from [0, 1].
      */
     _getColorInfo(cssColor) {
         const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)\s*$/.exec(cssColor);

@@ -21,8 +21,7 @@
 class ObjectPropertyAccessor {
     /**
      * Create a new accessor for a specific object.
-     * @param target The object which the getter and mutation methods are applied to.
-     * @returns A new ObjectPropertyAccessor instance.
+     * @param {object} target The object which the getter and mutation methods are applied to.
      */
     constructor(target) {
         this._target = target;
@@ -30,11 +29,11 @@ class ObjectPropertyAccessor {
 
     /**
      * Gets the value at the specified path.
-     * @param pathArray The path to the property on the target object.
-     * @param pathLength How many parts of the pathArray to use.
+     * @param {(string|number)[]} pathArray The path to the property on the target object.
+     * @param {number} [pathLength] How many parts of the pathArray to use.
      *   This parameter is optional and defaults to the length of pathArray.
-     * @returns The value found at the path.
-     * @throws An error is thrown if pathArray is not valid for the target object.
+     * @returns {*} The value found at the path.
+     * @throws {Error} An error is thrown if pathArray is not valid for the target object.
      */
     get(pathArray, pathLength) {
         let target = this._target;
@@ -51,9 +50,9 @@ class ObjectPropertyAccessor {
 
     /**
      * Sets the value at the specified path.
-     * @param pathArray The path to the property on the target object.
-     * @param value The value to assign to the property.
-     * @throws An error is thrown if pathArray is not valid for the target object.
+     * @param {(string|number)[]} pathArray The path to the property on the target object.
+     * @param {*} value The value to assign to the property.
+     * @throws {Error} An error is thrown if pathArray is not valid for the target object.
      */
     set(pathArray, value) {
         const ii = pathArray.length - 1;
@@ -70,8 +69,8 @@ class ObjectPropertyAccessor {
 
     /**
      * Deletes the property of the target object at the specified path.
-     * @param pathArray The path to the property on the target object.
-     * @throws An error is thrown if pathArray is not valid for the target object.
+     * @param {(string|number)[]}pathArray The path to the property on the target object.
+     * @throws {Error} An error is thrown if pathArray is not valid for the target object.
      */
     delete(pathArray) {
         const ii = pathArray.length - 1;
@@ -92,8 +91,8 @@ class ObjectPropertyAccessor {
 
     /**
      * Swaps two properties of an object or array.
-     * @param pathArray1 The path to the first property on the target object.
-     * @param pathArray2 The path to the second property on the target object.
+     * @param {(string|number)[]} pathArray1 The path to the first property on the target object.
+     * @param {(string|number)[]} pathArray2 The path to the second property on the target object.
      * @throws An error is thrown if pathArray1 or pathArray2 is not valid for the target object,
      *   or if the swap cannot be performed.
      */
@@ -129,8 +128,9 @@ class ObjectPropertyAccessor {
 
     /**
      * Converts a path string to a path array.
-     * @param pathArray The path array to convert.
-     * @returns A string representation of pathArray.
+     * @param {(string|number)[]} pathArray The path array to convert.
+     * @returns {string} A string representation of `pathArray`.
+     * @throws {Error} An error is thrown if any item of `pathArray` is not a string or an integer.
      */
     static getPathString(pathArray) {
         const regexShort = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
@@ -166,8 +166,9 @@ class ObjectPropertyAccessor {
     /**
      * Converts a path array to a path string. For the most part, the format of this string
      * matches Javascript's notation for property access.
-     * @param pathString The path string to convert.
-     * @returns An array representation of pathString.
+     * @param {string} pathString The path string to convert.
+     * @returns {(string | number)[]} An array representation of `pathString`.
+     * @throws {Error} An error is thrown if `pathString` is malformed.
      */
     static getPathArray(pathString) {
         const pathArray = [];
@@ -286,11 +287,11 @@ class ObjectPropertyAccessor {
 
     /**
      * Checks whether an object or array has the specified property.
-     * @param object The object to test.
-     * @param property The property to check for existence.
+     * @param {*} object The object to test.
+     * @param {string|number} property The property to check for existence.
      *   This value should be a string if the object is a non-array object.
      *   For arrays, it should be an integer.
-     * @returns true if the property exists, otherwise false.
+     * @returns {boolean} `true` if the property exists, otherwise `false`.
      */
     static hasProperty(object, property) {
         switch (typeof property) {
@@ -315,9 +316,9 @@ class ObjectPropertyAccessor {
 
     /**
      * Checks whether a property is valid for the given object
-     * @param object The object to test.
-     * @param property The property to check for existence.
-     * @returns true if the property is correct for the given object type, otherwise false.
+     * @param {object} object The object to test.
+     * @param {string|number} property The property to check for existence.
+     * @returns {boolean} `true` if the property is correct for the given object type, otherwise `false`.
      *   For arrays, this means that the property should be a positive integer.
      *   For non-array objects, the property should be a string.
      */

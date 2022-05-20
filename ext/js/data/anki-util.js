@@ -22,8 +22,8 @@ class AnkiUtil {
     /**
      * Gets the root deck name of a full deck name. If the deck is a root deck,
      * the same name is returned. Nested decks are separated using '::'.
-     * @param deckName A string of the deck name.
-     * @returns A string corresponding to the name of the root deck.
+     * @param {string} deckName A string of the deck name.
+     * @returns {string} A string corresponding to the name of the root deck.
      */
     static getRootDeckName(deckName) {
         const index = deckName.indexOf('::');
@@ -32,8 +32,8 @@ class AnkiUtil {
 
     /**
      * Checks whether or not any marker is contained in a string.
-     * @param string A string to check.
-     * @return `true` if the text contains an Anki field marker, `false` otherwise.
+     * @param {string} string A string to check.
+     * @returns {boolean} `true` if the text contains an Anki field marker, `false` otherwise.
      */
     static stringContainsAnyFieldMarker(string) {
         const result = this._markerPattern.test(string);
@@ -43,8 +43,8 @@ class AnkiUtil {
 
     /**
      * Gets a list of all markers that are contained in a string.
-     * @param string A string to check.
-     * @return An array of marker strings.
+     * @param {string} string A string to check.
+     * @returns {string[]} An array of marker strings.
      */
     static getFieldMarkers(string) {
         const pattern = this._markerPattern;
@@ -58,25 +58,9 @@ class AnkiUtil {
     }
 
     /**
-     * Checks whether an object of key-value pairs has a value which contains a specific marker.
-     * @param fieldsObject An object with key-value pairs, where the value corresponds to the field value.
-     * @param marker The marker string to check for, excluding brackets.
-     * @returns `true` if any of the fields contains the marker, `false` otherwise.
-     */
-    static fieldsObjectContainsMarker(fieldsObject, marker) {
-        marker = `{${marker}}`;
-        for (const [, fieldValue] of fieldsObject) {
-            if (fieldValue.includes(marker)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Returns a regular expression which can be used to find markers in a string.
-     * @param global Whether or not the regular expression should have the global flag.
-     * @returns A new `RegExp` instance.
+     * @param {boolean} global Whether or not the regular expression should have the global flag.
+     * @returns {RegExp} A new `RegExp` instance.
      */
     static cloneFieldMarkerPattern(global) {
         return new RegExp(this._markerPattern.source, global ? 'g' : '');
@@ -84,8 +68,8 @@ class AnkiUtil {
 
     /**
      * Checks whether or not a note object is valid.
-     * @param note A note object to check.
-     * @return `true` if the note is valid, `false` otherwise.
+     * @param {*} note A note object to check.
+     * @returns {boolean} `true` if the note is valid, `false` otherwise.
      */
     static isNoteDataValid(note) {
         if (!isObject(note)) { return false; }

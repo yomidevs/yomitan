@@ -22,12 +22,12 @@ class RegexUtil {
     /**
      * Applies string.replace using a regular expression and replacement string as arguments.
      * A source map of the changes is also maintained.
-     * @param text A string of the text to replace.
-     * @param sourceMap An instance of `TextSourceMap` which corresponds to `text`.
-     * @param pattern A regular expression to use as the replacement.
-     * @param replacement A replacement string that follows the format of the standard
+     * @param {string} text A string of the text to replace.
+     * @param {TextSourceMap} sourceMap An instance of `TextSourceMap` which corresponds to `text`.
+     * @param {RegExp} pattern A regular expression to use as the replacement.
+     * @param {string} replacement A replacement string that follows the format of the standard
      *   JavaScript regular expression replacement string.
-     * @return A new string with the pattern replacements applied and the source map updated.
+     * @returns {string} A new string with the pattern replacements applied and the source map updated.
      */
     static applyTextReplacement(text, sourceMap, pattern, replacement) {
         const isGlobal = pattern.global;
@@ -57,10 +57,10 @@ class RegexUtil {
 
     /**
      * Applies the replacement string for a given regular expression match.
-     * @param replacement The replacement string that follows the format of the standard
+     * @param {string} replacement The replacement string that follows the format of the standard
      *   JavaScript regular expression replacement string.
-     * @param match A match object returned from RegExp.match.
-     * @return A new string with the pattern replacement applied.
+     * @param {object} match A match object returned from RegExp.match.
+     * @returns {string} A new string with the pattern replacement applied.
      */
     static applyMatchReplacement(replacement, match) {
         const pattern = this._matchReplacementPattern;

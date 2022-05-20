@@ -63,7 +63,7 @@ class PopupFactory {
 
     /**
      * Gets or creates a popup based on a set of parameters
-     * @param {object} details
+     * @param {object} details Details about how to acquire the popup.
      * @param {?number} [details.frameId] The ID of the frame that should host the popup.
      * @param {?string} [details.id] A specific ID used to find an existing popup, or to assign to the new popup.
      * @param {?string} [details.parentPopupId] The ID of the parent popup.

@@ -21,6 +21,7 @@
 class HotkeyUtil {
     /**
      * Creates a new instance.
+     * @param {?string} os The operating system for this instance.
      */
     constructor(os=null) {
         this._os = os;
@@ -41,6 +42,7 @@ class HotkeyUtil {
     /**
      * Gets the operating system for this instance.
      * The operating system is used to display system-localized modifier key names.
+     * @type {?string}
      */
     get os() {
         return this._os;
@@ -48,7 +50,7 @@ class HotkeyUtil {
 
     /**
      * Sets the operating system for this instance.
-     * @param value The value to assign.
+     * @param {?string} value The value to assign.
      *   Valid values are: win, mac, linux, openbsd, cros, android.
      */
     set os(value) {
@@ -59,10 +61,10 @@ class HotkeyUtil {
 
     /**
      * Gets a display string for a key and a set of modifiers.
-     * @param key The key code string, or `null` for no key.
-     * @param modifiers An array of modifiers.
+     * @param {?string} key The key code string, or `null` for no key.
+     * @param {string[]} modifiers An array of modifiers.
      *   Valid values are: ctrl, alt, shift, meta, or mouseN, where N is an integer.
-     * @returns A user-friendly string for the combination of key and modifiers.
+     * @returns {string} A user-friendly string for the combination of key and modifiers.
      */
     getInputDisplayValue(key, modifiers) {
         const separator = this._inputSeparator;
@@ -85,9 +87,9 @@ class HotkeyUtil {
 
     /**
      * Gets a display string for a single modifier.
-     * @param modifier A string representing a modifier.
+     * @param {string} modifier A string representing a modifier.
      *   Valid values are: ctrl, alt, shift, meta, or mouseN, where N is an integer.
-     * @returns A user-friendly string for the modifier.
+     * @returns {string} A user-friendly string for the modifier.
      */
     getModifierDisplayValue(modifier) {
         const match = this._mouseInputNamePattern.exec(modifier);
@@ -101,8 +103,8 @@ class HotkeyUtil {
 
     /**
      * Gets a display string for a key.
-     * @param key The key code string, or `null` for no key.
-     * @returns A user-friendly string for the combination of key and modifiers, or `null` if key was already `null`.
+     * @param {?string} key The key code string, or `null` for no key.
+     * @returns {?string} A user-friendly string for the combination of key and modifiers, or `null` if key was already `null`.
      */
     getKeyDisplayValue(key) {
         if (typeof key === 'string' && key.length === 4 && key.startsWith('Key')) {
@@ -113,9 +115,9 @@ class HotkeyUtil {
 
     /**
      * Gets a display string for a single modifier.
-     * @param modifier A string representing a modifier.
+     * @param {string} modifier A string representing a modifier.
      *   Valid values are: ctrl, alt, shift, meta, or mouseN, where N is an integer.
-     * @returns `'mouse'` if the modifier represents a mouse button, `'key'` otherwise.
+     * @returns {'mouse'|'key'} `'mouse'` if the modifier represents a mouse button, `'key'` otherwise.
      */
     getModifierType(modifier) {
         return (this._mouseInputNamePattern.test(modifier) ? 'mouse' : 'key');
@@ -123,8 +125,8 @@ class HotkeyUtil {
 
     /**
      * Converts an extension command string into a standard input.
-     * @param command An extension command string.
-     * @returns An object `{key, modifiers}`, where key is a string (or `null`) representing the key, and modifiers is an array of modifier keys.
+     * @param {string} command An extension command string.
+     * @returns {{key: ?string, modifiers: string[]}} An object `{key, modifiers}`, where key is a string (or `null`) representing the key, and modifiers is an array of modifier keys.
      */
     convertCommandToInput(command) {
         let key = null;
@@ -142,10 +144,10 @@ class HotkeyUtil {
 
     /**
      * Gets a command string for a specified input.
-     * @param key The key code string, or `null` for no key.
-     * @param modifiers An array of modifier keys.
+     * @param {?string} key The key code string, or `null` for no key.
+     * @param {string[]} modifiers An array of modifier keys.
      *   Valid values are: ctrl, alt, shift, meta.
-     * @returns An extension command string representing the input.
+     * @returns {string} An extension command string representing the input.
      */
     convertInputToCommand(key, modifiers) {
         const separator = '+';
@@ -168,9 +170,9 @@ class HotkeyUtil {
 
     /**
      * Sorts an array of modifiers.
-     * @param modifiers An array of modifiers.
+     * @param {string[]} modifiers An array of modifiers.
      *   Valid values are: ctrl, alt, shift, meta.
-     * @returns A sorted array of modifiers. The array instance is the same as the input array.
+     * @returns {string[]} A sorted array of modifiers. The array instance is the same as the input array.
      */
     sortModifiers(modifiers) {
         const pattern = this._mouseInputNamePattern;

@@ -24,6 +24,16 @@
  */
 class HotkeyHandler extends EventDispatcher {
     /**
+     * Information describing a hotkey.
+     * @typedef {object} HotkeyDefinition
+     * @property {string} action A string indicating which action to perform.
+     * @property {string} key A keyboard key code indicating which key needs to be pressed.
+     * @property {string[]} modifiers An array of keyboard modifiers which also need to be pressed. Supports: `'alt', 'ctrl', 'shift', 'meta'`.
+     * @property {string[]} scopes An array of scopes for which the hotkey is valid. If this array does not contain `this.scope`, the hotkey will not be registered.
+     * @property {boolean} enabled A boolean indicating whether the hotkey is currently enabled.
+     */
+
+    /**
      * Creates a new instance of the class.
      */
     constructor() {
@@ -49,7 +59,7 @@ class HotkeyHandler extends EventDispatcher {
 
     /**
      * Registers a set of actions that this hotkey handler supports.
-     * @param actions An array of `[name, handler]` entries, where `name` is a string and `handler` is a function.
+     * @param {*[][]} actions An array of `[name, handler]` entries, where `name` is a string and `handler` is a function.
      */
     registerActions(actions) {
         for (const [name, handler] of actions) {
@@ -59,13 +69,8 @@ class HotkeyHandler extends EventDispatcher {
 
     /**
      * Registers a set of hotkeys for a given scope.
-     * @param scope The scope that the hotkey definitions must be for in order to be activated.
-     * @param hotkeys An array of hotkey definitions of the format `{action, key, modifiers, scopes, enabled}`.
-     * * `action` - a string indicating which action to perform.
-     * * `key` - a keyboard key code indicating which key needs to be pressed.
-     * * `modifiers` - an array of keyboard modifiers which also need to be pressed. Supports: `'alt', 'ctrl', 'shift', 'meta'`.
-     * * `scopes` - an array of scopes for which the hotkey is valid. If this array does not contain `this.scope`, the hotkey will not be registered.
-     * * `enabled` - a boolean indicating whether the hotkey is currently enabled.
+     * @param {string} scope The scope that the hotkey definitions must be for in order to be activated.
+     * @param {HotkeyDefinition[]} hotkeys An array of hotkey definitions.
      */
     registerHotkeys(scope, hotkeys) {
         let registrations = this._hotkeyRegistrations.get(scope);
@@ -79,6 +84,7 @@ class HotkeyHandler extends EventDispatcher {
 
     /**
      * Removes all registered hotkeys for a given scope.
+     * @param {string} scope The scope that the hotkey definitions were registered in.
      */
     clearHotkeys(scope) {
         const registrations = this._hotkeyRegistrations.get(scope);
@@ -91,7 +97,8 @@ class HotkeyHandler extends EventDispatcher {
     /**
      * Assigns a set of hotkeys for a given scope. This is an optimized shorthand for calling
      * `clearHotkeys`, then calling `registerHotkeys`.
-     * @see registerHotkeys for argument information.
+     * @param {string} scope The scope that the hotkey definitions must be for in order to be activated.
+     * @param {HotkeyDefinition[]} hotkeys An array of hotkey definitions.
      */
     setHotkeys(scope, hotkeys) {
         let registrations = this._hotkeyRegistrations.get(scope);
@@ -107,8 +114,9 @@ class HotkeyHandler extends EventDispatcher {
 
     /**
      * Adds a single event listener to a specific event.
-     * @param eventName The string representing the event's name.
-     * @param callback The event listener callback to add.
+     * @param {string} eventName The string representing the event's name.
+     * @param {Function} callback The event listener callback to add.
+     * @returns {void}
      */
     on(eventName, callback) {
         const result = super.on(eventName, callback);
@@ -119,9 +127,9 @@ class HotkeyHandler extends EventDispatcher {
 
     /**
      * Removes a single event listener from a specific event.
-     * @param eventName The string representing the event's name.
-     * @param callback The event listener callback to add.
-     * @returns `true` if the callback was removed, `false` otherwise.
+     * @param {string} eventName The string representing the event's name.
+     * @param {Function} callback The event listener callback to add.
+     * @returns {boolean} `true` if the callback was removed, `false` otherwise.
      */
     off(eventName, callback) {
         const result = super.off(eventName, callback);
@@ -132,9 +140,9 @@ class HotkeyHandler extends EventDispatcher {
 
     /**
      * Attempts to simulate an action for a given combination of key and modifiers.
-     * @param key A keyboard key code indicating which key needs to be pressed.
-     * @param modifiers An array of keyboard modifiers which also need to be pressed. Supports: `'alt', 'ctrl', 'shift', 'meta'`.
-     * @returns `true` if an action was performed, `false` otherwise.
+     * @param {string} key A keyboard key code indicating which key needs to be pressed.
+     * @param {string[]} modifiers An array of keyboard modifiers which also need to be pressed. Supports: `'alt', 'ctrl', 'shift', 'meta'`.
+     * @returns {boolean} `true` if an action was performed, `false` otherwise.
      */
     simulate(key, modifiers) {
         const hotkeyInfo = this._hotkeys.get(key);

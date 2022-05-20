@@ -36,8 +36,9 @@ class CssStyleApplier {
 
     /**
      * Creates a new instance of the class.
-     * @param styleDataUrl The local URL to the JSON file continaing the style rules.
+     * @param {string} styleDataUrl The local URL to the JSON file continaing the style rules.
      *   The style rules should be of the format:
+     *   ```
      *   [
      *     {
      *       selectors: [(selector:string)...],
@@ -46,6 +47,7 @@ class CssStyleApplier {
      *       ]
      *     }...
      *   ]
+     *   ```
      */
     constructor(styleDataUrl) {
         this._styleDataUrl = styleDataUrl;
@@ -84,7 +86,7 @@ class CssStyleApplier {
     /**
      * Applies CSS styles directly to the "style" attribute using the "class" attribute.
      * This only works for elements with a single class.
-     * @param elements An iterable collection of HTMLElement objects.
+     * @param {Iterable<HTMLElement>} elements An iterable collection of HTMLElement objects.
      */
     applyClassStyles(elements) {
         const elementStyles = [];

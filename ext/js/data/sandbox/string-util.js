@@ -21,8 +21,8 @@
 class StringUtil {
     /**
      * Decodes the contents of an ArrayBuffer using UTF8.
-     * @param arrayBuffer The input ArrayBuffer.
-     * @returns A UTF8-decoded string.
+     * @param {ArrayBuffer} arrayBuffer The input ArrayBuffer.
+     * @returns {string} A UTF8-decoded string.
      */
     static arrayBufferUtf8Decode(arrayBuffer) {
         try {
@@ -34,8 +34,8 @@ class StringUtil {
 
     /**
      * Converts the contents of an ArrayBuffer to a base64 string.
-     * @param arrayBuffer The input ArrayBuffer.
-     * @returns A base64 string representing the binary content.
+     * @param {ArrayBuffer} arrayBuffer The input ArrayBuffer.
+     * @returns {string} A base64 string representing the binary content.
      */
     static arrayBufferToBase64(arrayBuffer) {
         return btoa(this.arrayBufferToBinaryString(arrayBuffer));
@@ -43,8 +43,8 @@ class StringUtil {
 
     /**
      * Converts the contents of an ArrayBuffer to a binary string.
-     * @param arrayBuffer The input ArrayBuffer.
-     * @returns A string representing the binary content.
+     * @param {ArrayBuffer} arrayBuffer The input ArrayBuffer.
+     * @returns {string} A string representing the binary content.
      */
     static arrayBufferToBinaryString(arrayBuffer) {
         const bytes = new Uint8Array(arrayBuffer);
@@ -61,8 +61,8 @@ class StringUtil {
 
     /**
      * Converts a base64 string to an ArrayBuffer.
-     * @param content The binary content string encoded in base64.
-     * @returns A new `ArrayBuffer` object corresponding to the specified content.
+     * @param {string} content The binary content string encoded in base64.
+     * @returns {ArrayBuffer} A new `ArrayBuffer` object corresponding to the specified content.
      */
     static base64ToArrayBuffer(content) {
         const binaryContent = atob(content);

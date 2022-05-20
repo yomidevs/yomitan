@@ -26,6 +26,16 @@
  */
 class Translator {
     /**
+     * Information about how popup content should be shown, specifically related to the outer popup frame.
+     * @typedef {object} TermFrequency
+     * @property {string} term The term.
+     * @property {string} reading The reading of the term.
+     * @property {string} dictionary The name of the dictionary that the term frequency originates from.
+     * @property {boolean} hasReading Whether or not a reading was specified.
+     * @property {number|string} frequency The frequency value for the term.
+     */
+
+    /**
      * Creates a new Translator instance.
      * @param {object} details The details for the class.
      * @param {JapaneseUtil} details.japaneseUtil An instance of JapaneseUtil.

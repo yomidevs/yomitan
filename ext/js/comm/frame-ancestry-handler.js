@@ -24,7 +24,7 @@
 class FrameAncestryHandler {
     /**
      * Creates a new instance.
-     * @param frameId The frame ID of the current frame the instance is instantiated in.
+     * @param {number} frameId The frame ID of the current frame the instance is instantiated in.
      */
     constructor(frameId) {
         this._frameId = frameId;
@@ -37,6 +37,7 @@ class FrameAncestryHandler {
 
     /**
      * Gets the frame ID that the instance is instantiated in.
+     * @type {number}
      */
     get frameId() {
         return this._frameId;
@@ -53,7 +54,7 @@ class FrameAncestryHandler {
 
     /**
      * Returns whether or not this frame is the root frame in the tab.
-     * @returns `true` if it is the root, otherwise `false`.
+     * @returns {boolean} `true` if it is the root, otherwise `false`.
      */
     isRootFrame() {
         return (window === window.parent);
@@ -63,8 +64,7 @@ class FrameAncestryHandler {
      * Gets the frame ancestry information for the current frame. If the frame is the
      * root frame, an empty array is returned. Otherwise, an array of frame IDs is returned,
      * starting from the nearest ancestor.
-     * @param timeout The maximum time to wait to receive a response to frame information requests.
-     * @returns An array of frame IDs corresponding to the ancestors of the current frame.
+     * @returns {number[]} An array of frame IDs corresponding to the ancestors of the current frame.
      */
     async getFrameAncestryInfo() {
         if (this._getFrameAncestryInfoPromise === null) {
@@ -77,8 +77,8 @@ class FrameAncestryHandler {
      * Gets the frame element of a child frame given a frame ID.
      * For this function to work, the `getFrameAncestryInfo` function needs to have
      * been invoked previously.
-     * @param frameId The frame ID of the child frame to get.
-     * @returns The element corresponding to the frame with ID `frameId`, otherwise `null`.
+     * @param {number} frameId The frame ID of the child frame to get.
+     * @returns {HTMLElement} The element corresponding to the frame with ID `frameId`, otherwise `null`.
      */
     getChildFrameElement(frameId) {
         const frameInfo = this._childFrameMap.get(frameId);

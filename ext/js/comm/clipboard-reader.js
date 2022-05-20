@@ -25,9 +25,10 @@
 class ClipboardReader {
     /**
      * Creates a new instances of a clipboard reader.
-     * @param document The Document object to be used, or null for no support.
-     * @param pasteTargetSelector The selector for the paste target element.
-     * @param imagePasteTargetSelector The selector for the image paste target element.
+     * @param {object} details Details about how to set up the instance.
+     * @param {?Document} details.document The Document object to be used, or null for no support.
+     * @param {?string} details.pasteTargetSelector The selector for the paste target element.
+     * @param {?string} details.imagePasteTargetSelector The selector for the image paste target element.
      */
     constructor({document=null, pasteTargetSelector=null, imagePasteTargetSelector=null}) {
         this._document = document;
@@ -40,6 +41,7 @@ class ClipboardReader {
 
     /**
      * Gets the browser being used.
+     * @type {?string}
      */
     get browser() {
         return this._browser;
@@ -54,8 +56,8 @@ class ClipboardReader {
 
     /**
      * Gets the text in the clipboard.
-     * @returns A string containing the clipboard text.
-     * @throws Error if not supported.
+     * @returns {string} A string containing the clipboard text.
+     * @throws {Error} Error if not supported.
      */
     async getText() {
         /*
@@ -103,8 +105,8 @@ class ClipboardReader {
 
     /**
      * Gets the first image in the clipboard.
-     * @returns A string containing a data URL of the image file, or null if no image was found.
-     * @throws Error if not supported.
+     * @returns {string} A string containing a data URL of the image file, or null if no image was found.
+     * @throws {Error} Error if not supported.
      */
     async getImage() {
         // See browser-specific notes in getText

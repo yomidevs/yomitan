@@ -22,7 +22,7 @@
 class PopupProxy extends EventDispatcher {
     /**
      * Creates a new instance.
-     * @param {object} details
+     * @param {object} details Details about how to set up the instance.
      * @param {string} details.id The ID of the popup.
      * @param {number} details.depth The depth of the popup.
      * @param {number} details.frameId The ID of the host frame.
@@ -66,10 +66,10 @@ class PopupProxy extends EventDispatcher {
 
     /**
      * Attempts to set the parent popup.
-     * @param {Popup} value
-     * @throws Throws an error, since this class doesn't support a direct parent.
+     * @param {Popup} _value The parent to assign.
+     * @throws {Error} Throws an error, since this class doesn't support a direct parent.
      */
-    set parent(value) {
+    set parent(_value) {
         throw new Error('Not supported on PopupProxy');
     }
 
@@ -84,10 +84,10 @@ class PopupProxy extends EventDispatcher {
 
     /**
      * Attempts to set the child popup.
-     * @param {Popup} value
-     * @throws Throws an error, since this class doesn't support children.
+     * @param {Popup} _child The child to assign.
+     * @throws {Error} Throws an error, since this class doesn't support children.
      */
-    set child(value) {
+    set child(_child) {
         throw new Error('Not supported on PopupProxy');
     }
 
@@ -233,7 +233,6 @@ class PopupProxy extends EventDispatcher {
 
     /**
      * Returns whether or not the popup is currently visible, synchronously.
-     * @returns {boolean} `true` if the popup is visible, `false` otherwise.
      * @throws An exception is thrown for `PopupProxy` since it cannot synchronously detect visibility.
      */
     isVisibleSync() {

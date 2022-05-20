@@ -68,27 +68,27 @@ class DocumentUtil {
 
     /**
      * Extract a sentence from a document.
-     * @param source The text source object, either `TextSourceRange` or `TextSourceElement`.
-     * @param layoutAwareScan Whether or not layout-aware scan mode should be used.
-     * @param extent The length of the sentence to extract.
-     * @param terminateAtNewlines Whether or not a sentence should be terminated at newline characters.
-     * @param terminatorMap A mapping of characters that terminate a sentence.
+     * @param {TextSourceRange|TextSourceElement} source The text source object, either `TextSourceRange` or `TextSourceElement`.
+     * @param {boolean} layoutAwareScan Whether or not layout-aware scan mode should be used.
+     * @param {number} extent The length of the sentence to extract.
+     * @param {boolean} terminateAtNewlines Whether or not a sentence should be terminated at newline characters.
+     * @param {Map<string, *[]>} terminatorMap A mapping of characters that terminate a sentence.
      *   Format:
      *   ```js
      *   new Map([ [character: string, [includeCharacterAtStart: boolean, includeCharacterAtEnd: boolean]], ... ])
      *   ```
-     * @param forwardQuoteMap A mapping of quote characters that delimit a sentence.
+     * @param {Map<string, *[]>} forwardQuoteMap A mapping of quote characters that delimit a sentence.
      *   Format:
      *   ```js
      *   new Map([ [character: string, [otherCharacter: string, includeCharacterAtStart: boolean]], ... ])
      *   ```
-     * @param backwardQuoteMap A mapping of quote characters that delimit a sentence,
+     * @param {Map<string, *[]>} backwardQuoteMap A mapping of quote characters that delimit a sentence,
      *   which is the inverse of forwardQuoteMap.
      *   Format:
      *   ```js
      *   new Map([ [character: string, [otherCharacter: string, includeCharacterAtEnd: boolean]], ... ])
      *   ```
-     * @returns The sentence and the offset to the original source: `{sentence: string, offset: integer}`.
+     * @returns {{sentence: string, offset: number}} The sentence and the offset to the original source.
      */
     extractSentence(source, layoutAwareScan, extent, terminateAtNewlines, terminatorMap, forwardQuoteMap, backwardQuoteMap) {
         // Scan text

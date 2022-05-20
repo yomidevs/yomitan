@@ -26,7 +26,7 @@
 class AnkiNoteDataCreator {
     /**
      * Creates a new instance.
-     * @param japaneseUtil An instance of `JapaneseUtil`.
+     * @param {JapaneseUtil} japaneseUtil An instance of `JapaneseUtil`.
      */
     constructor(japaneseUtil) {
         this._japaneseUtil = japaneseUtil;
@@ -34,8 +34,16 @@ class AnkiNoteDataCreator {
 
     /**
      * Creates a compatibility representation of the specified data.
-     * @param marker The marker that is being used for template rendering.
-     * @returns An object used for rendering Anki templates.
+     * @param {string} marker The marker that is being used for template rendering.
+     * @param {object} details Information which is used to generate the data.
+     * @param {Translation.DictionaryEntry} details.dictionaryEntry The dictionary entry.
+     * @param {string} details.resultOutputMode The result output mode.
+     * @param {string} details.mode The mode being used to generate the Anki data.
+     * @param {string} details.glossaryLayoutMode The glossary layout mode.
+     * @param {boolean} details.compactTags Whether or not compact tags mode is enabled.
+     * @param {{documentTitle: string, query: string, fullQuery: string}} details.context Contextual information about the source of the dictionary entry.
+     * @param {object} details.media Media data.
+     * @returns {object} An object used for rendering Anki templates.
      */
     create(marker, {
         dictionaryEntry,
@@ -83,8 +91,8 @@ class AnkiNoteDataCreator {
 
     /**
      * Creates a deferred-evaluation value.
-     * @param getter The function to invoke to get the return value.
-     * @returns An object which can be passed into `getCachedValue`.
+     * @param {Function} getter The function to invoke to get the return value.
+     * @returns {{getter: Function, hasValue: false, value: undefined}} An object which can be passed into `getCachedValue`.
      */
     createCachedValue(getter) {
         return {getter, hasValue: false, value: void 0};
@@ -92,8 +100,8 @@ class AnkiNoteDataCreator {
 
     /**
      * Gets the value of a cached object.
-     * @param item An object that was returned from `createCachedValue`.
-     * @returns The result of evaluating the getter, which is cached after the first invocation.
+     * @param {{getter: Function, hasValue: boolean, value: *}} item An object that was returned from `createCachedValue`.
+     * @returns {*} The result of evaluating the getter, which is cached after the first invocation.
      */
     getCachedValue(item) {
         if (item.hasValue) { return item.value; }

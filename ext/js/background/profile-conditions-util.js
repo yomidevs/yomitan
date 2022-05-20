@@ -24,6 +24,20 @@
  */
 class ProfileConditionsUtil {
     /**
+     * A group of conditions.
+     * @typedef {object} ProfileConditionGroup
+     * @property {ProfileCondition[]} conditions The list of conditions for this group.
+     */
+
+    /**
+     * A single condition.
+     * @typedef {object} ProfileCondition
+     * @property {string} type The type of the condition.
+     * @property {string} operator The condition operator.
+     * @property {string} value The value to compare against.
+     */
+
+    /**
      * Creates a new instance.
      */
     constructor() {
@@ -78,20 +92,9 @@ class ProfileConditionsUtil {
 
     /**
      * Creates a new JSON schema descriptor for the given set of condition groups.
-     * @param conditionGroups An array of condition groups in the following format:
-     *  conditionGroups = [
-     *      {
-     *          conditions: [
-     *              {
-     *                  type: (condition type: string),
-     *                  operator: (condition sub-type: string),
-     *                  value: (value to compare against: string)
-     *              },
-     *              ...
-     *          ]
-     *      },
-     *      ...
-     *  ]
+     * @param {ProfileConditionGroup[]} conditionGroups An array of condition groups.
+     *   For a profile match, all of the items must return successfully in at least one of the groups.
+     * @returns {JsonSchema} A new `JsonSchema` object.
      */
     createSchema(conditionGroups) {
         const anyOf = [];
@@ -125,8 +128,8 @@ class ProfileConditionsUtil {
     /**
      * Creates a normalized version of the context object to test,
      * assigning dependent fields as needed.
-     * @param context A context object which is used during schema validation.
-     * @returns A normalized context object.
+     * @param {object} context A context object which is used during schema validation.
+     * @returns {object} A normalized context object.
      */
     normalizeContext(context) {
         const normalizedContext = Object.assign({}, context);

@@ -21,7 +21,7 @@
 class CacheMap {
     /**
      * Creates a new CacheMap.
-     * @param maxSize The maximum number of entries able to be stored in the cache.
+     * @param {number} maxSize The maximum number of entries able to be stored in the cache.
      */
     constructor(maxSize) {
         if (!(
@@ -42,6 +42,7 @@ class CacheMap {
 
     /**
      * Returns the number of items in the cache.
+     * @type {number}
      */
     get size() {
         return this._map.size;
@@ -49,6 +50,7 @@ class CacheMap {
 
     /**
      * Returns the maximum number of items that can be added to the cache.
+     * @type {number}
      */
     get maxSize() {
         return this._maxSize;
@@ -56,8 +58,8 @@ class CacheMap {
 
     /**
      * Returns whether or not an element exists at the given key.
-     * @param key The key of the element.
-     * @returns `true` if an element with the specified key exists, `false` otherwise.
+     * @param {*} key The key of the element.
+     * @returns {boolean} `true` if an element with the specified key exists, `false` otherwise.
      */
     has(key) {
         return this._map.has(key);
@@ -65,8 +67,8 @@ class CacheMap {
 
     /**
      * Gets an element at the given key, if it exists. Otherwise, returns undefined.
-     * @param key The key of the element.
-     * @returns The existing value at the key, if any; `undefined` otherwise.
+     * @param {*} key The key of the element.
+     * @returns {*} The existing value at the key, if any; `undefined` otherwise.
      */
     get(key) {
         const node = this._map.get(key);
@@ -77,8 +79,8 @@ class CacheMap {
 
     /**
      * Sets a value at a given key.
-     * @param key The key of the element.
-     * @param value The value to store in the cache.
+     * @param {*} key The key of the element.
+     * @param {*} value The value to store in the cache.
      */
     set(key, value) {
         let node = this._map.get(key);

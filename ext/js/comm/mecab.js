@@ -21,6 +21,21 @@
  */
 class Mecab {
     /**
+     * The resulting data from an invocation of `parseText`.
+     * @typedef {object} ParseResult
+     * @property {string} name The dictionary name for the parsed result.
+     * @property {ParseTerm[]} lines The resulting parsed terms.
+     */
+
+    /**
+     * A fragment of the parsed text.
+     * @typedef {object} ParseFragment
+     * @property {string} term The term.
+     * @property {string} reading The reading of the term.
+     * @property {string} source The source text.
+     */
+
+    /**
      * Creates a new instance of the class.
      */
     constructor() {
@@ -37,6 +52,7 @@ class Mecab {
 
     /**
      * Returns whether or not the component is enabled.
+     * @returns {boolean} Whether or not the object is enabled.
      */
     isEnabled() {
         return this._enabled;
@@ -44,7 +60,7 @@ class Mecab {
 
     /**
      * Changes whether or not the component connection is enabled.
-     * @param enabled A boolean indicating whether or not the component should be enabled.
+     * @param {boolean} enabled A boolean indicating whether or not the component should be enabled.
      */
     setEnabled(enabled) {
         this._enabled = !!enabled;
@@ -64,7 +80,7 @@ class Mecab {
 
     /**
      * Returns whether or not the connection to the native application is active.
-     * @returns `true` if the connection is active, `false` otherwise.
+     * @returns {boolean} `true` if the connection is active, `false` otherwise.
      */
     isConnected() {
         return (this._port !== null);
@@ -72,7 +88,7 @@ class Mecab {
 
     /**
      * Returns whether or not any invocation is currently active.
-     * @returns `true` if an invocation is active, `false` otherwise.
+     * @returns {boolean} `true` if an invocation is active, `false` otherwise.
      */
     isActive() {
         return (this._invocations.size > 0);
@@ -80,7 +96,7 @@ class Mecab {
 
     /**
      * Gets the local API version being used.
-     * @returns An integer representing the API version that Yomichan uses.
+     * @returns {number} An integer representing the API version that Yomichan uses.
      */
     getLocalVersion() {
         return this._version;
@@ -88,7 +104,7 @@ class Mecab {
 
     /**
      * Gets the version of the MeCab component.
-     * @returns The version of the MeCab component, or `null` if the component was not found.
+     * @returns {?number} The version of the MeCab component, or `null` if the component was not found.
      */
     async getVersion() {
         try {
@@ -115,8 +131,8 @@ class Mecab {
      *     ...
      * ]
      * ```
-     * @param text The string to parse.
-     * @returns A collection of parsing results of the text.
+     * @param {string} text The string to parse.
+     * @returns {ParseResult[]} A collection of parsing results of the text.
      */
     async parseText(text) {
         await this._setupPort();

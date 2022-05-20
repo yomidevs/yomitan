@@ -20,8 +20,8 @@ const {testMain} = require('../dev/util');
 
 /**
  * This function tests the following bug:
- * * https://github.com/jsdom/jsdom/issues/3211
- * * https://github.com/dperini/nwsapi/issues/48
+ * - https://github.com/jsdom/jsdom/issues/3211
+ * - https://github.com/dperini/nwsapi/issues/48
  */
 function testJSDOMSelectorBug() {
     // nwsapi is used by JSDOM

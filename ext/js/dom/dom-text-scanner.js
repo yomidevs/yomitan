@@ -21,9 +21,12 @@
 class DOMTextScanner {
     /**
      * Creates a new instance of a DOMTextScanner.
-     * @param node The DOM Node to start at.
-     * @param offset The character offset in to start at when node is a text node.
+     * @param {Node} node The DOM Node to start at.
+     * @param {number} offset The character offset in to start at when node is a text node.
      *   Use 0 for non-text nodes.
+     * @param {boolean} forcePreserveWhitespace Whether or not whitespace should be forced to be preserved,
+     *   regardless of CSS styling.
+     * @param {boolean} generateLayoutContent Whether or not newlines should be added based on CSS styling.
      */
     constructor(node, offset, forcePreserveWhitespace=false, generateLayoutContent=true) {
         const ruby = DOMTextScanner.getParentRubyElement(node);
@@ -393,6 +396,7 @@ class DOMTextScanner {
 
     /**
      * Gets seek information about an element.
+     * @param {Element} element The element to check.
      * @returns {{enterable: boolean, newlines: number}} The seek information.
      *   The `enterable` value indicates whether the content of this node should be entered.
      *   The `newlines` value corresponds to the number of newline characters that should be added.
@@ -443,6 +447,8 @@ class DOMTextScanner {
     /**
      * Gets attributes for the specified character.
      * @param {string} character A string containing a single character.
+     * @param {boolean} preserveNewlines Whether or not newlines should be preserved.
+     * @param {boolean} preserveWhitespace Whether or not whitespace should be preserved.
      * @returns {number} An integer representing the attributes of the character.
      *   0: Character should be ignored.
      *   1: Character is collapsible whitespace.

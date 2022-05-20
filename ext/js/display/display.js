@@ -39,6 +39,49 @@ class Display extends EventDispatcher {
     /**
      * Information about how popup content should be shown, specifically related to the inner popup content.
      * @typedef {object} ContentDetails
+     * @property {boolean} focus Whether or not the frame should be `focus()`'d.
+     * @property {HistoryParams} params An object containing key-value pairs representing the URL search params.
+     * @property {?HistoryState} state The semi-persistent state assigned to the navigation entry.
+     * @property {?HistoryContent} content The non-persistent content assigned to the navigation entry.
+     * @property {'clear'|'overwrite'|'new'} historyMode How the navigation history should be modified.
+     */
+
+    /**
+     * An object containing key-value pairs representing the URL search params.
+     * @typedef {object} HistoryParams
+     * @property {'terms'|'kanji'|'unloaded'|'clear'} [type] The type of content that is being shown.
+     * @property {string} [query] The search query.
+     * @property {'on'|'off'} [wildcards] Whether or not wildcards can be used for the search query.
+     * @property {string} [offset] The start position of the `query` string as an index into the `full` query string.
+     * @property {string} [full] The full search text. If absent, `query` is the full search text.
+     * @property {'true'|'false'} [full-visible] Whether or not the full search query should be forced to be visible.
+     * @property {'true'|'false'} [lookup] Whether or not the query should be looked up. If it is not looked up,
+     *   the content should be provided.
+     */
+
+    /**
+     * The semi-persistent state assigned to the navigation entry.
+     * @typedef {object} HistoryState
+     * @property {'queryParser'} [cause] What was the cause of the navigation.
+     * @property {object} [sentence] The sentence context.
+     * @property {string} sentence.text The full string.
+     * @property {number} sentence.offset The offset from the start of `text` to the full search query.
+     * @property {number} [focusEntry] The index of the dictionary entry to focus.
+     * @property {number} [scrollX] The horizontal scroll position.
+     * @property {number} [scrollY] The vertical scroll position.
+     * @property {object} [optionsContext] The options context which should be used for lookups.
+     * @property {string} [url] The originating URL of the content.
+     * @property {string} [documentTitle] The originating document title of the content.
+     */
+
+    /**
+     * The non-persistent content assigned to the navigation entry.
+     * @typedef {object} HistoryContent
+     * @property {boolean} [animate] Whether or not any CSS animations should occur.
+     * @property {object[]} [dictionaryEntries] An array of dictionary entries to display as content.
+     * @property {object} [contentOrigin] The identifying information for the frame the content originated from.
+     * @property {number} [contentOrigin.tabId] The tab id.
+     * @property {number} [contentOrigin.frameId] The frame id within the tab.
      */
 
     constructor(tabId, frameId, pageType, japaneseUtil, documentFocusController, hotkeyHandler) {
@@ -348,7 +391,7 @@ class Display extends EventDispatcher {
 
     /**
      * Updates the content of the display.
-     * @param {ContentDetails} details
+     * @param {ContentDetails} details Information about the content to show.
      */
     setContent(details) {
         const {focus, params, state, content} = details;
