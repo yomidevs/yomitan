@@ -637,8 +637,7 @@ class Display extends EventDispatcher {
                     this._setContentExtensionUnloaded();
                     break;
                 default:
-                    type = 'clear';
-                    this._contentType = type;
+                    this._contentType = 'clear';
                     this._clearContent();
                     break;
             }
