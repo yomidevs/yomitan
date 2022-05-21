@@ -1719,6 +1719,9 @@ button.footer-notification-close-button {
 .tag-details-disambiguation-list>.tag-details-disambiguation:not(:last-child)::after {
     content: var(--disambiguation-separator);
 }
+.footer-notification a {
+    color: var(--notification-text-color);
+}
 
 
 /* Overlays */
