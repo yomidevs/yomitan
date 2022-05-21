@@ -172,6 +172,10 @@ class API {
         return this._invoke('getTermFrequencies', {termReadingList, dictionaries});
     }
 
+    findAnkiNotes(query) {
+        return this._invoke('findAnkiNotes', {query});
+    }
+
     // Utilities
 
     _createActionPort(timeout=5000) {

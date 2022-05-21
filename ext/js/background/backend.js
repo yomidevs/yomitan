@@ -129,7 +129,8 @@ class Backend {
             ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}],
             ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}],
             ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
-            ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}]
+            ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}],
+            ['findAnkiNotes',                {async: true,  contentScript: true,  handler: this._onApiFindAnkiNotes.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -750,6 +751,10 @@ class Backend {
 
     async _onApiGetTermFrequencies({termReadingList, dictionaries}) {
         return await this._translator.getTermFrequencies(termReadingList, dictionaries);
+    }
+
+    async _onApiFindAnkiNotes({query}) {
+        return await this._anki.findNotes(query);
     }
 
     // Command handlers

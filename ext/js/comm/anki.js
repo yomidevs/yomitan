@@ -120,6 +120,18 @@ class AnkiConnect {
         return await this._invoke('storeMediaFile', {filename: fileName, data: content});
     }
 
+    /**
+     * Finds notes matching a query.
+     * @param {string} query Searches for notes matching a query.
+     * @returns {number[]} An array of note IDs.
+     * @see https://docs.ankiweb.net/searching.html
+     */
+    async findNotes(query) {
+        if (!this._enabled) { return []; }
+        await this._checkVersion();
+        return await this._invoke('findNotes', {query});
+    }
+
     async findNoteIds(notes) {
         if (!this._enabled) { return []; }
         await this._checkVersion();
