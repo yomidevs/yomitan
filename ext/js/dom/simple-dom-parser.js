@@ -22,8 +22,7 @@
 class SimpleDOMParser {
     constructor(content) {
         this._document = parse5.parse(content);
-        // eslint-disable-next-line no-control-regex
-        this._patternHtmlWhitespace = /[\t\r\n\x0C ]+/g;
+        this._patternHtmlWhitespace = /[\t\r\n\f ]+/g;
     }
 
     getElementById(id, root=null) {

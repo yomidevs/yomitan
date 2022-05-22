@@ -53,8 +53,7 @@ class CssStyleApplier {
         this._styleDataUrl = styleDataUrl;
         this._styleData = [];
         this._cachedRules = new Map();
-        // eslint-disable-next-line no-control-regex
-        this._patternHtmlWhitespace = /[\t\r\n\x0C ]+/g;
+        this._patternHtmlWhitespace = /[\t\r\n\f ]+/g;
         this._patternClassNameCharacter = /[0-9a-zA-Z-_]/;
     }
 
