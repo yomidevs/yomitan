@@ -167,6 +167,26 @@ class AnkiConnect {
         return await this.findCards(`nid:${noteId}`);
     }
 
+    /**
+     * Gets information about the AnkiConnect APIs available.
+     * @param {string[]} scopes A list of scopes to get information about.
+     * @param {?string[]} actions A list of actions to check for
+     * @returns {object} Information about the APIs.
+     */
+    async apiReflect(scopes, actions=null) {
+        return await this._invoke('apiReflect', {scopes, actions});
+    }
+
+    /**
+     * Checks whether a specific API action exists.
+     * @param {string} action The action to check for.
+     * @returns {boolean} Whether or not the action exists.
+     */
+    async apiExists(action) {
+        const {actions} = await this.apiReflect(['actions'], [action]);
+        return actions.includes(action);
+    }
+
     // Private
 
     async _checkVersion() {
