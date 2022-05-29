@@ -1911,7 +1911,7 @@ class Backend {
                         const result = new Error('Audio download failed due to possible extension permissions error');
                         result.data = {
                             errors,
-                            referenceUrl: '/issues.html'
+                            referenceUrl: '/issues.html#audio-download-failed'
                         };
                         return result;
                     }
