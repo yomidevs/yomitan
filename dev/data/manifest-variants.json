@@ -172,7 +172,6 @@
                 {"action": "move",   "path": ["content_security_policy_old"], "newPath": ["content_security_policy", "extension_pages"]},
                 {"action": "move",   "path": ["sandbox", "content_security_policy"], "newPath": ["content_security_policy", "sandbox"]},
                 {"action": "remove", "path": ["permissions"], "item": "<all_urls>"},
-                {"action": "remove", "path": ["permissions"], "item": "webRequest"},
                 {"action": "remove", "path": ["permissions"], "item": "webRequestBlocking"},
                 {"action": "add",    "path": ["permissions"], "items": ["declarativeNetRequest", "scripting"]},
                 {"action": "set",    "path": ["host_permissions"], "value": ["<all_urls>"], "after": "optional_permissions"},

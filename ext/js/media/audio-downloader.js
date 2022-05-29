@@ -51,6 +51,7 @@ class AudioDownloader {
     }
 
     async downloadTermAudio(sources, preferredAudioIndex, term, reading) {
+        const errors = [];
         for (const source of sources) {
             let infoList = await this.getTermAudioInfoList(source, term, reading);
             if (typeof preferredAudioIndex === 'number') {
@@ -62,14 +63,16 @@ class AudioDownloader {
                         try {
                             return await this._downloadAudioFromUrl(info.url, source.type);
                         } catch (e) {
-                            // NOP
+                            errors.push(e);
                         }
                         break;
                 }
             }
         }
 
-        throw new Error('Could not download audio');
+        const error = new Error('Could not download audio');
+        error.data = {errors};
+        throw error;
     }
 
     // Private

@@ -17,7 +17,6 @@
 
 class RequestBuilder {
     constructor() {
-        this._extraHeadersSupported = null;
         this._onBeforeSendHeadersExtraInfoSpec = ['blocking', 'requestHeaders', 'extraHeaders'];
         this._textEncoder = new TextEncoder();
         this._ruleIds = new Set();
@@ -36,74 +35,107 @@ class RequestBuilder {
             return await this._fetchAnonymousDeclarative(url, init);
         }
         const originURL = this._getOriginURL(url);
-        const modifications = [
+        const headerModifications = [
             ['cookie', null],
             ['origin', {name: 'Origin', value: originURL}]
         ];
-        return await this._fetchModifyHeaders(url, init, modifications);
+        return await this._fetchInternal(url, init, headerModifications);
     }
 
     // Private
 
-    async _fetchModifyHeaders(url, init, modifications) {
-        const matchURL = this._getMatchURL(url);
-
-        let done = false;
-        const callback = (details) => {
-            if (done || details.url !== url) { return {}; }
-            done = true;
-
-            const requestHeaders = details.requestHeaders;
-            this._modifyHeaders(requestHeaders, modifications);
-            return {requestHeaders};
-        };
+    async _fetchInternal(url, init, headerModifications) {
         const filter = {
-            urls: [matchURL],
+            urls: [this._getMatchURL(url)],
             types: ['xmlhttprequest']
         };
 
-        let needsCleanup = false;
-        try {
-            this._onBeforeSendHeadersAddListener(callback, filter);
-            needsCleanup = true;
-        } catch (e) {
-            // NOP
-        }
+        let requestId = null;
+        const onBeforeSendHeadersCallback = (details) => {
+            if (requestId !== null || details.url !== url) { return {}; }
+            ({requestId} = details);
+
+            if (headerModifications === null) { return {}; }
+
+            const requestHeaders = details.requestHeaders;
+            this._modifyHeaders(requestHeaders, headerModifications);
+            return {requestHeaders};
+        };
+
+        let errorDetailsTimer = null;
+        let {promise: errorDetailsPromise, resolve: errorDetailsResolve} = deferPromise();
+        const onErrorOccurredCallback = (details) => {
+            if (errorDetailsResolve === null || details.requestId !== requestId) { return; }
+            if (errorDetailsTimer !== null) {
+                clearTimeout(errorDetailsTimer);
+                errorDetailsTimer = null;
+            }
+            errorDetailsResolve(details);
+            errorDetailsResolve = null;
+        };
+
+        const eventListeners = [];
+        const onBeforeSendHeadersExtraInfoSpec = (headerModifications !== null ? this._onBeforeSendHeadersExtraInfoSpec : []);
+        this._addWebRequestEventListener(chrome.webRequest.onBeforeSendHeaders, onBeforeSendHeadersCallback, filter, onBeforeSendHeadersExtraInfoSpec, eventListeners);
+        this._addWebRequestEventListener(chrome.webRequest.onErrorOccurred, onErrorOccurredCallback, filter, void 0, eventListeners);
 
         try {
             return await fetch(url, init);
-        } finally {
-            if (needsCleanup) {
-                try {
-                    chrome.webRequest.onBeforeSendHeaders.removeListener(callback);
-                } catch (e) {
-                    // NOP
-                }
+        } catch (e) {
+            // onErrorOccurred is not always invoked by this point, so a delay is needed
+            if (errorDetailsResolve !== null) {
+                errorDetailsTimer = setTimeout(() => {
+                    errorDetailsTimer = null;
+                    if (errorDetailsResolve === null) { return; }
+                    errorDetailsResolve(null);
+                    errorDetailsResolve = null;
+                }, 100);
             }
+            const details = await errorDetailsPromise;
+            e.data = {details};
+            throw e;
+        } finally {
+            this._removeWebRequestEventListeners(eventListeners);
         }
     }
 
-    _onBeforeSendHeadersAddListener(callback, filter) {
-        const extraInfoSpec = this._onBeforeSendHeadersExtraInfoSpec;
-        for (let i = 0; i < 2; ++i) {
-            try {
-                chrome.webRequest.onBeforeSendHeaders.addListener(callback, filter, extraInfoSpec);
-                if (this._extraHeadersSupported === null) {
-                    this._extraHeadersSupported = true;
-                }
-                break;
-            } catch (e) {
-                // Firefox doesn't support the 'extraHeaders' option and will throw the following error:
-                // Type error for parameter extraInfoSpec (Error processing 2: Invalid enumeration value "extraHeaders") for webRequest.onBeforeSendHeaders.
-                if (this._extraHeadersSupported !== null || !`${e.message}`.includes('extraHeaders')) {
+    _addWebRequestEventListener(target, callback, filter, extraInfoSpec, eventListeners) {
+        try {
+            for (let i = 0; i < 2; ++i) {
+                try {
+                    if (typeof extraInfoSpec === 'undefined') {
+                        target.addListener(callback, filter);
+                    } else {
+                        target.addListener(callback, filter, extraInfoSpec);
+                    }
+                    break;
+                } catch (e) {
+                    // Firefox doesn't support the 'extraHeaders' option and will throw the following error:
+                    // Type error for parameter extraInfoSpec (Error processing 2: Invalid enumeration value "extraHeaders") for [target].
+                    if (i === 0 && `${e.message}`.includes('extraHeaders') && Array.isArray(extraInfoSpec)) {
+                        const index = extraInfoSpec.indexOf('extraHeaders');
+                        if (index >= 0) {
+                            extraInfoSpec.splice(index, 1);
+                            continue;
+                        }
+                    }
                     throw e;
                 }
             }
+        } catch (e) {
+            console.log(e);
+            return;
+        }
+        eventListeners.push({target, callback});
+    }
 
-            // addListener failed; remove 'extraHeaders' from extraInfoSpec.
-            this._extraHeadersSupported = false;
-            const index = extraInfoSpec.indexOf('extraHeaders');
-            if (index >= 0) { extraInfoSpec.splice(index, 1); }
+    _removeWebRequestEventListeners(eventListeners) {
+        for (const {target, callback} of eventListeners) {
+            try {
+                target.removeListener(callback);
+            } catch (e) {
+                console.log(e);
+            }
         }
     }
 
@@ -197,7 +229,7 @@ class RequestBuilder {
 
             await this._updateDynamicRules({addRules});
             try {
-                return await fetch(url, init);
+                return await this._fetchInternal(url, init, null);
             } finally {
                 await this._tryUpdateDynamicRules({removeRuleIds: [id]});
             }
