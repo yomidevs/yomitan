@@ -17,6 +17,7 @@
 
 /* global
  * DocumentFocusController
+ * ExtensionContentController
  * ModalController
  * PermissionsOriginController
  * PermissionsToggleController
@@ -66,18 +67,10 @@ function setupPermissionsToggles() {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 
+        const extensionContentController = new ExtensionContentController();
+        extensionContentController.prepare();
+
         setupPermissionsToggles();
-
-        for (const node of document.querySelectorAll('.extension-id-example')) {
-            node.textContent = chrome.runtime.getURL('/');
-        }
-
-        const extensionId = chrome.runtime.id;
-        const idPattern = /\{id\}/g;
-        for (const node of document.querySelectorAll('.extension-settings-link[data-special-url]')) {
-            const {specialUrl} = node.dataset;
-            node.dataset.specialUrl = `${specialUrl}`.replace(idPattern, extensionId);
-        }
 
         await yomichan.prepare();
 

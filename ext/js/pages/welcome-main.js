@@ -19,6 +19,7 @@
  * DictionaryController
  * DictionaryImportController
  * DocumentFocusController
+ * ExtensionContentController
  * GenericSettingController
  * ModalController
  * ScanInputsSimpleController
@@ -44,6 +45,9 @@ async function setupGenericSettingsController(genericSettingController) {
     try {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
+
+        const extensionContentController = new ExtensionContentController();
+        extensionContentController.prepare();
 
         const statusFooter = new StatusFooter(document.querySelector('.status-footer-container'));
         statusFooter.prepare();

@@ -17,16 +17,15 @@
 
 /* global
  * DocumentFocusController
+ * ExtensionContentController
  */
-
-function setupEnvironmentInfo() {
-    const {manifest_version: manifestVersion} = chrome.runtime.getManifest();
-    document.documentElement.dataset.manifestVersion = `${manifestVersion}`;
-}
 
 (() => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
+
+    const extensionContentController = new ExtensionContentController();
+    extensionContentController.prepare();
+
     document.documentElement.dataset.loaded = 'true';
-    setupEnvironmentInfo();
 })();
