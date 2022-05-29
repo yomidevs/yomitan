@@ -1376,12 +1376,12 @@ class Translator {
             i = v2.sourceTermExactMatchCount - v1.sourceTermExactMatchCount;
             if (i !== 0) { return i; }
 
-            // Sort by dictionary priority
-            i = v2.dictionaryPriority - v1.dictionaryPriority;
-            if (i !== 0) { return i; }
-
             // Sort by frequency order
             i = v1.frequencyOrder - v2.frequencyOrder;
+            if (i !== 0) { return i; }
+
+            // Sort by dictionary priority
+            i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
 
             // Sort by term score
@@ -1411,12 +1411,12 @@ class Translator {
 
     _sortTermDictionaryEntryDefinitions(definitions) {
         const compareFunction = (v1, v2) => {
-            // Sort by dictionary priority
-            let i = v2.dictionaryPriority - v1.dictionaryPriority;
+            // Sort by frequency order
+            let i = v1.frequencyOrder - v2.frequencyOrder;
             if (i !== 0) { return i; }
 
-            // Sort by frequency order
-            i = v1.frequencyOrder - v2.frequencyOrder;
+            // Sort by dictionary priority
+            i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
 
             // Sort by term score
