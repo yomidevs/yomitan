@@ -1909,7 +1909,10 @@ class Backend {
                         // The message logged to the console looks like this:
                         //  Access to fetch at '<URL>' from origin 'chrome-extension://<ID>' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
                         const result = new Error('Audio download failed due to possible extension permissions error');
-                        result.data = {errors};
+                        result.data = {
+                            errors,
+                            referenceUrl: '/issues.html'
+                        };
                         return result;
                     }
                 }
