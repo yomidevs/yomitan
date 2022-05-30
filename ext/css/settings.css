@@ -1628,8 +1628,8 @@ code.anki-field-marker {
     resize: none;
     min-height: calc(var(--textarea-line-height) * 5 + var(--textarea-padding) * 2);
 }
-#anki-card-templates-render-result,
-#anki-card-templates-compile-result {
+
+.code {
     flex: 0 0 auto;
     width: 100%;
     max-width: 100%;

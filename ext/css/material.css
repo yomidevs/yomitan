@@ -807,6 +807,10 @@ input[type=number].code,
 input[type=password].code {
     font-family: 'Courier New', Courier, monospace;
 }
+textarea.no-wrap {
+    white-space: pre;
+    overflow-wrap: normal;
+}
 
 /* Input groups */
 .input-group {

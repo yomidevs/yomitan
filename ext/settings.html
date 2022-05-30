@@ -2440,8 +2440,85 @@
             </div>
         </div>
     </div>
+    <div class="modal-body-addon">
+        <p>
+            Dictionary definitions can be collapsed if they exceed a certain line count,
+            which may be useful for dictionaries with long definitions.
+            The appearance can be customized using custom CSS.
+            <a tabindex="0" data-modal-action="show,collapsible-dictionaries-info">More&hellip;</a>
+        </p>
+    </div>
     <div class="modal-body">
         <div id="collapsible-dictionary-list" class="collapsible-dictionary-list"></div>
+    </div>
+    <div class="modal-footer">
+        <button data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
+<div id="collapsible-dictionaries-info-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+    <div class="modal-header">
+        <div class="modal-title">Collapsible Dictionary Info</div>
+        <div class="modal-header-button-container">
+            <div class="modal-header-button-group">
+                <button class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                <button class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-body">
+        <p>
+            Dictionary definitions can be collapsed if they exceed a certain line count,
+            which may be useful for dictionaries with long definitions.
+            There are five different modes:
+        </p>
+        <ul>
+            <li>
+                <strong>Not collapsible</strong> -
+                Definitions will not be collapsed.
+            </li>
+            <li>
+                <strong>Collapsed</strong> -
+                Definitions will show a collapse button if their size exceeds the max height,
+                and they will be collapsed by default.
+            </li>
+            <li>
+                <strong>Expanded</strong> -
+                Definitions will show a collapse button if their size exceeds the max height,
+                and they will be expanded by default.
+            </li>
+            <li>
+                <strong>Force collapsed</strong> -
+                Definitions will always show a collapse button,
+                and they will be collapsed by default.
+            </li>
+            <li>
+                <strong>Force expanded</strong> -
+                Definitions will always show a collapse button,
+                and they will be expanded by default.
+            </li>
+        </ul>
+        <p>
+            By default, the number of lines shown for a definition is 3.
+            This can be configured by adjusting the <a tabindex="0" data-modal-action="show,custom-css">custom CSS</a>;
+            the value can be a unitless integer or decimal number.
+        </p>
+        <div class="code margin-above">/* Globally set the line count */
+:root {
+    --collapsible-definition-line-count: 2;
+}
+
+/* Set the line count for a specific dictionary */
+.definition-item[data-dictionary='JMdict'] {
+    --collapsible-definition-line-count: 2;
+}
+
+/* Spoiler-like functionality, use with <em>Force collapsed</em> mode */
+.definition-item[data-dictionary='JMdict'] .definition-item-inner.collapsible.collapsed {
+    color: #000000;
+    background-color: #000000;
+}
+</div>
     </div>
     <div class="modal-footer">
         <button data-modal-action="hide">Close</button>
@@ -2580,6 +2657,8 @@
             <option value="not-collapsible">Not collapsible</option>
             <option value="collapsed">Collapsed</option>
             <option value="expanded">Expanded</option>
+            <option value="force-collapsed">Force collapsed</option>
+            <option value="force-expanded">Force expanded</option>
         </select>
     </div>
 </div></template>
@@ -2599,9 +2678,9 @@
         </div>
         <div class="modal-body custom-popup-css-container">
             <div class="custom-popup-css-header">Popup CSS</div>
-            <textarea autocomplete="off" spellcheck="false" id="custom-popup-css" data-setting="general.customPopupCss" data-tab-action="indent,4"></textarea>
+            <textarea class="no-wrap" autocomplete="off" spellcheck="false" id="custom-popup-css" data-setting="general.customPopupCss" data-tab-action="indent,4"></textarea>
             <div class="custom-popup-css-header margin-above">Popup outer CSS</div>
-            <textarea autocomplete="off" spellcheck="false" id="custom-popup-outer-css" data-setting="general.customPopupOuterCss" data-tab-action="indent,4"></textarea>
+            <textarea class="no-wrap" autocomplete="off" spellcheck="false" id="custom-popup-outer-css" data-setting="general.customPopupOuterCss" data-tab-action="indent,4"></textarea>
         </div>
         <div class="modal-footer">
             <button data-modal-action="hide">Close</button>
@@ -3201,8 +3280,8 @@
                 Consider copy-pasting the source into a code editor that supports syntax highlighting for easier editing.
             </p>
         </div>
-        <textarea autocomplete="off" spellcheck="false" id="anki-card-templates-textarea" class="margin-above" data-tab-action="indent,4"></textarea>
-        <div id="anki-card-templates-compile-result" class="danger-text margin-above" hidden></div>
+        <textarea autocomplete="off" spellcheck="false" id="anki-card-templates-textarea" class="no-wrap margin-above" data-tab-action="indent,4"></textarea>
+        <div id="anki-card-templates-compile-result" class="code danger-text margin-above" hidden></div>
         <div class="anki-card-templates-test-container margin-above">
             <p>
                 Card templates can be tested using the inputs below.
@@ -3219,7 +3298,7 @@
                 <button id="anki-card-templates-test-render-button">Test</button>
             </div>
         </div>
-        <div class="margin-above" id="anki-card-templates-render-result"><em>Card render result</em></div>
+        <div class="code margin-above" id="anki-card-templates-render-result"><em>Card render result</em></div>
     </div>
     <div class="modal-footer">
         <button class="danger" id="anki-card-templates-reset-button">Reset Templates</button>

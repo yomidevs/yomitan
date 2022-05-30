@@ -791,7 +791,7 @@
                                         },
                                         "definitionsCollapsible": {
                                             "type": "string",
-                                            "enum": ["not-collapsible", "expanded", "collapsed"],
+                                            "enum": ["not-collapsible", "expanded", "collapsed", "force-collapsed", "force-expanded"],
                                             "default": "not-collapsible"
                                         }
                                     }
