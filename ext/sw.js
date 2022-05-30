@@ -25,7 +25,7 @@ self.importScripts(
     '/js/background/profile-conditions-util.js',
     '/js/background/request-builder.js',
     '/js/background/script-manager.js',
-    '/js/comm/anki.js',
+    '/js/comm/anki-connect.js',
     '/js/comm/clipboard-monitor.js',
     '/js/comm/clipboard-reader.js',
     '/js/comm/mecab.js',

@@ -223,7 +223,7 @@
                 "ext/js/background/profile-conditions-util.js",
                 "ext/js/background/request-builder.js",
                 "ext/js/background/script-manager.js",
-                "ext/js/comm/anki.js",
+                "ext/js/comm/anki-connect.js",
                 "ext/js/comm/clipboard-monitor.js",
                 "ext/js/comm/clipboard-reader.js",
                 "ext/js/comm/mecab.js",
