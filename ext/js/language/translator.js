@@ -1402,6 +1402,10 @@ class Translator {
                 if (i !== 0) { return i; }
             }
 
+            // Sort by definition count
+            i = v2.definitions.length - v1.definitions.length;
+            if (i !== 0) { return i; }
+
             // Sort by dictionary order
             i = v1.dictionaryIndex - v2.dictionaryIndex;
             return i;
