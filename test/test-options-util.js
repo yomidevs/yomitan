@@ -453,7 +453,8 @@ function createProfileOptionsUpdatedTestData1() {
             displayTags: 'never',
             checkForDuplicates: true,
             fieldTemplates: null,
-            suspendNewCards: false
+            suspendNewCards: false,
+            noteGuiMode: 'browse'
         },
         sentenceParsing: {
             scanExtent: 200,
@@ -602,7 +603,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 18,
+        version: 19,
         global: {
             database: {
                 prefixWildcardsSupported: false

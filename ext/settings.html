@@ -1767,6 +1767,39 @@
         <div class="settings-item advanced-only">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
+                    <div class="settings-item-label">Note viewer window</div>
+                    <div class="settings-item-description">
+                        Clicking the <em>View added note</em> button shows this window.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <select data-setting="anki.noteGuiMode">
+                        <option value="browse">Card browser</option>
+                        <option value="edit">Note editor</option>
+                    </select>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    AnkiConnect releases after around 2022-05-29 support a new note editor window
+                    which can be shown when clicking the <em>View added note</em> button.
+                    This can be tested using the buttons below.
+                    If an error occurs, Anki and/or AnkiConnect may need to be updated.
+                </p>
+                <div class="test-anki-note-viewer-container">
+                    <button class="test-anki-note-viewer-button" data-mode="browse">Test <em>Card browser</em></button>
+                    <button class="test-anki-note-viewer-button" data-mode="edit">Test <em>Note editor</em></button>
+                    <div class="test-anki-note-viewer-results" id="test-anki-note-viewer-results" hidden></div>
+                </div>
+                <p class="margin-above">
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
                     <div class="settings-item-label">
                         Show card tags
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>

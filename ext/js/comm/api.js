@@ -60,8 +60,8 @@ class API {
         return this._invoke('injectAnkiNoteMedia', {timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails});
     }
 
-    noteView(noteId) {
-        return this._invoke('noteView', {noteId});
+    noteView(noteId, mode, allowFallback) {
+        return this._invoke('noteView', {noteId, mode, allowFallback});
     }
 
     suspendAnkiCardsForNote(noteId) {

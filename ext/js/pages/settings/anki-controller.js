@@ -71,6 +71,12 @@ class AnkiController {
             input.addEventListener('change', this._onAnkiCardPrimaryTypeRadioChange.bind(this), false);
         }
 
+        const testAnkiNoteViewerButtons = document.querySelectorAll('.test-anki-note-viewer-button');
+        const onTestAnkiNoteViewerButtonClick = this._onTestAnkiNoteViewerButtonClick.bind(this);
+        for (const button of testAnkiNoteViewerButtons) {
+            button.addEventListener('click', onTestAnkiNoteViewerButtonClick, false);
+        }
+
         document.querySelector('#anki-error-log').addEventListener('click', this._onAnkiErrorLogLinkClick.bind(this));
 
         const options = await this._settingsController.getOptions();
@@ -190,6 +196,10 @@ class AnkiController {
     _onAnkiErrorLogLinkClick() {
         if (this._ankiError === null) { return; }
         console.log({error: this._ankiError});
+    }
+
+    _onTestAnkiNoteViewerButtonClick(e) {
+        this._testAnkiNoteViewerSafe(e.currentTarget.dataset.mode);
     }
 
     _setAnkiCardPrimaryType(ankiCardType, ankiCardMenu) {
@@ -335,6 +345,54 @@ class AnkiController {
     _sortStringArray(array) {
         const stringComparer = this._stringComparer;
         array.sort((a, b) => stringComparer.compare(a, b));
+    }
+
+    async _testAnkiNoteViewerSafe(mode) {
+        this._setAnkiNoteViewerStatus(false, null);
+        try {
+            await this._testAnkiNoteViewer(mode);
+        } catch (e) {
+            this._setAnkiNoteViewerStatus(true, e);
+            return;
+        }
+        this._setAnkiNoteViewerStatus(true, null);
+    }
+
+    async _testAnkiNoteViewer(mode) {
+        const queries = [
+            '"よむ" deck:current',
+            '"よむ"',
+            'deck:current',
+            ''
+        ];
+
+        let noteId = null;
+        for (const query of queries) {
+            const notes = await yomichan.api.findAnkiNotes(query);
+            if (notes.length > 0) {
+                noteId = notes[0];
+                break;
+            }
+        }
+
+        if (noteId === null) {
+            throw new Error('Could not find a note to test with');
+        }
+
+        await yomichan.api.noteView(noteId, mode, false);
+    }
+
+    _setAnkiNoteViewerStatus(visible, error) {
+        const node = document.querySelector('#test-anki-note-viewer-results');
+        if (visible) {
+            const success = (error === null);
+            node.textContent = success ? 'Success!' : error.message;
+            node.dataset.success = `${success}`;
+        } else {
+            node.textContent = '';
+            delete node.dataset.success;
+        }
+        node.hidden = !visible;
     }
 }
 

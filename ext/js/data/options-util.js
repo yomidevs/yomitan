@@ -467,7 +467,8 @@ class OptionsUtil {
             {async: false, update: this._updateVersion15.bind(this)},
             {async: false, update: this._updateVersion16.bind(this)},
             {async: false, update: this._updateVersion17.bind(this)},
-            {async: false, update: this._updateVersion18.bind(this)}
+            {async: false, update: this._updateVersion18.bind(this)},
+            {async: false, update: this._updateVersion19.bind(this)}
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -944,6 +945,15 @@ class OptionsUtil {
             }
             profile.options.scanning.hidePopupOnCursorExit = false;
             profile.options.scanning.hidePopupOnCursorExitDelay = profile.options.scanning.hideDelay;
+        }
+        return options;
+    }
+
+    _updateVersion19(options) {
+        // Version 19 changes:
+        //  Added anki.noteGuiMode.
+        for (const profile of options.profiles) {
+            profile.options.anki.noteGuiMode = 'browse';
         }
         return options;
     }

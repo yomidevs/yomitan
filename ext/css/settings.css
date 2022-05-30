@@ -2147,6 +2147,28 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     display: none;
 }
 
+.test-anki-note-viewer-container {
+    margin-top: 0.85em;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-start;
+}
+.test-anki-note-viewer-container>:nth-child(n+2) {
+    margin-left: 0.5em;
+}
+.test-anki-note-viewer-button {
+    flex: 0 0 auto;
+}
+.test-anki-note-viewer-results {
+    align-self: center;
+}
+.test-anki-note-viewer-results[data-success=true] {
+    color: var(--success-color);
+}
+.test-anki-note-viewer-results[data-success=false] {
+    color: var(--danger-color);
+}
+
 
 /* Dictionary settings */
 .dictionary-list {

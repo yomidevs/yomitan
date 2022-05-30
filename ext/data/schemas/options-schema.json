@@ -844,7 +844,8 @@
                                     "checkForDuplicates",
                                     "fieldTemplates",
                                     "suspendNewCards",
-                                    "displayTags"
+                                    "displayTags",
+                                    "noteGuiMode"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -959,6 +960,11 @@
                                         "type": "string",
                                         "enum": ["never", "always", "non-standard"],
                                         "default": "never"
+                                    },
+                                    "noteGuiMode": {
+                                        "type": "string",
+                                        "enum": ["browse", "edit"],
+                                        "default": "browse"
                                     }
                                 }
                             },

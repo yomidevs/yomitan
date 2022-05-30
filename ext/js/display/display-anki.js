@@ -47,6 +47,7 @@ class DisplayAnki {
         this._screenshotFormat = 'png';
         this._screenshotQuality = 100;
         this._scanLength = 10;
+        this._noteGuiMode = 'browse';
         this._noteTags = [];
         this._modeOptions = new Map();
         this._dictionaryEntryTypeModeMap = new Map([
@@ -132,7 +133,7 @@ class DisplayAnki {
     _onOptionsUpdated({options}) {
         const {
             general: {resultOutputMode, glossaryLayoutMode, compactTags},
-            anki: {tags, duplicateScope, duplicateScopeCheckAllModels, suspendNewCards, checkForDuplicates, displayTags, kanji, terms, screenshot: {format, quality}},
+            anki: {tags, duplicateScope, duplicateScopeCheckAllModels, suspendNewCards, checkForDuplicates, displayTags, kanji, terms, noteGuiMode, screenshot: {format, quality}},
             scanning: {length: scanLength}
         } = options;
 
@@ -147,6 +148,7 @@ class DisplayAnki {
         this._screenshotFormat = format;
         this._screenshotQuality = quality;
         this._scanLength = scanLength;
+        this._noteGuiMode = noteGuiMode;
         this._noteTags = [...tags];
         this._modeOptions.clear();
         this._modeOptions.set('kanji', kanji);
@@ -418,7 +420,9 @@ class DisplayAnki {
         return error;
     }
 
-    _showErrorNotification(errors) {
+    _showErrorNotification(errors, displayErrors) {
+        if (typeof displayErrors === 'undefined') { displayErrors = errors; }
+
         if (this._errorNotificationEventListeners !== null) {
             this._errorNotificationEventListeners.removeAllEventListeners();
         }
@@ -428,7 +432,7 @@ class DisplayAnki {
             this._errorNotificationEventListeners = new EventListenerCollection();
         }
 
-        const content = this._display.displayGenerator.createAnkiNoteErrorsNotificationContent(errors);
+        const content = this._display.displayGenerator.createAnkiNoteErrorsNotificationContent(displayErrors);
         for (const node of content.querySelectorAll('.anki-note-error-log-link')) {
             this._errorNotificationEventListeners.addEventListener(node, 'click', () => {
                 console.log({ankiNoteErrors: errors});
@@ -634,10 +638,20 @@ class DisplayAnki {
         }
     }
 
-    _viewNote(node) {
+    async _viewNote(node) {
         const noteIds = this._getNodeNoteIds(node);
         if (noteIds.length === 0) { return; }
-        yomichan.api.noteView(noteIds[0]);
+        try {
+            await yomichan.api.noteView(noteIds[0], this._noteGuiMode, false);
+        } catch (e) {
+            const displayErrors = (
+                e.message === 'Mode not supported' ?
+                [this._display.displayGenerator.instantiateTemplateFragment('footer-notification-anki-view-note-error')] :
+                void 0
+            );
+            this._showErrorNotification([e], displayErrors);
+            return;
+        }
     }
 
     _showViewNoteMenu(node) {

@@ -220,23 +220,27 @@ class DisplayGenerator {
         for (const error of errors) {
             const div = document.createElement('li');
             div.className = 'anki-note-error-message';
-            let message = isObject(error) && typeof error.message === 'string' ? error.message : `${error}`;
-            let link = null;
-            if (isObject(error) && isObject(error.data)) {
-                const {referenceUrl} = error.data;
-                if (typeof referenceUrl === 'string') {
-                    message = message.trimEnd();
-                    if (!/[.!?]^/.test()) { message += '.'; }
-                    message += ' ';
-                    link = document.createElement('a');
-                    link.href = referenceUrl;
-                    link.target = '_blank';
-                    link.rel = 'noreferrer noopener';
-                    link.textContent = 'More info';
+            if (error instanceof DocumentFragment || error instanceof Node) {
+                div.appendChild(error);
+            } else {
+                let message = isObject(error) && typeof error.message === 'string' ? error.message : `${error}`;
+                let link = null;
+                if (isObject(error) && isObject(error.data)) {
+                    const {referenceUrl} = error.data;
+                    if (typeof referenceUrl === 'string') {
+                        message = message.trimEnd();
+                        if (!/[.!?]^/.test()) { message += '.'; }
+                        message += ' ';
+                        link = document.createElement('a');
+                        link.href = referenceUrl;
+                        link.target = '_blank';
+                        link.rel = 'noreferrer noopener';
+                        link.textContent = 'More info';
+                    }
                 }
+                this._setTextContent(div, message);
+                if (link !== null) { div.appendChild(link); }
             }
-            this._setTextContent(div, message);
-            if (link !== null) { div.appendChild(link); }
             list.appendChild(div);
         }
 
@@ -249,6 +253,10 @@ class DisplayGenerator {
 
     instantiateTemplate(name) {
         return this._templates.instantiate(name);
+    }
+
+    instantiateTemplateFragment(name) {
+        return this._templates.instantiateFragment(name);
     }
 
     // Private
