@@ -61,6 +61,7 @@ class AnkiController {
         this._ankiErrorInvalidResponseInfo = document.querySelector('#anki-error-invalid-response-info');
         this._ankiEnableCheckbox = document.querySelector('[data-setting="anki.enable"]');
         this._ankiCardPrimary = document.querySelector('#anki-card-primary');
+        const ankiApiKeyInput = document.querySelector('#anki-api-key-input');
         const ankiCardPrimaryTypeRadios = document.querySelectorAll('input[type=radio][name=anki-card-primary-type]');
 
         this._setupFieldMenus();
@@ -79,9 +80,17 @@ class AnkiController {
 
         document.querySelector('#anki-error-log').addEventListener('click', this._onAnkiErrorLogLinkClick.bind(this));
 
-        const options = await this._settingsController.getOptions();
+        ankiApiKeyInput.addEventListener('focus', this._onApiKeyInputFocus.bind(this));
+        ankiApiKeyInput.addEventListener('blur', this._onApiKeyInputBlur.bind(this));
+
+        const onAnkiSettingChanged = () => { this._updateOptions(); };
+        const nodes = [ankiApiKeyInput, ...document.querySelectorAll('[data-setting="anki.enable"]')];
+        for (const node of nodes) {
+            node.addEventListener('settingChanged', onAnkiSettingChanged);
+        }
+
+        await this._updateOptions();
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
-        this._onOptionsChanged({options});
     }
 
     getFieldMarkers(type) {
@@ -164,9 +173,17 @@ class AnkiController {
 
     // Private
 
+    async _updateOptions() {
+        const options = await this._settingsController.getOptions();
+        this._onOptionsChanged({options});
+    }
+
     async _onOptionsChanged({options: {anki}}) {
+        let {apiKey} = anki;
+        if (apiKey === '') { apiKey = null; }
         this._ankiConnect.server = anki.server;
         this._ankiConnect.enabled = anki.enable;
+        this._ankiConnect.apiKey = apiKey;
 
         this._selectorObserver.disconnect();
         this._selectorObserver.observe(document.documentElement, true);
@@ -200,6 +217,14 @@ class AnkiController {
 
     _onTestAnkiNoteViewerButtonClick(e) {
         this._testAnkiNoteViewerSafe(e.currentTarget.dataset.mode);
+    }
+
+    _onApiKeyInputFocus(e) {
+        e.currentTarget.type = 'text';
+    }
+
+    _onApiKeyInputBlur(e) {
+        e.currentTarget.type = 'password';
     }
 
     _setAnkiCardPrimaryType(ankiCardType, ankiCardMenu) {

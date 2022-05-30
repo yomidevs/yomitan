@@ -126,10 +126,9 @@ class DOMDataBinder {
 
     _createObserver(element) {
         const metadata = this._createElementMetadata(element);
-        const nodeName = element.nodeName.toUpperCase();
         const observer = {
             element,
-            type: (nodeName === 'INPUT' ? element.type : null),
+            type: this._getNormalizedElementType(element),
             value: null,
             hasValue: false,
             onChange: null,
@@ -157,28 +156,21 @@ class DOMDataBinder {
 
     _isObserverStale(element, observer) {
         const {type, metadata} = observer;
-        const nodeName = element.nodeName.toUpperCase();
         return !(
-            type === (nodeName === 'INPUT' ? element.type : null) &&
+            type === this._getNormalizedElementType(element) &&
             this._compareElementMetadata(metadata, this._createElementMetadata(element))
         );
     }
 
     _setElementValue(element, value) {
-        switch (element.nodeName.toUpperCase()) {
-            case 'INPUT':
-                switch (element.type) {
-                    case 'checkbox':
-                        element.checked = value;
-                        break;
-                    case 'text':
-                    case 'number':
-                        element.value = value;
-                        break;
-                }
+        switch (this._getNormalizedElementType(element)) {
+            case 'checkbox':
+                element.checked = value;
                 break;
-            case 'TEXTAREA':
-            case 'SELECT':
+            case 'text':
+            case 'number':
+            case 'textarea':
+            case 'select':
                 element.value = value;
                 break;
         }
@@ -188,22 +180,35 @@ class DOMDataBinder {
     }
 
     _getElementValue(element) {
-        switch (element.nodeName.toUpperCase()) {
-            case 'INPUT':
-                switch (element.type) {
-                    case 'checkbox':
-                        return !!element.checked;
-                    case 'text':
-                        return `${element.value}`;
-                    case 'number':
-                        return DOMDataBinder.convertToNumber(element.value, element);
-                }
-                break;
-            case 'TEXTAREA':
-            case 'SELECT':
+        switch (this._getNormalizedElementType(element)) {
+            case 'checkbox':
+                return !!element.checked;
+            case 'text':
+                return `${element.value}`;
+            case 'number':
+                return DOMDataBinder.convertToNumber(element.value, element);
+            case 'textarea':
+            case 'select':
                 return element.value;
         }
         return null;
+    }
+
+    _getNormalizedElementType(element) {
+        switch (element.nodeName.toUpperCase()) {
+            case 'INPUT':
+            {
+                let {type} = element;
+                if (type === 'password') { type = 'text'; }
+                return type;
+            }
+            case 'TEXTAREA':
+                return 'textarea';
+            case 'SELECT':
+                return 'select';
+            default:
+                return null;
+        }
     }
 
     // Utilities

@@ -454,7 +454,8 @@ function createProfileOptionsUpdatedTestData1() {
             checkForDuplicates: true,
             fieldTemplates: null,
             suspendNewCards: false,
-            noteGuiMode: 'browse'
+            noteGuiMode: 'browse',
+            apiKey: ''
         },
         sentenceParsing: {
             scanExtent: 200,

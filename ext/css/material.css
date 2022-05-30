@@ -723,7 +723,8 @@ select::-ms-expand {
 
 /* Material design inputs */
 input[type=text],
-input[type=number] {
+input[type=number],
+input[type=password] {
     width: var(--input-width);
     height: var(--input-height);
     line-height: var(--line-height);
@@ -745,7 +746,8 @@ input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-input[type=text] {
+input[type=text],
+input[type=password] {
     width: var(--input-width-large);
 }
 textarea {
@@ -763,23 +765,27 @@ select:invalid,
 textarea:invalid,
 input[type=text]:invalid,
 input[type=number]:invalid,
+input[type=password]:invalid,
 select[data-invalid=true],
 textarea[data-invalid=true],
 input[type=text][data-invalid=true],
-input[type=number][data-invalid=true] {
+input[type=number][data-invalid=true],
+input[type=password][data-invalid=true] {
     border: var(--thin-border-size) solid var(--danger-color);
 }
 select,
 textarea,
 input[type=text],
-input[type=number] {
+input[type=number],
+input[type=password] {
     box-shadow: none;
     transition: box-shadow calc(var(--animation-duration) / 2) linear;
 }
 select:focus,
 textarea:focus,
 input[type=text]:focus,
-input[type=number]:focus {
+input[type=number]:focus,
+input[type=password]:focus {
     box-shadow: 0 0 0 calc(2em / var(--font-size-no-units)) var(--input-outline-color);
     outline: none;
 }
@@ -787,15 +793,18 @@ select:invalid:focus,
 textarea:invalid:focus,
 input[type=text]:invalid:focus,
 input[type=number]:invalid:focus,
+input[type=password]:invalid:focus,
 select[data-invalid=true]:focus,
 textarea[data-invalid=true]:focus,
 input[type=text][data-invalid=true]:focus,
-input[type=number][data-invalid=true]:focus {
+input[type=number][data-invalid=true]:focus,
+input[type=password][data-invalid=true]:focus {
     box-shadow: 0 0 0 calc(2em / var(--font-size-no-units)) var(--danger-color);
     outline: none;
 }
 input[type=text].code,
-input[type=number].code {
+input[type=number].code,
+input[type=password].code {
     font-family: 'Courier New', Courier, monospace;
 }
 
@@ -807,6 +816,7 @@ input[type=number].code {
 }
 .input-group>input[type=text],
 .input-group>input[type=number],
+.input-group>input[type=password],
 .input-group>button.input-button {
     flex: 1 1 auto;
     border-top-right-radius: 0;
@@ -815,6 +825,7 @@ input[type=number].code {
     z-index: 1;
 }
 .input-suffix,
+.button.input-suffix,
 button.input-suffix {
     display: flex;
     flex-flow: row nowrap;
@@ -828,11 +839,13 @@ button.input-suffix {
     position: relative;
 }
 .input-suffix:not(:first-child),
+.button.input-suffix:not(:first-child),
 button.input-suffix:not(:first-child) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
 .input-suffix:not(:last-child),
+.button.input-suffix:not(:last-child),
 button.input-suffix:not(:last-child) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -842,8 +855,10 @@ button.input-suffix:not(:last-child) {
 }
 input[type=text]:invalid~.input-suffix:not(button),
 input[type=number]:invalid~.input-suffix:not(button),
+input[type=password]:invalid~.input-suffix:not(button),
 input[type=text][data-invalid=true]~.input-suffix:not(button),
-input[type=number][data-invalid=true]~.input-suffix:not(button) {
+input[type=number][data-invalid=true]~.input-suffix:not(button),
+input[type=password][data-invalid=true]~.input-suffix:not(button) {
     border-color: var(--danger-color);
     border-width: var(--thin-border-size);
     border-style: solid;
@@ -1079,8 +1094,10 @@ button.input-suffix.input-suffix-icon-button>.icon {
 }
 input[type=text]:invalid~button.input-suffix,
 input[type=number]:invalid~button.input-suffix,
+input[type=password]:invalid~button.input-suffix,
 input[type=text][data-invalid=true]~button.input-suffix,
-input[type=number][data-invalid=true]~button.input-suffix {
+input[type=number][data-invalid=true]~button.input-suffix,
+input[type=password][data-invalid=true]~button.input-suffix {
     --button-border-color: var(--danger-color);
     --button-hover-border-color: var(--danger-color);
     --button-active-border-color: var(--danger-color);

@@ -845,7 +845,8 @@
                                     "fieldTemplates",
                                     "suspendNewCards",
                                     "displayTags",
-                                    "noteGuiMode"
+                                    "noteGuiMode",
+                                    "apiKey"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -965,6 +966,10 @@
                                         "type": "string",
                                         "enum": ["browse", "edit"],
                                         "default": "browse"
+                                    },
+                                    "apiKey": {
+                                        "type": "string",
+                                        "default": ""
                                     }
                                 }
                             },

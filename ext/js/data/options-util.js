@@ -952,8 +952,10 @@ class OptionsUtil {
     _updateVersion19(options) {
         // Version 19 changes:
         //  Added anki.noteGuiMode.
+        //  Added anki.apiKey.
         for (const profile of options.profiles) {
             profile.options.anki.noteGuiMode = 'browse';
+            profile.options.anki.apiKey = '';
         }
         return options;
     }

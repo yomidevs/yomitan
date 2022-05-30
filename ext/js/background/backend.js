@@ -998,8 +998,11 @@ class Backend {
 
         const enabled = options.general.enable;
 
+        let {apiKey} = options.anki;
+        if (apiKey === '') { apiKey = null; }
         this._anki.server = options.anki.server;
         this._anki.enabled = options.anki.enable && enabled;
+        this._anki.apiKey = apiKey;
 
         this._mecab.setEnabled(options.parsing.enableMecabParser && enabled);
 

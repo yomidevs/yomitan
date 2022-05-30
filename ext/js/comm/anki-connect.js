@@ -26,6 +26,7 @@ class AnkiConnect {
         this._localVersion = 2;
         this._remoteVersion = 0;
         this._versionCheckPromise = null;
+        this._apiKey = null;
     }
 
     get server() {
@@ -42,6 +43,14 @@ class AnkiConnect {
 
     set enabled(value) {
         this._enabled = value;
+    }
+
+    get apiKey() {
+        return this._apiKey;
+    }
+
+    set apiKey(value) {
+        this._apiKey = value;
     }
 
     async isConnected() {
@@ -230,6 +239,8 @@ class AnkiConnect {
     }
 
     async _invoke(action, params) {
+        const body = {action, params, version: this._localVersion};
+        if (this._apiKey !== null) { body.key = this._apiKey; }
         let response;
         try {
             response = await fetch(this._server, {
@@ -242,7 +253,7 @@ class AnkiConnect {
                 },
                 redirect: 'follow',
                 referrerPolicy: 'no-referrer',
-                body: JSON.stringify({action, params, version: this._localVersion})
+                body: JSON.stringify(body)
             });
         } catch (e) {
             const error = new Error('Anki connection failure');
