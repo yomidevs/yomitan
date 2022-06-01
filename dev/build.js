@@ -141,22 +141,25 @@ async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath,
 
         const modifiedManifest = manifestUtil.getManifest(variant.name);
 
-        const fileNameSafe = path.basename(fileName);
-        const fullFileName = path.join(buildDir, fileNameSafe);
         ensureFilesExist(extDir, excludeFiles);
-        if (!dryRun) {
-            fs.writeFileSync(manifestPath, ManifestUtil.createManifestString(modifiedManifest));
-        }
 
-        if (!dryRun || dryRunBuildZip) {
-            await createZip(extDir, excludeFiles, fullFileName, sevenZipExes, onUpdate, dryRun);
-        }
+        if (typeof fileName === 'string') {
+            const fileNameSafe = path.basename(fileName);
+            const fullFileName = path.join(buildDir, fileNameSafe);
+            if (!dryRun) {
+                fs.writeFileSync(manifestPath, ManifestUtil.createManifestString(modifiedManifest));
+            }
 
-        if (!dryRun) {
-            if (Array.isArray(fileCopies)) {
-                for (const fileName2 of fileCopies) {
-                    const fileName2Safe = path.basename(fileName2);
-                    fs.copyFileSync(fullFileName, path.join(buildDir, fileName2Safe));
+            if (!dryRun || dryRunBuildZip) {
+                await createZip(extDir, excludeFiles, fullFileName, sevenZipExes, onUpdate, dryRun);
+            }
+
+            if (!dryRun) {
+                if (Array.isArray(fileCopies)) {
+                    for (const fileName2 of fileCopies) {
+                        const fileName2Safe = path.basename(fileName2);
+                        fs.copyFileSync(fullFileName, path.join(buildDir, fileName2Safe));
+                    }
                 }
             }
         }

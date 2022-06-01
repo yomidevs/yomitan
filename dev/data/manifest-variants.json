@@ -306,6 +306,26 @@
                 "js/dom/simple-dom-parser.js",
                 "lib/parse5.js"
             ]
+        },
+        {
+            "name": "safari",
+            "fileName": null,
+            "modifications": [
+                {"action": "remove", "path": ["optional_permissions"], "item": "clipboardRead"},
+                {"action": "remove", "path": ["permissions"], "item": "webRequestBlocking"},
+                {"action": "delete", "path": ["content_scripts", 0, "match_about_blank"]},
+                {"action": "delete", "path": ["sandbox"]},
+                {
+                    "action": "set",
+                    "path": ["content_security_policy"],
+                    "value": "default-src 'self'; script-src 'self' 'unsafe-eval'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
+                }
+            ],
+            "excludeFiles": [
+                "sw.js",
+                "js/dom/simple-dom-parser.js",
+                "lib/parse5.js"
+            ]
         }
     ]
 }
