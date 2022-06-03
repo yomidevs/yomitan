@@ -457,10 +457,15 @@
                                                     "searchTerms": true,
                                                     "searchKanji": true,
                                                     "scanOnTouchMove": true,
+                                                    "scanOnTouchPress": true,
+                                                    "scanOnTouchRelease": false,
+                                                    "scanOnPenMove": true,
                                                     "scanOnPenHover": true,
+                                                    "scanOnPenReleaseHover": false,
                                                     "scanOnPenPress": true,
                                                     "scanOnPenRelease": false,
-                                                    "preventTouchScrolling": false
+                                                    "preventTouchScrolling": false,
+                                                    "preventPenScrolling": false
                                                 }
                                             },
                                             {
@@ -476,10 +481,15 @@
                                                     "searchTerms": true,
                                                     "searchKanji": true,
                                                     "scanOnTouchMove": true,
+                                                    "scanOnTouchPress": true,
+                                                    "scanOnTouchRelease": false,
+                                                    "scanOnPenMove": true,
                                                     "scanOnPenHover": true,
+                                                    "scanOnPenReleaseHover": false,
                                                     "scanOnPenPress": true,
                                                     "scanOnPenRelease": false,
-                                                    "preventTouchScrolling": true
+                                                    "preventTouchScrolling": true,
+                                                    "preventPenScrolling": true
                                                 }
                                             }
                                         ],
@@ -528,10 +538,12 @@
                                                         "searchTerms",
                                                         "searchKanji",
                                                         "scanOnTouchMove",
+                                                        "scanOnTouchPress",
+                                                        "scanOnPenMove",
                                                         "scanOnPenHover",
-                                                        "scanOnPenPress",
-                                                        "scanOnPenRelease",
-                                                        "preventTouchScrolling"
+                                                        "scanOnPenReleaseHover",
+                                                        "preventTouchScrolling",
+                                                        "preventPenScrolling"
                                                     ],
                                                     "properties": {
                                                         "showAdvanced": {
@@ -550,9 +562,25 @@
                                                             "type": "boolean",
                                                             "default": true
                                                         },
+                                                        "scanOnTouchPress": {
+                                                            "type": "boolean",
+                                                            "default": true
+                                                        },
+                                                        "scanOnTouchRelease": {
+                                                            "type": "boolean",
+                                                            "default": false
+                                                        },
+                                                        "scanOnPenMove": {
+                                                            "type": "boolean",
+                                                            "default": true
+                                                        },
                                                         "scanOnPenHover": {
                                                             "type": "boolean",
                                                             "default": true
+                                                        },
+                                                        "scanOnPenReleaseHover": {
+                                                            "type": "boolean",
+                                                            "default": false
                                                         },
                                                         "scanOnPenPress": {
                                                             "type": "boolean",
@@ -563,6 +591,10 @@
                                                             "default": false
                                                         },
                                                         "preventTouchScrolling": {
+                                                            "type": "boolean",
+                                                            "default": true
+                                                        },
+                                                        "preventPenScrolling": {
                                                             "type": "boolean",
                                                             "default": true
                                                         }

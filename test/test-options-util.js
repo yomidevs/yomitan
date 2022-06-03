@@ -367,10 +367,15 @@ function createProfileOptionsUpdatedTestData1() {
                         searchTerms: true,
                         searchKanji: true,
                         scanOnTouchMove: true,
+                        scanOnTouchPress: true,
+                        scanOnTouchRelease: false,
+                        scanOnPenMove: true,
                         scanOnPenHover: true,
+                        scanOnPenReleaseHover: false,
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
-                        preventTouchScrolling: true
+                        preventTouchScrolling: true,
+                        preventPenScrolling: true
                     }
                 },
                 {
@@ -386,10 +391,15 @@ function createProfileOptionsUpdatedTestData1() {
                         searchTerms: true,
                         searchKanji: true,
                         scanOnTouchMove: true,
+                        scanOnTouchPress: true,
+                        scanOnTouchRelease: false,
+                        scanOnPenMove: true,
                         scanOnPenHover: true,
+                        scanOnPenReleaseHover: false,
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
-                        preventTouchScrolling: true
+                        preventTouchScrolling: true,
+                        preventPenScrolling: true
                     }
                 },
                 {
@@ -405,10 +415,15 @@ function createProfileOptionsUpdatedTestData1() {
                         searchTerms: true,
                         searchKanji: true,
                         scanOnTouchMove: true,
+                        scanOnTouchPress: true,
+                        scanOnTouchRelease: false,
+                        scanOnPenMove: true,
                         scanOnPenHover: true,
+                        scanOnPenReleaseHover: false,
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
-                        preventTouchScrolling: true
+                        preventTouchScrolling: true,
+                        preventPenScrolling: true
                     }
                 }
             ]

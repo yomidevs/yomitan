@@ -953,9 +953,25 @@ class OptionsUtil {
         // Version 19 changes:
         //  Added anki.noteGuiMode.
         //  Added anki.apiKey.
+        //  Renamed scanning.inputs[].options.scanOnPenPress to scanOnPenMove.
+        //  Renamed scanning.inputs[].options.scanOnPenRelease to scanOnPenReleaseHover.
+        //  Added scanning.inputs[].options.scanOnTouchPress.
+        //  Added scanning.inputs[].options.scanOnTouchRelease.
+        //  Added scanning.inputs[].options.scanOnPenPress.
+        //  Added scanning.inputs[].options.scanOnPenRelease.
+        //  Added scanning.inputs[].options.preventPenScrolling.
         for (const profile of options.profiles) {
             profile.options.anki.noteGuiMode = 'browse';
             profile.options.anki.apiKey = '';
+            for (const input of profile.options.scanning.inputs) {
+                input.options.scanOnPenMove = input.options.scanOnPenPress;
+                input.options.scanOnPenReleaseHover = input.options.scanOnPenRelease;
+                input.options.scanOnTouchPress = true;
+                input.options.scanOnTouchRelease = false;
+                input.options.scanOnPenPress = input.options.scanOnPenMove;
+                input.options.scanOnPenRelease = false;
+                input.options.preventPenScrolling = input.options.preventTouchScrolling;
+            }
         }
         return options;
     }

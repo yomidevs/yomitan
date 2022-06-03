@@ -2934,16 +2934,28 @@
             </label>
         </div>
 
-        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-pen-options"><span>Touch &amp; pen:</span></div>
-        <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-pen-options">
+        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-options"><span>Touch options:</span></div>
+        <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-options">
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchPress"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on touch press</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchRelease"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on touch release</span>
+            </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchMove"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
                 <span>Scan on touch move</span>
             </label>
             <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on pen hover</span>
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.preventTouchScrolling"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Prevent touch scrolling</span>
             </label>
+        </div>
+
+        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="pen-options"><span>Pen options:</span></div>
+        <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="pen-options">
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenPress"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
                 <span>Scan on pen press</span>
@@ -2953,8 +2965,20 @@
                 <span>Scan on pen release</span>
             </label>
             <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.preventTouchScrolling"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Prevent touch/pen scrolling</span>
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenMove"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on pen move (while touched)</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on pen hover (before touched)</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenReleaseHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on pen hover (after touched)</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.preventPenScrolling"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Prevent pen scrolling</span>
             </label>
         </div>
     </div>

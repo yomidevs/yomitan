@@ -1516,10 +1516,15 @@ class Display extends EventDispatcher {
                     searchTerms: true,
                     searchKanji: true,
                     scanOnTouchMove: false,
+                    scanOnTouchPress: false,
+                    scanOnTouchRelease: false,
+                    scanOnPenMove: false,
                     scanOnPenHover: false,
+                    scanOnPenReleaseHover: false,
                     scanOnPenPress: false,
                     scanOnPenRelease: false,
-                    preventTouchScrolling: false
+                    preventTouchScrolling: false,
+                    preventPenScrolling: false
                 }
             }],
             deepContentScan: scanningOptions.deepDomScan,
