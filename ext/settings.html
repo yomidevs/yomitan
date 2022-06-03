@@ -2706,23 +2706,11 @@
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">
-                        Audio sources
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                        When searching for audio, the sources are checked in order until the first
+                        valid source is found. This allows for selecting a fallback source if the
+                        first choice is not available.
                     </div>
                 </div>
-                <div class="settings-item-right">
-                    <button id="audio-source-add" class="low-emphasis">Add</button>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    When searching for audio, the sources are checked in order until the first
-                    valid source is found. This allows for selecting a fallback source if the
-                    first choice is not available.
-                </p>
-                <p>
-                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
             </div>
             <div class="settings-item-children">
                 <div id="audio-source-list" class="generic-list"></div>
@@ -2733,6 +2721,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button id="audio-source-add" class="low-emphasis">Add</button>
         <button data-modal-action="hide">Close</button>
     </div>
 </div></div>
@@ -2876,9 +2865,9 @@
             No scanning inputs have been defined yet.
             Click the <em>Add</em> button to add a new input.
         </div>
-        <div class="flex-row-nowrap right"><button class="low-emphasis" id="scan-input-add">Add</button></div>
     </div>
     <div class="modal-footer">
+        <button class="low-emphasis" id="scan-input-add">Add</button>
         <button data-modal-action="hide">Close</button>
     </div>
 </div></div>
@@ -3435,9 +3424,6 @@
                 <div class="settings-item-left">
                     <div class="settings-item-label">Text replacement patterns</div>
                 </div>
-                <div class="settings-item-right">
-                    <button id="translation-text-replacement-add" class="low-emphasis">Add</button>
-                </div>
             </div>
             <div class="settings-item-children">
                 <div id="translation-text-replacement-list" class="generic-list"></div>
@@ -3446,6 +3432,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button id="translation-text-replacement-add" class="low-emphasis">Add</button>
         <button data-modal-action="hide">Close</button>
     </div>
 </div></div>

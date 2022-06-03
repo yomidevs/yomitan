@@ -116,6 +116,12 @@ class ScanInputsController {
             deleteCount: 0,
             items: [scanningInput]
         }]);
+
+        // Scroll to bottom
+        const button = e.currentTarget;
+        const modalContainer = button.closest('.modal');
+        const scrollContainer = modalContainer.querySelector('.modal-body');
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
     }
 
     _addOption(index, scanningInput) {
