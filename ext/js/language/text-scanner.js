@@ -87,6 +87,9 @@ class TextScanner extends EventDispatcher {
         this._pointerIdTypeMap = new Map();
 
         this._canClearSelection = true;
+
+        this._yomichanIsChangingTextSelectionNow = false;
+        this._userHasNotSelectedAnythingManually = true;
     }
 
     get canClearSelection() {
@@ -141,6 +144,7 @@ class TextScanner extends EventDispatcher {
 
         if (value) {
             this._hookEvents();
+            this._userHasNotSelectedAnythingManually = window.getSelection().isCollapsed;
         }
     }
 
@@ -259,8 +263,10 @@ class TextScanner extends EventDispatcher {
 
     setCurrentTextSource(textSource) {
         this._textSourceCurrent = textSource;
-        if (this._selectText) {
+        if (this._selectText && this._userHasNotSelectedAnythingManually) {
+            this._yomichanIsChangingTextSelectionNow = true;
             this._textSourceCurrent.select();
+            setTimeout(() => this._yomichanIsChangingTextSelectionNow = false, 0);
             this._textSourceCurrentSelected = true;
         } else {
             this._textSourceCurrentSelected = false;
@@ -369,6 +375,11 @@ class TextScanner extends EventDispatcher {
     _onSelectionChange() {
         if (this._preventNextClickScanTimer !== null) { return; } // Ignore deselection that occurs at the start of the click
         this._preventNextClickScan = true;
+    }
+
+    _onSelectionChangeCheckUserSelection() {
+        if (this._yomichanIsChangingTextSelectionNow) { return; }
+        this._userHasNotSelectedAnythingManually = window.getSelection().isCollapsed;
     }
 
     _onSearchClickMouseDown(e) {
@@ -754,6 +765,8 @@ class TextScanner extends EventDispatcher {
             eventListenerInfos.push(...this._getMouseClickOnlyEventListeners2(capture));
         }
 
+        eventListenerInfos.push(this._getSelectionChangeCheckUserSelectionListener());
+
         for (const args of eventListenerInfos) {
             this._eventListeners.addEventListener(...args);
         }
@@ -813,6 +826,10 @@ class TextScanner extends EventDispatcher {
             }
         }
         return entries;
+    }
+
+    _getSelectionChangeCheckUserSelectionListener() {
+        return [document, 'selectionchange', this._onSelectionChangeCheckUserSelection.bind(this)];
     }
 
     _getTouch(touchList, identifier) {
