@@ -13,6 +13,10 @@
                 {
                     "version": "22.4.4.0",
                     "update_link": "https://github.com/FooSoft/yomichan/releases/download/22.4.4.0/yomichan_testing-22.4.4.0-an+fx.xpi"
+                },
+                {
+                    "version": "22.6.6.0",
+                    "update_link": "https://github.com/FooSoft/yomichan/releases/download/22.6.6.0/a708116f79104891acbd-22.6.6.0.xpi"
                 }
             ]
         }
