@@ -1,12 +1,3 @@
-<!-- +++
-Area = "projects"
-GitHub = "yomichan"
-Layout = "page"
-Tags = ["anki", "gpl license", "japanese", "web", "yomichan", "anki-connect", "extension"]
-Description = "Japanese pop-up dictionary extension for Chrome and Firefox."
-Collection = "ProjectsActive"
-+++ -->
-
 # Yomichan
 
 Yomichan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
