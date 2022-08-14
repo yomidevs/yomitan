@@ -252,7 +252,6 @@
                 },
                 "fontSize": {
                     "type": "string",
-                    "enum": ["xx-small", "x-small", "small", "medium", "large", "x-large", "xx-large", "xxx-large"],
                     "default": "medium"
                 },
                 "textDecorationLine": {
@@ -276,6 +275,11 @@
                     "type": "string",
                     "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"],
                     "default": "baseline"
+                },
+                "textAlign": {
+                    "type": "string",
+                    "enum": ["start", "end", "left", "right", "center", "justify", "justify-all", "match-parent"],
+                    "default": "start"
                 },
                 "marginTop": {
                     "type": "number",

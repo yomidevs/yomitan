@@ -83,9 +83,13 @@
                 {"tag": "div", "style": {"fontWeight": "bold"}, "content": "fontWeight:bold"},
                 {"tag": "div", "style": {"fontSize": "xx-small"}, "content": "fontSize:xx-small"},
                 {"tag": "div", "style": {"fontSize": "x-small"}, "content": "fontSize:x-small"},
+                {"tag": "div", "style": {"fontSize": "70%"}, "content": "fontSize:70%"},
+                {"tag": "div", "style": {"fontSize": "smaller"}, "content": "fontSize:smaller"},
                 {"tag": "div", "style": {"fontSize": "small"}, "content": "fontSize:small"},
                 {"tag": "div", "style": {"fontSize": "medium"}, "content": "fontSize:medium"},
                 {"tag": "div", "style": {"fontSize": "large"}, "content": "fontSize:large"},
+                {"tag": "div", "style": {"fontSize": "larger"}, "content": "fontSize:larger"},
+                {"tag": "div", "style": {"fontSize": "130%"}, "content": "fontSize:130%"},
                 {"tag": "div", "style": {"fontSize": "x-large"}, "content": "fontSize:x-large"},
                 {"tag": "div", "style": {"fontSize": "xx-large"}, "content": "fontSize:xx-large"},
                 {"tag": "div", "style": {"fontSize": "xxx-large"}, "content": "fontSize:xxx-large"},
@@ -137,6 +141,15 @@
                         ]},
                         {"tag": "tr", "content": [
                             {"tag": "td", "content": "Cell A4"}
+                        ]},
+                        {"tag": "tr", "content": [
+                            {"tag": "td", "content": "Cell A5", "colSpan": 4, "style": {"textAlign": "left"}}
+                        ]},
+                        {"tag": "tr", "content": [
+                            {"tag": "td", "content": "Cell A6", "colSpan": 4, "style": {"textAlign": "center"}}
+                        ]},
+                        {"tag": "tr", "content": [
+                            {"tag": "td", "content": "Cell A7", "colSpan": 4, "style": {"textAlign": "right"}}
                         ]}
                     ]},
                     {"tag": "tfoot", "content": [
@@ -230,8 +243,8 @@
                 {"tag": "ul", "content": [
                     {"tag": "li", "style": {"listStyleType": "'⇄'"}, "content": ["【", {"tag": "a", "href": "?query=よみ&wildcards=off", "content": ["Antonym"]}, "】"]},
                     {"tag": "li", "style": {"listStyleType": "'🔄'"}, "content": ["【", {"tag": "a", "href": "?query=よみ&wildcards=off", "content": ["References and is referenced by"]}, "】"]},
-                    {"tag": "li", "style": {"listStyleType": "'➡'"}, "content": ["【", {"tag": "a", "href": "?query=よみ&wildcards=off", "content": ["References"]}, "】"]},
-                    {"tag": "li", "style": {"listStyleType": "'⬅'"}, "content": ["【", {"tag": "a", "href": "?query=よみ&wildcards=off", "content": ["Referenced by"]}, "】"]}
+                    {"tag": "li", "style": {"listStyleType": "'➡️'"}, "content": ["【", {"tag": "a", "href": "?query=よみ&wildcards=off", "content": ["References"]}, "】"]},
+                    {"tag": "li", "style": {"listStyleType": "'⬅️'"}, "content": ["【", {"tag": "a", "href": "?query=よみ&wildcards=off", "content": ["Referenced by"]}, "】"]}
                 ]}
             ]},
             {"type": "structured-content", "content": [

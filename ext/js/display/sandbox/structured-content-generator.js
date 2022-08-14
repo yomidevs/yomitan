@@ -265,6 +265,7 @@ class StructuredContentGenerator {
             fontSize,
             textDecorationLine,
             verticalAlign,
+            textAlign,
             marginTop,
             marginLeft,
             marginRight,
@@ -275,6 +276,7 @@ class StructuredContentGenerator {
         if (typeof fontWeight === 'string') { style.fontWeight = fontWeight; }
         if (typeof fontSize === 'string') { style.fontSize = fontSize; }
         if (typeof verticalAlign === 'string') { style.verticalAlign = verticalAlign; }
+        if (typeof textAlign === 'string') { style.textAlign = textAlign; }
         if (typeof textDecorationLine === 'string') {
             style.textDecoration = textDecorationLine;
         } else if (Array.isArray(textDecorationLine)) {
