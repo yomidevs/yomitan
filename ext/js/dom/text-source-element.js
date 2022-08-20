@@ -95,7 +95,7 @@ class TextSourceElement {
     }
 
     getRects() {
-        return this.getClientRects();
+        return this._element.getClientRects();
     }
 
     getWritingMode() {
