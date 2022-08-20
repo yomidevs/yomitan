@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * StringUtil
+ */
+
 class TextSourceElement {
     constructor(element, fullContent=null, startOffset=0, endOffset=0) {
         this._element = element;
@@ -61,24 +65,24 @@ class TextSourceElement {
     }
 
     setEndOffset(length, _layoutAwareScan, fromEnd) {
-        if (fromEnd) {
-            const delta = Math.min(this._fullContent.length - this._endOffset, length);
-            this._endOffset += delta;
-            this._content = this._fullContent.substring(this._startOffset, this._endOffset);
-            return delta;
-        } else {
-            const delta = Math.min(this._fullContent.length - this._startOffset, length);
-            this._endOffset = this._startOffset + delta;
-            this._content = this._fullContent.substring(this._startOffset, this._endOffset);
-            return delta;
+        const offset = fromEnd ? this._endOffset : this._startOffset;
+        length = Math.min(this._fullContent.length - offset, length);
+        if (length > 0) {
+            length = StringUtil.readCodePointsForward(this._fullContent, offset, length).length;
         }
+        this._endOffset = offset + length;
+        this._content = this._fullContent.substring(this._startOffset, this._endOffset);
+        return length;
     }
 
     setStartOffset(length) {
-        const delta = Math.min(this._startOffset, length);
-        this._startOffset -= delta;
+        length = Math.min(this._startOffset, length);
+        if (length > 0) {
+            length = StringUtil.readCodePointsBackward(this._fullContent, this._startOffset - 1, length).length;
+        }
+        this._startOffset -= length;
         this._content = this._fullContent.substring(this._startOffset, this._endOffset);
-        return delta;
+        return length;
     }
 
     collapse(toStart) {

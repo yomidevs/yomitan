@@ -27,16 +27,19 @@ class StringUtil {
      * @returns {string} The code points from the string.
      */
     static readCodePointsForward(text, position, count) {
+        const textLength = text.length;
         let result = '';
         for (; count > 0; --count) {
             const char = text[position];
-            const charCode = char.charCodeAt(0);
             result += char;
-            if (charCode >= 0xd800 && charCode < 0xdc00 && ++position < text.length) {
+            if (++position >= textLength) { break; }
+            const charCode = char.charCodeAt(0);
+            if (charCode >= 0xd800 && charCode < 0xdc00) {
                 const char2 = text[position];
                 const charCode2 = char2.charCodeAt(0);
                 if (charCode2 >= 0xdc00 && charCode2 < 0xe000) {
                     result += char2;
+                    if (++position >= textLength) { break; }
                 }
             }
         }
@@ -54,13 +57,15 @@ class StringUtil {
         let result = '';
         for (; count > 0; --count) {
             const char = text[position];
-            const charCode = char.charCodeAt(0);
             result = char + result;
-            if (charCode >= 0xdc00 && charCode < 0xe000 && position > 0) {
-                const char2 = text[position - 1];
+            if (--position < 0) { break; }
+            const charCode = char.charCodeAt(0);
+            if (charCode >= 0xdc00 && charCode < 0xe000) {
+                const char2 = text[position];
                 const charCode2 = char2.charCodeAt(0);
                 if (charCode2 >= 0xd800 && charCode2 < 0xdc00) {
                     result = char2 + result;
+                    if (--position < 0) { break; }
                 }
             }
         }
