@@ -106,3 +106,8 @@ This page lists several of the browser bugs that have affected Yomichan over the
 * **Browser**: Chrome
 * **Date**: 2022-04-03
 * **Links**: [Demo](https://github.com/toasted-nutbread/chrome-extension-audio-autoplay-bug), [Report](https://bugs.chromium.org/p/chromium/issues/detail?id=1312816)
+
+## DOMException.data sometimes throws error on assignment
+* **Browser**: Firefox
+* **Date**: 2022-06-25
+* **Links**: [Report](https://bugzilla.mozilla.org/show_bug.cgi?id=1776555)
