@@ -468,7 +468,8 @@ class OptionsUtil {
             {async: false, update: this._updateVersion16.bind(this)},
             {async: false, update: this._updateVersion17.bind(this)},
             {async: false, update: this._updateVersion18.bind(this)},
-            {async: false, update: this._updateVersion19.bind(this)}
+            {async: false, update: this._updateVersion19.bind(this)},
+            {async: false, update: this._updateVersion20.bind(this)}
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -972,6 +973,15 @@ class OptionsUtil {
                 input.options.scanOnPenRelease = false;
                 input.options.preventPenScrolling = input.options.preventTouchScrolling;
             }
+        }
+        return options;
+    }
+
+    _updateVersion20(options) {
+        // Version 20 changes:
+        //  Added anki.downloadTimeout.
+        for (const profile of options.profiles) {
+            profile.options.anki.downloadTimeout = 0;
         }
         return options;
     }

@@ -1809,7 +1809,7 @@ class Backend {
             return null;
         }
 
-        const {sources, preferredAudioIndex} = details;
+        const {sources, preferredAudioIndex, idleTimeout} = details;
         let data;
         let contentType;
         try {
@@ -1817,7 +1817,8 @@ class Backend {
                 sources,
                 preferredAudioIndex,
                 term,
-                reading
+                reading,
+                idleTimeout
             ));
         } catch (e) {
             const error = this._getAudioDownloadError(e);
@@ -1918,6 +1919,9 @@ class Backend {
             const {errors} = error.data;
             if (Array.isArray(errors)) {
                 for (const error2 of errors) {
+                    if (error2.name === 'AbortError') {
+                        return this._createAudioDownloadError('Audio download was cancelled due to an idle timeout', 'audio-download-idle-timeout', errors);
+                    }
                     if (!isObject(error2.data)) { continue; }
                     const {details} = error2.data;
                     if (!isObject(details)) { continue; }
@@ -1925,17 +1929,29 @@ class Backend {
                         // This is potentially an error due to the extension not having enough URL privileges.
                         // The message logged to the console looks like this:
                         //  Access to fetch at '<URL>' from origin 'chrome-extension://<ID>' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
-                        const result = new Error('Audio download failed due to possible extension permissions error');
-                        result.data = {
-                            errors,
-                            referenceUrl: '/issues.html#audio-download-failed'
-                        };
-                        return result;
+                        return this._createAudioDownloadError('Audio download failed due to possible extension permissions error', 'audio-download-failed', errors);
                     }
                 }
             }
         }
         return null;
+    }
+
+    _createAudioDownloadError(message, issueId, errors) {
+        const error = new Error(message);
+        const hasErrors = Array.isArray(errors);
+        const hasIssueId = (typeof issueId === 'string');
+        if (hasErrors || hasIssueId) {
+            error.data = {};
+            if (hasErrors) {
+                // Errors need to be serialized since they are passed to other frames
+                error.data.errors = errors.map((e) => serializeError(e));
+            }
+            if (hasIssueId) {
+                error.data.referenceUrl = `/issues.html#${issueId}`;
+            }
+        }
+        return error;
     }
 
     _generateAnkiNoteMediaFileName(prefix, extension, timestamp, definitionDetails) {

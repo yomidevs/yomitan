@@ -291,6 +291,14 @@
             "rules": {
                 "no-implicit-globals": "error"
             }
+        },
+        {
+            "files": [
+                "ext/js/**/*.js"
+            ],
+            "globals": {
+                "AbortController": "readonly"
+            }
         }
     ]
 }

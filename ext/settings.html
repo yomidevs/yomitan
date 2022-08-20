@@ -1763,7 +1763,31 @@
                 </div>
             </div>
         </div></div>
-
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Idle download timeout <span class="light">(in milliseconds)</span></div>
+                    <div class="settings-item-description">
+                        The maximum time before an idle download will be cancelled; 0 = no limit.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <input type="number" data-setting="anki.downloadTimeout" min="0">
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    Audio files can be downloaded from remote servers when creating Anki cards,
+                    and sometimes these downloads can stall due to server or internet connectivity issues.
+                    When this setting has a non-zero value, if a download has stalled for longer than the time specified,
+                    the download will be cancelled.
+                </p>
+                <p class="margin-above">
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
         <div class="settings-item advanced-only"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Suspend new cards</div>

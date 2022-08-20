@@ -470,7 +470,8 @@ function createProfileOptionsUpdatedTestData1() {
             fieldTemplates: null,
             suspendNewCards: false,
             noteGuiMode: 'browse',
-            apiKey: ''
+            apiKey: '',
+            downloadTimeout: 0
         },
         sentenceParsing: {
             scanExtent: 200,
@@ -619,7 +620,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 19,
+        version: 20,
         global: {
             database: {
                 prefixWildcardsSupported: false

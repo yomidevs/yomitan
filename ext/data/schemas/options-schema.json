@@ -878,7 +878,8 @@
                                     "suspendNewCards",
                                     "displayTags",
                                     "noteGuiMode",
-                                    "apiKey"
+                                    "apiKey",
+                                    "downloadTimeout"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -1002,6 +1003,11 @@
                                     "apiKey": {
                                         "type": "string",
                                         "default": ""
+                                    },
+                                    "downloadTimeout": {
+                                        "type": "number",
+                                        "default": 0,
+                                        "minimum": 0
                                     }
                                 }
                             },

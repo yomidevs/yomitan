@@ -18,6 +18,7 @@
 /* global
  * JsonSchema
  * NativeSimpleDOMParser
+ * RequestBuilder
  * SimpleDOMParser
  * StringUtil
  */
@@ -50,7 +51,7 @@ class AudioDownloader {
         return [];
     }
 
-    async downloadTermAudio(sources, preferredAudioIndex, term, reading) {
+    async downloadTermAudio(sources, preferredAudioIndex, term, reading, idleTimeout) {
         const errors = [];
         for (const source of sources) {
             let infoList = await this.getTermAudioInfoList(source, term, reading);
@@ -61,7 +62,7 @@ class AudioDownloader {
                 switch (info.type) {
                     case 'url':
                         try {
-                            return await this._downloadAudioFromUrl(info.url, source.type);
+                            return await this._downloadAudioFromUrl(info.url, source.type, idleTimeout);
                         } catch (e) {
                             errors.push(e);
                         }
@@ -241,21 +242,42 @@ class AudioDownloader {
         return url.replace(/\{([^}]*)\}/g, (m0, m1) => (Object.prototype.hasOwnProperty.call(data, m1) ? `${data[m1]}` : m0));
     }
 
-    async _downloadAudioFromUrl(url, sourceType) {
+    async _downloadAudioFromUrl(url, sourceType, idleTimeout) {
+        let signal;
+        let onProgress = null;
+        let idleTimer = null;
+        if (typeof idleTimeout === 'number') {
+            const abortController = new AbortController();
+            ({signal} = abortController);
+            const onIdleTimeout = () => {
+                abortController.abort('Idle timeout');
+            };
+            onProgress = (done) => {
+                clearTimeout(idleTimer);
+                idleTimer = done ? null : setTimeout(onIdleTimeout, idleTimeout);
+            };
+            idleTimer = setTimeout(onIdleTimeout, idleTimeout);
+        }
+
         const response = await this._requestBuilder.fetchAnonymous(url, {
             method: 'GET',
             mode: 'cors',
             cache: 'default',
             credentials: 'omit',
             redirect: 'follow',
-            referrerPolicy: 'no-referrer'
+            referrerPolicy: 'no-referrer',
+            signal
         });
 
         if (!response.ok) {
             throw new Error(`Invalid response: ${response.status}`);
         }
 
-        const arrayBuffer = await response.arrayBuffer();
+        const arrayBuffer = await RequestBuilder.readFetchResponseArrayBuffer(response, onProgress);
+
+        if (idleTimer !== null) {
+            clearTimeout(idleTimer);
+        }
 
         if (!await this._isAudioBinaryValid(arrayBuffer, sourceType)) {
             throw new Error('Could not retrieve audio');
