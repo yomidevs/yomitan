@@ -16,9 +16,9 @@
  */
 
 /**
- * Class containing generic string utility functions.
+ * Class containing generic ArrayBuffer utility functions.
  */
-class StringUtil {
+class ArrayBufferUtil {
     /**
      * Decodes the contents of an ArrayBuffer using UTF8.
      * @param {ArrayBuffer} arrayBuffer The input ArrayBuffer.

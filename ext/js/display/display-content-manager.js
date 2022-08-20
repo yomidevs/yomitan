@@ -16,7 +16,7 @@
  */
 
 /* global
- * StringUtil
+ * ArrayBufferUtil
  */
 
 /**
@@ -139,7 +139,7 @@ class DisplayContentManager {
         const token = this._token;
         const data = (await yomichan.api.getMedia([{path, dictionary}]))[0];
         if (token === this._token && data !== null) {
-            const buffer = StringUtil.base64ToArrayBuffer(data.content);
+            const buffer = ArrayBufferUtil.base64ToArrayBuffer(data.content);
             const blob = new Blob([buffer], {type: data.mediaType});
             const url = URL.createObjectURL(blob);
             cachedData.data = data;

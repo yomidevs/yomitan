@@ -16,9 +16,9 @@
  */
 
 /* global
+ * ArrayBufferUtil
  * DictionaryController
  * OptionsUtil
- * StringUtil
  */
 
 class BackupController {
@@ -319,7 +319,7 @@ class BackupController {
     }
 
     async _importSettingsFile(file) {
-        const dataString = StringUtil.arrayBufferUtf8Decode(await this._readFileArrayBuffer(file));
+        const dataString = ArrayBufferUtil.arrayBufferUtf8Decode(await this._readFileArrayBuffer(file));
         const data = JSON.parse(dataString);
 
         // Type check

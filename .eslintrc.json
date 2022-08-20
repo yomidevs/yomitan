@@ -232,7 +232,7 @@
                 "ext/js/data/json-schema.js",
                 "ext/js/data/options-util.js",
                 "ext/js/data/permissions-util.js",
-                "ext/js/data/sandbox/string-util.js",
+                "ext/js/data/sandbox/array-buffer-util.js",
                 "ext/js/dom/simple-dom-parser.js",
                 "ext/js/extension/environment.js",
                 "ext/js/general/cache-map.js",

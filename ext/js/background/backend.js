@@ -19,6 +19,7 @@
  * AccessibilityController
  * AnkiConnect
  * AnkiUtil
+ * ArrayBufferUtil
  * AudioDownloader
  * ClipboardMonitor
  * ClipboardReader
@@ -33,7 +34,6 @@
  * ProfileConditionsUtil
  * RequestBuilder
  * ScriptManager
- * StringUtil
  * Translator
  * wanakana
  */
@@ -2223,7 +2223,7 @@ class Backend {
         for (const item of results) {
             const {content} = item;
             if (content instanceof ArrayBuffer) {
-                item.content = StringUtil.arrayBufferToBase64(content);
+                item.content = ArrayBufferUtil.arrayBufferToBase64(content);
             }
         }
         return results;

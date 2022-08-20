@@ -16,11 +16,11 @@
  */
 
 /* global
+ * ArrayBufferUtil
  * JsonSchema
  * NativeSimpleDOMParser
  * RequestBuilder
  * SimpleDOMParser
- * StringUtil
  */
 
 class AudioDownloader {
@@ -283,7 +283,7 @@ class AudioDownloader {
             throw new Error('Could not retrieve audio');
         }
 
-        const data = StringUtil.arrayBufferToBase64(arrayBuffer);
+        const data = ArrayBufferUtil.arrayBufferToBase64(arrayBuffer);
         const contentType = response.headers.get('Content-Type');
         return {data, contentType};
     }

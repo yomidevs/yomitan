@@ -34,7 +34,7 @@ self.importScripts(
     '/js/data/json-schema.js',
     '/js/data/options-util.js',
     '/js/data/permissions-util.js',
-    '/js/data/sandbox/string-util.js',
+    '/js/data/sandbox/array-buffer-util.js',
     '/js/dom/simple-dom-parser.js',
     '/js/extension/environment.js',
     '/js/general/cache-map.js',
