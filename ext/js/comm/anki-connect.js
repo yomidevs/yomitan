@@ -153,20 +153,36 @@ class AnkiConnect {
     async findNoteIds(notes) {
         if (!this._enabled) { return []; }
         await this._checkVersion();
-        const actions = notes.map((note) => {
-            let query = '';
-            switch (this._getDuplicateScopeFromNote(note)) {
-                case 'deck':
-                    query = `"deck:${this._escapeQuery(note.deckName)}" `;
-                    break;
-                case 'deck-root':
-                    query = `"deck:${this._escapeQuery(AnkiUtil.getRootDeckName(note.deckName))}" `;
-                    break;
+
+        const actions = [];
+        const actionsTargetsList = [];
+        const actionsTargetsMap = new Map();
+        const allNoteIds = [];
+
+        for (const note of notes) {
+            const query = this._getNoteQuery(note);
+            let actionsTargets = actionsTargetsMap.get(query);
+            if (typeof actionsTargets === 'undefined') {
+                actionsTargets = [];
+                actionsTargetsList.push(actionsTargets);
+                actionsTargetsMap.set(query, actionsTargets);
+                actions.push({action: 'findNotes', params: {query}});
             }
-            query += this._fieldsToQuery(note.fields);
-            return {action: 'findNotes', params: {query}};
-        });
-        return await this._invoke('multi', {actions});
+            const noteIds = [];
+            allNoteIds.push(noteIds);
+            actionsTargets.push(noteIds);
+        }
+
+        const result = await this._invoke('multi', {actions});
+        for (let i = 0, ii = Math.min(result.length, actionsTargetsList.length); i < ii; ++i) {
+            const noteIds = result[i];
+            for (const actionsTargets of actionsTargetsList[i]) {
+                for (const noteId of noteIds) {
+                    actionsTargets.push(noteId);
+                }
+            }
+        }
+        return allNoteIds;
     }
 
     async suspendCards(cardIds) {
@@ -313,5 +329,19 @@ class AnkiConnect {
             }
         }
         return null;
+    }
+
+    _getNoteQuery(note) {
+        let query = '';
+        switch (this._getDuplicateScopeFromNote(note)) {
+            case 'deck':
+                query = `"deck:${this._escapeQuery(note.deckName)}" `;
+                break;
+            case 'deck-root':
+                query = `"deck:${this._escapeQuery(AnkiUtil.getRootDeckName(note.deckName))}" `;
+                break;
+        }
+        query += this._fieldsToQuery(note.fields);
+        return query;
     }
 }
