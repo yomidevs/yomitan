@@ -226,7 +226,7 @@ class TextScanner extends EventDispatcher {
     getTextSourceContent(textSource, length, layoutAwareScan) {
         const clonedTextSource = textSource.clone();
 
-        clonedTextSource.setEndOffset(length, layoutAwareScan);
+        clonedTextSource.setEndOffset(length, layoutAwareScan, false);
 
         const includeSelector = this._includeSelector;
         const excludeSelector = this._excludeSelector;
@@ -872,7 +872,7 @@ class TextScanner extends EventDispatcher {
         const {dictionaryEntries, originalTextLength} = await yomichan.api.termsFind(searchText, details, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
-        textSource.setEndOffset(originalTextLength, layoutAwareScan);
+        textSource.setEndOffset(originalTextLength, layoutAwareScan, false);
         const sentence = this._documentUtil.extractSentence(
             textSource,
             layoutAwareScan,
@@ -899,7 +899,7 @@ class TextScanner extends EventDispatcher {
         const dictionaryEntries = await yomichan.api.kanjiFind(searchText, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
-        textSource.setEndOffset(1, layoutAwareScan);
+        textSource.setEndOffset(1, layoutAwareScan, false);
         const sentence = this._documentUtil.extractSentence(
             textSource,
             layoutAwareScan,
@@ -1121,7 +1121,7 @@ class TextScanner extends EventDispatcher {
                 (excludeSelector !== null && DocumentUtil.anyNodeMatchesSelector(nodes, excludeSelector))
             ) {
                 --length;
-                textSource.setEndOffset(length, layoutAwareScan);
+                textSource.setEndOffset(length, layoutAwareScan, false);
             } else {
                 break;
             }

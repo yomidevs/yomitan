@@ -60,7 +60,7 @@ class TextSourceElement {
         return this._content;
     }
 
-    setEndOffset(length, fromEnd=false) {
+    setEndOffset(length, _layoutAwareScan, fromEnd) {
         if (fromEnd) {
             const delta = Math.min(this._fullContent.length - this._endOffset, length);
             this._endOffset += delta;

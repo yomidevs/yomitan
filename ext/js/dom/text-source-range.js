@@ -66,7 +66,7 @@ class TextSourceRange {
         return this._content;
     }
 
-    setEndOffset(length, layoutAwareScan, fromEnd=false) {
+    setEndOffset(length, layoutAwareScan, fromEnd) {
         const state = (
             fromEnd ?
             new DOMTextScanner(this._range.endContainer, this._range.endOffset, !layoutAwareScan, layoutAwareScan).seek(length) :
