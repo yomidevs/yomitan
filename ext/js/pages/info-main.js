@@ -111,7 +111,7 @@ function getOperatingSystemDisplayName(os) {
         })();
 
         const settingsController = new SettingsController();
-        settingsController.prepare();
+        await settingsController.prepare();
 
         const backupController = new BackupController(settingsController, null);
         await backupController.prepare();

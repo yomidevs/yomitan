@@ -22,9 +22,9 @@
  */
 
 class SettingsController extends EventDispatcher {
-    constructor(profileIndex=0) {
+    constructor() {
         super();
-        this._profileIndex = profileIndex;
+        this._profileIndex = 0;
         this._source = generateId(16);
         this._pageExitPreventions = new Set();
         this._pageExitPreventionEventListeners = new EventListenerCollection();
@@ -42,23 +42,28 @@ class SettingsController extends EventDispatcher {
 
     set profileIndex(value) {
         if (this._profileIndex === value) { return; }
-        this._setProfileIndex(value);
+        this._setProfileIndex(value, true);
     }
 
     get permissionsUtil() {
         return this._permissionsUtil;
     }
 
-    prepare() {
+    async prepare() {
         yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         if (this._canObservePermissionsChanges()) {
             chrome.permissions.onAdded.addListener(this._onPermissionsChanged.bind(this));
             chrome.permissions.onRemoved.addListener(this._onPermissionsChanged.bind(this));
         }
+        const optionsFull = await this.getOptionsFull();
+        const {profiles, profileCurrent} = optionsFull;
+        if (profileCurrent >= 0 && profileCurrent < profiles.length) {
+            this._profileIndex = profileCurrent;
+        }
     }
 
     async refresh() {
-        await this._onOptionsUpdatedInternal();
+        await this._onOptionsUpdatedInternal(true);
     }
 
     async getOptions() {
@@ -73,7 +78,7 @@ class SettingsController extends EventDispatcher {
     async setAllSettings(value) {
         const profileIndex = value.profileCurrent;
         await yomichan.api.setAllSettings(value, this._source);
-        this._setProfileIndex(profileIndex);
+        this._setProfileIndex(profileIndex, true);
     }
 
     async getSettings(targets) {
@@ -143,21 +148,29 @@ class SettingsController extends EventDispatcher {
 
     // Private
 
-    _setProfileIndex(value) {
+    _setProfileIndex(value, canUpdateProfileIndex) {
         this._profileIndex = value;
         this.trigger('optionsContextChanged');
-        this._onOptionsUpdatedInternal();
+        this._onOptionsUpdatedInternal(canUpdateProfileIndex);
     }
 
     _onOptionsUpdated({source}) {
         if (source === this._source) { return; }
-        this._onOptionsUpdatedInternal();
+        this._onOptionsUpdatedInternal(true);
     }
 
-    async _onOptionsUpdatedInternal() {
+    async _onOptionsUpdatedInternal(canUpdateProfileIndex) {
         const optionsContext = this.getOptionsContext();
-        const options = await this.getOptions();
-        this.trigger('optionsChanged', {options, optionsContext});
+        try {
+            const options = await this.getOptions();
+            this.trigger('optionsChanged', {options, optionsContext});
+        } catch (e) {
+            if (canUpdateProfileIndex) {
+                this._setProfileIndex(0, false);
+                return;
+            }
+            throw e;
+        }
     }
 
     _setupTargets(targets, extraFields) {

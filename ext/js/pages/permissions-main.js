@@ -93,8 +93,8 @@ function setupPermissionsToggles() {
         const modalController = new ModalController();
         modalController.prepare();
 
-        const settingsController = new SettingsController(0);
-        settingsController.prepare();
+        const settingsController = new SettingsController();
+        await settingsController.prepare();
 
         const permissionsToggleController = new PermissionsToggleController(settingsController);
         permissionsToggleController.prepare();

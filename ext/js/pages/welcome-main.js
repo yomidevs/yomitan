@@ -56,15 +56,13 @@ async function setupGenericSettingsController(genericSettingController) {
 
         setupEnvironmentInfo();
 
-        const optionsFull = await yomichan.api.optionsGetFull();
-
         const preparePromises = [];
 
         const modalController = new ModalController();
         modalController.prepare();
 
-        const settingsController = new SettingsController(optionsFull.profileCurrent);
-        settingsController.prepare();
+        const settingsController = new SettingsController();
+        await settingsController.prepare();
 
         const dictionaryController = new DictionaryController(settingsController, modalController, statusFooter);
         dictionaryController.prepare();

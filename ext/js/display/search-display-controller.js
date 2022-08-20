@@ -135,7 +135,7 @@ class SearchDisplayController {
         await this._display.updateOptions();
         const query = this._queryInput.value;
         if (query) {
-            this._display.searchLast();
+            this._display.searchLast(false);
         }
     }
 

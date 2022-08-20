@@ -215,13 +215,13 @@ class ProfileController {
 
         this._updateProfileSelectOptions();
 
-        // Modify settings
-        await this._settingsController.modifyGlobalSettings(modifications);
-
         // Update profile index
         if (settingsProfileIndex === profileIndex) {
             this._settingsController.profileIndex = profileCurrentNew;
         }
+
+        // Modify settings
+        await this._settingsController.modifyGlobalSettings(modifications);
     }
 
     async swapProfiles(index1, index2) {

@@ -77,15 +77,13 @@ async function setupGenericSettingsController(genericSettingController) {
         }
         delete document.documentElement.dataset.loadingStalled;
 
-        const optionsFull = await yomichan.api.optionsGetFull();
-
         const preparePromises = [];
 
         const modalController = new ModalController();
         modalController.prepare();
 
-        const settingsController = new SettingsController(optionsFull.profileCurrent);
-        settingsController.prepare();
+        const settingsController = new SettingsController();
+        await settingsController.prepare();
 
         const persistentStorageController = new PersistentStorageController();
         persistentStorageController.prepare();
