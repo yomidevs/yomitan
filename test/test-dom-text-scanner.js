@@ -166,7 +166,10 @@ async function testDocument1() {
         window.getComputedStyle = createAbsoluteGetComputedStyle(window);
 
         const vm = new VM({document, window, Range, Node});
-        vm.execute('js/dom/dom-text-scanner.js');
+        vm.execute([
+            'js/data/sandbox/string-util.js',
+            'js/dom/dom-text-scanner.js'
+        ]);
         const DOMTextScanner = vm.get('DOMTextScanner');
 
         await testDomTextScanner(dom, {DOMTextScanner});

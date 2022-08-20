@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * StringUtil
+ */
+
 /**
  * A class used to scan text in a document.
  */
@@ -146,44 +150,6 @@ class DOMTextScanner {
     // Private
 
     /**
-     * Reads a code point in a string in the forward direction.
-     * @param {string} text The text to read the code point from.
-     * @param {number} position The index of the first character to read.
-     * @returns {string} The code point from the string.
-     */
-    _readCodePointForward(text, position) {
-        let char = text[position];
-        const charCode = char.charCodeAt(0);
-        if (charCode >= 0xd800 && charCode < 0xdc00 && ++position < text.length) {
-            const char2 = text[position];
-            const charCode2 = char2.charCodeAt(0);
-            if (charCode2 >= 0xdc00 && charCode2 < 0xe000) {
-                char += char2;
-            }
-        }
-        return char;
-    }
-
-    /**
-     * Reads a code point in a string in the backward direction.
-     * @param {string} text The text to read the code point from.
-     * @param {number} position The index of the first character to read.
-     * @returns {string} The code point from the string.
-     */
-    _readCodePointBackward(text, position) {
-        let char = text[position];
-        const charCode = char.charCodeAt(0);
-        if (charCode >= 0xdc00 && charCode < 0xe000 && position > 0) {
-            const char2 = text[position - 1];
-            const charCode2 = char2.charCodeAt(0);
-            if (charCode2 >= 0xd800 && charCode2 < 0xdc00) {
-                char = char2 + char;
-            }
-        }
-        return char;
-    }
-
-    /**
      * Seeks forward in a text node.
      * @param {Text} textNode The text node to use.
      * @param {boolean} resetOffset Whether or not the text offset should be reset.
@@ -202,7 +168,7 @@ class DOMTextScanner {
         let newlines = this._newlines;
 
         while (offset < nodeValueLength) {
-            const char = this._readCodePointForward(nodeValue, offset);
+            const char = StringUtil.readCodePointsForward(nodeValue, offset, 1);
             offset += char.length;
             const charAttributes = DOMTextScanner.getCharacterAttributes(char, preserveNewlines, preserveWhitespace);
 
@@ -288,7 +254,7 @@ class DOMTextScanner {
         let newlines = this._newlines;
 
         while (offset > 0) {
-            const char = this._readCodePointBackward(nodeValue, offset - 1);
+            const char = StringUtil.readCodePointsBackward(nodeValue, offset - 1, 1);
             offset -= char.length;
             const charAttributes = DOMTextScanner.getCharacterAttributes(char, preserveNewlines, preserveWhitespace);
 

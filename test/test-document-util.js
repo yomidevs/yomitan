@@ -94,6 +94,7 @@ async function testDocument1() {
 
     const vm = new VM({document, window, Range, Node});
     vm.execute([
+        'js/data/sandbox/string-util.js',
         'js/dom/dom-text-scanner.js',
         'js/dom/text-source-range.js',
         'js/dom/text-source-element.js',
