@@ -980,8 +980,17 @@ class OptionsUtil {
     _updateVersion20(options) {
         // Version 20 changes:
         //  Added anki.downloadTimeout.
+        //  Fixed general.popupTheme invalid default.
+        //  Fixed general.popupOuterTheme invalid default.
         for (const profile of options.profiles) {
             profile.options.anki.downloadTimeout = 0;
+            const {general} = profile.options;
+            if (general.popupTheme === 'default') {
+                general.popupTheme = 'light';
+            }
+            if (general.popupOuterTheme === 'default') {
+                general.popupOuterTheme = 'light';
+            }
         }
         return options;
     }

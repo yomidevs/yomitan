@@ -215,12 +215,12 @@
                                     "popupTheme": {
                                         "type": "string",
                                         "enum": ["light", "dark", "browser"],
-                                        "default": "default"
+                                        "default": "light"
                                     },
                                     "popupOuterTheme": {
                                         "type": "string",
                                         "enum": ["light", "dark", "browser", "site"],
-                                        "default": "default"
+                                        "default": "light"
                                     },
                                     "customPopupCss": {
                                         "type": "string",
