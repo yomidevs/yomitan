@@ -980,10 +980,12 @@ class OptionsUtil {
     _updateVersion20(options) {
         // Version 20 changes:
         //  Added anki.downloadTimeout.
+        //  Added scanning.normalizeCssZoom.
         //  Fixed general.popupTheme invalid default.
         //  Fixed general.popupOuterTheme invalid default.
         for (const profile of options.profiles) {
             profile.options.anki.downloadTimeout = 0;
+            profile.options.scanning.normalizeCssZoom = true;
             const {general} = profile.options;
             if (general.popupTheme === 'default') {
                 general.popupTheme = 'light';

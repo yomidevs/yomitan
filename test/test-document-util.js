@@ -167,7 +167,10 @@ async function testDocumentTextScanningFunctions(dom, {DocumentUtil, TextSourceR
 
         // Test docRangeFromPoint
         const documentUtil = new DocumentUtil();
-        const source = documentUtil.getRangeFromPoint(0, 0, false);
+        const source = documentUtil.getRangeFromPoint(0, 0, {
+            deepContentScan: false,
+            normalizeCssZoom: true
+        });
         switch (resultType) {
             case 'TextSourceRange':
                 assert.strictEqual(getPrototypeOfOrNull(source), TextSourceRange.prototype);

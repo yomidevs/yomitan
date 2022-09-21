@@ -514,6 +514,34 @@
         <div class="settings-item advanced-only">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
+                    <div class="settings-item-label">Normalize CSS zoom</div>
+                    <div class="settings-item-description">
+                        Correct the pointer location on webpages where CSS <code>zoom</code> is used.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="scanning.normalizeCssZoom"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    The non-standard CSS <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/zoom" target="_blank" rel="noopener noreferrer"><code>zoom</code></a> property interferes with the normal calculation of the pointer coordinates when scanning webpages. This property is discouraged from being used and its use is rare, but some webpages may still use it.
+                </p>
+                <p>
+                    Enabling this option, which is on by default, will take the value of this property into account when scanning webpage content. It is currently put behind an option in case there are unforeseen negative side effects.
+                </p>
+                <p>
+                    This setting does not have any effect in Firefox, as it does not implement the <code>zoom</code> property.
+                </p>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
                     <div class="settings-item-label">Wildcard scanning</div>
                     <div class="settings-item-description">
                         Enable suffix wildcard when looking up scanned webpage text.

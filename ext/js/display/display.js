@@ -367,6 +367,7 @@ class Display extends EventDispatcher {
             scanning: {
                 inputs: scanningOptions.inputs,
                 deepContentScan: scanningOptions.deepDomScan,
+                normalizeCssZoom: scanningOptions.normalizeCssZoom,
                 selectText: scanningOptions.selectText,
                 delay: scanningOptions.delay,
                 touchInputEnabled: scanningOptions.touchInputEnabled,
@@ -1532,6 +1533,7 @@ class Display extends EventDispatcher {
                 }
             }],
             deepContentScan: scanningOptions.deepDomScan,
+            normalizeCssZoom: scanningOptions.normalizeCssZoom,
             selectText: false,
             delay: scanningOptions.delay,
             touchInputEnabled: false,

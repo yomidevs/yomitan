@@ -347,6 +347,7 @@ function createProfileOptionsUpdatedTestData1() {
             matchTypePrefix: false,
             hidePopupOnCursorExit: false,
             hidePopupOnCursorExitDelay: 0,
+            normalizeCssZoom: true,
             preventMiddleMouse: {
                 onWebPages: false,
                 onPopupPages: false,

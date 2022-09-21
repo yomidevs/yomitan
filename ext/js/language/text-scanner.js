@@ -54,6 +54,7 @@ class TextScanner extends EventDispatcher {
         this._selectionRestoreInfo = null;
 
         this._deepContentScan = false;
+        this._normalizeCssZoom = true;
         this._selectText = false;
         this._delay = 0;
         this._touchInputEnabled = false;
@@ -151,6 +152,7 @@ class TextScanner extends EventDispatcher {
     setOptions({
         inputs,
         deepContentScan,
+        normalizeCssZoom,
         selectText,
         delay,
         touchInputEnabled,
@@ -166,6 +168,9 @@ class TextScanner extends EventDispatcher {
         }
         if (typeof deepContentScan === 'boolean') {
             this._deepContentScan = deepContentScan;
+        }
+        if (typeof normalizeCssZoom === 'boolean') {
+            this._normalizeCssZoom = normalizeCssZoom;
         }
         if (typeof selectText === 'boolean') {
             this._selectText = selectText;
@@ -932,7 +937,10 @@ class TextScanner extends EventDispatcher {
                 return;
             }
 
-            const textSource = this._documentUtil.getRangeFromPoint(x, y, this._deepContentScan);
+            const textSource = this._documentUtil.getRangeFromPoint(x, y, {
+                deepContentScan: this._deepContentScan,
+                normalizeCssZoom: this._normalizeCssZoom
+            });
             try {
                 await this._search(textSource, searchTerms, searchKanji, inputInfo);
             } finally {

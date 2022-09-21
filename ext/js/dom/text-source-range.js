@@ -91,11 +91,11 @@ class TextSourceRange {
     }
 
     getRect() {
-        return this._range.getBoundingClientRect();
+        return DocumentUtil.convertRectZoomCoordinates(this._range.getBoundingClientRect(), this._range.startContainer);
     }
 
     getRects() {
-        return this._range.getClientRects();
+        return DocumentUtil.convertMultipleRectZoomCoordinates(this._range.getClientRects(), this._range.startContainer);
     }
 
     getWritingMode() {

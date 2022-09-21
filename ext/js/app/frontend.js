@@ -395,6 +395,7 @@ class Frontend {
         this._textScanner.setOptions({
             inputs: scanningOptions.inputs,
             deepContentScan: scanningOptions.deepDomScan,
+            normalizeCssZoom: scanningOptions.normalizeCssZoom,
             selectText: scanningOptions.selectText,
             delay: scanningOptions.delay,
             touchInputEnabled: scanningOptions.touchInputEnabled,

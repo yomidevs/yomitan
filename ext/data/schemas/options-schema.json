@@ -438,7 +438,8 @@
                                     "layoutAwareScan",
                                     "matchTypePrefix",
                                     "hidePopupOnCursorExit",
-                                    "hidePopupOnCursorExitDelay"
+                                    "hidePopupOnCursorExitDelay",
+                                    "normalizeCssZoom"
                                 ],
                                 "properties": {
                                     "inputs": {
@@ -706,6 +707,10 @@
                                         "type": "number",
                                         "minimum": 0,
                                         "default": 0
+                                    },
+                                    "normalizeCssZoom": {
+                                        "type": "boolean",
+                                        "default": true
                                     }
                                 }
                             },

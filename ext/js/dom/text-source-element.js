@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DocumentUtil
  * StringUtil
  */
 
@@ -95,11 +96,11 @@ class TextSourceElement {
     }
 
     getRect() {
-        return this._element.getBoundingClientRect();
+        return DocumentUtil.convertRectZoomCoordinates(this._element.getBoundingClientRect(), this._element);
     }
 
     getRects() {
-        return this._element.getClientRects();
+        return DocumentUtil.convertMultipleRectZoomCoordinates(this._element.getClientRects(), this._element);
     }
 
     getWritingMode() {
