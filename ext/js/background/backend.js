@@ -130,7 +130,8 @@ class Backend {
             ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}],
             ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
             ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}],
-            ['findAnkiNotes',                {async: true,  contentScript: true,  handler: this._onApiFindAnkiNotes.bind(this)}]
+            ['findAnkiNotes',                {async: true,  contentScript: true,  handler: this._onApiFindAnkiNotes.bind(this)}],
+            ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -769,6 +770,16 @@ class Backend {
 
     async _onApiFindAnkiNotes({query}) {
         return await this._anki.findNotes(query);
+    }
+
+    async _onApiLoadExtensionScripts({files}, sender) {
+        if (!sender || !sender.tab) { throw new Error('Invalid sender'); }
+        const tabId = sender.tab.id;
+        if (typeof tabId !== 'number') { throw new Error('Sender has invalid tab ID'); }
+        const {frameId} = sender;
+        for (const file of files) {
+            await this._scriptManager.injectScript(file, tabId, frameId, false, true, 'document_start');
+        }
     }
 
     // Command handlers

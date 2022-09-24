@@ -176,6 +176,10 @@ class API {
         return this._invoke('findAnkiNotes', {query});
     }
 
+    loadExtensionScripts(files) {
+        return this._invoke('loadExtensionScripts', {files});
+    }
+
     // Utilities
 
     _createActionPort(timeout=5000) {

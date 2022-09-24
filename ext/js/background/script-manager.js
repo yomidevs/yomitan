@@ -290,6 +290,7 @@ class ScriptManager {
     _injectScriptMV3(file, tabId, frameId, allFrames) {
         return new Promise((resolve, reject) => {
             const details = {
+                injectImmediately: true,
                 files: [file],
                 target: {tabId, allFrames}
             };
