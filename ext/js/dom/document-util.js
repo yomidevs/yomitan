@@ -22,7 +22,40 @@
  */
 
 class DocumentUtil {
-    static getRangeFromPoint(x, y, {deepContentScan, normalizeCssZoom}) {
+    /**
+     * Options to configure how element detection is performed.
+     * @typedef {object} GetRangeFromPointOptions
+     * @property {boolean} deepContentScan Whether or deep content scanning should be performed. When deep content scanning is enabled,
+     *   some transparent overlay elements will be ignored when looking for the element at the input position.
+     * @property {boolean} normalizeCssZoom Whether or not zoom coordinates should be normalized.
+     */
+
+    /**
+     * Scans the document for text or elements with text information at the given coordinate.
+     * Coordinates are provided in [client space](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems).
+     * @callback GetRangeFromPointHandler
+     * @param {number} x The x coordinate to search at.
+     * @param {number} y The y coordinate to search at.
+     * @param {GetRangeFromPointOptions} options Options to configure how element detection is performed.
+     * @returns {?TextSourceRange|TextSourceElement} A range for the hovered text or element, or `null` if no applicable content was found.
+     */
+
+    /**
+     * Scans the document for text or elements with text information at the given coordinate.
+     * Coordinates are provided in [client space](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems).
+     * @param {number} x The x coordinate to search at.
+     * @param {number} y The y coordinate to search at.
+     * @param {GetRangeFromPointOptions} options Options to configure how element detection is performed.
+     * @returns {?TextSourceRange|TextSourceElement} A range for the hovered text or element, or `null` if no applicable content was found.
+     */
+    static getRangeFromPoint(x, y, options) {
+        for (const handler of this._getRangeFromPointHandlers) {
+            const r = handler(x, y, options);
+            if (r !== null) { return r; }
+        }
+
+        const {deepContentScan, normalizeCssZoom} = options;
+
         const elements = this._getElementsFromPoint(x, y, deepContentScan);
         let imposter = null;
         let imposterContainer = null;
@@ -60,6 +93,14 @@ class DocumentUtil {
             }
             return null;
         }
+    }
+
+    /**
+     * Registers a custom handler for scanning for text or elements at the input position.
+     * @param {GetRangeFromPointHandler} handler The handler callback which will be invoked when calling `getRangeFromPoint`.
+     */
+    static registerGetRangeFromPointHandler(handler) {
+        this._getRangeFromPointHandlers.push(handler);
     }
 
     /**
@@ -724,3 +765,5 @@ class DocumentUtil {
 DocumentUtil._transparentColorPattern = /rgba\s*\([^)]*,\s*0(?:\.0+)?\s*\)/;
 // eslint-disable-next-line no-underscore-dangle
 DocumentUtil._cssZoomSupported = null;
+// eslint-disable-next-line no-underscore-dangle
+DocumentUtil._getRangeFromPointHandlers = [];
