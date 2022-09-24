@@ -22,7 +22,6 @@
 class TextScanner extends EventDispatcher {
     constructor({
         node,
-        documentUtil,
         getSearchContext,
         ignoreElements=null,
         ignorePoint=null,
@@ -33,7 +32,6 @@ class TextScanner extends EventDispatcher {
     }) {
         super();
         this._node = node;
-        this._documentUtil = documentUtil;
         this._getSearchContext = getSearchContext;
         this._ignoreElements = ignoreElements;
         this._ignorePoint = ignorePoint;
@@ -878,7 +876,7 @@ class TextScanner extends EventDispatcher {
         if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(originalTextLength, layoutAwareScan, false);
-        const sentence = this._documentUtil.extractSentence(
+        const sentence = DocumentUtil.extractSentence(
             textSource,
             layoutAwareScan,
             sentenceScanExtent,
@@ -905,7 +903,7 @@ class TextScanner extends EventDispatcher {
         if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(1, layoutAwareScan, false);
-        const sentence = this._documentUtil.extractSentence(
+        const sentence = DocumentUtil.extractSentence(
             textSource,
             layoutAwareScan,
             sentenceScanExtent,
@@ -937,7 +935,7 @@ class TextScanner extends EventDispatcher {
                 return;
             }
 
-            const textSource = this._documentUtil.getRangeFromPoint(x, y, {
+            const textSource = DocumentUtil.getRangeFromPoint(x, y, {
                 deepContentScan: this._deepContentScan,
                 normalizeCssZoom: this._normalizeCssZoom
             });

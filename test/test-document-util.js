@@ -166,8 +166,7 @@ async function testDocumentTextScanningFunctions(dom, {DocumentUtil, TextSourceR
         };
 
         // Test docRangeFromPoint
-        const documentUtil = new DocumentUtil();
-        const source = documentUtil.getRangeFromPoint(0, 0, {
+        const source = DocumentUtil.getRangeFromPoint(0, 0, {
             deepContentScan: false,
             normalizeCssZoom: true
         });
@@ -202,7 +201,7 @@ async function testDocumentTextScanningFunctions(dom, {DocumentUtil, TextSourceR
         }
 
         // Test docSentenceExtract
-        const sentenceActual = documentUtil.extractSentence(
+        const sentenceActual = DocumentUtil.extractSentence(
             source,
             false,
             sentenceScanExtent,

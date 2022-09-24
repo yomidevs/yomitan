@@ -73,13 +73,11 @@ class Frontend {
         this._pageZoomFactor = 1.0;
         this._contentScale = 1.0;
         this._lastShowPromise = Promise.resolve();
-        this._documentUtil = new DocumentUtil();
         this._textScanner = new TextScanner({
             node: window,
             ignoreElements: this._ignoreElements.bind(this),
             ignorePoint: this._ignorePoint.bind(this),
             getSearchContext: this._getSearchContext.bind(this),
-            documentUtil: this._documentUtil,
             searchTerms: true,
             searchKanji: true
         });

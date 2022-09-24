@@ -20,10 +20,9 @@
  */
 
 class QueryParser extends EventDispatcher {
-    constructor({getSearchContext, documentUtil, japaneseUtil}) {
+    constructor({getSearchContext, japaneseUtil}) {
         super();
         this._getSearchContext = getSearchContext;
-        this._documentUtil = documentUtil;
         this._japaneseUtil = japaneseUtil;
         this._text = '';
         this._setTextToken = null;
@@ -39,7 +38,6 @@ class QueryParser extends EventDispatcher {
         this._textScanner = new TextScanner({
             node: this._queryParser,
             getSearchContext,
-            documentUtil,
             searchTerms: true,
             searchKanji: false,
             searchOnClick: true

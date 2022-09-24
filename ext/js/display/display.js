@@ -20,7 +20,6 @@
  * DisplayGenerator
  * DisplayHistory
  * DisplayNotification
- * DocumentUtil
  * ElementOverflowController
  * FrameEndpoint
  * Frontend
@@ -121,7 +120,6 @@ class Display extends EventDispatcher {
         this._query = '';
         this._fullQuery = '';
         this._queryOffset = 0;
-        this._documentUtil = new DocumentUtil();
         this._progressIndicator = document.querySelector('#progress-indicator');
         this._progressIndicatorTimer = null;
         this._progressIndicatorVisible = new DynamicProperty(false);
@@ -130,7 +128,6 @@ class Display extends EventDispatcher {
         this._queryParserContainer = document.querySelector('#query-parser-container');
         this._queryParser = new QueryParser({
             getSearchContext: this._getSearchContext.bind(this),
-            documentUtil: this._documentUtil,
             japaneseUtil
         });
         this._contentScrollElement = document.querySelector('#content-scroll');
@@ -1498,7 +1495,6 @@ class Display extends EventDispatcher {
             this._contentTextScanner = new TextScanner({
                 node: window,
                 getSearchContext: this._getSearchContext.bind(this),
-                documentUtil: this._documentUtil,
                 searchTerms: true,
                 searchKanji: false,
                 searchOnClick: true,
