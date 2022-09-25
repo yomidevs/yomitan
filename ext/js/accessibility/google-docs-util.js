@@ -33,26 +33,28 @@ class GoogleDocsUtil {
      * @returns {?TextSourceRange|TextSourceElement} A range for the hovered text or element, or `null` if no applicable content was found.
      */
     static getRangeFromPoint(x, y, {normalizeCssZoom}) {
-        const selector = '.kix-canvas-tile-content svg>g>rect';
-        const styleNode = this._getStyleNode(selector);
+        const styleNode = this._getStyleNode();
         styleNode.disabled = false;
-        const elements = document.elementsFromPoint(x, y);
+        const element = document.elementFromPoint(x, y);
         styleNode.disabled = true;
-        for (const element of elements) {
-            if (!element.matches(selector)) { continue; }
+        if (element !== null && element.matches('.kix-canvas-tile-content svg>g>rect')) {
             const ariaLabel = element.getAttribute('aria-label');
-            if (typeof ariaLabel !== 'string' || ariaLabel.length === 0) { continue; }
-            return this._createRange(element, ariaLabel, x, y, normalizeCssZoom);
+            if (typeof ariaLabel === 'string' && ariaLabel.length > 0) {
+                return this._createRange(element, ariaLabel, x, y, normalizeCssZoom);
+            }
         }
         return null;
     }
 
-    static _getStyleNode(selector) {
+    static _getStyleNode() {
         // This <style> node is necessary to force the SVG <rect> elements to have a fill,
         // which allows them to be included in document.elementsFromPoint's return value.
         if (this._styleNode === null) {
             const style = document.createElement('style');
-            style.textContent = `${selector}{fill:#0000 !important;}`;
+            style.textContent = [
+                '.kix-canvas-tile-content{pointer-events:none!important;}',
+                '.kix-canvas-tile-content svg>g>rect{pointer-events:all!important;}'
+            ].join('\n');
             const parent = document.head || document.documentElement;
             if (parent !== null) {
                 parent.appendChild(style);
@@ -67,13 +69,14 @@ class GoogleDocsUtil {
         const content = document.createTextNode(text);
         const svgText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         const transform = element.getAttribute('transform') || '';
+        const font = element.getAttribute('data-font-css') || '';
         svgText.setAttribute('x', element.getAttribute('x'));
         svgText.setAttribute('y', element.getAttribute('y'));
         svgText.appendChild(content);
         const textStyle = svgText.style;
         this._setImportantStyle(textStyle, 'all', 'initial');
         this._setImportantStyle(textStyle, 'transform', transform);
-        this._setImportantStyle(textStyle, 'font', element.dataset.fontCss);
+        this._setImportantStyle(textStyle, 'font', font);
         this._setImportantStyle(textStyle, 'text-anchor', 'start');
         element.parentNode.appendChild(svgText);
 
