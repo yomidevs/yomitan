@@ -2067,7 +2067,7 @@
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">
-                        Force HTML-based rendering for Google Docs
+                        Enable Google Docs compatibility mode
                         <a tabindex="0" class="more-toggle more-only danger-text" data-parent-distance="4">(?)</a>
                     </div>
                 </div>
@@ -2077,14 +2077,16 @@
             </div>
             <div class="settings-item-children more" hidden>
                 <p>
-                    Google Docs is moving from HTML-based rendering to
+                    Google Docs now uses
                     <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas" target="_blank" rel="noopener noreferrer">canvas-based</a>
-                    rendering to display content<sup><a href="https://workspaceupdates.googleblog.com/2021/05/Google-Docs-Canvas-Based-Rendering-Update.html" target="_blank" rel="noopener noreferrer">[2]</a></sup>,
-                    which prevents Yomichan from being able to scan text.
-                    Enabling this option will force HTML-based rendering to be used.
+                    rendering to display content<sup><a href="https://workspaceupdates.googleblog.com/2021/05/Google-Docs-Canvas-Based-Rendering-Update.html" target="_blank" rel="noopener noreferrer">[2]</a></sup>
+                    which prevents Yomichan from being able to scan text using the standard methods.
+                    Enabling this option will force Google Docs webpages to expose some additional text
+                    information which should allow Yomichan to still work.
                 </p>
                 <p class="danger-text">
-                    This is a workaround and it is likely that Google will unfortunately remove support for this workaround in the future.
+                    Google has changed this compatibility implementation several times, and the changes do not seem to be announced or documented.
+                    Therefore, it is possible that this feature could stop working at any time the future without warning.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>

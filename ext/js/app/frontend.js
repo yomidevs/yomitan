@@ -17,6 +17,7 @@
 
 /* global
  * DocumentUtil
+ * GoogleDocsUtil
  * TextScanner
  * TextSourceRange
  */
@@ -164,6 +165,7 @@ class Frontend {
             ['Frontend.getPageInfo',      {async: false, handler: this._onApiGetPageInfo.bind(this)}]
         ]);
 
+        this._prepareSiteSpecific();
         this._updateContentScale();
         this._signalFrontendReady();
     }
@@ -769,5 +771,22 @@ class Frontend {
             }
         }
         return null;
+    }
+
+    _prepareSiteSpecific() {
+        switch (location.hostname.toLowerCase()) {
+            case 'docs.google.com':
+                this._prepareGoogleDocs();
+                break;
+        }
+    }
+
+    async _prepareGoogleDocs() {
+        if (typeof GoogleDocsUtil !== 'undefined') { return; }
+        await yomichan.api.loadExtensionScripts([
+            '/js/accessibility/google-docs-util.js'
+        ]);
+        if (typeof GoogleDocsUtil === 'undefined') { return; }
+        DocumentUtil.registerGetRangeFromPointHandler(GoogleDocsUtil.getRangeFromPoint.bind(GoogleDocsUtil));
     }
 }
