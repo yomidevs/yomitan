@@ -87,7 +87,7 @@ class GoogleDocsUtil {
         const range = this._getRangeWithPoint(content, x, y, normalizeCssZoom);
         this._setImportantStyle(textStyle, 'pointer-events', 'none');
         this._setImportantStyle(textStyle, 'opacity', '0');
-        return new TextSourceRange(range, '', svgText, element);
+        return TextSourceRange.createFromImposter(range, svgText, element);
     }
 
     static _getRangeWithPoint(textNode, x, y, normalizeCssZoom) {
@@ -110,7 +110,7 @@ class GoogleDocsUtil {
             }
         }
         range.setStart(textNode, start);
-        range.setEnd(textNode, end);
+        range.setEnd(textNode, start);
         return range;
     }
 

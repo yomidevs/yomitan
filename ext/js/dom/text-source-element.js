@@ -21,9 +21,9 @@
  */
 
 class TextSourceElement {
-    constructor(element, fullContent=null, startOffset=0, endOffset=0) {
+    constructor(element, fullContent, startOffset, endOffset) {
         this._element = element;
-        this._fullContent = (typeof fullContent === 'string' ? fullContent : TextSourceElement.getElementContent(element));
+        this._fullContent = fullContent;
         this._startOffset = startOffset;
         this._endOffset = endOffset;
         this._content = this._fullContent.substring(this._startOffset, this._endOffset);
@@ -49,10 +49,6 @@ class TextSourceElement {
         return this._endOffset;
     }
 
-    get isConnected() {
-        return this._element.isConnected;
-    }
-
     clone() {
         return new TextSourceElement(this._element, this._fullContent, this._startOffset, this._endOffset);
     }
@@ -65,7 +61,7 @@ class TextSourceElement {
         return this._content;
     }
 
-    setEndOffset(length, _layoutAwareScan, fromEnd) {
+    setEndOffset(length, fromEnd) {
         const offset = fromEnd ? this._endOffset : this._startOffset;
         length = Math.min(this._fullContent.length - offset, length);
         if (length > 0) {
@@ -84,19 +80,6 @@ class TextSourceElement {
         this._startOffset -= length;
         this._content = this._fullContent.substring(this._startOffset, this._endOffset);
         return length;
-    }
-
-    collapse(toStart) {
-        if (toStart) {
-            this._endOffset = this._startOffset;
-        } else {
-            this._startOffset = this._endOffset;
-        }
-        this._content = '';
-    }
-
-    getRect() {
-        return DocumentUtil.convertRectZoomCoordinates(this._element.getBoundingClientRect(), this._element);
     }
 
     getRects() {
@@ -130,7 +113,11 @@ class TextSourceElement {
         return [this._element];
     }
 
-    static getElementContent(element) {
+    static create(element) {
+        return new TextSourceElement(element, this._getElementContent(element), 0, 0);
+    }
+
+    static _getElementContent(element) {
         let content;
         switch (element.nodeName.toUpperCase()) {
             case 'BUTTON':

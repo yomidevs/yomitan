@@ -21,12 +21,14 @@
  */
 
 class TextSourceRange {
-    constructor(range, content, imposterContainer, imposterSourceElement) {
+    constructor(range, rangeStartOffset, content, imposterElement, imposterSourceElement, cachedRects, cachedSourceRect) {
         this._range = range;
-        this._rangeStartOffset = range.startOffset;
+        this._rangeStartOffset = rangeStartOffset;
         this._content = content;
-        this._imposterContainer = imposterContainer;
+        this._imposterElement = imposterElement;
         this._imposterSourceElement = imposterSourceElement;
+        this._cachedRects = cachedRects;
+        this._cachedSourceRect = cachedSourceRect;
     }
 
     get type() {
@@ -45,20 +47,21 @@ class TextSourceRange {
         return this._imposterSourceElement;
     }
 
-    get isConnected() {
-        return (
-            this._range.startContainer.isConnected &&
-            this._range.endContainer.isConnected
+    clone() {
+        return new TextSourceRange(
+            this._range.cloneRange(),
+            this._rangeStartOffset,
+            this._content,
+            this._imposterElement,
+            this._imposterSourceElement,
+            this._cachedRects,
+            this._cachedSourceRect
         );
     }
 
-    clone() {
-        return new TextSourceRange(this._range.cloneRange(), this._content, this._imposterContainer, this._imposterSourceElement);
-    }
-
     cleanup() {
-        if (this._imposterContainer !== null && this._imposterContainer.parentNode !== null) {
-            this._imposterContainer.parentNode.removeChild(this._imposterContainer);
+        if (this._imposterElement !== null && this._imposterElement.parentNode !== null) {
+            this._imposterElement.parentNode.removeChild(this._imposterElement);
         }
     }
 
@@ -66,12 +69,17 @@ class TextSourceRange {
         return this._content;
     }
 
-    setEndOffset(length, layoutAwareScan, fromEnd) {
-        const state = (
-            fromEnd ?
-            new DOMTextScanner(this._range.endContainer, this._range.endOffset, !layoutAwareScan, layoutAwareScan).seek(length) :
-            new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan).seek(length)
-        );
+    setEndOffset(length, fromEnd, layoutAwareScan) {
+        let node;
+        let offset;
+        if (fromEnd) {
+            node = this._range.endContainer;
+            offset = this._range.endOffset;
+        } else {
+            node = this._range.startContainer;
+            offset = this._range.startOffset;
+        }
+        const state = new DOMTextScanner(node, offset, !layoutAwareScan, layoutAwareScan).seek(length);
         this._range.setEnd(state.node, state.offset);
         this._content = (fromEnd ? this._content + state.content : state.content);
         return length - state.remainder;
@@ -85,30 +93,25 @@ class TextSourceRange {
         return length - state.remainder;
     }
 
-    collapse(toStart) {
-        this._range.collapse(toStart);
-        this._content = '';
-    }
-
-    getRect() {
-        return DocumentUtil.convertRectZoomCoordinates(this._range.getBoundingClientRect(), this._range.startContainer);
-    }
-
     getRects() {
+        if (this._isImposterDisconnected()) { return this._getCachedRects(); }
         return DocumentUtil.convertMultipleRectZoomCoordinates(this._range.getClientRects(), this._range.startContainer);
     }
 
     getWritingMode() {
-        return TextSourceRange.getElementWritingMode(TextSourceRange.getParentElement(this._range.startContainer));
+        const node = this._isImposterDisconnected() ? this._imposterSourceElement : this._range.startContainer;
+        return DocumentUtil.getElementWritingMode(node !== null ? node.parentElement : null);
     }
 
     select() {
+        if (this._imposterElement !== null) { return; }
         const selection = window.getSelection();
         selection.removeAllRanges();
         selection.addRange(this._range);
     }
 
     deselect() {
+        if (this._imposterElement !== null) { return; }
         const selection = window.getSelection();
         selection.removeAllRanges();
     }
@@ -143,36 +146,26 @@ class TextSourceRange {
         return DocumentUtil.getNodesInRange(this._range);
     }
 
-    static getParentElement(node) {
-        while (node !== null && node.nodeType !== Node.ELEMENT_NODE) {
-            node = node.parentNode;
-        }
-        return node;
+    static create(range) {
+        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null);
     }
 
-    static getElementWritingMode(element) {
-        if (element !== null) {
-            const style = window.getComputedStyle(element);
-            const writingMode = style.writingMode;
-            if (typeof writingMode === 'string') {
-                return TextSourceRange.normalizeWritingMode(writingMode);
-            }
-        }
-        return 'horizontal-tb';
+    static createFromImposter(range, imposterElement, imposterSourceElement) {
+        const cachedRects = DocumentUtil.convertMultipleRectZoomCoordinates(range.getClientRects(), range.startContainer);
+        const cachedSourceRect = DocumentUtil.convertRectZoomCoordinates(imposterSourceElement.getBoundingClientRect(), imposterSourceElement);
+        return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect);
     }
 
-    static normalizeWritingMode(writingMode) {
-        switch (writingMode) {
-            case 'lr':
-            case 'lr-tb':
-            case 'rl':
-                return 'horizontal-tb';
-            case 'tb':
-                return 'vertical-lr';
-            case 'tb-rl':
-                return 'vertical-rl';
-            default:
-                return writingMode;
-        }
+    _isImposterDisconnected() {
+        return this._imposterElement !== null && !this._imposterElement.isConnected;
+    }
+
+    _getCachedRects() {
+        const sourceRect = DocumentUtil.convertRectZoomCoordinates(this._imposterSourceElement.getBoundingClientRect(), this._imposterSourceElement);
+        return DocumentUtil.offsetDOMRects(
+            this._cachedRects,
+            sourceRect.left - this._cachedSourceRect.left,
+            sourceRect.top - this._cachedSourceRect.top
+        );
     }
 }

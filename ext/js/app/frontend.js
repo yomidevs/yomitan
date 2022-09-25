@@ -757,7 +757,7 @@ class Frontend {
     async _scanSelectedText(allowEmptyRange) {
         const range = this._getFirstSelectionRange(allowEmptyRange);
         if (range === null) { return false; }
-        const source = new TextSourceRange(range, range.toString(), null, null);
+        const source = TextSourceRange.create(range);
         await this._textScanner.search(source, {focus: true, restoreSelection: true});
         return true;
     }

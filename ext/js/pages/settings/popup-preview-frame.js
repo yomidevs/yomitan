@@ -212,7 +212,7 @@ class PopupPreviewFrame {
 
         const range = document.createRange();
         range.selectNodeContents(textNode);
-        const source = new TextSourceRange(range, range.toString(), null, null);
+        const source = TextSourceRange.create(range);
 
         try {
             await this._frontend.setTextSource(source);

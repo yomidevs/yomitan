@@ -66,7 +66,7 @@ class DocumentUtil {
                 case 'IMG':
                 case 'BUTTON':
                 case 'SELECT':
-                    return new TextSourceElement(element);
+                    return TextSourceElement.create(element);
                 case 'INPUT':
                     if (element.type === 'text') {
                         imposterSourceElement = element;
@@ -85,8 +85,9 @@ class DocumentUtil {
             if (imposter !== null) {
                 this._setImposterStyle(imposterContainer.style, 'z-index', '-2147483646');
                 this._setImposterStyle(imposter.style, 'pointer-events', 'none');
+                return TextSourceRange.createFromImposter(range, imposterContainer, imposterSourceElement);
             }
-            return new TextSourceRange(range, '', imposterContainer, imposterSourceElement);
+            return TextSourceRange.create(range);
         } else {
             if (imposterContainer !== null) {
                 imposterContainer.parentNode.removeChild(imposterContainer);
@@ -131,7 +132,7 @@ class DocumentUtil {
         // Scan text
         source = source.clone();
         const startLength = source.setStartOffset(extent, layoutAwareScan);
-        const endLength = source.setEndOffset(extent * 2 - startLength, layoutAwareScan, true);
+        const endLength = source.setEndOffset(extent * 2 - startLength, true, layoutAwareScan);
         const text = source.text();
         const textLength = text.length;
         const textEndAnchor = textLength - endLength;
@@ -415,6 +416,58 @@ class DocumentUtil {
                 return true;
             default:
                 return element.isContentEditable;
+        }
+    }
+
+    /**
+     * Offsets an array of DOMRects by a given amount.
+     * @param {DOMRect[]} rects The DOMRects to offset.
+     * @param {number} x The horizontal offset amount.
+     * @param {number} y The vertical offset amount.
+     * @returns {DOMRect} The DOMRects with the offset applied.
+     */
+    static offsetDOMRects(rects, x, y) {
+        const results = [];
+        for (const rect of rects) {
+            results.push(new DOMRect(rect.left + x, rect.top + y, rect.width, rect.height));
+        }
+        return results;
+    }
+
+    /**
+     * Gets the parent writing mode of an element.
+     * See: https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode.
+     * @param {Element} element The HTML element to check.
+     * @returns {string} The writing mode.
+     */
+    static getElementWritingMode(element) {
+        if (element !== null) {
+            const {writingMode} = getComputedStyle(element);
+            if (typeof writingMode === 'string') {
+                return this.normalizeWritingMode(writingMode);
+            }
+        }
+        return 'horizontal-tb';
+    }
+
+    /**
+     * Normalizes a CSS writing mode value by converting non-standard and deprecated values
+     * into their corresponding standard vaules.
+     * @param {string} writingMode The writing mode to normalize.
+     * @returns {string} The normalized writing mode.
+     */
+    static normalizeWritingMode(writingMode) {
+        switch (writingMode) {
+            case 'lr':
+            case 'lr-tb':
+            case 'rl':
+                return 'horizontal-tb';
+            case 'tb':
+                return 'vertical-lr';
+            case 'tb-rl':
+                return 'vertical-rl';
+            default:
+                return writingMode;
         }
     }
 
