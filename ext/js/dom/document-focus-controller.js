@@ -22,11 +22,19 @@
  * focus a dummy element inside the main content, which gives keyboard scroll focus to that element.
  */
 class DocumentFocusController {
+    /**
+     * Creates a new instance of the class.
+     * @param {?string} autofocusElementSelector A selector string which can be used to specify an element which
+     *   should be automatically focused on prepare.
+     */
     constructor(autofocusElementSelector=null) {
         this._autofocusElement = (autofocusElementSelector !== null ? document.querySelector(autofocusElementSelector) : null);
         this._contentScrollFocusElement = document.querySelector('#content-scroll-focus');
     }
 
+    /**
+     * Initializes the instance.
+     */
     prepare() {
         window.addEventListener('focus', this._onWindowFocus.bind(this), false);
         this._updateFocusedElement(false);
@@ -35,6 +43,10 @@ class DocumentFocusController {
         }
     }
 
+    /**
+     * Removes focus from a given element.
+     * @param {Element} element The element to remove focus from.
+     */
     blurElement(element) {
         if (document.activeElement !== element) { return; }
         element.blur();

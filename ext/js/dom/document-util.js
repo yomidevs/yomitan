@@ -21,6 +21,9 @@
  * TextSourceRange
  */
 
+/**
+ * This class contains utility functions related to the HTML document.
+ */
 class DocumentUtil {
     /**
      * Options to configure how element detection is performed.
@@ -251,11 +254,23 @@ class DocumentUtil {
         return scale;
     }
 
+    /**
+     * Converts a rect based on the CSS zoom scaling for a given node.
+     * @param {DOMRect} rect The rect to convert.
+     * @param {Node} node The node to compute the zoom from.
+     * @returns {DOMRect} The updated rect, or the same rect if no change is needed.
+     */
     static convertRectZoomCoordinates(rect, node) {
         const scale = this.computeZoomScale(node);
         return (scale === 1 ? rect : new DOMRect(rect.left * scale, rect.top * scale, rect.width * scale, rect.height * scale));
     }
 
+    /**
+     * Converts multiple rects based on the CSS zoom scaling for a given node.
+     * @param {DOMRect[]} rects The rects to convert.
+     * @param {Node} node The node to compute the zoom from.
+     * @returns {DOMRect[]} The updated rects, or the same rects array if no change is needed.
+     */
     static convertMultipleRectZoomCoordinates(rects, node) {
         const scale = this.computeZoomScale(node);
         if (scale === 1) { return rects; }
@@ -266,6 +281,13 @@ class DocumentUtil {
         return results;
     }
 
+    /**
+     * Checks whether a given point is contained within a rect.
+     * @param {number} x The horizontal coordinate.
+     * @param {number} y The vertical coordinate.
+     * @param {DOMRect} rect The rect to check.
+     * @returns {boolean} `true` if the point is inside the rect, `false` otherwise.
+     */
     static isPointInRect(x, y, rect) {
         return (
             x >= rect.left && x < rect.right &&
@@ -273,6 +295,13 @@ class DocumentUtil {
         );
     }
 
+    /**
+     * Checks whether a given point is contained within any rect in a list.
+     * @param {number} x The horizontal coordinate.
+     * @param {number} y The vertical coordinate.
+     * @param {DOMRect[]} rects The rect to check.
+     * @returns {boolean} `true` if the point is inside any of the rects, `false` otherwise.
+     */
     static isPointInAnyRect(x, y, rects) {
         for (const rect of rects) {
             if (this.isPointInRect(x, y, rect)) {
@@ -282,6 +311,13 @@ class DocumentUtil {
         return false;
     }
 
+    /**
+     * Checks whether a given point is contained within a selection range.
+     * @param {number} x The horizontal coordinate.
+     * @param {number} y The vertical coordinate.
+     * @param {Selection} selection The selection to check.
+     * @returns {boolean} `true` if the point is inside the selection, `false` otherwise.
+     */
     static isPointInSelection(x, y, selection) {
         for (let i = 0; i < selection.rangeCount; ++i) {
             const range = selection.getRangeAt(i);
@@ -302,6 +338,11 @@ class DocumentUtil {
         }
     }
 
+    /**
+     * Gets an array of the active modifier keys.
+     * @param {KeyboardEvent|MouseEvent|TouchEvent} event The event to check.
+     * @returns {string[]} An array of modifiers.
+     */
     static getActiveModifiers(event) {
         const modifiers = [];
         if (event.altKey) { modifiers.push('alt'); }
@@ -311,18 +352,33 @@ class DocumentUtil {
         return modifiers;
     }
 
+    /**
+     * Gets an array of the active modifier keys and buttons.
+     * @param {KeyboardEvent|MouseEvent|TouchEvent} event The event to check.
+     * @returns {string[]} An array of modifiers and buttons.
+     */
     static getActiveModifiersAndButtons(event) {
         const modifiers = this.getActiveModifiers(event);
         this._getActiveButtons(event, modifiers);
         return modifiers;
     }
 
+    /**
+     * Gets an array of the active buttons.
+     * @param {KeyboardEvent|MouseEvent|TouchEvent} event The event to check.
+     * @returns {string[]} An array of modifiers and buttons.
+     */
     static getActiveButtons(event) {
         const buttons = [];
         this._getActiveButtons(event, buttons);
         return buttons;
     }
 
+    /**
+     * Adds a fullscreen change event listener. This function handles all of the browser-specific variants.
+     * @param {Function} onFullscreenChanged The event callback.
+     * @param {?EventListenerCollection} eventListenerCollection An optional `EventListenerCollection` to add the registration to.
+     */
     static addFullscreenChangeEventListener(onFullscreenChanged, eventListenerCollection=null) {
         const target = document;
         const options = false;
@@ -341,6 +397,10 @@ class DocumentUtil {
         }
     }
 
+    /**
+     * Returns the current fullscreen element. This function handles all of the browser-specific variants.
+     * @returns {?Element} The current fullscreen element, or `null` if the window is not fullscreen.
+     */
     static getFullscreenElement() {
         return (
             document.fullscreenElement ||
@@ -351,6 +411,11 @@ class DocumentUtil {
         );
     }
 
+    /**
+     * Gets all of the nodes within a `Range`.
+     * @param {Range} range The range to check.
+     * @returns {Node[]} The list of nodes.
+     */
     static getNodesInRange(range) {
         const end = range.endContainer;
         const nodes = [];
@@ -361,6 +426,11 @@ class DocumentUtil {
         return nodes;
     }
 
+    /**
+     * Gets the next node after a specified node. This traverses the DOM in its logical order.
+     * @param {Node} node The node to start at.
+     * @returns {?Node} The next node, or `null` if there is no next node.
+     */
     static getNextNode(node) {
         let next = node.firstChild;
         if (next === null) {
@@ -377,6 +447,12 @@ class DocumentUtil {
         return next;
     }
 
+    /**
+     * Checks whether any node in a list of nodes matches a selector.
+     * @param {Node[]} nodes The list of ndoes to check.
+     * @param {string} selector The selector to test.
+     * @returns {boolean} `true` if any element node matches the selector, `false` otherwise.
+     */
     static anyNodeMatchesSelector(nodes, selector) {
         const ELEMENT_NODE = Node.ELEMENT_NODE;
         for (let node of nodes) {
@@ -389,6 +465,12 @@ class DocumentUtil {
         return false;
     }
 
+    /**
+     * Checks whether every node in a list of nodes matches a selector.
+     * @param {Node[]} nodes The list of ndoes to check.
+     * @param {string} selector The selector to test.
+     * @returns {boolean} `true` if every element node matches the selector, `false` otherwise.
+     */
     static everyNodeMatchesSelector(nodes, selector) {
         const ELEMENT_NODE = Node.ELEMENT_NODE;
         for (let node of nodes) {
@@ -401,10 +483,20 @@ class DocumentUtil {
         return true;
     }
 
+    /**
+     * Checks whether the meta key is supported in the browser on the specified operating system.
+     * @param {string} os The operating system to check.
+     * @param {string} browser The browser to check.
+     * @returns {boolean} `true` if supported, `false` otherwise.
+     */
     static isMetaKeySupported(os, browser) {
         return !(browser === 'firefox' || browser === 'firefox-mobile') || os === 'mac';
     }
 
+    /**
+     * Checks whether an element on the page that can accept input is focused.
+     * @returns {boolean} `true` if an input element is focused, `false` otherwise.
+     */
     static isInputElementFocused() {
         const element = document.activeElement;
         if (element === null) { return false; }

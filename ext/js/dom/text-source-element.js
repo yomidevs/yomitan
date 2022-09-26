@@ -20,7 +20,18 @@
  * StringUtil
  */
 
+/**
+ * This class represents a text source that is attached to a HTML element, such as an <img>
+ * with alt text or a <button>.
+ */
 class TextSourceElement {
+    /**
+     * Creates a new instance of the class.
+     * @param {Element} element The source element.
+     * @param {string} fullContent The string representing the element's full text value.
+     * @param {number} startOffset The text start offset position within the full content.
+     * @param {number} endOffset The text end offset position within the full content.
+     */
     constructor(element, fullContent, startOffset, endOffset) {
         this._element = element;
         this._fullContent = fullContent;
@@ -29,38 +40,76 @@ class TextSourceElement {
         this._content = this._fullContent.substring(this._startOffset, this._endOffset);
     }
 
+    /**
+     * Gets the type name of this instance.
+     * @type {string}
+     */
     get type() {
         return 'element';
     }
 
+    /**
+     * The source element.
+     * @type {Element}
+     */
     get element() {
         return this._element;
     }
 
+    /**
+     * The string representing the element's full text value.
+     * @type {string}
+     */
     get fullContent() {
         return this._fullContent;
     }
 
+    /**
+     * The text start offset position within the full content.
+     * @type {number}
+     */
     get startOffset() {
         return this._startOffset;
     }
 
+    /**
+     * The text end offset position within the full content.
+     * @type {number}
+     */
     get endOffset() {
         return this._endOffset;
     }
 
+    /**
+     * Creates a clone of the instance.
+     * @returns {TextSourceElement} The new clone.
+     */
     clone() {
         return new TextSourceElement(this._element, this._fullContent, this._startOffset, this._endOffset);
     }
 
+    /**
+     * Performs any cleanup that is necessary after the element has been used.
+     */
     cleanup() {
         // NOP
     }
 
+    /**
+     * Gets the selected text of element, which is a substring of the full content
+     * starting at `startOffset` and ending at `endOffset`.
+     * @returns {string} The text content.
+     */
     text() {
         return this._content;
     }
 
+    /**
+     * Moves the end offset of the text by a set amount of unicode codepoints.
+     * @param {number} length The maximum number of codepoints to move by.
+     * @param {boolean} fromEnd Whether to move the offset from the current end position (if `true`) or the start position (if `false`).
+     * @returns {number} The actual number of characters (not codepoints) that were read.
+     */
     setEndOffset(length, fromEnd) {
         const offset = fromEnd ? this._endOffset : this._startOffset;
         length = Math.min(this._fullContent.length - offset, length);
@@ -72,6 +121,11 @@ class TextSourceElement {
         return length;
     }
 
+    /**
+     * Moves the start offset of the text by a set amount of unicode codepoints.
+     * @param {number} length The maximum number of codepoints to move by.
+     * @returns {number} The actual number of characters (not codepoints) that were read.
+     */
     setStartOffset(length) {
         length = Math.min(this._startOffset, length);
         if (length > 0) {
@@ -82,22 +136,42 @@ class TextSourceElement {
         return length;
     }
 
+    /**
+     * Gets the rects that represent the position and bounds of the text source.
+     * @returns {DOMRect[]} The rects.
+     */
     getRects() {
         return DocumentUtil.convertMultipleRectZoomCoordinates(this._element.getClientRects(), this._element);
     }
 
+    /**
+     * Gets writing mode that is used for this element.
+     * See: https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode.
+     * @returns {string} The rects.
+     */
     getWritingMode() {
         return 'horizontal-tb';
     }
 
+    /**
+     * Selects the text source in the document.
+     */
     select() {
         // NOP
     }
 
+    /**
+     * Deselects the text source in the document.
+     */
     deselect() {
         // NOP
     }
 
+    /**
+     * Checks whether another text source has the same starting point.
+     * @param {TextSourceElement|TextSourceRange} other The other source to test.
+     * @returns {boolean} `true` if the starting points are equivalent, `false` otherwise.
+     */
     hasSameStart(other) {
         return (
             typeof other === 'object' &&
@@ -109,14 +183,28 @@ class TextSourceElement {
         );
     }
 
+    /**
+     * Gets a list of the nodes in this text source's range.
+     * @returns {Node[]} The nodes in the range.
+     */
     getNodesInRange() {
         return [this._element];
     }
 
+    /**
+     * Creates a new instance for a given element.
+     * @param {Element} element The source element.
+     * @returns {TextSourceElement} A new instance of the class corresponding to the element.
+     */
     static create(element) {
         return new TextSourceElement(element, this._getElementContent(element), 0, 0);
     }
 
+    /**
+     * Gets the full content string for a given element.
+     * @param {Element} element The element to get the full content of.
+     * @returns {string} The content string.
+     */
     static _getElementContent(element) {
         let content;
         switch (element.nodeName.toUpperCase()) {
