@@ -17,6 +17,7 @@
 
 /* globals
  * DOMDataBinder
+ * DocumentUtil
  */
 
 class GenericSettingController {
@@ -218,7 +219,7 @@ class GenericSettingController {
     _toNumber(value, data) {
         let {constraints} = data;
         if (!isObject(constraints)) { constraints = {}; }
-        return DOMDataBinder.convertToNumber(value, constraints);
+        return DocumentUtil.convertElementValueToNumber(value, constraints);
     }
 
     _toBoolean(value) {

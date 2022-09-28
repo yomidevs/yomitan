@@ -16,14 +16,14 @@
  */
 
 /* global
+ * DocumentUtil
  * SelectorObserver
  * TaskAccumulator
  */
 
 class DOMDataBinder {
-    constructor({selector, ignoreSelectors=[], createElementMetadata, compareElementMetadata, getValues, setValues, onError=null}) {
+    constructor({selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError=null}) {
         this._selector = selector;
-        this._ignoreSelectors = ignoreSelectors;
         this._createElementMetadata = createElementMetadata;
         this._compareElementMetadata = compareElementMetadata;
         this._getValues = getValues;
@@ -33,7 +33,7 @@ class DOMDataBinder {
         this._assignTasks = new TaskAccumulator(this._onBulkAssign.bind(this));
         this._selectorObserver = new SelectorObserver({
             selector,
-            ignoreSelector: (ignoreSelectors.length > 0 ? ignoreSelectors.join(',') : null),
+            ignoreSelector: null,
             onAdded: this._createObserver.bind(this),
             onRemoved: this._removeObserver.bind(this),
             onChildrenUpdated: this._onObserverChildrenUpdated.bind(this),
@@ -186,7 +186,7 @@ class DOMDataBinder {
             case 'text':
                 return `${element.value}`;
             case 'number':
-                return DOMDataBinder.convertToNumber(element.value, element);
+                return DocumentUtil.convertElementValueToNumber(element.value, element);
             case 'textarea':
             case 'select':
                 return element.value;
@@ -209,31 +209,5 @@ class DOMDataBinder {
             default:
                 return null;
         }
-    }
-
-    // Utilities
-
-    static convertToNumber(value, constraints) {
-        value = parseFloat(value);
-        if (!Number.isFinite(value)) { value = 0; }
-
-        let {min, max, step} = constraints;
-        min = DOMDataBinder.convertToNumberOrNull(min);
-        max = DOMDataBinder.convertToNumberOrNull(max);
-        step = DOMDataBinder.convertToNumberOrNull(step);
-        if (typeof min === 'number') { value = Math.max(value, min); }
-        if (typeof max === 'number') { value = Math.min(value, max); }
-        if (typeof step === 'number' && step !== 0) { value = Math.round(value / step) * step; }
-        return value;
-    }
-
-    static convertToNumberOrNull(value) {
-        if (typeof value !== 'number') {
-            if (typeof value !== 'string' || value.length === 0) {
-                return null;
-            }
-            value = parseFloat(value);
-        }
-        return !Number.isNaN(value) ? value : null;
     }
 }

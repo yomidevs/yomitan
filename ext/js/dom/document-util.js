@@ -328,16 +328,6 @@ class DocumentUtil {
         return false;
     }
 
-    static isMouseButtonPressed(mouseEvent, button) {
-        const mouseEventButton = mouseEvent.button;
-        switch (button) {
-            case 'primary': return mouseEventButton === 0;
-            case 'secondary': return mouseEventButton === 2;
-            case 'auxiliary': return mouseEventButton === 1;
-            default: return false;
-        }
-    }
-
     /**
      * Gets an array of the active modifier keys.
      * @param {KeyboardEvent|MouseEvent|TouchEvent} event The event to check.
@@ -561,6 +551,26 @@ class DocumentUtil {
             default:
                 return writingMode;
         }
+    }
+
+    /**
+     * Converts a value from an element to a number.
+     * @param {string} value A string representation of a number.
+     * @param {object} constraints An object which might contain `min`, `max`, and `step` fields which are used to constrain the value.
+     * @returns {number} The parsed and constrained number.
+     */
+    static convertElementValueToNumber(value, constraints) {
+        value = parseFloat(value);
+        if (!Number.isFinite(value)) { value = 0; }
+
+        let {min, max, step} = constraints;
+        min = this._convertToNumberOrNull(min);
+        max = this._convertToNumberOrNull(max);
+        step = this._convertToNumberOrNull(step);
+        if (typeof min === 'number') { value = Math.max(value, min); }
+        if (typeof max === 'number') { value = Math.min(value, max); }
+        if (typeof step === 'number' && step !== 0) { value = Math.round(value / step) * step; }
+        return value;
     }
 
     // Private
@@ -904,6 +914,16 @@ class DocumentUtil {
 
     static _isElementUserSelectAll(element) {
         return getComputedStyle(element).userSelect === 'all';
+    }
+
+    static _convertToNumberOrNull(value) {
+        if (typeof value !== 'number') {
+            if (typeof value !== 'string' || value.length === 0) {
+                return null;
+            }
+            value = parseFloat(value);
+        }
+        return !Number.isNaN(value) ? value : null;
     }
 }
 // eslint-disable-next-line no-underscore-dangle

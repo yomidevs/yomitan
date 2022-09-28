@@ -16,7 +16,7 @@
  */
 
 /* global
- * DOMDataBinder
+ * DocumentUtil
  */
 
 class NestedPopupsController {
@@ -52,7 +52,7 @@ class NestedPopupsController {
 
     _onNestedPopupsCountChange(e) {
         const node = e.currentTarget;
-        const value = Math.max(1, DOMDataBinder.convertToNumber(node.value, node));
+        const value = Math.max(1, DocumentUtil.convertElementValueToNumber(node.value, node));
         this._setPopupNestingMaxDepth(value);
     }
 

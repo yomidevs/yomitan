@@ -16,7 +16,7 @@
  */
 
 /* global
- * DOMDataBinder
+ * DocumentUtil
  * KeyboardMouseInputField
  * ObjectPropertyAccessor
  */
@@ -322,7 +322,7 @@ class KeyboardShortcutHotkeyEntry {
         let value = this._getArgumentInputValue(node);
         switch (template) {
             case 'hotkey-argument-move-offset':
-                value = `${DOMDataBinder.convertToNumber(value, node)}`;
+                value = `${DocumentUtil.convertElementValueToNumber(value, node)}`;
                 break;
         }
         this._setArgument(value);
