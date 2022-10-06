@@ -25,7 +25,7 @@
 
     <h1>Yomichan Issues</h1>
 
-    <h2 id="audio-download-failed">Audio download failed due to possible extension permissions error <em>(Chrome)</em></h2>
+    <h2 id="audio-download-failed-permissions-error">Audio download failed due to possible extension permissions error <em>(Chrome)</em></h2>
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
             <p>
@@ -38,6 +38,21 @@
                 Check the <em>Site access</em> section of the
                 <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings pages</a>
                 and grant the extension access to <em>all sites</em> or add the specific audio host URLs.
+            </p>
+        </div></div></div></div>
+    </div>
+
+    <h2 id="audio-download-failed-expired-server-certificate">Audio download failed due to an expired server certificate</h2>
+    <div class="settings-group">
+        <div class="settings-item"><div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
+            <p>
+                If a website failes to keep its HTTPS certificate up to date,
+                downloads can fail because the browser flags the connection as insecure.
+                This has happened occasionally for some websites that Yomichan interacts with,
+                and the issue is usually resolved within a day.
+            </p>
+            <p>
+                This issue is a server-side issue that Yomichan doesn't have control over.
             </p>
         </div></div></div></div>
     </div>
