@@ -87,6 +87,7 @@ class TextScanner extends EventDispatcher {
 
         this._canClearSelection = true;
 
+        this._textSelectionTimer = null;
         this._yomichanIsChangingTextSelectionNow = false;
         this._userHasNotSelectedAnythingManually = true;
     }
@@ -269,7 +270,13 @@ class TextScanner extends EventDispatcher {
         if (this._selectText && this._userHasNotSelectedAnythingManually) {
             this._yomichanIsChangingTextSelectionNow = true;
             this._textSourceCurrent.select();
-            setTimeout(() => this._yomichanIsChangingTextSelectionNow = false, 0);
+            if (this._textSelectionTimer !== null) { clearTimeout(this._textSelectionTimer); }
+            // This timeout uses a 50ms delay to ensure that the selectionchange event has time to occur.
+            // If the delay is 0ms, the timeout will sometimes complete before the event.
+            this._textSelectionTimer = setTimeout(() => {
+                this._yomichanIsChangingTextSelectionNow = false;
+                this._textSelectionTimer = null;
+            }, 50);
             this._textSourceCurrentSelected = true;
         } else {
             this._textSourceCurrentSelected = false;
