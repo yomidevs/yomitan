@@ -53,7 +53,7 @@ class Backend {
             // eslint-disable-next-line no-undef
             document: (typeof document === 'object' && document !== null ? document : null),
             pasteTargetSelector: '#clipboard-paste-target',
-            imagePasteTargetSelector: '#clipboard-image-paste-target'
+            richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
         });
         this._clipboardMonitor = new ClipboardMonitor({
             japaneseUtil: this._japaneseUtil,
@@ -596,7 +596,7 @@ class Backend {
     }
 
     async _onApiClipboardGet() {
-        return this._clipboardReader.getText();
+        return this._clipboardReader.getText(false);
     }
 
     async _onApiGetDisplayTemplatesHtml() {
@@ -1773,7 +1773,7 @@ class Backend {
 
         try {
             if (clipboardDetails !== null && clipboardDetails.text) {
-                clipboardText = await this._clipboardReader.getText();
+                clipboardText = await this._clipboardReader.getText(false);
             }
         } catch (e) {
             errors.push(serializeError(e));

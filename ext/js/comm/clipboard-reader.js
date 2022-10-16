@@ -28,15 +28,15 @@ class ClipboardReader {
      * @param {object} details Details about how to set up the instance.
      * @param {?Document} details.document The Document object to be used, or null for no support.
      * @param {?string} details.pasteTargetSelector The selector for the paste target element.
-     * @param {?string} details.imagePasteTargetSelector The selector for the image paste target element.
+     * @param {?string} details.richContentPasteTargetSelector The selector for the rich content paste target element.
      */
-    constructor({document=null, pasteTargetSelector=null, imagePasteTargetSelector=null}) {
+    constructor({document=null, pasteTargetSelector=null, richContentPasteTargetSelector=null}) {
         this._document = document;
         this._browser = null;
         this._pasteTarget = null;
         this._pasteTargetSelector = pasteTargetSelector;
-        this._imagePasteTarget = null;
-        this._imagePasteTargetSelector = imagePasteTargetSelector;
+        this._richContentPasteTarget = null;
+        this._richContentPasteTargetSelector = richContentPasteTargetSelector;
     }
 
     /**
@@ -56,13 +56,14 @@ class ClipboardReader {
 
     /**
      * Gets the text in the clipboard.
+     * @param {boolean} useRichText Whether or not to use rich text for pasting, when possible.
      * @returns {string} A string containing the clipboard text.
      * @throws {Error} Error if not supported.
      */
-    async getText() {
+    async getText(useRichText) {
         /*
         Notes:
-            document.execCommand('paste') doesn't work on Firefox.
+            document.execCommand('paste') sometimes doesn't work on Firefox.
             See: https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
             Therefore, navigator.clipboard.readText() is used on Firefox.
 
@@ -72,7 +73,7 @@ class ClipboardReader {
               being an extension with clipboard permissions. It effectively asks for the
               non-extension permission for clipboard access.
         */
-        if (this._isFirefox()) {
+        if (this._isFirefox() && !useRichText) {
             try {
                 return await navigator.clipboard.readText();
             } catch (e) {
@@ -86,21 +87,22 @@ class ClipboardReader {
             throw new Error('Clipboard reading not supported in this context');
         }
 
-        let target = this._pasteTarget;
-        if (target === null) {
-            target = document.querySelector(this._pasteTargetSelector);
-            if (target === null) {
-                throw new Error('Clipboard paste target does not exist');
-            }
-            this._pasteTarget = target;
+        if (useRichText) {
+            const target = this._getRichContentPasteTarget();
+            target.focus();
+            document.execCommand('paste');
+            const result = target.textContent;
+            this._clearRichContent(target);
+            return result;
+        } else {
+            const target = this._getPasteTarget();
+            target.value = '';
+            target.focus();
+            document.execCommand('paste');
+            const result = target.value;
+            target.value = '';
+            return (typeof result === 'string' ? result : '');
         }
-
-        target.value = '';
-        target.focus();
-        document.execCommand('paste');
-        const result = target.value;
-        target.value = '';
-        return (typeof result === 'string' ? result : '');
     }
 
     /**
@@ -143,23 +145,12 @@ class ClipboardReader {
             throw new Error('Clipboard reading not supported in this context');
         }
 
-        let target = this._imagePasteTarget;
-        if (target === null) {
-            target = document.querySelector(this._imagePasteTargetSelector);
-            if (target === null) {
-                throw new Error('Clipboard paste target does not exist');
-            }
-            this._imagePasteTarget = target;
-        }
-
+        const target = this._getRichContentPasteTarget();
         target.focus();
         document.execCommand('paste');
         const image = target.querySelector('img[src^="data:"]');
         const result = (image !== null ? image.getAttribute('src') : null);
-        for (const image2 of target.querySelectorAll('img')) {
-            image2.removeAttribute('src');
-        }
-        target.textContent = '';
+        this._clearRichContent(target);
         return result;
     }
 
@@ -176,5 +167,29 @@ class ClipboardReader {
             reader.onerror = () => reject(reader.error);
             reader.readAsDataURL(file);
         });
+    }
+
+    _getPasteTarget() {
+        if (this._pasteTarget === null) { this._pasteTarget = this._findPasteTarget(this._pasteTargetSelector); }
+        return this._pasteTarget;
+    }
+
+    _getRichContentPasteTarget() {
+        if (this._richContentPasteTarget === null) { this._richContentPasteTarget = this._findPasteTarget(this._richContentPasteTargetSelector); }
+        return this._richContentPasteTarget;
+    }
+
+    _findPasteTarget(selector) {
+        const target = this._document.querySelector(selector);
+        if (target === null) { throw new Error('Clipboard paste target does not exist'); }
+        return target;
+    }
+
+    _clearRichContent(element) {
+        for (const image of element.querySelectorAll('img')) {
+            image.removeAttribute('src');
+            image.removeAttribute('srcset');
+        }
+        element.textContent = '';
     }
 }

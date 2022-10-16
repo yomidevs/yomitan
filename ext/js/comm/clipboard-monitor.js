@@ -39,7 +39,7 @@ class ClipboardMonitor extends EventDispatcher {
 
             let text = null;
             try {
-                text = await this._clipboardReader.getText();
+                text = await this._clipboardReader.getText(false);
             } catch (e) {
                 // NOP
             }
