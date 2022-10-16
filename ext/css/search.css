@@ -86,6 +86,7 @@ h1 {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     white-space: pre-wrap;
     z-index: 1;
+    margin: 0;
 }
 .search-button {
     flex: 0 0 auto;
