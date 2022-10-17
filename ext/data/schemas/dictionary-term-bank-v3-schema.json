@@ -27,7 +27,7 @@
                             "properties": {
                                 "tag": {
                                     "type": "string",
-                                    "enum": ["br"]
+                                    "const": "br"
                                 },
                                 "data": {
                                     "$ref": "#/definitions/structuredContentData"
@@ -364,7 +364,7 @@
                                     "properties": {
                                         "type": {
                                             "type": "string",
-                                            "enum": ["text"]
+                                            "const": "text"
                                         },
                                         "text": {
                                             "type": "string",
@@ -381,7 +381,7 @@
                                     "properties": {
                                         "type": {
                                             "type": "string",
-                                            "enum": ["structured-content"]
+                                            "const": "structured-content"
                                         },
                                         "content": {
                                             "$ref": "#/definitions/structuredContent",
@@ -398,7 +398,7 @@
                                     "properties": {
                                         "type": {
                                             "type": "string",
-                                            "enum": ["image"]
+                                            "const": "image"
                                         },
                                         "path": {
                                             "type": "string",

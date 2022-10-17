@@ -49,7 +49,7 @@
             {
                 "items": [
                     {},
-                    {"enum": ["freq"]},
+                    {"const": "freq"},
                     {
                         "oneOf": [
                             {
@@ -81,7 +81,7 @@
             {
                 "items": [
                     {},
-                    {"enum": ["pitch"]},
+                    {"const": "pitch"},
                     {
                         "type": ["object"],
                         "description": "Pitch accent information for the term.",

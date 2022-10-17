@@ -38,7 +38,7 @@
             },
             {
                 "type": "string",
-                "enum": ["freq"],
+                "const": "freq",
                 "description": "Type of data. \"freq\" corresponds to frequency information."
             },
             {
