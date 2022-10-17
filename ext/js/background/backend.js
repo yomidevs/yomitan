@@ -38,7 +38,14 @@
  * wanakana
  */
 
+/**
+ * This class controls the core logic of the extension, including API calls
+ * and various forms of communication between browser tabs and external applications.
+ */
 class Backend {
+    /**
+     * Creates a new instance.
+     */
     constructor() {
         this._japaneseUtil = new JapaneseUtil(wanakana);
         this._environment = new Environment();
@@ -145,6 +152,10 @@ class Backend {
         ]);
     }
 
+    /**
+     * Initializes the instance.
+     * @returns {Promise<void>} A promise which is resolved when initialization completes.
+     */
     prepare() {
         if (this._preparePromise === null) {
             const promise = this._prepareInternal();

@@ -19,7 +19,13 @@
  * AnkiUtil
  */
 
+/**
+ * This class controls communication with Anki via the AnkiConnect plugin.
+ */
 class AnkiConnect {
+    /**
+     * Creates a new instance.
+     */
     constructor() {
         this._enabled = false;
         this._server = null;
@@ -29,30 +35,59 @@ class AnkiConnect {
         this._apiKey = null;
     }
 
+    /**
+     * Gets the URL of the AnkiConnect server.
+     * @type {string}
+     */
     get server() {
         return this._server;
     }
 
+    /**
+     * Assigns the URL of the AnkiConnect server.
+     * @param {string} value The new server URL to assign.
+     */
     set server(value) {
         this._server = value;
     }
 
+    /**
+     * Gets whether or not server communication is enabled.
+     * @type {boolean}
+     */
     get enabled() {
         return this._enabled;
     }
 
+    /**
+     * Sets whether or not server communication is enabled.
+     * @param {boolean} value The enabled state.
+     */
     set enabled(value) {
         this._enabled = value;
     }
 
+    /**
+     * Gets the API key used when connecting to AnkiConnect.
+     * The value will be `null` if no API key is used.
+     * @type {?string}
+     */
     get apiKey() {
         return this._apiKey;
     }
 
+    /**
+     * Sets the API key used when connecting to AnkiConnect.
+     * @param {?string} value The API key to use, or `null` if no API key should be used.
+     */
     set apiKey(value) {
         this._apiKey = value;
     }
 
+    /**
+     * Checks whether a connection to AnkiConnect can be established.
+     * @returns {Promise<boolean>} `true` if the connection was made, `false` otherwise.
+     */
     async isConnected() {
         try {
             await this._invoke('version');
@@ -62,6 +97,10 @@ class AnkiConnect {
         }
     }
 
+    /**
+     * Gets the AnkiConnect API version number.
+     * @returns {Promise<number>} The version number
+     */
     async getVersion() {
         if (!this._enabled) { return null; }
         await this._checkVersion();

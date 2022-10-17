@@ -15,13 +15,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * This class is used to generate `fetch()` requests on the background page
+ * with additional controls over anonymity and error handling.
+ */
 class RequestBuilder {
+    /**
+     * A progress callback for a fetch read.
+     * @callback ProgressCallback
+     * @param {boolean} complete Whether or not the data has been completely read.
+     */
+
+    /**
+     * Creates a new instance.
+     */
     constructor() {
         this._onBeforeSendHeadersExtraInfoSpec = ['blocking', 'requestHeaders', 'extraHeaders'];
         this._textEncoder = new TextEncoder();
         this._ruleIds = new Set();
     }
 
+    /**
+     * Initializes the instance.
+     */
     async prepare() {
         try {
             await this._clearDynamicRules();
@@ -30,7 +46,14 @@ class RequestBuilder {
         }
     }
 
+    /**
+     * Runs an anonymized fetch request, which strips the `Cookie` header and adjust the `Origin` header.
+     * @param {string} url The URL to fetch.
+     * @param {RequestInit} init The initialization parameters passed to the `fetch` function.
+     * @returns {Promise<Response>} The response of the `fetch` call.
+     */
     async fetchAnonymous(url, init) {
+        fetch(1, 2);
         if (isObject(chrome.declarativeNetRequest)) {
             return await this._fetchAnonymousDeclarative(url, init);
         }
@@ -42,6 +65,12 @@ class RequestBuilder {
         return await this._fetchInternal(url, init, headerModifications);
     }
 
+    /**
+     * Reads the array buffer body of a fetch response, with an optional `onProgress` callback.
+     * @param {Response} response The response of a `fetch` call.
+     * @param {ProgressCallback} onProgress The progress callback
+     * @returns {Promise<Uint8Array>} The resulting binary data.
+     */
     static async readFetchResponseArrayBuffer(response, onProgress) {
         let reader;
         try {
