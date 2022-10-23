@@ -1,0 +1,36 @@
+{
+    "addons": {
+        "alex.testing@foosoft.net": {
+            "updates": [
+                {
+                    "version": "21.10.31.1",
+                    "update_link": "https://github.com/FooSoft/yomichan/releases/download/21.10.31.1/yomichan_testing-21.10.31.1-an+fx.xpi"
+                },
+                {
+                    "version": "22.2.2.0",
+                    "update_link": "https://github.com/FooSoft/yomichan/releases/download/22.2.2.0/yomichan_testing-22.2.2.0-an+fx.xpi"
+                },
+                {
+                    "version": "22.4.4.0",
+                    "update_link": "https://github.com/FooSoft/yomichan/releases/download/22.4.4.0/yomichan_testing-22.4.4.0-an+fx.xpi"
+                },
+                {
+                    "version": "22.6.6.0",
+                    "update_link": "https://github.com/FooSoft/yomichan/releases/download/22.6.6.0/a708116f79104891acbd-22.6.6.0.xpi"
+                },
+                {
+                    "version": "22.9.9.0",
+                    "update_link": "https://github.com/FooSoft/yomichan/releases/download/22.9.9.0/a708116f79104891acbd-22.9.9.0.xpi"
+                },
+                {
+                    "version": "22.9.9.1",
+                    "update_link": "https://github.com/FooSoft/yomichan/releases/download/22.9.9.1/a708116f79104891acbd-22.9.9.1.xpi"
+                },
+                {
+                    "version": "22.9.9.2",
+                    "update_link": "https://github.com/FooSoft/yomichan/releases/download/22.9.9.2/a708116f79104891acbd-22.9.9.2.xpi"
+                }
+            ]
+        }
+    }
+}
