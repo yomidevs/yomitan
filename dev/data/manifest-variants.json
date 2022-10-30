@@ -259,7 +259,7 @@
                 {
                     "action": "set",
                     "path": ["browser_specific_settings", "gecko", "update_url"],
-                    "value": "https://foosoft.net/projects/yomichan/dl/updates.json"
+                    "value": "https://raw.githubusercontent.com/FooSoft/yomichan/metadata/updates.json"
                 }
             ],
             "excludeFiles": [
