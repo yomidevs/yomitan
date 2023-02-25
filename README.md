@@ -1,5 +1,8 @@
 # Yomichan
 
+*Note: this project is no longer maintained. Please see [this
+post](https://foosoft.net/posts/sunsetting-the-yomichan-project/) for more information.*
+
 Yomichan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
 which would be otherwise too difficult tackle. This extension is similar to
 [Rikaichamp](https://addons.mozilla.org/en-US/firefox/addon/rikaichamp/) for Firefox and
