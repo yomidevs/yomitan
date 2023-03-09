@@ -1,2 +1,2 @@
-#!/bin/bash
+#!/bin/sh
 npm run-script build -- "$@"
