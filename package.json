@@ -47,7 +47,7 @@
         "fake-indexeddb": "^4.0.0",
         "html-validate": "^7.6.0",
         "jsdom": "^20.0.1",
-        "parse5": "^7.1.1",
+        "parse5": "^7.1.2",
         "stylelint": "^14.14.0",
         "stylelint-config-recommended": "^9.0.0",
         "web-ext": "^7.3.0"
