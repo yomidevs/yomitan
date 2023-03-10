@@ -11,7 +11,7 @@
 
 Yomitan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
 which would be otherwise too difficult tackle. This extension is similar to
-[Rikaichamp](https://addons.mozilla.org/en-US/firefox/addon/rikaichamp/) for Firefox and
+[10ten Japanese Reader (formerly Rikaichamp)](https://addons.mozilla.org/en-US/firefox/addon/10ten-ja-reader/) for Firefox and
 [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp?hl=en) for Chrome, but it
 stands apart in its goal of being an all-encompassing learning tool as opposed to a mere browser-based dictionary.
 
@@ -87,7 +87,7 @@ language is not English, you may consider also importing the English version for
     *   [jmdict\_swedish.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_swedish.zip)
 *   **[JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese names)
     *   [jmnedict.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmnedict.zip)
-*   **[KireiCake](https://kireicake.com/rikaicakes/)** (Japanese slang)
+*   **KireiCake (upstream project dead)** (Japanese slang)
     *   [kireicake.zip](https://github.com/themoeway/yomitan/raw/dictionaries/kireicake.zip)
 *   **[KANJIDIC](http://nihongo.monash.edu/kanjidic2/index.html)** (Japanese kanji)
     *   [kanjidic\_english.zip](https://github.com/themoeway/yomitan/raw/dictionaries/kanjidic_english.zip)
