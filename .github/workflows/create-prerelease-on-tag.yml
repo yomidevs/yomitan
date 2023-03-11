@@ -1,0 +1,35 @@
+name: Create prerelease on tag
+on:
+  push:
+    tags:
+      - "*.*.*.*"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build-release-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Validate manifest.json of the extension
+        uses: cardinalby/schema-validator-action@c2da05377e89dd0c9b7be9420da0b3534b1efcce # pin@v1
+        with:
+          file: ext/manifest.json
+          schema: "https://json.schemastore.org/webextension.json"
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: ".node-version"
+
+      - name: Lint
+        run: npm run-script build
+        shell: bash
+
+      - name: Release
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v0.1.15
+        with:
+          generate_release_notes: true
+          prerelease: true
+          files: builds/*

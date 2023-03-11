@@ -1,0 +1,17 @@
+changelog:
+  exclude:
+    labels:
+      - kind/meta
+  categories:
+    - title: Breaking Changes
+      labels:
+        - kind/breaking-change
+    - title: Enhancement
+      labels:
+        - kind/enhancement
+    - title: Bug Fixes
+      labels:
+        - kind/bug
+    - title: Dependencies
+      labels:
+        - area/dependencies
