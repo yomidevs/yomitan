@@ -1,5 +1,8 @@
 name: CI
 
+permissions:
+  contents: read
+
 on: [push, pull_request]
 
 jobs:
@@ -7,33 +10,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Setup node
-      uses: actions/setup-node@v1
-      with:
-        node-version: '16.x'
-    - name: Install dependencies
-      run: npm ci
-    - name: Lint
-      run: npm run test-lint
-      env:
-        CI: true
-    - name: Lint CSS
-      run: npm run test-lint-css
-      env:
-        CI: true
-    - name: Lint HTML
-      run: npm run test-lint-html
-      env:
-        CI: true
-    - name: Tests
-      run: npm run test-code
-      env:
-        CI: true
-    - name: Manifest
-      run: npm run test-manifest
-      env:
-        CI: true
-    - name: Build
-      run: npm run test-build
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.x"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run test-lint
+        env:
+          CI: true
+
+      - name: Lint CSS
+        run: npm run test-lint-css
+        env:
+          CI: true
+
+      - name: Lint HTML
+        run: npm run test-lint-html
+        env:
+          CI: true
+
+      - name: Tests
+        run: npm run test-code
+        env:
+          CI: true
+
+      - name: Manifest
+        run: npm run test-manifest
+        env:
+          CI: true
+
+      - name: Build
+        run: npm run test-build
