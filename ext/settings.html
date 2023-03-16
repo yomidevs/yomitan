@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Yomichan Settings</title>
+    <title>Rikaitan Settings</title>
     <link rel="icon" type="image/png" href="/images/icon16.png" sizes="16x16">
     <link rel="icon" type="image/png" href="/images/icon19.png" sizes="19x19">
     <link rel="icon" type="image/png" href="/images/icon32.png" sizes="32x32">
@@ -50,7 +50,7 @@
                     }'
                 ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </span><span class="outline-item-label">Advanced</span></label>
-            <a href="/info.html" class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="question-mark"></span></span><span class="outline-item-label">About Yomichan</span></a>
+            <a href="/info.html" class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="question-mark"></span></span><span class="outline-item-label">About Rikaitan</span></a>
         </div>
     </div></div>
 </div>
@@ -58,7 +58,7 @@
 
     <span tabindex="-1" id="content-scroll-focus"></span>
 
-    <h1>Yomichan Settings</h1>
+    <h1>Rikaitan Settings</h1>
 
     <!-- Notifications -->
     <div class="settings-group settings-group-top-margin page-loading-stalled-notification">
@@ -69,7 +69,7 @@
                         This page is taking longer than expected to load.
                     </p>
                     <p data-show-for-browser="safari">
-                        Due to a bug in Safari, it may be necessary to click the <img src="/images/yomichan-icon.svg" class="inline-icon" alt=""> <em>Yomichan</em>
+                        Due to a bug in Safari, it may be necessary to click the <img src="/images/yomichan-icon.svg" class="inline-icon" alt=""> <em>Rikaitan</em>
                         button in the browser bar to fully load the page
                     </p>
                 </div>
@@ -136,13 +136,13 @@
                     <div class="settings-item-label">Storage</div>
                     <div class="settings-item-description">
                         <span class="storage-use-invalid">
-                            Yomichan is using an indeterminate amount of storage.
+                            Rikaitan is using an indeterminate amount of storage.
                         </span>
                         <span class="storage-use-finite" hidden>
-                            Yomichan is using approximately <span class="storage-usage">?</span> of <span class="storage-quota">?</span>.
+                            Rikaitan is using approximately <span class="storage-usage">?</span> of <span class="storage-quota">?</span>.
                         </span>
                         <span class="storage-use-infinite" hidden>
-                            Yomichan is permitted unlimited storage.
+                            Rikaitan is permitted unlimited storage.
                         </span>
                     </div>
                 </div>
@@ -167,7 +167,7 @@
             <div class="settings-item-children more" hidden>
                 <p>
                     Web browsers will sometimes clear stored data if the device is running low on storage space.
-                    This can result in the imported dictionaries being deleted unexpectedly, causing Yomichan to stop functioning.
+                    This can result in the imported dictionaries being deleted unexpectedly, causing Rikaitan to stop functioning.
                     Enabling persistent storage tells the browser that the data should not be deleted in those circumstances.
                 </p>
                 <p data-show-for-browser="firefox firefox-mobile" class="storage-use-invalid" hidden>
@@ -182,7 +182,7 @@
                     It may not be possible to enable Persistent Storage on Firefox for Android.
                 </p>
                 <p data-show-for-browser="chrome edge">
-                    Chromium-based browsers should not need to enable this setting since the Yomichan extension has
+                    Chromium-based browsers should not need to enable this setting since the Rikaitan extension has
                     the <code>unlimitedStorage</code> permission, which should prevent data deletion.<sup><a href="https://bugs.chromium.org/p/chromium/issues/detail?id=680392#c15" target="_blank" rel="noopener">[1]</a></sup>
                 </p>
                 <p>
@@ -1337,7 +1337,7 @@
         </div>
         <div class="heading-description more" hidden>
             <p>
-                Yomichan is able to scan the sentence surrounding a term and parse individual words
+                Rikaitan is able to scan the sentence surrounding a term and parse individual words
                 of the query on the <a href="/search.html" target="_blank" rel="noopener">search page</a>.
                 This information can also be added to Anki cards to provide additional context.
             </p>
@@ -1350,9 +1350,9 @@
         <div class="settings-item">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
-                    <div class="settings-item-label">Parse sentences using Yomichan's internal parser</div>
+                    <div class="settings-item-label">Parse sentences using Rikaitan's internal parser</div>
                     <div class="settings-item-description">
-                        Sentence words are parsed using Yomichan's dictionaries.
+                        Sentence words are parsed using Rikaitan's dictionaries.
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                     </div>
                 </div>
@@ -1362,7 +1362,7 @@
             </div>
             <div class="settings-item-children more" hidden>
                 <p>
-                    Yomichan's internal parser is a simple algorithm which can parse sentences using the installed dictionaries.
+                    Rikaitan's internal parser is a simple algorithm which can parse sentences using the installed dictionaries.
                     It works by repeatedly detecting the longest term at the start of the sentence and advancing until no text remains.
                     This provides decent results for the general case, but since grammatical structure is not taken into account,
                     it can sometimes yield incorrect segmentation.
@@ -1391,10 +1391,10 @@
             <div class="settings-item-children more" hidden>
                 <p>
                     MeCab is a third-party program which uses its own dictionaries and parsing algorithm to decompose sentences into individual words.
-                    MeCab may provide more accurate parsing results than Yomichan's internal parser.
+                    MeCab may provide more accurate parsing results than Rikaitan's internal parser.
                 </p>
                 <p>
-                    In order for Yomichan to use it, both MeCab and a native messaging component must be installed.
+                    In order for Rikaitan to use it, both MeCab and a native messaging component must be installed.
                     A setup guide can be found <a href="https://github.com/siikamiika/yomichan-mecab-installer/blob/master/README.md" target="_blank" rel="noopener noreferrer">here</a>.
                 </p>
                 <div class="margin-above flex-row-nowrap">
@@ -1602,7 +1602,7 @@
         </div>
         <div class="heading-description more" hidden>
             <p>
-                Yomichan supports automatic flashcard creation for <a href="https://apps.ankiweb.net/" target="_blank" rel="noopener noreferrer">Anki</a>,
+                Rikaitan supports automatic flashcard creation for <a href="https://apps.ankiweb.net/" target="_blank" rel="noopener noreferrer">Anki</a>,
                 a free application designed to assist in remembering information.
                 This feature requires installation of the <a href="https://foosoft.net/projects/anki-connect/" target="_blank" rel="noopener noreferrer">AnkiConnect</a> plugin.
             </p>
@@ -1639,7 +1639,7 @@
             <div class="settings-item-children" data-show-for-os="mac">
                 <p class="warning-text">
                     <strong>Notice for macOS users:</strong>
-                    If Yomichan has issues connecting to AnkiConnect, it may be necessary to adjust adjust some system settings.
+                    If Rikaitan has issues connecting to AnkiConnect, it may be necessary to adjust adjust some system settings.
                     See <a href="https://foosoft.net/projects/anki-connect/#notes-for-mac-os-x-users" target="_blank" rel="noopener noreferrer">this link</a> for details.
                 </p>
             </div>
@@ -1913,12 +1913,12 @@
         </div>
         <div class="heading-description more" hidden>
             <p>
-                Yomichan can watch the system copy clipboard for Japanese text and automatically search the
+                Rikaitan can watch the system copy clipboard for Japanese text and automatically search the
                 text on the search page.
-                This can be useful for using Yomichan to scan text from external applications.
+                This can be useful for using Rikaitan to scan text from external applications.
             </p>
             <p>
-                This feature requires Yomichan to have clipboard reading permissions, and when this option is enabled,
+                This feature requires Rikaitan to have clipboard reading permissions, and when this option is enabled,
                 the clipboard will be frequently checked for new text.
             </p>
             <p>
@@ -1991,12 +1991,12 @@
             <div class="settings-item-left">
                 <div class="settings-item-label">
                     <p>
-                        Yomichan has two categories of keyboard shortcuts:
+                        Rikaitan has two categories of keyboard shortcuts:
                     </p>
                     <ul>
                         <li>
                             <strong>Standard</strong> keyboard shortcuts are controlled by the extension, and can be added, removed,
-                            and configured to work on webpages that Yomichan functions on.
+                            and configured to work on webpages that Rikaitan functions on.
                         </li>
                         <li>
                             <strong>Native</strong> keyboard shortcuts are controlled by the web browser, and function globally
@@ -2033,7 +2033,7 @@
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">
-                    Yomichan can import and export settings files which can be used to restore settings, share settings across devices, and to help to debug problems.
+                    Rikaitan can import and export settings files which can be used to restore settings, share settings across devices, and to help to debug problems.
                     These files will only contain settings and will not contain dictionaries.
                     Dictionaries must be imported separately.
                 </div>
@@ -2080,9 +2080,9 @@
                     Google Docs now uses
                     <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas" target="_blank" rel="noopener noreferrer">canvas-based</a>
                     rendering to display content<sup><a href="https://workspaceupdates.googleblog.com/2021/05/Google-Docs-Canvas-Based-Rendering-Update.html" target="_blank" rel="noopener noreferrer">[2]</a></sup>
-                    which prevents Yomichan from being able to scan text using the standard methods.
+                    which prevents Rikaitan from being able to scan text using the standard methods.
                     Enabling this option will force Google Docs webpages to expose some additional text
-                    information which should allow Yomichan to still work.
+                    information which should allow Rikaitan to still work.
                 </p>
                 <p class="danger-text">
                     Google has changed this compatibility implementation several times, and the changes do not seem to be announced or documented.
@@ -2118,7 +2118,7 @@
                     On <a href="https://caniuse.com/shadowdomv1" target="_blank" rel="noopener noreferrer">supported browsers</a>,
                     a popup's <code>iframe</code> element will be embeded inside of a container with a closed <a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM" target="_blank" rel="noopener noreferrer">shadow DOM</a>.
                     This container prevents scripts running on the underlying web page from being able to discover the <code>iframe</code>,
-                    which helps avoid situations where the web page might try to modify or use the Yomichan popup for an unintended purpose.
+                    which helps avoid situations where the web page might try to modify or use the Rikaitan popup for an unintended purpose.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -2143,7 +2143,7 @@
                     directly changing the location of the <code>iframe</code>'s internal document, rather than using
                     the <code>iframe</code>'s <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-src" target="_blank" rel="noopener noreferrer"><code>src</code></a>
                     attribute. This results in the extension URL not being exposed to the underling web page, and thus making it harder
-                    to detect the presence of Yomichan.
+                    to detect the presence of Rikaitan.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -2407,7 +2407,7 @@
 
         <div class="warning-text margin-above no-dictionaries-installed-warning" hidden>
             No dictionaries have been installed yet.
-            Visit the <a href="https://foosoft.net/projects/yomichan/#dictionaries" target="_blank" rel="noopener noreferrer">Yomichan homepage</a>
+            Visit the <a href="https://foosoft.net/projects/yomichan/#dictionaries" target="_blank" rel="noopener noreferrer">Rikaitan homepage</a>
             for a list free dictionaries or click the <em>Import</em> button below to select a dictionary file to import.
         </div>
         <div id="dictionary-error" class="danger-text margin-above" hidden></div>
@@ -3268,7 +3268,7 @@
                 </tr>
                 <tr>
                     <td><code class="anki-field-marker">{cloze-body}</code></td>
-                    <td>Original inflected term as it appeared before being reduced to dictionary form by Yomichan.</td>
+                    <td>Original inflected term as it appeared before being reduced to dictionary form by Rikaitan.</td>
                 </tr>
                 <tr>
                     <td><code class="anki-field-marker">{cloze-prefix}</code></td>
@@ -3421,7 +3421,7 @@
     <div class="modal-header"><div class="modal-title">Reset Settings</div></div>
     <div class="modal-body">
         <p class="danger-text">
-            You are about to reset all Yomichan settings back to their default values.
+            You are about to reset all Rikaitan settings back to their default values.
             This will delete all custom profiles you may have created.
             <strong>This action cannot be undone.</strong>
         </p>
@@ -3653,18 +3653,18 @@
 
             <ul data-show-for-browser="chrome">
                 <li>Open <a tabindex="0" data-special-url="chrome://extensions/shortcuts">chrome://extensions/shortcuts</a> in a new tab.</li>
-                <li>Find the <em>Yomichan</em> section and configure the shortcuts.</li>
+                <li>Find the <em>Rikaitan</em> section and configure the shortcuts.</li>
             </ul>
 
             <ul data-show-for-browser="edge">
                 <li>Open <a tabindex="0" data-special-url="edge://extensions/shortcuts">edge://extensions/shortcuts</a> in a new tab.</li>
-                <li>Find the <em>Yomichan</em> section and configure the shortcuts.</li>
+                <li>Find the <em>Rikaitan</em> section and configure the shortcuts.</li>
             </ul>
 
             <ul data-show-for-browser="firefox">
                 <li>Open the extensions page (<a tabindex="0" data-select-on-click="">about:addons</a>)</li>
                 <li>Click the button on the right with the gear icon, then click <em>Manage Extension Shortcuts</em>.</li>
-                <li>Find the <em>Yomichan</em> section and configure the shortcuts.</li>
+                <li>Find the <em>Rikaitan</em> section and configure the shortcuts.</li>
             </ul>
         </div>
         <div class="modal-separator-line"></div>
