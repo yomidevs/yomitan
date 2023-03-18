@@ -40,8 +40,6 @@ jobs:
               return attempt < max ? attempt + 1 : '';
             }
 
-      - uses: actions/checkout@v3
-
       - uses: robinraju/release-downloader@768b85c8d69164800db5fc00337ab917daf3ce68 # pin@v1.7
         with:
           tag: ${{ github.ref_name }}
@@ -60,7 +58,7 @@ jobs:
         continue-on-error: true
         uses: cardinalby/webext-buildtools-chrome-webstore-upload-action@8db7a005529498d95d3e2e0166f6f4050d2b96a5 # pin@v1.0.10
         with:
-          zipFilePath: builds/yomitan-chrome.zip
+          zipFilePath: yomitan-chrome.zip
           extensionId: ${{ secrets.G_STABLE_EXTENSION_ID }}
           apiAccessToken: ${{ steps.fetchAccessToken.outputs.accessToken }}
           waitForUploadCheckCount: 10

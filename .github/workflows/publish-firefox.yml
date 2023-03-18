@@ -9,8 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: cd
     steps:
-      - uses: actions/checkout@v3
-
       - uses: robinraju/release-downloader@768b85c8d69164800db5fc00337ab917daf3ce68 # pin@v1.7
         with:
           tag: ${{ github.ref_name }}
@@ -21,7 +19,7 @@ jobs:
         uses: cardinalby/webext-buildtools-firefox-addons-action@924ad87df7e4af50a654c164ad9e498dce260ffa # pin@v1.0.9
         continue-on-error: true
         with:
-          zipFilePath: builds/yomitan-firefox.zip
+          zipFilePath: yomitan-firefox.zip
           extensionId: ${{ secrets.FF_EXTENSION_ID }}
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}

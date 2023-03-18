@@ -15,8 +15,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
-
       - uses: robinraju/release-downloader@768b85c8d69164800db5fc00337ab917daf3ce68 # pin@v1.7
         with:
           release: ${{ github.event.release.id }}
@@ -29,8 +27,8 @@ jobs:
         with:
           timeoutMs: 1200000
           extensionId: ${{ secrets.FF_OFFLINE_EXT_ID }}
-          zipFilePath: builds/yomitan-firefox-dev.zip
-          xpiFilePath: builds/yomitan-firefox-dev.xpi
+          zipFilePath: yomitan-firefox-dev.zip
+          xpiFilePath: yomitan-firefox-dev.xpi
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}
 
@@ -48,7 +46,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: builds/yomitan-firefox.xpi
+          asset_path: yomitan-firefox.xpi
           asset_name: yomitan-firefox.xpi
           asset_content_type: application/x-xpinstall
 
