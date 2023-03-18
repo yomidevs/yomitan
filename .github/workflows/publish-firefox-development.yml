@@ -1,0 +1,86 @@
+# For the Firefox development addon, people install it manually,
+# and updates are distributed via the JSON file created in this
+# action which is stored in the metadata branch of this repo.
+
+name: publish-firefox-development
+on:
+  release:
+    types: [prereleased]
+permissions:
+  contents: write
+jobs:
+  build-signed-xpi-asset:
+    needs: ensure-zip
+    runs-on: ubuntu-latest
+    environment: cd
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: robinraju/release-downloader@768b85c8d69164800db5fc00337ab917daf3ce68 # pin@v1.7
+        with:
+          release: ${{ github.event.release.id }}
+          fileName: "*"
+
+      - name: Sign Firefox xpi for offline distribution
+        id: ffSignXpi
+        continue-on-error: true
+        uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@94a2e58141e33c4306a72a93f191e8540189df92 # pin@v1.0.6
+        with:
+          timeoutMs: 1200000
+          extensionId: ${{ secrets.FF_OFFLINE_EXT_ID }}
+          zipFilePath: builds/yomitan-firefox-dev.zip
+          xpiFilePath: builds/yomitan-firefox-dev.xpi
+          jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
+          jwtSecret: ${{ secrets.FF_JWT_SECRET }}
+
+      - name: Abort on sign error
+        if: |
+          steps.ffSignXpi.outcome == 'failure' &&
+          steps.ffSignXpi.outputs.sameVersionAlreadyUploadedError != 'true'
+        run: exit 1
+
+      - name: Upload offline xpi release asset
+        id: uploadReleaseAsset
+        if: steps.ffSignXpi.outcome == 'success'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: builds/yomitan-firefox.xpi
+          asset_name: yomitan-firefox.xpi
+          asset_content_type: application/x-xpinstall
+
+      # update update.json so that all people who have the dev version installed get the new update
+
+      - uses: actions/checkout@v3
+        with:
+          ref: metadata
+
+      - name: Recreate update.json
+        run: |
+          cat > update.json << EOF
+          {
+              "addons": {
+                  "{2d13e145-294e-4ead-9bce-b4644b203a00}": {
+                      "updates": [
+                          {
+                              "version": "${{ github.event.release.name }}",
+                              "update_link": "${{ uploadReleaseAsset.browser_download_url }}"
+                          }
+                      ]
+                  }
+              }
+          }
+          EOF
+
+      - name: Commit files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -a -m "${{ github.event.release.name }} - ${{ github.event.release.html_url }}"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@0fafdd62b84042d49ec0cb92d9cac7f7ce4ec79e # pin@master
+        with:
+          branch: metadata

@@ -178,7 +178,7 @@
                 {
                     "action": "delete",
                     "path": [
-                        "service_worker"
+                        "background"
                     ]
                 },
                 {
@@ -218,7 +218,7 @@
                     ],
                     "value": {
                         "gecko": {
-                            "id": "themoeway@googlegroups.com",
+                            "id": "{cb7c0bec-7085-4f84-8422-7b55a7c4467c}",
                             "strict_min_version": "101.0"
                         }
                     }
@@ -267,7 +267,7 @@
                     ],
                     "pattern": "^(.*)(?:\\.\\s*)?$",
                     "patternFlags": "",
-                    "replacement": "$1. This is a development build; get the stable version here: https://tinyurl.com/yaatdjmp"
+                    "replacement": "$1. This is a development build."
                 },
                 {
                     "action": "set",
@@ -276,7 +276,7 @@
                         "gecko",
                         "id"
                     ],
-                    "value": "themoeway+development@googlegroups.com"
+                    "value": "{2d13e145-294e-4ead-9bce-b4644b203a00}"
                 },
                 {
                     "action": "set",
