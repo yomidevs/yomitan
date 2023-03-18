@@ -13,7 +13,6 @@ on:
         required: false
         default: "10"
 permissions:
-  actions: write
   contents: read
 jobs:
   upload-on-webstore:
@@ -22,6 +21,8 @@ jobs:
     outputs:
       result: ${{ steps.webStorePublish.outcome }}
       releaseUploadUrl: ${{ steps.getZipAsset.outputs.releaseUploadUrl }}
+    permissions:
+      actions: write
     steps:
       - name: Get the next attempt number
         id: getNextAttemptNumber

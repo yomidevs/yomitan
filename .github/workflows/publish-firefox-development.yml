@@ -7,12 +7,14 @@ on:
   release:
     types: [prereleased]
 permissions:
-  contents: write
+  contents: read
 jobs:
   build-signed-xpi-asset:
     needs: ensure-zip
     runs-on: ubuntu-latest
     environment: cd
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
 
