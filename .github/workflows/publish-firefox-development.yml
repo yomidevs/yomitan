@@ -4,8 +4,7 @@
 
 name: publish-firefox-development
 on:
-  release:
-    types: [prereleased]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:

@@ -1,7 +1,5 @@
 name: publish-chrome-development
 on:
-  release:
-    types: [prereleased]
   workflow_dispatch:
     inputs:
       attemptNumber:
