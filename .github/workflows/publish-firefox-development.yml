@@ -62,7 +62,7 @@ jobs:
           cat > update.json << EOF
           {
               "addons": {
-                  "themoeway+development@googlegroups.com": {
+                  "{2d13e145-294e-4ead-9bce-b4644b203a00}": {
                       "updates": [
                           {
                               "version": "${{ github.event.release.name }}",
