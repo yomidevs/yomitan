@@ -9,7 +9,6 @@ permissions:
   contents: read
 jobs:
   build-signed-xpi-asset:
-    needs: ensure-zip
     runs-on: ubuntu-latest
     environment: cd
     permissions:
@@ -17,7 +16,7 @@ jobs:
     steps:
       - uses: robinraju/release-downloader@768b85c8d69164800db5fc00337ab917daf3ce68 # pin@v1.7
         with:
-          release: ${{ github.event.release.id }}
+          tag: ${{ github.ref_name }}
           fileName: "*"
 
       - name: Sign Firefox xpi for offline distribution
@@ -65,7 +64,7 @@ jobs:
                       "updates": [
                           {
                               "version": "${{ github.event.release.name }}",
-                              "update_link": "${{ uploadReleaseAsset.browser_download_url }}"
+                              "update_link": "${{ steps.uploadReleaseAsset.browser_download_url }}"
                           }
                       ]
                   }
