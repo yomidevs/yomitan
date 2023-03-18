@@ -2,7 +2,7 @@
     "manifest": {
         "manifest_version": 3,
         "name": "Yomitan",
-        "version": "22.10.23.0",
+        "version": "23.3.18.0",
         "description": "Japanese dictionary with Anki integration",
         "author": "TheMoeWay",
         "icons": {
