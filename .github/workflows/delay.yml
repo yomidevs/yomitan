@@ -22,12 +22,13 @@ on:
         description: "Max attempts"
         required: false
         default: "10"
-permissions:
-  actions: write
+permissions: {}
 jobs:
   delay:
     runs-on: ubuntu-latest
     environment: 12hoursDelay
+    permissions:
+      actions: write
     steps:
       - name: Start the next attempt
         uses: aurelien-baudet/workflow-dispatch@93e95b157d791ae7f42aef8f8a0d3d723eba1c31 # pin@v2
