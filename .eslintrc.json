@@ -5,7 +5,7 @@
         "plugin:jsonc/recommended-with-json"
     ],
     "parserOptions": {
-        "ecmaVersion": 8,
+        "ecmaVersion": 9,
         "sourceType": "script",
         "ecmaFeatures": {
             "globalReturn": false,
@@ -14,7 +14,7 @@
     },
     "env": {
         "browser": true,
-        "es2017": true,
+        "es2018": true,
         "webextensions": true
     },
     "plugins": [
@@ -27,12 +27,24 @@
         "/ext/lib/"
     ],
     "rules": {
-        "arrow-parens": ["error", "always"],
-        "comma-dangle": ["error", "never"],
-        "curly": ["error", "all"],
+        "arrow-parens": [
+            "error",
+            "always"
+        ],
+        "comma-dangle": [
+            "error",
+            "never"
+        ],
+        "curly": [
+            "error",
+            "all"
+        ],
         "dot-notation": "error",
         "eqeqeq": "error",
-        "func-names": ["error", "always"],
+        "func-names": [
+            "error",
+            "always"
+        ],
         "guard-for-in": "error",
         "new-parens": "error",
         "no-case-declarations": "error",
@@ -41,57 +53,184 @@
         "no-global-assign": "error",
         "no-param-reassign": "off",
         "no-prototype-builtins": "error",
-        "no-shadow": ["error", {"builtinGlobals": false}],
+        "no-shadow": [
+            "error",
+            {
+                "builtinGlobals": false
+            }
+        ],
         "no-undef": "error",
         "no-undefined": "error",
-        "no-underscore-dangle": ["error", {"allowAfterThis": true, "allowAfterSuper": false, "allowAfterThisConstructor": false}],
+        "no-underscore-dangle": [
+            "error",
+            {
+                "allowAfterThis": true,
+                "allowAfterSuper": false,
+                "allowAfterThisConstructor": false
+            }
+        ],
         "no-unexpected-multiline": "error",
         "no-unneeded-ternary": "error",
-        "no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
+        "no-unused-vars": [
+            "error",
+            {
+                "vars": "local",
+                "args": "after-used",
+                "argsIgnorePattern": "^_",
+                "caughtErrors": "none"
+            }
+        ],
         "no-unused-expressions": "error",
         "no-var": "error",
-        "prefer-const": ["error", {"destructuring": "all"}],
-        "quote-props": ["error", "consistent"],
-        "quotes": ["error", "single", "avoid-escape"],
+        "prefer-const": [
+            "error",
+            {
+                "destructuring": "all"
+            }
+        ],
+        "quote-props": [
+            "error",
+            "consistent"
+        ],
+        "quotes": [
+            "error",
+            "single",
+            "avoid-escape"
+        ],
         "require-atomic-updates": "off",
         "semi": "error",
-        "wrap-iife": ["error", "inside"],
-
-        "brace-style": ["error", "1tbs", {"allowSingleLine": true}],
-        "indent": ["error", 4, {"SwitchCase": 1, "MemberExpression": 1, "flatTernaryExpressions": true, "ignoredNodes": ["ConditionalExpression"]}],
+        "wrap-iife": [
+            "error",
+            "inside"
+        ],
+        "brace-style": [
+            "error",
+            "1tbs",
+            {
+                "allowSingleLine": true
+            }
+        ],
+        "indent": [
+            "error",
+            4,
+            {
+                "SwitchCase": 1,
+                "MemberExpression": 1,
+                "flatTernaryExpressions": true,
+                "ignoredNodes": [
+                    "ConditionalExpression"
+                ]
+            }
+        ],
         "object-curly-newline": "error",
-        "padded-blocks": ["error", "never"],
-
-        "array-bracket-spacing": ["error", "never"],
-        "arrow-spacing": ["error", {"before": true, "after": true}],
-        "block-spacing": ["error", "always"],
-        "comma-spacing": ["error", {"before": false, "after": true}],
-        "computed-property-spacing": ["error", "never"],
-        "func-call-spacing": ["error", "never"],
-        "function-paren-newline": ["error", "multiline-arguments"],
-        "generator-star-spacing": ["error", "before"],
-        "key-spacing": ["error", {"beforeColon": false, "afterColon": true, "mode": "strict"}],
-        "keyword-spacing": ["error", {"before": true, "after": true}],
+        "padded-blocks": [
+            "error",
+            "never"
+        ],
+        "array-bracket-spacing": [
+            "error",
+            "never"
+        ],
+        "arrow-spacing": [
+            "error",
+            {
+                "before": true,
+                "after": true
+            }
+        ],
+        "block-spacing": [
+            "error",
+            "always"
+        ],
+        "comma-spacing": [
+            "error",
+            {
+                "before": false,
+                "after": true
+            }
+        ],
+        "computed-property-spacing": [
+            "error",
+            "never"
+        ],
+        "func-call-spacing": [
+            "error",
+            "never"
+        ],
+        "function-paren-newline": [
+            "error",
+            "multiline-arguments"
+        ],
+        "generator-star-spacing": [
+            "error",
+            "before"
+        ],
+        "key-spacing": [
+            "error",
+            {
+                "beforeColon": false,
+                "afterColon": true,
+                "mode": "strict"
+            }
+        ],
+        "keyword-spacing": [
+            "error",
+            {
+                "before": true,
+                "after": true
+            }
+        ],
         "no-trailing-spaces": "error",
         "no-whitespace-before-property": "error",
-        "object-curly-spacing": ["error", "never"],
-        "rest-spread-spacing": ["error", "never"],
-        "semi-spacing": ["error", {"before": false, "after": true}],
-        "space-before-function-paren": ["error", {
-            "anonymous": "never",
-            "named": "never",
-            "asyncArrow": "always"
-        }],
-        "space-in-parens": ["error", "never"],
+        "object-curly-spacing": [
+            "error",
+            "never"
+        ],
+        "rest-spread-spacing": [
+            "error",
+            "never"
+        ],
+        "semi-spacing": [
+            "error",
+            {
+                "before": false,
+                "after": true
+            }
+        ],
+        "space-before-function-paren": [
+            "error",
+            {
+                "anonymous": "never",
+                "named": "never",
+                "asyncArrow": "always"
+            }
+        ],
+        "space-in-parens": [
+            "error",
+            "never"
+        ],
         "space-unary-ops": "error",
-        "spaced-comment": ["error", "always"],
-        "switch-colon-spacing": ["error", {"after": true, "before": false}],
-        "template-curly-spacing": ["error", "never"],
-        "template-tag-spacing": ["error", "never"],
-
+        "spaced-comment": [
+            "error",
+            "always"
+        ],
+        "switch-colon-spacing": [
+            "error",
+            {
+                "after": true,
+                "before": false
+            }
+        ],
+        "template-curly-spacing": [
+            "error",
+            "never"
+        ],
+        "template-tag-spacing": [
+            "error",
+            "never"
+        ],
         "no-unsanitized/method": "error",
         "no-unsanitized/property": "error",
-
         "jsdoc/check-access": "error",
         "jsdoc/check-alignment": "error",
         "jsdoc/check-line-alignment": "error",
@@ -103,11 +242,17 @@
         "jsdoc/empty-tags": "error",
         "jsdoc/implements-on-classes": "error",
         "jsdoc/multiline-blocks": "error",
-        "jsdoc/newline-after-description": ["error", "never"],
+        "jsdoc/newline-after-description": [
+            "error",
+            "never"
+        ],
         "jsdoc/no-bad-blocks": "error",
         "jsdoc/no-multi-asterisks": "error",
         "jsdoc/require-asterisk-prefix": "error",
-        "jsdoc/require-hyphen-before-param-description": ["error", "never"],
+        "jsdoc/require-hyphen-before-param-description": [
+            "error",
+            "never"
+        ],
         "jsdoc/require-jsdoc": "off",
         "jsdoc/require-param": "error",
         "jsdoc/require-param-description": "error",
@@ -126,17 +271,51 @@
         "jsdoc/require-yields-check": "error",
         "jsdoc/tag-lines": "error",
         "jsdoc/valid-types": "error",
-
-        "jsonc/indent": ["error", 4],
-        "jsonc/array-bracket-newline": ["error", "consistent"],
-        "jsonc/array-bracket-spacing": ["error", "never"],
-        "jsonc/array-element-newline": ["error", "consistent"],
-        "jsonc/comma-style": ["error", "last"],
-        "jsonc/key-spacing": ["error", {"beforeColon": false, "afterColon": true, "mode": "strict"}],
+        "jsonc/indent": [
+            "error",
+            4
+        ],
+        "jsonc/array-bracket-newline": [
+            "error",
+            "consistent"
+        ],
+        "jsonc/array-bracket-spacing": [
+            "error",
+            "never"
+        ],
+        "jsonc/array-element-newline": [
+            "error",
+            "consistent"
+        ],
+        "jsonc/comma-style": [
+            "error",
+            "last"
+        ],
+        "jsonc/key-spacing": [
+            "error",
+            {
+                "beforeColon": false,
+                "afterColon": true,
+                "mode": "strict"
+            }
+        ],
         "jsonc/no-octal-escape": "error",
-        "jsonc/object-curly-newline": ["error", {"consistent": true}],
-        "jsonc/object-curly-spacing": ["error", "never"],
-        "jsonc/object-property-newline": ["error", {"allowAllPropertiesOnSameLine": true}]
+        "jsonc/object-curly-newline": [
+            "error",
+            {
+                "consistent": true
+            }
+        ],
+        "jsonc/object-curly-spacing": [
+            "error",
+            "never"
+        ],
+        "jsonc/object-property-newline": [
+            "error",
+            {
+                "allowAllPropertiesOnSameLine": true
+            }
+        ]
     },
     "overrides": [
         {
@@ -152,7 +331,10 @@
                 "test/data/translator-test-results.json"
             ],
             "rules": {
-                "jsonc/indent": ["error", 2]
+                "jsonc/indent": [
+                    "error",
+                    2
+                ]
             }
         },
         {
@@ -160,8 +342,12 @@
                 "test/data/dictionaries/valid-dictionary1/term_bank_1.json"
             ],
             "rules": {
-                "jsonc/array-element-newline": ["off"],
-                "jsonc/object-property-newline": ["off"]
+                "jsonc/array-element-newline": [
+                    "off"
+                ],
+                "jsonc/object-property-newline": [
+                    "off"
+                ]
             }
         },
         {
@@ -188,7 +374,9 @@
             }
         },
         {
-            "files": ["ext/**/*.js"],
+            "files": [
+                "ext/**/*.js"
+            ],
             "excludedFiles": [
                 "ext/js/core.js",
                 "ext/js/accessibility/google-docs.js",
@@ -215,7 +403,9 @@
             }
         },
         {
-            "files": ["ext/**/*.js"],
+            "files": [
+                "ext/**/*.js"
+            ],
             "excludedFiles": [
                 "ext/js/core.js",
                 "ext/js/accessibility/google-docs.js",
@@ -227,7 +417,9 @@
             }
         },
         {
-            "files": ["ext/js/yomichan.js"],
+            "files": [
+                "ext/js/yomichan.js"
+            ],
             "globals": {
                 "chrome": "writable"
             }
@@ -237,7 +429,9 @@
                 "test/**/*.js",
                 "dev/**/*.js"
             ],
-            "excludedFiles": ["test/data/html/*.js"],
+            "excludedFiles": [
+                "test/data/html/*.js"
+            ],
             "parserOptions": {
                 "ecmaVersion": 8,
                 "sourceType": "module"
@@ -247,6 +441,35 @@
                 "es2017": true,
                 "node": true,
                 "webextensions": false
+            }
+        },
+        {
+            "files": [
+                "playwright.config.js"
+            ],
+            "env": {
+                "browser": false,
+                "es2017": true,
+                "node": true,
+                "webextensions": false
+            },
+            "rules": {
+                "no-undefined": "off"
+            }
+        },
+        {
+            "files": [
+                "visual.spec.js"
+            ],
+            "env": {
+                "browser": false,
+                "es2017": true,
+                "node": true,
+                "webextensions": false
+            },
+            "rules": {
+                "no-undefined": "off",
+                "no-empty-pattern": "off"
             }
         },
         {

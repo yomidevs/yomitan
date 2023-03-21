@@ -1,0 +1,109 @@
+name: Playwright Tests
+on:
+  push:
+    branches: [master]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  playwright:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: "npm"
+          node-version-file: ".node-version"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache playwright browsers
+        id: cache-playwright
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: cache-playwright-${{ hashFiles('package-lock.json') }} # playwright version is included in package-lock, so this serves as a reasonable cache key
+
+      - if: ${{ steps.cache-playwright.outputs.cache-hit != 'true' }}
+        name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Grab latest dictionaries from dictionaries branch
+        uses: actions/checkout@v3
+        with:
+          ref: dictionaries
+          path: dictionaries
+
+      - name: Grab latest screenshots from master branch
+        uses: dawidd6/action-download-artifact@5e780fc7bbd0cac69fc73271ed86edf5dcb72d67 # pin@v2
+        continue-on-error: true
+        id: download-screenshots
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          name: playwright-screenshots
+          branch: master
+          workflow: playwright.yml
+          workflow_conclusion: success
+          path: test/playwright/__screenshots__/
+
+      - name: "[PR] Generate new screenshots & compare against master"
+        id: playwright
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "PLAYWRIGHT_OUTPUT<<$EOF" >> $GITHUB_OUTPUT
+          npx playwright test 2>&1 | tee $GITHUB_OUTPUT || true
+          echo "$EOF" >> $GITHUB_OUTPUT
+          echo "NUM_FAILED=$(grep -c 'Screenshot comparison failed' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
+        continue-on-error: true
+        if: github.event_name == 'pull_request' && steps.download-screenshots.outcome != 'failure'
+
+      - name: "[Push] Generate new authoritative screenshots for master"
+        id: playwright-master
+        run: npx playwright test -u
+        if: github.event_name == 'push'
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: playwright-screenshots
+          path: test/playwright/__screenshots__/
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: playwright-report/
+
+      - name: "[Couldn't download screenshots] Comment results on PR"
+        uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
+        if: github.event_name == 'pull_request' && steps.download-screenshots.outcome == 'failure'
+        with:
+          message: |
+            :heavy_exclamation_mark: Could not fetch screenshots from master branch, so had nothing to make a visual comparison against; please check the "download-screenshots" step in the workflow run and rerun it before merging.
+
+      - name: "[Success] Comment results on PR"
+        uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
+        if: github.event_name == 'pull_request' && steps.download-screenshots.outcome != 'failure' && steps.playwright.outputs.NUM_FAILED == 0
+        with:
+          message: |
+            :heavy_check_mark: No visual differences introduced by this PR.
+            [View Playwright Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts) (note: open the "playwright-report" artifact)
+
+      - name: "[Failure] Comment results on PR"
+        uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
+        if: github.event_name == 'pull_request' && steps.download-screenshots.outcome != 'failure' && steps.playwright.outputs.NUM_FAILED != 0
+        with:
+          message: |
+            :warning: {{ steps.playwright.outputs.NUM_FAILED }} visual differences introduced by this PR; please validate if they are desirable.
+            <details>
+            <summary>Playwright Test Results</summary>
+            <pre>
+            ${{ steps.playwright.outputs.PLAYWRIGHT_OUTPUT }}
+            </pre>
+            </details>
+            [View Playwright Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts) (note: open the "playwright-report" artifact)
