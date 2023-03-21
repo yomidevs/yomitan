@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Yomichan Permissions</title>
+    <title>Yomitan Permissions</title>
     <link rel="icon" type="image/png" href="/images/icon16.png" sizes="16x16">
     <link rel="icon" type="image/png" href="/images/icon19.png" sizes="19x19">
     <link rel="icon" type="image/png" href="/images/icon32.png" sizes="32x32">
@@ -24,7 +24,7 @@
 
     <span tabindex="-1" id="content-scroll-focus"></span>
 
-    <h1>Yomichan Permissions</h1>
+    <h1>Yomitan Permissions</h1>
 
     <h2 id="permissions"></h2>
     <div class="settings-group">
@@ -32,7 +32,7 @@
             <div class="settings-item-left">
                 <div class="settings-item-label"><code>&lt;all_urls&gt;</code></div>
                 <div class="settings-item-description">
-                    Yomichan requires access to all URLs in order to run scripts to scan text and show the definitions popup,
+                    Yomitan requires access to all URLs in order to run scripts to scan text and show the definitions popup,
                     request audio for playback and download, and connect with Anki.
                 </div>
             </div>
@@ -41,7 +41,7 @@
             <div class="settings-item-left">
                 <div class="settings-item-label"><code>storage</code> and <code>unlimitedStorage</code></div>
                 <div class="settings-item-description">
-                    Yomichan uses storage permissions in order to save extension settings and dictionary data.
+                    Yomitan uses storage permissions in order to save extension settings and dictionary data.
                     <code>unlimitedStorage</code> is used to help prevent web browsers from unexpectedly
                     deleting dictionary data.
                 </div>
@@ -52,7 +52,7 @@
                 <div class="settings-item-label"><code>webRequest</code> and <code>webRequestBlocking</code></div>
                 <div class="settings-item-description">
                     <p>
-                        Yomichan uses these permissions to ensure certain requests have valid and secure headers.
+                        Yomitan uses these permissions to ensure certain requests have valid and secure headers.
                         This sometimes involves removing or changing the <code>Origin</code> request header,
                         as this can be used to fingerprint browser configuration.
                     </p>
@@ -67,7 +67,7 @@
                 <div class="settings-item-label"><code>declarativeNetRequest</code></div>
                 <div class="settings-item-description">
                     <p>
-                        Yomichan uses this permission to ensure certain requests have valid and secure headers.
+                        Yomitan uses this permission to ensure certain requests have valid and secure headers.
                         This sometimes involves removing or changing the <code>Origin</code> request header,
                         as this can be used to fingerprint browser configuration.
                     </p>
@@ -81,7 +81,7 @@
             <div class="settings-item-left">
                 <div class="settings-item-label"><code>scripting</code></div>
                 <div class="settings-item-description">
-                    Yomichan will sometimes need to inject stylesheets into webpages in order to
+                    Yomitan will sometimes need to inject stylesheets into webpages in order to
                     properly display the search popup.
                 </div>
             </div>
@@ -90,7 +90,7 @@
             <div class="settings-item-left">
                 <div class="settings-item-label"><code>clipboardWrite</code></div>
                 <div class="settings-item-description">
-                    Yomichan supports simulating the <code>Ctrl+C</code> (copy to clipboard) keyboard shortcut
+                    Yomitan supports simulating the <code>Ctrl+C</code> (copy to clipboard) keyboard shortcut
                     when a definitions popup is open and focused.
                 </div>
             </div>
@@ -99,9 +99,9 @@
             <div class="settings-item-left">
                 <div class="settings-item-label"><code>clipboardRead</code> <span class="light">(optional)</span></div>
                 <div class="settings-item-description">
-                    Yomichan supports automatically opening a search window when Japanese text is copied to the clipboard
+                    Yomitan supports automatically opening a search window when Japanese text is copied to the clipboard
                     while the browser is running, depending on how certain settings are configured.
-                    This allows Yomichan to support scanning text from external applications, provided there is a way
+                    This allows Yomitan to support scanning text from external applications, provided there is a way
                     to copy text from those applications to the clipboard.
                 </div>
             </div>
@@ -113,7 +113,7 @@
             <div class="settings-item-left">
                 <div class="settings-item-label"><code>nativeMessaging</code> <span class="light" data-show-for-browser="chrome edge">(optional)</span></div>
                 <div class="settings-item-description">
-                    Yomichan has the ability to communicate with an optional native messaging component in order to support
+                    Yomitan has the ability to communicate with an optional native messaging component in order to support
                     parsing large blocks of Japanese text using
                     <a href="https://en.wikipedia.org/wiki/MeCab" target="_blank" rel="noopener noreferrer">MeCab</a>.
                     The installation of this component is optional and is not included by default.
@@ -127,7 +127,7 @@
             <div class="settings-item-left">
                 <div class="settings-item-label"><code>webNavigation</code> <span class="light">(optional)</span></div>
                 <div class="settings-item-description">
-                    Yomichan may require this permission to inject content scripts for certain browsers
+                    Yomitan may require this permission to inject content scripts for certain browsers
                     if Google Docs accessibility mode is enabled.
                 </div>
             </div>
@@ -140,7 +140,7 @@
                 <div class="settings-item-label">Allow in private windows <span class="light">(optional)</span></div>
                 <div class="settings-item-description">
                     <p>
-                        When enabled, Yomichan is able to scan text and show definitions in private/incognito web browser windows.
+                        When enabled, Yomitan is able to scan text and show definitions in private/incognito web browser windows.
                     </p>
                     <p>
                         This option can be configured from the web browser's <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings pages</a>.
@@ -156,7 +156,7 @@
                 <div class="settings-item-label">Allow access to file URLs <span class="light">(optional)</span></div>
                 <div class="settings-item-description">
                     <p>
-                        When enabled, Yomichan is able to scan text and show definitions on local HTML files located using the <code>file://*</code> scheme.
+                        When enabled, Yomitan is able to scan text and show definitions on local HTML files located using the <code>file://*</code> scheme.
                     </p>
                     <p data-show-for-browser="chrome edge">
                         This option can be configured from the web browser's <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings pages</a>.
@@ -180,7 +180,7 @@
                         It may not be possible to enable this permission on Firefox for Android.
                     </p>
                     <p data-show-for-browser="chrome edge">
-                        Chromium-based browsers should not need to enable this setting since the Yomichan extension has
+                        Chromium-based browsers should not need to enable this setting since the Yomitan extension has
                         the <code>unlimitedStorage</code> permission, which should prevent data deletion.<sup><a href="https://bugs.chromium.org/p/chromium/issues/detail?id=680392#c15" target="_blank" rel="noopener">[1]</a></sup>
                     </p>
                 </div>
