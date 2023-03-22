@@ -101,7 +101,7 @@ language is not English, you may consider also importing the English version for
 
 ## Basic Usage
 
-1.  Click the <img src="ext/images/yomichan-icon.svg" alt="" width="16" height="16"> _Yomitan_ button in the browser bar to open the quick-actions popup.
+1.  Click the <img src="ext/images/yomitan-icon.svg" alt="" width="16" height="16"> _Yomitan_ button in the browser bar to open the quick-actions popup.
 
     <img src="resources/images/browser-action-popup1.png" alt="">
 
