@@ -108,6 +108,8 @@ class MediaUtil {
      */
     static getFileExtensionFromAudioMediaType(mediaType) {
         switch (mediaType) {
+            case 'audio/aac':
+                return '.aac';
             case 'audio/mpeg':
             case 'audio/mp3':
                 return '.mp3';
