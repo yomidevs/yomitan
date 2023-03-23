@@ -178,12 +178,14 @@
                 {
                     "action": "delete",
                     "path": [
-                        "background"
+                        "background",
+                        "service_worker"
                     ]
                 },
                 {
                     "action": "set",
                     "path": [
+                        "background",
                         "page"
                     ],
                     "value": "background.html"
