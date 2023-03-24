@@ -1379,16 +1379,16 @@ class Backend {
 
     _getBrowserIconTitle() {
         return (
-            isObject(chrome.browserAction) &&
-            typeof chrome.browserAction.getTitle === 'function' ?
-                new Promise((resolve) => chrome.browserAction.getTitle({}, resolve)) :
+            isObject(chrome.action) &&
+            typeof chrome.action.getTitle === 'function' ?
+                new Promise((resolve) => chrome.action.getTitle({}, resolve)) :
                 Promise.resolve('')
         );
     }
 
     _updateBadge() {
         let title = this._defaultBrowserActionTitle;
-        if (title === null || !isObject(chrome.browserAction)) {
+        if (title === null || !isObject(chrome.action)) {
             // Not ready or invalid
             return;
         }
@@ -1437,17 +1437,17 @@ class Backend {
             }
         }
 
-        if (color !== null && typeof chrome.browserAction.setBadgeBackgroundColor === 'function') {
-            chrome.browserAction.setBadgeBackgroundColor({color});
+        if (color !== null && typeof chrome.action.setBadgeBackgroundColor === 'function') {
+            chrome.action.setBadgeBackgroundColor({color});
         }
-        if (text !== null && typeof chrome.browserAction.setBadgeText === 'function') {
-            chrome.browserAction.setBadgeText({text});
+        if (text !== null && typeof chrome.action.setBadgeText === 'function') {
+            chrome.action.setBadgeText({text});
         }
-        if (typeof chrome.browserAction.setTitle === 'function') {
+        if (typeof chrome.action.setTitle === 'function') {
             if (status !== null) {
                 title = `${title} - ${status}`;
             }
-            chrome.browserAction.setTitle({title});
+            chrome.action.setTitle({title});
         }
     }
 
