@@ -82,7 +82,7 @@ class AccessibilityController {
                     allFrames: true,
                     matchAboutBlank: true,
                     matches: ['*://docs.google.com/*'],
-                    urlMatches: '^[^:]*://docs.google.com/[\\w\\W]*$',
+                    urlMatches: '^[^:]*://docs\\.google\\.com/[\\w\\W]*$',
                     runAt: 'document_start',
                     js: ['js/accessibility/google-docs.js']
                 };
