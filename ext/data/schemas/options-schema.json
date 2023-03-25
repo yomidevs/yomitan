@@ -901,7 +901,7 @@
                                             "type": "string"
                                         },
                                         "default": [
-                                            "yomichan"
+                                            "yomitan"
                                         ]
                                     },
                                     "screenshot": {
