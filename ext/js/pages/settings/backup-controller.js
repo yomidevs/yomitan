@@ -154,7 +154,7 @@ class BackupController {
         }
         this._settingsExportToken = null;
 
-        const fileName = `yomichan-settings-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
+        const fileName = `yomitan-settings-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
         const blob = new Blob([JSON.stringify(data, null, 4)], {type: 'application/json'});
         this._saveBlob(blob, fileName);
     }
