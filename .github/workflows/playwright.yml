@@ -12,6 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install CJK fonts
+        run: sudo apt install -y noto-fonts-cjk
+
       - uses: actions/setup-node@v3
         with:
           cache: "npm"
