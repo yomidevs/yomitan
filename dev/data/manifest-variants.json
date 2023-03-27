@@ -184,6 +184,11 @@
                 },
                 {
                     "action": "set",
+                    "path": ["page"],
+                    "value": "background.html"
+                },
+                {
+                    "action": "set",
                     "path": [
                         "background",
                         "page"
