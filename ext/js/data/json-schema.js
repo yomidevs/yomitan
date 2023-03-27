@@ -400,6 +400,8 @@ class JsonSchema {
             if (counter === 0) { this._progress(this); }
         }
 
+        // console.log('json-schema.js::_validate()', this._schema);
+
         const ref = this._schema.$ref;
         const schemaInfo = (typeof ref === 'string') ? this._getReference(ref) : null;
 

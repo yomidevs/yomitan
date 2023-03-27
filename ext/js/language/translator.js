@@ -19,6 +19,7 @@
  * Deinflector
  * RegexUtil
  * TextSourceMap
+ * LanguageUtil
  */
 
 /**
@@ -75,6 +76,8 @@ class Translator {
      * @returns {{dictionaryEntries: Translation.TermDictionaryEntry[], originalTextLength: number}} An object containing dictionary entries and the length of the original source text.
      */
     async findTerms(mode, text, options) {
+        console.log('findTerms', mode, text, options);
+
         const {enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder} = options;
         let {dictionaryEntries, originalTextLength} = await this._findTermsInternal(text, enabledDictionaryMap, options);
 
@@ -97,6 +100,7 @@ class Translator {
             await this._addTermMeta(dictionaryEntries, enabledDictionaryMap);
             await this._expandTermTags(dictionaryEntries);
         }
+        console.log('after meta dictionary entries', dictionaryEntries);
 
         if (sortFrequencyDictionary !== null) {
             this._updateSortFrequencies(dictionaryEntries, sortFrequencyDictionary, sortFrequencyDictionaryOrder === 'ascending');
@@ -216,6 +220,7 @@ class Translator {
                 const {id} = databaseEntry;
                 if (ids.has(id)) { continue; }
                 const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, true, enabledDictionaryMap);
+                // console.log('_findTermsInternal() dictionaryEntry.pronunciations', dictionaryEntry.pronunciations);
                 dictionaryEntries.push(dictionaryEntry);
                 ids.add(id);
             }
@@ -273,15 +278,19 @@ class Translator {
             this._getTextOptionEntryVariants(options.convertAlphabeticCharacters),
             this._getTextOptionEntryVariants(options.convertHiraganaToKatakana),
             this._getTextOptionEntryVariants(options.convertKatakanaToHiragana),
+            this._getTextOptionEntryVariants(options.decapitalize),
             this._getCollapseEmphaticOptions(options)
         ];
 
         const jp = this._japaneseUtil;
+        
         const deinflections = [];
         const used = new Set();
-        for (const [textReplacements, halfWidth, numeric, alphabetic, katakana, hiragana, [collapseEmphatic, collapseEmphaticFull]] of this._getArrayVariants(textOptionVariantArray)) {
+        for (const [textReplacements, halfWidth, numeric, alphabetic, katakana, hiragana, decapitalize, [collapseEmphatic, collapseEmphaticFull]] of this._getArrayVariants(textOptionVariantArray)) {
             let text2 = text;
             const sourceMap = new TextSourceMap(text2);
+            
+
             if (textReplacements !== null) {
                 text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
             }
@@ -300,18 +309,29 @@ class Translator {
             if (hiragana) {
                 text2 = jp.convertKatakanaToHiragana(text2);
             }
+            if (decapitalize) {
+                text2 = LanguageUtil.decapitalize(text2);
+            }
             if (collapseEmphatic) {
                 text2 = jp.collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
             }
-
-            for (let i = text2.length; i > 0; --i) {
+            let i = text2.length;
+            while ( i > 0) {
                 const source = text2.substring(0, i);
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
+                console.log("translator.js getalldeinflections() source: ", source , " rawSource: " , rawSource );
                 for (const {term, rules, reasons} of this._deinflector.deinflect(source)) {
+                    console.log(term)
                     deinflections.push(this._createDeinflection(rawSource, source, term, rules, reasons, []));
                 }
+
+                //last index of word boundary regex \/b\
+                if(options.searchResolution === "word") i = source.search(/[^a-zA-Z](\w*)$/);
+                else --i
+
+                console.log(i)
             }
         }
         return deinflections;
@@ -784,6 +804,7 @@ class Translator {
     // Metadata
 
     async _addTermMeta(dictionaryEntries, enabledDictionaryMap) {
+        console.log('_addTermMeta');
         const headwordMap = new Map();
         const headwordMapKeys = [];
         const headwordReadingMaps = [];
@@ -859,11 +880,37 @@ class Translator {
                                     dictionary,
                                     dictionaryIndex,
                                     dictionaryPriority,
-                                    pitches
+                                    pitches,
+                                    []
                                 ));
                             }
                         }
                         break;
+                    case 'ipa':
+                    {
+                        // console.log('IPA!!!', data);
+                        if (data.reading !== reading) { continue; }
+                        const phoneticTranscriptions = [];
+                        for (const {ipa} of data.ipa) {
+                            // const tags2 = [];
+                            // if (Array.isArray(tags) && tags.length > 0) {
+                            //     tags2.push(this._createTagGroup(dictionary, tags));
+                            // }
+                            phoneticTranscriptions.push({ipa, tags: []});
+                            // console.log(JSON.stringify(phoneticTranscriptions));
+                        }
+                        for (const {pronunciations, headwordIndex} of targets) {
+                            pronunciations.push(this._createTermPronunciation(
+                                pronunciations.length,
+                                headwordIndex,
+                                dictionary,
+                                dictionaryIndex,
+                                dictionaryPriority,
+                                [],
+                                phoneticTranscriptions
+                            ));
+                        }
+                    }
                 }
             }
         }
@@ -1101,8 +1148,8 @@ class Translator {
         };
     }
 
-    _createTermPronunciation(index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches) {
-        return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches};
+    _createTermPronunciation(index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches, phoneticTranscriptions) {
+        return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches, phoneticTranscriptions};
     }
 
     _createTermFrequency(index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, hasReading, frequency, displayValue, displayValueParsed) {

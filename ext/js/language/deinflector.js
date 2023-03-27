@@ -17,25 +17,27 @@
 
 class Deinflector {
     constructor(reasons) {
+        console.log('Deinflector::constructor() reasons = ', reasons);
         this.reasons = Deinflector.normalizeReasons(reasons);
     }
 
     deinflect(source) {
         const results = [this._createDeinflection(source, 0, [])];
+        // console.log('Deinflector::deinflect() source = ', source, 'results = ', results);
         for (let i = 0; i < results.length; ++i) {
             const {rules, term, reasons} = results[i];
             for (const [reason, variants] of this.reasons) {
-                for (const [kanaIn, kanaOut, rulesIn, rulesOut] of variants) {
+                // console.log("reason = ", reason, "variants = ", variants);
+                for (const [inflected, uninflect, rulesIn, rulesOut] of variants) {
                     if (
                         (rules !== 0 && (rules & rulesIn) === 0) ||
-                        !term.endsWith(kanaIn) ||
-                        (term.length - kanaIn.length + kanaOut.length) <= 0
+                        !inflected.test(term)
                     ) {
                         continue;
                     }
 
                     results.push(this._createDeinflection(
-                        term.substring(0, term.length - kanaIn.length) + kanaOut,
+                        uninflect(term),
                         rulesOut,
                         [reason, ...reasons]
                     ));
@@ -46,17 +48,19 @@ class Deinflector {
     }
 
     _createDeinflection(term, rules, reasons) {
+        // console.log('Deinflector::_createDeinflection() term = ', term, 'rules = ', rules, 'reasons = ', reasons);
         return {term, rules, reasons};
     }
 
     static normalizeReasons(reasons) {
+        console.log('Deinflector::normalizeReasons() reasons = ', reasons);
         const normalizedReasons = [];
         for (const [reason, reasonInfo] of Object.entries(reasons)) {
             const variants = [];
-            for (const {kanaIn, kanaOut, rulesIn, rulesOut} of reasonInfo) {
+            for (const {inflected, uninflect, rulesIn, rulesOut} of reasonInfo) {
                 variants.push([
-                    kanaIn,
-                    kanaOut,
+                    inflected,
+                    uninflect,
                     this.rulesToRuleFlags(rulesIn),
                     this.rulesToRuleFlags(rulesOut)
                 ]);
@@ -67,6 +71,7 @@ class Deinflector {
     }
 
     static rulesToRuleFlags(rules) {
+        // console.log('Deinflector::rulesToRuleFlags() rules = ', rules);
         const ruleTypes = this._ruleTypes;
         let value = 0;
         for (const rule of rules) {

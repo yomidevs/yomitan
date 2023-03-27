@@ -36,6 +36,7 @@ class ExtensionKeyboardShortcutController {
     }
 
     async prepare() {
+        console.log('ExtensionKeyboardShortcutController.prepare()');
         this._resetButton = document.querySelector('#extension-hotkey-list-reset-all');
         this._clearButton = document.querySelector('#extension-hotkey-list-clear-all');
         this._listContainer = document.querySelector('#extension-hotkey-list');

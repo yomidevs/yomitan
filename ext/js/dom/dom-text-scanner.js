@@ -33,6 +33,8 @@ class DOMTextScanner {
      * @param {boolean} generateLayoutContent Whether or not newlines should be added based on CSS styling.
      */
     constructor(node, offset, forcePreserveWhitespace=false, generateLayoutContent=true) {
+        // console.log('DOMTextScanner.constructor()');
+
         const ruby = DOMTextScanner.getParentRubyElement(node);
         const resetOffset = (ruby !== null);
         if (resetOffset) { node = ruby; }

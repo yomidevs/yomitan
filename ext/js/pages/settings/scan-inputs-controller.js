@@ -30,6 +30,7 @@ class ScanInputsController {
     }
 
     async prepare() {
+        console.log('ScanInputsController.prepare()');
         const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
         this._os = os;
 

@@ -267,7 +267,7 @@ class DictionaryImporter {
             '/data/schemas/dictionary-term-bank-v1-schema.json' :
             '/data/schemas/dictionary-term-bank-v3-schema.json'
         );
-        const termMetaBank = '/data/schemas/dictionary-term-meta-bank-v3-schema.json';
+        const termMetaBank = `/data/schemas/dictionary-term-meta-bank-v${version}-schema.json`;
         const kanjiBank = (
             version === 1 ?
             '/data/schemas/dictionary-kanji-bank-v1-schema.json' :

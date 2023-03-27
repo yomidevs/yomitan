@@ -10,7 +10,7 @@
         "ecmaFeatures": {
             "globalReturn": false,
             "impliedStrict": true
-        }
+        },
     },
     "env": {
         "browser": true,

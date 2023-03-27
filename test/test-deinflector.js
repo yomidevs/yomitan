@@ -17,9 +17,11 @@
 
 const fs = require('fs');
 const path = require('path');
-const assert = require('assert');
+const assert = require('assert');   
 const {testMain} = require('../dev/util');
 const {VM} = require('../dev/vm');
+const {deinflectionReasonsJa} = require('../ext/js/language/Japanese');
+
 
 
 function hasTermReasons(Deinflector, deinflector, source, expectedTerm, expectedRule, expectedReasons) {
@@ -919,9 +921,8 @@ function testDeinflections() {
     const vm = new VM();
     vm.execute(['js/language/deinflector.js']);
     const [Deinflector] = vm.get(['Deinflector']);
-
-    const deinflectionReasions = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect.json')));
-    const deinflector = new Deinflector(deinflectionReasions);
+    
+    const deinflector = new Deinflector(deinflectionReasonsJa);
 
     for (const {valid, tests} of data) {
         for (const {source, term, rule, reasons} of tests) {

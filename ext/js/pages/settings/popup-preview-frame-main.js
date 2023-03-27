@@ -23,6 +23,8 @@
 
 (async () => {
     try {
+        console.log('popup-preview.js: Initializing');
+
         await yomichan.prepare();
 
         const {tabId, frameId} = await yomichan.api.frameInformationGet();
