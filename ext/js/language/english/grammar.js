@@ -127,7 +127,36 @@ async function deinflectionReasonsEn (){
         ],
         'adverb': [
             suffixInflection('ly', '', [], ['Adjective']),
-        ]
+        ],
+        'comparative': [
+            suffixInflection('er', 'e', [], ['Adjective']),
+            suffixInflection('er', '', [], ['Adjective']),
+            suffixInflection('ier', 'y', [], ['Adjective']),
+            suffixInflection('gger', 'g', [], ['Adjective']),
+            suffixInflection('tter', 't', [], ['Adjective']),
+            suffixInflection('dder', 'd', [], ['Adjective']),
+            suffixInflection('nner', 'n', [], ['Adjective']),
+
+            wholeWordInflection('better', 'good', [], ['Adjective']),
+            wholeWordInflection('worse', 'bad', [], ['Adjective']),
+            wholeWordInflection('farther', 'far', [], ['Adjective']),
+            wholeWordInflection('further', 'far', [], ['Adjective']),
+
+        ],
+        'superlative': [
+            suffixInflection('est', 'e', [], ['Adjective']),
+            suffixInflection('est', '', [], ['Adjective']),
+            suffixInflection('iest', 'y', [], ['Adjective']),
+            suffixInflection('ggest', 'g', [], ['Adjective']),
+            suffixInflection('ttest', 't', [], ['Adjective']),
+            suffixInflection('ddest', 'd', [], ['Adjective']),
+            suffixInflection('nnest', 'n', [], ['Adjective']),
+
+            wholeWordInflection('best', 'good', [], ['Adjective']),
+            wholeWordInflection('worst', 'bad', [], ['Adjective']),
+            wholeWordInflection('farthest', 'far', [], ['Adjective']),
+            wholeWordInflection('furthest', 'far', [], ['Adjective']),
+        ],
     }
 
     const irregularVerbs = JSON.parse(await fetchAsset('/js/language/english/irregular-verbs.json'))
