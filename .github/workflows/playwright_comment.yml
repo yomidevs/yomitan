@@ -21,7 +21,7 @@ jobs:
         id: playwright-output
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run_id: ${{ github.event.workflow_run.id }}
           name: playwright-output
 
       - name: Grab master-screenshots-outcome from PR run
@@ -30,7 +30,7 @@ jobs:
         id: master-screenshots-outcome
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run_id: ${{ github.event.workflow_run.id }}
           name: master-screenshots-outcome
 
       - name: Load artifacts into environment variables
