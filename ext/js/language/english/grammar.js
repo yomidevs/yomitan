@@ -48,7 +48,7 @@ async function deinflectionReasonsEn (){
         ],
         '-ing': [
             suffixInflection('ing', '', [], ['Verb']),
-            suffixInflection('ing', 'e', [], ['Verb']),
+            suffixInflection('ing', 'e', [], ['Verb']), // e.g. 'driving', but false positive singe for 'singing'
             suffixInflection('ing', 'y', [], ['Verb']),
             suffixInflection('ying', 'ie', [], ['Verb']),
             suffixInflection('nning', 'n', [], ['Verb']),
@@ -157,6 +157,9 @@ async function deinflectionReasonsEn (){
             wholeWordInflection('farthest', 'far', [], ['Adjective']),
             wholeWordInflection('furthest', 'far', [], ['Adjective']),
         ],
+        'dropped g': [
+            suffixInflection('in\'', 'ing', [], ['Verb']),
+        ]
     }
 
     const irregularVerbs = JSON.parse(await fetchAsset('/js/language/english/irregular-verbs.json'))
