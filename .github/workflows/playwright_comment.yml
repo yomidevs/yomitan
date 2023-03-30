@@ -18,19 +18,17 @@ jobs:
       - name: Grab playwright-output from PR run
         uses: dawidd6/action-download-artifact@5e780fc7bbd0cac69fc73271ed86edf5dcb72d67 # pin@v2
         continue-on-error: true
-        id: playwright-output
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run_id: ${{ github.event.workflow_run.id }}
           name: playwright-output
 
       - name: Grab master-screenshots-outcome from PR run
         uses: dawidd6/action-download-artifact@5e780fc7bbd0cac69fc73271ed86edf5dcb72d67 # pin@v2
         continue-on-error: true
-        id: master-screenshots-outcome
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run_id: ${{ github.event.workflow_run.id }}
           name: master-screenshots-outcome
 
       - name: Load artifacts into environment variables
@@ -40,27 +38,41 @@ jobs:
           echo "PLAYWRIGHT_OUTPUT<<$EOF" >> $GITHUB_OUTPUT
           cat ./playwright-output >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
+          echo "MASTER_SCREENSHOTS_OUTCOME<<$EOF" >> $GITHUB_OUTPUT
+          cat ./master-screenshots-outcome >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
           echo "NUM_FAILED=$(grep -c 'Screenshot comparison failed' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
+
+      # this is required because github.event.workflow_run.pull_requests is not available for PRs from forks
+      - name: "Get PR information"
+        uses: potiuk/get-workflow-origin@e2dae063368361e4cd1f510e8785cd73bca9352e # pin@v1_5
+        id: source-run-info
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sourceRunId: ${{ github.event.workflow_run.id }}
 
       - name: "[Comment] Couldn't download screenshots from master branch"
         uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
-        if: github.event_name == 'pull_request' && steps.master-screenshots-outcome == 'failure'
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME == 'failure'
         with:
+          issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
             :heavy_exclamation_mark: Could not fetch screenshots from master branch, so had nothing to make a visual comparison against; please check the "master-screenshots" step in the workflow run and rerun it before merging.
 
       - name: "[Comment] Success: No visual differences introduced by this PR"
         uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
-        if: github.event_name == 'pull_request' && steps.master-screenshots-outcome != 'failure' && steps.playwright.outputs.NUM_FAILED == 0
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.NUM_FAILED == 0
         with:
+          issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
             :heavy_check_mark: No visual differences introduced by this PR.
             [View Playwright Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts) (note: open the "playwright-report" artifact)
 
       - name: "[Comment] Warning: Visual differences introduced by this PR"
         uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
-        if: github.event_name == 'pull_request' && steps.master-screenshots-outcome != 'failure' && steps.playwright.outputs.NUM_FAILED != 0
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.NUM_FAILED != 0
         with:
+          issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
             :warning: ${{ steps.playwright.outputs.NUM_FAILED }} visual differences introduced by this PR; please validate if they are desirable.
             <details>
