@@ -2154,15 +2154,17 @@ class Backend {
 
     async _openWelcomeGuidePageOnce() {
         if (isObject(chrome.storage) && isObject(chrome.storage.session)) {
+            // Chrome
             chrome.storage.session.get(['openedWelcomePage']).then((result) => {
-                console.log(new Date(), 'openedWelcomePage:', result.openedWelcomePage);
                 if (!result.openedWelcomePage) {
                     this._openWelcomeGuidePage();
                     chrome.storage.session.set({'openedWelcomePage': true});
                 }
             });
         } else {
-            // likely not mv3
+            // Firefox (storage.session is not supported yet)
+            // NOTE: This means that the welcome page will repeatedly open in Firefox
+            // until they support storage.session.
             this._openWelcomeGuidePage();
         }
     }
