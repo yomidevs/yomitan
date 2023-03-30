@@ -45,14 +45,14 @@ jobs:
 
       - name: "[Comment] Couldn't download screenshots from master branch"
         uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
-        if: github.event_name == 'pull_request' && steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME == 'failure'
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME == 'failure'
         with:
           message: |
             :heavy_exclamation_mark: Could not fetch screenshots from master branch, so had nothing to make a visual comparison against; please check the "master-screenshots" step in the workflow run and rerun it before merging.
 
       - name: "[Comment] Success: No visual differences introduced by this PR"
         uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
-        if: github.event_name == 'pull_request' && steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.NUM_FAILED == 0
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.NUM_FAILED == 0
         with:
           message: |
             :heavy_check_mark: No visual differences introduced by this PR.
@@ -60,7 +60,7 @@ jobs:
 
       - name: "[Comment] Warning: Visual differences introduced by this PR"
         uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
-        if: github.event_name == 'pull_request' && steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.NUM_FAILED != 0
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.NUM_FAILED != 0
         with:
           message: |
             :warning: ${{ steps.playwright.outputs.NUM_FAILED }} visual differences introduced by this PR; please validate if they are desirable.
