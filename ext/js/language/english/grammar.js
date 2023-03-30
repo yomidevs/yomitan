@@ -21,8 +21,8 @@ async function deinflectionReasonsEn (){
             suffixInflection('teeth', 'tooth', ['Noun'], ['Noun']),
 
             // incomplete: 
-            // latin plurals (e.g. 'indices' -> 'index') (also other languages), 
-            // compound nouns (e.g. 'passers-by' -> 'passer-by'), 
+            // latin plurals ('indices' -> 'index') (also other languages), 
+            // compound nouns ('passers-by' -> 'passer-by'), 
             // ...
         ],
         'possessive': [
@@ -46,30 +46,31 @@ async function deinflectionReasonsEn (){
             wholeWordInflection('them', 'they', ['Pronoun'], ['Pronoun']),
             wholeWordInflection('thee', 'thou', ['Pronoun'], ['Pronoun']),
         ],
+        'past': [
+            suffixInflection('ed', '', [], ['Verb']), // 'walked'
+            suffixInflection('ed', 'e', [], ['Verb']), // 'hoped'
+            suffixInflection('ied', 'y', [], ['Verb']), // 'tried'
+            suffixInflection('cked', 'c', [], ['Verb']), // 'frolicked'
+
+            suffixInflection('laid', 'lay', [], ['Verb']),
+            suffixInflection('paid', 'pay', [], ['Verb']),
+            suffixInflection('said', 'say', [], ['Verb']),
+
+            ...doubledConsonantInflection('bdgklmnprstz', 'ed', [], ['Verb']),
+        ],
+        'past (irregular)': [
+            wholeWordInflection('were', 'are', [], ['Verb']),
+        ],
         '-ing': [
             suffixInflection('ing', '', [], ['Verb']),
-            suffixInflection('ing', 'e', [], ['Verb']), // e.g. 'driving', but false positive singe for 'singing'
+            suffixInflection('ing', 'e', [], ['Verb']), // 'driving', but false positive singe for 'singing'
             suffixInflection('ing', 'y', [], ['Verb']),
             suffixInflection('ying', 'ie', [], ['Verb']),
-            suffixInflection('nning', 'n', [], ['Verb']),
-            suffixInflection('cking', 'c', [], ['Verb']),
+            suffixInflection('cking', 'c', [], ['Verb']), // 'frolicking'
 
-            suffixInflection('bbing', 'b', [], ['Verb']),
-            suffixInflection('dding', 'd', [], ['Verb']),
-            suffixInflection('ffing', 'f', [], ['Verb']),
-            suffixInflection('gging', 'g', [], ['Verb']),
-            suffixInflection('kking', 'k', [], ['Verb']),
-            suffixInflection('lling', 'l', [], ['Verb']),
-            suffixInflection('mming', 'm', [], ['Verb']),
-            suffixInflection('nning', 'n', [], ['Verb']), // e.g. 'canning'
-            suffixInflection('pping', 'p', [], ['Verb']),
-            suffixInflection('rring', 'r', [], ['Verb']),
-            suffixInflection('ssing', 's', [], ['Verb']),
-            suffixInflection('tting', 't', [], ['Verb']),
-            suffixInflection('zzing', 'z', [], ['Verb']),
+            ...doubledConsonantInflection('bdgklmnprstz', 'ing', [], ['Verb']),
         ],
-        // should probably be removed
-        'archaic': [
+        'archaic': [ // should probably be removed
             wholeWordInflection('thou', 'you', ['Pronoun'], ['Pronoun']),
             wholeWordInflection('thy', 'your', ['Pronoun'], ['Pronoun']),
             wholeWordInflection('thine', 'your', ['Pronoun'], ['Pronoun']),
@@ -85,32 +86,6 @@ async function deinflectionReasonsEn (){
             suffixInflection('ies', 'y', ['Verb'], ['Verb']),
             wholeWordInflection('is', 'be', ['Verb'], ['Verb']),
             wholeWordInflection('has', 'have', ['Verb'], ['Verb']),
-        ],
-        'past': [
-            suffixInflection('ed', '', [], ['Verb']), // e.g 'walked'
-            suffixInflection('ed', 'e', [], ['Verb']), // e.g. 'hoped'
-            suffixInflection('ied', 'y', [], ['Verb']), // e.g. 'tried'
-
-            suffixInflection('laid', 'lay', [], ['Verb']),
-            suffixInflection('paid', 'pay', [], ['Verb']),
-            suffixInflection('said', 'say', [], ['Verb']),
-
-            suffixInflection('bbed', 'b', [], ['Verb']), // e.g. 'robbed'
-            suffixInflection('dded', 'd', [], ['Verb']), // e.g. 'prodded'
-            suffixInflection('ffed', 'f', [], ['Verb']), // e.g. ''
-            suffixInflection('gged', 'g', [], ['Verb']), // e.g. 'gagged'
-            suffixInflection('kked', 'k', [], ['Verb']), // e.g. 'trekked'
-            suffixInflection('lled', 'l', [], ['Verb']), // e.g. 'cancelled'
-            suffixInflection('mmed', 'm', [], ['Verb']), // e.g. 'trimmed'
-            suffixInflection('nned', 'n', [], ['Verb']), // e.g. 'conned'
-            suffixInflection('pped', 'p', [], ['Verb']), // e.g. 'slipped'
-            suffixInflection('rred', 'r', [], ['Verb']), // e.g. 'marred'
-            suffixInflection('ssed', 's', [], ['Verb']), // e.g. 'bussed'
-            suffixInflection('tted', 't', [], ['Verb']), // e.g. 'potted'
-            suffixInflection('zzed', 'z', [], ['Verb']), // e.g. 'quizzed'
-        ],
-        'past (irregular)': [
-            wholeWordInflection('were', 'are', [], ['Verb']),
         ],
         'participle': [],
         'contraction': [    
@@ -132,10 +107,8 @@ async function deinflectionReasonsEn (){
             suffixInflection('er', 'e', [], ['Adjective']),
             suffixInflection('er', '', [], ['Adjective']),
             suffixInflection('ier', 'y', [], ['Adjective']),
-            suffixInflection('gger', 'g', [], ['Adjective']),
-            suffixInflection('tter', 't', [], ['Adjective']),
-            suffixInflection('dder', 'd', [], ['Adjective']),
-            suffixInflection('nner', 'n', [], ['Adjective']),
+            
+            ...doubledConsonantInflection('bdgmnt', 'er', [], ['Adjective']),
 
             wholeWordInflection('better', 'good', [], ['Adjective']),
             wholeWordInflection('worse', 'bad', [], ['Adjective']),
@@ -147,10 +120,9 @@ async function deinflectionReasonsEn (){
             suffixInflection('est', 'e', [], ['Adjective']),
             suffixInflection('est', '', [], ['Adjective']),
             suffixInflection('iest', 'y', [], ['Adjective']),
-            suffixInflection('ggest', 'g', [], ['Adjective']),
-            suffixInflection('ttest', 't', [], ['Adjective']),
-            suffixInflection('ddest', 'd', [], ['Adjective']),
-            suffixInflection('nnest', 'n', [], ['Adjective']),
+            
+            ...doubledConsonantInflection('bdgmnt', 'est', [], ['Adjective']),
+
 
             wholeWordInflection('best', 'good', [], ['Adjective']),
             wholeWordInflection('worst', 'bad', [], ['Adjective']),
@@ -159,11 +131,14 @@ async function deinflectionReasonsEn (){
         ],
         'dropped g': [
             suffixInflection('in\'', 'ing', [], ['Verb']),
+        ],
+        '-y': [
+            suffixInflection('y', '', [], ['Noun', 'Verb']), // dirty
+            ...doubledConsonantInflection('glmnprst', 'y', [], ['Noun', 'Verb']),
         ]
     }
 
     const irregularVerbs = JSON.parse(await fetchAsset('/js/language/english/irregular-verbs.json'))
-    
     for ( const [verb, inflections] of Object.entries(irregularVerbs)){
         for ( const [past, participle] of inflections){
             if(past !== verb)reasons['past (irregular)'].push(suffixInflection(past, verb, ['Verb'], ['Verb']))
@@ -172,5 +147,9 @@ async function deinflectionReasonsEn (){
     }
     
     return reasons
+}
+
+function doubledConsonantInflection(consonants, suffix, inTypes, outTypes){
+    return consonants.split('').map(consonant => suffixInflection(`${consonant}${consonant}${suffix}`, consonant, inTypes, outTypes))
 }
 
