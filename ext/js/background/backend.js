@@ -151,6 +151,12 @@ class Backend {
             ['openSearchPage',     this._onCommandOpenSearchPage.bind(this)],
             ['openPopupWindow',    this._onCommandOpenPopupWindow.bind(this)]
         ]);
+
+        // Messages from other extensions (e.g., the original Yomichan)
+        this._messageExternalHandlers = new Map([
+            ['hello', {async: false, handler: this._onApiHello.bind(this)}],
+            ['dbBulkAdd', {async: true, handler: this._onApiDBBulkAdd.bind(this)}]
+        ]);
     }
 
     /**
@@ -194,6 +200,9 @@ class Backend {
 
         const onMessage = this._onMessageWrapper.bind(this);
         chrome.runtime.onMessage.addListener(onMessage);
+
+        const onMessageExternal = this._onMessageExternalWrapper.bind(this);
+        chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
         if (this._canObservePermissionsChanges()) {
             const onPermissionsChanged = this._onWebExtensionEventWrapper(this._onPermissionsChanged.bind(this));
@@ -309,6 +318,18 @@ class Backend {
         return true;
     }
 
+    _onMessageExternalWrapper(message, sender, sendResponse) {
+        if (this._isPrepared) {
+            return this._onMessageExternal(message, sender, sendResponse);
+        }
+
+        this._prepareCompletePromise.then(
+            () => { this._onMessageExternal(message, sender, sendResponse); },
+            () => { sendResponse(); }
+        );
+        return true;
+    }
+
     // WebExtension event handlers
 
     _onCommand(command) {
@@ -329,6 +350,20 @@ class Backend {
         }
 
         return invokeMessageHandler(messageHandler, params, callback, sender);
+    }
+
+    _onMessageExternal({action, params}, sender, callback) {
+        const messageExternalHandler = this._messageExternalHandlers.get(action);
+        if (typeof messageExternalHandler === 'undefined') { return false; }
+
+        try {
+            this._validatePrivilegedMessageExternalSender(sender);
+        } catch (error) {
+            callback({error: serializeError(error)});
+            return false;
+        }
+
+        return invokeMessageHandler(messageExternalHandler, params, callback, sender);
     }
 
     _onConnect(port) {
@@ -792,6 +827,16 @@ class Backend {
         for (const file of files) {
             await this._scriptManager.injectScript(file, tabId, frameId, false, true, 'document_start');
         }
+    }
+
+    // Inform other extensions that this extension exists
+    // This is used when exporting from Yomichan to Yomitan, so Yomichan can detect which extension ID Yomitan is using
+    _onApiHello() {
+        return chrome.runtime.getManifest().name + ' [' + chrome.runtime.getManifest().version + ']';
+    }
+
+    async _onApiDBBulkAdd({objectStoreType, entries}) {
+        return await this._dictionaryDatabase.bulkAdd(objectStoreType, entries, 0, entries.length);
     }
 
     // Command handlers
@@ -1374,6 +1419,13 @@ class Backend {
             ({url} = tab);
             if (typeof url === 'string' && yomichan.isExtensionUrl(url)) { return; }
         }
+        throw new Error('Invalid message sender');
+    }
+
+    _validatePrivilegedMessageExternalSender(sender) {
+        if ([
+            'ogmnaimimemjmbakcfefmnahgdfhfami' // original Yomichan chrome extension
+        ].includes(sender.id)) { return; }
         throw new Error('Invalid message sender');
     }
 
