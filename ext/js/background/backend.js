@@ -2154,11 +2154,11 @@ class Backend {
 
     async _openWelcomeGuidePageOnce() {
         if (isObject(chrome.storage) && isObject(chrome.storage.session)) {
-            chrome.storage.session.get(["openedWelcomePage"]).then((result) => {
-                console.log(new Date(), "openedWelcomePage:", result["openedWelcomePage"]);
-                if (!result["openedWelcomePage"]) {
+            chrome.storage.session.get(['openedWelcomePage']).then((result) => {
+                console.log(new Date(), 'openedWelcomePage:', result.openedWelcomePage);
+                if (!result.openedWelcomePage) {
                     this._openWelcomeGuidePage();
-                    chrome.storage.session.set({"openedWelcomePage": true});
+                    chrome.storage.session.set({'openedWelcomePage': true});
                 }
             });
         } else {
