@@ -43,11 +43,19 @@ jobs:
           echo "$EOF" >> $GITHUB_OUTPUT
           echo "NUM_FAILED=$(grep -c 'Screenshot comparison failed' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
 
+      # this is required because github.event.workflow_run.pull_requests is not available for PRs from forks
+      - name: "Get PR information"
+        uses: potiuk/get-workflow-origin@e2dae063368361e4cd1f510e8785cd73bca9352e # pin@v1_5
+        id: source-run-info
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sourceRunId: ${{ github.event.workflow_run.id }}
+
       - name: "[Comment] Couldn't download screenshots from master branch"
         uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
         if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME == 'failure'
         with:
-          issue: ${{ github.event.workflow_run.pull_requests[0].number }}
+          issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
             :heavy_exclamation_mark: Could not fetch screenshots from master branch, so had nothing to make a visual comparison against; please check the "master-screenshots" step in the workflow run and rerun it before merging.
 
@@ -55,7 +63,7 @@ jobs:
         uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
         if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.NUM_FAILED == 0
         with:
-          issue: ${{ github.event.workflow_run.pull_requests[0].number }}
+          issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
             :heavy_check_mark: No visual differences introduced by this PR.
             [View Playwright Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts) (note: open the "playwright-report" artifact)
@@ -64,7 +72,7 @@ jobs:
         uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
         if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.NUM_FAILED != 0
         with:
-          issue: ${{ github.event.workflow_run.pull_requests[0].number }}
+          issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
             :warning: ${{ steps.playwright.outputs.NUM_FAILED }} visual differences introduced by this PR; please validate if they are desirable.
             <details>
