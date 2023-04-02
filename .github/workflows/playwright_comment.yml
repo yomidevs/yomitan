@@ -41,7 +41,7 @@ jobs:
           echo "MASTER_SCREENSHOTS_OUTCOME<<$EOF" >> $GITHUB_OUTPUT
           cat ./master-screenshots-outcome >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
-          echo "NUM_FAILED=$(grep -c 'Screenshot comparison failed' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
+          echo "FAILED=$(grep -c '^ *[0-9] failed$' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
 
       # this is required because github.event.workflow_run.pull_requests is not available for PRs from forks
       - name: "Get PR information"
@@ -61,24 +61,26 @@ jobs:
 
       - name: "[Comment] Success: No visual differences introduced by this PR"
         uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
-        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.NUM_FAILED == 0
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FAILED == 0
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
             :heavy_check_mark: No visual differences introduced by this PR.
-            [View Playwright Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts) (note: open the "playwright-report" artifact)
+
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
 
       - name: "[Comment] Warning: Visual differences introduced by this PR"
         uses: mshick/add-pr-comment@a65df5f64fc741e91c59b8359a4bc56e57aaf5b1 # pin@v2
-        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.NUM_FAILED != 0
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FAILED != 0
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
-            :warning: ${{ steps.playwright.outputs.NUM_FAILED }} visual differences introduced by this PR; please validate if they are desirable.
+            :warning: Visual differences introduced by this PR; please validate if they are desirable.
             <details>
             <summary>Playwright Test Results</summary>
             <pre>
             ${{ steps.playwright.outputs.PLAYWRIGHT_OUTPUT }}
             </pre>
             </details>
-            [View Playwright Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts) (note: open the "playwright-report" artifact)
+
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
