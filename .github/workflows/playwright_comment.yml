@@ -76,11 +76,5 @@ jobs:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
             :warning: Visual differences introduced by this PR; please validate if they are desirable.
-            <details>
-            <summary>Playwright Test Results</summary>
-            <pre>
-            ${{ steps.playwright.outputs.PLAYWRIGHT_OUTPUT }}
-            </pre>
-            </details>
 
             <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
