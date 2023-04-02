@@ -239,7 +239,7 @@ class Backend {
 
             const options = this._getProfileOptions({current: true});
             if (options.general.showGuide) {
-                this._openWelcomeGuidePage();
+                this._openWelcomeGuidePageOnce();
             }
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
@@ -2150,6 +2150,23 @@ class Backend {
             textReplacements.unshift(null);
         }
         return textReplacements;
+    }
+
+    async _openWelcomeGuidePageOnce() {
+        if (isObject(chrome.storage) && isObject(chrome.storage.session)) {
+            // Chrome
+            chrome.storage.session.get(['openedWelcomePage']).then((result) => {
+                if (!result.openedWelcomePage) {
+                    this._openWelcomeGuidePage();
+                    chrome.storage.session.set({'openedWelcomePage': true});
+                }
+            });
+        } else {
+            // Firefox (storage.session is not supported yet)
+            // NOTE: This means that the welcome page will repeatedly open in Firefox
+            // until they support storage.session.
+            this._openWelcomeGuidePage();
+        }
     }
 
     async _openWelcomeGuidePage() {
