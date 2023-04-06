@@ -2,23 +2,23 @@ async function deinflectionReasonsEn (){
     const reasons = {
         'plural': [
             // regular and near-regular plurals
-            suffixInflection('s', '', ['Noun'], ['Noun']),
-            suffixInflection('es', '', ['Noun'], ['Noun']),
-            suffixInflection('ies', 'y', ['Noun'], ['Noun']),
-            suffixInflection('ves', 'fe', ['Noun'], ['Noun']),
-            suffixInflection('ves', 'f', ['Noun'], ['Noun']),
+            suffixInflection('s', '', ['n'], ['n']),
+            suffixInflection('es', '', ['n'], ['n']),
+            suffixInflection('ies', 'y', ['n'], ['n']),
+            suffixInflection('ves', 'fe', ['n'], ['n']),
+            suffixInflection('ves', 'f', ['n'], ['n']),
 
             // irregular plurals (-en)
-            suffixInflection('children', 'child', ['Noun'], ['Noun']),
-            suffixInflection('oxen', 'ox', ['Noun'], ['Noun']),
+            suffixInflection('children', 'child', ['n'], ['n']),
+            suffixInflection('oxen', 'ox', ['n'], ['n']),
             
             // irregular plurals (apophonic plurals)
-            suffixInflection('feet', 'foot', ['Noun'], ['Noun']),
-            suffixInflection('geese', 'goose', ['Noun'], ['Noun']),
-            suffixInflection('lice', 'louse', ['Noun'], ['Noun']),
-            suffixInflection('mice', 'mouse', ['Noun'], ['Noun']),
-            suffixInflection('men', 'man', ['Noun'], ['Noun']),
-            suffixInflection('teeth', 'tooth', ['Noun'], ['Noun']),
+            suffixInflection('feet', 'foot', ['n'], ['n']),
+            suffixInflection('geese', 'goose', ['n'], ['n']),
+            suffixInflection('lice', 'louse', ['n'], ['n']),
+            suffixInflection('mice', 'mouse', ['n'], ['n']),
+            suffixInflection('men', 'man', ['n'], ['n']),
+            suffixInflection('teeth', 'tooth', ['n'], ['n']),
 
             // incomplete: 
             // latin plurals ('indices' -> 'index') (also other languages), 
@@ -26,130 +26,169 @@ async function deinflectionReasonsEn (){
             // ...
         ],
         'possessive': [
-            suffixInflection('\'s', '', ['Noun'], ['Noun']),
-            suffixInflection('s\'', 's', ['Noun'], ['Noun']),
+            suffixInflection('\'s', '', ['n'], ['n']),
+            suffixInflection('s\'', 's', ['n'], ['n']),
 
-            wholeWordInflection('my', 'I', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('your', 'you', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('his', 'he', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('her', 'she', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('its', 'it', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('our', 'we', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('their', 'they', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('whose', 'who', ['Pronoun'], ['Pronoun']),
+            wholeWordInflection('my', 'I', ['pn'], ['pn']),
+            wholeWordInflection('your', 'you', ['pn'], ['pn']),
+            wholeWordInflection('his', 'he', ['pn'], ['pn']),
+            wholeWordInflection('her', 'she', ['pn'], ['pn']),
+            wholeWordInflection('its', 'it', ['pn'], ['pn']),
+            wholeWordInflection('our', 'we', ['pn'], ['pn']),
+            wholeWordInflection('their', 'they', ['pn'], ['pn']),
+            wholeWordInflection('whose', 'who', ['pn'], ['pn']),
         ],
         'accusative': [
-            wholeWordInflection('me', 'I', ['Pronoun'], ['Pronoun']), 
-            wholeWordInflection('him', 'he', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('her', 'she', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('us', 'we', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('them', 'they', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('thee', 'thou', ['Pronoun'], ['Pronoun']),
+            wholeWordInflection('me', 'I', ['pn'], ['pn']), 
+            wholeWordInflection('him', 'he', ['pn'], ['pn']),
+            wholeWordInflection('her', 'she', ['pn'], ['pn']),
+            wholeWordInflection('us', 'we', ['pn'], ['pn']),
+            wholeWordInflection('them', 'they', ['pn'], ['pn']),
+            wholeWordInflection('thee', 'thou', ['pn'], ['pn']),
         ],
         'past': [
-            suffixInflection('ed', '', [], ['Verb']), // 'walked'
-            suffixInflection('ed', 'e', [], ['Verb']), // 'hoped'
-            suffixInflection('ied', 'y', [], ['Verb']), // 'tried'
-            suffixInflection('cked', 'c', [], ['Verb']), // 'frolicked'
+            suffixInflection('ed', '', [], ['v']), // 'walked'
+            suffixInflection('ed', 'e', [], ['v']), // 'hoped'
+            suffixInflection('ied', 'y', [], ['v']), // 'tried'
+            suffixInflection('cked', 'c', [], ['v']), // 'frolicked'
 
-            suffixInflection('laid', 'lay', [], ['Verb']),
-            suffixInflection('paid', 'pay', [], ['Verb']),
-            suffixInflection('said', 'say', [], ['Verb']),
+            suffixInflection('laid', 'lay', [], ['v']),
+            suffixInflection('paid', 'pay', [], ['v']),
+            suffixInflection('said', 'say', [], ['v']),
 
-            ...doubledConsonantInflection('bdgklmnprstz', 'ed', [], ['Verb']),
+            ...doubledConsonantInflection('bdgklmnprstz', 'ed', [], ['v']),
         ],
         'past (irregular)': [
-            wholeWordInflection('were', 'are', [], ['Verb']),
+            prefixInflection('was', 'am', [], ['v']),
+            prefixInflection('was', 'is', [], ['v']),
+            prefixInflection('were', 'are', [], ['v']),
+            prefixInflection('could', 'can', [], ['v']),
+
+            ...(await irregularVerbs())['past'],
         ],
         '-ing': [
-            suffixInflection('ing', '', [], ['Verb']),
-            suffixInflection('ing', 'e', [], ['Verb']), // 'driving', but false positive singe for 'singing'
-            suffixInflection('ing', 'y', [], ['Verb']),
-            suffixInflection('ying', 'ie', [], ['Verb']),
-            suffixInflection('cking', 'c', [], ['Verb']), // 'frolicking'
+            suffixInflection('ing', '', [], ['v']),
+            suffixInflection('ing', 'e', [], ['v']), // 'driving', but false positive singe for 'singing'
+            suffixInflection('ing', 'y', [], ['v']),
+            suffixInflection('ying', 'ie', [], ['v']),
+            suffixInflection('cking', 'c', [], ['v']), // 'frolicking'
 
-            ...doubledConsonantInflection('bdgklmnprstz', 'ing', [], ['Verb']),
+            ...doubledConsonantInflection('bdgklmnprstz', 'ing', [], ['v']),
         ],
         'archaic': [ // should probably be removed
-            wholeWordInflection('thou', 'you', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('thy', 'your', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('thine', 'your', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('ye', 'you', ['Pronoun'], ['Pronoun']),
-            wholeWordInflection('thyself', 'yourself', ['Pronoun'], ['Pronoun']),
+            wholeWordInflection('thou', 'you', ['pn'], ['pn']),
+            wholeWordInflection('thy', 'your', ['pn'], ['pn']),
+            wholeWordInflection('thine', 'your', ['pn'], ['pn']),
+            wholeWordInflection('ye', 'you', ['pn'], ['pn']),
+            wholeWordInflection('thyself', 'yourself', ['pn'], ['pn']),
         ],
         '1st person singular': [
-            wholeWordInflection('am', 'be', ['Verb'], ['Verb']),
+            wholeWordInflection('am', 'be', ['v'], ['v']),
         ],
         '3rd person singular': [
-            suffixInflection('s', '', ['Verb'], ['Verb']),
-            suffixInflection('es', '', ['Verb'], ['Verb']),
-            suffixInflection('ies', 'y', ['Verb'], ['Verb']),
-            wholeWordInflection('is', 'be', ['Verb'], ['Verb']),
-            wholeWordInflection('has', 'have', ['Verb'], ['Verb']),
+            suffixInflection('s', '', ['v'], ['v']),
+            suffixInflection('es', '', ['v'], ['v']),
+            suffixInflection('ies', 'y', ['v'], ['v']),
+            wholeWordInflection('is', 'be', ['v'], ['v']),
+            wholeWordInflection('has', 'have', ['v'], ['v']),
         ],
-        'participle': [],
+        'participle': [
+            ...(await irregularVerbs())['participle'],
+        ],
         'contraction': [    
-            wholeWordInflection('\'m', 'am', [], ['Verb']),
-            wholeWordInflection('\'re', 'are', [], ['Verb']),
-            wholeWordInflection('\'ve', 'have', [], ['Verb']),
-            wholeWordInflection('\'ll', 'will', [], ['Verb']),
-            wholeWordInflection('\'d', 'would', [], ['Verb']),
-            wholeWordInflection('\'d', 'had', [], ['Verb']),
-            wholeWordInflection('\'d', 'did', [], ['Verb']),
-            wholeWordInflection('\'s', 'is', [], ['Verb']),
-            wholeWordInflection('\'s', 'has', [], ['Verb']),
-            wholeWordInflection('\'em', 'them', [], ['Pronoun']),
+            wholeWordInflection('\'m', 'am', [], ['v']),
+            wholeWordInflection('\'re', 'are', [], ['v']),
+            wholeWordInflection('\'ve', 'have', [], ['v']),
+            prefixInflection('\'ll', 'will', [], ['v']),
+            wholeWordInflection('\'d', 'would', [], ['v']),
+            wholeWordInflection('\'d', 'had', [], ['v']),
+            wholeWordInflection('\'d', 'did', [], ['v']),
+            wholeWordInflection('\'s', 'is', [], ['v']),
+            wholeWordInflection('\'s', 'has', [], ['v']),
+            wholeWordInflection('\'em', 'them', [], ['pn']),
+            prefixInflection('gonna', 'going to', [], ['pn']),
+            prefixInflection('won\'t', 'will not', [], []),
+            prefixInflection('whatcha', 'what are you', [], []),
+            wholeWordInflection('c\'mon', 'come on', [], []),
+            wholeWordInflection('gimme', 'give me', [], []),
+            wholeWordInflection('gotta', 'got to', [], []),
+            wholeWordInflection('lemme', 'let me', [], []),
+            wholeWordInflection('wanna', 'want to', [], []),
+            prefixInflection('don\'t', 'do not', [], []),
         ],
         'adverb': [
-            suffixInflection('ly', '', [], ['Adjective']),
+            suffixInflection('ly', '', [], ['adj']),
         ],
         'comparative': [
-            suffixInflection('er', 'e', [], ['Adjective']),
-            suffixInflection('er', '', [], ['Adjective']),
-            suffixInflection('ier', 'y', [], ['Adjective']),
+            suffixInflection('er', 'e', [], ['adj']),
+            suffixInflection('er', '', [], ['adj']),
+            suffixInflection('ier', 'y', [], ['adj']),
             
-            ...doubledConsonantInflection('bdgmnt', 'er', [], ['Adjective']),
+            ...doubledConsonantInflection('bdgmnt', 'er', [], ['adj']),
 
-            wholeWordInflection('better', 'good', [], ['Adjective']),
-            wholeWordInflection('worse', 'bad', [], ['Adjective']),
-            wholeWordInflection('farther', 'far', [], ['Adjective']),
-            wholeWordInflection('further', 'far', [], ['Adjective']),
+            wholeWordInflection('better', 'good', [], ['adj']),
+            wholeWordInflection('worse', 'bad', [], ['adj']),
+            wholeWordInflection('farther', 'far', [], ['adj']),
+            wholeWordInflection('further', 'far', [], ['adj']),
 
         ],
         'superlative': [
-            suffixInflection('est', 'e', [], ['Adjective']),
-            suffixInflection('est', '', [], ['Adjective']),
-            suffixInflection('iest', 'y', [], ['Adjective']),
+            suffixInflection('est', 'e', [], ['adj']),
+            suffixInflection('est', '', [], ['adj']),
+            suffixInflection('iest', 'y', [], ['adj']),
             
-            ...doubledConsonantInflection('bdgmnt', 'est', [], ['Adjective']),
+            ...doubledConsonantInflection('bdgmnt', 'est', [], ['adj']),
 
-
-            wholeWordInflection('best', 'good', [], ['Adjective']),
-            wholeWordInflection('worst', 'bad', [], ['Adjective']),
-            wholeWordInflection('farthest', 'far', [], ['Adjective']),
-            wholeWordInflection('furthest', 'far', [], ['Adjective']),
+            wholeWordInflection('best', 'good', [], ['adj']),
+            wholeWordInflection('worst', 'bad', [], ['adj']),
+            wholeWordInflection('farthest', 'far', [], ['adj']),
+            wholeWordInflection('furthest', 'far', [], ['adj']),
         ],
         'dropped g': [
-            suffixInflection('in\'', 'ing', [], ['Verb']),
+            suffixInflection('in\'', 'ing', [], ['v']),
         ],
         '-y': [
-            suffixInflection('y', '', [], ['Noun', 'Verb']), // dirty
-            ...doubledConsonantInflection('glmnprst', 'y', [], ['Noun', 'Verb']),
-        ]
+            suffixInflection('y', '', [], ['n', 'v']), // dirty
+            ...doubledConsonantInflection('glmnprst', 'y', [], ['n', 'v']),
+        ],
+        'un-': [
+            prefixInflection('un', '', [], ['adj', 'v']),
+        ],
+        'going-to future': [
+            prefixInflection('going to ', '', [], ['v']),
+        ],
+        'will future': [
+            prefixInflection('will ', '', [], ['v']),
+        ],
+        'negative': [
+            prefixInflection('will not ', 'will ', [], []),
+        ],
+        'negative imperative': [
+            prefixInflection('do not ', '', [], []),
+        ],
     }
 
-    const irregularVerbs = JSON.parse(await fetchAsset('/js/language/english/irregular-verbs.json'))
-    for ( const [verb, inflections] of Object.entries(irregularVerbs)){
-        for ( const [past, participle] of inflections){
-            if(past !== verb)reasons['past (irregular)'].push(suffixInflection(past, verb, ['Verb'], ['Verb']))
-            if(participle !== verb) reasons['participle'].push(suffixInflection(participle, verb, ['Verb'], ['Verb']))
-        }
-    }
-    
     return reasons
 }
 
 function doubledConsonantInflection(consonants, suffix, inTypes, outTypes){
     return consonants.split('').map(consonant => suffixInflection(`${consonant}${consonant}${suffix}`, consonant, inTypes, outTypes))
+}
+
+async function irregularVerbs(){
+    verbs = {
+        'past': [],
+        'participle': [],
+    }
+
+    const irregularVerbs = JSON.parse(await fetchAsset('/js/language/english/irregular-verbs.json'))
+    for ( const [verb, inflections] of Object.entries(irregularVerbs)){
+        for ( const [past, participle] of inflections){
+            if(past !== verb) verbs['past'].push(suffixInflection(past, verb, ['v'], ['v']))
+            if(participle !== verb) verbs['participle'].push(suffixInflection(participle, verb, ['v'], ['v']))
+        }
+    }
+
+    return verbs
 }
 
