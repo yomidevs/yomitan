@@ -25,6 +25,7 @@ jobs:
         shell: bash
 
       - name: Release
+        id: release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v0.1.15
         with:
           generate_release_notes: true
@@ -44,3 +45,4 @@ jobs:
           workflow: publish-firefox-development
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: false
+          inputs: '{ "upload_url": "${{ steps.release.outputs.upload_url }}" }'
