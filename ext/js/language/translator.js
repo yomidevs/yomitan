@@ -330,7 +330,7 @@ class Translator {
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                console.log(`${i} translator.js _getAllDeinflections() source: ${source} rawSource: ${rawSource}`)
+                // console.log(`${i} translator.js _getAllDeinflections() source: ${source} rawSource: ${rawSource}`)
                 for (const {term, rules, reasons} of this._deinflector.deinflect(source)) {
                     deinflections.push(this._createDeinflection(rawSource, source, term, rules, reasons, []));
                 }
