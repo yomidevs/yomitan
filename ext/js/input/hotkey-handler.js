@@ -37,6 +37,7 @@ class HotkeyHandler extends EventDispatcher {
      * Creates a new instance of the class.
      */
     constructor() {
+        console.log('HotkeyHandler constructor');
         super();
         this._actions = new Map();
         this._hotkeys = new Map();

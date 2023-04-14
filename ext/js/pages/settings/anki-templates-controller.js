@@ -148,6 +148,7 @@ class AnkiTemplatesController {
     }
 
     async _validate(infoNode, field, mode, showSuccessResult, invalidateInput) {
+        // console.log('_validate()');
         const allErrors = [];
         const text = this._renderTextInput.value || '';
         let result = `No definition found for ${text}`;

@@ -1,33 +1,35 @@
 {{#*inline "glossary-single"}}
-    {{~#unless brief~}}
-        {{~#scope~}}
-            {{~#set "any" false}}{{/set~}}
-            {{~#each definitionTags~}}
-                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
-                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
-                    {{name}}
-                    {{~#set "any" true}}{{/set~}}
-                {{~/if~}}
-            {{~/each~}}
-            {{~#unless noDictionaryTag~}}
-                {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
-                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
-                    {{dictionary}}
-                    {{~#set "any" true}}{{/set~}}
-                {{~/if~}}
-            {{~/unless~}}
-            {{~#if (get "any")}})</i> {{/if~}}
-        {{~/scope~}}
-        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
-    {{~/unless~}}
-    {{~#if (op "<=" glossary.length 1)~}}
-        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
-    {{~else if @root.compactGlossaries~}}
-        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
-    {{~else~}}
-        <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
+   {{~#if (op "||" (op "===" targetDictionary undefined) (op "===" targetDictionary dictionary))~}}
+        {{~#unless brief~}}
+            {{~#scope~}}
+                {{~#set "any" false}}{{/set~}}
+                {{~#each definitionTags~}}
+                    {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
+                        {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                        {{name}}
+                        {{~#set "any" true}}{{/set~}}
+                    {{~/if~}}
+                {{~/each~}}
+                {{~#unless noDictionaryTag~}}
+                    {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
+                        {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                        {{dictionary}}
+                        {{~#set "any" true}}{{/set~}}
+                    {{~/if~}}
+                {{~/unless~}}
+                {{~#if (get "any")}})</i> {{/if~}}
+            {{~/scope~}}
+            {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+        {{~/unless~}}
+        {{~#if (op "<=" glossary.length 1)~}}
+            {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
+        {{~else if @root.compactGlossaries~}}
+            {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
+        {{~else~}}
+            <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
+        {{~/if~}}
+        {{~#set "previousDictionary" dictionary~}}{{~/set~}}
     {{~/if~}}
-    {{~#set "previousDictionary" dictionary~}}{{~/set~}}
 {{/inline}}
 
 {{#*inline "audio"}}
@@ -101,12 +103,12 @@
     <div style="text-align: left;">
     {{~#scope~}}
         {{~#if (op "===" definition.type "term")~}}
-            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag targetDictionary=targetDictionary ~}}
         {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
             {{~#if (op ">" definition.definitions.length 1)~}}
-                <ol>{{~#each definition.definitions~}}<li>{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}</li>{{~/each~}}</ol>
+                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag targetDictionary=../targetDictionary ~}}{{~/each~}}
             {{~else~}}
-                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/each~}}
+                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag targetDictionary=../targetDictionary ~}}{{~/each~}}
             {{~/if~}}
         {{~else if (op "===" definition.type "kanji")~}}
             {{~#if (op ">" definition.glossary.length 1)~}}
@@ -126,6 +128,19 @@
 {{#*inline "glossary-brief"}}
     {{~> glossary brief=true ~}}
 {{/inline}}
+
+{{~#*inline "glossary-erjecnik"~}}
+    {{~> glossary targetDictionary="eRječnik" ~}}
+{{~/inline~}}
+
+{{~#*inline "glossary-serbian"~}}
+    {{~> glossary targetDictionary="Serbian" ~}}
+{{~/inline~}}
+
+{{~#*inline "glossary-croatian"~}}
+    {{~> glossary targetDictionary="Croatian (NC)" ~}}
+{{~/inline~}}
+
 
 {{#*inline "kunyomi"}}
     {{~#each definition.kunyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each~}}
@@ -184,7 +199,7 @@
 
 {{! Pitch Accents }}
 {{#*inline "pitch-accent-item"}}
-    {{~#pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}{{~/pronunciation~}}
+    {{~#pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions type=type~}}{{~/pronunciation~}}
 {{/inline}}
 
 {{#*inline "pitch-accent-item-disambiguation"}}
@@ -211,8 +226,6 @@
             {{~/each~}}
         {{~/each~}}
         {{~#if (op ">" pitchCount 1)~}}</ol>{{~/if~}}
-    {{~else~}}
-        No pitch accent data
     {{~/if~}}
 {{/inline}}
 
@@ -228,6 +241,16 @@
     {{~> pitch-accent-list format='position'~}}
 {{/inline}}
 {{! End Pitch Accents }}
+
+{{#*inline "phonetic-transcriptions"}}
+    <span>
+        {{~#each definition.phoneticTranscriptions~}}
+            {{~#each phoneticTranscriptions~}}
+                {{~#if (op ">" @index 0)}}, {{/if~}}{{ipa}}
+            {{~/each~}}
+        {{~/each~}}
+    </span>
+{{/inline}}
 
 {{#*inline "clipboard-image"}}
     {{~#if (hasMedia "clipboardImage")~}}

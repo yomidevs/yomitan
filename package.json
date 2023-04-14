@@ -1,7 +1,7 @@
 {
     "name": "yomichan",
     "version": "0.0.0",
-    "description": "Japanese pop-up dictionary extension for Chrome and Firefox.",
+    "description": "Pop-up dictionary extension for Chrome and Firefox.",
     "directories": {
         "test": "test"
     },

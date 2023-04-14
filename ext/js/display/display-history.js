@@ -69,6 +69,7 @@ class DisplayHistory extends EventDispatcher {
     }
 
     pushState(state, content, url) {
+        // console.log('pushState', content);
         if (typeof url === 'undefined') { url = location.href; }
 
         const entry = this._createHistoryEntry(null, url, state, content, this._current);
@@ -78,6 +79,7 @@ class DisplayHistory extends EventDispatcher {
     }
 
     replaceState(state, content, url) {
+        // console.log('replaceState', content);
         if (typeof url === 'undefined') { url = location.href; }
 
         this._current.url = url;
@@ -87,6 +89,7 @@ class DisplayHistory extends EventDispatcher {
     }
 
     _onPopState() {
+        // console.log('_onPopState()');
         this._updateStateFromHistory();
         this._triggerStateChanged(false);
     }
@@ -113,8 +116,11 @@ class DisplayHistory extends EventDispatcher {
     }
 
     _updateHistoryFromCurrent(replace) {
+        // console.log('_updateHistoryFromCurrent()', replace, this.content);
+
         const {id, state, url} = this._current;
         if (replace) {
+            // console.log(state);
             history.replaceState({id, state}, '', url);
         } else {
             history.pushState({id, state}, '', url);

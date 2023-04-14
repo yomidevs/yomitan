@@ -36,12 +36,16 @@
  * ScriptManager
  * Translator
  * wanakana
+ * deinflectionReasonsJa
+ * deinflectionReasonsEn
+ * fetchAsset
  */
 
 /**
  * This class controls the core logic of the extension, including API calls
  * and various forms of communication between browser tabs and external applications.
  */
+
 class Backend {
     /**
      * Creates a new instance.
@@ -227,11 +231,12 @@ class Backend {
                 log.error(e);
             }
 
-            const deinflectionReasions = await this._fetchAsset('/data/deinflect.json', true);
-            this._translator.prepare(deinflectionReasions);
+            const deinflectionReasons = Object.assign({}, deinflectionReasonsJa, await deinflectionReasonsEn());
+
+            this._translator.prepare(deinflectionReasons);
 
             await this._optionsUtil.prepare();
-            this._defaultAnkiFieldTemplates = (await this._fetchAsset('/data/templates/default-anki-field-templates.handlebars')).trim();
+            this._defaultAnkiFieldTemplates = (await fetchAsset('/data/templates/default-anki-field-templates.handlebars')).trim();
             this._options = await this._optionsUtil.load();
 
             this._applyOptions('background');
@@ -432,6 +437,7 @@ class Backend {
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
         const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
         dictionaryEntries.splice(maxResults);
+        console.log('backend.js::_onApiTermsFind dictionaryEntries:', dictionaryEntries);
         return {dictionaryEntries, originalTextLength};
     }
 
@@ -513,6 +519,7 @@ class Backend {
     }
 
     async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails}) {
+        console.log('backend.js: _onApiInjectAnkiNoteMedia');
         return await this._injectAnkNoteMedia(
             this._anki,
             timestamp,
@@ -599,7 +606,7 @@ class Backend {
         if (!url.startsWith('/') || url.startsWith('//') || !url.endsWith('.css')) {
             throw new Error('Invalid URL');
         }
-        return await this._fetchAsset(url);
+        return await fetchAsset(url);
     }
 
     _onApiGetEnvironmentInfo() {
@@ -611,7 +618,7 @@ class Backend {
     }
 
     async _onApiGetDisplayTemplatesHtml() {
-        return await this._fetchAsset('/display-templates.html');
+        return await fetchAsset('/display-templates.html');
     }
 
     _onApiGetZoom(params, sender) {
@@ -1599,7 +1606,9 @@ class Backend {
     }
 
     _waitUntilTabFrameIsReady(tabId, frameId, timeout=null) {
+        console.log('backend.js: _waitUntilTabFrameIsReady ');
         return new Promise((resolve, reject) => {
+            console.log('backend.js: _waitUntilTabFrameIsReady promise');
             let timer = null;
             let onMessage = (message, sender) => {
                 if (
@@ -1646,21 +1655,6 @@ class Backend {
                 }, timeout);
             }
         });
-    }
-
-    async _fetchAsset(url, json=false) {
-        const response = await fetch(chrome.runtime.getURL(url), {
-            method: 'GET',
-            mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.status}`);
-        }
-        return await (json ? response.json() : response.text());
     }
 
     _sendMessageIgnoreResponse(...args) {
@@ -1760,6 +1754,8 @@ class Backend {
     }
 
     async _injectAnkNoteMedia(ankiConnect, timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails) {
+        console.log('backend.js: _injectAnkNoteMedia');
+
         let screenshotFileName = null;
         let clipboardImageFileName = null;
         let clipboardText = null;
@@ -1821,6 +1817,8 @@ class Backend {
     }
 
     async _injectAnkiNoteAudio(ankiConnect, timestamp, definitionDetails, details) {
+        console.log('backend.js: _injectAnkiNoteAudio');
+
         const {type, term, reading} = definitionDetails;
         if (
             type === 'kanji' ||
@@ -2058,6 +2056,7 @@ class Backend {
      * @returns {FindTermsOptions} An options object.
      */
     _getTranslatorFindTermsOptions(mode, details, options) {
+        console.log("backend.js", options)
         let {matchType, deinflect} = details;
         if (typeof matchType !== 'string') { matchType = 'exact'; }
         if (typeof deinflect !== 'boolean') { deinflect = true; }
@@ -2065,6 +2064,7 @@ class Backend {
         const {
             general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder},
             scanning: {alphanumeric},
+            parsing: {searchResolution},
             translation: {
                 convertHalfWidthCharacters,
                 convertNumericCharacters,
@@ -2072,6 +2072,7 @@ class Backend {
                 convertHiraganaToKatakana,
                 convertKatakanaToHiragana,
                 collapseEmphaticSequences,
+                decapitalize,
                 textReplacements: textReplacementsOptions
             }
         } = options;
@@ -2099,6 +2100,8 @@ class Backend {
             convertHiraganaToKatakana,
             convertKatakanaToHiragana,
             collapseEmphaticSequences,
+            searchResolution,
+            decapitalize,
             textReplacements,
             enabledDictionaryMap,
             excludeDictionaryDefinitions

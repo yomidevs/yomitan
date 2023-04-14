@@ -47,6 +47,8 @@ function getOperatingSystemDisplayName(os) {
 
 (async () => {
     try {
+        console.log('infomain.js: Initializing');
+
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 

@@ -1,0 +1,210 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "frequency": {
+            "oneOf": [
+                {
+                    "type": ["string", "number"]
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "value"
+                    ],
+                    "properties": {
+                        "value": {
+                            "type": "number"
+                        },
+                        "displayValue": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "type": "array",
+    "description": "Custom metadata for terms.",
+    "items": {
+        "type": "array",
+        "description": "Metadata about a single term.",
+        "minItems": 3,
+        "additionalItems": false,
+        "items": [
+            {
+                "type": "string",
+                "description": "The text for the term."
+            },
+            {
+                "type": "string",
+                "enum": ["freq", "pitch", "ipa"],
+                "description": "Type of data. \"freq\" corresponds to frequency information; \"pitch\" corresponds to pitch information. \"ipa\" corresponds to IPA transcription."
+            },
+            {
+                "description": "Data for the term."
+            }
+        ],
+        "oneOf": [
+            {
+                "items": [
+                    {},
+                    {"const": "freq"},
+                    {
+                        "oneOf": [
+                            {
+                                "$ref": "#/definitions/frequency",
+                                "description": "Frequency information for the term."
+                            },
+                            {
+                                "type": ["object"],
+                                "required": [
+                                    "reading",
+                                    "frequency"
+                                ],
+                                "additionalProperties": false,
+                                "properties": {
+                                    "reading": {
+                                        "type": "string",
+                                        "description": "Reading for the term."
+                                    },
+                                    "frequency": {
+                                        "$ref": "#/definitions/frequency",
+                                        "description": "Frequency information for the term."
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "items": [
+                    {},
+                    {"const": "pitch"},
+                    {
+                        "type": ["object"],
+                        "description": "Pitch accent information for the term.",
+                        "required": [
+                            "reading",
+                            "pitches"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "reading": {
+                                "type": "string",
+                                "description": "Reading for the term."
+                            },
+                            "pitches": {
+                                "type": "array",
+                                "description": "List of different pitch accent information for the term and reading combination.",
+                                "items": {
+                                    "type": "object",
+                                    "required": [
+                                        "position"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "position": {
+                                            "type": "integer",
+                                            "description": "Mora position of the pitch accent downstep. A value of 0 indicates that the word does not have a downstep (heiban).",
+                                            "minimum": 0
+                                        },
+                                        "nasal": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "integer",
+                                                    "description": "Position of a mora with nasal sound.",
+                                                    "minimum": 0
+                                                },
+                                                {
+                                                    "type": "array",
+                                                    "description": "Positions of morae with nasal sound.",
+                                                    "items": {
+                                                        "type": "integer",
+                                                        "minimum": 0
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "devoice": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "integer",
+                                                    "description": "Position of a mora with devoiced sound.",
+                                                    "minimum": 0
+                                                },
+                                                {
+                                                    "type": "array",
+                                                    "description": "Positions of morae with devoiced sound.",
+                                                    "items": {
+                                                        "type": "integer",
+                                                        "minimum": 0
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "tags": {
+                                            "type": "array",
+                                            "description": "List of tags for this pitch accent.",
+                                            "items": {
+                                                "type": "string",
+                                                "description": "Tag for this pitch accent. This typically corresponds to a certain type of part of speech."
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "items": [
+                    {},
+                    {"const": "ipa"},
+                    {
+                        "type": ["object"],
+                        "description": "IPA transcription information for the term.",
+                        "required": [
+                            "reading",
+                            "ipa"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "reading": {
+                                "type": "string",
+                                "description": "Reading for the term."
+                            },
+                            "ipa": {
+                                "type": "array",
+                                "description": "List of different IPA transcription information for the term and reading combination.",
+                                "items": {
+                                    "type": "object",
+                                    "required": [
+                                        "ipa"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "ipa": {
+                                            "type": "string",
+                                            "description": "IPA transcription for the term."
+                                        },
+                                        "tags": {
+                                            "type": "array",
+                                            "description": "List of tags for this IPA transcription.",
+                                            "items": {
+                                                "type": "string",
+                                                "description": "Tag for this IPA transcription."
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

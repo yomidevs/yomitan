@@ -1,3 +1,5 @@
 node_modules/
 builds/
 .DS_Store
+ext.pem
+ext.crx

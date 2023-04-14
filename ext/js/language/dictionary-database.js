@@ -353,6 +353,7 @@ class DictionaryDatabase {
             let completeCount = 0;
             const requiredCompleteCount = itemCount * indexCount;
             const onGetAll = (rows, data) => {
+                // console.log('dictionary-database.js _findMultiBulk() onGetAll() rows', rows)
                 for (const row of rows) {
                     if (predicate(row, data.item)) {
                         results.push(createResult(row, data));

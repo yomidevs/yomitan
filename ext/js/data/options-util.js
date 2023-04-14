@@ -18,6 +18,7 @@
 /* global
  * JsonSchema
  * TemplatePatcher
+ * fetchAsset
  */
 
 class OptionsUtil {
@@ -27,7 +28,7 @@ class OptionsUtil {
     }
 
     async prepare() {
-        const schema = await this._fetchAsset('/data/schemas/options-schema.json', true);
+        const schema = await fetchAsset('/data/schemas/options-schema.json', true);
         this._optionsSchema = new JsonSchema(schema);
     }
 
@@ -313,7 +314,8 @@ class OptionsUtil {
                 convertAlphabeticCharacters: 'false',
                 convertHiraganaToKatakana: 'false',
                 convertKatakanaToHiragana: 'variant',
-                collapseEmphaticSequences: 'false'
+                collapseEmphaticSequences: 'false',
+                decapitalize: 'true',
             },
 
             dictionaries: {},
@@ -390,7 +392,7 @@ class OptionsUtil {
             if (fieldTemplates === null) { continue; }
 
             if (patch === null) {
-                const content = await this._fetchAsset(modificationsUrl);
+                const content = await fetchAsset(modificationsUrl);
                 if (this._templatePatcher === null) {
                     this._templatePatcher = new TemplatePatcher();
                 }
@@ -399,22 +401,6 @@ class OptionsUtil {
 
             profileOptions.anki.fieldTemplates = this._templatePatcher.applyPatch(fieldTemplates, patch);
         }
-    }
-
-    async _fetchAsset(url, json=false) {
-        url = chrome.runtime.getURL(url);
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.status}`);
-        }
-        return await (json ? response.json() : response.text());
     }
 
     _getStringHashCode(string) {

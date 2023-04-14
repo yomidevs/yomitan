@@ -436,6 +436,7 @@ function createProfileOptionsUpdatedTestData1() {
             convertHiraganaToKatakana: 'false',
             convertKatakanaToHiragana: 'variant',
             collapseEmphaticSequences: 'false',
+            decapitalize: 'true',
             textReplacements: {
                 searchOriginal: true,
                 groups: []

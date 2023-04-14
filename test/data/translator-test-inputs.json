@@ -24,6 +24,7 @@
             "convertHiraganaToKatakana": false,
             "convertKatakanaToHiragana": false,
             "collapseEmphaticSequences": false,
+            "decapitalize": true,
             "textReplacements": [
                 null
             ],

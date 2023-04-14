@@ -253,6 +253,7 @@ class Display extends EventDispatcher {
     }
 
     async prepare() {
+        console.log('Display.prepare()');
         // Theme
         this._themeController.siteTheme = 'light';
         this._themeController.prepare();
@@ -401,6 +402,7 @@ class Display extends EventDispatcher {
         }
         const url = `${location.protocol}//${location.host}${location.pathname}?${urlSearchParams.toString()}`;
 
+        // console.log('setContent() content:', content);
         switch (historyMode) {
             case 'clear':
                 this._history.clear();
@@ -486,6 +488,7 @@ class Display extends EventDispatcher {
                 contentOrigin: this.getContentOrigin()
             }
         };
+        // console.log('searchLast() calling setContent()');
         this.setContent(details);
     }
 
@@ -559,6 +562,7 @@ class Display extends EventDispatcher {
     }
 
     _onMessageSetContent({details}) {
+        // console.log('_onMessageSetContent() calling setContent()');
         this.setContent(details);
     }
 
@@ -602,6 +606,7 @@ class Display extends EventDispatcher {
     }
 
     async _onStateChanged() {
+        // console.log('State changed', this._history._current.content);
         if (this._historyChangeIgnore) { return; }
 
         const token = {}; // Unique identifier token
@@ -953,6 +958,7 @@ class Display extends EventDispatcher {
         this._setQuery(query, queryFull, queryOffset);
 
         let {state, content} = this._history;
+        // console.log('setContentTermsOrKanji() content:', content);
         let changeHistory = false;
         if (!isObject(content)) {
             content = {};
@@ -1652,7 +1658,7 @@ class Display extends EventDispatcher {
             }
         }
 
-        console.log(result);
+        // console.log(result);
     }
 
     _triggerContentClear() {

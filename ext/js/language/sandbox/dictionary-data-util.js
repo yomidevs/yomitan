@@ -91,6 +91,7 @@ class DictionaryDataUtil {
     }
 
     static getGroupedPronunciations(dictionaryEntry) {
+        // console.log('getGroupedPronunciations', dictionaryEntry);
         const {headwords, pronunciations} = dictionaryEntry;
 
         const allTerms = new Set();
@@ -101,7 +102,8 @@ class DictionaryDataUtil {
         }
 
         const groupedPronunciationsMap = new Map();
-        for (const {headwordIndex, dictionary, pitches} of pronunciations) {
+        // console.log('pronunciations', pronunciations);
+        for (const {headwordIndex, dictionary, pitches, phoneticTranscriptions} of pronunciations) {
             const {term, reading} = headwords[headwordIndex];
             let dictionaryGroupedPronunciationList = groupedPronunciationsMap.get(dictionary);
             if (typeof dictionaryGroupedPronunciationList === 'undefined') {
@@ -112,12 +114,29 @@ class DictionaryDataUtil {
                 let groupedPronunciation = this._findExistingGroupedPronunciation(reading, position, nasalPositions, devoicePositions, tags, dictionaryGroupedPronunciationList);
                 if (groupedPronunciation === null) {
                     groupedPronunciation = {
+                        type: 'pitch-accent',
                         terms: new Set(),
                         reading,
                         position,
                         nasalPositions,
                         devoicePositions,
                         tags,
+                        exclusiveTerms: [],
+                        exclusiveReadings: []
+                    };
+                    dictionaryGroupedPronunciationList.push(groupedPronunciation);
+                }
+                groupedPronunciation.terms.add(term);
+            }
+            for (const {ipa} of phoneticTranscriptions) {
+                let groupedPronunciation = this._findExistingGroupedPronunciation(reading, null, null, null, null, dictionaryGroupedPronunciationList);
+                if (groupedPronunciation === null) {
+                    groupedPronunciation = {
+                        type: 'phonetic-transcription',
+                        terms: new Set(),
+                        reading,
+                        ipa,
+                        tags: [],
                         exclusiveTerms: [],
                         exclusiveReadings: []
                     };

@@ -55,6 +55,8 @@ async function setupGenericSettingsController(genericSettingController) {
 
 (async () => {
     try {
+        console.log('settings-main.js');
+
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 

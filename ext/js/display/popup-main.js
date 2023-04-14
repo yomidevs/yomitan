@@ -28,6 +28,8 @@
 
 (async () => {
     try {
+        console.log('popup-main.js');
+
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 

@@ -17,6 +17,7 @@
 
 class API {
     constructor(yomichan) {
+        console.log('API.constructor()');
         this._yomichan = yomichan;
     }
 
