@@ -1658,7 +1658,7 @@ class Display extends EventDispatcher {
             }
         }
 
-        console.log(result);
+        // console.log(result);
     }
 
     _triggerContentClear() {

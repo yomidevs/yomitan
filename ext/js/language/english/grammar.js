@@ -1,5 +1,109 @@
+const pastSuffixInflections = [
+    suffixInflection('ed', '', [], ['v']), // 'walked'
+    suffixInflection('ed', 'e', [], ['v']), // 'hoped'
+    suffixInflection('ied', 'y', [], ['v']), // 'tried'
+    suffixInflection('cked', 'c', [], ['v']), // 'frolicked'
+    ...doubledConsonantInflection('bdgklmnprstz', 'ed', [], ['v']),
+
+    suffixInflection('laid', 'lay', [], ['v']),
+    suffixInflection('paid', 'pay', [], ['v']),
+    suffixInflection('said', 'say', [], ['v']),
+]
+
+const ingSuffixInflections = [
+    suffixInflection('ing', '', [], ['v']),
+    suffixInflection('ing', 'e', [], ['v']), // 'driving', but false positive singe for 'singing'
+    suffixInflection('ing', 'y', [], ['v']),
+    suffixInflection('ying', 'ie', [], ['v']), // 'lying'
+    suffixInflection('cking', 'c', [], ['v']), // 'frolicking'
+    ...doubledConsonantInflection('bdgklmnprstz', 'ing', [], ['v']),
+]
+
+const thirdPersonSgPresentSuffixInflections = [
+    suffixInflection('s', '', ['v'], ['v']),
+    suffixInflection('es', '', ['v'], ['v']),
+    suffixInflection('ies', 'y', ['v'], ['v']),
+]
+
+function doubledConsonantInflection(consonants, suffix, inTypes, outTypes){
+    return consonants.split('').map(consonant => suffixInflection(`${consonant}${consonant}${suffix}`, consonant, inTypes, outTypes))
+}
+
+async function createIrregularVerbInflections(){
+    verbs = {
+        'past': [],
+        'participle': [],
+    }
+
+    console.log('Fetching irregular verbs file...')
+    const irregularVerbs = JSON.parse(await fetchAsset('/js/language/english/irregular-verbs.json'))
+    for ( const [verb, inflections] of Object.entries(irregularVerbs)){
+        for ( const [past, participle] of inflections){
+            if(past !== verb) verbs['past'].push(suffixInflection(past, verb, ['v'], ['v']))
+            if(participle !== verb) verbs['participle'].push(suffixInflection(participle, verb, ['v'], ['v']))
+        }
+    }
+
+    return verbs
+}
+
+const irregularVerbInflections = createIrregularVerbInflections()
+
+async function createPhrasalVerbInflections(){
+    const phrasalVerbParticles = JSON.parse(await fetchAsset('/js/language/english/phrasal-verb-particles.json'))
+    const particlesDisjunction = phrasalVerbParticles.join('|')
+
+    const phrasalVerbPrepositions = JSON.parse(await fetchAsset('/js/language/english/phrasal-verb-prepositions.json'))
+
+    const combinedSet = new Set([...phrasalVerbParticles, ...phrasalVerbPrepositions])
+    const combinedDisjunction = Array.from(combinedSet).join('|')
+
+    function createPhrasalVerbInflection(inflected, deinflected){
+
+        return {
+            inflected: new RegExp(`^\\w*${inflected} (?:${combinedDisjunction})`),
+            uninflect: (term) => {
+                return term.replace(new RegExp(`(?<=)${inflected}(?= (?:${combinedDisjunction}))`), deinflected)
+            },
+            rulesIn: [],
+            rulesOut: ['v'],
+        }
+    }
+
+    function createPhrasalVerbInflectionsFromRules(sourceRules){
+        return sourceRules.map(({inflected, deinflected}) => {
+            const inflectedSuffix = inflected.source.replace('.*', '').replace('$', '')
+            const deinflectedSuffix = deinflected
+
+            return createPhrasalVerbInflection(inflectedSuffix, deinflectedSuffix)
+        })
+    }
+
+    return {
+        'past': createPhrasalVerbInflectionsFromRules(pastSuffixInflections),
+        'past (irregular)': createPhrasalVerbInflectionsFromRules((await irregularVerbInflections)['past']),
+        '-ing': createPhrasalVerbInflectionsFromRules(ingSuffixInflections),
+        '3 sg present': createPhrasalVerbInflectionsFromRules(thirdPersonSgPresentSuffixInflections),
+        'interposed object': [
+            {
+                inflected: new RegExp(`^\\w* (?:(?!\\b(${combinedDisjunction})\\b).)+ (?:${particlesDisjunction})`),
+                uninflect: (term) => {
+                    return term.replace(new RegExp(`(?<=\\w) (?:(?!\\b(${combinedDisjunction})\\b).)+ (?=(?:${particlesDisjunction}))`), ' ')
+                },
+                rulesIn: [],
+                rulesOut: ['v'],
+            }
+        ]
+    }
+}
+
+const phrasalVerbInflections = createPhrasalVerbInflections()
+
 async function deinflectionReasonsEn (){
     const reasons = {
+        'interposed object': [
+            ...(await phrasalVerbInflections)['interposed object'],
+        ],
         'plural': [
             // regular and near-regular plurals
             suffixInflection('s', '', ['n'], ['n']),
@@ -47,16 +151,8 @@ async function deinflectionReasonsEn (){
             wholeWordInflection('thee', 'thou', ['pn'], ['pn']),
         ],
         'past': [
-            suffixInflection('ed', '', [], ['v']), // 'walked'
-            suffixInflection('ed', 'e', [], ['v']), // 'hoped'
-            suffixInflection('ied', 'y', [], ['v']), // 'tried'
-            suffixInflection('cked', 'c', [], ['v']), // 'frolicked'
-
-            suffixInflection('laid', 'lay', [], ['v']),
-            suffixInflection('paid', 'pay', [], ['v']),
-            suffixInflection('said', 'say', [], ['v']),
-
-            ...doubledConsonantInflection('bdgklmnprstz', 'ed', [], ['v']),
+            ...pastSuffixInflections,
+            ...(await phrasalVerbInflections)['past'],
         ],
         'past (irregular)': [
             prefixInflection('was', 'am', [], ['v']),
@@ -64,16 +160,12 @@ async function deinflectionReasonsEn (){
             prefixInflection('were', 'are', [], ['v']),
             prefixInflection('could', 'can', [], ['v']),
 
-            ...(await irregularVerbs())['past'],
+            ...(await irregularVerbInflections)['past'],
+            ...(await phrasalVerbInflections)['past (irregular)'],
         ],
         '-ing': [
-            suffixInflection('ing', '', [], ['v']),
-            suffixInflection('ing', 'e', [], ['v']), // 'driving', but false positive singe for 'singing'
-            suffixInflection('ing', 'y', [], ['v']),
-            suffixInflection('ying', 'ie', [], ['v']),
-            suffixInflection('cking', 'c', [], ['v']), // 'frolicking'
-
-            ...doubledConsonantInflection('bdgklmnprstz', 'ing', [], ['v']),
+            ...ingSuffixInflections,
+            ...(await phrasalVerbInflections)['-ing'],
         ],
         'archaic': [ // should probably be removed
             wholeWordInflection('thou', 'you', ['pn'], ['pn']),
@@ -82,18 +174,17 @@ async function deinflectionReasonsEn (){
             wholeWordInflection('ye', 'you', ['pn'], ['pn']),
             wholeWordInflection('thyself', 'yourself', ['pn'], ['pn']),
         ],
-        '1st person singular': [
+        '1 sg present': [
             wholeWordInflection('am', 'be', ['v'], ['v']),
         ],
-        '3rd person singular': [
-            suffixInflection('s', '', ['v'], ['v']),
-            suffixInflection('es', '', ['v'], ['v']),
-            suffixInflection('ies', 'y', ['v'], ['v']),
+        '3 sg present': [
             wholeWordInflection('is', 'be', ['v'], ['v']),
             wholeWordInflection('has', 'have', ['v'], ['v']),
+            ...thirdPersonSgPresentSuffixInflections,
+            ...(await phrasalVerbInflections)['3 sg present'],
         ],
         'participle': [
-            ...(await irregularVerbs())['participle'],
+            ...(await irregularVerbInflections)['participle'],
         ],
         'contraction': [    
             wholeWordInflection('\'m', 'am', [], ['v']),
@@ -168,27 +259,8 @@ async function deinflectionReasonsEn (){
         ],
     }
 
+    console.log(reasons)
     return reasons
 }
 
-function doubledConsonantInflection(consonants, suffix, inTypes, outTypes){
-    return consonants.split('').map(consonant => suffixInflection(`${consonant}${consonant}${suffix}`, consonant, inTypes, outTypes))
-}
-
-async function irregularVerbs(){
-    verbs = {
-        'past': [],
-        'participle': [],
-    }
-
-    const irregularVerbs = JSON.parse(await fetchAsset('/js/language/english/irregular-verbs.json'))
-    for ( const [verb, inflections] of Object.entries(irregularVerbs)){
-        for ( const [past, participle] of inflections){
-            if(past !== verb) verbs['past'].push(suffixInflection(past, verb, ['v'], ['v']))
-            if(participle !== verb) verbs['participle'].push(suffixInflection(participle, verb, ['v'], ['v']))
-        }
-    }
-
-    return verbs
-}
 

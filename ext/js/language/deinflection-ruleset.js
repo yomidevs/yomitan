@@ -1,6 +1,7 @@
 function suffixInflection(inflectedSuffix, deinflectedSuffix, rulesIn, rulesOut){
     return {
         inflected: new RegExp('.*' + inflectedSuffix + '$'), 
+        deinflected: deinflectedSuffix,
         uninflect:  (term) =>  term.replace(new RegExp(inflectedSuffix + '$'), deinflectedSuffix),
         rulesIn,
         rulesOut
@@ -10,6 +11,7 @@ function suffixInflection(inflectedSuffix, deinflectedSuffix, rulesIn, rulesOut)
 function prefixInflection(inflectedPrefix, deinflectedPrefix, rulesIn, rulesOut){
     return {
         inflected: new RegExp('^' + inflectedPrefix + '.*'), 
+        deinflected: deinflectedPrefix,
         uninflect:  (term) =>  term.replace(new RegExp('^' + inflectedPrefix), deinflectedPrefix),
         rulesIn,
         rulesOut
@@ -19,14 +21,9 @@ function prefixInflection(inflectedPrefix, deinflectedPrefix, rulesIn, rulesOut)
 function wholeWordInflection(inflected, deinflected, rulesIn, rulesOut){
     return {
         inflected: new RegExp('^' + inflected + '$'), 
+        deinflected,
         uninflect:  () =>  deinflected,
         rulesIn,
         rulesOut
     }
-}
-
-module.exports = {
-    suffixInflection,
-    prefixInflection,
-    wholeWordInflection
 }

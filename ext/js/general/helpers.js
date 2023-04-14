@@ -1,15 +1,23 @@
 async function fetchAsset(url, json=false) {
-    url = chrome.runtime.getURL(url);
-    const response = await fetch(url, {
-        method: 'GET',
-        mode: 'no-cors',
-        cache: 'default',
-        credentials: 'omit',
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer'
-    });
-    if (!response.ok) {
-        throw new Error(`Failed to fetch ${url}: ${response.status}`);
+    if (typeof window === 'undefined') {
+        const fs = require('fs');
+        const path = require('path');
+
+        return fs.readFileSync(path.resolve(__dirname + '/../ext' + url), 'utf8')
     }
-    return await (json ? response.json() : response.text());
+    else {
+        url = chrome.runtime.getURL(url);
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'no-cors',
+            cache: 'default',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer'
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${url}: ${response.status}`);
+        }
+        return await (json ? response.json() : response.text());
+    }
 }

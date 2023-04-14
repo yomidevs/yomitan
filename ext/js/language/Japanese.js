@@ -1,12 +1,4 @@
 
-// if (typeof window === 'undefined')
-// {
-//     console.log("aaa")
-//     const {suffixInflection} = require('../language/deinflection-ruleset')
-// }
-
-// console.log("bbb", suffixInflection)
-
 const deinflectionReasonsJa = {
     '-ba': [        
         suffixInflection('ければ', 'い', [], ['adj-i']),
@@ -282,9 +274,6 @@ const deinflectionReasonsJa = {
         {'inflected': /.*来ぬ$/, 'uninflect':  (term) =>  term.replace(/来ぬ$/, "来る"), 'rulesIn': [], 'rulesOut': ['vk']},
         {'inflected': /.*來ぬ$/, 'uninflect':  (term) =>  term.replace(/來ぬ$/, "來る"), 'rulesIn': [], 'rulesOut': ['vk']}
     ],
-    'adv': [
-        {'inflected': /.*く$/, 'uninflect':  (term) =>  term.replace(/く$/, "い"), 'rulesIn': [], 'rulesOut': ['adj-i']}
-    ],
     'causative': [
         {'inflected': /.*させる$/, 'uninflect':  (term) =>  term.replace(/させる$/, "る"), 'rulesIn': ['v1'], 'rulesOut': ['v1']},
         {'inflected': /.*かせる$/, 'uninflect':  (term) =>  term.replace(/かせる$/, "く"), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
@@ -385,9 +374,6 @@ const deinflectionReasonsJa = {
         {'inflected': /.*こない$/, 'uninflect':  (term) =>  term.replace(/こない$/, "くる"), 'rulesIn': ['adj-i'], 'rulesOut': ['vk']},
         {'inflected': /.*来ない$/, 'uninflect':  (term) =>  term.replace(/来ない$/, "来る"), 'rulesIn': ['adj-i'], 'rulesOut': ['vk']},
         {'inflected': /.*來ない$/, 'uninflect':  (term) =>  term.replace(/來ない$/, "來る"), 'rulesIn': ['adj-i'], 'rulesOut': ['vk']}
-    ],
-    "noun": [    
-        suffixInflection('さ', 'い', [], ['adj-i'])
     ],
     'passive': [
         {'inflected': /.*かれる$/, 'uninflect':  (term) =>  term.replace(/かれる$/, "く"), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
@@ -622,6 +608,17 @@ const deinflectionReasonsJa = {
     '-ge': [
         {'inflected': /.*しげ$/, 'uninflect':  (term) =>  term.replace(/しげ$/, "しい"), 'rulesIn': [], 'rulesOut': ['adj-i']}
     ],
+
+    // word formation ----------------------------------------
+    'adv': [
+        {'inflected': /.*く$/, 'uninflect':  (term) =>  term.replace(/く$/, "い"), 'rulesIn': [], 'rulesOut': ['adj-i']}
+    ],
+    "noun": [    
+        suffixInflection('さ', 'い', [], ['adj-i'])
+    ],
+    // -------------------------------------------------------
+
+    // linguistic variables -----------------------------------------------------
     '-e': [
         {'inflected': /.*ねえ$/, 'uninflect':  (term) =>  term.replace(/ねえ$/, "ない"), 'rulesIn': [], 'rulesOut': ['adj-i']},
         {'inflected': /.*めえ$/, 'uninflect':  (term) =>  term.replace(/めえ$/, "むい"), 'rulesIn': [], 'rulesOut': ['adj-i']},
@@ -648,8 +645,9 @@ const deinflectionReasonsJa = {
         {'inflected': /.*れえ$/, 'uninflect':  (term) =>  term.replace(/れえ$/, "れい"), 'rulesIn': [], 'rulesOut': ['adj-i']},
         {'inflected': /.*べえ$/, 'uninflect':  (term) =>  term.replace(/べえ$/, "ばい"), 'rulesIn': [], 'rulesOut': ['adj-i']}
     ]
+    // --------------------------------------------------------------------------
 }
 
-module.exports = {
-    deinflectionReasonsJa,
-}
+// module.exports = {
+//     deinflectionReasonsJa,
+// }

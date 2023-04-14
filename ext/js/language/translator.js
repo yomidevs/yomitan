@@ -252,13 +252,20 @@ class Translator {
             deinflectionArray.push(deinflection);
         }
 
+        // console.log('_findTermsInternal2() uniqueDeinflectionTerms', uniqueDeinflectionTerms, uniqueDeinflectionArrays, uniqueDeinflectionsMap);
+
         const {matchType} = options;
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
 
+        // console.log('_findTermsInternal2() databaseEntries', databaseEntries);
+
         for (const databaseEntry of databaseEntries) {
             const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
+            // console.log('_findTermsInternal2() definitionRules', databaseEntry.term, definitionRules, databaseEntry.rules)
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
                 const deinflectionRules = deinflection.rules;
+                // console.log('\t _findTermsInternal2() deinflectionRules', deinflection.deinflectedText, deinflectionRules)
+                // console.log('\t', definitionRules & deinflectionRules)
                 if (deinflectionRules === 0 || (definitionRules & deinflectionRules) !== 0) {
                     deinflection.databaseEntries.push(databaseEntry);
                 }
@@ -271,6 +278,8 @@ class Translator {
     // Deinflections and text transformations
 
     _getAllDeinflections(text, options) {
+        const start = performance.now();
+
         const textOptionVariantArray = [
             this._getTextReplacementsVariants(options),
             this._getTextOptionEntryVariants(options.convertHalfWidthCharacters),
@@ -321,19 +330,19 @@ class Translator {
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                console.log("translator.js getalldeinflections() source: ", source , " rawSource: " , rawSource );
+                console.log(`${i} translator.js _getAllDeinflections() source: ${source} rawSource: ${rawSource}`)
                 for (const {term, rules, reasons} of this._deinflector.deinflect(source)) {
-                    console.log(term)
                     deinflections.push(this._createDeinflection(rawSource, source, term, rules, reasons, []));
                 }
 
-                //last index of word boundary regex \/b\
                 if(options.searchResolution === "word") i = source.search(/[^a-zA-Z](\w*)$/);
                 else --i
-
-                console.log(i)
             }
         }
+
+        const end = performance.now();
+        console.log(`_getAllDeinflections() ${deinflections.length} deinflections in ${end - start}ms`);
+
         return deinflections;
     }
 
@@ -790,9 +799,12 @@ class Translator {
                 lastPartOfSpeech = partOfSpeech;
             }
 
+            // console.log('translator.js _flagRedundantDefinitionTags()', partOfSpeech, lastPartOfSpeech)
+
             if (removeCategoriesSet.size > 0) {
                 for (const tag of tags) {
                     if (removeCategoriesSet.has(tag.category)) {
+                        // console.log('translator.js _flagRedundantDefinitionTags() redundant', tag)
                         tag.redundant = true;
                     }
                 }
@@ -804,7 +816,7 @@ class Translator {
     // Metadata
 
     async _addTermMeta(dictionaryEntries, enabledDictionaryMap) {
-        console.log('_addTermMeta');
+        // console.log('_addTermMeta');
         const headwordMap = new Map();
         const headwordMapKeys = [];
         const headwordReadingMaps = [];

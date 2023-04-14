@@ -136,9 +136,11 @@ function createURLClass() {
     return result;
 }
 
-
 class VM {
     constructor(context={}) {
+        context.console = console;
+        context.require = require;
+        context.__dirname = __dirname;
         context.URL = createURLClass();
         context.crypto = {
             getRandomValues: (array) => {
@@ -194,6 +196,10 @@ class VM {
         }
 
         return single ? results[0] : results;
+    }
+
+    executeString(codeString){
+        return vm.runInContext(codeString, this._context);
     }
 }
 

@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "JonnyJane",
     "version": "22.10.23.0",
-    "description": "English dictionary with Anki integration",
+    "description": "Dictionary lookup with Anki integration",
     "author": "Alex Yatskov",
     "icons": {
         "16": "images/flag.png",
