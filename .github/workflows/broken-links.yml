@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: lycheeverse/lychee-action@9ace499fe66cee282a29eaa628fdac2c72fa087f
+      - uses: lycheeverse/lychee-action@97189f2c0a3c8b0cb0e704fd4e878af6e5e2b2c5
         with:
           fail: true
           jobSummary: false
