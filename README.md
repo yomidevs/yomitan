@@ -52,7 +52,7 @@ New changes are initially introduced into the *testing* version, and after some 
 relatively bug free, they will be promoted to the *stable* version. If you are technically savvy and don't mind
 submitting issues on GitHub, try the *testing* version; otherwise, the *stable* version will be your best bet.
 
-> :warning: These are releases are not updated yet and still link to yomichan.
+> :warning: These releases haven't been updated and still link to yomichan.
 
 *   **Google Chrome**
     ([stable](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami) or [testing](https://chrome.google.com/webstore/detail/yomichan-testing/bcknnfebhefllbjhagijobjklocakpdm)) \
