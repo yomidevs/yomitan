@@ -83,7 +83,7 @@ class TemplateRenderer {
         let instance = cache.get(template);
         if (typeof instance === 'undefined') {
             this._updateCacheSize(this._cacheMaxSize - 1);
-            instance = Handlebars.compile(template);
+            instance = Handlebars[handlebarsCompileFnName](template);
             cache.set(template, instance);
         }
 
