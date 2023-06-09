@@ -18,6 +18,7 @@
 
 /* global
  * Handlebars
+ * handlebarsCompileFnName
  */
 
 class TemplateRenderer {
