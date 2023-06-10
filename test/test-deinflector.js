@@ -921,8 +921,8 @@ function testDeinflections() {
     vm.execute(['js/language/deinflector.js']);
     const [Deinflector] = vm.get(['Deinflector']);
 
-    const deinflectionReasions = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect.json')));
-    const deinflector = new Deinflector(deinflectionReasions);
+    const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect.json')));
+    const deinflector = new Deinflector(deinflectionReasons);
 
     for (const {valid, tests} of data) {
         for (const {source, term, rule, reasons} of tests) {
