@@ -36,7 +36,7 @@
         "sourceDir": "ext"
     },
     "devDependencies": {
-        "@playwright/test": "^1.31.2",
+        "@playwright/test": "^1.35.0",
         "ajv": "^8.11.0",
         "browserify": "^17.0.0",
         "css": "^3.0.0",
