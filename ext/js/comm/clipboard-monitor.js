@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 class ClipboardMonitor extends EventDispatcher {
     constructor({japaneseUtil, clipboardReader}) {
         super();
@@ -30,6 +31,23 @@ class ClipboardMonitor extends EventDispatcher {
     start() {
         this.stop();
 
+        // Continuously selecting and focusing on an element makes the search
+        // Function is unusable manually this code disables the function
+        // If the mouse is over the content
+        const content = document.querySelector('.content-body-inner');
+
+        let isMouseAbove = false;
+
+        content.addEventListener('mouseover', handleMouseover);
+        content.addEventListener('mouseleave', handleMouseleave);
+
+        function handleMouseover() {
+            isMouseAbove = true;
+        }
+
+        function handleMouseleave() {
+            isMouseAbove = false;
+        }
         // The token below is used as a unique identifier to ensure that a new clipboard monitor
         // hasn't been started during the await call. The check below the await call
         // will exit early if the reference has changed.
@@ -40,7 +58,9 @@ class ClipboardMonitor extends EventDispatcher {
 
             let text = null;
             try {
-                text = await this._clipboardReader.getText(false);
+                if (isMouseAbove) { text = this._previousText; } else {
+                    text = this.paste();
+                }
             } catch (e) {
                 // NOP
             }
@@ -66,6 +86,22 @@ class ClipboardMonitor extends EventDispatcher {
         intervalCallback();
     }
 
+    paste() {
+        const previouslyFocusedElement = document.activeElement;
+        const ta = document.createElement('textarea');
+        ta.style.cssText =
+            'opacity:0; position:fixed; width:1px; height:1px; top:0; left:0;';
+        document.body.appendChild(ta);
+
+        ta.focus();
+        ta.select();
+        document.execCommand('paste');
+        const a = ta.value;
+        ta.remove();
+        previouslyFocusedElement.focus();
+
+        return a;
+    }
     stop() {
         this._timerToken = null;
         this._previousText = null;
