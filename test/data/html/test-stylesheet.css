@@ -1,5 +1,9 @@
+@font-face {
+    font-family: "Noto Sans JP";
+    src: url('https://github.com/google/fonts/raw/main/ofl/notosansjp/NotoSansJP%5Bwght%5D.ttf');
+}
 body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Noto Sans JP', Helvetica, Arial, sans-serif;
     font-size: 14px;
     max-width: 680px;
     padding: 0 1em;
