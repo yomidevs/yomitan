@@ -33,8 +33,10 @@ Yomitan provides advanced features not available in other browser-based dictiona
 ## Table of Contents
 
 *   [Installation](#installation)
+*   [Migrating from Yomichan](#migrating-from-yomichan)
 *   [Dictionaries](#dictionaries)
 *   [Basic Usage](#basic-usage)
+    *   [Importing Dictionaries](#importing-dictionaries)
 *   [Custom Dictionaries](#custom-dictionaries)
 *   [Anki Integration](#anki-integration)
     *   [Flashcard Configuration](#flashcard-configuration)
@@ -64,6 +66,17 @@ submitting issues on GitHub, try the *testing* version; otherwise, the *stable* 
     <sup>*</sup>Unlike Chrome, Firefox does not allow extensions meant for testing to be hosted in the marketplace.
     You will have to download a desired version and side-load it yourself. You only need to do this once and will get
     updates automatically.
+
+## Migrating from Yomichan
+
+If you are an existing user of Yomichan, you can export your dictionary collection and settings such that they can be imported into Yomitan to reflect your setup exactly as it was.
+
+You can export your settings from Yomichan's Settings page. Go to the `Backup` section and click on `Export Settings`.
+
+Yomichan doesn't have first-class support to export the dictionary collection. Please follow the instructions provided in the following link to export your data:
+https://github.com/themoeway/yomichan-data-exporter#steps-to-export-the-data
+
+You can them import the exported files into Yomitan from the `Backup` section of the `Settings` page. Please see [the section on importing dictionaries](#importing-dictionaries) further below for more explicit steps.
 
 ## Dictionaries
 
@@ -99,6 +112,7 @@ language is not English, you may consider also importing the English version for
 *   **[Kanjium](https://github.com/mifunetoshiro/kanjium)** (Pitch dictionary, see [related project page](https://github.com/toasted-nutbread/yomichan-pitch-accent-dictionary) for details)
     *   [kanjium_pitch_accents.zip](https://github.com/themoeway/yomitan/raw/dictionaries/kanjium_pitch_accents.zip)
 
+
 ## Basic Usage
 
 1.  Click the <img src="ext/images/yomitan-icon.svg" alt="" width="16" height="16"> _Yomitan_ button in the browser bar to open the quick-actions popup.
@@ -130,6 +144,32 @@ language is not English, you may consider also importing the English version for
     including stroke order diagrams, readings, meanings, as well as other useful data.
 
     <img src="resources/images/search-popup-kanji.png" alt="">
+
+### Importing Dictionaries
+
+You can import individual dictionaries from the settings page as described above.
+
+Yomitan also supports exporting and importing your entire collection of dictionaries.
+
+#### Importing a Dictionary Collection
+
+- Go to Yomitan's Settings page (Click on the extension's icon then click on the cog icon from the popup)
+- Click `Import Dictionary Collection` and select the database file you want to import
+- Wait for the import to finish then turn all the dictionaries back on from the `Dictionaries > Configure installed and enabled dictionaries` section
+- Refresh the browser tab to see the dictionaries in effect
+
+#### Exporting the Dictionary Collection
+
+- Click `Export Dictionary Collection` from the backup section of Yomitan's settings page
+- It will show you a progress report as it exports the data then initiates a
+  download for a file named something like  `yomitan-dictionaries-YYYY-MM-DD-HH-mm-ss.json`
+  (e.g. `yomitan-dictionaries-2023-07-05-02-42-04.json`)
+
+### Importing and Exporting Personal Configuration
+
+Note that you can also similarly export and import your Yomitan settings from the `Backup` section of the Settings page.
+
+You should be able to replicate your exact Yomitan setup across devices by exporting your settings and dictionary collection from the source device then importing those from the destination.
 
 ## Custom Dictionaries
 

@@ -18,6 +18,7 @@
 
 /* global
  * ArrayBufferUtil
+ * Dexie
  * DictionaryController
  * OptionsUtil
  */
@@ -33,6 +34,10 @@ class BackupController {
         this._settingsImportErrorModal = null;
         this._settingsImportWarningModal = null;
         this._optionsUtil = null;
+
+        this._dictionariesDatabaseName = 'dict';
+        this._settingsExportDatabaseToken = null;
+
         try {
             this._optionsUtil = new OptionsUtil();
         } catch (e) {
@@ -56,6 +61,10 @@ class BackupController {
         this._addNodeEventListener('#settings-import-file', 'change', this._onSettingsImportFileChange.bind(this), false);
         this._addNodeEventListener('#settings-reset-button', 'click', this._onSettingsResetClick.bind(this), false);
         this._addNodeEventListener('#settings-reset-confirm-button', 'click', this._onSettingsResetConfirmClick.bind(this), false);
+
+        this._addNodeEventListener('#settings-export-db-button', 'click', this._onSettingsExportDatabaseClick.bind(this), false);
+        this._addNodeEventListener('#settings-import-db-button', 'click', this._onSettingsImportDatabaseClick.bind(this), false);
+        this._addNodeEventListener('#settings-import-db', 'change', this._onSettingsImportDatabaseChange.bind(this), false);
     }
 
     // Private
@@ -411,6 +420,127 @@ class BackupController {
             await this._settingsImportSetOptionsFull(optionsFull);
         } catch (e) {
             log.error(e);
+        }
+    }
+
+    // Exporting Dictionaries Database
+
+    _databaseExportImportErrorMessage(message, isWarning=false) {
+        const errorMessageContainer = document.querySelector('#db-ops-error-report');
+        errorMessageContainer.style.display = 'block';
+        errorMessageContainer.textContent = message;
+
+        if (isWarning) { // Hide after 5 seconds (5000 milliseconds)
+            errorMessageContainer.style.color = '#FFC40C';
+            setTimeout(function _hideWarningMessage() {
+                errorMessageContainer.style.display = 'none';
+                errorMessageContainer.style.color = '#8B0000';
+            }, 5000);
+        }
+    }
+
+    _databaseExportProgressCallback({totalRows, completedRows, done}) {
+        console.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
+        const messageContainer = document.querySelector('#db-ops-progress-report');
+        messageContainer.style.display = 'block';
+        messageContainer.textContent = `Export Progress: ${completedRows} of ${totalRows} rows completed`;
+
+        if (done) {
+            console.log('Done exporting.');
+            messageContainer.style.display = 'none';
+        }
+    }
+
+    async _exportDatabase(databaseName) {
+        const db = await new Dexie(databaseName).open();
+        const blob = await db.export({progressCallback: this._databaseExportProgressCallback});
+        await db.close();
+        return blob;
+    }
+
+    async _onSettingsExportDatabaseClick() {
+        if (this._settingsExportDatabaseToken !== null) {
+            // An existing import or export is in progress.
+            this._databaseExportImportErrorMessage('An export or import operation is already in progress. Please wait till it is over.', true);
+            return;
+        }
+
+        const errorMessageContainer = document.querySelector('#db-ops-error-report');
+        errorMessageContainer.style.display = 'none';
+
+        const date = new Date(Date.now());
+        const pageExitPrevention = this._settingsController.preventPageExit();
+        try {
+            const token = {};
+            this._settingsExportDatabaseToken = token;
+            const fileName = `yomitan-dictionaries-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
+            const data = await this._exportDatabase(this._dictionariesDatabaseName);
+            const blob = new Blob([data], {type: 'application/json'});
+            this._saveBlob(blob, fileName);
+        } catch (error) {
+            console.log(error);
+            this._databaseExportImportErrorMessage('Errors encountered while exporting. Please try again. Restart the browser if it continues to fail.');
+        } finally {
+            pageExitPrevention.end();
+            this._settingsExportDatabaseToken = null;
+        }
+    }
+
+    // Importing Dictionaries Database
+
+    _databaseImportProgressCallback({totalRows, completedRows, done}) {
+        console.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
+        const messageContainer = document.querySelector('#db-ops-progress-report');
+        messageContainer.style.display = 'block';
+        messageContainer.style.color = '#4169e1';
+        messageContainer.textContent = `Import Progress: ${completedRows} of ${totalRows} rows completed`;
+
+        if (done) {
+            console.log('Done importing.');
+            messageContainer.style.color = '#006633';
+            messageContainer.textContent = 'Done importing. You will need to re-enable the dictionaries and refresh afterward. If you run into issues, please restart the browser. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.';
+        }
+    }
+
+    async _importDatabase(databaseName, file) {
+        await yomichan.api.purgeDatabase();
+        await Dexie.import(file, {progressCallback: this._databaseImportProgressCallback});
+        yomichan.api.triggerDatabaseUpdated('dictionary', 'import');
+        yomichan.trigger('storageChanged');
+    }
+
+    _onSettingsImportDatabaseClick() {
+        document.querySelector('#settings-import-db').click();
+    }
+
+    async _onSettingsImportDatabaseChange(e) {
+        if (this._settingsExportDatabaseToken !== null) {
+            // An existing import or export is in progress.
+            this._databaseExportImportErrorMessage('An export or import operation is already in progress. Please wait till it is over.', true);
+            return;
+        }
+
+        const errorMessageContainer = document.querySelector('#db-ops-error-report');
+        errorMessageContainer.style.display = 'none';
+
+        const files = e.target.files;
+        if (files.length === 0) { return; }
+
+        const pageExitPrevention = this._settingsController.preventPageExit();
+        const file = files[0];
+        e.target.value = null;
+        try {
+            const token = {};
+            this._settingsExportDatabaseToken = token;
+            await this._importDatabase(this._dictionariesDatabaseName, file);
+        } catch (error) {
+            console.log(error);
+            const messageContainer = document.querySelector('#db-ops-progress-report');
+            messageContainer.style.color = 'red';
+            this._databaseExportImportErrorMessage('Encountered errors when importing. Please restart the browser and try again. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.');
+        } finally {
+            pageExitPrevention.end();
+            this._settingsExportDatabaseToken = null;
         }
     }
 }

@@ -680,6 +680,16 @@ select.short-height {
     padding-top: var(--padding);
     padding-right: var(--padding);
 }
+.settings-item-progress-report {
+    display: none;
+    font-weight: bold;
+    color: #4169e1;
+}
+.settings-item-error-report {
+    display: none;
+    font-weight: bold;
+    color: #8b0000;
+}
 
 
 /* Advanced settings */

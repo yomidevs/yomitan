@@ -2033,9 +2033,13 @@
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">
-                    Yomitan can import and export settings files which can be used to restore settings, share settings across devices, and to help to debug problems.
-                    These files will only contain settings and will not contain dictionaries.
-                    Dictionaries must be imported separately.
+                    Yomitan can import and export settings files which can be
+                    used to restore settings, share settings across devices,
+                    and to help to debug problems. These files will only
+                    contain settings and will not contain dictionaries.
+                    Dictionaries must be imported separately. However, you can
+                    also import a previously exported collection of
+                    dictionaries. See the next section about that.
                 </div>
             </div>
         </div></div>
@@ -2052,6 +2056,52 @@
                     <div class="settings-item-button-group-item">
                         <button class="low-emphasis danger" id="settings-reset-button">Reset Settings</button>
                     </div>
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">
+                    You can try to export the entire collection of your
+                    dictionaries into a single large file that you can try to
+                    import from other browsers or devices. Importing the
+                    collection like that is a destructive operation and will
+                    replace your current database of dictionaries so please
+                    proceed with caution. These operations can take a lot of
+                    time depending on the size of your database, especially to
+                    start and to complete, so have patience.
+
+                    <br><br>
+
+                    See <a href="https://github.com/themoeway/yomichan-data-exporter" target="_blank" rel="noopener noreferrer">yomichan-data-exporter</a> for
+                    instructions to export your data from older Yomichan installations.
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-right settings-item-button-group-container">
+                <div class="settings-item-button-group">
+                    <div class="settings-item-button-group-item">
+                        <button class="low-emphasis" id="settings-import-db-button">Import Dictionary Collection</button>
+                        <div hidden><input type="file" id="settings-import-db" accept=".json,application/json"></div>
+                    </div>
+                    <div class="settings-item-button-group-item">
+                        <button class="low-emphasis" id="settings-export-db-button">Export Dictionary Collection</button>
+                    </div>
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-progress-report" id="db-ops-progress-report">
+                    Placeholder text.
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-error-report" id="db-ops-error-report">
+                    Placeholder text.
                 </div>
             </div>
         </div></div>
@@ -3803,6 +3853,13 @@
 
 
 <!-- Scripts -->
+<script src="/lib/dexie.min.js"></script>
+
+<!-- The linter enforces a lexicographical order for each 'group' of imported scripts as demarked by newline between groups
+     but this extension to dexie must be loaded after the main dexie library, hence breaking it out into its own group.
+     Perhaps The linter could be smarter and ignore 3p libaries for import order. -->
+<script src="/lib/dexie-export-import.min.js"></script>
+
 <script src="/lib/wanakana.min.js"></script>
 
 <script src="/js/core.js"></script>
