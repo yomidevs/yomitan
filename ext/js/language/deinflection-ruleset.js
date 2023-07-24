@@ -18,6 +18,16 @@ function prefixInflection(inflectedPrefix, deinflectedPrefix, rulesIn, rulesOut)
     }
 }
 
+function infixInflection(inflectedInfix, deinflectedInfix, rulesIn, rulesOut){
+    return {
+        inflected: new RegExp('.*' + inflectedInfix + '.*'), 
+        deinflected: deinflectedInfix,
+        uninflect:  (term) =>  term.replace(new RegExp(inflectedInfix), deinflectedInfix),
+        rulesIn,
+        rulesOut
+    }
+}
+
 function wholeWordInflection(inflected, deinflected, rulesIn, rulesOut){
     return {
         inflected: new RegExp('^' + inflected + '$'), 

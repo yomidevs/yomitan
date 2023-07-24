@@ -99,6 +99,13 @@ async function createPhrasalVerbInflections(){
 
 const phrasalVerbInflections = createPhrasalVerbInflections()
 
+const mainModalVerbs = ['can', 'could', 'may', 'might', 'shall', 'should', 'will', 'would', 'must']
+
+function createModalVerbNegations(){
+    return mainModalVerbs.map(modalVerb => prefixInflection(`${modalVerb} not`, modalVerb, ['v'], ['v']))
+}
+
+
 async function deinflectionReasonsEn (){
     const reasons = {
         'interposed object': [
@@ -187,25 +194,26 @@ async function deinflectionReasonsEn (){
             ...(await irregularVerbInflections)['participle'],
         ],
         'contraction': [    
-            wholeWordInflection('\'m', 'am', [], ['v']),
-            wholeWordInflection('\'re', 'are', [], ['v']),
-            wholeWordInflection('\'ve', 'have', [], ['v']),
-            prefixInflection('\'ll', 'will', [], ['v']),
-            wholeWordInflection('\'d', 'would', [], ['v']),
-            wholeWordInflection('\'d', 'had', [], ['v']),
-            wholeWordInflection('\'d', 'did', [], ['v']),
-            wholeWordInflection('\'s', 'is', [], ['v']),
-            wholeWordInflection('\'s', 'has', [], ['v']),
-            wholeWordInflection('\'em', 'them', [], ['pn']),
+            wholeWordInflection("'m", 'am', [], ['v']),
+            wholeWordInflection("'re", 'are', [], ['v']),
+            wholeWordInflection("'ve", 'have', [], ['v']),
+            prefixInflection("'ll", 'will', [], ['v']),
+            wholeWordInflection("'d", 'would', [], ['v']),
+            wholeWordInflection("'d", 'had', [], ['v']),
+            wholeWordInflection("'d", 'did', [], ['v']),
+            wholeWordInflection("'s", 'is', [], ['v']),
+            wholeWordInflection("'s", 'has', [], ['v']),
+            wholeWordInflection("'em", 'them', [], ['pn']),
             prefixInflection('gonna', 'going to', [], ['pn']),
-            prefixInflection('won\'t', 'will not', [], []),
             prefixInflection('whatcha', 'what are you', [], []),
-            wholeWordInflection('c\'mon', 'come on', [], []),
+            wholeWordInflection("c'mon", 'come on', [], []),
             wholeWordInflection('gimme', 'give me', [], []),
             wholeWordInflection('gotta', 'got to', [], []),
             wholeWordInflection('lemme', 'let me', [], []),
             wholeWordInflection('wanna', 'want to', [], []),
-            prefixInflection('don\'t', 'do not', [], []),
+            infixInflection("n't", ' not', [], []),
+            prefixInflection("won't", 'will not', [], []),
+            prefixInflection("can't", 'can not', [], []),
         ],
         'adverb': [
             suffixInflection('ly', '', [], ['adj']),
@@ -252,7 +260,9 @@ async function deinflectionReasonsEn (){
             prefixInflection('will ', '', [], ['v']),
         ],
         'negative': [
-            prefixInflection('will not ', 'will ', [], []),
+            ...createModalVerbNegations(),
+            prefixInflection('does not ', ' ', [], []),
+            wholeWordInflection('does not', 'does', [], []),
         ],
         'negative imperative': [
             prefixInflection('do not ', '', [], []),
