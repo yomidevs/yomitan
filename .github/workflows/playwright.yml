@@ -40,8 +40,7 @@ jobs:
       - if: ${{ steps.cache-playwright.outputs.cache-hit != 'true' }}
         name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
-      - name: Check Available Fonts
-        run: fc-list
+        
       - name: Grab latest dictionaries from dictionaries branch
         uses: actions/checkout@v3
         with:
