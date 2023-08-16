@@ -247,6 +247,13 @@
                     "items": [
                         "nativeMessaging"
                     ]
+                },
+                {
+                    "action": "remove",
+                    "path": [
+                        "permissions"
+                    ],
+                    "item": "declarativeNetRequest"
                 }
             ],
             "excludeFiles": [
