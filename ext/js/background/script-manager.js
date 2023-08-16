@@ -179,8 +179,8 @@ class ScriptManager {
         return new Promise((resolve, reject) => {
             const details = (
                 type === 'file' ?
-                {origin: chrome.scripting.StyleOrigin.AUTHOR, files: [content]} :
-                {origin: chrome.scripting.StyleOrigin.USER,   css: content}
+                {origin: 'AUTHOR', files: [content]} :
+                {origin: 'USER',   css: content}
             );
             details.target = {
                 tabId,
