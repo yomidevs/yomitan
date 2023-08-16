@@ -36,14 +36,10 @@ class ScriptManager {
      * @param {number} tabId The id of the tab to inject into.
      * @param {number} [frameId] The id of the frame to inject into.
      * @param {boolean} [allFrames] Whether or not the stylesheet should be injected into all frames.
-     * @param {boolean} [matchAboutBlank] Whether or not the stylesheet should be injected into about:blank frames.
-     * @param {string} [runAt] The time to inject the stylesheet at.
      * @returns {Promise<void>}
      */
-    injectStylesheet(type, content, tabId, frameId, allFrames, matchAboutBlank, runAt) {
-        if (isObject(chrome.tabs) && typeof chrome.tabs.insertCSS === 'function') {
-            return this._injectStylesheetMV2(type, content, tabId, frameId, allFrames, matchAboutBlank, runAt);
-        } else if (isObject(chrome.scripting) && typeof chrome.scripting.insertCSS === 'function') {
+    injectStylesheet(type, content, tabId, frameId, allFrames) {
+        if (isObject(chrome.scripting) && typeof chrome.scripting.insertCSS === 'function') {
             return this._injectStylesheetMV3(type, content, tabId, frameId, allFrames);
         } else {
             return Promise.reject(new Error('Stylesheet injection not supported'));
@@ -56,14 +52,10 @@ class ScriptManager {
      * @param {number} tabId The id of the tab to inject into.
      * @param {number} [frameId] The id of the frame to inject into.
      * @param {boolean} [allFrames] Whether or not the script should be injected into all frames.
-     * @param {boolean} [matchAboutBlank] Whether or not the script should be injected into about:blank frames.
-     * @param {string} [runAt] The time to inject the script at.
      * @returns {Promise<{frameId: number, result: object}>} The id of the frame and the result of the script injection.
      */
-    injectScript(file, tabId, frameId, allFrames, matchAboutBlank, runAt) {
-        if (isObject(chrome.tabs) && typeof chrome.tabs.executeScript === 'function') {
-            return this._injectScriptMV2(file, tabId, frameId, allFrames, matchAboutBlank, runAt);
-        } else if (isObject(chrome.scripting) && typeof chrome.scripting.executeScript === 'function') {
+    injectScript(file, tabId, frameId, allFrames) {
+        if (isObject(chrome.scripting) && typeof chrome.scripting.executeScript === 'function') {
             return this._injectScriptMV3(file, tabId, frameId, allFrames);
         } else {
             return Promise.reject(new Error('Script injection not supported'));
@@ -122,19 +114,6 @@ class ScriptManager {
             throw new Error('Registration already exists');
         }
 
-        // Firefox
-        if (
-            typeof browser === 'object' && browser !== null &&
-            isObject(browser.contentScripts) &&
-            typeof browser.contentScripts.register === 'function'
-        ) {
-            const details2 = this._convertContentScriptRegistrationDetails(details, id, true);
-            const registration = await browser.contentScripts.register(details2);
-            this._contentScriptRegistrations.set(id, registration);
-            return;
-        }
-
-        // Chrome
         if (isObject(chrome.scripting) && typeof chrome.scripting.registerContentScripts === 'function') {
             const details2 = this._convertContentScriptRegistrationDetails(details, id, false);
             await new Promise((resolve, reject) => {
@@ -161,18 +140,17 @@ class ScriptManager {
      * @returns {Promise<boolean>} `true` if the content script was unregistered, `false` otherwise.
      */
     async unregisterContentScript(id) {
-        // Chrome
         if (isObject(chrome.scripting) && typeof chrome.scripting.unregisterContentScripts === 'function') {
             this._contentScriptRegistrations.delete(id);
             try {
-                await this._unregisterContentScriptChrome(id);
+                await this._unregisterContentScriptMV3(id);
                 return true;
             } catch (e) {
                 return false;
             }
         }
 
-        // Firefox or fallback
+        // Fallback
         const registration = this._contentScriptRegistrations.get(id);
         if (typeof registration === 'undefined') { return false; }
         this._contentScriptRegistrations.delete(id);
@@ -187,19 +165,7 @@ class ScriptManager {
      * @returns {string[]} An array of the required permissions, which may be empty.
      */
     getRequiredContentScriptRegistrationPermissions() {
-        if (
-            // Firefox
-            (
-                typeof browser === 'object' && browser !== null &&
-                isObject(browser.contentScripts) &&
-                typeof browser.contentScripts.register === 'function'
-            ) ||
-            // Chrome
-            (
-                isObject(chrome.scripting) &&
-                typeof chrome.scripting.registerContentScripts === 'function'
-            )
-        ) {
+        if (isObject(chrome.scripting) && typeof chrome.scripting.registerContentScripts === 'function') {
             return [];
         }
 
@@ -208,39 +174,6 @@ class ScriptManager {
     }
 
     // Private
-
-    _injectStylesheetMV2(type, content, tabId, frameId, allFrames, matchAboutBlank, runAt) {
-        return new Promise((resolve, reject) => {
-            const details = (
-                type === 'file' ?
-                {
-                    file: content,
-                    runAt,
-                    cssOrigin: 'author',
-                    allFrames,
-                    matchAboutBlank
-                } :
-                {
-                    code: content,
-                    runAt,
-                    cssOrigin: 'user',
-                    allFrames,
-                    matchAboutBlank
-                }
-            );
-            if (typeof frameId === 'number') {
-                details.frameId = frameId;
-            }
-            chrome.tabs.insertCSS(tabId, details, () => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    resolve();
-                }
-            });
-        });
-    }
 
     _injectStylesheetMV3(type, content, tabId, frameId, allFrames) {
         return new Promise((resolve, reject) => {
@@ -262,27 +195,6 @@ class ScriptManager {
                     reject(new Error(e.message));
                 } else {
                     resolve();
-                }
-            });
-        });
-    }
-
-    _injectScriptMV2(file, tabId, frameId, allFrames, matchAboutBlank, runAt) {
-        return new Promise((resolve, reject) => {
-            const details = {
-                allFrames,
-                frameId,
-                file,
-                matchAboutBlank,
-                runAt
-            };
-            chrome.tabs.executeScript(tabId, details, (results) => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    const result = results[0];
-                    resolve({frameId, result});
                 }
             });
         });
@@ -310,7 +222,7 @@ class ScriptManager {
         });
     }
 
-    _unregisterContentScriptChrome(id) {
+    _unregisterContentScriptMV3(id) {
         return new Promise((resolve, reject) => {
             chrome.scripting.unregisterContentScripts({ids: [id]}, () => {
                 const e = chrome.runtime.lastError;
@@ -407,7 +319,7 @@ class ScriptManager {
         const {urlRegex} = details;
         if (urlRegex !== null && !urlRegex.test(url)) { return; }
 
-        let {allFrames, css, js, matchAboutBlank, runAt} = details;
+        let {allFrames, css, js, runAt} = details;
 
         if (isWebNavigation) {
             if (allFrames) {
@@ -425,14 +337,13 @@ class ScriptManager {
 
         const promises = [];
         if (Array.isArray(css)) {
-            const runAtCss = (typeof runAt === 'string' ? runAt : 'document_start');
             for (const file of css) {
-                promises.push(this.injectStylesheet('file', file, tabId, frameId, allFrames, matchAboutBlank, runAtCss));
+                promises.push(this.injectStylesheet('file', file, tabId, frameId, allFrames));
             }
         }
         if (Array.isArray(js)) {
             for (const file of js) {
-                promises.push(this.injectScript(file, tabId, frameId, allFrames, matchAboutBlank, runAt));
+                promises.push(this.injectScript(file, tabId, frameId, allFrames));
             }
         }
         await Promise.all(promises);
