@@ -206,12 +206,19 @@
                     ]
                 },
                 {
+                    "action": "delete",
+                    "path": [
+                        "content_security_policy",
+                        "sandbox"
+                    ]
+                },
+                {
                     "action": "set",
                     "path": [
                         "content_security_policy",
                         "extension_pages"
                     ],
-                    "value": "default-src 'self'; script-src 'self' 'unsafe-eval'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
+                    "value": "default-src 'self'; script-src 'self'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
                 },
                 {
                     "action": "set",
