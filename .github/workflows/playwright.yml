@@ -10,14 +10,17 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Remove all fonts
+        run: rm -rf /usr/share/fonts
 
+      - uses: actions/checkout@v3
+      
       - name: Install CJK fonts
         uses: awalsh128/cache-apt-pkgs-action@1850ee53f6e706525805321a3f2f863dcf73c962 # v1.3.0
         with:
-          packages: fonts-noto-cjk
+          packages: fonts-ipafont-mincho
           execute_install_scripts: true
-
+        
       - uses: actions/setup-node@v3
         with:
           cache: "npm"
@@ -37,7 +40,7 @@ jobs:
       - if: ${{ steps.cache-playwright.outputs.cache-hit != 'true' }}
         name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
-
+        
       - name: Grab latest dictionaries from dictionaries branch
         uses: actions/checkout@v3
         with:
