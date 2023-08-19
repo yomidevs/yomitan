@@ -17,6 +17,7 @@
  */
 
 /* global
+ * RecommendedPermissionsController
  * DictionaryController
  * DictionaryImportController
  * DocumentFocusController
@@ -27,7 +28,6 @@
  * SettingsController
  * SettingsDisplayController
  * StatusFooter
- * RecommendedPermissionsController
  */
 
 async function setupEnvironmentInfo() {
