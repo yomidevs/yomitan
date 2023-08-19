@@ -49,8 +49,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ inputs.upload_url }}
-          asset_path: yomitan-firefox.xpi
-          asset_name: yomitan-firefox.xpi
+          asset_path: yomitan-firefox-dev.xpi
+          asset_name: yomitan-firefox-dev.xpi
           asset_content_type: application/x-xpinstall
 
       # update update.json so that all people who have the dev version installed get the new update
