@@ -17,13 +17,13 @@
  */
 
 /* global
- * RecommendedPermissionsController
  * DictionaryController
  * DictionaryImportController
  * DocumentFocusController
  * ExtensionContentController
  * GenericSettingController
  * ModalController
+ * RecommendedPermissionsController
  * ScanInputsSimpleController
  * SettingsController
  * SettingsDisplayController
