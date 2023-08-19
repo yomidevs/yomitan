@@ -39,7 +39,7 @@ jobs:
 
       - if: ${{ steps.cache-playwright.outputs.cache-hit != 'true' }}
         name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
         
       - name: Grab latest dictionaries from dictionaries branch
         uses: actions/checkout@v3
