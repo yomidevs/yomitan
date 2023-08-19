@@ -27,6 +27,7 @@
  * SettingsController
  * SettingsDisplayController
  * StatusFooter
+ * RecommendedPermissionsController
  */
 
 async function setupEnvironmentInfo() {
@@ -76,6 +77,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const simpleScanningInputController = new ScanInputsSimpleController(settingsController);
         simpleScanningInputController.prepare();
+
+        const recommendedPermissionsController = new RecommendedPermissionsController(settingsController);
+        recommendedPermissionsController.prepare();
 
         await Promise.all(preparePromises);
 
