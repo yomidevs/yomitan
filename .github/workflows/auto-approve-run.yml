@@ -4,6 +4,7 @@ on:
     workflows: [Auto-Approve Safe PRs]
     types:
       - completed
+permissions: {}
 jobs:
   auto-approve-run:
     runs-on: ubuntu-latest
