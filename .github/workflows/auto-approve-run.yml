@@ -1,0 +1,29 @@
+name: Auto-Approve Safe PRs (workflow-run)
+on:
+  workflow_run:
+    workflows: [Auto-Approve Safe PRs]
+    types:
+      - completed
+jobs:
+  auto-approve-run:
+    runs-on: ubuntu-latest
+    environment: themoeway-bot
+    permissions:
+      pull-requests: write
+    if: github.actor == 'djahandarie'
+    steps:
+      - name: Download workflow artifact
+        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615 # v2.27.0
+        with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            workflow: auto-approve.yml
+            run_id: ${{ github.event.workflow_run.id }}
+      - name: Read the pr_num file
+        id: pr_num_reader
+        uses: juliangruber/read-file-action@02bbba9876a8f870efd4ad64e3b9088d3fb94d4b # v1.1.6
+        with:
+            path: ./pr_num/pr_num.txt
+      - uses: hmarr/auto-approve-action@44888193675f29a83e04faf4002fa8c0b537b1e4 # v3.2.1
+        with:
+          pull-request-number: ${{ steps.pr_num_reader.outputs.content }}
+          github-token: ${{ secrets.THEMOEWAY_BOT_PAT }}
