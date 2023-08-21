@@ -49,8 +49,8 @@
         "html-validate": "^7.6.0",
         "jsdom": "^22.1.0",
         "parse5": "^7.1.2",
-        "stylelint": "^14.16.1",
-        "stylelint-config-recommended": "^9.0.0",
+        "stylelint": "^15.10.3",
+        "stylelint-config-recommended": "^13.0.0",
         "web-ext": "^7.6.0"
     }
 }
