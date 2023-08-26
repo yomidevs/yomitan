@@ -34,6 +34,7 @@ body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, sans-serif;
     font-size: var(--font-size);
+    width: max-content;
 }
 
 h3 {
