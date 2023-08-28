@@ -83,6 +83,6 @@ jobs:
           git commit -a -m "${{ github.event.release.name }} - ${{ github.event.release.html_url }}"
 
       - name: Push changes
-        uses: ad-m/github-push-action@9a2e3c14aaecf56d5816dc3a54514f82050820b2 # pin@master
+        uses: ad-m/github-push-action@29f05e01bb17e6f28228b47437e03a7b69e1f9ef # pin@master
         with:
           branch: metadata
