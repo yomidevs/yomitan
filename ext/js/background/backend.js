@@ -1130,48 +1130,58 @@ class Backend {
     }
 
     async _textParseScanning(text, scanLength, optionsContext) {
-        const jp = this._japaneseUtil;
-        const mode = 'simple';
         const options = this._getProfileOptions(optionsContext);
-        const details = {matchType: 'exact', deinflect: true};
-        const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
-        const results = [];
-        let previousUngroupedSegment = null;
-        let i = 0;
-        const ii = text.length;
-        while (i < ii) {
-            const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
-                mode,
-                text.substring(i, i + scanLength),
-                findTermsOptions
-            );
-            const codePoint = text.codePointAt(i);
-            const character = String.fromCodePoint(codePoint);
-            if (
-                dictionaryEntries.length > 0 &&
-                originalTextLength > 0 &&
-                (originalTextLength !== character.length || jp.isCodePointJapanese(codePoint))
-            ) {
-                previousUngroupedSegment = null;
-                const {headwords: [{term, reading}]} = dictionaryEntries[0];
-                const source = text.substring(i, i + originalTextLength);
-                const textSegments = [];
-                for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(term, reading, source)) {
-                    textSegments.push({text: text2, reading: reading2});
-                }
-                results.push(textSegments);
-                i += originalTextLength;
-            } else {
-                if (previousUngroupedSegment === null) {
-                    previousUngroupedSegment = {text: character, reading: ''};
-                    results.push([previousUngroupedSegment]);
+
+        // console.log('textParseScanning', text, scanLength, options)
+        
+        if(options.general.language === 'ja') {
+
+            const jp = this._japaneseUtil;
+            const mode = 'simple';
+            const details = {matchType: 'exact', deinflect: true};
+            const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
+            const results = [];
+            let previousUngroupedSegment = null;
+            let i = 0;
+            const ii = text.length;
+            while (i < ii) {
+                const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
+                    mode,
+                    text.substring(i, i + scanLength),
+                    findTermsOptions
+                );
+                const codePoint = text.codePointAt(i);
+                const character = String.fromCodePoint(codePoint);
+                if (
+                    dictionaryEntries.length > 0 &&
+                    originalTextLength > 0 &&
+                    (originalTextLength !== character.length || jp.isCodePointJapanese(codePoint))
+                ) {
+                    previousUngroupedSegment = null;
+                    const {headwords: [{term, reading}]} = dictionaryEntries[0];
+                    const source = text.substring(i, i + originalTextLength);
+                    const textSegments = [];
+                    for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(term, reading, source)) {
+                        textSegments.push({text: text2, reading: reading2});
+                    }
+                    results.push(textSegments);
+                    i += originalTextLength;
                 } else {
-                    previousUngroupedSegment.text += character;
+                    if (previousUngroupedSegment === null) {
+                        previousUngroupedSegment = {text: character, reading: ''};
+                        results.push([previousUngroupedSegment]);
+                    } else {
+                        previousUngroupedSegment.text += character;
+                    }
+                    i += character.length;
                 }
-                i += character.length;
             }
+            console.log('textParseScanning results', results)
+            return results;
         }
-        return results;
+        else { 
+            return [[{"text": text, "reading": text}]];
+        }
     }
 
     async _textParseMecab(text) {
