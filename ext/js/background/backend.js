@@ -564,7 +564,9 @@ class Backend {
     }
 
     async _onApiGetTermAudioInfoList({source, term, reading}) {
-        return await this._audioDownloader.getTermAudioInfoList(source, term, reading);
+        const options = this._getProfileOptions({current: true});
+        const language = options.general.language;
+        return await this._audioDownloader.getTermAudioInfoList(source, term, reading, language);
     }
 
     _onApiSendMessageToFrame({frameId: targetFrameId, action, params}, sender) {
@@ -1310,6 +1312,7 @@ class Backend {
     }
 
     _getSetting(target) {
+        // console.log('backend.js: _getSetting()');
         const options = this._getModifySettingObject(target);
         const accessor = new ObjectPropertyAccessor(options);
         const {path} = target;
@@ -2056,7 +2059,7 @@ class Backend {
      * @returns {FindTermsOptions} An options object.
      */
     _getTranslatorFindTermsOptions(mode, details, options) {
-        console.log("backend.js", options)
+        // console.log("backend.js::_getTranslatorFindTermsOptions", options)
         let {matchType, deinflect} = details;
         if (typeof matchType !== 'string') { matchType = 'exact'; }
         if (typeof deinflect !== 'boolean') { deinflect = true; }

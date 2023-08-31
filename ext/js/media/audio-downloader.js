@@ -41,11 +41,11 @@ class AudioDownloader {
         ]);
     }
 
-    async getTermAudioInfoList(source, term, reading) {
+    async getTermAudioInfoList(source, term, reading, language) {
         const handler = this._getInfoHandlers.get(source.type);
         if (typeof handler === 'function') {
             try {
-                return await handler(term, reading, source);
+                return await handler(term, reading, source, language);
             } catch (e) {
                 // NOP
             }
@@ -202,13 +202,13 @@ class AudioDownloader {
         return [{type: 'tts', text: reading, voice: voice}];
     }
 
-    async _getInfoCustom(term, reading, {url}) {
-        url = this._getCustomUrl(term, reading, url);
+    async _getInfoCustom(term, reading, {url}, language) {
+        url = this._getCustomUrl(term, reading, language, url);
         return [{type: 'url', url}];
     }
 
-    async _getInfoCustomJson(term, reading, {url}) {
-        url = this._getCustomUrl(term, reading, url);
+    async _getInfoCustomJson(term, reading, {url}, language) {
+        url = this._getCustomUrl(term, reading, language, url);
 
         const response = await this._requestBuilder.fetchAnonymous(url, {
             method: 'GET',
@@ -240,11 +240,13 @@ class AudioDownloader {
         return results;
     }
 
-    _getCustomUrl(term, reading, url) {
+    _getCustomUrl(term, reading, language, url) {
+        // console.log('_getCustomUrl()', term, reading, language, url);
         if (typeof url !== 'string') {
             throw new Error('No custom URL defined');
         }
-        const data = {term, reading};
+
+        const data = {term, reading, language};
         return url.replace(/\{([^}]*)\}/g, (m0, m1) => (Object.prototype.hasOwnProperty.call(data, m1) ? `${data[m1]}` : m0));
     }
 

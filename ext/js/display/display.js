@@ -344,6 +344,7 @@ class Display extends EventDispatcher {
     }
 
     async updateOptions() {
+        // console.log('Display.updateOptions()');
         const options = await yomichan.api.optionsGet(this.getOptionsContext());
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
