@@ -134,6 +134,10 @@
                                         "type": "boolean",
                                         "default": false
                                     },
+                                    "language": {
+                                        "type": "string",
+                                        "default": "ja"
+                                    },
                                     "maxResults": {
                                         "type": "integer",
                                         "minimum": 1,
