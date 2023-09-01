@@ -214,7 +214,9 @@ class Yomichan extends EventDispatcher {
     }
 
     _onMessageOptionsUpdated({source}) {
-        this.trigger('optionsUpdated', {source});
+        if (source !== 'background') {
+            this.trigger('optionsUpdated', {source});
+        }
     }
 
     _onMessageDatabaseUpdated({type, cause}) {
