@@ -41,24 +41,26 @@ class AudioDownloader {
         ]);
     }
 
-    async getTermAudioInfoList(source, term, reading, language) {
+async getTermAudioInfoList(source, term, reading, language) {
+        //console.log('audio-downloader.js: getTermAudioInfoList()', source, term, reading, language);
         const handler = this._getInfoHandlers.get(source.type);
         if (typeof handler === 'function') {
             try {
                 return await handler(term, reading, source, language);
             } catch (e) {
+                console.error(e);
                 // NOP
             }
         }
         return [];
     }
 
-    async downloadTermAudio(sources, preferredAudioIndex, term, reading, idleTimeout) {
+    async downloadTermAudio(sources, preferredAudioIndex, term, reading, language, idleTimeout) {
         console.log('audio-downloader.js: downloadTermAudio()');
         console.log('sources', sources);
         const errors = [];
         for (const source of sources) {
-            let infoList = await this.getTermAudioInfoList(source, term, reading);
+            let infoList = await this.getTermAudioInfoList(source, term, reading, language);
             console.log('infoList', infoList);
 
             if (typeof preferredAudioIndex === 'number') {
@@ -241,7 +243,6 @@ class AudioDownloader {
     }
 
     _getCustomUrl(term, reading, language, url) {
-        // console.log('_getCustomUrl()', term, reading, language, url);
         if (typeof url !== 'string') {
             throw new Error('No custom URL defined');
         }

@@ -54,7 +54,6 @@ class RequestBuilder {
      * @returns {Promise<Response>} The response of the `fetch` call.
      */
     async fetchAnonymous(url, init) {
-        fetch(1, 2);
         if (isObject(chrome.declarativeNetRequest)) {
             return await this._fetchAnonymousDeclarative(url, init);
         }

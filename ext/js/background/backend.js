@@ -437,7 +437,7 @@ class Backend {
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
         const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
         dictionaryEntries.splice(maxResults);
-        console.log('backend.js::_onApiTermsFind dictionaryEntries:', dictionaryEntries);
+        // console.log('backend.js::_onApiTermsFind dictionaryEntries:', dictionaryEntries);
         return {dictionaryEntries, originalTextLength};
     }
 
@@ -519,7 +519,7 @@ class Backend {
     }
 
     async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails}) {
-        console.log('backend.js: _onApiInjectAnkiNoteMedia');
+        // console.log('backend.js: _onApiInjectAnkiNoteMedia');
         return await this._injectAnkNoteMedia(
             this._anki,
             timestamp,
@@ -564,8 +564,8 @@ class Backend {
     }
 
     async _onApiGetTermAudioInfoList({source, term, reading}) {
-        const options = this._getProfileOptions({current: true});
-        const language = options.general.language;
+        const language = this._getProfileLanguage({current: true});
+        console.log('backend.js::_onApiGetTermAudioInfoList source:', source, 'term:', term, 'reading:', reading, 'language:', language);
         return await this._audioDownloader.getTermAudioInfoList(source, term, reading, language);
     }
 
@@ -1057,6 +1057,10 @@ class Backend {
         return this._getProfile(optionsContext, useSchema).options;
     }
 
+    _getProfileLanguage(optionsContext, useSchema=false) {
+        return this._getProfile(optionsContext, useSchema).options.general.language;
+    }
+
     _getProfile(optionsContext, useSchema=false) {
         const options = this._getOptionsFull(useSchema);
         const profiles = options.profiles;
@@ -1176,7 +1180,7 @@ class Backend {
                     i += character.length;
                 }
             }
-            console.log('textParseScanning results', results)
+            // console.log('textParseScanning results', results)
             return results;
         }
         else { 
@@ -1619,9 +1623,9 @@ class Backend {
     }
 
     _waitUntilTabFrameIsReady(tabId, frameId, timeout=null) {
-        console.log('backend.js: _waitUntilTabFrameIsReady ');
+        // console.log('backend.js: _waitUntilTabFrameIsReady ');
         return new Promise((resolve, reject) => {
-            console.log('backend.js: _waitUntilTabFrameIsReady promise');
+            // console.log('backend.js: _waitUntilTabFrameIsReady promise');
             let timer = null;
             let onMessage = (message, sender) => {
                 if (
@@ -1767,7 +1771,7 @@ class Backend {
     }
 
     async _injectAnkNoteMedia(ankiConnect, timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails) {
-        console.log('backend.js: _injectAnkNoteMedia');
+        // console.log('backend.js: _injectAnkNoteMedia');
 
         let screenshotFileName = null;
         let clipboardImageFileName = null;
@@ -1843,6 +1847,8 @@ class Backend {
         }
 
         const {sources, preferredAudioIndex, idleTimeout} = details;
+        const language = this._getProfileLanguage({current: true});
+        
         let data;
         let contentType;
         try {
@@ -1851,6 +1857,7 @@ class Backend {
                 preferredAudioIndex,
                 term,
                 reading,
+                language,
                 idleTimeout
             ));
         } catch (e) {
