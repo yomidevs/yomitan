@@ -29,6 +29,7 @@ class DisplayAudio {
         this._autoPlay = false;
         this._autoPlayAudioTimer = null;
         this._autoPlayAudioDelay = 400;
+        this._playInflectedText = false;
         this._eventListeners = new EventListenerCollection();
         this._cache = new Map();
         this._menuContainer = document.querySelector('#popup-menus');
@@ -244,6 +245,8 @@ class DisplayAudio {
         const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
         const dictionaryEntryIndex = this._display.getElementDictionaryEntryIndex(button);
 
+        this._playInflectedText = e.altKey;
+
         if (e.shiftKey) {
             this._showAudioMenu(e.currentTarget, dictionaryEntryIndex, headwordIndex);
         } else {
@@ -323,7 +326,13 @@ class DisplayAudio {
 
         const buttons = this._getAudioPlayButtons(dictionaryEntryIndex, headwordIndex);
 
-        const {term, reading} = headword;
+        let {term, reading} = headword;
+        // console.log('headword', headword);
+
+        if (this._playInflectedText && headword.sources?.length) {
+            term = headword.sources[0].transformedText;
+            reading = '';
+        }
 
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
         const overrideToken = progressIndicatorVisible.setOverride(true);
