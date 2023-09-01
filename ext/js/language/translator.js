@@ -76,7 +76,7 @@ class Translator {
      * @returns {{dictionaryEntries: Translation.TermDictionaryEntry[], originalTextLength: number}} An object containing dictionary entries and the length of the original source text.
      */
     async findTerms(mode, text, options) {
-        console.log('findTerms', mode, text, options);
+        // console.log('findTerms', mode, text, options);
 
         const {enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder} = options;
         let {dictionaryEntries, originalTextLength} = await this._findTermsInternal(text, enabledDictionaryMap, options);

@@ -223,7 +223,7 @@ class HotkeyUtil {
     // Private
 
     _getModifierKeyNames(os) {
-        console.log(`_getModifierKeyNames(${os})`);
+        // console.log(`_getModifierKeyNames(${os})`);
         switch (os) {
             case 'win':
                 return [
@@ -260,7 +260,7 @@ class HotkeyUtil {
     }
 
     _updateModifierKeyNames() {
-        console.log('_updateModifierKeyNames()');
+        // console.log('_updateModifierKeyNames()');
         const map = this._modifierKeyNames;
         map.clear();
         for (const [key, value] of this._getModifierKeyNames(this._os)) {
