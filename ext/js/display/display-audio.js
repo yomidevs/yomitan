@@ -245,6 +245,7 @@ class DisplayAudio {
         const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
         const dictionaryEntryIndex = this._display.getElementDictionaryEntryIndex(button);
 
+        // TODO: make key configurable
         this._playInflectedText = e.altKey;
 
         if (e.shiftKey) {
