@@ -53,7 +53,7 @@ class ClipboardMonitor extends EventDispatcher {
                 this._previousText = text;
                 // should generalise to match the selected language charset
                 if (
-                    canChange 
+                    canChange
                     // && this._japaneseUtil.isStringPartiallyJapanese(text)
                 ) {
                     this.trigger('change', {text});

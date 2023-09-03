@@ -1137,9 +1137,8 @@ class Backend {
         const options = this._getProfileOptions(optionsContext);
 
         // console.log('textParseScanning', text, scanLength, options)
-        
-        if(options.general.language === 'ja') {
 
+        if (options.general.language === 'ja') {
             const jp = this._japaneseUtil;
             const mode = 'simple';
             const details = {matchType: 'exact', deinflect: true};
@@ -1182,9 +1181,8 @@ class Backend {
             }
             // console.log('textParseScanning results', results)
             return results;
-        }
-        else { 
-            return [[{"text": text, "reading": text}]];
+        } else {
+            return [[{'text': text, 'reading': text}]];
         }
     }
 
@@ -1848,7 +1846,7 @@ class Backend {
 
         const {sources, preferredAudioIndex, idleTimeout} = details;
         const language = this._getProfileLanguage({current: true});
-        
+
         let data;
         let contentType;
         try {

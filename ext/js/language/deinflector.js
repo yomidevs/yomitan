@@ -31,7 +31,6 @@ class Deinflector {
         // console.log('\tDeinflector::deinflect() results = ', results);
 
         for (let i = 0; i < results.length && i < 200; ++i) {
-
             // console.log(`\t\t${i} deinflecting ${results[i].term}`);
 
             const {rules, term, reasons} = results[i];
@@ -59,7 +58,7 @@ class Deinflector {
 
         // const end = performance.now();
         // console.log(`\tDeinflector::deinflect() performance = ${end - start}ms`);
-        
+
         return results;
     }
 
@@ -102,7 +101,7 @@ class Deinflector {
 
 // eslint-disable-next-line no-underscore-dangle
 Deinflector._ruleTypes = new Map([
-    // ['v',    0b0000011111], // Verb // does not work for some reason, breaks both 'his' and 'belongs' 
+    // ['v',    0b0000011111], // Verb // does not work for some reason, breaks both 'his' and 'belongs'
     ['v1',    0b0000000001], // Verb ichidan
     ['v5',    0b0000000010], // Verb godan
     ['vs',    0b0000000100], // Verb suru
@@ -110,7 +109,7 @@ Deinflector._ruleTypes = new Map([
     ['vz',    0b0000010000], // Verb zuru
     // ['adj',  0b0000100000], // Adjective
     ['adj-i', 0b0000100000], // Adjective i
-    ['iru',   0b0001000000], // Intermediate -iru endings for progressive or perfect tens
+    ['iru',   0b0001000000] // Intermediate -iru endings for progressive or perfect tens
     // ['n',     0b0010000000], // Noun
     // ['pn',   0b0100000000], // Pronoun
 ]);

@@ -17,7 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const assert = require('assert');   
+const assert = require('assert');
 const {testMain} = require('../dev/util');
 const {VM} = require('../dev/vm');
 
@@ -48,7 +48,7 @@ function hasTermReasons(Deinflector, deinflector, source, expectedTerm, expected
 
 async function testDeinflections(language) {
     let data = [];
-    switch(language){
+    switch (language){
         case 'en':
             data = [
                 {
@@ -65,17 +65,17 @@ async function testDeinflections(language) {
                         {term: 'turn down', source: 'turned you down', reasons: ['past', 'interposed object']},
                         {term: 'bring up', source: 'brought their son up', reasons: ['past (irregular)', 'interposed object']},
 
-                        {term: 'take after', source: 'takes after', reasons: ['3 sg present']},
+                        {term: 'take after', source: 'takes after', reasons: ['3 sg present']}
                     ]
                 },
                 {
                     valid: false,
                     tests: [
                         {term: 'turn off', source: 'turned you down. off', reasons: ['past']},
-                        {term: 'take after', source: 'take him after', reasons: ['interposed object']},
+                        {term: 'take after', source: 'take him after', reasons: ['interposed object']}
                     ]
                 }
-            ]
+            ];
             break;
         default:
             data = [
@@ -963,8 +963,8 @@ async function testDeinflections(language) {
     const deinflectionReasons = {
         'ja': deinflectionReasonsJa,
         'en': await deinflectionReasonsEn()
-    }
-    
+    };
+
     const deinflector = new Deinflector(deinflectionReasons[language]);
 
     for (const {valid, tests} of data) {
@@ -993,6 +993,8 @@ function main() {
     const language = args[2] || 'ja';
 
     testDeinflections(language);
+
+    console.log(language, 'tests passed');
 }
 
 

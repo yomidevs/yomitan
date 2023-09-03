@@ -670,7 +670,7 @@
                                         "minimum": 1,
                                         "default": 16
                                     },
-                                    "searchResolution":{
+                                    "searchResolution": {
                                         "type": "string",
                                         "enum": [
                                             "letter",

@@ -34,7 +34,7 @@ class API {
     }
 
     parseText(text, optionsContext, scanLength, useInternalParser, useMecabParser) {
-        //console.log('API.parseText()');
+        // console.log('API.parseText()');
         return this._invoke('parseText', {text, optionsContext, scanLength, useInternalParser, useMecabParser});
     }
 
