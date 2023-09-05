@@ -213,9 +213,9 @@ namespace Translation {
          */
         isPrimary: boolean;
         /**
-         * A list of inflections that was applied to get the term.
+         * A list of possible inflection combinations that could be the form of the term.
          */
-        inflections: string[];
+        inflectionHypotheses: string[];
         /**
          * A score for the dictionary entry.
          */

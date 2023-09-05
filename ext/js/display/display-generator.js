@@ -24,7 +24,6 @@
 
 class DisplayGenerator {
     constructor({japaneseUtil, contentManager, hotkeyHelpController=null}) {
-        // console.log('DisplayGenerator::constructor');
         this._japaneseUtil = japaneseUtil;
         this._contentManager = contentManager;
         this._hotkeyHelpController = hotkeyHelpController;
@@ -48,20 +47,17 @@ class DisplayGenerator {
     }
 
     createTermEntry(dictionaryEntry) {
-        // console.log('DisplayGenerator::createTermEntry', dictionaryEntry);
         const node = this._templates.instantiate('term-entry');
 
         const headwordsContainer = node.querySelector('.headword-list');
-        const inflectionsContainer = node.querySelector('.inflection-list');
+        const inflectionHypothesesContainer = node.querySelector('.inflection-hypotheses-list');
         const groupedPronunciationsContainer = node.querySelector('.pronunciation-group-list');
         const frequencyGroupListContainer = node.querySelector('.frequency-group-list');
         const definitionsContainer = node.querySelector('.definition-list');
         const headwordTagsContainer = node.querySelector('.headword-list-tag-list');
 
-        const {headwords, type, inflections, definitions, frequencies, pronunciations} = dictionaryEntry;
+        const {headwords, type, inflectionHypotheses, definitions, frequencies, pronunciations} = dictionaryEntry;
         const groupedPronunciations = DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry);
-
-        // console.log('createTermEntry() groupedPronunciations', groupedPronunciations);
 
         const pronunciationCount = groupedPronunciations.reduce((i, v) => i + v.pronunciations.length, 0);
         const groupedFrequencies = DictionaryDataUtil.groupTermFrequencies(dictionaryEntry);
@@ -97,7 +93,9 @@ class DisplayGenerator {
         }
         headwordsContainer.dataset.count = `${headwords.length}`;
 
-        this._appendMultiple(inflectionsContainer, this._createTermInflection.bind(this), inflections);
+        if (inflectionHypotheses.flat().length) {
+            this._appendMultiple(inflectionHypothesesContainer, this._createInflectionHypothesis.bind(this), inflectionHypotheses);
+        }
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations);
         this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length);
@@ -267,7 +265,6 @@ class DisplayGenerator {
     // Private
 
     _createTermHeadword(headword, headwordIndex, pronunciations) {
-        // console.log('display-generator.js: _createTermHeadword');
         const {term, reading, tags, sources} = headword;
 
         let isPrimaryAny = false;
@@ -305,6 +302,13 @@ class DisplayGenerator {
         this._appendFurigana(termContainer, term, reading, this._appendKanjiLinks.bind(this));
 
         return node;
+    }
+
+    _createInflectionHypothesis(composedInflection) {
+        const fragment = this._templates.instantiateFragment('inflection-list');
+        const node = fragment.querySelector('.inflection-list');
+        this._appendMultiple(node, this._createTermInflection.bind(this), composedInflection);
+        return fragment;
     }
 
     _createTermInflection(inflection) {
@@ -480,7 +484,6 @@ class DisplayGenerator {
     }
 
     _createGroupedPronunciation(details) {
-        // console.log('_createGroupedPronunciation(), details: ', details);
         const {dictionary, pronunciations} = details;
 
         const node = this._templates.instantiate('pronunciation-group');
@@ -507,7 +510,6 @@ class DisplayGenerator {
     }
 
     _createPronunciation(details) {
-        // console.log('_createPronunciation(), details: ', details);
         if (details.type === 'pitch-accent') {
             const {reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} = details;
             const jp = this._japaneseUtil;
@@ -530,6 +532,7 @@ class DisplayGenerator {
             n.appendChild(this._pronunciationGenerator.createPronunciationDownstepPosition(position));
 
             n = node.querySelector('.pronunciation-text-container');
+            // TODO: generalize
             n.lang = 'ja';
             n.appendChild(this._pronunciationGenerator.createPronunciationText(morae, position, nasalPositions, devoicePositions));
 
@@ -550,6 +553,7 @@ class DisplayGenerator {
             this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
 
             n = node.querySelector('.pronunciation-text-container');
+            // TODO: generalize
             n.lang = 'en';
             this._setTextContent(n, ipa);
 
@@ -692,7 +696,6 @@ class DisplayGenerator {
     }
 
     _appendMultiple(container, createItem, detailsArray, ...args) {
-        // console.log('appendMultiple', detailsArray);
         let count = 0;
         const {ELEMENT_NODE} = Node;
         if (Array.isArray(detailsArray)) {

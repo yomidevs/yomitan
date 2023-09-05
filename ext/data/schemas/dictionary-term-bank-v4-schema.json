@@ -1,0 +1,482 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "structuredContent": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "description": "Represents a text node."
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structuredContent",
+                        "description": "An array of child content."
+                    }
+                },
+                {
+                    "type": "object",
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "description": "Empty tags.",
+                            "required": [
+                                "tag"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "tag": {
+                                    "type": "string",
+                                    "const": "br"
+                                },
+                                "data": {
+                                    "$ref": "#/definitions/structuredContentData"
+                                }
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "description": "Generic container tags.",
+                            "required": [
+                                "tag"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "tag": {
+                                    "type": "string",
+                                    "enum": ["ruby", "rt", "rp", "table", "thead", "tbody", "tfoot", "tr"]
+                                },
+                                "content": {
+                                    "$ref": "#/definitions/structuredContent"
+                                },
+                                "data": {
+                                    "$ref": "#/definitions/structuredContentData"
+                                },
+                                "lang": {
+                                    "type": "string",
+                                    "description": "Defines the language of an element in the format defined by RFC 5646."
+                                }
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "description": "Table tags.",
+                            "required": [
+                                "tag"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "tag": {
+                                    "type": "string",
+                                    "enum": ["td", "th"]
+                                },
+                                "content": {
+                                    "$ref": "#/definitions/structuredContent"
+                                },
+                                "data": {
+                                    "$ref": "#/definitions/structuredContentData"
+                                },
+                                "colSpan": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "rowSpan": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "style": {
+                                    "$ref": "#/definitions/structuredContentStyle"
+                                },
+                                "lang": {
+                                    "type": "string",
+                                    "description": "Defines the language of an element in the format defined by RFC 5646."
+                                }
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "description": "Container tags supporting configurable styles.",
+                            "required": [
+                                "tag"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "tag": {
+                                    "type": "string",
+                                    "enum": ["span", "div", "ol", "ul", "li"]
+                                },
+                                "content": {
+                                    "$ref": "#/definitions/structuredContent"
+                                },
+                                "data": {
+                                    "$ref": "#/definitions/structuredContentData"
+                                },
+                                "style": {
+                                    "$ref": "#/definitions/structuredContentStyle"
+                                },
+                                "lang": {
+                                    "type": "string",
+                                    "description": "Defines the language of an element in the format defined by RFC 5646."
+                                }
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "description": "Image tag.",
+                            "required": [
+                                "tag",
+                                "path"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "tag": {
+                                    "type": "string",
+                                    "const": "img"
+                                },
+                                "data": {
+                                    "$ref": "#/definitions/structuredContentData"
+                                },
+                                "path": {
+                                    "type": "string",
+                                    "description": "Path to the image file in the archive."
+                                },
+                                "width": {
+                                    "type": "number",
+                                    "description": "Preferred width of the image.",
+                                    "minimum": 0
+                                },
+                                "height": {
+                                    "type": "number",
+                                    "description": "Preferred width of the image.",
+                                    "minimum": 0
+                                },
+                                "title": {
+                                    "type": "string",
+                                    "description": "Hover text for the image."
+                                },
+                                "pixelated": {
+                                    "type": "boolean",
+                                    "description": "Whether or not the image should appear pixelated at sizes larger than the image's native resolution.",
+                                    "default": false
+                                },
+                                "imageRendering": {
+                                    "type": "string",
+                                    "description": "Controls how the image is rendered. The value of this field supersedes the pixelated field.",
+                                    "enum": ["auto", "pixelated", "crisp-edges"],
+                                    "default": "auto"
+                                },
+                                "appearance": {
+                                    "type": "string",
+                                    "description": "Controls the appearance of the image. The \"monochrome\" value will mask the opaque parts of the image using the current text color.",
+                                    "enum": ["auto", "monochrome"],
+                                    "default": "auto"
+                                },
+                                "background": {
+                                    "type": "boolean",
+                                    "description": "Whether or not a background color is displayed behind the image.",
+                                    "default": true
+                                },
+                                "collapsed": {
+                                    "type": "boolean",
+                                    "description": "Whether or not the image is collapsed by default.",
+                                    "default": false
+                                },
+                                "collapsible": {
+                                    "type": "boolean",
+                                    "description": "Whether or not the image can be collapsed.",
+                                    "default": false
+                                },
+                                "verticalAlign": {
+                                    "type": "string",
+                                    "description": "The vertical alignment of the image.",
+                                    "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"]
+                                },
+                                "sizeUnits": {
+                                    "type": "string",
+                                    "description": "The units for the width and height.",
+                                    "enum": ["px", "em"]
+                                }
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "description": "Link tag.",
+                            "required": [
+                                "tag",
+                                "href"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "tag": {
+                                    "type": "string",
+                                    "const": "a"
+                                },
+                                "content": {
+                                    "$ref": "#/definitions/structuredContent"
+                                },
+                                "href": {
+                                    "type": "string",
+                                    "description": "The URL for the link. URLs starting with a ? are treated as internal links to other dictionary content.",
+                                    "pattern": "^(?:https?:|\\?)[\\w\\W]*"
+                                },
+                                "lang": {
+                                    "type": "string",
+                                    "description": "Defines the language of an element in the format defined by RFC 5646."
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "structuredContentData": {
+            "type": "object",
+            "description": "Generic data attributes that should be added to the element.",
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
+        "structuredContentStyle": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "fontStyle": {
+                    "type": "string",
+                    "enum": ["normal", "italic"],
+                    "default": "normal"
+                },
+                "fontWeight": {
+                    "type": "string",
+                    "enum": ["normal", "bold"],
+                    "default": "normal"
+                },
+                "fontSize": {
+                    "type": "string",
+                    "default": "medium"
+                },
+                "textDecorationLine": {
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "enum": ["none", "underline", "overline", "line-through"],
+                            "default": "none"
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["underline", "overline", "line-through"],
+                                "default": "none"
+                            }
+                        }
+                    ]
+                },
+                "verticalAlign": {
+                    "type": "string",
+                    "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"],
+                    "default": "baseline"
+                },
+                "textAlign": {
+                    "type": "string",
+                    "enum": ["start", "end", "left", "right", "center", "justify", "justify-all", "match-parent"],
+                    "default": "start"
+                },
+                "marginTop": {
+                    "type": "number",
+                    "default": 0
+                },
+                "marginLeft": {
+                    "type": "number",
+                    "default": 0
+                },
+                "marginRight": {
+                    "type": "number",
+                    "default": 0
+                },
+                "marginBottom": {
+                    "type": "number",
+                    "default": 0
+                },
+                "listStyleType": {
+                    "type": "string",
+                    "default": "disc"
+                }
+            }
+        }
+    },
+    "type": "array",
+    "description": "Data file containing term information.",
+    "items": {
+        "type": "array",
+        "description": "Information about a single term.",
+        "minItems": 8,
+        "additionalItems": false,
+        "items": [
+            {
+                "type": "string",
+                "description": "The text for the term."
+            },
+            {
+                "type": "string",
+                "description": "Reading of the term, or an empty string if the reading is the same as the term."
+            },
+            {
+                "type": ["string", "null"],
+                "description": "String of space-separated tags for the definition. An empty string is treated as no tags."
+            },
+            {
+                "type": "string",
+                "description": "String of space-separated rule identifiers for the definition which is used to validate deinflection. Valid rule identifiers are: v1: ichidan verb; v5: godan verb; vs: suru verb; vk: kuru verb; adj-i: i-adjective. An empty string corresponds to words which aren't inflected, such as nouns."
+            },
+            {
+                "type": "number",
+                "description": "Score used to determine popularity. Negative values are more rare and positive values are more frequent. This score is also used to sort search results."
+            },
+            {
+                "type": "array",
+                "description": "Array of definitions for the term.",
+                "items": {
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "description": "Single definition for the term."
+                        },
+                        {
+                            "type": "object",
+                            "description": "Single detailed definition for the term.",
+                            "required": [
+                                "type"
+                            ],
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "description": "The type of the data for this definition.",
+                                    "enum": ["text", "image", "structured-content"]
+                                }
+                            },
+                            "oneOf": [
+                                {
+                                    "required": [
+                                        "type",
+                                        "text"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "const": "text"
+                                        },
+                                        "text": {
+                                            "type": "string",
+                                            "description": "Single definition for the term."
+                                        }
+                                    }
+                                },
+                                {
+                                    "required": [
+                                        "type",
+                                        "content"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "const": "structured-content"
+                                        },
+                                        "content": {
+                                            "$ref": "#/definitions/structuredContent",
+                                            "description": "Single definition for the term using a structured content object."
+                                        }
+                                    }
+                                },
+                                {
+                                    "required": [
+                                        "type",
+                                        "path"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "const": "image"
+                                        },
+                                        "path": {
+                                            "type": "string",
+                                            "description": "Path to the image file in the archive."
+                                        },
+                                        "width": {
+                                            "type": "integer",
+                                            "description": "Preferred width of the image.",
+                                            "minimum": 1
+                                        },
+                                        "height": {
+                                            "type": "integer",
+                                            "description": "Preferred width of the image.",
+                                            "minimum": 1
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "description": "Hover text for the image."
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "description": "Description of the image."
+                                        },
+                                        "pixelated": {
+                                            "type": "boolean",
+                                            "description": "Whether or not the image should appear pixelated at sizes larger than the image's native resolution.",
+                                            "default": false
+                                        },
+                                        "imageRendering": {
+                                            "type": "string",
+                                            "description": "Controls how the image is rendered. The value of this field supersedes the pixelated field.",
+                                            "enum": ["auto", "pixelated", "crisp-edges"],
+                                            "default": "auto"
+                                        },
+                                        "appearance": {
+                                            "type": "string",
+                                            "description": "Controls the appearance of the image. The \"monochrome\" value will mask the opaque parts of the image using the current text color.",
+                                            "enum": ["auto", "monochrome"],
+                                            "default": "auto"
+                                        },
+                                        "background": {
+                                            "type": "boolean",
+                                            "description": "Whether or not a background color is displayed behind the image.",
+                                            "default": true
+                                        },
+                                        "collapsed": {
+                                            "type": "boolean",
+                                            "description": "Whether or not the image is collapsed by default.",
+                                            "default": false
+                                        },
+                                        "collapsible": {
+                                            "type": "boolean",
+                                            "description": "Whether or not the image can be collapsed.",
+                                            "default": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "type": "integer",
+                "description": "Sequence number for the term. Terms with the same sequence number can be shown together when the \"resultOutputMode\" option is set to \"merge\"."
+            },
+            {
+                "type": "string",
+                "description": "String of space-separated tags for the term. An empty string is treated as no tags."
+            },
+            {
+                "type": ["string", "null"],
+                "description": "Lemma form of the term. Empty for lemmas."
+            },
+            {
+                "type": ["array", "null"],
+                "description": "Array of inflections that apply to the non-lemma form"
+            }
+        ]
+    }
+}

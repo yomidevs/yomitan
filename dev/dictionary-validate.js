@@ -74,7 +74,7 @@ async function validateDictionary(mode, archive, schemas) {
         throw e;
     }
 
-    await validateDictionaryBanks(mode, archive, 'term_bank_?.json', version === 1 ? schemas.termBankV1 : schemas.termBankV3);
+    await validateDictionaryBanks(mode, archive, 'term_bank_?.json', schemas[`termBankV${version}`]);
     await validateDictionaryBanks(mode, archive, 'term_meta_bank_?.json', schemas[`termMetaBankV${version}`]);
     await validateDictionaryBanks(mode, archive, 'kanji_bank_?.json', version === 1 ? schemas.kanjiBankV1 : schemas.kanjiBankV3);
     await validateDictionaryBanks(mode, archive, 'kanji_meta_bank_?.json', schemas.kanjiMetaBankV3);
@@ -90,6 +90,7 @@ function getSchemas() {
         tagBankV3: readSchema('../ext/data/schemas/dictionary-tag-bank-v3-schema.json'),
         termBankV1: readSchema('../ext/data/schemas/dictionary-term-bank-v1-schema.json'),
         termBankV3: readSchema('../ext/data/schemas/dictionary-term-bank-v3-schema.json'),
+        termBankV4: readSchema('../ext/data/schemas/dictionary-term-bank-v4-schema.json'),
         termMetaBankV3: readSchema('../ext/data/schemas/dictionary-term-meta-bank-v3-schema.json'),
         termMetaBankV4: readSchema('../ext/data/schemas/dictionary-term-meta-bank-v4-schema.json')
     };

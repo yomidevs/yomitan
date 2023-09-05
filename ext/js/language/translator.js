@@ -76,8 +76,6 @@ class Translator {
      * @returns {{dictionaryEntries: Translation.TermDictionaryEntry[], originalTextLength: number}} An object containing dictionary entries and the length of the original source text.
      */
     async findTerms(mode, text, options) {
-        // console.log('findTerms', mode, text, options);
-
         const {enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder} = options;
         let {dictionaryEntries, originalTextLength} = await this._findTermsInternal(text, enabledDictionaryMap, options);
 
@@ -100,7 +98,6 @@ class Translator {
             await this._addTermMeta(dictionaryEntries, enabledDictionaryMap);
             await this._expandTermTags(dictionaryEntries);
         }
-        console.log('after meta dictionary entries', dictionaryEntries);
 
         if (sortFrequencyDictionary !== null) {
             this._updateSortFrequencies(dictionaryEntries, sortFrequencyDictionary, sortFrequencyDictionaryOrder === 'ascending');
@@ -201,6 +198,7 @@ class Translator {
     // Find terms internal implementation
 
     async _findTermsInternal(text, enabledDictionaryMap, options) {
+        // TODO: generalize to other languages
         if (options.removeNonJapaneseCharacters) {
             text = this._getJapaneseOnlyText(text);
         }
@@ -208,19 +206,33 @@ class Translator {
             return {dictionaryEntries: [], originalTextLength: 0};
         }
 
-        const deinflections = await this._findTermsInternal2(text, enabledDictionaryMap, options);
+        const deinflections = await this._getDeinflections(text, enabledDictionaryMap, options);
 
         let originalTextLength = 0;
         const dictionaryEntries = [];
         const ids = new Set();
-        for (const {databaseEntries, originalText, transformedText, deinflectedText, reasons} of deinflections) {
+        for (const {databaseEntries, originalText, transformedText, deinflectedText, reasons, isDictionaryDeinflection} of deinflections) {
             if (databaseEntries.length === 0) { continue; }
-            originalTextLength = Math.max(originalTextLength, originalText.length);
+            if (!isDictionaryDeinflection) {
+                originalTextLength = Math.max(originalTextLength, originalText.length);
+            }
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
-                if (ids.has(id)) { continue; }
-                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, true, enabledDictionaryMap);
-                // console.log('_findTermsInternal() dictionaryEntry.pronunciations', dictionaryEntry.pronunciations);
+                if (ids.has(id)) {
+                    const existingEntry = dictionaryEntries.find((entry) => {
+                        return entry.definitions.some((definition) => definition.id === id);
+                    });
+                    if (!existingEntry.inflectionHypotheses.some(
+                        (hypothesis) => JSON.stringify(hypothesis) === JSON.stringify(reasons)
+                    ) && existingEntry.headwords[0].sources[0].transformedText.length <= transformedText.length
+                    ) {
+                        existingEntry.inflectionHypotheses.push(reasons);
+                    }
+                    continue;
+                }
+                // TODO: make configurable
+                if (databaseEntry.definitionTags.includes('non-lemma')) { continue; }
+                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, [reasons], true, enabledDictionaryMap);
                 dictionaryEntries.push(dictionaryEntry);
                 ids.add(id);
             }
@@ -229,57 +241,83 @@ class Translator {
         return {dictionaryEntries, originalTextLength};
     }
 
-    async _findTermsInternal2(text, enabledDictionaryMap, options) {
-        const deinflections = (
+    async _getDeinflections(text, enabledDictionaryMap, options) {
+        let deinflections = (
             options.deinflect ?
-            this._getAllDeinflections(text, options) :
+            this._getAlgorithmDeinflections(text, options) :
             [this._createDeinflection(text, text, text, 0, [], [])]
         );
         if (deinflections.length === 0) { return []; }
 
-        const uniqueDeinflectionTerms = [];
-        const uniqueDeinflectionArrays = [];
-        const uniqueDeinflectionsMap = new Map();
-        for (const deinflection of deinflections) {
-            const term = deinflection.deinflectedText;
-            let deinflectionArray = uniqueDeinflectionsMap.get(term);
-            if (typeof deinflectionArray === 'undefined') {
-                deinflectionArray = [];
-                uniqueDeinflectionTerms.push(term);
-                uniqueDeinflectionArrays.push(deinflectionArray);
-                uniqueDeinflectionsMap.set(term, deinflectionArray);
-            }
-            deinflectionArray.push(deinflection);
-        }
-
-        // console.log('_findTermsInternal2() uniqueDeinflectionTerms', uniqueDeinflectionTerms, uniqueDeinflectionArrays, uniqueDeinflectionsMap);
-
         const {matchType} = options;
+
+        await this._addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType);
+
+        deinflections = deinflections.filter((deinflection) => deinflection.databaseEntries.length > 0);
+
+        const dictionaryDeinflections = await this._getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType);
+
+        deinflections.push(...dictionaryDeinflections);
+
+        return deinflections;
+    }
+
+    async _addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType) {
+        const uniqueDeinflectionsMap = this._groupDeinflectionsByTerm(deinflections);
+        const uniqueDeinflectionArrays = Object.values(uniqueDeinflectionsMap);
+        const uniqueDeinflectionTerms = Object.keys(uniqueDeinflectionsMap);
+
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
+        this._matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays);
+    }
 
-        // console.log('_findTermsInternal2() databaseEntries', databaseEntries);
+    async _getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType) {
+        const dictionaryDeinflections = [];
+        deinflections.forEach((deinflection) => {
+            const {databaseEntries} = deinflection;
+            databaseEntries.forEach((entry) => {
+                const {definitionTags, term, formOf, inflections}  = entry;
+                if (definitionTags.includes('non-lemma')) {
+                    const lemma = formOf || '';
+                    const hypothesis = inflections || [];
 
+                    const dictionaryDeinflection = this._createDeinflection(term, term, lemma, 0, hypothesis, []);
+                    dictionaryDeinflection.isDictionaryDeinflection = true;
+                    dictionaryDeinflections.push(dictionaryDeinflection);
+                }
+            });
+        });
+
+        await this._addEntriesToDeinflections(dictionaryDeinflections, enabledDictionaryMap, matchType);
+
+        return dictionaryDeinflections;
+    }
+
+    _groupDeinflectionsByTerm(deinflections) {
+        return deinflections.reduce((map, deinflection) => {
+            const term = deinflection.deinflectedText;
+            const deinflectionArray = map[term] || [];
+            deinflectionArray.push(deinflection);
+            map[term] = deinflectionArray;
+            return map;
+        }, {});
+    }
+
+    _matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays) {
         for (const databaseEntry of databaseEntries) {
             const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
-            // console.log('_findTermsInternal2() definitionRules', databaseEntry.term, definitionRules, databaseEntry.rules)
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
                 const deinflectionRules = deinflection.rules;
-                // console.log('\t _findTermsInternal2() deinflectionRules', deinflection.deinflectedText, deinflectionRules)
-                // console.log('\t', definitionRules & deinflectionRules)
                 if (deinflectionRules === 0 || (definitionRules & deinflectionRules) !== 0) {
                     deinflection.databaseEntries.push(databaseEntry);
                 }
             }
         }
-
-        return deinflections;
     }
 
     // Deinflections and text transformations
 
-    _getAllDeinflections(text, options) {
-        const start = performance.now();
-
+    _getAlgorithmDeinflections(text, options) {
         const textOptionVariantArray = [
             this._getTextReplacementsVariants(options),
             this._getTextOptionEntryVariants(options.convertHalfWidthCharacters),
@@ -292,13 +330,12 @@ class Translator {
         ];
 
         const jp = this._japaneseUtil;
-        
+
         const deinflections = [];
         const used = new Set();
         for (const [textReplacements, halfWidth, numeric, alphabetic, katakana, hiragana, decapitalize, [collapseEmphatic, collapseEmphaticFull]] of this._getArrayVariants(textOptionVariantArray)) {
             let text2 = text;
             const sourceMap = new TextSourceMap(text2);
-            
 
             if (textReplacements !== null) {
                 text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
@@ -325,23 +362,23 @@ class Translator {
                 text2 = jp.collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
             }
             let i = text2.length;
-            while ( i > 0) {
+            while (i > 0) {
                 const source = text2.substring(0, i);
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                // console.log(`${i} translator.js _getAllDeinflections() source: ${source} rawSource: ${rawSource}`)
                 for (const {term, rules, reasons} of this._deinflector.deinflect(source)) {
                     deinflections.push(this._createDeinflection(rawSource, source, term, rules, reasons, []));
                 }
 
-                if(options.searchResolution === "word") i = source.search(/[^a-zA-Z](\w*)$/);
-                else --i
+                if (options.searchResolution === 'word') {
+                    // TODO: only works for latin script
+                    i = source.search(/[^a-zA-Z](\w*)$/);
+                } else {
+                    --i;
+                }
             }
         }
-
-        const end = performance.now();
-        console.log(`_getAllDeinflections() ${deinflections.length} deinflections in ${end - start}ms`);
 
         return deinflections;
     }
@@ -518,8 +555,8 @@ class Translator {
     _groupDictionaryEntriesByHeadword(dictionaryEntries) {
         const groups = new Map();
         for (const dictionaryEntry of dictionaryEntries) {
-            const {inflections, headwords: [{term, reading}]} = dictionaryEntry;
-            const key = this._createMapKey([term, reading, ...inflections]);
+            const {inflectionHypotheses, headwords: [{term, reading}]} = dictionaryEntry;
+            const key = this._createMapKey([term, reading, ...inflectionHypotheses]);
             let groupDictionaryEntries = groups.get(key);
             if (typeof groupDictionaryEntries === 'undefined') {
                 groupDictionaryEntries = [];
@@ -799,12 +836,10 @@ class Translator {
                 lastPartOfSpeech = partOfSpeech;
             }
 
-            // console.log('translator.js _flagRedundantDefinitionTags()', partOfSpeech, lastPartOfSpeech)
 
             if (removeCategoriesSet.size > 0) {
                 for (const tag of tags) {
                     if (removeCategoriesSet.has(tag.category)) {
-                        // console.log('translator.js _flagRedundantDefinitionTags() redundant', tag)
                         tag.redundant = true;
                     }
                 }
@@ -816,7 +851,6 @@ class Translator {
     // Metadata
 
     async _addTermMeta(dictionaryEntries, enabledDictionaryMap) {
-        // console.log('_addTermMeta');
         const headwordMap = new Map();
         const headwordMapKeys = [];
         const headwordReadingMaps = [];
@@ -900,7 +934,6 @@ class Translator {
                         break;
                     case 'ipa':
                     {
-                        // console.log('IPA!!!', data);
                         if (data.reading !== reading) { continue; }
                         const phoneticTranscriptions = [];
                         for (const {ipa} of data.ipa) {
@@ -909,7 +942,6 @@ class Translator {
                             //     tags2.push(this._createTagGroup(dictionary, tags));
                             // }
                             phoneticTranscriptions.push({ipa, tags: []});
-                            // console.log(JSON.stringify(phoneticTranscriptions));
                         }
                         for (const {pronunciations, headwordIndex} of targets) {
                             pronunciations.push(this._createTermPronunciation(
@@ -1168,11 +1200,11 @@ class Translator {
         return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, hasReading, frequency, displayValue, displayValueParsed};
     }
 
-    _createTermDictionaryEntry(isPrimary, inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxTransformedTextLength, headwords, definitions) {
+    _createTermDictionaryEntry(isPrimary, inflectionHypotheses, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxTransformedTextLength, headwords, definitions) {
         return {
             type: 'term',
             isPrimary,
-            inflections,
+            inflectionHypotheses,
             score,
             frequencyOrder: 0,
             dictionaryIndex,
@@ -1236,7 +1268,7 @@ class Translator {
         let isPrimary = false;
         const definitions = [];
         const definitionsMap = checkDuplicateDefinitions ? new Map() : null;
-        let inflections = null;
+        let inflectionHypotheses = null;
 
         for (const {dictionaryEntry, headwordIndexMap} of definitionEntries) {
             score = Math.max(score, dictionaryEntry.score);
@@ -1245,9 +1277,9 @@ class Translator {
             if (dictionaryEntry.isPrimary) {
                 isPrimary = true;
                 maxTransformedTextLength = Math.max(maxTransformedTextLength, dictionaryEntry.maxTransformedTextLength);
-                const dictionaryEntryInflections = dictionaryEntry.inflections;
-                if (inflections === null || dictionaryEntryInflections.length < inflections.length) {
-                    inflections = dictionaryEntryInflections;
+                const dictionaryEntryInflections = dictionaryEntry.inflectionHypotheses;
+                if (inflectionHypotheses === null || dictionaryEntryInflections.length < inflectionHypotheses.length) {
+                    inflectionHypotheses = dictionaryEntryInflections;
                 }
             }
             if (checkDuplicateDefinitions) {
@@ -1271,7 +1303,7 @@ class Translator {
 
         return this._createTermDictionaryEntry(
             isPrimary,
-            inflections !== null ? inflections : [],
+            inflectionHypotheses !== null ? inflectionHypotheses : [],
             score,
             dictionaryIndex,
             dictionaryPriority,
@@ -1428,7 +1460,7 @@ class Translator {
             if (i !== 0) { return i; }
 
             // Sort by the number of inflection reasons
-            i = v1.inflections.length - v2.inflections.length;
+            i = v1.inflectionHypotheses.length - v2.inflectionHypotheses.length;
             if (i !== 0) { return i; }
 
             // Sort by how many terms exactly match the source (e.g. for exact kana prioritization)
