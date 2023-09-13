@@ -487,10 +487,10 @@ class DictionaryImporter {
     }
 
     _convertTermBankEntryV4(entry, dictionary) {
-        let [expression, reading, definitionTags, rules, score, glossary, sequence, termTags, formOf, inflections] = entry;
+        let [expression, reading, definitionTags, rules, score, glossary, sequence, termTags, formOf, inflectionHypotheses] = entry;
         expression = this._normalizeTermOrReading(expression);
         reading = this._normalizeTermOrReading(reading.length > 0 ? reading : expression);
-        return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, formOf, inflections, dictionary};
+        return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, formOf, inflectionHypotheses, dictionary};
     }
 
     _convertTermMetaBankEntry(entry, dictionary) {

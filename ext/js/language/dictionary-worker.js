@@ -35,6 +35,7 @@ class DictionaryWorker {
     }
 
     deleteDictionary(dictionaryTitle, onProgress) {
+        console.log('dictionary-worker.js deleteDictionary');
         return this._invoke('deleteDictionary', {dictionaryTitle}, [], onProgress);
     }
 

@@ -623,6 +623,7 @@ class DictionaryController {
     }
 
     async _deleteDictionary(dictionaryTitle) {
+        console.log(`_deleteDictionary(${dictionaryTitle})`);
         if (this._isDeleting || this._checkingIntegrity) { return; }
 
         const index = this._dictionaryEntries.findIndex((entry) => entry.dictionaryTitle === dictionaryTitle);
@@ -679,6 +680,7 @@ class DictionaryController {
     }
 
     async _deleteDictionaryInternal(dictionaryTitle, onProgress) {
+        console.log(`_deleteDictionaryInternal(${dictionaryTitle})`);
         await new DictionaryWorker().deleteDictionary(dictionaryTitle, onProgress);
         yomichan.api.triggerDatabaseUpdated('dictionary', 'delete');
     }

@@ -475,7 +475,15 @@
             },
             {
                 "type": ["array", "null"],
-                "description": "Array of inflections that apply to the non-lemma form"
+                "description": "Array of possible inflection combinations that apply to the non-lemma form",
+                "items": {
+                    "type": "array",
+                    "description": "An inflection combination.",
+                    "items": {
+                        "type": "string",
+                        "description": "An inflection."
+                    }
+                }
             }
         ]
     }

@@ -82,6 +82,7 @@ class DictionaryWorkerHandler {
     }
 
     async _deleteDictionary({dictionaryTitle}, onProgress) {
+        console.log('dictionary-worker-handler.js deleteDictionary');
         const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
         try {
             return await dictionaryDatabase.deleteDictionary(dictionaryTitle, 1000, onProgress);

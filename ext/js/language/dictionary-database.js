@@ -139,6 +139,8 @@ class DictionaryDatabase {
     }
 
     async deleteDictionary(dictionaryName, progressRate, onProgress) {
+        console.log('dictionary-database.js: deleteDictionary()');
+
         if (typeof progressRate !== 'number') {
             progressRate = 1;
         }
@@ -173,11 +175,13 @@ class DictionaryDatabase {
         };
 
         const filterKeys = (keys) => {
+            console.log('dictionary-database.js: deleteDictionary() filterKeys() keys.length', keys.length);
             ++progressData.storesProcesed;
             progressData.count += keys.length;
             onProgress(progressData);
             return keys;
         };
+
         const onProgress2 = () => {
             const processed = progressData.processed + 1;
             progressData.processed = processed;
@@ -192,6 +196,7 @@ class DictionaryDatabase {
                 const query = IDBKeyRange.only(dictionaryName);
                 const promise = this._db.bulkDelete(objectStoreName, indexName, query, filterKeys, onProgress2);
                 promises.push(promise);
+                console.log('promise', promises.length);
             }
             await Promise.all(promises);
         }
@@ -425,7 +430,7 @@ class DictionaryDatabase {
             id: row.id,
             sequence: typeof sequence === 'number' ? sequence : -1,
             formOf: row.formOf || null,
-            inflections: row.inflections || null
+            inflectionHypotheses: row.inflectionHypotheses || null
         };
     }
 

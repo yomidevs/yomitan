@@ -216,28 +216,33 @@ class Translator {
             if (!isDictionaryDeinflection) {
                 originalTextLength = Math.max(originalTextLength, originalText.length);
             }
+            console.log('_findTermsInternal databaseEntries', databaseEntries);
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
                 if (ids.has(id)) {
                     const existingEntry = dictionaryEntries.find((entry) => {
                         return entry.definitions.some((definition) => definition.id === id);
                     });
-                    if (!existingEntry.inflectionHypotheses.some(
-                        (hypothesis) => JSON.stringify(hypothesis) === JSON.stringify(reasons)
-                    ) && existingEntry.headwords[0].sources[0].transformedText.length <= transformedText.length
+                    if (
+                        existingEntry.headwords[0].sources[0].transformedText.length <= transformedText.length
                     ) {
-                        existingEntry.inflectionHypotheses.push(reasons);
+                        existingEntry.inflectionHypotheses =
+                            existingEntry.inflectionHypotheses
+                                .concat(reasons.filter((reason) => {
+                                    return !existingEntry.inflectionHypotheses.includes(reason);
+                                }));
                     }
                     continue;
                 }
                 // TODO: make configurable
                 if (databaseEntry.definitionTags.includes('non-lemma')) { continue; }
-                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, [reasons], true, enabledDictionaryMap);
+                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, true, enabledDictionaryMap);
                 dictionaryEntries.push(dictionaryEntry);
                 ids.add(id);
             }
         }
 
+        console.log('dictionaryEntries', dictionaryEntries);
         return {dictionaryEntries, originalTextLength};
     }
 
@@ -255,7 +260,11 @@ class Translator {
 
         deinflections = deinflections.filter((deinflection) => deinflection.databaseEntries.length > 0);
 
+        console.log('_getDeinflections deinflections', deinflections);
+
         const dictionaryDeinflections = await this._getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType);
+
+        console.log('_getDeinflections dictionaryDeinflections', dictionaryDeinflections);
 
         deinflections.push(...dictionaryDeinflections);
 
@@ -268,6 +277,7 @@ class Translator {
         const uniqueDeinflectionTerms = Object.keys(uniqueDeinflectionsMap);
 
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
+        console.log('_addEntriesToDeinflections databaseEntries', databaseEntries);
         this._matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays);
     }
 
@@ -276,12 +286,12 @@ class Translator {
         deinflections.forEach((deinflection) => {
             const {databaseEntries} = deinflection;
             databaseEntries.forEach((entry) => {
-                const {definitionTags, term, formOf, inflections}  = entry;
+                const {definitionTags, term, formOf, inflectionHypotheses}  = entry;
                 if (definitionTags.includes('non-lemma')) {
                     const lemma = formOf || '';
-                    const hypothesis = inflections || [];
+                    const hypotheses = inflectionHypotheses || [];
 
-                    const dictionaryDeinflection = this._createDeinflection(term, term, lemma, 0, hypothesis, []);
+                    const dictionaryDeinflection = this._createDeinflection(term, term, lemma, 0, hypotheses, []);
                     dictionaryDeinflection.isDictionaryDeinflection = true;
                     dictionaryDeinflections.push(dictionaryDeinflection);
                 }
@@ -372,8 +382,7 @@ class Translator {
                 }
 
                 if (options.searchResolution === 'word') {
-                    // TODO: only works for latin script
-                    i = source.search(/[^a-zA-Z](\w*)$/);
+                    i = source.search(new RegExp('[^\\p{Letter}]([\\p{Letter}\\p{Number}]*)$', 'u'));
                 } else {
                     --i;
                 }

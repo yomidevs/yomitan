@@ -165,18 +165,29 @@ class Database {
     }
 
     bulkDelete(objectStoreName, indexName, query, filterKeys=null, onProgress=null) {
+        console.log('bulkDelete', objectStoreName, indexName, query);
+
         return new Promise((resolve, reject) => {
             const transaction = this._readWriteTransaction([objectStoreName], resolve, reject);
             const objectStore = transaction.objectStore(objectStoreName);
             const objectStoreOrIndex = indexName !== null ? objectStore.index(indexName) : objectStore;
 
             const onGetKeys = (keys) => {
+                transaction.commit();
+                console.log('bulkDelete onGetKeys', keys.length);
                 try {
                     if (typeof filterKeys === 'function') {
                         keys = filterKeys(keys);
                     }
-                    this._bulkDeleteInternal(objectStore, keys, onProgress);
-                    transaction.commit();
+                    const batchSize = 100000;
+                    for (let i=0; i*batchSize < keys.length; i += 1) {
+                        const transaction2 = this._readWriteTransaction([objectStoreName], resolve, reject);
+                        const objectStore2 = transaction2.objectStore(objectStoreName);
+                        const batchKeys = keys.slice(i*batchSize, (i+1)*batchSize);
+                        this._bulkDeleteInternal(objectStore2, batchKeys, onProgress);
+                        console.log('bulkDelete onGetKeys commit', batchKeys.length);
+                        transaction2.commit();
+                    }
                 } catch (e) {
                     reject(e);
                 }
@@ -288,6 +299,7 @@ class Database {
 
     _bulkDeleteInternal(objectStore, keys, onProgress) {
         const count = keys.length;
+        console.log('bulkDeleteInternal', objectStore, count);
         if (count === 0) { return; }
 
         let completedCount = 0;
