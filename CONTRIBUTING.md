@@ -50,9 +50,10 @@ Several command line arguments are available for these scripts:
 * `[target]` - Builds a specific target.
 * `--all` - Builds all targets specified in [manifest-variants.json](dev/data/manifest-variants.json).
 * `--default` - Restores the default manifest file.
-* `--manifest <target>` - Overwrites [ext/manifest.json](ext/manifest.json) with the manifest variant for the specified build target.
+* `--manifest <target>` - Overwrites `ext/manifest.json` with the manifest variant for the specified build target.
 * `--dry-run` - Runs the full build process (excluding zip building), checking that the configuration is valid.
 * `--dry-run-build-zip` - If `--dry-run` is also specified, zip building will also be performed in memory; no files are created.
+* `--yomitan-version <version>` - Sets the version number in the extension manifest. Defaults to 0.0.0.0 if not set.
 
 If no arguments are specified, the command is equivalent to `build.bat --all`.
 
@@ -66,11 +67,8 @@ Otherwise, the [JSZip](https://stuk.github.io/jszip/) API is used to generate th
 ## Manifest
 
 Manifest variants for different build targets are specified in [manifest-variants.json](dev/data/manifest-variants.json).
-This file is used to overwrite the [manfiest.json](ext/manifest.json) file included in the extension.
-By default, this manifest should be the default `chrome` manifest, and changes to [manfiest.json](ext/manifest.json) should not be committed
-unless there is a corresponding change in [manifest-variants.json](dev/data/manifest-variants.json).
-There is a continuous integration test which validates this, and the default manifest can be restored by running
-`build.bat --default`.
+This file is used to generate the `ext/manifest.json` file included in the extension.
+The generated `ext/manfiest.json` should not be committed.
 
 ## Style
 
