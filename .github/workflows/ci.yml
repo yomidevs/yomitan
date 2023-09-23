@@ -41,16 +41,11 @@ jobs:
         env:
           CI: true
 
-      - name: Manifest
-        run: npm run test-manifest
-        env:
-          CI: true
+      - name: Build
+        run: npm run build
 
       - name: Validate manifest.json of the extension
         uses: cardinalby/schema-validator-action@c2da05377e89dd0c9b7be9420da0b3534b1efcce # pin@v1
         with:
           file: ext/manifest.json
           schema: "https://json.schemastore.org/chrome-manifest.json"
-
-      - name: Build
-        run: npm run test-build
