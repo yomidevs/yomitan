@@ -21,7 +21,7 @@ jobs:
           node-version-file: ".node-version"
 
       - name: Lint
-        run: npm run-script build -- --yomitan-version ${{ github.ref_name }}
+        run: npm run-script build -- --all --yomitan-version ${{ github.ref_name }}
         shell: bash
 
       - name: Release
