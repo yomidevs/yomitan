@@ -14,9 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-const LanguageUtil = {
 
-    decapitalize: function(str) {
+/* global
+ */
+class LanguageUtil {
+    static decapitalize(str) {
         return str.toLowerCase();
     }
-};
+
+    static capitalizeFirstLetter(str){
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+}
+

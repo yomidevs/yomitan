@@ -336,6 +336,7 @@ class Translator {
             this._getTextOptionEntryVariants(options.convertHiraganaToKatakana),
             this._getTextOptionEntryVariants(options.convertKatakanaToHiragana),
             this._getTextOptionEntryVariants(options.decapitalize),
+            this._getTextOptionEntryVariants(options.capitalizeFirstLetter),
             this._getCollapseEmphaticOptions(options)
         ];
 
@@ -343,7 +344,9 @@ class Translator {
 
         const deinflections = [];
         const used = new Set();
-        for (const [textReplacements, halfWidth, numeric, alphabetic, katakana, hiragana, decapitalize, [collapseEmphatic, collapseEmphaticFull]] of this._getArrayVariants(textOptionVariantArray)) {
+
+        for (const arrayVariant of this._getArrayVariants(textOptionVariantArray)) {
+            const [textReplacements, halfWidth, numeric, alphabetic, katakana, hiragana, decapitalize, capitalizeFirstLetter, [collapseEmphatic, collapseEmphaticFull]] = arrayVariant;
             let text2 = text;
             const sourceMap = new TextSourceMap(text2);
 
@@ -367,6 +370,9 @@ class Translator {
             }
             if (decapitalize) {
                 text2 = LanguageUtil.decapitalize(text2);
+            }
+            if (capitalizeFirstLetter) {
+                text2 = LanguageUtil.capitalizeFirstLetter(text2);
             }
             if (collapseEmphatic) {
                 text2 = jp.collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);

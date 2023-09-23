@@ -42,7 +42,6 @@ class AudioDownloader {
     }
 
     async getTermAudioInfoList(source, term, reading, language) {
-        // console.log('audio-downloader.js: getTermAudioInfoList()', source, term, reading, language);
         const handler = this._getInfoHandlers.get(source.type);
         if (typeof handler === 'function') {
             try {

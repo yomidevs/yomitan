@@ -25,6 +25,7 @@
  * ClipboardReader
  * DictionaryDatabase
  * Environment
+ * LanguageUtil
  * JapaneseUtil
  * Mecab
  * MediaUtil
@@ -51,6 +52,7 @@ class Backend {
      * Creates a new instance.
      */
     constructor() {
+        this._languageUtil = new LanguageUtil();
         this._japaneseUtil = new JapaneseUtil(wanakana);
         this._environment = new Environment();
         this._dictionaryDatabase = new DictionaryDatabase();
@@ -2091,6 +2093,7 @@ class Backend {
                 convertKatakanaToHiragana,
                 collapseEmphaticSequences,
                 decapitalize,
+                capitalizeFirstLetter,
                 textReplacements: textReplacementsOptions
             }
         } = options;
@@ -2120,6 +2123,7 @@ class Backend {
             collapseEmphaticSequences,
             searchResolution,
             decapitalize,
+            capitalizeFirstLetter,
             textReplacements,
             enabledDictionaryMap,
             excludeDictionaryDefinitions

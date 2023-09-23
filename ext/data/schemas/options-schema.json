@@ -736,6 +736,7 @@
                                     "convertKatakanaToHiragana",
                                     "collapseEmphaticSequences",
                                     "decapitalize",
+                                    "capitalizeFirstLetter",
                                     "textReplacements"
                                 ],
                                 "properties": {
@@ -770,6 +771,11 @@
                                         "default": "false"
                                     },
                                     "decapitalize": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "variant"],
+                                        "default": "false"
+                                    },
+                                    "capitalizeFirstLetter": {
                                         "type": "string",
                                         "enum": ["false", "true", "variant"],
                                         "default": "false"

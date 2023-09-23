@@ -315,7 +315,8 @@ class OptionsUtil {
                 convertHiraganaToKatakana: 'false',
                 convertKatakanaToHiragana: 'variant',
                 collapseEmphaticSequences: 'false',
-                decapitalize: 'true'
+                decapitalize: 'true',
+                capitalizeFirstLetter: 'false'
             },
 
             dictionaries: {},
