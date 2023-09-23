@@ -1,6 +1,6 @@
 # Yomitan
 
-[![Chrome Release (Testing)](https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?label=chrome%20release%20(testing))](https://chrome.google.com/webstore/detail/yomitan-development-build/glnaenfapkkecknnmginabpmgkenenml)
+[![Chrome Release (Testing)](https://img.shields.io/chrome-web-store/v/glnaenfapkkecknnmginabpmgkenenml?label=chrome%20release%20(testing))](https://chrome.google.com/webstore/detail/yomitan-development-build/glnaenfapkkecknnmginabpmgkenenml)
 [![Firefox Release (Testing)](https://img.shields.io/github/v/release/themoeway/yomitan?filter=*&label=firefox%20release%20(testing))](https://github.com/themoeway/yomitan/releases)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
 [![Discord Server](https://dcbadge.vercel.app/api/server/4ysT8qjE?style=flat)](https://discord.gg/4ysT8qjE)\
