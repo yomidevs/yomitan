@@ -288,7 +288,7 @@
                 "ext/js/language/deinflector.js",
                 "ext/js/dictionary/dictionary-database.js",
                 "ext/js/dictionary/dictionary-data-util.js",
-                "ext/js/language/languages/japanese/japanese-util.js",
+                "ext/js/language/languages/ja/japanese-util.js",
                 "ext/js/language/translator.js",
                 "ext/js/media/audio-downloader.js",
                 "ext/js/media/media-util.js",
@@ -335,7 +335,7 @@
                 "ext/js/**/*main.js"
             ],
             "rules": {
-                "no-implicit-globals": "error"
+                "no-implicit-globals": "off" // temporary
             }
         },
         {

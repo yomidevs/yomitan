@@ -14,6 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+/* global
+ * suffixInflection
+ * infixInflection
+ * prefixInflection
+ * wholeWordInflection
+ * fetchAsset
+*/
+
 const pastSuffixInflections = [
     suffixInflection('ed', '', [], ['v']), // 'walked'
     suffixInflection('ed', 'e', [], ['v']), // 'hoped'
@@ -46,13 +55,13 @@ function doubledConsonantInflection(consonants, suffix, inTypes, outTypes){
 }
 
 async function createIrregularVerbInflections(){
-    verbs = {
+    const verbs = {
         'past': [],
         'participle': []
     };
 
     console.log('Fetching irregular verbs file...');
-    const irregularVerbs = JSON.parse(await fetchAsset('/js/language/languages/english/irregular-verbs.json'));
+    const irregularVerbs = JSON.parse(await fetchAsset('/js/language/languages/en/irregular-verbs.json'));
     for (const [verb, inflections] of Object.entries(irregularVerbs)){
         for (const [past, participle] of inflections){
             if (past !== verb) { verbs.past.push(suffixInflection(past, verb, ['v'], ['v'])); }
@@ -66,10 +75,10 @@ async function createIrregularVerbInflections(){
 const irregularVerbInflections = createIrregularVerbInflections();
 
 async function createPhrasalVerbInflections(){
-    const phrasalVerbParticles = JSON.parse(await fetchAsset('/js/language/languages/english/phrasal-verb-particles.json'));
+    const phrasalVerbParticles = JSON.parse(await fetchAsset('/js/language/languages/en/phrasal-verb-particles.json'));
     const particlesDisjunction = phrasalVerbParticles.join('|');
 
-    const phrasalVerbPrepositions = JSON.parse(await fetchAsset('/js/language/languages/english/phrasal-verb-prepositions.json'));
+    const phrasalVerbPrepositions = JSON.parse(await fetchAsset('/js/language/languages/en/phrasal-verb-prepositions.json'));
 
     const combinedSet = new Set([...phrasalVerbParticles, ...phrasalVerbPrepositions]);
     const combinedDisjunction = Array.from(combinedSet).join('|');
@@ -120,8 +129,7 @@ function createModalVerbNegations(){
     return mainModalVerbs.map((modalVerb) => prefixInflection(`${modalVerb} not`, modalVerb, ['v'], ['v']));
 }
 
-
-async function deinflectionReasonsEn(){
+async function getDeinflectionReasons(){
     const reasons = {
         'interposed object': [
             ...(await phrasalVerbInflections)['interposed object']

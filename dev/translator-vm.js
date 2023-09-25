@@ -51,7 +51,7 @@ class TranslatorVM extends DatabaseVM {
             'js/dictionary/dictionary-data-util.js',
             'js/dictionary/dictionary-importer.js',
             'js/dictionary/dictionary-database.js',
-            'js/language/languages/japanese/japanese-util.js',
+            'js/language/languages/ja/japanese-util.js',
             'js/language/translator.js',
             'js/media/media-util.js'
         ]);

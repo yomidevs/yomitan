@@ -103,7 +103,7 @@ class AudioDownloader {
             params.set('kana', reading);
         }
 
-        const url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.toString()}`;
+        const url = `https://assets.languagepod101.com/dictionary/ja/audiomp3.php?${params.toString()}`;
         return [{type: 'url', url}];
     }
 

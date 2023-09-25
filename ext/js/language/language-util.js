@@ -16,10 +16,17 @@
  */
 
 /* global
+ * loadScript
+ * getDeinflectionReasons
  */
+
 class LanguageUtil {
     constructor(getLanguageFunction) {
         this.getLanguage = getLanguageFunction;
+    }
+
+    get language() {
+        return this.getLanguage();
     }
 
     decapitalize(str) {
@@ -28,6 +35,12 @@ class LanguageUtil {
 
     capitalizeFirstLetter(str){
         return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    async getLanguageDeinflectionReasons(){
+        await loadScript(`/js/language/languages/${this.language}/grammar.js`);
+        const reasons = await getDeinflectionReasons();
+        return reasons;
     }
 }
 

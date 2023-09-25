@@ -217,7 +217,6 @@ class Translator {
             if (!isDictionaryDeinflection) {
                 originalTextLength = Math.max(originalTextLength, originalText.length);
             }
-            console.log('_findTermsInternal databaseEntries', databaseEntries);
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
                 if (ids.has(id)) {
@@ -243,7 +242,6 @@ class Translator {
             }
         }
 
-        console.log('dictionaryEntries', dictionaryEntries);
         return {dictionaryEntries, originalTextLength};
     }
 
@@ -261,11 +259,7 @@ class Translator {
 
         deinflections = deinflections.filter((deinflection) => deinflection.databaseEntries.length > 0);
 
-        console.log('_getDeinflections deinflections', deinflections);
-
         const dictionaryDeinflections = await this._getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType);
-
-        console.log('_getDeinflections dictionaryDeinflections', dictionaryDeinflections);
 
         deinflections.push(...dictionaryDeinflections);
 
@@ -278,7 +272,6 @@ class Translator {
         const uniqueDeinflectionTerms = Object.keys(uniqueDeinflectionsMap);
 
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
-        console.log('_addEntriesToDeinflections databaseEntries', databaseEntries);
         this._matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays);
     }
 

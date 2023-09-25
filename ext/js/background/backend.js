@@ -235,13 +235,11 @@ class Backend {
                 log.error(e);
             }
 
-            const deinflectionReasons = Object.assign({}, deinflectionReasonsJa, await deinflectionReasonsEn());
-
-            this._translator.prepare(deinflectionReasons);
-
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await fetchAsset('/data/templates/default-anki-field-templates.handlebars')).trim();
             this._options = await this._optionsUtil.load();
+
+            await this._prepareTranslator();
 
             this._applyOptions('background');
 
@@ -263,6 +261,13 @@ class Backend {
                 this._badgePrepareDelayTimer = null;
             }
         }
+    }
+
+    async _prepareTranslator() {
+        const reasons = await this._languageUtil.getLanguageDeinflectionReasons();
+        console.log('reasons', reasons);
+        const deinflectionReasons = Object.assign({}, reasons);
+        this._translator.prepare(deinflectionReasons);
     }
 
     // Event handlers
@@ -1142,8 +1147,6 @@ class Backend {
     async _textParseScanning(text, scanLength, optionsContext) {
         const options = this._getProfileOptions(optionsContext);
 
-        // console.log('textParseScanning', text, scanLength, options)
-
         if (options.general.language === 'ja') {
             const jp = this._japaneseUtil;
             const mode = 'simple';
@@ -1185,7 +1188,6 @@ class Backend {
                     i += character.length;
                 }
             }
-            // console.log('textParseScanning results', results)
             return results;
         } else {
             return [[{'text': text, 'reading': text}]];

@@ -44,7 +44,7 @@ self.importScripts(
     '/js/language/deinflector.js',
     '/js/dictionary/dictionary-database.js',
     '/js/dictionary/dictionary-data-util.js',
-    '/js/language/languages/japanese/japanese-util.js',
+    '/js/language/languages/ja/japanese-util.js',
     '/js/language/translator.js',
     '/js/media/audio-downloader.js',
     '/js/media/media-util.js',

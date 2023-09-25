@@ -36,3 +36,23 @@ async function fetchAsset(url, json=false) {
         return await (json ? response.json() : response.text());
     }
 }
+
+function loadScript(filename) {
+    return new Promise((resolve, reject) => {
+        const fileref = document.createElement('script');
+        fileref.setAttribute('type', 'text/javascript');
+        fileref.setAttribute('src', filename);
+
+        if (typeof fileref !== 'undefined') {
+            fileref.onload = () => {
+                resolve(); // Resolve the Promise when the script has loaded
+            };
+            fileref.onerror = () => {
+                reject(new Error('Error loading script: ' + filename)); // Reject the Promise on error
+            };
+
+            document.getElementsByTagName('head')[0].appendChild(fileref);
+        }
+    });
+}
+
