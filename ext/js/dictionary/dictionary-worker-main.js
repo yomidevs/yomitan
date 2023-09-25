@@ -25,10 +25,10 @@ self.importScripts(
     '/js/data/database.js',
     '/js/data/json-schema.js',
     '/js/general/cache-map.js',
-    '/js/language/dictionary-database.js',
-    '/js/language/dictionary-importer.js',
-    '/js/language/dictionary-worker-handler.js',
-    '/js/language/dictionary-worker-media-loader.js',
+    '/js/dictionary/dictionary-database.js',
+    '/js/dictionary/dictionary-importer.js',
+    '/js/dictionary/dictionary-worker-handler.js',
+    '/js/dictionary/dictionary-worker-media-loader.js',
     '/js/media/media-util.js'
 );
 

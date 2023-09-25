@@ -139,8 +139,6 @@ class DictionaryDatabase {
     }
 
     async deleteDictionary(dictionaryName, progressRate, onProgress) {
-        console.log('dictionary-database.js: deleteDictionary()');
-
         if (typeof progressRate !== 'number') {
             progressRate = 1;
         }
@@ -175,7 +173,6 @@ class DictionaryDatabase {
         };
 
         const filterKeys = (keys) => {
-            console.log('dictionary-database.js: deleteDictionary() filterKeys() keys.length', keys.length);
             ++progressData.storesProcesed;
             progressData.count += keys.length;
             onProgress(progressData);

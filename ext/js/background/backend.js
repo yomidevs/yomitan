@@ -52,11 +52,13 @@ class Backend {
      * Creates a new instance.
      */
     constructor() {
-        this._languageUtil = new LanguageUtil();
+        this._languageUtil = new LanguageUtil(() => this._getProfileLanguage({current: true}));
+
         this._japaneseUtil = new JapaneseUtil(wanakana);
         this._environment = new Environment();
         this._dictionaryDatabase = new DictionaryDatabase();
         this._translator = new Translator({
+            languageUtil: this._languageUtil,
             japaneseUtil: this._japaneseUtil,
             database: this._dictionaryDatabase
         });
@@ -434,6 +436,8 @@ class Backend {
     }
 
     async _onApiTermsFind({text, details, optionsContext}) {
+        console.log('getlanguage', this._languageUtil.getLanguage());
+
         const options = this._getProfileOptions(optionsContext);
         const {general: {resultOutputMode: mode, maxResults}} = options;
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
@@ -1060,7 +1064,7 @@ class Backend {
     }
 
     _getProfileLanguage(optionsContext, useSchema=false) {
-        return this._getProfile(optionsContext, useSchema).options.general.language;
+        return this._getProfileOptions(optionsContext, useSchema).general.language;
     }
 
     _getProfile(optionsContext, useSchema=false) {

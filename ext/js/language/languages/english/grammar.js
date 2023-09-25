@@ -52,7 +52,7 @@ async function createIrregularVerbInflections(){
     };
 
     console.log('Fetching irregular verbs file...');
-    const irregularVerbs = JSON.parse(await fetchAsset('/js/language/english/irregular-verbs.json'));
+    const irregularVerbs = JSON.parse(await fetchAsset('/js/language/languages/english/irregular-verbs.json'));
     for (const [verb, inflections] of Object.entries(irregularVerbs)){
         for (const [past, participle] of inflections){
             if (past !== verb) { verbs.past.push(suffixInflection(past, verb, ['v'], ['v'])); }
@@ -66,10 +66,10 @@ async function createIrregularVerbInflections(){
 const irregularVerbInflections = createIrregularVerbInflections();
 
 async function createPhrasalVerbInflections(){
-    const phrasalVerbParticles = JSON.parse(await fetchAsset('/js/language/english/phrasal-verb-particles.json'));
+    const phrasalVerbParticles = JSON.parse(await fetchAsset('/js/language/languages/english/phrasal-verb-particles.json'));
     const particlesDisjunction = phrasalVerbParticles.join('|');
 
-    const phrasalVerbPrepositions = JSON.parse(await fetchAsset('/js/language/english/phrasal-verb-prepositions.json'));
+    const phrasalVerbPrepositions = JSON.parse(await fetchAsset('/js/language/languages/english/phrasal-verb-prepositions.json'));
 
     const combinedSet = new Set([...phrasalVerbParticles, ...phrasalVerbPrepositions]);
     const combinedDisjunction = Array.from(combinedSet).join('|');

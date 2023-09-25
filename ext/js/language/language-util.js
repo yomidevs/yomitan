@@ -18,11 +18,15 @@
 /* global
  */
 class LanguageUtil {
-    static decapitalize(str) {
+    constructor(getLanguageFunction) {
+        this.getLanguage = getLanguageFunction;
+    }
+
+    decapitalize(str) {
         return str.toLowerCase();
     }
 
-    static capitalizeFirstLetter(str){
+    capitalizeFirstLetter(str){
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 }

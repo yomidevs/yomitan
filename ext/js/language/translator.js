@@ -19,7 +19,6 @@
  * Deinflector
  * RegexUtil
  * TextSourceMap
- * LanguageUtil
  */
 
 /**
@@ -41,8 +40,10 @@ class Translator {
      * @param {object} details The details for the class.
      * @param {JapaneseUtil} details.japaneseUtil An instance of JapaneseUtil.
      * @param {DictionaryDatabase} details.database An instance of DictionaryDatabase.
+     * @param {LanguageUtil} details.languageUtil An instance of LanguageUtil.
      */
-    constructor({japaneseUtil, database}) {
+    constructor({languageUtil, japaneseUtil, database}) {
+        this._languageUtil = languageUtil;
         this._japaneseUtil = japaneseUtil;
         this._database = database;
         this._deinflector = null;
@@ -369,10 +370,10 @@ class Translator {
                 text2 = jp.convertKatakanaToHiragana(text2);
             }
             if (decapitalize) {
-                text2 = LanguageUtil.decapitalize(text2);
+                text2 = this._languageUtil.decapitalize(text2);
             }
             if (capitalizeFirstLetter) {
-                text2 = LanguageUtil.capitalizeFirstLetter(text2);
+                text2 = this._languageUtil.capitalizeFirstLetter(text2);
             }
             if (collapseEmphatic) {
                 text2 = jp.collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
