@@ -385,7 +385,7 @@ class Translator {
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
                 for (const {term, rules, reasons} of this._deinflector.deinflect(source)) {
-                    deinflections.push(this._createDeinflection(rawSource, source, term, rules, reasons, []));
+                    deinflections.push(this._createDeinflection(rawSource, source, term, rules, [reasons], []));
                 }
 
                 if (options.searchResolution === 'word') {
