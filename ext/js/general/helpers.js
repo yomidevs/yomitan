@@ -56,3 +56,9 @@ function loadScript(filename) {
     });
 }
 
+function removeScript(filename){
+    const scriptElement = document.querySelector(`script[src="${filename}"]`);
+    if (scriptElement) {
+        document.head.removeChild(scriptElement);
+    }
+}

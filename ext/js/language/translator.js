@@ -57,8 +57,8 @@ class Translator {
      * this function has been called.
      * @param {object} deinflectionReasons The raw deinflections reasons data that the Deinflector uses.
      */
-    prepare(deinflectionReasons) {
-        this._deinflector = new Deinflector(deinflectionReasons);
+    prepare() {
+        this._deinflector = new Deinflector(this._languageUtil.deinflectionReasons);
     }
 
     /**

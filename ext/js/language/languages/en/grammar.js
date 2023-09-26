@@ -60,7 +60,6 @@ async function createIrregularVerbInflections(){
         'participle': []
     };
 
-    console.log('Fetching irregular verbs file...');
     const irregularVerbs = JSON.parse(await fetchAsset('/js/language/languages/en/irregular-verbs.json'));
     for (const [verb, inflections] of Object.entries(irregularVerbs)){
         for (const [past, participle] of inflections){
@@ -129,7 +128,7 @@ function createModalVerbNegations(){
     return mainModalVerbs.map((modalVerb) => prefixInflection(`${modalVerb} not`, modalVerb, ['v'], ['v']));
 }
 
-async function getDeinflectionReasons(){
+window.getDeinflectionReasons = async () => {
     const reasons = {
         'interposed object': [
             ...(await phrasalVerbInflections)['interposed object']
@@ -293,4 +292,4 @@ async function getDeinflectionReasons(){
     };
 
     return reasons;
-}
+};

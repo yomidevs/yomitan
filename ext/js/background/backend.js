@@ -52,7 +52,7 @@ class Backend {
      * Creates a new instance.
      */
     constructor() {
-        this._languageUtil = new LanguageUtil(() => this._getProfileLanguage({current: true}));
+        this._languageUtil = new LanguageUtil();
 
         this._japaneseUtil = new JapaneseUtil(wanakana);
         this._environment = new Environment();
@@ -239,7 +239,8 @@ class Backend {
             this._defaultAnkiFieldTemplates = (await fetchAsset('/data/templates/default-anki-field-templates.handlebars')).trim();
             this._options = await this._optionsUtil.load();
 
-            await this._prepareTranslator();
+            await this._languageUtil.setLanguage(this._getProfileLanguage({current: true}));
+            this._translator.prepare();
 
             this._applyOptions('background');
 
@@ -263,12 +264,6 @@ class Backend {
         }
     }
 
-    async _prepareTranslator() {
-        const reasons = await this._languageUtil.getLanguageDeinflectionReasons();
-        console.log('reasons', reasons);
-        const deinflectionReasons = Object.assign({}, reasons);
-        this._translator.prepare(deinflectionReasons);
-    }
 
     // Event handlers
 
@@ -441,14 +436,11 @@ class Backend {
     }
 
     async _onApiTermsFind({text, details, optionsContext}) {
-        console.log('getlanguage', this._languageUtil.getLanguage());
-
         const options = this._getProfileOptions(optionsContext);
         const {general: {resultOutputMode: mode, maxResults}} = options;
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
         const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
         dictionaryEntries.splice(maxResults);
-        // console.log('backend.js::_onApiTermsFind dictionaryEntries:', dictionaryEntries);
         return {dictionaryEntries, originalTextLength};
     }
 
@@ -530,7 +522,6 @@ class Backend {
     }
 
     async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails}) {
-        // console.log('backend.js: _onApiInjectAnkiNoteMedia');
         return await this._injectAnkNoteMedia(
             this._anki,
             timestamp,
@@ -576,7 +567,6 @@ class Backend {
 
     async _onApiGetTermAudioInfoList({source, term, reading}) {
         const language = this._getProfileLanguage({current: true});
-        console.log('backend.js::_onApiGetTermAudioInfoList source:', source, 'term:', term, 'reading:', reading, 'language:', language);
         return await this._audioDownloader.getTermAudioInfoList(source, term, reading, language);
     }
 
@@ -1034,7 +1024,7 @@ class Backend {
         );
     }
 
-    _applyOptions(source) {
+    async _applyOptions(source) {
         const options = this._getProfileOptions({current: true});
         this._updateBadge();
 
@@ -1055,6 +1045,11 @@ class Backend {
         }
 
         this._accessibilityController.update(this._getOptionsFull(false));
+
+        if (options.general.language !== this._languageUtil.language){
+            await this._languageUtil.setLanguage(options.general.language);
+            this._translator.prepare();
+        }
 
         this._sendMessageAllTabsIgnoreResponse('Yomichan.optionsUpdated', {source});
     }
@@ -1332,7 +1327,6 @@ class Backend {
     }
 
     _getSetting(target) {
-        // console.log('backend.js: _getSetting()');
         const options = this._getModifySettingObject(target);
         const accessor = new ObjectPropertyAccessor(options);
         const {path} = target;
@@ -1629,9 +1623,7 @@ class Backend {
     }
 
     _waitUntilTabFrameIsReady(tabId, frameId, timeout=null) {
-        // console.log('backend.js: _waitUntilTabFrameIsReady ');
         return new Promise((resolve, reject) => {
-            // console.log('backend.js: _waitUntilTabFrameIsReady promise');
             let timer = null;
             let onMessage = (message, sender) => {
                 if (
@@ -1777,8 +1769,6 @@ class Backend {
     }
 
     async _injectAnkNoteMedia(ankiConnect, timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails) {
-        // console.log('backend.js: _injectAnkNoteMedia');
-
         let screenshotFileName = null;
         let clipboardImageFileName = null;
         let clipboardText = null;
@@ -1840,8 +1830,6 @@ class Backend {
     }
 
     async _injectAnkiNoteAudio(ankiConnect, timestamp, definitionDetails, details) {
-        console.log('backend.js: _injectAnkiNoteAudio');
-
         const {type, term, reading} = definitionDetails;
         if (
             type === 'kanji' ||
@@ -2082,7 +2070,6 @@ class Backend {
      * @returns {FindTermsOptions} An options object.
      */
     _getTranslatorFindTermsOptions(mode, details, options) {
-        // console.log("backend.js::_getTranslatorFindTermsOptions", options)
         let {matchType, deinflect} = details;
         if (typeof matchType !== 'string') { matchType = 'exact'; }
         if (typeof deinflect !== 'boolean') { deinflect = true; }

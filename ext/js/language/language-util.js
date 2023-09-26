@@ -17,16 +17,14 @@
 
 /* global
  * loadScript
+ * removeScript
  * getDeinflectionReasons
  */
 
 class LanguageUtil {
-    constructor(getLanguageFunction) {
-        this.getLanguage = getLanguageFunction;
-    }
-
-    get language() {
-        return this.getLanguage();
+    constructor() {
+        this.language = null;
+        this.deinflectionReasons = [];
     }
 
     decapitalize(str) {
@@ -37,10 +35,24 @@ class LanguageUtil {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    async getLanguageDeinflectionReasons(){
-        await loadScript(`/js/language/languages/${this.language}/grammar.js`);
-        const reasons = await getDeinflectionReasons();
-        return reasons;
+    async setLanguage(newLanguage){
+        let reasons = [];
+        try {
+            if (this.language !== newLanguage) {
+                removeScript(`/js/language/languages/${this.language}/grammar.js`);
+
+                this.language = newLanguage;
+
+                await loadScript(`/js/language/languages/${this.language}/grammar.js`);
+                reasons = await getDeinflectionReasons();
+            } else {
+                reasons = this.deinflectionReasons;
+            }
+
+            this.deinflectionReasons = reasons;
+        } catch (e) {
+            console.log(e);
+        }
     }
 }
 

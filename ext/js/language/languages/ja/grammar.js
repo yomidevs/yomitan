@@ -19,7 +19,7 @@
  * suffixInflection
 */
 
-async function getDeinflectionReasons() {
+window.getDeinflectionReasons = async () =>  {
     return {
         '-ba': [
             suffixInflection('ければ', 'い', [], ['adj-i']),
@@ -667,7 +667,7 @@ async function getDeinflectionReasons() {
             {'inflected': /.*べえ$/, 'uninflect': (term) =>  term.replace(/べえ$/, 'ばい'), 'rulesIn': [], 'rulesOut': ['adj-i']}
         ]
     };
-}
+};
 
 // module.exports = {
 //     deinflectionReasonsJa,
