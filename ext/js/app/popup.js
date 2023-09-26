@@ -201,7 +201,6 @@ class Popup extends EventDispatcher {
      * Prepares the popup for use.
      */
     prepare() {
-        console.log('Popup.prepare()');
         this._frame.addEventListener('mouseover', this._onFrameMouseOver.bind(this));
         this._frame.addEventListener('mouseout', this._onFrameMouseOut.bind(this));
         this._frame.addEventListener('mousedown', (e) => e.stopPropagation());
@@ -301,7 +300,6 @@ class Popup extends EventDispatcher {
         await this._show(sourceRects, writingMode);
 
         if (displayDetails !== null) {
-            console.log('Popup.showContent() calling Display.setContent() displayDetails=', displayDetails);
             this._invokeSafe('Display.setContent', {details: displayDetails});
         }
     }
@@ -452,7 +450,6 @@ class Popup extends EventDispatcher {
                 error.source = this; // Used to detect a passive error which should be ignored
                 throw error;
             }
-            console.log('popup.js _injectInner2');
             const url = chrome.runtime.getURL('/popup.html');
             if (useSecurePopupFrameUrl) {
                 contentDocument.location.href = url;

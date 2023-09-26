@@ -30,8 +30,6 @@
 
 (async () => {
     try {
-        console.log('search-main.js');
-
         const documentFocusController = new DocumentFocusController('#search-textbox');
         documentFocusController.prepare();
 

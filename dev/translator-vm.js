@@ -94,6 +94,8 @@ class TranslatorVM extends DatabaseVM {
             japaneseUtil: this._japaneseUtil,
             database: dictionaryDatabase
         });
+
+        // should not work
         const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect_ja.json')));
         this._translator.prepare(deinflectionReasons);
 

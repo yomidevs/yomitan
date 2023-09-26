@@ -54,7 +54,6 @@ class AnkiNoteDataCreator {
         context,
         media
     }) {
-        // console.log('create()');
         const self = this;
         const definition = this.createCachedValue(this._getDefinition.bind(this, dictionaryEntry, context, resultOutputMode));
         const uniqueExpressions = this.createCachedValue(this._getUniqueExpressions.bind(this, dictionaryEntry));
@@ -214,7 +213,6 @@ class AnkiNoteDataCreator {
 
     _getPitchCount(cachedPitches) {
         const pitches = this.getCachedValue(cachedPitches);
-        // console.log('cachedPitches 1', pitches);
         return pitches.reduce((i, v) => i + v.pitches.length, 0);
     }
 
@@ -437,12 +435,10 @@ class AnkiNoteDataCreator {
         const {headwords} = dictionaryEntry;
 
         const pitchAccentPronunciations = dictionaryEntry.pronunciations.filter(({type}) => (type === 'pitch-accent'));
-        // console.log('filtered pitchAccentPronunciations', pitchAccentPronunciations);
 
         for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches} of pitchAccentPronunciations) {
             const {term, reading} = headwords[headwordIndex];
             const cachedPitches = this.createCachedValue(this._getTermPitchesInner.bind(this, pitches));
-            // console.log('cachedPitches 2', cachedPitches);
 
             results.push({
                 index: results.length,
@@ -461,7 +457,6 @@ class AnkiNoteDataCreator {
     }
 
     _getTermPhoneticTranscriptions(dictionaryEntry) {
-        // console.log('_getTermPhoneticTranscriptions dictionaryEntry', dictionaryEntry);
         const results = [];
         const {headwords} = dictionaryEntry;
         for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, phoneticTranscriptions} of dictionaryEntry.pronunciations) {
@@ -565,13 +560,11 @@ class AnkiNoteDataCreator {
         const results = [];
         const {headwords, pronunciations} = dictionaryEntry;
         const pitchAccentPronunciations = pronunciations.filter(({type}) => (type === 'pitch-accent'));
-        // console.log('filtered pitchAccentPronunciations', pitchAccentPronunciations);
 
         for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches} of pitchAccentPronunciations) {
             if (headwordIndex !== i) { continue; }
             const {term, reading} = headwords[headwordIndex];
             const cachedPitches = this.createCachedValue(this._getTermPitchesInner.bind(this, pitches));
-            // console.log('cachedPitches 3', cachedPitches);
             results.push({
                 index: results.length,
                 expressionIndex: headwordIndex,
@@ -616,7 +609,6 @@ class AnkiNoteDataCreator {
     }
 
     _convertTags(tags) {
-        // console.log('convertTags', tags);
         const results = [];
         for (const tag of tags) {
             results.push(this._convertTag(tag));

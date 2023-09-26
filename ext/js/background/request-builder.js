@@ -30,7 +30,6 @@ class RequestBuilder {
      * Creates a new instance.
      */
     constructor() {
-        console.log('RequestBuilder constructor');
         this._onBeforeSendHeadersExtraInfoSpec = ['blocking', 'requestHeaders', 'extraHeaders'];
         this._textEncoder = new TextEncoder();
         this._ruleIds = new Set();

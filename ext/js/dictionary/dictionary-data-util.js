@@ -91,7 +91,6 @@ class DictionaryDataUtil {
     }
 
     static getGroupedPronunciations(dictionaryEntry) {
-        // console.log('getGroupedPronunciations', dictionaryEntry);
         const {headwords, pronunciations} = dictionaryEntry;
 
         const allTerms = new Set();
@@ -102,7 +101,6 @@ class DictionaryDataUtil {
         }
 
         const groupedPronunciationsMap = new Map();
-        // console.log('pronunciations', pronunciations);
         for (const {headwordIndex, dictionary, pitches, phoneticTranscriptions} of pronunciations) {
             const {term, reading} = headwords[headwordIndex];
             let dictionaryGroupedPronunciationList = groupedPronunciationsMap.get(dictionary);

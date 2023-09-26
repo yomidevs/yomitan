@@ -178,7 +178,6 @@ class DictionaryDatabase {
             onProgress(progressData);
             return keys;
         };
-
         const onProgress2 = () => {
             const processed = progressData.processed + 1;
             progressData.processed = processed;
@@ -193,7 +192,6 @@ class DictionaryDatabase {
                 const query = IDBKeyRange.only(dictionaryName);
                 const promise = this._db.bulkDelete(objectStoreName, indexName, query, filterKeys, onProgress2);
                 promises.push(promise);
-                console.log('promise', promises.length);
             }
             await Promise.all(promises);
         }

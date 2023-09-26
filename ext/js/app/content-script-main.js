@@ -23,7 +23,6 @@
 
 (async () => {
     try {
-        console.log('Yomichan content script main');
         await yomichan.prepare();
 
         const {tabId, frameId} = await yomichan.api.frameInformationGet();

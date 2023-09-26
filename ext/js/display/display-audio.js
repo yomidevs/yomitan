@@ -328,7 +328,6 @@ class DisplayAudio {
         const buttons = this._getAudioPlayButtons(dictionaryEntryIndex, headwordIndex);
 
         let {term, reading} = headword;
-        // console.log('headword', headword);
 
         if (this._playInflectedText && headword.sources?.length) {
             term = headword.sources[0].transformedText;

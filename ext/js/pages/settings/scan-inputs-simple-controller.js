@@ -30,8 +30,6 @@ class ScanInputsSimpleController {
     }
 
     async prepare() {
-        console.log('ScanInputsSimpleController.prepare()');
-
         this._middleMouseButtonScan = document.querySelector('#middle-mouse-button-scan');
         this._mainScanModifierKeyInput = document.querySelector('#main-scan-modifier-key');
 

@@ -17,7 +17,6 @@
 
 class API {
     constructor(yomichan) {
-        console.log('API.constructor()');
         this._yomichan = yomichan;
     }
 
@@ -34,7 +33,6 @@ class API {
     }
 
     parseText(text, optionsContext, scanLength, useInternalParser, useMecabParser) {
-        // console.log('API.parseText()');
         return this._invoke('parseText', {text, optionsContext, scanLength, useInternalParser, useMecabParser});
     }
 

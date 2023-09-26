@@ -25,8 +25,6 @@
 
 class AudioDownloader {
     constructor({japaneseUtil, requestBuilder}) {
-        console.log('audio-downloader.js: constructor');
-
         this._japaneseUtil = japaneseUtil;
         this._requestBuilder = requestBuilder;
         this._customAudioListSchema = null;
@@ -55,12 +53,9 @@ class AudioDownloader {
     }
 
     async downloadTermAudio(sources, preferredAudioIndex, term, reading, language, idleTimeout) {
-        console.log('audio-downloader.js: downloadTermAudio()');
-        console.log('sources', sources);
         const errors = [];
         for (const source of sources) {
             let infoList = await this.getTermAudioInfoList(source, term, reading, language);
-            console.log('infoList', infoList);
 
             if (typeof preferredAudioIndex === 'number') {
                 infoList = (preferredAudioIndex >= 0 && preferredAudioIndex < infoList.length ? [infoList[preferredAudioIndex]] : []);

@@ -28,7 +28,6 @@ class HotkeyHelpController {
     }
 
     async prepare() {
-        console.log('HotkeyHelpController.prepare()');
         const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
         this._hotkeyUtil.os = os;
         await this._setupGlobalCommands(this._globalActionHotkeys);

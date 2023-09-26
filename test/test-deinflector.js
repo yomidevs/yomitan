@@ -48,7 +48,7 @@ function hasTermReasons(Deinflector, deinflector, source, expectedTerm, expected
 
 async function testDeinflections(language) {
     let data = [];
-    switch (language){
+    switch (language){ // TODO: move to languages folder
         case 'en':
             data = [
                 {

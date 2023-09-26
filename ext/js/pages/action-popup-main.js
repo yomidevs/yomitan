@@ -154,7 +154,6 @@ class DisplayController {
     }
 
     async _setupHotkeys() {
-        console.log('Setting up hotkeys...');
         const hotkeyHelpController = new HotkeyHelpController();
         await hotkeyHelpController.prepare();
 
@@ -244,9 +243,6 @@ class DisplayController {
 }
 
 (async () => {
-    console.log('actionPopup.js: Initializing');
-
-
     await yomichan.prepare();
 
     yomichan.api.logIndicatorClear();
