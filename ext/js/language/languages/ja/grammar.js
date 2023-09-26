@@ -668,7 +668,3 @@ window.getDeinflectionReasons = async () =>  {
         ]
     };
 };
-
-// module.exports = {
-//     deinflectionReasonsJa,
-// }

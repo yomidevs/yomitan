@@ -37,8 +37,6 @@
  * ScriptManager
  * Translator
  * wanakana
- * deinflectionReasonsJa
- * deinflectionReasonsEn
  * fetchAsset
  */
 
@@ -46,7 +44,6 @@
  * This class controls the core logic of the extension, including API calls
  * and various forms of communication between browser tabs and external applications.
  */
-
 class Backend {
     /**
      * Creates a new instance.
@@ -263,7 +260,6 @@ class Backend {
             }
         }
     }
-
 
     // Event handlers
 
