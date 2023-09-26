@@ -24,8 +24,6 @@ class HotkeyUtil {
      * @param {?string} os The operating system for this instance.
      */
     constructor(os=null) {
-        console.log('HotkeyUtil.constructor');
-
         this._os = os;
         this._inputSeparator = ' + ';
         this._modifierKeyNames = new Map();
@@ -56,8 +54,6 @@ class HotkeyUtil {
      *   Valid values are: win, mac, linux, openbsd, cros, android.
      */
     set os(value) {
-        console.log('HotkeyUtil.os.set');
-
         if (this._os === value) { return; }
         this._os = value;
         this._updateModifierKeyNames();
@@ -223,7 +219,6 @@ class HotkeyUtil {
     // Private
 
     _getModifierKeyNames(os) {
-        // console.log(`_getModifierKeyNames(${os})`);
         switch (os) {
             case 'win':
                 return [
@@ -260,7 +255,6 @@ class HotkeyUtil {
     }
 
     _updateModifierKeyNames() {
-        // console.log('_updateModifierKeyNames()');
         const map = this._modifierKeyNames;
         map.clear();
         for (const [key, value] of this._getModifierKeyNames(this._os)) {
