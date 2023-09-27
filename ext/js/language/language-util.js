@@ -35,23 +35,19 @@ class LanguageUtil {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    async setLanguage(newLanguage){
-        let reasons = [];
+    async setLanguage(newLanguage) {
         try {
             if (this.language !== newLanguage) {
+                this.deinflectionReasons = [];
+
                 removeScript(`/js/language/languages/${this.language}/grammar.js`);
-
                 this.language = newLanguage;
-
                 await loadScript(`/js/language/languages/${this.language}/grammar.js`);
-                reasons = await getDeinflectionReasons();
-            } else {
-                reasons = this.deinflectionReasons;
-            }
 
-            this.deinflectionReasons = reasons;
+                this.deinflectionReasons = await getDeinflectionReasons();
+            }
         } catch (e) {
-            console.log(e);
+            console.error('Error while changing language:', e);
         }
     }
 }

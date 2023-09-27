@@ -55,7 +55,6 @@ class Translator {
     /**
      * Initializes the instance for use. The public API should not be used until
      * this function has been called.
-     * @param {object} deinflectionReasons The raw deinflections reasons data that the Deinflector uses.
      */
     prepare() {
         this._deinflector = new Deinflector(this._languageUtil.deinflectionReasons);
