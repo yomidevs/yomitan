@@ -112,20 +112,21 @@ class PopupPreviewFrame {
         this._exampleTextInput.lang = lang;
         this._exampleText.lang = lang;
 
-        this._exampleTextInput.value = example;
-        this._exampleText.innerText = example;
+        this._setText(example, true);
     }
 
     _getExampleText(lang) {
         switch (lang) {
-            case 'ja':
-                return '読め';
-            case 'en':
-                return "don't read";
-            case 'sq':
-                return 'lexo';
             case 'de':
                 return 'gelesen';
+            case 'en':
+                return "don't read";
+            case 'ja':
+                return '読め';
+            case 'ru':
+                return 'читать';
+            case 'sq':
+                return 'lexo';
         }
     }
     async _apiOptionsGet(...args) {
@@ -238,7 +239,6 @@ class PopupPreviewFrame {
         if (this._frontend === null) { return; }
         this._frontend.setOptionsContextOverride(optionsContext);
         await this._frontend.updateOptions();
-        await this._updateSearch();
         await this._getOptions(optionsContext);
         this._setExampleText();
     }
