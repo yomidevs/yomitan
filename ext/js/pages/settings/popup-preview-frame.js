@@ -103,7 +103,6 @@ class PopupPreviewFrame {
 
     async _setExampleText() {
         const options = this._options;
-        console.log('popup-preview options', options);
 
         const lang = options.general.language;
 
@@ -234,7 +233,6 @@ class PopupPreviewFrame {
     }
 
     async _updateOptionsContext({optionsContext}) {
-        console.log('popup-preview updateOptionsContext', optionsContext);
         this._optionsContext = optionsContext;
         if (this._frontend === null) { return; }
         this._frontend.setOptionsContextOverride(optionsContext);

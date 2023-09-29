@@ -40,17 +40,18 @@
  * fetchAsset
  */
 
+import {LanguageUtil} from '../language/language-util.js';
+
 /**
  * This class controls the core logic of the extension, including API calls
  * and various forms of communication between browser tabs and external applications.
  */
-class Backend {
+export class Backend {
     /**
      * Creates a new instance.
      */
     constructor() {
         this._languageUtil = new LanguageUtil();
-
         this._japaneseUtil = new JapaneseUtil(wanakana);
         this._environment = new Environment();
         this._dictionaryDatabase = new DictionaryDatabase();
@@ -143,7 +144,8 @@ class Backend {
             ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
             ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}],
             ['findAnkiNotes',                {async: true,  contentScript: true,  handler: this._onApiFindAnkiNotes.bind(this)}],
-            ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}]
+            ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}],
+            ['getTextTransformations',       {async: true,  contentScript: true,  handler: this._onApiGetTextTransformations.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -236,6 +238,7 @@ class Backend {
             this._defaultAnkiFieldTemplates = (await fetchAsset('/data/templates/default-anki-field-templates.handlebars')).trim();
             this._options = await this._optionsUtil.load();
 
+            await this._languageUtil.prepare();
             await this._languageUtil.setLanguage(this._getProfileLanguage({current: true}));
             this._translator.prepare();
 
@@ -434,7 +437,7 @@ class Backend {
     async _onApiTermsFind({text, details, optionsContext}) {
         const options = this._getProfileOptions(optionsContext);
         const {general: {resultOutputMode: mode, maxResults}} = options;
-        const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
+        const findTermsOptions = await this._getTranslatorFindTermsOptions(mode, details, options);
         const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
         dictionaryEntries.splice(maxResults);
         return {dictionaryEntries, originalTextLength};
@@ -799,6 +802,10 @@ class Backend {
         }
     }
 
+    async _onApiGetTextTransformations({language}){
+        return await this._languageUtil.getTextTransformations(language);
+    }
+
     // Command handlers
 
     async _onCommandOpenSearchPage(params) {
@@ -1042,12 +1049,28 @@ class Backend {
 
         this._accessibilityController.update(this._getOptionsFull(false));
 
-        if (options.general.language !== this._languageUtil.language){
-            await this._languageUtil.setLanguage(options.general.language);
-            this._translator.prepare();
-        }
+        await this._onChangedLanguage(options);
 
         this._sendMessageAllTabsIgnoreResponse('Yomichan.optionsUpdated', {source});
+    }
+
+    async _onChangedLanguage(options) {
+        const {language} = options.general;
+        if (language !== this._languageUtil.language){
+            await this._languageUtil.setLanguage(language);
+            this._translator.prepare();
+            if (!options.languages[language]) {
+                this._modifySetting({
+                    action: 'set',
+                    path: `languages.${language}`,
+                    value: {
+                        textTransformations: {}
+                    },
+                    scope: 'profile',
+                    optionsContext: {current: true}
+                });
+            }
+        }
     }
 
     _getOptionsFull(useSchema=false) {
@@ -1142,7 +1165,7 @@ class Backend {
             const jp = this._japaneseUtil;
             const mode = 'simple';
             const details = {matchType: 'exact', deinflect: true};
-            const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
+            const findTermsOptions = await this._getTranslatorFindTermsOptions(mode, details, options);
             const results = [];
             let previousUngroupedSegment = null;
             let i = 0;
@@ -1338,7 +1361,10 @@ class Backend {
             case 'set':
             {
                 const {path, value} = target;
-                if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                if (typeof path !== 'string') {
+                    console.error('_modifySetting invalid path', path);
+                    throw new Error('Invalid path');
+                }
                 const pathArray = ObjectPropertyAccessor.getPathArray(path);
                 accessor.set(pathArray, value);
                 return accessor.get(pathArray);
@@ -2065,27 +2091,28 @@ class Backend {
      * @param {object} options The options.
      * @returns {FindTermsOptions} An options object.
      */
-    _getTranslatorFindTermsOptions(mode, details, options) {
+    async _getTranslatorFindTermsOptions(mode, details, options) {
         let {matchType, deinflect} = details;
         if (typeof matchType !== 'string') { matchType = 'exact'; }
         if (typeof deinflect !== 'boolean') { deinflect = true; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
-            general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder},
+            general: {
+                mainDictionary,
+                sortFrequencyDictionary,
+                sortFrequencyDictionaryOrder,
+                language
+            },
             scanning: {alphanumeric},
             parsing: {searchResolution},
             translation: {
-                convertHalfWidthCharacters,
-                convertNumericCharacters,
-                convertAlphabeticCharacters,
-                convertHiraganaToKatakana,
-                convertKatakanaToHiragana,
                 collapseEmphaticSequences,
-                decapitalize,
-                capitalizeFirstLetter,
                 textReplacements: textReplacementsOptions
             }
         } = options;
+
+        const textTransformations = await this._getTranslatorTextTransformations(options, language);
+
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
         let excludeDictionaryDefinitions = null;
         if (mode === 'merge' && !enabledDictionaryMap.has(mainDictionary)) {
@@ -2104,18 +2131,12 @@ class Backend {
             sortFrequencyDictionary,
             sortFrequencyDictionaryOrder,
             removeNonJapaneseCharacters: !alphanumeric,
-            convertHalfWidthCharacters,
-            convertNumericCharacters,
-            convertAlphabeticCharacters,
-            convertHiraganaToKatakana,
-            convertKatakanaToHiragana,
             collapseEmphaticSequences,
             searchResolution,
-            decapitalize,
-            capitalizeFirstLetter,
             textReplacements,
             enabledDictionaryMap,
-            excludeDictionaryDefinitions
+            excludeDictionaryDefinitions,
+            textTransformations
         };
     }
 
@@ -2163,6 +2184,25 @@ class Backend {
             textReplacements.unshift(null);
         }
         return textReplacements;
+    }
+
+    async _getTranslatorTextTransformations(options, language) {
+        const textTransformationsOptions = options?.languages?.[language]?.textTransformations || {};
+        const textTransformations = await this._languageUtil.getTextTransformations(language);
+
+        const textTransformationsResult = Object.keys(textTransformationsOptions).reduce((result, key) => {
+            const value = textTransformationsOptions[key];
+            const transformation = textTransformations.find((t) => t.id === key);
+            if (transformation) {
+                result[key] = {
+                    ...transformation,
+                    setting: value
+                };
+            }
+            return result;
+        }, {});
+
+        return textTransformationsResult;
     }
 
     async _openWelcomeGuidePage() {

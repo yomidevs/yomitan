@@ -321,55 +321,44 @@ class Translator {
     // Deinflections and text transformations
 
     _getAlgorithmDeinflections(text, options) {
-        const textOptionVariantArray = [
-            this._getTextReplacementsVariants(options),
-            this._getTextOptionEntryVariants(options.convertHalfWidthCharacters),
-            this._getTextOptionEntryVariants(options.convertNumericCharacters),
-            this._getTextOptionEntryVariants(options.convertAlphabeticCharacters),
-            this._getTextOptionEntryVariants(options.convertHiraganaToKatakana),
-            this._getTextOptionEntryVariants(options.convertKatakanaToHiragana),
-            this._getTextOptionEntryVariants(options.decapitalize),
-            this._getTextOptionEntryVariants(options.capitalizeFirstLetter),
-            this._getCollapseEmphaticOptions(options)
-        ];
+        const textTransformationsVectorSpace = Object.entries(options.textTransformations).reduce((map, [key, value]) => {
+            map[key] = this._getTextOptionEntryVariants(value.setting);
+            return map;
+        }, {});
+
+        const variantVectorSpace = {
+            textReplacements: this._getTextReplacementsVariants(options),
+            collapseEmphaticOptions: this._getCollapseEmphaticOptions(options),
+            ...textTransformationsVectorSpace
+        };
 
         const jp = this._japaneseUtil;
 
         const deinflections = [];
         const used = new Set();
 
-        for (const arrayVariant of this._getArrayVariants(textOptionVariantArray)) {
-            const [textReplacements, halfWidth, numeric, alphabetic, katakana, hiragana, decapitalize, capitalizeFirstLetter, [collapseEmphatic, collapseEmphaticFull]] = arrayVariant;
+        for (const arrayVariant of this._generateArrayVariants(variantVectorSpace)) {
+            const {
+                textReplacements,
+                collapseEmphaticOptions: [collapseEmphatic, collapseEmphaticFull]
+            } = arrayVariant;
+
             let text2 = text;
             const sourceMap = new TextSourceMap(text2);
 
             if (textReplacements !== null) {
                 text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
             }
-            if (halfWidth) {
-                text2 = jp.convertHalfWidthKanaToFullWidth(text2, sourceMap);
-            }
-            if (numeric) {
-                text2 = jp.convertNumericToFullWidth(text2);
-            }
-            if (alphabetic) {
-                text2 = jp.convertAlphabeticToKana(text2, sourceMap);
-            }
-            if (katakana) {
-                text2 = jp.convertHiraganaToKatakana(text2);
-            }
-            if (hiragana) {
-                text2 = jp.convertKatakanaToHiragana(text2);
-            }
-            if (decapitalize) {
-                text2 = this._languageUtil.decapitalize(text2);
-            }
-            if (capitalizeFirstLetter) {
-                text2 = this._languageUtil.capitalizeFirstLetter(text2);
-            }
             if (collapseEmphatic) {
                 text2 = jp.collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
             }
+
+            Object.values(options.textTransformations).forEach((textTransformation) => {
+                if (arrayVariant[textTransformation.id]) {
+                    text2 = textTransformation.transform(text2);
+                }
+            });
+
             let i = text2.length;
             while (i > 0) {
                 const source = text2.substring(0, i);
@@ -1095,22 +1084,23 @@ class Translator {
         return {index, priority};
     }
 
-    *_getArrayVariants(arrayVariants) {
-        const ii = arrayVariants.length;
+    *_generateArrayVariants(variantVectorSpace) {
+        const variantKeys = Object.keys(variantVectorSpace);
+        const lengths = variantKeys.map((key) => variantVectorSpace[key].length);
+        const totalVariants = lengths.reduce((acc, length) => acc * length, 1);
 
-        let total = 1;
-        for (let i = 0; i < ii; ++i) {
-            total *= arrayVariants[i].length;
-        }
+        for (let variantIndex = 0; variantIndex < totalVariants; ++variantIndex) {
+            const variant = {};
+            let remainingIndex = variantIndex;
 
-        for (let a = 0; a < total; ++a) {
-            const variant = [];
-            let index = a;
-            for (let i = 0; i < ii; ++i) {
-                const entryVariants = arrayVariants[i];
-                variant.push(entryVariants[index % entryVariants.length]);
-                index = Math.floor(index / entryVariants.length);
+            for (let keyIndex = 0; keyIndex < variantKeys.length; ++keyIndex) {
+                const key = variantKeys[keyIndex];
+                const entryVariants = variantVectorSpace[key];
+                const entryIndex = remainingIndex % entryVariants.length;
+                variant[key] = entryVariants[entryIndex];
+                remainingIndex = Math.floor(remainingIndex / entryVariants.length);
             }
+
             yield variant;
         }
     }

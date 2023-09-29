@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2022  Yomichan Authors
+ * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,14 +16,7 @@
  */
 
 /* global
- * Backend
- */
-
-import {Backend} from './backend.js';
-
-(() => {
-    yomichan.prepare(true);
-
-    const backend = new Backend();
-    backend.prepare();
-})();
+*/
+window.getDeinflectionReasons = async () => {
+    return {};
+};

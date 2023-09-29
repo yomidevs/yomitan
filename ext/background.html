@@ -25,7 +25,7 @@
 <script src="/js/yomichan.js"></script>
 
 <script src="/js/accessibility/accessibility-controller.js"></script>
-<script src="/js/background/backend.js"></script>
+<script src="/js/background/backend.js" type="module"></script>
 <script src="/js/background/profile-conditions-util.js"></script>
 <script src="/js/background/request-builder.js"></script>
 <script src="/js/background/script-manager.js"></script>
@@ -51,13 +51,18 @@
 <script src="/js/dictionary/dictionary-data-util.js"></script>
 <script src="/js/language/deinflection-ruleset.js"></script>
 <script src="/js/language/languages/ja/japanese-util.js"></script>
-<script src="/js/language/language-util.js"></script>
+<script src="/js/language/language-util.js" type="module"></script>
 <script src="/js/language/translator.js"></script>
 <script src="/js/media/audio-downloader.js"></script>
 <script src="/js/media/media-util.js"></script>
 <script src="/js/templates/template-patcher.js"></script>
 
-<script src="/js/background/background-main.js"></script>
+<script src="/js/background/background-main.js" type="module"></script>
+
+<!-- Japanese -->
+<script src="/js/language/languages/ja/util.js" type="module"></script>
+<script src="/js/language/languages/ja/constants.js" type="module"></script>
+<script src="/js/language/languages/ja/textTransformations.js" type="module"></script>
 
 <!--
     Due to a Firefox bug, this next element is purposefully terminated incorrectly.

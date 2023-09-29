@@ -180,6 +180,10 @@ class API {
         return this._invoke('loadExtensionScripts', {files});
     }
 
+    getTextTransformations(language){
+        return this._invoke('getTextTransformations', {language});
+    }
+
     // Utilities
 
     _createActionPort(timeout=5000) {

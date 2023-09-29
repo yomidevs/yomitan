@@ -19,20 +19,22 @@
  * loadScript
  * removeScript
  * getDeinflectionReasons
+ * fetchAsset
  */
 
-class LanguageUtil {
+export class LanguageUtil {
     constructor() {
         this.language = null;
         this.deinflectionReasons = [];
     }
 
-    decapitalize(str) {
-        return str.toLowerCase();
-    }
+    async prepare() {
+        const languages = JSON.parse(await fetchAsset('/js/language/languages.json'));
 
-    capitalizeFirstLetter(str){
-        return str.charAt(0).toUpperCase() + str.slice(1);
+        window.languages = window.languages || {};
+        languages.forEach((language) => {
+            window.languages[language] = window.languages[language] || {};
+        });
     }
 
     async setLanguage(newLanguage) {
@@ -48,6 +50,26 @@ class LanguageUtil {
             }
         } catch (e) {
             console.error('Error while changing language:', e);
+        }
+    }
+
+    async getLanguages() {
+        return window.languages;
+    }
+
+    async getDeinflectionReasons(language = this.language) {
+        return window[language].getDeinflectionReasons();
+    }
+
+    async getTextTransformations(language = this.language) {
+        try {
+            if (!window.languages[language].getTextTransformations) {
+                await loadScript(`/js/language/languages/${language}/textTransformations.js`);
+            }
+            return window.languages[language].textTransformations;
+        } catch (e){
+            console.error(e);
+            return [];
         }
     }
 }
