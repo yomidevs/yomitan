@@ -224,10 +224,13 @@ class CrossFrameAPI {
         this._commPorts = new Map();
         this._messageHandlers = new Map();
         this._onDisconnectBind = this._onDisconnect.bind(this);
+        this._tabId = null;
+        this._frameId = null;
     }
 
-    prepare() {
+    async prepare() {
         chrome.runtime.onConnect.addListener(this._onConnect.bind(this));
+        ({tabId: this._tabId, frameId: this._frameId} = await yomichan.api.frameInformationGet());
     }
 
     invoke(targetFrameId, action, params={}) {
@@ -235,8 +238,8 @@ class CrossFrameAPI {
     }
 
     async invokeTab(targetTabId, targetFrameId, action, params={}) {
-        if (typeof targetTabId !== 'number') { targetTabId = null; }
-        const commPort = this._getOrCreateCommPort(targetTabId, targetFrameId);
+        if (typeof targetTabId !== 'number') { targetTabId = this._tabId; }
+        const commPort = await this._getOrCreateCommPort(targetTabId, targetFrameId);
         return await commPort.invoke(action, params, this._ackTimeout, this._responseTimeout);
     }
 
@@ -265,8 +268,8 @@ class CrossFrameAPI {
             }
             if (details.name !== 'cross-frame-communication-port') { return; }
 
-            const otherTabId = details.sourceTabId;
-            const otherFrameId = details.sourceFrameId;
+            const otherTabId = details.otherTabId;
+            const otherFrameId = details.otherFrameId;
             this._setupCommPort(otherTabId, otherFrameId, port);
         } catch (e) {
             port.disconnect();
@@ -297,14 +300,16 @@ class CrossFrameAPI {
         return this._createCommPort(otherTabId, otherFrameId);
     }
 
-    _createCommPort(otherTabId, otherFrameId) {
-        const details = {
-            name: 'background-cross-frame-communication-port',
-            targetTabId: otherTabId,
-            targetFrameId: otherFrameId
-        };
-        const port = yomichan.connect(null, {name: JSON.stringify(details)});
-        return this._setupCommPort(otherTabId, otherFrameId, port);
+    async _createCommPort(otherTabId, otherFrameId) {
+        await yomichan.api.openCrossFramePort(otherTabId, otherFrameId);
+
+        const tabPorts = this._commPorts.get(otherTabId);
+        if (typeof tabPorts !== 'undefined') {
+            const commPort = tabPorts.get(otherFrameId);
+            if (typeof commPort !== 'undefined') {
+                return commPort;
+            }
+        }
     }
 
     _setupCommPort(otherTabId, otherFrameId, port) {

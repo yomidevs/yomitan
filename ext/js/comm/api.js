@@ -181,6 +181,10 @@ class API {
         return this._invoke('loadExtensionScripts', {files});
     }
 
+    openCrossFramePort(targetTabId, targetFrameId) {
+        return this._invoke('openCrossFramePort', {targetTabId, targetFrameId});
+    }
+
     // Utilities
 
     _createActionPort(timeout=5000) {
