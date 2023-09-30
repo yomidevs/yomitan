@@ -3,7 +3,7 @@
 [![Chrome Release (Testing)](https://img.shields.io/chrome-web-store/v/glnaenfapkkecknnmginabpmgkenenml?label=chrome%20release%20(testing))](https://chrome.google.com/webstore/detail/yomitan-development-build/glnaenfapkkecknnmginabpmgkenenml)
 [![Firefox Release (Testing)](https://img.shields.io/github/v/release/themoeway/yomitan?filter=*&label=firefox%20release%20(testing))](https://github.com/themoeway/yomitan/releases)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
-[![Discord Server](https://dcbadge.vercel.app/api/server/4ysT8qjE?style=flat)](https://discord.gg/4ysT8qjE)\
+[![Discord Server](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC)\
 **Important note:** Yomitan is still not recommended for use, as we are still trying to complete the transition to Manifest V3 (which is required of all new browser extensions), and there are [some critical bugs remaining](https://github.com/themoeway/yomitan/issues?q=is%3Aopen+is%3Aissue+label%3Apriority%2Fhigh). This is also why there is no stable release of yomitan yet.
 
 > :wave: **This project is a community fork of yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023).
@@ -12,7 +12,7 @@
 > 
 > Since the owner requested forks be uniquely named, we have chosen a new name: *yomitan*. (*-tan* is an honorific used for anthropomorphic moe characters.) While we've renamed the codebase and made judicious use of find-and-replace, it is entirely the hard work of foosoft and numerous other open source contributors from 2016-2023 and we do not claim any credit.
 >
-> Since this is a distributed effort, we highly welcome new contributors! Feel free to browse the issue tracker, and you can find us on [TheMoeWay Discord](https://discord.gg/4ysT8qjE) at [#colab-tmw-projects](https://discord.com/channels/617136488840429598/1081538711742844980)
+> Since this is a distributed effort, we highly welcome new contributors! Feel free to browse the issue tracker, and you can find us on [TheMoeWay Discord](https://discord.gg/UGNPMDE7zC) at [#yomitan](https://discord.com/channels/617136488840429598/1081538711742844980)
 
 
 Yomitan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
