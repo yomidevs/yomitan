@@ -405,8 +405,8 @@ class DOMTextScanner {
      * @returns {{enterable: boolean, newlines: number}} The seek information.
      *   The `enterable` value indicates whether the content of this node should be entered.
      *   The `newlines` value corresponds to the number of newline characters that should be added.
-     *     1 newline corresponds to a simple new line in the layout.
-     *     2 newlines corresponds to a significant visual distinction since the previous content.
+     *   - 1 newline corresponds to a simple new line in the layout.
+     *   - 2 newlines corresponds to a significant visual distinction since the previous content.
      */
     static getElementSeekInfo(element) {
         let enterable = true;

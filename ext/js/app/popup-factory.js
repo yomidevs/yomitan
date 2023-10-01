@@ -71,6 +71,7 @@ class PopupFactory {
      * @param {?number} [details.depth] A specific depth value to assign to the popup.
      * @param {boolean} [details.popupWindow] Whether or not a separate popup window should be used, rather than an iframe.
      * @param {boolean} [details.childrenSupported] Whether or not the popup is able to show child popups.
+     * @returns {Popup|PopupWindow|PopupProxy} The new or existing popup.
      */
     async getOrCreatePopup({
         frameId=null,

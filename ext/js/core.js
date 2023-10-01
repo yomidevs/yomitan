@@ -309,7 +309,7 @@ function promiseTimeout(delay, resolveValue) {
  * Creates a promise that will resolve after the next animation frame, using `requestAnimationFrame`.
  * @param {number} [timeout] A maximum duration (in milliseconds) to wait until the promise resolves. If null or omitted, no timeout is used.
  * @returns {Promise<{time: number, timeout: number}>} A promise that is resolved with `{time, timeout}`, where `time` is the timestamp from `requestAnimationFrame`,
- *  and `timeout` is a boolean indicating whether the cause was a timeout or not.
+ *   and `timeout` is a boolean indicating whether the cause was a timeout or not.
  * @throws The promise throws an error if animation is not supported in this context, such as in a service worker.
  */
 function promiseAnimationFrame(timeout=null) {
@@ -609,7 +609,7 @@ class DynamicProperty extends EventDispatcher {
      * @param {*} value The override value to assign.
      * @param {number} [priority] The priority value to use, as a number.
      * @returns {string} A string token which can be passed to the clearOverride function
-     *  to remove the override.
+     *   to remove the override.
      */
     setOverride(value, priority=0) {
         const overridesCount = this._overrides.length;

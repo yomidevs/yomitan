@@ -233,7 +233,13 @@
         "no-unsanitized/property": "error",
         "jsdoc/check-access": "error",
         "jsdoc/check-alignment": "error",
-        "jsdoc/check-line-alignment": "error",
+        "jsdoc/check-line-alignment": [
+            "error",
+            "never",
+            {
+                "wrapIndent": "  "
+            }
+        ],
         "jsdoc/check-param-names": "error",
         "jsdoc/check-property-names": "error",
         "jsdoc/check-tag-names": "error",
@@ -242,10 +248,6 @@
         "jsdoc/empty-tags": "error",
         "jsdoc/implements-on-classes": "error",
         "jsdoc/multiline-blocks": "error",
-        "jsdoc/newline-after-description": [
-            "error",
-            "never"
-        ],
         "jsdoc/no-bad-blocks": "error",
         "jsdoc/no-multi-asterisks": "error",
         "jsdoc/require-asterisk-prefix": "error",
