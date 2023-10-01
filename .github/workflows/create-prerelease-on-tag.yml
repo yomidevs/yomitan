@@ -13,7 +13,7 @@ jobs:
       actions: write
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -21,7 +21,7 @@ jobs:
           node-version-file: ".node-version"
 
       - name: Lint
-        run: npm run-script build
+        run: npm run-script build -- --all --yomitan-version ${{ github.ref_name }}
         shell: bash
 
       - name: Release

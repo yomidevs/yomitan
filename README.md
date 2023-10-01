@@ -1,12 +1,18 @@
 # Yomitan
 
+[![Chrome Release (Testing)](https://img.shields.io/chrome-web-store/v/glnaenfapkkecknnmginabpmgkenenml?label=chrome%20release%20(testing))](https://chrome.google.com/webstore/detail/yomitan-development-build/glnaenfapkkecknnmginabpmgkenenml)
+[![Firefox Release (Testing)](https://img.shields.io/github/v/release/themoeway/yomitan?filter=*&label=firefox%20release%20(testing))](https://github.com/themoeway/yomitan/releases)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
+[![Discord Server](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC)\
+**Important note:** Yomitan is still not recommended for use, as we are still trying to complete the transition to Manifest V3 (which is required of all new browser extensions), and there are [some critical bugs remaining](https://github.com/themoeway/yomitan/issues?q=is%3Aopen+is%3Aissue+label%3Apriority%2Fhigh). This is also why there is no stable release of yomitan yet.
+
 > :wave: **This project is a community fork of yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023).
 >
 > The primary goal is to **keep the project alive and working on latest browser versions and doing bugfixes**. (Feature improvements are considered secondary.)
 > 
 > Since the owner requested forks be uniquely named, we have chosen a new name: *yomitan*. (*-tan* is an honorific used for anthropomorphic moe characters.) While we've renamed the codebase and made judicious use of find-and-replace, it is entirely the hard work of foosoft and numerous other open source contributors from 2016-2023 and we do not claim any credit.
 >
-> Since this is a distributed effort, we highly welcome new contributors! Feel free to browse the issue tracker, and you can find us on [TheMoeWay Discord](https://discord.gg/nhqjydaR8j) at [#colab-tmw-projects](https://discord.com/channels/617136488840429598/1081538711742844980)
+> Since this is a distributed effort, we highly welcome new contributors! Feel free to browse the issue tracker, and you can find us on [TheMoeWay Discord](https://discord.gg/UGNPMDE7zC) at [#yomitan](https://discord.com/channels/617136488840429598/1081538711742844980)
 
 
 Yomitan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
@@ -54,18 +60,17 @@ New changes are initially introduced into the *testing* version, and after some 
 relatively bug free, they will be promoted to the *stable* version. If you are technically savvy and don't mind
 submitting issues on GitHub, try the *testing* version; otherwise, the *stable* version will be your best bet.
 
-> :warning: These releases haven't been updated and still link to yomichan.
+* **Google Chrome**
+  * stable (not released yet)
+  * [testing](https://chrome.google.com/webstore/detail/yomitan-development-build/glnaenfapkkecknnmginabpmgkenenml) 
 
-*   **Google Chrome**
-    ([stable](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami) or [testing](https://chrome.google.com/webstore/detail/yomichan-testing/bcknnfebhefllbjhagijobjklocakpdm)) \
-    [![](img/chrome-web-store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
+* **Mozilla Firefox**
+  * stable (not released yet)
+  * [testing](https://github.com/themoeway/yomitan/releases) ※
 
-*   **Mozilla Firefox**
-    ([stable](https://addons.mozilla.org/en-US/firefox/addon/yomichan/) or [testing](https://github.com/FooSoft/yomichan/releases)<sup>*</sup>) \
-    [![](img/firefox-marketplace.png)](https://addons.mozilla.org/en-US/firefox/addon/yomichan/) \
-    <sup>*</sup>Unlike Chrome, Firefox does not allow extensions meant for testing to be hosted in the marketplace.
-    You will have to download a desired version and side-load it yourself. You only need to do this once and will get
-    updates automatically.
+※ NOTE: Unlike Chrome, Firefox does not allow extensions meant for testing to be hosted in the marketplace.
+You will have to download a desired version and side-load it yourself. You only need to do this once and will get
+updates automatically.
 
 ## Migrating from Yomichan
 
@@ -383,7 +388,7 @@ Required licensing notices for this project follow below:
 Yomitan uses several third-party libraries to function. Below are links to homepages, snapshots, and licenses of the exact
 versions packaged.
 
-*   Handlebars: [homepage](https://handlebarsjs.com/) - [snapshot](https://s3.amazonaws.com/builds.handlebarsjs.com/handlebars.min-v4.7.7.js) - [license](https://github.com/handlebars-lang/handlebars.js/blob/v4.7.7/LICENSE)
+*   Handlebars: To retain Handlebars templating without unsafe-eval, a fork of handlebars by Kibana is being used. [homepage](https://github.com/Aquafina-water-bottle/handlebars-noeval) - [snapshot](https://raw.githubusercontent.com/Aquafina-water-bottle/handlebars-noeval/10efaac28d8d2e8d7e503347281eff1a90aa3f31/handlebars.min.js) - [license](https://github.com/Aquafina-water-bottle/handlebars-noeval/blob/10efaac28d8d2e8d7e503347281eff1a90aa3f31/src/hb/LICENSE)
 *   JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://github.com/Stuk/jszip/blob/v3.9.1/dist/jszip.min.js) - [license](https://github.com/Stuk/jszip/blob/v3.9.1/LICENSE.markdown)
 *   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://unpkg.com/wanakana@4.0.2/umd/wanakana.min.js) - [license](https://github.com/WaniKani/WanaKana/blob/4.0.2/LICENSE)
 *   parse5: [homepage](https://github.com/inikulin/parse5) - [snapshot](https://github.com/inikulin/parse5/tree/v7.1.2/packages/parse5) - [license](https://github.com/inikulin/parse5/blob/v7.1.2/LICENSE) _(Only used in MV3 build)_

@@ -593,7 +593,7 @@ class Backend {
     async _onApiInjectStylesheet({type, value}, sender) {
         const {frameId, tab} = sender;
         if (!isObject(tab)) { throw new Error('Invalid tab'); }
-        return await this._scriptManager.injectStylesheet(type, value, tab.id, frameId, false, true, 'document_start');
+        return await this._scriptManager.injectStylesheet(type, value, tab.id, frameId, false);
     }
 
     async _onApiGetStylesheetContent({url}) {
@@ -790,7 +790,7 @@ class Backend {
         if (typeof tabId !== 'number') { throw new Error('Sender has invalid tab ID'); }
         const {frameId} = sender;
         for (const file of files) {
-            await this._scriptManager.injectScript(file, tabId, frameId, false, true, 'document_start');
+            await this._scriptManager.injectScript(file, tabId, frameId, false);
         }
     }
 

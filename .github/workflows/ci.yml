@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -41,10 +41,8 @@ jobs:
         env:
           CI: true
 
-      - name: Manifest
-        run: npm run test-manifest
-        env:
-          CI: true
+      - name: Build
+        run: npm run build
 
       - name: Validate manifest.json of the extension
         uses: cardinalby/schema-validator-action@8407573c2627c5159428cf9fa3770d13b2360a27 # v3
@@ -52,6 +50,3 @@ jobs:
           file: ext/manifest.json
           schema: "https://json.schemastore.org/chrome-manifest.json"
           mode: lax
-
-      - name: Build
-        run: npm run test-build

@@ -2,7 +2,7 @@
     "manifest": {
         "manifest_version": 3,
         "name": "Yomitan",
-        "version": "23.4.7.0",
+        "version": "$YOMITAN_VERSION",
         "description": "Japanese dictionary with Anki integration",
         "author": "TheMoeWay",
         "icons": {
@@ -206,12 +206,19 @@
                     ]
                 },
                 {
+                    "action": "delete",
+                    "path": [
+                        "content_security_policy",
+                        "sandbox"
+                    ]
+                },
+                {
                     "action": "set",
                     "path": [
                         "content_security_policy",
                         "extension_pages"
                     ],
-                    "value": "default-src 'self'; script-src 'self' 'unsafe-eval'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
+                    "value": "default-src 'self'; script-src 'self'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
                 },
                 {
                     "action": "set",
@@ -221,7 +228,7 @@
                     "value": {
                         "gecko": {
                             "id": "{cb7c0bec-7085-4f84-8422-7b55a7c4467c}",
-                            "strict_min_version": "101.0"
+                            "strict_min_version": "102.0"
                         }
                     }
                 },
@@ -240,6 +247,13 @@
                     "items": [
                         "nativeMessaging"
                     ]
+                },
+                {
+                    "action": "remove",
+                    "path": [
+                        "permissions"
+                    ],
+                    "item": "declarativeNetRequest"
                 }
             ],
             "excludeFiles": [

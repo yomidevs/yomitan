@@ -49,19 +49,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ inputs.upload_url }}
-          asset_path: yomitan-firefox.xpi
-          asset_name: yomitan-firefox.xpi
+          asset_path: yomitan-firefox-dev.xpi
+          asset_name: yomitan-firefox-dev.xpi
           asset_content_type: application/x-xpinstall
 
-      # update update.json so that all people who have the dev version installed get the new update
+      # update updates.json so that all people who have the dev version installed get the new update
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: metadata
 
-      - name: Recreate update.json
+      - name: Recreate updates.json
         run: |
-          cat > update.json << EOF
+          cat > updates.json << EOF
           {
               "addons": {
                   "{2d13e145-294e-4ead-9bce-b4644b203a00}": {
@@ -83,6 +83,6 @@ jobs:
           git commit -a -m "${{ github.event.release.name }} - ${{ github.event.release.html_url }}"
 
       - name: Push changes
-        uses: ad-m/github-push-action@0fafdd62b84042d49ec0cb92d9cac7f7ce4ec79e # pin@master
+        uses: ad-m/github-push-action@29f05e01bb17e6f28228b47437e03a7b69e1f9ef # pin@master
         with:
           branch: metadata
