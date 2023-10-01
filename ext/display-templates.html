@@ -5,27 +5,27 @@
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header">
         <div class="actions">
-            <button class="action-button action-button-collapsible" data-action="view-tags" hidden disabled>
+            <button type="button" class="action-button action-button-collapsible" data-action="view-tags" hidden disabled>
                 <span class="action-icon icon" data-icon="tag"></span>
             </button>
-            <button class="action-button" data-action="view-note" hidden disabled title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]' data-menu-position="left below h-cover v-cover">
+            <button type="button" class="action-button" data-action="view-note" hidden disabled title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]' data-menu-position="left below h-cover v-cover">
                 <span class="action-icon icon color-icon" data-icon="view-note"></span>
                 <span class="action-button-badge icon" hidden></span>
             </button>
-            <button class="action-button" data-action="add-note" hidden disabled data-mode="term-kanji" title="Add expression" data-hotkey='["addNoteTermKanji","title","Add expression ({0})"]'>
+            <button type="button" class="action-button" data-action="add-note" hidden disabled data-mode="term-kanji" title="Add expression" data-hotkey='["addNoteTermKanji","title","Add expression ({0})"]'>
                 <span class="action-icon icon color-icon" data-icon="add-term-kanji"></span>
             </button>
-            <button class="action-button" data-action="add-note" hidden disabled data-mode="term-kana" title="Add reading" data-hotkey='["addNoteTermKana","title","Add reading ({0})"]'>
+            <button type="button" class="action-button" data-action="add-note" hidden disabled data-mode="term-kana" title="Add reading" data-hotkey='["addNoteTermKana","title","Add reading ({0})"]'>
                 <span class="action-icon icon color-icon" data-icon="add-term-kana"></span>
             </button>
-            <button class="action-button" data-action="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover">
+            <button type="button" class="action-button" data-action="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover">
                 <span class="action-icon icon color-icon" data-icon="play-audio"></span>
                 <span class="action-button-badge icon" hidden></span>
             </button>
             <span class="entry-current-indicator-icon" title="Current entry">
                 <span class="icon color-icon" data-icon="entry-current"></span>
             </span>
-            <button class="action-button action-button-collapsible" data-action="menu" data-menu-position="left below h-cover v-cover">
+            <button type="button" class="action-button action-button-collapsible" data-action="menu" data-menu-position="left below h-cover v-cover">
                 <span class="action-icon icon" data-icon="kebab-menu"></span>
             </button>
         </div>
@@ -58,7 +58,7 @@
         </span>
     </div>
     <div class="headword-details">
-        <button class="action-button" data-action="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="right below h-cover v-cover">
+        <button type="button" class="action-button" data-action="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="right below h-cover v-cover">
             <span class="action-icon icon color-icon" data-icon="play-audio"></span>
             <span class="action-button-badge icon" hidden></span>
         </button>
@@ -66,7 +66,7 @@
 </div></template>
 <template id="definition-item-template" data-remove-whitespace-text="true"><li class="definition-item">
     <div class="definition-item-inner">
-        <button class="definition-item-expansion-button"><div class="definition-item-expansion-button-icon icon" data-icon="double-down-chevron"></div></button>
+        <button type="button" class="definition-item-expansion-button"><div class="definition-item-expansion-button-icon icon" data-icon="double-down-chevron"></div></button>
         <div class="definition-item-content">
             <div class="definition-tag-list tag-list"></div>
             <div class="definition-disambiguation-list"></div>
@@ -110,16 +110,16 @@
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header">
         <div class="actions">
-            <button class="action-button" data-action="view-note" hidden disabled title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]'>
+            <button type="button" class="action-button" data-action="view-note" hidden disabled title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]'>
                 <span class="action-icon icon color-icon" data-icon="view-note"></span>
             </button>
-            <button class="action-button" data-action="add-note" hidden disabled data-mode="kanji" title="Add kanji" data-hotkey='["addNoteKanji","title","Add kanji ({0})"]'>
+            <button type="button" class="action-button" data-action="add-note" hidden disabled data-mode="kanji" title="Add kanji" data-hotkey='["addNoteKanji","title","Add kanji ({0})"]'>
                 <span class="action-icon icon color-icon" data-icon="add-term-kanji"></span>
             </button>
             <span class="entry-current-indicator-icon" title="Current entry">
                 <span class="icon color-icon" data-icon="entry-current"></span>
             </span>
-            <button class="action-button action-button-collapsible" data-action="menu" data-menu-position="left below h-cover v-cover">
+            <button type="button" class="action-button action-button-collapsible" data-action="menu" data-menu-position="left below h-cover v-cover">
                 <span class="action-icon icon" data-icon="kebab-menu"></span>
             </button>
         </div>
@@ -136,25 +136,25 @@
     </div>
     <table class="kanji-glyph-data"><tbody>
         <tr>
-            <th>Meaning</th>
-            <th>Readings</th>
-            <th>Statistics</th>
+            <th scope="col">Meaning</th>
+            <th scope="col">Readings</th>
+            <th scope="col">Statistics</th>
         </tr>
         <tr>
             <td class="kanji-gloss-container"><ol class="kanji-gloss-list"></ol></td>
             <td class="kanji-readings"><dl class="kanji-readings-chinese"></dl><dl class="kanji-readings-japanese"></dl></td>
             <td class="kanji-statistics"></td>
         </tr>
-        <tr><th colspan="3">Classifications</th></tr>
+        <tr><th scope="col" colspan="3">Classifications</th></tr>
         <tr><td colspan="3" class="kanji-classifications"></td></tr>
-        <tr><th colspan="3">Codepoints</th></tr>
+        <tr><th scope="col" colspan="3">Codepoints</th></tr>
         <tr><td colspan="3" class="kanji-codepoints"></td></tr>
-        <tr><th colspan="3">Dictionary Indices</th></tr>
+        <tr><th scope="col" colspan="3">Dictionary Indices</th></tr>
         <tr><td colspan="3" class="kanji-dictionary-indices"></td></tr>
     </tbody></table>
 </div></template>
 <template id="kanji-info-table-template"><table class="kanji-info-table"><tbody class="kanji-info-table-body"></tbody></table></template>
-<template id="kanji-info-table-item-template"><tr class="kanji-info-table-item"><th class="kanji-info-table-item-header"></th><td class="kanji-info-table-item-value"></td></tr></template>
+<template id="kanji-info-table-item-template"><tr class="kanji-info-table-item"><th scope="col" class="kanji-info-table-item-header"></th><td class="kanji-info-table-item-value"></td></tr></template>
 <template id="kanji-info-table-empty-template"><tr class="kanji-info-table-item kanji-info-table-item-empty"><td class="kanji-info-table-item-value-empty">No data found</td></tr></template>
 <template id="kanji-gloss-item-template"><li class="kanji-gloss-item"><span class="kanji-gloss-content"></span></li></template>
 <!-- [html-validate-disable element-required-ancestor] -->
@@ -169,7 +169,7 @@
 <template id="footer-notification-template"><div class="footer-notification scrollbar-inverse">
     <div class="footer-notification-body"></div>
     <div class="footer-notification-close-button-container">
-        <button class="footer-notification-close-button"><span class="footer-notification-close-button-icon icon" data-icon="cross"></span></button>
+        <button type="button" class="footer-notification-close-button"><span class="footer-notification-close-button-icon icon" data-icon="cross"></span></button>
     </div>
 </div></template>
 <template id="footer-notification-tag-details-template" data-remove-whitespace-text="true">
@@ -193,12 +193,12 @@
 <!-- Popup menu -->
 <template id="audio-button-popup-menu-template"><div class="popup-menu-container scan-disable audio-button-popup-menu" tabindex="-1" role="dialog"><div class="popup-menu popup-menu-auto-size"><div class="popup-menu-body"></div></div></div></template>
 <template id="audio-button-popup-menu-item-template"><div class="popup-menu-item-group">
-    <button class="popup-menu-item popup-menu-item-audio-button" data-menu-action="playAudioFromSource"><div class="popup-menu-item-icon icon" data-icon="none"></div><span class="popup-menu-item-label"></span></button>
-    <button class="popup-menu-item popup-menu-item-set-primary-audio-button" data-menu-action="setPrimaryAudio" title="Use as audio for Anki card"><div class="popup-menu-item-icon icon" data-icon="note-card"></div></button>
+    <button type="button" class="popup-menu-item popup-menu-item-audio-button" data-menu-action="playAudioFromSource"><div class="popup-menu-item-icon icon" data-icon="none"></div><span class="popup-menu-item-label"></span></button>
+    <button type="button" class="popup-menu-item popup-menu-item-set-primary-audio-button" data-menu-action="setPrimaryAudio" title="Use as audio for Anki card"><div class="popup-menu-item-icon icon" data-icon="note-card"></div></button>
 </div></template>
 <template id="view-note-button-popup-menu-template"><div class="popup-menu-container scan-disable view-note-button-popup-menu" tabindex="-1" role="dialog"><div class="popup-menu popup-menu-auto-size"><div class="popup-menu-body"></div></div></div></template>
-<template id="view-note-button-popup-menu-item-template"><button class="popup-menu-item"><span class="popup-menu-item-label"></span></button></template>
+<template id="view-note-button-popup-menu-item-template"><button type="button" class="popup-menu-item"><span class="popup-menu-item-label"></span></button></template>
 <template id="dictionary-entry-popup-menu-template"><div class="popup-menu-container scan-disable dictionary-entry-popup-menu" tabindex="-1" role="dialog"><div class="popup-menu popup-menu-auto-size"><div class="popup-menu-body"></div></div></div></template>
-<template id="dictionary-entry-popup-menu-item-template"><button class="popup-menu-item"><span class="popup-menu-item-label"></span></button></template>
+<template id="dictionary-entry-popup-menu-item-template"><button type="button" class="popup-menu-item"><span class="popup-menu-item-label"></span></button></template>
 
 </body></html>
