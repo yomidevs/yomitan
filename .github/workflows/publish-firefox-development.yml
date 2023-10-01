@@ -12,11 +12,13 @@ on:
 permissions:
   contents: read
 jobs:
-  build-signed-xpi-asset:
+  build:
     runs-on: ubuntu-latest
     environment: cd
     permissions:
       contents: write
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
     steps:
       - uses: robinraju/release-downloader@efa4cd07bd0195e6cc65e9e30c251b49ce4d3e51 # pin@v1.8
         with:
@@ -40,6 +42,11 @@ jobs:
           steps.ffSignXpi.outcome == 'failure' &&
           steps.ffSignXpi.outputs.sameVersionAlreadyUploadedError != 'true'
         run: exit 1
+
+      - name: Generate hashes
+        id: hash
+        run: |
+          echo "hashes=$(sha256sum yomitan-firefox-dev.xpi | base64 -w0)" >> "$GITHUB_OUTPUT"
 
       - name: Upload offline xpi release asset
         id: uploadReleaseAsset
@@ -86,3 +93,14 @@ jobs:
         uses: ad-m/github-push-action@29f05e01bb17e6f28228b47437e03a7b69e1f9ef # pin@master
         with:
           branch: metadata
+
+  provenance:
+    needs: [build]
+    permissions:
+      actions: read # To read the workflow path.
+      id-token: write # To sign the provenance.
+      contents: write # To add assets to a release.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@07e64b653f10a80b6510f4568f685f8b7b9ea830
+    with:
+      base64-subjects: "${{ needs.build.outputs.hashes }}"
+      upload-assets: true
