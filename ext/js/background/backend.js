@@ -2244,7 +2244,6 @@ class Backend {
         let targetPort = chrome.tabs.connect(targetTabId, {frameId: targetFrameId, name: JSON.stringify(targetDetails)});
 
         const cleanup = () => {
-            console.log('cross-frame cleanup', targetPort, sourcePort);
             this._checkLastError(chrome.runtime.lastError);
             if (targetPort !== null) {
                 targetPort.disconnect();
