@@ -233,7 +233,13 @@
         "no-unsanitized/property": "error",
         "jsdoc/check-access": "error",
         "jsdoc/check-alignment": "error",
-        "jsdoc/check-line-alignment": "error",
+        "jsdoc/check-line-alignment": [
+            "error",
+            "never",
+            {
+                "wrapIndent": "  "
+            }
+        ],
         "jsdoc/check-param-names": "error",
         "jsdoc/check-property-names": "error",
         "jsdoc/check-tag-names": "error",
