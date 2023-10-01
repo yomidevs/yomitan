@@ -392,3 +392,5 @@ versions packaged.
 *   JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://github.com/Stuk/jszip/blob/v3.9.1/dist/jszip.min.js) - [license](https://github.com/Stuk/jszip/blob/v3.9.1/LICENSE.markdown)
 *   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://unpkg.com/wanakana@4.0.2/umd/wanakana.min.js) - [license](https://github.com/WaniKani/WanaKana/blob/4.0.2/LICENSE)
 *   parse5: [homepage](https://github.com/inikulin/parse5) - [snapshot](https://github.com/inikulin/parse5/tree/v7.1.2/packages/parse5) - [license](https://github.com/inikulin/parse5/blob/v7.1.2/LICENSE) _(Only used in MV3 build)_
+*   Dexie: [homepage](https://dexie.org/) - [snapshot](https://unpkg.com/dexie@3.2.4/dist/dexie.min.js) - [license](https://unpkg.com/dexie@3.2.4/LICENSE)
+*   dexie-export-import: [homepage](https://www.npmjs.com/package/dexie-export-import) - [snapshot](https://unpkg.com/dexie-export-import@4.0.7/dist/dexie-export-import.js) - [license](https://unpkg.com/dexie-export-import@4.0.7/LICENSE)
