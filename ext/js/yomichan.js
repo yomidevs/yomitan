@@ -172,24 +172,6 @@ class Yomichan extends EventDispatcher {
         }
     }
 
-    /**
-     * Runs `chrome.runtime.connect()` with additional exception handling events.
-     * @param {...*} args The arguments to be passed to `chrome.runtime.connect()`.
-     * @returns {Port} The resulting port.
-     * @throws {Error} Errors thrown by `chrome.runtime.connect()` are re-thrown.
-     */
-    connect(...args) {
-        try {
-            return chrome.runtime.connect(...args);
-        } catch (e) {
-            this.triggerExtensionUnloaded();
-            throw e;
-        }
-    }
-
-    /**
-     * Runs chrome.runtime.connect() with additional exception handling events.
-     */
     triggerExtensionUnloaded() {
         this._isExtensionUnloaded = true;
         if (this._isTriggeringExtensionUnloaded) { return; }
