@@ -129,11 +129,11 @@ class Yomichan extends EventDispatcher {
         if (!isBackground) {
             this._api = new API(this);
 
-            this._crossFrame = new CrossFrameAPI();
-            this._crossFrame.prepare();
-
             this.sendMessage({action: 'requestBackendReadySignal'});
             await this._isBackendReadyPromise;
+
+            this._crossFrame = new CrossFrameAPI();
+            await this._crossFrame.prepare();
 
             log.on('log', this._onForwardLog.bind(this));
         }
@@ -172,24 +172,6 @@ class Yomichan extends EventDispatcher {
         }
     }
 
-    /**
-     * Runs `chrome.runtime.connect()` with additional exception handling events.
-     * @param {...*} args The arguments to be passed to `chrome.runtime.connect()`.
-     * @returns {Port} The resulting port.
-     * @throws {Error} Errors thrown by `chrome.runtime.connect()` are re-thrown.
-     */
-    connect(...args) {
-        try {
-            return chrome.runtime.connect(...args);
-        } catch (e) {
-            this.triggerExtensionUnloaded();
-            throw e;
-        }
-    }
-
-    /**
-     * Runs chrome.runtime.connect() with additional exception handling events.
-     */
     triggerExtensionUnloaded() {
         this._isExtensionUnloaded = true;
         if (this._isTriggeringExtensionUnloaded) { return; }

@@ -139,7 +139,8 @@ class Backend {
             ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
             ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}],
             ['findAnkiNotes',                {async: true,  contentScript: true,  handler: this._onApiFindAnkiNotes.bind(this)}],
-            ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}]
+            ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}],
+            ['openCrossFramePort',           {async: false, contentScript: true,  handler: this._onApiOpenCrossFramePort.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -188,9 +189,6 @@ class Backend {
             const onZoomChange = this._onWebExtensionEventWrapper(this._onZoomChange.bind(this));
             chrome.tabs.onZoomChange.addListener(onZoomChange);
         }
-
-        const onConnect = this._onWebExtensionEventWrapper(this._onConnect.bind(this));
-        chrome.runtime.onConnect.addListener(onConnect);
 
         const onMessage = this._onMessageWrapper.bind(this);
         chrome.runtime.onMessage.addListener(onMessage);
@@ -329,58 +327,6 @@ class Backend {
         }
 
         return invokeMessageHandler(messageHandler, params, callback, sender);
-    }
-
-    _onConnect(port) {
-        try {
-            let details;
-            try {
-                details = JSON.parse(port.name);
-            } catch (e) {
-                return;
-            }
-            if (details.name !== 'background-cross-frame-communication-port') { return; }
-
-            const senderTabId = (port.sender && port.sender.tab ? port.sender.tab.id : null);
-            if (typeof senderTabId !== 'number') {
-                throw new Error('Port does not have an associated tab ID');
-            }
-            const senderFrameId = port.sender.frameId;
-            if (typeof senderFrameId !== 'number') {
-                throw new Error('Port does not have an associated frame ID');
-            }
-            let {targetTabId, targetFrameId} = details;
-            if (typeof targetTabId !== 'number') {
-                targetTabId = senderTabId;
-            }
-
-            const details2 = {
-                name: 'cross-frame-communication-port',
-                sourceTabId: senderTabId,
-                sourceFrameId: senderFrameId
-            };
-            let forwardPort = chrome.tabs.connect(targetTabId, {frameId: targetFrameId, name: JSON.stringify(details2)});
-
-            const cleanup = () => {
-                this._checkLastError(chrome.runtime.lastError);
-                if (forwardPort !== null) {
-                    forwardPort.disconnect();
-                    forwardPort = null;
-                }
-                if (port !== null) {
-                    port.disconnect();
-                    port = null;
-                }
-            };
-
-            port.onMessage.addListener((message) => { forwardPort.postMessage(message); });
-            forwardPort.onMessage.addListener((message) => { port.postMessage(message); });
-            port.onDisconnect.addListener(cleanup);
-            forwardPort.onDisconnect.addListener(cleanup);
-        } catch (e) {
-            port.disconnect();
-            log.error(e);
-        }
     }
 
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
@@ -2272,5 +2218,48 @@ class Backend {
             }
         }
         return results;
+    }
+
+    _onApiOpenCrossFramePort({targetTabId, targetFrameId}, sender) {
+        const sourceTabId = (sender && sender.tab ? sender.tab.id : null);
+        if (typeof sourceTabId !== 'number') {
+            throw new Error('Port does not have an associated tab ID');
+        }
+        const sourceFrameId = sender.frameId;
+        if (typeof sourceFrameId !== 'number') {
+            throw new Error('Port does not have an associated frame ID');
+        }
+
+        const sourceDetails = {
+            name: 'cross-frame-communication-port',
+            otherTabId: targetTabId,
+            otherFrameId: targetFrameId
+        };
+        const targetDetails = {
+            name: 'cross-frame-communication-port',
+            otherTabId: sourceTabId,
+            otherFrameId: sourceFrameId
+        };
+        let sourcePort = chrome.tabs.connect(sourceTabId, {frameId: sourceFrameId, name: JSON.stringify(sourceDetails)});
+        let targetPort = chrome.tabs.connect(targetTabId, {frameId: targetFrameId, name: JSON.stringify(targetDetails)});
+
+        const cleanup = () => {
+            this._checkLastError(chrome.runtime.lastError);
+            if (targetPort !== null) {
+                targetPort.disconnect();
+                targetPort = null;
+            }
+            if (sourcePort !== null) {
+                sourcePort.disconnect();
+                sourcePort = null;
+            }
+        };
+
+        sourcePort.onMessage.addListener((message) => { targetPort.postMessage(message); });
+        targetPort.onMessage.addListener((message) => { sourcePort.postMessage(message); });
+        sourcePort.onDisconnect.addListener(cleanup);
+        targetPort.onDisconnect.addListener(cleanup);
+
+        return {targetTabId, targetFrameId};
     }
 }
