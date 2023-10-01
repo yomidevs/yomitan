@@ -7,11 +7,13 @@ on:
 permissions:
   contents: read
 jobs:
-  build-release-publish:
+  build:
     runs-on: ubuntu-latest
     permissions:
       actions: write
       contents: write
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
     steps:
       - uses: actions/checkout@v4
 
@@ -23,6 +25,12 @@ jobs:
       - name: Lint
         run: npm run-script build -- --all --yomitan-version ${{ github.ref_name }}
         shell: bash
+
+      - name: Generate hashes
+        id: hash
+        run: |
+          cd builds
+          echo "hashes=$(sha256sum * | base64 -w0)" >> "$GITHUB_OUTPUT"
 
       - name: Release
         id: release
@@ -46,3 +54,14 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: false
           inputs: '{ "upload_url": "${{ steps.release.outputs.upload_url }}" }'
+
+  provenance:
+    needs: [build]
+    permissions:
+      actions: read # To read the workflow path.
+      id-token: write # To sign the provenance.
+      contents: write # To add assets to a release.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@07e64b653f10a80b6510f4568f685f8b7b9ea830
+    with:
+      base64-subjects: "${{ needs.build.outputs.hashes }}"
+      upload-assets: true
