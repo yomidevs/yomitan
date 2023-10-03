@@ -17,6 +17,7 @@
 
 /* global
  * loadScript
+ * loadModule
  * removeScript
  * getDeinflectionReasons
  * fetchAsset
@@ -63,8 +64,10 @@ export class LanguageUtil {
 
     async getTextTransformations(language = this.language) {
         try {
-            if (!window.languages[language].getTextTransformations) {
-                await loadScript(`/js/language/languages/${language}/textTransformations.js`);
+            if (!window.languages[language].textTransformations) {
+                await loadModule(`/js/language/languages/${language}/constants.js`);
+                await loadModule(`/js/language/languages/${language}/util.js`);
+                await loadModule(`/js/language/languages/${language}/textTransformations.js`);
             }
             return window.languages[language].textTransformations;
         } catch (e){

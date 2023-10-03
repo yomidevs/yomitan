@@ -18,27 +18,39 @@
 /* global
 */
 
+import {decapitalize, capitalizeFirstLetter} from '../../textTransformations.js';
+
 window.languages.de.textTransformations = [
+    decapitalize,
+    capitalizeFirstLetter,
     {
-        id: 'decapitalize',
-        name: 'Decapitalize text',
-        description: 'CAPITALIZED TEXT → capitalized text',
+        id: 'ssToSharpS',
+        name: "Convert 'ss' to 'ß'",
+        description: 'ss → ß, SS → ẞ',
         options: {
             false: 'Disabled',
             true: 'Enabled',
             variant: 'Use both variants'
         },
-        transform: (str) => str.toLowerCase()
+        transform: (text) => {
+            return text
+                .replace(/ss/g, 'ß')
+                .replace(/SS/g, 'ẞ');
+        }
     },
     {
-        id: 'capitalizeFirstLetter',
-        name: 'Capitalize first letter',
-        description: 'lowercase text → Lowercase text',
+        id: 'sharpSToSS',
+        name: "Convert 'ß' to 'ss'",
+        description: 'ß → ss, ẞ → SS',
         options: {
             false: 'Disabled',
             true: 'Enabled',
             variant: 'Use both variants'
         },
-        transform: (str) => str.charAt(0).toUpperCase() + str.slice(1)
+        transform: (text) => {
+            return text
+                .replace(/ẞ/g, 'SS')
+                .replace(/ß/g, 'ss');
+        }
     }
 ];

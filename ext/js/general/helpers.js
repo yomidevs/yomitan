@@ -48,7 +48,28 @@ function loadScript(filename) {
                 resolve(); // Resolve the Promise when the script has loaded
             };
             fileref.onerror = () => {
-                reject(new Error('Error loading script: ' + filename)); // Reject the Promise on error
+                console.error('Error loading script: ' + filename); // Reject the Promise on error
+                resolve(); // Resolve the Promise when the script has loaded
+            };
+
+            document.getElementsByTagName('head')[0].appendChild(fileref);
+        }
+    });
+}
+
+function loadModule(filename){
+    return new Promise((resolve, reject) => {
+        const fileref = document.createElement('script');
+        fileref.setAttribute('type', 'module');
+        fileref.setAttribute('src', filename);
+
+        if (typeof fileref !== 'undefined') {
+            fileref.onload = () => {
+                resolve(); // Resolve the Promise when the script has loaded
+            };
+            fileref.onerror = () => {
+                console.error('Error loading script: ' + filename); // Reject the Promise on error
+                resolve(); // Resolve the Promise when the script has loaded
             };
 
             document.getElementsByTagName('head')[0].appendChild(fileref);

@@ -164,8 +164,6 @@ export function convertAlphabeticToKana(text, sourceMap=null) {
     return result;
 }
 
-window.languages = window.languages || {};
-window.languages.ja = window.languages.ja || {};
 window.languages.ja.textTransformations = [
     {
         id: 'convertHalfWidthCharacters',

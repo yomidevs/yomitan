@@ -20,37 +20,7 @@
 
 import {decapitalize, capitalizeFirstLetter} from '../../textTransformations.js';
 
-window.languages.ru.textTransformations = [
-    {
-        id: 'yoToE',
-        name: "Convert 'ё' to 'е'",
-        description: 'Ё → Е, ё → е',
-        options: {
-            false: 'Disabled',
-            true: 'Enabled',
-            variant: 'Use both variants'
-        },
-        transform: (text) => {
-            return text
-                .replace(/Ё/g, 'Е')
-                .replace(/ё/g, 'е');
-        }
-    },
-    {
-        id: 'eToYo',
-        name: "Convert 'е' to 'ё'",
-        description: 'Е → Ё, е → ё',
-        options: {
-            false: 'Disabled',
-            true: 'Enabled',
-            variant: 'Use both variants'
-        },
-        transform: (text) => {
-            return text
-                .replace(/Е/g, 'Ё')
-                .replace(/е/g, 'ё');
-        }
-    },
+window.languages.sq.textTransformations = [
     decapitalize,
     capitalizeFirstLetter
 ];
