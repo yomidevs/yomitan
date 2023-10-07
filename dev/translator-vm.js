@@ -95,8 +95,8 @@ class TranslatorVM extends DatabaseVM {
             japaneseUtil: this._japaneseUtil,
             database: dictionaryDatabase
         });
-        const deinflectionReasions = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect.json')));
-        this._translator.prepare(deinflectionReasions);
+        const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect.json')));
+        this._translator.prepare(deinflectionReasons);
 
         // Assign properties
         this._ankiNoteDataCreator = new AnkiNoteDataCreator(this._japaneseUtil);
