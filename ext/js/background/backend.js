@@ -226,8 +226,8 @@ class Backend {
                 log.error(e);
             }
 
-            const deinflectionReasions = await this._fetchAsset('/data/deinflect.json', true);
-            this._translator.prepare(deinflectionReasions);
+            const deinflectionReasons = await this._fetchAsset('/data/deinflect.json', true);
+            this._translator.prepare(deinflectionReasons);
 
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await this._fetchAsset('/data/templates/default-anki-field-templates.handlebars')).trim();
