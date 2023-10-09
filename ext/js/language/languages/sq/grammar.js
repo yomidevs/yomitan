@@ -16,7 +16,13 @@
  */
 
 /* global
+ * suffixInflection
 */
+
 window.getDeinflectionReasons = async () => {
-    return {};
+    return {
+        'definite': [
+            suffixInflection('gu', 'g', [], ['noun'])
+        ]
+    };
 };

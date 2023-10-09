@@ -20,9 +20,9 @@ class Deinflector {
         this.reasons = Deinflector.normalizeReasons(reasons);
     }
 
-    deinflect(source) {
+    deinflect(source, options) {
         // const start = performance.now();
-
+        const checkRules = options.deinflectionPosFilter;
         const results = [this._createDeinflection(source, 0, [])];
 
         for (let i = 0; i < results.length && i < 200; ++i) {
@@ -30,7 +30,7 @@ class Deinflector {
             for (const [reason, variants] of this.reasons) {
                 for (const [inflected, uninflect, rulesIn, rulesOut] of variants) {
                     if (
-                        (rules !== 0 && (rules & rulesIn) === 0) ||
+                        (checkRules && !this._rulesFit(rules, rulesIn)) ||
                         !inflected.test(term)
                     ) {
                         continue;
@@ -49,6 +49,10 @@ class Deinflector {
         // console.log(`\tDeinflector::deinflect() performance = ${end - start}ms`);
 
         return results;
+    }
+
+    _rulesFit(rules1, rules2) {
+        return rules1 === 0 || (rules1 & rules2) !== 0;
     }
 
     _createDeinflection(term, rules, reasons) {
@@ -79,17 +83,18 @@ class Deinflector {
     }
 }
 
+// TODO: generalize, extract to language-specific file?
 // eslint-disable-next-line no-underscore-dangle
 Deinflector._ruleTypes = new Map([
-    // ['v',    0b0000011111], // Verb // does not work for some reason, breaks both 'his' and 'belongs'
-    ['v1',    0b0000000001], // Verb ichidan
-    ['v5',    0b0000000010], // Verb godan
-    ['vs',    0b0000000100], // Verb suru
-    ['vk',    0b0000001000], // Verb kuru
-    ['vz',    0b0000010000], // Verb zuru
-    // ['adj',  0b0000100000], // Adjective
-    ['adj-i', 0b0000100000], // Adjective i
-    ['iru',   0b0001000000] // Intermediate -iru endings for progressive or perfect tens
-    // ['n',     0b0010000000], // Noun
-    // ['pn',   0b0100000000], // Pronoun
+    ['v',       0b0000011111], // Verb // does not work for some reason, breaks both 'his' and 'belongs'
+    ['v1',      0b0000000001], // Verb ichidan
+    ['v5',      0b0000000010], // Verb godan
+    ['vs',      0b0000000100], // Verb suru
+    ['vk',      0b0000001000], // Verb kuru
+    ['vz',      0b0000010000], // Verb zuru
+    ['adj',     0b0000100000], // Adjective
+    ['adj-i',   0b0000100000], // Adjective i
+    ['iru',     0b0001000000], // Intermediate -iru endings for progressive or perfect tens
+    ['n',       0b0010000000], // Noun
+    ['pn',      0b0100000000] // Pronoun
 ]);

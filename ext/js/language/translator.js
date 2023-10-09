@@ -258,9 +258,10 @@ class Translator {
 
         deinflections = deinflections.filter((deinflection) => deinflection.databaseEntries.length > 0);
 
-        const dictionaryDeinflections = await this._getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType);
-
-        deinflections.push(...dictionaryDeinflections);
+        if (options.deinflectionSource !== 'algorithm') {
+            const dictionaryDeinflections = await this._getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType);
+            deinflections.push(...dictionaryDeinflections);
+        }
 
         return deinflections;
     }
@@ -365,8 +366,13 @@ class Translator {
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                for (const {term, rules, reasons} of this._deinflector.deinflect(source)) {
-                    deinflections.push(this._createDeinflection(rawSource, source, term, rules, [reasons], []));
+
+                if (options.deinflectionSource !== 'dictionary'){
+                    for (const {term, rules, reasons} of this._deinflector.deinflect(source, options)) {
+                        deinflections.push(this._createDeinflection(rawSource, source, term, rules, [reasons], []));
+                    }
+                } else {
+                    deinflections.push(this._createDeinflection(rawSource, source, source, 0, [], []));
                 }
 
                 if (options.searchResolution === 'word') {

@@ -2107,7 +2107,9 @@ export class Backend {
             parsing: {searchResolution},
             translation: {
                 collapseEmphaticSequences,
-                textReplacements: textReplacementsOptions
+                textReplacements: textReplacementsOptions,
+                deinflectionSource,
+                deinflectionPosFilter
             }
         } = options;
 
@@ -2136,7 +2138,9 @@ export class Backend {
             textReplacements,
             enabledDictionaryMap,
             excludeDictionaryDefinitions,
-            textTransformations
+            textTransformations,
+            deinflectionSource,
+            deinflectionPosFilter
         };
     }
 

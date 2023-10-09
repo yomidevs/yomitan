@@ -777,6 +777,15 @@
                                                 }
                                             }
                                         }
+                                    },
+                                    "deinflectionSource":{
+                                        "type": "string",
+                                        "enum": ["algorithm", "dictionary", "both"],
+                                        "default": "algorithm"
+                                    },
+                                    "deinflectionPosFitler":{
+                                        "type": "boolean",
+                                        "default": true
                                     }
                                 }
                             },
