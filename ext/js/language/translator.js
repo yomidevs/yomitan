@@ -283,9 +283,9 @@ class Translator {
         );
         if (deinflections.length === 0) { return []; }
 
-        const {matchType} = options;
+        const {matchType, deinflectionPosFilter: checkRules} = options;
 
-        await this._addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType);
+        await this._addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType, checkRules);
 
         deinflections = deinflections.filter((deinflection) => deinflection.databaseEntries.length > 0);
 
@@ -297,13 +297,13 @@ class Translator {
         return deinflections;
     }
 
-    async _addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType) {
+    async _addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType, checkRules) {
         const uniqueDeinflectionsMap = this._groupDeinflectionsByTerm(deinflections);
         const uniqueDeinflectionArrays = Object.values(uniqueDeinflectionsMap);
         const uniqueDeinflectionTerms = Object.keys(uniqueDeinflectionsMap);
 
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
-        this._matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays);
+        this._matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, checkRules);
     }
 
     async _getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType) {
@@ -338,16 +338,20 @@ class Translator {
         }, {});
     }
 
-    _matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays) {
+    _matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, checkRules) {
         for (const databaseEntry of databaseEntries) {
             const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
                 const deinflectionRules = deinflection.rules;
-                if (deinflectionRules === 0 || (definitionRules & deinflectionRules) !== 0) {
+                if (!checkRules || this._rulesFit(deinflectionRules, definitionRules)) {
                     deinflection.databaseEntries.push(databaseEntry);
                 }
             }
         }
+    }
+
+    _rulesFit(rules1, rules2) {
+        return rules1 === 0 || (rules1 & rules2) !== 0;
     }
 
     // Deinflections and text transformations

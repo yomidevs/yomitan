@@ -45,9 +45,6 @@ class Deinflector {
             }
         }
 
-        // const end = performance.now();
-        // console.log(`\tDeinflector::deinflect() performance = ${end - start}ms`);
-
         return results;
     }
 
@@ -86,7 +83,8 @@ class Deinflector {
 // TODO: generalize, extract to language-specific file?
 // eslint-disable-next-line no-underscore-dangle
 Deinflector._ruleTypes = new Map([
-    ['v',       0b0000011111], // Verb // does not work for some reason, breaks both 'his' and 'belongs'
+    ['v',       0b0000011111], // Verb
+    ['verb',    0b0000011111], // Verb
     ['v1',      0b0000000001], // Verb ichidan
     ['v5',      0b0000000010], // Verb godan
     ['vs',      0b0000000100], // Verb suru
@@ -96,5 +94,6 @@ Deinflector._ruleTypes = new Map([
     ['adj-i',   0b0000100000], // Adjective i
     ['iru',     0b0001000000], // Intermediate -iru endings for progressive or perfect tens
     ['n',       0b0010000000], // Noun
+    ['noun',    0b0010000000], // Noun'
     ['pn',      0b0100000000] // Pronoun
 ]);
