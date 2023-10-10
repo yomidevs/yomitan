@@ -19,10 +19,40 @@
  * suffixInflection
 */
 
-window.getDeinflectionReasons = async () => {
+window.languages.sq.getDeinflectionReasons = async () => {
     return {
+        // Nouns
         'definite': [
-            suffixInflection('gu', 'g', [], ['noun'])
+            suffixInflection('ku', 'k', [], ['noun']),
+            suffixInflection('gu', 'g', [], ['noun']),
+            suffixInflection('hu', 'h', [], ['noun']),
+            suffixInflection('au', 'a', [], ['noun']),
+            suffixInflection('iu', 'i', [], ['noun']),
+            suffixInflection('eu', 'e', [], ['noun'])
+        ],
+        'plural': [
+            suffixInflection('e', '', [], ['noun'])
+        ],
+        // Verbs
+        'present indicative 2nd singular': [
+            suffixInflection('n', 'j', [], ['verb'])
+        ],
+        'present indicative 3rd singular': [
+            suffixInflection('n', 'j', [], ['verb'])
+        ],
+        'present indicative 1st plural': [
+            suffixInflection('jmë', 'j', [], ['verb']),
+            suffixInflection('im', '', [], ['verb']),
+            suffixInflection('më', '', [], ['verb'])
+        ],
+        'present indicative 2nd plural': [
+            suffixInflection('ni', 'j', [], ['verb']),
+            suffixInflection('ni', '', [], ['verb'])
+        ],
+        'present indicative 3rd plural': [
+            suffixInflection('jnë', 'j', [], ['verb']),
+            suffixInflection('in', '', [], ['verb']),
+            suffixInflection('në', '', [], ['verb'])
         ]
     };
 };

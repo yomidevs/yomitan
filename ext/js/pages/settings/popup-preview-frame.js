@@ -125,7 +125,8 @@ class PopupPreviewFrame {
             case 'ru':
                 return 'читать';
             case 'sq':
-                return 'lexo';
+                // return 'lexo';
+                return 'bregu';
         }
     }
     async _apiOptionsGet(...args) {
