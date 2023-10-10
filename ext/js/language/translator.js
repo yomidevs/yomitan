@@ -57,7 +57,7 @@ class Translator {
      * this function has been called.
      */
     prepare() {
-        this._deinflector = new Deinflector(this._languageUtil.deinflectionReasons);
+        this._deinflector = new Deinflector(this._languageUtil);
     }
 
     /**
@@ -278,7 +278,7 @@ class Translator {
     async _getDeinflections(text, enabledDictionaryMap, options) {
         let deinflections = (
             options.deinflect ?
-            this._getAlgorithmDeinflections(text, options) :
+            await this._getAlgorithmDeinflections(text, options) :
             [this._createDeinflection(text, text, text, 0, [], [])]
         );
         if (deinflections.length === 0) { return []; }
@@ -356,7 +356,7 @@ class Translator {
 
     // Deinflections and text transformations
 
-    _getAlgorithmDeinflections(text, options) {
+    async _getAlgorithmDeinflections(text, options) {
         const textTransformationsVectorSpace = Object.entries(options.textTransformations).reduce((map, [key, value]) => {
             map[key] = this._getTextOptionEntryVariants(value.setting);
             return map;
@@ -403,7 +403,7 @@ class Translator {
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
 
                 if (options.deinflectionSource !== 'dictionary'){
-                    for (const {term, rules, reasons} of this._deinflector.deinflect(source, options)) {
+                    for (const {term, rules, reasons} of await this._deinflector.deinflect(source, options)) {
                         deinflections.push(this._createDeinflection(rawSource, source, term, rules, [reasons], []));
                     }
                 } else {

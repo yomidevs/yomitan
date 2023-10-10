@@ -17,6 +17,6 @@
 
 /* global
 */
-window.getDeinflectionReasons = async () => {
+window.languages.de.getDeinflectionReasons = async () => {
     return {};
 };

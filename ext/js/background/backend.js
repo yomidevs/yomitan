@@ -239,7 +239,6 @@ export class Backend {
             this._options = await this._optionsUtil.load();
 
             await this._languageUtil.prepare();
-            await this._languageUtil.setLanguage(this._getProfileLanguage({current: true}));
             this._translator.prepare();
 
             this._applyOptions('background');
@@ -1049,27 +1048,23 @@ export class Backend {
 
         this._accessibilityController.update(this._getOptionsFull(false));
 
-        await this._onChangedLanguage(options);
+        this._onChangedLanguage(options);
 
         this._sendMessageAllTabsIgnoreResponse('Yomichan.optionsUpdated', {source});
     }
 
-    async _onChangedLanguage(options) {
+    _onChangedLanguage(options) {
         const {language} = options.general;
-        if (language !== this._languageUtil.language){
-            await this._languageUtil.setLanguage(language);
-            this._translator.prepare();
-            if (!options.languages[language]) {
-                this._modifySetting({
-                    action: 'set',
-                    path: `languages.${language}`,
-                    value: {
-                        textTransformations: {}
-                    },
-                    scope: 'profile',
-                    optionsContext: {current: true}
-                });
-            }
+        if (!options.languages[language]) {
+            this._modifySetting({
+                action: 'set',
+                path: `languages.${language}`,
+                value: {
+                    textTransformations: {}
+                },
+                scope: 'profile',
+                optionsContext: {current: true}
+            });
         }
     }
 
@@ -2140,7 +2135,8 @@ export class Backend {
             excludeDictionaryDefinitions,
             textTransformations,
             deinflectionSource,
-            deinflectionPosFilter
+            deinflectionPosFilter,
+            language
         };
     }
 

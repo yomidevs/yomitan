@@ -19,7 +19,7 @@
  * suffixInflection
 */
 
-window.getDeinflectionReasons = async () =>  {
+window.languages.ja.getDeinflectionReasons = async () =>  {
     return {
         '-ba': [
             suffixInflection('ければ', 'い', [], ['adj-i']),

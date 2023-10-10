@@ -15,19 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 class Deinflector {
-    constructor(reasons) {
-        this.reasons = Deinflector.normalizeReasons(reasons);
+    constructor(languageUtil) {
+        this._languageUtil = languageUtil;
     }
 
-    deinflect(source, options) {
-        // const start = performance.now();
+    async deinflect(source, options) {
         const checkRules = options.deinflectionPosFilter;
         const results = [this._createDeinflection(source, 0, [])];
 
         for (let i = 0; i < results.length && i < 200; ++i) {
             const {rules, term, reasons} = results[i];
-            for (const [reason, variants] of this.reasons) {
+            const deinflectionReasons = Deinflector.normalizeReasons(await this._languageUtil.getDeinflectionReasons(options.language));
+            for (const [reason, variants] of deinflectionReasons) {
                 for (const [inflected, uninflect, rulesIn, rulesOut] of variants) {
                     if (
                         (checkRules && !this._rulesFit(rules, rulesIn)) ||

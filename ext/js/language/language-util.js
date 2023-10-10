@@ -26,7 +26,6 @@
 export class LanguageUtil {
     constructor() {
         this.language = null;
-        this.deinflectionReasons = [];
     }
 
     async prepare() {
@@ -38,28 +37,23 @@ export class LanguageUtil {
         });
     }
 
-    async setLanguage(newLanguage) {
-        try {
-            if (this.language !== newLanguage) {
-                this.deinflectionReasons = [];
-
-                removeScript(`/js/language/languages/${this.language}/grammar.js`);
-                this.language = newLanguage;
-                await loadScript(`/js/language/languages/${this.language}/grammar.js`);
-
-                this.deinflectionReasons = await getDeinflectionReasons();
-            }
-        } catch (e) {
-            console.error('Error while changing language:', e);
-        }
-    }
-
     async getLanguages() {
         return window.languages;
     }
 
     async getDeinflectionReasons(language = this.language) {
-        return window[language].getDeinflectionReasons();
+        try {
+            if (!window.languages[language].deinflectionReasons) {
+                if (!window.languages[language].getDeinflectionReasons) {
+                    await loadModule(`/js/language/languages/${language}/grammar.js`);
+                }
+                window.languages[language].deinflectionReasons = await window.languages[language].getDeinflectionReasons();
+            }
+            return window.languages[language].deinflectionReasons;
+        } catch (e){
+            console.error(e);
+            return [];
+        }
     }
 
     async getTextTransformations(language = this.language) {

@@ -22,7 +22,7 @@
  * wholeWordInflection
  * fetchAsset
 */
-window.getDeinflectionReasons = async () => {
+window.languages.en.getDeinflectionReasons = async () => {
     const pastSuffixInflections = [
         suffixInflection('ed', '', [], ['v']), // 'walked'
         suffixInflection('ed', 'e', [], ['v']), // 'hoped'
