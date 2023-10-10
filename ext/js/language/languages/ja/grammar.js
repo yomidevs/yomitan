@@ -20,8 +20,8 @@
 */
 
 window.languages.ja.getDeinflectionReasons = async () =>  {
-    return {
-        '-ba': [
+    return new Map([
+        ['-ba', [
             suffixInflection('ければ', 'い', [], ['adj-i']),
             suffixInflection('えば', 'う', [], ['v5']),
             suffixInflection('けば', 'く', [], ['v5']),
@@ -32,8 +32,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             suffixInflection('べば', 'ぶ', [], ['v5']),
             suffixInflection('めば', 'む', [], ['v5']),
             suffixInflection('れば', 'る', [], ['v1', 'v5', 'vk', 'vs', 'vz'])
-        ],
-        '-chau': [
+        ]],
+        ['-chau', [
             suffixInflection('ちゃう', 'る', ['v5'], ['v1']),
             suffixInflection('いじゃう', 'ぐ', ['v5'], ['v5']),
             suffixInflection('いちゃう', 'く', ['v5'], ['v5']),
@@ -51,8 +51,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             suffixInflection('きちゃう', 'くる', ['v5'], ['vk']),
             suffixInflection('来ちゃう', '来る', ['v5'], ['vk']),
             suffixInflection('來ちゃう', '來る', ['v5'], ['vk'])
-        ],
-        '-chimau': [
+        ]],
+        ['-chimau', [
             suffixInflection('ちまう', 'る', ['v5'], ['v1']),
             suffixInflection('いじまう', 'ぐ', ['v5'], ['v5']),
             suffixInflection('いちまう', 'く', ['v5'], ['v5']),
@@ -70,12 +70,12 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             suffixInflection('きちまう', 'くる', ['v5'], ['vk']),
             suffixInflection('来ちまう', '来る', ['v5'], ['vk']),
             suffixInflection('來ちまう', '來る', ['v5'], ['vk'])
-        ],
-        '-shimau': [
+        ]],
+        ['-shimau', [
             suffixInflection('てしまう', 'て', ['v5'], ['iru']),
             suffixInflection('でしまう', 'で', ['v5'], ['iru'])
-        ],
-        '-nasai': [
+        ]],
+        ['-nasai', [
             suffixInflection('なさい', 'る', ['v5'], ['v1']),
             suffixInflection('いなさい', 'う', ['v5'], ['v5']),
             suffixInflection('きなさい', 'く', ['v5'], ['v5']),
@@ -92,8 +92,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             suffixInflection('きなさい', 'くる', ['v5'], ['vk']),
             suffixInflection('来なさい', '来る', ['v5'], ['vk']),
             suffixInflection('來なさい', '來る', ['v5'], ['vk'])
-        ],
-        '-sou': [
+        ]],
+        ['-sou', [
             suffixInflection('そう', 'い', ['v5'], ['adj-i']),
             suffixInflection('そう', 'る', ['v5'], ['v1']),
             suffixInflection('いそう', 'う', ['v5'], ['v5']),
@@ -111,8 +111,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             suffixInflection('きそう', 'くる', ['v5'], ['vk']),
             suffixInflection('来そう', '来る', ['v5'], ['vk']),
             suffixInflection('來そう', '來る', ['v5'], ['vk'])
-        ],
-        '-sugiru': [
+        ]],
+        ['-sugiru', [
             suffixInflection('すぎる', 'い', ['v1'], ['adj-i']),
             suffixInflection('すぎる', 'る', ['v1'], ['v1']),
             suffixInflection('いすぎる', 'う', ['v1'], ['v5']),
@@ -130,8 +130,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             suffixInflection('きすぎる', 'くる', ['v1'], ['vk']),
             suffixInflection('来すぎる', '来る', ['v1'], ['vk']),
             suffixInflection('來すぎる', '來る', ['v1'], ['vk'])
-        ],
-        '-tai': [
+        ]],
+        ['-tai', [
             suffixInflection('たい', 'る', ['adj-i'], ['v1']),
             suffixInflection('いたい', 'う', ['adj-i'], ['v5']),
             suffixInflection('きたい', 'く', ['adj-i'], ['v5']),
@@ -148,8 +148,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             suffixInflection('きたい', 'くる', ['adj-i'], ['vk']),
             suffixInflection('来たい', '来る', ['adj-i'], ['vk']),
             suffixInflection('來たい', '來る', ['adj-i'], ['vk'])
-        ],
-        '-tara': [
+        ]],
+        ['-tara', [
             suffixInflection('かったら', 'い', [], ['adj-i']),
             suffixInflection('たら', 'る', [], ['v1']),
             suffixInflection('いたら', 'く', [], ['v5']),
@@ -185,8 +185,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             suffixInflection('副うたら', '副う', [], ['v5']),
             suffixInflection('厭うたら', '厭う', [], ['v5']),
             suffixInflection('のたもうたら', 'のたまう', [], ['v5'])
-        ],
-        '-tari': [
+        ]],
+        ['-tari', [
             suffixInflection('かったり', 'い', [], ['adj-i']),
             suffixInflection('たり', 'る', [], ['v1']),
             suffixInflection('いたり', 'く', [], ['v5']),
@@ -221,45 +221,46 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             suffixInflection('添うたり', '添う', [], ['v5']),
             suffixInflection('副うたり', '副う', [], ['v5']),
             suffixInflection('厭うたり', '厭う', [], ['v5']),
-            suffixInflection('のたもうたり', 'のたまう', [], ['v5'])],
-        '-te': [
-            {'inflected': /.*くて$/, 'uninflect': (term) =>  term.replace(/くて$/, 'い'), 'rulesIn': ['iru'], 'rulesOut': ['adj-i']},
-            {'inflected': /.*て$/, 'uninflect': (term) =>  term.replace(/て$/, 'る'), 'rulesIn': ['iru'], 'rulesOut': ['v1']},
-            {'inflected': /.*いて$/, 'uninflect': (term) =>  term.replace(/いて$/, 'く'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*いで$/, 'uninflect': (term) =>  term.replace(/いで$/, 'ぐ'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*して$/, 'uninflect': (term) =>  term.replace(/して$/, 'す'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*って$/, 'uninflect': (term) =>  term.replace(/って$/, 'う'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*って$/, 'uninflect': (term) =>  term.replace(/って$/, 'つ'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*って$/, 'uninflect': (term) =>  term.replace(/って$/, 'る'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*んで$/, 'uninflect': (term) =>  term.replace(/んで$/, 'ぬ'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*んで$/, 'uninflect': (term) =>  term.replace(/んで$/, 'ぶ'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*んで$/, 'uninflect': (term) =>  term.replace(/んで$/, 'む'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*じて$/, 'uninflect': (term) =>  term.replace(/じて$/, 'ずる'), 'rulesIn': ['iru'], 'rulesOut': ['vz']},
-            {'inflected': /.*して$/, 'uninflect': (term) =>  term.replace(/して$/, 'する'), 'rulesIn': ['iru'], 'rulesOut': ['vs']},
-            {'inflected': /.*為て$/, 'uninflect': (term) =>  term.replace(/為て$/, '為る'), 'rulesIn': ['iru'], 'rulesOut': ['vs']},
-            {'inflected': /.*きて$/, 'uninflect': (term) =>  term.replace(/きて$/, 'くる'), 'rulesIn': ['iru'], 'rulesOut': ['vk']},
-            {'inflected': /.*来て$/, 'uninflect': (term) =>  term.replace(/来て$/, '来る'), 'rulesIn': ['iru'], 'rulesOut': ['vk']},
-            {'inflected': /.*來て$/, 'uninflect': (term) =>  term.replace(/來て$/, '來る'), 'rulesIn': ['iru'], 'rulesOut': ['vk']},
-            {'inflected': /.*いって$/, 'uninflect': (term) =>  term.replace(/いって$/, 'いく'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*おうて$/, 'uninflect': (term) =>  term.replace(/おうて$/, 'おう'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*こうて$/, 'uninflect': (term) =>  term.replace(/こうて$/, 'こう'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*そうて$/, 'uninflect': (term) =>  term.replace(/そうて$/, 'そう'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*とうて$/, 'uninflect': (term) =>  term.replace(/とうて$/, 'とう'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*行って$/, 'uninflect': (term) =>  term.replace(/行って$/, '行く'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*逝って$/, 'uninflect': (term) =>  term.replace(/逝って$/, '逝く'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*往って$/, 'uninflect': (term) =>  term.replace(/往って$/, '往く'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*請うて$/, 'uninflect': (term) =>  term.replace(/請うて$/, '請う'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*乞うて$/, 'uninflect': (term) =>  term.replace(/乞うて$/, '乞う'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*恋うて$/, 'uninflect': (term) =>  term.replace(/恋うて$/, '恋う'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*問うて$/, 'uninflect': (term) =>  term.replace(/問うて$/, '問う'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*負うて$/, 'uninflect': (term) =>  term.replace(/負うて$/, '負う'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*沿うて$/, 'uninflect': (term) =>  term.replace(/沿うて$/, '沿う'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*添うて$/, 'uninflect': (term) =>  term.replace(/添うて$/, '添う'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*副うて$/, 'uninflect': (term) =>  term.replace(/副うて$/, '副う'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*厭うて$/, 'uninflect': (term) =>  term.replace(/厭うて$/, '厭う'), 'rulesIn': ['iru'], 'rulesOut': ['v5']},
-            {'inflected': /.*のたもうて$/, 'uninflect': (term) =>  term.replace(/のたもうて$/, 'のたまう'), 'rulesIn': ['iru'], 'rulesOut': ['v5']}
-        ],
-        '-zu': [
+            suffixInflection('のたもうたり', 'のたまう', [], ['v5'])
+        ]],
+        ['-te', [
+            suffixInflection('くて', 'い', ['iru'], ['adj-i']),
+            suffixInflection('て', 'る', ['iru'], ['v1']),
+            suffixInflection('いて', 'く', ['iru'], ['v5']),
+            suffixInflection('いで', 'ぐ', ['iru'], ['v5']),
+            suffixInflection('して', 'す', ['iru'], ['v5']),
+            suffixInflection('って', 'う', ['iru'], ['v5']),
+            suffixInflection('って', 'つ', ['iru'], ['v5']),
+            suffixInflection('って', 'る', ['iru'], ['v5']),
+            suffixInflection('んで', 'ぬ', ['iru'], ['v5']),
+            suffixInflection('んで', 'ぶ', ['iru'], ['v5']),
+            suffixInflection('んで', 'む', ['iru'], ['v5']),
+            suffixInflection('じて', 'ずる', ['iru'], ['vz']),
+            suffixInflection('して', 'する', ['iru'], ['vs']),
+            suffixInflection('為て', '為る', ['iru'], ['vs']),
+            suffixInflection('きて', 'くる', ['iru'], ['vk']),
+            suffixInflection('来て', '来る', ['iru'], ['vk']),
+            suffixInflection('來て', '來る', ['iru'], ['vk']),
+            suffixInflection('いって', 'いく', ['iru'], ['v5']),
+            suffixInflection('おうて', 'おう', ['iru'], ['v5']),
+            suffixInflection('こうて', 'こう', ['iru'], ['v5']),
+            suffixInflection('そうて', 'そう', ['iru'], ['v5']),
+            suffixInflection('とうて', 'とう', ['iru'], ['v5']),
+            suffixInflection('行って', '行く', ['iru'], ['v5']),
+            suffixInflection('逝って', '逝く', ['iru'], ['v5']),
+            suffixInflection('往って', '往く', ['iru'], ['v5']),
+            suffixInflection('請うて', '請う', ['iru'], ['v5']),
+            suffixInflection('乞うて', '乞う', ['iru'], ['v5']),
+            suffixInflection('恋うて', '恋う', ['iru'], ['v5']),
+            suffixInflection('問うて', '問う', ['iru'], ['v5']),
+            suffixInflection('負うて', '負う', ['iru'], ['v5']),
+            suffixInflection('沿うて', '沿う', ['iru'], ['v5']),
+            suffixInflection('添うて', '添う', ['iru'], ['v5']),
+            suffixInflection('副うて', '副う', ['iru'], ['v5']),
+            suffixInflection('厭うて', '厭う', ['iru'], ['v5']),
+            suffixInflection('のたもうて', 'のたまう', ['iru'], ['v5'])
+        ]],
+        ['-zu', [
             {'inflected': /.*ず$/, 'uninflect': (term) =>  term.replace(/ず$/, 'る'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*かず$/, 'uninflect': (term) =>  term.replace(/かず$/, 'く'), 'rulesIn': [], 'rulesOut': ['v5']},
             {'inflected': /.*がず$/, 'uninflect': (term) =>  term.replace(/がず$/, 'ぐ'), 'rulesIn': [], 'rulesOut': ['v5']},
@@ -276,8 +277,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*こず$/, 'uninflect': (term) =>  term.replace(/こず$/, 'くる'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*来ず$/, 'uninflect': (term) =>  term.replace(/来ず$/, '来る'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*來ず$/, 'uninflect': (term) =>  term.replace(/來ず$/, '來る'), 'rulesIn': [], 'rulesOut': ['vk']}
-        ],
-        '-nu': [
+        ]],
+        ['-nu', [
             {'inflected': /.*ぬ$/, 'uninflect': (term) =>  term.replace(/ぬ$/, 'る'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*かぬ$/, 'uninflect': (term) =>  term.replace(/かぬ$/, 'く'), 'rulesIn': [], 'rulesOut': ['v5']},
             {'inflected': /.*がぬ$/, 'uninflect': (term) =>  term.replace(/がぬ$/, 'ぐ'), 'rulesIn': [], 'rulesOut': ['v5']},
@@ -294,8 +295,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*こぬ$/, 'uninflect': (term) =>  term.replace(/こぬ$/, 'くる'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*来ぬ$/, 'uninflect': (term) =>  term.replace(/来ぬ$/, '来る'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*來ぬ$/, 'uninflect': (term) =>  term.replace(/來ぬ$/, '來る'), 'rulesIn': [], 'rulesOut': ['vk']}
-        ],
-        'causative': [
+        ]],
+        ['causative', [
             {'inflected': /.*させる$/, 'uninflect': (term) =>  term.replace(/させる$/, 'る'), 'rulesIn': ['v1'], 'rulesOut': ['v1']},
             {'inflected': /.*かせる$/, 'uninflect': (term) =>  term.replace(/かせる$/, 'く'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
             {'inflected': /.*がせる$/, 'uninflect': (term) =>  term.replace(/がせる$/, 'ぐ'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
@@ -315,8 +316,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*こさせる$/, 'uninflect': (term) =>  term.replace(/こさせる$/, 'くる'), 'rulesIn': ['v1'], 'rulesOut': ['vk']},
             {'inflected': /.*来させる$/, 'uninflect': (term) =>  term.replace(/来させる$/, '来る'), 'rulesIn': ['v1'], 'rulesOut': ['vk']},
             {'inflected': /.*來させる$/, 'uninflect': (term) =>  term.replace(/來させる$/, '來る'), 'rulesIn': ['v1'], 'rulesOut': ['vk']}
-        ],
-        'imperative': [
+        ]],
+        ['imperative', [
             {'inflected': /.*ろ$/, 'uninflect': (term) =>  term.replace(/ろ$/, 'る'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*よ$/, 'uninflect': (term) =>  term.replace(/よ$/, 'る'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*え$/, 'uninflect': (term) =>  term.replace(/え$/, 'う'), 'rulesIn': [], 'rulesOut': ['v5']},
@@ -337,11 +338,11 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*こい$/, 'uninflect': (term) =>  term.replace(/こい$/, 'くる'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*来い$/, 'uninflect': (term) =>  term.replace(/来い$/, '来る'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*來い$/, 'uninflect': (term) =>  term.replace(/來い$/, '來る'), 'rulesIn': [], 'rulesOut': ['vk']}
-        ],
-        'imperative negative': [
+        ]],
+        ['imperative negative', [
             {'inflected': /.*な$/, 'uninflect': (term) =>  term.replace(/な$/, ''), 'rulesIn': [], 'rulesOut': ['v1', 'v5', 'vk', 'vs', 'vz']}
-        ],
-        'masu stem': [
+        ]],
+        ['masu stem', [
             {'inflected': /.*い$/, 'uninflect': (term) =>  term.replace(/い$/, 'いる'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*え$/, 'uninflect': (term) =>  term.replace(/え$/, 'える'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*き$/, 'uninflect': (term) =>  term.replace(/き$/, 'きる'), 'rulesIn': [], 'rulesOut': ['v1']},
@@ -376,8 +377,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*き$/, 'uninflect': (term) =>  term.replace(/き$/, 'くる'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*来$/, 'uninflect': (term) =>  term.replace(/来$/, '来る'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*來$/, 'uninflect': (term) =>  term.replace(/來$/, '來る'), 'rulesIn': [], 'rulesOut': ['vk']}
-        ],
-        'negative': [
+        ]],
+        ['negative', [
             {'inflected': /.*くない$/, 'uninflect': (term) =>  term.replace(/くない$/, 'い'), 'rulesIn': ['adj-i'], 'rulesOut': ['adj-i']},
             {'inflected': /.*ない$/, 'uninflect': (term) =>  term.replace(/ない$/, 'る'), 'rulesIn': ['adj-i'], 'rulesOut': ['v1']},
             {'inflected': /.*かない$/, 'uninflect': (term) =>  term.replace(/かない$/, 'く'), 'rulesIn': ['adj-i'], 'rulesOut': ['v5']},
@@ -395,8 +396,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*こない$/, 'uninflect': (term) =>  term.replace(/こない$/, 'くる'), 'rulesIn': ['adj-i'], 'rulesOut': ['vk']},
             {'inflected': /.*来ない$/, 'uninflect': (term) =>  term.replace(/来ない$/, '来る'), 'rulesIn': ['adj-i'], 'rulesOut': ['vk']},
             {'inflected': /.*來ない$/, 'uninflect': (term) =>  term.replace(/來ない$/, '來る'), 'rulesIn': ['adj-i'], 'rulesOut': ['vk']}
-        ],
-        'passive': [
+        ]],
+        ['passive', [
             {'inflected': /.*かれる$/, 'uninflect': (term) =>  term.replace(/かれる$/, 'く'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
             {'inflected': /.*がれる$/, 'uninflect': (term) =>  term.replace(/がれる$/, 'ぐ'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
             {'inflected': /.*される$/, 'uninflect': (term) =>  term.replace(/される$/, 'す'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
@@ -413,8 +414,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*こられる$/, 'uninflect': (term) =>  term.replace(/こられる$/, 'くる'), 'rulesIn': ['v1'], 'rulesOut': ['vk']},
             {'inflected': /.*来られる$/, 'uninflect': (term) =>  term.replace(/来られる$/, '来る'), 'rulesIn': ['v1'], 'rulesOut': ['vk']},
             {'inflected': /.*來られる$/, 'uninflect': (term) =>  term.replace(/來られる$/, '來る'), 'rulesIn': ['v1'], 'rulesOut': ['vk']}
-        ],
-        'past': [
+        ]],
+        ['past', [
             {'inflected': /.*かった$/, 'uninflect': (term) =>  term.replace(/かった$/, 'い'), 'rulesIn': [], 'rulesOut': ['adj-i']},
             {'inflected': /.*た$/, 'uninflect': (term) =>  term.replace(/た$/, 'る'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*いた$/, 'uninflect': (term) =>  term.replace(/いた$/, 'く'), 'rulesIn': [], 'rulesOut': ['v5']},
@@ -450,8 +451,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*副うた$/, 'uninflect': (term) =>  term.replace(/副うた$/, '副う'), 'rulesIn': [], 'rulesOut': ['v5']},
             {'inflected': /.*厭うた$/, 'uninflect': (term) =>  term.replace(/厭うた$/, '厭う'), 'rulesIn': [], 'rulesOut': ['v5']},
             {'inflected': /.*のたもうた$/, 'uninflect': (term) =>  term.replace(/のたもうた$/, 'のたまう'), 'rulesIn': [], 'rulesOut': ['v5']}
-        ],
-        'polite': [
+        ]],
+        ['polite', [
             {'inflected': /.*ます$/, 'uninflect': (term) =>  term.replace(/ます$/, 'る'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*います$/, 'uninflect': (term) =>  term.replace(/います$/, 'う'), 'rulesIn': [], 'rulesOut': ['v5']},
             {'inflected': /.*きます$/, 'uninflect': (term) =>  term.replace(/きます$/, 'く'), 'rulesIn': [], 'rulesOut': ['v5']},
@@ -468,8 +469,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*きます$/, 'uninflect': (term) =>  term.replace(/きます$/, 'くる'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*来ます$/, 'uninflect': (term) =>  term.replace(/来ます$/, '来る'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*來ます$/, 'uninflect': (term) =>  term.replace(/來ます$/, '來る'), 'rulesIn': [], 'rulesOut': ['vk']}
-        ],
-        'polite negative': [
+        ]],
+        ['polite negative', [
             {'inflected': /.*くありません$/, 'uninflect': (term) =>  term.replace(/くありません$/, 'い'), 'rulesIn': [], 'rulesOut': ['adj-i']},
             {'inflected': /.*ません$/, 'uninflect': (term) =>  term.replace(/ません$/, 'る'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*いません$/, 'uninflect': (term) =>  term.replace(/いません$/, 'う'), 'rulesIn': [], 'rulesOut': ['v5']},
@@ -487,8 +488,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*きません$/, 'uninflect': (term) =>  term.replace(/きません$/, 'くる'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*来ません$/, 'uninflect': (term) =>  term.replace(/来ません$/, '来る'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*來ません$/, 'uninflect': (term) =>  term.replace(/來ません$/, '來る'), 'rulesIn': [], 'rulesOut': ['vk']}
-        ],
-        'polite past': [
+        ]],
+        ['polite past', [
             {'inflected': /.*ました$/, 'uninflect': (term) =>  term.replace(/ました$/, 'る'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*いました$/, 'uninflect': (term) =>  term.replace(/いました$/, 'う'), 'rulesIn': [], 'rulesOut': ['v5']},
             {'inflected': /.*きました$/, 'uninflect': (term) =>  term.replace(/きました$/, 'く'), 'rulesIn': [], 'rulesOut': ['v5']},
@@ -505,8 +506,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*きました$/, 'uninflect': (term) =>  term.replace(/きました$/, 'くる'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*来ました$/, 'uninflect': (term) =>  term.replace(/来ました$/, '来る'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*來ました$/, 'uninflect': (term) =>  term.replace(/來ました$/, '來る'), 'rulesIn': [], 'rulesOut': ['vk']}
-        ],
-        'polite past negative': [
+        ]],
+        ['polite past negative', [
             {'inflected': /.*くありませんでした$/, 'uninflect': (term) =>  term.replace(/くありませんでした$/, 'い'), 'rulesIn': [], 'rulesOut': ['adj-i']},
             {'inflected': /.*ませんでした$/, 'uninflect': (term) =>  term.replace(/ませんでした$/, 'る'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*いませんでした$/, 'uninflect': (term) =>  term.replace(/いませんでした$/, 'う'), 'rulesIn': [], 'rulesOut': ['v5']},
@@ -524,8 +525,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*きませんでした$/, 'uninflect': (term) =>  term.replace(/きませんでした$/, 'くる'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*来ませんでした$/, 'uninflect': (term) =>  term.replace(/来ませんでした$/, '来る'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*來ませんでした$/, 'uninflect': (term) =>  term.replace(/來ませんでした$/, '來る'), 'rulesIn': [], 'rulesOut': ['vk']}
-        ],
-        'polite volitional': [
+        ]],
+        ['polite volitional', [
             {'inflected': /.*ましょう$/, 'uninflect': (term) =>  term.replace(/ましょう$/, 'る'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*いましょう$/, 'uninflect': (term) =>  term.replace(/いましょう$/, 'う'), 'rulesIn': [], 'rulesOut': ['v5']},
             {'inflected': /.*きましょう$/, 'uninflect': (term) =>  term.replace(/きましょう$/, 'く'), 'rulesIn': [], 'rulesOut': ['v5']},
@@ -542,8 +543,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*きましょう$/, 'uninflect': (term) =>  term.replace(/きましょう$/, 'くる'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*来ましょう$/, 'uninflect': (term) =>  term.replace(/来ましょう$/, '来る'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*來ましょう$/, 'uninflect': (term) =>  term.replace(/來ましょう$/, '來る'), 'rulesIn': [], 'rulesOut': ['vk']}
-        ],
-        'potential': [
+        ]],
+        ['potential', [
             {'inflected': /.*れる$/, 'uninflect': (term) =>  term.replace(/れる$/, 'る'), 'rulesIn': ['v1'], 'rulesOut': ['v1', 'v5']},
             {'inflected': /.*える$/, 'uninflect': (term) =>  term.replace(/える$/, 'う'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
             {'inflected': /.*ける$/, 'uninflect': (term) =>  term.replace(/ける$/, 'く'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
@@ -556,8 +557,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*これる$/, 'uninflect': (term) =>  term.replace(/これる$/, 'くる'), 'rulesIn': ['v1'], 'rulesOut': ['vk']},
             {'inflected': /.*来れる$/, 'uninflect': (term) =>  term.replace(/来れる$/, '来る'), 'rulesIn': ['v1'], 'rulesOut': ['vk']},
             {'inflected': /.*來れる$/, 'uninflect': (term) =>  term.replace(/來れる$/, '來る'), 'rulesIn': ['v1'], 'rulesOut': ['vk']}
-        ],
-        'potential or passive': [
+        ]],
+        ['potential or passive', [
             suffixInflection('られる', 'る', ['v1'], ['v1']),
             suffixInflection('ざれる', 'ずる', ['v1'], ['vz']),
             suffixInflection('ぜられる', 'ずる', ['v1'], ['vz']),
@@ -566,8 +567,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             suffixInflection('こられる', 'くる', ['v1'], ['vk']),
             suffixInflection('来られる', '来る', ['v1'], ['vk']),
             suffixInflection('來られる', '來る', ['v1'], ['vk'])
-        ],
-        'volitional': [
+        ]],
+        ['volitional', [
             {'inflected': /.*よう$/, 'uninflect': (term) =>  term.replace(/よう$/, 'る'), 'rulesIn': [], 'rulesOut': ['v1']},
             {'inflected': /.*おう$/, 'uninflect': (term) =>  term.replace(/おう$/, 'う'), 'rulesIn': [], 'rulesOut': ['v5']},
             {'inflected': /.*こう$/, 'uninflect': (term) =>  term.replace(/こう$/, 'く'), 'rulesIn': [], 'rulesOut': ['v5']},
@@ -584,8 +585,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*こよう$/, 'uninflect': (term) =>  term.replace(/こよう$/, 'くる'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*来よう$/, 'uninflect': (term) =>  term.replace(/来よう$/, '来る'), 'rulesIn': [], 'rulesOut': ['vk']},
             {'inflected': /.*來よう$/, 'uninflect': (term) =>  term.replace(/來よう$/, '來る'), 'rulesIn': [], 'rulesOut': ['vk']}
-        ],
-        'causative passive': [
+        ]],
+        ['causative passive', [
             {'inflected': /.*かされる$/, 'uninflect': (term) =>  term.replace(/かされる$/, 'く'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
             {'inflected': /.*がされる$/, 'uninflect': (term) =>  term.replace(/がされる$/, 'ぐ'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
             {'inflected': /.*たされる$/, 'uninflect': (term) =>  term.replace(/たされる$/, 'つ'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
@@ -594,8 +595,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*まされる$/, 'uninflect': (term) =>  term.replace(/まされる$/, 'む'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
             {'inflected': /.*らされる$/, 'uninflect': (term) =>  term.replace(/らされる$/, 'る'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
             {'inflected': /.*わされる$/, 'uninflect': (term) =>  term.replace(/わされる$/, 'う'), 'rulesIn': ['v1'], 'rulesOut': ['v5']}
-        ],
-        '-toku': [
+        ]],
+        ['-toku', [
             {'inflected': /.*とく$/, 'uninflect': (term) =>  term.replace(/とく$/, 'る'), 'rulesIn': ['v5'], 'rulesOut': ['v1']},
             {'inflected': /.*いとく$/, 'uninflect': (term) =>  term.replace(/いとく$/, 'く'), 'rulesIn': ['v5'], 'rulesOut': ['v5']},
             {'inflected': /.*いどく$/, 'uninflect': (term) =>  term.replace(/いどく$/, 'ぐ'), 'rulesIn': ['v5'], 'rulesOut': ['v5']},
@@ -612,8 +613,8 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*きとく$/, 'uninflect': (term) =>  term.replace(/きとく$/, 'くる'), 'rulesIn': ['v5'], 'rulesOut': ['vk']},
             {'inflected': /.*来とく$/, 'uninflect': (term) =>  term.replace(/来とく$/, '来る'), 'rulesIn': ['v5'], 'rulesOut': ['vk']},
             {'inflected': /.*來とく$/, 'uninflect': (term) =>  term.replace(/來とく$/, '來る'), 'rulesIn': ['v5'], 'rulesOut': ['vk']}
-        ],
-        'progressive or perfect': [
+        ]],
+        ['progressive or perfect', [
             {'inflected': /.*ている$/, 'uninflect': (term) =>  term.replace(/ている$/, 'て'), 'rulesIn': ['v1'], 'rulesOut': ['iru']},
             {'inflected': /.*ておる$/, 'uninflect': (term) =>  term.replace(/ておる$/, 'て'), 'rulesIn': ['v5'], 'rulesOut': ['iru']},
             {'inflected': /.*てる$/, 'uninflect': (term) =>  term.replace(/てる$/, 'て'), 'rulesIn': ['v1'], 'rulesOut': ['iru']},
@@ -622,25 +623,25 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*でる$/, 'uninflect': (term) =>  term.replace(/でる$/, 'で'), 'rulesIn': ['v1'], 'rulesOut': ['iru']},
             {'inflected': /.*とる$/, 'uninflect': (term) =>  term.replace(/とる$/, 'て'), 'rulesIn': ['v5'], 'rulesOut': ['iru']},
             {'inflected': /.*ないでいる$/, 'uninflect': (term) =>  term.replace(/ないでいる$/, 'ない'), 'rulesIn': ['v1'], 'rulesOut': ['adj-i']}
-        ],
-        '-ki': [
+        ]],
+        ['-ki', [
             {'inflected': /.*き$/, 'uninflect': (term) =>  term.replace(/き$/, 'い'), 'rulesIn': [], 'rulesOut': ['adj-i']}
-        ],
-        '-ge': [
+        ]],
+        ['-ge', [
             {'inflected': /.*しげ$/, 'uninflect': (term) =>  term.replace(/しげ$/, 'しい'), 'rulesIn': [], 'rulesOut': ['adj-i']}
-        ],
+        ]],
 
         // word formation ----------------------------------------
-        'adv': [
+        ['adv', [
             {'inflected': /.*く$/, 'uninflect': (term) =>  term.replace(/く$/, 'い'), 'rulesIn': [], 'rulesOut': ['adj-i']}
-        ],
-        'noun': [
+        ]],
+        ['noun', [
             suffixInflection('さ', 'い', [], ['adj-i'])
-        ],
+        ]],
         // -------------------------------------------------------
 
         // linguistic variables -----------------------------------------------------
-        '-e': [
+        ['-e', [
             {'inflected': /.*ねえ$/, 'uninflect': (term) =>  term.replace(/ねえ$/, 'ない'), 'rulesIn': [], 'rulesOut': ['adj-i']},
             {'inflected': /.*めえ$/, 'uninflect': (term) =>  term.replace(/めえ$/, 'むい'), 'rulesIn': [], 'rulesOut': ['adj-i']},
             {'inflected': /.*みい$/, 'uninflect': (term) =>  term.replace(/みい$/, 'むい'), 'rulesIn': [], 'rulesOut': ['adj-i']},
@@ -665,6 +666,6 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*でえ$/, 'uninflect': (term) =>  term.replace(/でえ$/, 'どい'), 'rulesIn': [], 'rulesOut': ['adj-i']},
             {'inflected': /.*れえ$/, 'uninflect': (term) =>  term.replace(/れえ$/, 'れい'), 'rulesIn': [], 'rulesOut': ['adj-i']},
             {'inflected': /.*べえ$/, 'uninflect': (term) =>  term.replace(/べえ$/, 'ばい'), 'rulesIn': [], 'rulesOut': ['adj-i']}
-        ]
-    };
+        ]]
+    ]);
 };

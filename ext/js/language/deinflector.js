@@ -40,7 +40,7 @@ class Deinflector {
                     results.push(this._createDeinflection(
                         uninflect(term),
                         rulesOut,
-                        [reason, ...reasons]
+                        [...reason, ...reasons]
                     ));
                 }
             }
@@ -58,15 +58,22 @@ class Deinflector {
     }
 
     static normalizeReasons(reasons) {
-        return Object.entries(reasons).map(([reason, reasonInfo]) => {
+        const normalizedReasons = new Map();
+
+        for (let [reason, reasonInfo] of reasons) {
+            if (!Array.isArray(reason)) {
+                reason = [reason];
+            }
             const variants = reasonInfo.map(({inflected, uninflect, rulesIn, rulesOut}) => [
                 inflected,
                 uninflect,
                 this.rulesToRuleFlags(rulesIn),
                 this.rulesToRuleFlags(rulesOut)
             ]);
-            return [reason, variants];
-        });
+            normalizedReasons.set(reason, variants);
+        }
+
+        return normalizedReasons;
     }
 
     static rulesToRuleFlags(rules) {

@@ -18,5 +18,5 @@
 /* global
 */
 window.languages.de.getDeinflectionReasons = async () => {
-    return {};
+    return new Map([]);
 };

@@ -20,39 +20,39 @@
 */
 
 window.languages.sq.getDeinflectionReasons = async () => {
-    return {
+    return new Map([
         // Nouns
-        'definite': [
+        ['definite', [
             suffixInflection('ku', 'k', [], ['noun']),
             suffixInflection('gu', 'g', [], ['noun']),
             suffixInflection('hu', 'h', [], ['noun']),
             suffixInflection('au', 'a', [], ['noun']),
             suffixInflection('iu', 'i', [], ['noun']),
             suffixInflection('eu', 'e', [], ['noun'])
-        ],
-        'plural': [
+        ]],
+        ['plural', [
             suffixInflection('e', '', [], ['noun'])
-        ],
+        ]],
         // Verbs
-        'present indicative 2nd singular': [
+        [['present', 'indicative', 'second-person', ' singular'], [
             suffixInflection('n', 'j', [], ['verb'])
-        ],
-        'present indicative 3rd singular': [
+        ]],
+        [['present', 'indicative', 'third-person', 'singular'], [
             suffixInflection('n', 'j', [], ['verb'])
-        ],
-        'present indicative 1st plural': [
+        ]],
+        [['present', 'indicative', 'first-person', 'plural'], [
             suffixInflection('jmë', 'j', [], ['verb']),
             suffixInflection('im', '', [], ['verb']),
             suffixInflection('më', '', [], ['verb'])
-        ],
-        'present indicative 2nd plural': [
+        ]],
+        [['present', 'indicative', 'second-person', 'plural'], [
             suffixInflection('ni', 'j', [], ['verb']),
             suffixInflection('ni', '', [], ['verb'])
-        ],
-        'present indicative 3rd plural': [
+        ]],
+        [['present', 'indicative', 'third-person', 'plural'], [
             suffixInflection('jnë', 'j', [], ['verb']),
             suffixInflection('in', '', [], ['verb']),
             suffixInflection('në', '', [], ['verb'])
-        ]
-    };
+        ]]
+    ]);
 };

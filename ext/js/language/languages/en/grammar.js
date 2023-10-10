@@ -128,11 +128,11 @@ window.languages.en.getDeinflectionReasons = async () => {
         return mainModalVerbs.map((modalVerb) => prefixInflection(`${modalVerb} not`, modalVerb, ['v'], ['v']));
     }
 
-    const reasons = {
-        'interposed object': [
+    const reasons = new Map([
+        ['interposed object', [
             ...(await phrasalVerbInflections)['interposed object']
-        ],
-        'plural': [
+        ]],
+        ['plural', [
             // regular and near-regular plurals
             suffixInflection('s', '', ['n'], ['n']),
             suffixInflection('es', '', ['n'], ['n']),
@@ -156,8 +156,8 @@ window.languages.en.getDeinflectionReasons = async () => {
             // latin plurals ('indices' -> 'index') (also other languages),
             // compound nouns ('passers-by' -> 'passer-by'),
             // ...
-        ],
-        'possessive': [
+        ]],
+        ['possessive', [
             suffixInflection('\'s', '', ['n'], ['n']),
             suffixInflection('s\'', 's', ['n'], ['n']),
 
@@ -169,20 +169,20 @@ window.languages.en.getDeinflectionReasons = async () => {
             wholeWordInflection('our', 'we', ['pn'], ['pn']),
             wholeWordInflection('their', 'they', ['pn'], ['pn']),
             wholeWordInflection('whose', 'who', ['pn'], ['pn'])
-        ],
-        'accusative': [
+        ]],
+        ['accusative', [
             wholeWordInflection('me', 'I', ['pn'], ['pn']),
             wholeWordInflection('him', 'he', ['pn'], ['pn']),
             wholeWordInflection('her', 'she', ['pn'], ['pn']),
             wholeWordInflection('us', 'we', ['pn'], ['pn']),
             wholeWordInflection('them', 'they', ['pn'], ['pn']),
             wholeWordInflection('thee', 'thou', ['pn'], ['pn'])
-        ],
-        'past': [
+        ]],
+        ['past', [
             ...pastSuffixInflections,
             ...(await phrasalVerbInflections).past
-        ],
-        'past (irregular)': [
+        ]],
+        ['past (irregular)', [
             prefixInflection('was', 'am', [], ['v']),
             prefixInflection('was', 'is', [], ['v']),
             prefixInflection('were', 'are', [], ['v']),
@@ -190,31 +190,31 @@ window.languages.en.getDeinflectionReasons = async () => {
 
             ...(await irregularVerbInflections).past,
             ...(await phrasalVerbInflections)['past (irregular)']
-        ],
-        '-ing': [
+        ]],
+        ['-ing', [
             ...ingSuffixInflections,
             ...(await phrasalVerbInflections)['-ing']
-        ],
-        'archaic': [ // should probably be removed
+        ]],
+        ['archaic', [ // should probably be removed
             wholeWordInflection('thou', 'you', ['pn'], ['pn']),
             wholeWordInflection('thy', 'your', ['pn'], ['pn']),
             wholeWordInflection('thine', 'your', ['pn'], ['pn']),
             wholeWordInflection('ye', 'you', ['pn'], ['pn']),
             wholeWordInflection('thyself', 'yourself', ['pn'], ['pn'])
-        ],
-        '1 sg present': [
+        ]],
+        [['first-person', 'singular', 'present'], [
             wholeWordInflection('am', 'be', ['v'], ['v'])
-        ],
-        '3 sg present': [
+        ]],
+        [['third-person', 'singular', 'present'], [
             wholeWordInflection('is', 'be', ['v'], ['v']),
             wholeWordInflection('has', 'have', ['v'], ['v']),
             ...thirdPersonSgPresentSuffixInflections,
             ...(await phrasalVerbInflections)['3 sg present']
-        ],
-        'participle': [
+        ]],
+        ['participle', [
             ...(await irregularVerbInflections).participle
-        ],
-        'contraction': [
+        ]],
+        ['contraction', [
             wholeWordInflection("'m", 'am', [], ['v']),
             wholeWordInflection("'re", 'are', [], ['v']),
             wholeWordInflection("'ve", 'have', [], ['v']),
@@ -235,11 +235,11 @@ window.languages.en.getDeinflectionReasons = async () => {
             infixInflection("n't", ' not', [], []),
             prefixInflection("won't", 'will not', [], []),
             prefixInflection("can't", 'can not', [], [])
-        ],
-        'adverb': [
+        ]],
+        ['adverb', [
             suffixInflection('ly', '', [], ['adj'])
-        ],
-        'comparative': [
+        ]],
+        ['comparative', [
             suffixInflection('er', 'e', [], ['adj']),
             suffixInflection('er', '', [], ['adj']),
             suffixInflection('ier', 'y', [], ['adj']),
@@ -251,8 +251,8 @@ window.languages.en.getDeinflectionReasons = async () => {
             wholeWordInflection('farther', 'far', [], ['adj']),
             wholeWordInflection('further', 'far', [], ['adj'])
 
-        ],
-        'superlative': [
+        ]],
+        ['superlative', [
             suffixInflection('est', 'e', [], ['adj']),
             suffixInflection('est', '', [], ['adj']),
             suffixInflection('iest', 'y', [], ['adj']),
@@ -263,32 +263,32 @@ window.languages.en.getDeinflectionReasons = async () => {
             wholeWordInflection('worst', 'bad', [], ['adj']),
             wholeWordInflection('farthest', 'far', [], ['adj']),
             wholeWordInflection('furthest', 'far', [], ['adj'])
-        ],
-        'dropped g': [
+        ]],
+        ['dropped g', [
             suffixInflection('in\'', 'ing', [], ['v'])
-        ],
-        '-y': [
+        ]],
+        ['-y', [
             suffixInflection('y', '', [], ['n', 'v']), // dirty
             ...doubledConsonantInflection('glmnprst', 'y', [], ['n', 'v'])
-        ],
-        'un-': [
+        ]],
+        ['un-', [
             prefixInflection('un', '', [], ['adj', 'v'])
-        ],
-        'going-to future': [
+        ]],
+        ['going-to future', [
             prefixInflection('going to ', '', [], ['v'])
-        ],
-        'will future': [
+        ]],
+        ['will future', [
             prefixInflection('will ', '', [], ['v'])
-        ],
-        'negative': [
+        ]],
+        ['negative', [
             ...createModalVerbNegations(),
             prefixInflection('does not ', ' ', [], []),
             wholeWordInflection('does not', 'does', [], [])
-        ],
-        'negative imperative': [
+        ]],
+        [['imperative', 'negative'], [
             prefixInflection('do not ', '', [], [])
-        ]
-    };
+        ]]
+    ]);
 
     return reasons;
 };
