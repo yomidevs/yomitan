@@ -222,26 +222,57 @@ class Translator {
                     const existingEntry = dictionaryEntries.find((entry) => {
                         return entry.definitions.some((definition) => definition.id === id);
                     });
-                    if (
-                        existingEntry.headwords[0].sources[0].transformedText.length <= transformedText.length
-                    ) {
-                        existingEntry.inflectionHypotheses =
-                            existingEntry.inflectionHypotheses
-                                .concat(reasons.filter((reason) => {
-                                    return !existingEntry.inflectionHypotheses.includes(reason);
-                                }));
+                    if (transformedText.length >= existingEntry.headwords[0].sources[0].transformedText.length) {
+                        const existingHypotheses = existingEntry.inflectionHypotheses;
+
+                        const newHypotheses = [];
+                        reasons.forEach((reason) => {
+                            const duplicate = existingHypotheses.find((hypothesis) => this._areInflectionHyphothesesEqual(hypothesis.inflections, reason));
+                            if (!duplicate) {
+                                newHypotheses.push(reason);
+                            } else if (
+                                duplicate.source === 'dictionary' && !isDictionaryDeinflection ||
+                                duplicate.source === 'algorithm' && isDictionaryDeinflection
+                            ) {
+                                duplicate.source = 'both';
+                            }
+                        });
+
+                        existingEntry.inflectionHypotheses = [
+                            ...existingEntry.inflectionHypotheses,
+                            ...this._addDeinflectionSourceToHypotheses(newHypotheses, isDictionaryDeinflection)
+                        ];
                     }
+
                     continue;
                 }
                 // TODO: make configurable
                 if (databaseEntry.definitionTags.includes('non-lemma')) { continue; }
-                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, true, enabledDictionaryMap);
+
+                const inflectionHypotheses = this._addDeinflectionSourceToHypotheses(reasons, isDictionaryDeinflection);
+                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionHypotheses, true, enabledDictionaryMap);
                 dictionaryEntries.push(dictionaryEntry);
                 ids.add(id);
             }
         }
 
         return {dictionaryEntries, originalTextLength};
+    }
+
+    _areInflectionHyphothesesEqual(hypotheses1, hypotheses2) {
+        const set1 = new Set(hypotheses1);
+        const set2 = new Set(hypotheses2);
+
+        return set1.size === set2.size && [...set1].every((x) => set2.has(x));
+    }
+
+    _addDeinflectionSourceToHypotheses(hypotheses, isDictionaryDeinflection = false) {
+        return hypotheses.map((hypothesis) => {
+            return {
+                inflections: hypothesis,
+                source: (isDictionaryDeinflection ? 'dictionary' : 'algorithm')
+            };
+        });
     }
 
     async _getDeinflections(text, enabledDictionaryMap, options) {

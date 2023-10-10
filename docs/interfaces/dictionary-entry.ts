@@ -215,7 +215,7 @@ namespace Translation {
         /**
          * A list of possible inflection combinations that could be the form of the term.
          */
-        inflectionHypotheses: string[];
+        inflectionHypotheses: InflectionHypothesis[];
         /**
          * A score for the dictionary entry.
          */
@@ -252,6 +252,23 @@ namespace Translation {
          * Frequencies for the entry.
          */
         frequencies: TermFrequency[];
+    }
+
+    /**
+     * An inflection hypothesis is a combination of inflections that may have been applied to the term.
+     */
+    export interface InflectionHypothesis{
+        source: DeinflectionSource;
+        inflections: string[];
+    }
+
+    /**
+     * Enum of possible deinflection sources.
+     */
+    export enum DeinflectionSource {
+        Dictionary = 'Dictionary',
+        Algorithm = 'Algorithm',
+        Both = 'Both',
     }
 
     /**

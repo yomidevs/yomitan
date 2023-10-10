@@ -304,11 +304,30 @@ class DisplayGenerator {
         return node;
     }
 
-    _createInflectionHypothesis(composedInflection) {
+    _createInflectionHypothesis(inflectionHypothesis) {
         const fragment = this._templates.instantiateFragment('inflection-list');
         const node = fragment.querySelector('.inflection-list');
-        this._appendMultiple(node, this._createTermInflection.bind(this), composedInflection);
+
+        const sourceIcon = document.createElement('span');
+        sourceIcon.style.marginRight = '0.5em';
+        sourceIcon.textContent = this._getIconForInflectionSource(inflectionHypothesis.source);
+
+        node.appendChild(sourceIcon);
+
+        const inflections = inflectionHypothesis.inflections;
+        this._appendMultiple(node, this._createTermInflection.bind(this), inflections);
         return fragment;
+    }
+
+    _getIconForInflectionSource(source) {
+        switch (source) {
+            case 'dictionary':
+                return '📖';
+            case 'algorithm':
+                return '🧩';
+            case 'both':
+                return '📖 🧩';
+        }
     }
 
     _createTermInflection(inflection) {
