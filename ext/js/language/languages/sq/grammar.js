@@ -19,6 +19,13 @@
  * suffixInflection
 */
 
+function conjugationIISuffixInflection(inflectedSuffix, deinflectedSuffix, rulesIn, rulesOut){
+    return {
+        ...suffixInflection(inflectedSuffix, deinflectedSuffix, rulesIn, rulesOut),
+        inflected: new RegExp('.*[^j]' + inflectedSuffix + '$')
+    };
+}
+
 window.languages.sq.getDeinflectionReasons = async () => {
     return new Map([
         // Nouns
@@ -39,6 +46,9 @@ window.languages.sq.getDeinflectionReasons = async () => {
             suffixInflection('a', '', [], ['noun']),
             suffixInflection('ja', 'e', [], ['noun'])
         ]],
+        [['singular', 'definite', 'accusative'], [
+            suffixInflection('n', '', [], ['noun'])
+        ]],
         ['plural', [
             suffixInflection('e', '', [], ['noun'])
         ]],
@@ -52,103 +62,101 @@ window.languages.sq.getDeinflectionReasons = async () => {
         [['present', 'indicative', 'third-person', 'singular'], [
             suffixInflection('on', 'oj', [], ['verb']),
             suffixInflection('uan', 'uaj', [], ['verb']),
-            suffixInflection('n', '', [], ['verb']), // fshin
+            suffixInflection('n', 'j', [], ['verb']), // fshin
             suffixInflection('het', 'hem', [], ['verb'])
         ]],
         [['present', 'indicative', 'first-person', 'plural'], [
-            // suffixInflection('ojmë', 'oj', [], ['verb']),
-            // suffixInflection('uajmë', 'uaj', [], ['verb']), // paguajmë
-            // suffixInflection('jmë', 'j', [], ['verb']), // fshijmë
-            suffixInflection('më', '', [], ['verb']),
-            suffixInflection('im', '', [], ['verb']),
+            suffixInflection('më', '', [], ['verb']), // ndihmojmë, paguajmë, fshijmë
+            suffixInflection('im', '', [], ['verb']), // vendosim, hapim
             suffixInflection('hemi', 'hem', [], ['verb'])
         ]],
         [['present', 'indicative', 'second-person', 'plural'], [
-            // suffixInflection('oni', 'oj', [], ['verb']),
-            // suffixInflection('uani', 'uaj', [], ['verb']),
-            suffixInflection('ni', 'j', [], ['verb']), // fshini
-            suffixInflection('ni', '', [], ['verb']),
+            suffixInflection('ni', 'j', [], ['verb']), // ndihmoni, paguani, fshini
+            suffixInflection('ni', '', [], ['verb']), // vendosni, hapni
             suffixInflection('heni', 'hem', [], ['verb'])
         ]],
         [['present', 'indicative', 'third-person', 'plural'], [
-            // suffixInflection('ojnë', 'oj', [], ['verb']),
-            // suffixInflection('uajnë', 'uaj', [], ['verb']),
-            suffixInflection('në', '', [], ['verb']), // fshijnë
-            suffixInflection('in', '', [], ['verb']),
+            suffixInflection('në', '', [], ['verb']), // ndihmojnë, paguajnë, fshijnë
+            suffixInflection('in', '', [], ['verb']), // vendosin, hapin
             suffixInflection('hen', 'hem', [], ['verb'])
         ]],
         [['imperfect', 'first-person', 'singular', 'indicative'], [
-            suffixInflection('oja', 'oj', [], ['verb']),
-            suffixInflection('uaja', 'uaj', [], ['verb']),
+            suffixInflection('ja', 'j', [], ['verb']), // ndihmoja, paguaja, fshija
+            suffixInflection('ja', '', [], ['verb']), // vendosja, hapja
             suffixInflection('hesha', 'hem', [], ['verb'])
         ]],
         [['imperfect', 'second-person', 'singular', 'indicative'], [
-            suffixInflection('oje', 'oj', [], ['verb']),
-            suffixInflection('uaje', 'uaj', [], ['verb']),
+            suffixInflection('je', 'j', [], ['verb']), // ndihmoje, paguaje, fshije
+            suffixInflection('je', '', [], ['verb']), // vendosje, hapje
             suffixInflection('heshe', 'hem', [], ['verb'])
         ]],
         [['imperfect', 'third-person', 'singular', 'indicative'], [
-            suffixInflection('onte', 'oj', [], ['verb']),
-            suffixInflection('uante', 'uaj', [], ['verb']),
+            suffixInflection('nte', 'j', [], ['verb']), // ndihmonte, paguante, fshinte
+            suffixInflection('te', '', [], ['verb']), // vendoste, hapte
             suffixInflection('hej', 'hem', [], ['verb'])
         ]],
         [['imperfect', 'first-person', 'plural', 'indicative'], [
-            suffixInflection('onim', 'oj', [], ['verb']),
-            suffixInflection('uanim', 'uaj', [], ['verb']),
+            suffixInflection('nim', 'j', [], ['verb']), // ndihmonim, paguanim, fshinim
+            suffixInflection('nim', '', [], ['verb']), // vendosnim, hapnim
             suffixInflection('heshim', 'hem', [], ['verb'])
         ]],
         [['imperfect', 'second-person', 'plural', 'indicative'], [
-            suffixInflection('onit', 'oj', [], ['verb']),
-            suffixInflection('uanit', 'uaj', [], ['verb']),
+            suffixInflection('nit', 'j', [], ['verb']), // ndihmonit, paguanit, fshinit
+            suffixInflection('nit', '', [], ['verb']), // vendosnit, hapnit
             suffixInflection('heshit', 'hem', [], ['verb'])
         ]],
         [['imperfect', 'third-person', 'plural', 'indicative'], [
-            suffixInflection('onin', 'oj', [], ['verb']),
-            suffixInflection('uanin', 'uaj', [], ['verb']),
+            suffixInflection('nin', 'j', [], ['verb']), // ndihmonin, paguanin, fshinin
+            suffixInflection('nin', '', [], ['verb']), // vendosnin, hapnin
             suffixInflection('heshin', 'hem', [], ['verb'])
         ]],
         [['aorist', 'first-person', 'singular', 'indicative'], [
-            suffixInflection('ova', 'oj', [], ['verb']), // ndihmova
             suffixInflection('ova', 'uaj', [], ['verb']), // pagova
-            suffixInflection('a', '', [], ['verb']) // vendosa, hapa // TODO: mistake on lexoja
+            suffixInflection('va', 'j', [], ['verb']), // ndihmova, fshiva
+            conjugationIISuffixInflection('a', '', [], ['verb']) // vendosa, hapa
         ]],
         [['aorist', 'second-person', 'singular', 'indicative'], [
-            suffixInflection('ove', 'oj', [], ['verb']), // ndihmove
             suffixInflection('ove', 'uaj', [], ['verb']), // pagove
-            suffixInflection('e', '', [], ['verb']) // vendose, hape // TODO: mistake on lexoje
+            suffixInflection('ve', 'j', [], ['verb']), // ndihmove, fshive
+            conjugationIISuffixInflection('e', '', [], ['verb']) // vendose, hape
         ]],
         [['aorist', 'third-person', 'singular', 'indicative'], [
             suffixInflection('oi', 'oj', [], ['verb']), // ndihmoi
             suffixInflection('oi', 'uaj', [], ['verb']), // pagoi
-            suffixInflection('i', '', [], ['verb']) // vendosi, hapi
+            suffixInflection('u', 'j', [], ['verb']), // fshiu
+            conjugationIISuffixInflection('i', '', [], ['verb']) // vendosi, hapi
         ]],
         [['aorist', 'first-person', 'plural', 'indicative'], [
             suffixInflection('uam', 'oj', [], ['verb']), // ndihmuam
             suffixInflection('uam', 'uaj', [], ['verb']), // paguam
-            suffixInflection('ëm', '', [], ['verb']) // vendosëm, hapëm
+            suffixInflection('më', 'j', [], ['verb']), // fshimë
+            conjugationIISuffixInflection('ëm', '', [], ['verb']) // vendosëm, hapëm
         ]],
         [['aorist', 'second-person', 'plural', 'indicative'], [
             suffixInflection('uat', 'oj', [], ['verb']), // ndihmuat
             suffixInflection('uat', 'uaj', [], ['verb']), // paguat
-            suffixInflection('ët', '', [], ['verb']) // vendosët, hapët
+            suffixInflection('të', 'j', [], ['verb']), // fshitë
+            conjugationIISuffixInflection('ët', '', [], ['verb']) // vendosët, hapët
         ]],
         [['aorist', 'third-person', 'plural', 'indicative'], [
             suffixInflection('uan', 'oj', [], ['verb']), // ndihmuan
             suffixInflection('uan', 'uaj', [], ['verb']), // paguan
-            suffixInflection('ën', '', [], ['verb']) // vendosën, hapën
+            suffixInflection('në', 'j', [], ['verb']), // fshinë
+            conjugationIISuffixInflection('ën', '', [], ['verb']) // vendosën, hapën
         ]],
         [['imperative', 'second-person', 'singular', 'present'], [
             suffixInflection('o', 'oj', [], ['verb']),
             suffixInflection('hu', 'hem', [], ['verb']) // kujtohu
         ]],
         [['imperative', 'second-person', 'plural', 'present'], [
-            suffixInflection('oni', 'oj', [], ['verb']),
-            suffixInflection('uani', 'uaj', [], ['verb']),
+            suffixInflection('ni', 'j', [], ['verb']), // ndihmoni, paguani, fshini
+            suffixInflection('ni', '', [], ['verb']), // vendosni, hapni
             suffixInflection('huni', 'hem', [], ['verb']) // kujtohuni
         ]],
         ['participle', [
             suffixInflection('uar', 'oj', [], ['verb']),
-            suffixInflection('ur', '', [], ['verb'])
+            suffixInflection('ur', '', [], ['verb']),
+            suffixInflection('rë', 'j', [], ['verb']) // fshirë
         ]],
         ['mediopassive', [
             suffixInflection('hem', 'h', ['verb'], ['verb']),
