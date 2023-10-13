@@ -93,6 +93,12 @@ class Translator {
         }
 
         if (mode === 'simple') {
+            if (sortFrequencyDictionary !== null) {
+                const sortDictionaryMap = [sortFrequencyDictionary]
+                    .filter((key) => enabledDictionaryMap.has(key))
+                    .reduce((subMap, key) => subMap.set(key, enabledDictionaryMap.get(key)), new Map());
+                await this._addTermMeta(dictionaryEntries, sortDictionaryMap);
+            }
             this._clearTermTags(dictionaryEntries);
         } else {
             await this._addTermMeta(dictionaryEntries, enabledDictionaryMap);
