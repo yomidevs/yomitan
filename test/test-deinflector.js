@@ -953,19 +953,13 @@ async function testDeinflections(language) {
     vm.execute(['js/general/helpers.js']);
     vm.execute(['js/language/deinflection-ruleset.js']);
     vm.execute(['js/language/deinflector.js']);
-    vm.execute(['js/language/Japanese.js']);
-    vm.execute(['js/language/english/grammar.js']);
+    vm.execute(['js/language/language-util.js']);
 
-    const [deinflectionReasonsJa] = vm.get(['deinflectionReasonsJa']);
-    const [deinflectionReasonsEn] = vm.get(['deinflectionReasonsEn']);
+    const [LanguageUtil] = vm.get(['LanguageUtil']);
     const [Deinflector] = vm.get(['Deinflector']);
 
-    const deinflectionReasons = {
-        'ja': deinflectionReasonsJa,
-        'en': await deinflectionReasonsEn()
-    };
-
-    const deinflector = new Deinflector(deinflectionReasons[language]);
+    const languageUtil = new LanguageUtil();
+    const deinflector = new Deinflector(languageUtil);
 
     for (const {valid, tests} of data) {
         for (const {source, term, rule, reasons} of tests) {
