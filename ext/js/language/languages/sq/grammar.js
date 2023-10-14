@@ -161,6 +161,24 @@ window.languages.sq.getDeinflectionReasons = async () => {
         ['mediopassive', [
             suffixInflection('hem', 'h', ['verb'], ['verb']),
             suffixInflection('hem', 'j', ['verb'], ['verb'])
+        ]],
+        [['optative', 'first-person', 'singular', 'present'], [
+            suffixInflection('fsha', 'j', [], ['verb']) // ndihmofsha
+        ]],
+        [['optative', 'second-person', 'singular', 'present'], [
+            suffixInflection('fsh', 'j', [], ['verb']) // ndihmofsh
+        ]],
+        [['optative', 'third-person', 'singular', 'present'], [
+            suffixInflection('ftë', 'j', [], ['verb']) // ndihmoftë
+        ]],
+        [['optative', 'first-person', 'plural', 'present'], [
+            suffixInflection('fshim', 'j', [], ['verb']) // ndihmofshim
+        ]],
+        [['optative', 'second-person', 'plural', 'present'], [
+            suffixInflection('fshi', 'j', [], ['verb']) // ndihmofshi
+        ]],
+        [['optative', 'third-person', 'plural', 'present'], [
+            suffixInflection('fshin', 'j', [], ['verb']) // ndihmofshin
         ]]
     ]);
 };
