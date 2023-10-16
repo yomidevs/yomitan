@@ -574,7 +574,7 @@ Joins the arguments to a single string with a separator, flattening any argument
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#join <i>separator</i> <i>value1</i> <i>value2</i> <i>valueN</i>...}}{{/join}}</code><br>
+  <code>{{join <i>separator</i> <i>value1</i> <i>value2</i> <i>valueN</i>...}}</code><br>
 
   * _`separator`_ <br>
     The separator string to use between values.
@@ -585,8 +585,8 @@ Joins the arguments to a single string with a separator, flattening any argument
   <summary>Example:</summary>
 
   ```handlebars
-  {{#set "index" 32}}{{/set~}}
-  {{~#join "_" "yomichan" (get "index") "value"}}{{/join}}
+  {{set "index" 32~}}
+  {{~join "_" "yomichan" (get "index") "value"}}
   ```
 
   Output:
@@ -603,7 +603,7 @@ Joins the arguments to a single string, without flattening arguments that are ar
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#concat <i>value1</i> <i>value1</i> <i>valueN</i>...}}{{/concat}}</code><br>
+  <code>{{concat <i>value1</i> <i>value1</i> <i>valueN</i>...}}</code><br>
 
   * _`valueN`_ <br>
     A value to join into the resulting string
@@ -612,8 +612,8 @@ Joins the arguments to a single string, without flattening arguments that are ar
   <summary>Example:</summary>
 
   ```handlebars
-  {{#set "index" 32}}{{/set~}}
-  {{~#concat "yomichan_" (get "index") "_value"}}{{/concat}}
+  {{set "index" 32~}}
+  {{~concat "yomichan_" (get "index") "_value"}}
   ```
 
   Output:
