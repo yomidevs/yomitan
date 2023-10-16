@@ -122,11 +122,11 @@ Replaces newline characters with a forced HTML line break `<br>`.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#kanjiLinks~}}
+  {{#multiLine~}}
   some
   multiline
   text
-  {{~/kanjiLinks}}
+  {{~/multiLine}}
   ```
 
   Output:
