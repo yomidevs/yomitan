@@ -443,7 +443,7 @@ Repeatedly gets a property of an object.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#property <i>object</i> <i>property1</i> <i>property2</i> <i>...</i> <i>propertyN</i>}}{{/property}}</code>
+  <code>{{property <i>object</i> <i>property1</i> <i>property2</i> <i>...</i> <i>propertyN</i>}}</code>
 
   * _`object`_ <br>
     The initial object to use.
