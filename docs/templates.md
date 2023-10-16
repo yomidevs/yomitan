@@ -630,7 +630,7 @@ Returns an array representing the different pitch categories for a specific term
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#pitchCategories @root}}{{/pitchCategories}}</code><br>
+  <code>{{pitchCategories @root}}</code><br>
 
   * _`@root`_ <br>
     The argument passed should always be the root data object.
