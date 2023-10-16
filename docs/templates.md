@@ -331,7 +331,7 @@ If an unknown operator is specified, the `undefined` value is returned.
   ```handlebars
   {{#if (op "===" value1 value2)}}Values are equal{{/op~}}<br>
   {{~#op "-" value1}}{{/op~}}<br>
-  {{~#op "?:" value1 "a" "b"}}{{/op}}
+  {{~op "?:" value1 "a" "b"}}
   ```
 
   Output:
