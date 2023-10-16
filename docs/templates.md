@@ -279,7 +279,7 @@ This allows it to be used similar to an [`Array.concat`](https://developer.mozil
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#spread <i>iterable1</i> <i>iterable2</i> <i>...</i> <i>iterableN</i>}}{{/spread}}</code>
+  <code>{{spread <i>iterable1</i> <i>iterable2</i> <i>...</i> <i>iterableN</i>}}</code>
 
   * _`iterableN`_ <br>
     A variable amount of iterable objects to combine into a single array.
