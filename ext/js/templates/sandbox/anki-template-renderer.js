@@ -68,9 +68,7 @@ class AnkiTemplateRenderer {
             ['dumpObject',       this._dumpObject.bind(this)],
             ['furigana',         this._furigana.bind(this)],
             ['furiganaPlain',    this._furiganaPlain.bind(this)],
-            ['kanjiLinks',       this._kanjiLinks.bind(this)],
             ['multiLine',        this._multiLine.bind(this)],
-            ['sanitizeCssClass', this._sanitizeCssClass.bind(this)],
             ['regexReplace',     this._regexReplace.bind(this)],
             ['regexMatch',       this._regexMatch.bind(this)],
             ['mergeTags',        this._mergeTags.bind(this)],
@@ -189,30 +187,12 @@ class AnkiTemplateRenderer {
         }
     }
 
-    _kanjiLinks(context, options) {
-        const jp = this._japaneseUtil;
-        let result = '';
-        for (const c of options.fn(context)) {
-            if (jp.isCodePointKanji(c.codePointAt(0))) {
-                result += `<a href="#" class="kanji-link">${c}</a>`;
-            } else {
-                result += c;
-            }
-        }
-
-        return result;
-    }
-
     _stringToMultiLineHtml(string) {
         return string.split('\n').join('<br>');
     }
 
     _multiLine(context, options) {
         return this._stringToMultiLineHtml(options.fn(context));
-    }
-
-    _sanitizeCssClass(context, options) {
-        return options.fn(context).replace(/[^_a-z0-9\u00a0-\uffff]/ig, '_');
     }
 
     _regexReplace(context, ...args) {
