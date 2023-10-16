@@ -543,7 +543,7 @@ Returns the type of a value.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#typeof <i>value</i>}}{{/typeof}}</code><br>
+  <code>{{typeof <i>value</i>}}</code><br>
   <code>{{#typeof}}<i>value</i>{{/typeof}}</code><br>
 
   * _`value`_ <br>
@@ -553,8 +553,8 @@ Returns the type of a value.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#typeof "よみちゃん"}}{{/typeof}}
-  {{#typeof 1}}{{/typeof}}
+  {{typeof "よみちゃん"}}
+  {{typeof 1}}
   {{#typeof}}よみちゃん{{/typeof}}
   ```
 
