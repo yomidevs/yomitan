@@ -212,7 +212,7 @@ Creates a set of all unique tags for the definition and returns a text represent
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#mergeTags <i>definition</i> <i>isGroupMode</i> <i>isMergeMode</i>}}{{/mergeTags}}</code>
+  <code>{{mergeTags <i>definition</i> <i>isGroupMode</i> <i>isMergeMode</i>}}</code>
 
   * _`definition`_ <br>
     The root definition object.
@@ -225,7 +225,7 @@ Creates a set of all unique tags for the definition and returns a text represent
   <summary>Example:</summary>
 
   ```handlebars
-  {{~#mergeTags definition group merge}}{{/mergeTags~}}
+  {{~mergeTags definition group merge~}}
   ```
 
   Output:
