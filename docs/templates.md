@@ -786,7 +786,7 @@ Converts katakana text to hiragana.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#hiragana <i>value</i> <i>[keepProlongedSoundMarks=true|false]</i>}}{{/hiragana}}</code><br>
+  <code>{{hiragana <i>value</i> <i>[keepProlongedSoundMarks=true|false]</i>}}</code><br>
   <code>{{#hiragana <i>[keepProlongedSoundMarks=true|false]</i>}}<i>value</i>{{/hiragana}}</code><br>
 
   * _`value`_ <br>
@@ -799,7 +799,7 @@ Converts katakana text to hiragana.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#hiragana "よみちゃん ヨミちゃん ヨミチャン"}}{{/hiragana}}
+  {{hiragana "よみちゃん ヨミちゃん ヨミチャン"}}
   {{#hiragana}}よみちゃん ヨミちゃん ヨミチャン{{/hiragana}}
   {{#hiragana}}ローマ字{{/hiragana}}
   {{#hiragana keepProlongedSoundMarks=true}}ローマ字{{/hiragana}}
@@ -822,7 +822,7 @@ Converts hiragana text to katakana.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#katakana <i>text</i>}}{{/katakana}}</code><br>
+  <code>{{katakana <i>text</i>}}</code><br>
   <code>{{#katakana}}<i>text</i>{{/katakana}}</code><br>
 
   * _`text`_ <br>
@@ -832,7 +832,7 @@ Converts hiragana text to katakana.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#katakana "よみちゃん ヨミちゃん ヨミチャン"}}{{/katakana}}
+  {{katakana "よみちゃん ヨミちゃん ヨミチャン"}}
   {{#katakana}}よみちゃん ヨミちゃん ヨミチャン{{/katakana}}
   ```
 
