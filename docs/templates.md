@@ -494,7 +494,7 @@ Returns whether or not a mora will have a high pitch, given the index of the mor
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#isMoraPitchHigh <i>index</i> <i>position</i>}}{{/isMoraPitchHigh}}</code>
+  <code>{{isMoraPitchHigh <i>index</i> <i>position</i>}}</code>
 </details>
 <details>
   <summary>Example:</summary>
@@ -517,7 +517,7 @@ Returns an array of the mora for a kana string.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#getKanaMorae <i>kana-string</i>}}{{/getKanaMorae}}</code>
+  <code>{{getKanaMorae <i>kana-string</i>}}</code>
 </details>
 <details>
   <summary>Example:</summary>
