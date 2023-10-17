@@ -132,6 +132,10 @@ class AnkiTemplateRenderer {
         return Handlebars.Utils.escapeExpression(text);
     }
 
+    _safeString(text) {
+        return new Handlebars.SafeString(text);
+    }
+
     // Template helpers
 
     _dumpObject(context, object) {
@@ -145,14 +149,16 @@ class AnkiTemplateRenderer {
 
         let result = '';
         for (const {text, reading: reading2} of segs) {
-            if (reading2.length > 0) {
-                result += `<ruby>${text}<rt>${reading2}</rt></ruby>`;
+            const safeText = this._escape(text);
+            const safeReading = this._escape(reading2);
+            if (safeReading.length > 0) {
+                result += `<ruby>${safeText}<rt>${safeReading}</rt></ruby>`;
             } else {
-                result += text;
+                result += safeText;
             }
         }
 
-        return result;
+        return this._safeString(result);
     }
 
     _furiganaPlain(context, ...args) {
@@ -173,12 +179,13 @@ class AnkiTemplateRenderer {
     }
 
     _getFuriganaExpressionAndReading(context, ...args) {
-        const options = args[args.length - 1];
         if (args.length >= 3) {
             return {expression: args[0], reading: args[1]};
-        } else {
-            const {expression, reading} = options.fn(context);
+        } else if (args.length === 2) {
+            const {expression, reading} = args[0];
             return {expression, reading};
+        } else {
+            return void 0;
         }
     }
 

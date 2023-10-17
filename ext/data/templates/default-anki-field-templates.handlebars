@@ -78,22 +78,22 @@
 {{#*inline "furigana"}}
     {{~#if merge~}}
         {{~#each definition.expressions~}}
-            <span class="expression-{{termFrequency}}">{{~#furigana}}{{{.}}}{{/furigana~}}</span>
+            <span class="expression-{{termFrequency}}">{{~furigana .~}}</span>
             {{~#unless @last}}、{{/unless~}}
         {{~/each~}}
     {{~else~}}
-        {{#furigana}}{{{definition}}}{{/furigana}}
+        {{furigana definition}}
     {{~/if~}}
 {{/inline}}
 
 {{#*inline "furigana-plain"}}
     {{~#if merge~}}
         {{~#each definition.expressions~}}
-            <span class="expression-{{termFrequency}}">{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}</span>
+            <span class="expression-{{termFrequency}}">{{~furiganaPlain .~}}</span>
             {{~#unless @last}}、{{/unless~}}
         {{~/each~}}
     {{~else~}}
-        {{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
+        {{furiganaPlain definition}}
     {{~/if~}}
 {{/inline}}
 
@@ -255,7 +255,7 @@
             <li>
             {{~#if (op "!==" ../definition.type "kanji")~}}
                 {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
-                    {{~#furigana expression reading~}}{{~/furigana~}}
+                    {{~furigana expression reading~}}
                 ) {{/if~}}
             {{~/if~}}
             {{~dictionary}}: {{frequency~}}

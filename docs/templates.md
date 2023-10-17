@@ -49,8 +49,8 @@ Converts a definition or expression/reading pair to its furigana representation.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#furigana}}<i>&lt;definition&gt;</i>{{/furigana}}</code><br>
-  <code>{{#furigana <i>expression</i> <i>reading</i>}}{{/furigana}}</code><br>
+  <code>{{furigana <i>definition</i>}}</code><br>
+  <code>{{furigana <i>expression</i> <i>reading</i>}}</code><br>
 
   * _`definition`_ <br>
     The definition to convert.
@@ -63,8 +63,8 @@ Converts a definition or expression/reading pair to its furigana representation.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#furigana}}{{.}}{{/furigana}}
-  {{#furigana "読む" "よむ"}}{{/furigana}}
+  {{furigana .}}
+  {{furigana "読む" "よむ"}}
   ```
 
   Output:
@@ -84,8 +84,8 @@ Converts a definition or expression/reading pair to its simplified furigana repr
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#furiganaPlain}}<i>&lt;definition&gt;</i>{{/furigana}}</code>
-  <code>{{#furiganaPlain <i>expression</i> <i>reading</i>}}{{/furiganaPlain}}</code><br>
+  <code>{{furiganaPlain <i>definition</i>}}</code>
+  <code>{{furiganaPlain <i>expression</i> <i>reading</i>}}</code><br>
 
   * _`definition`_ <br>
     The definition to convert.
@@ -98,8 +98,8 @@ Converts a definition or expression/reading pair to its simplified furigana repr
   <summary>Example:</summary>
 
   ```handlebars
-  {{~#furiganaPlain~}}{{.}}{{~/furiganaPlain~}}
-  {{#furiganaPlain "読む" "よむ"}}{{/furiganaPlain}}
+  {{~furiganaPlain .~}}
+  {{furiganaPlain "読む" "よむ"}}
   ```
 
   Output:

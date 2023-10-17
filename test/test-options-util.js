@@ -1217,14 +1217,92 @@ async function testFieldTemplatesUpdate(extDir) {
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
         },
-        // block helper update
+        // block helper update: furigana and furiganaPlain
         {
             oldVersion: 20,
             newVersion: 21,
             old: `
+{{#*inline "furigana"}}
+    {{~#if merge~}}
+        {{~#each definition.expressions~}}
+            <span class="expression-{{termFrequency}}">{{~#furigana}}{{{.}}}{{/furigana~}}</span>
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{#furigana}}{{{definition}}}{{/furigana}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "furigana-plain"}}
+    {{~#if merge~}}
+        {{~#each definition.expressions~}}
+            <span class="expression-{{termFrequency}}">{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}</span>
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequencies"}}
+    {{~#if (op ">" definition.frequencies.length 0)~}}
+        <ul style="text-align: left;">
+        {{~#each definition.frequencies~}}
+            <li>
+            {{~#if (op "!==" ../definition.type "kanji")~}}
+                {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
+                    {{~#furigana expression reading~}}{{~/furigana~}}
+                ) {{/if~}}
+            {{~/if~}}
+            {{~dictionary}}: {{frequency~}}
+            </li>
+        {{~/each~}}
+        </ul>
+    {{~/if~}}
+{{/inline}}
+
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
             expected: `
+{{#*inline "furigana"}}
+    {{~#if merge~}}
+        {{~#each definition.expressions~}}
+            <span class="expression-{{termFrequency}}">{{~furigana .~}}</span>
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{furigana definition}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "furigana-plain"}}
+    {{~#if merge~}}
+        {{~#each definition.expressions~}}
+            <span class="expression-{{termFrequency}}">{{~furiganaPlain .~}}</span>
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{furiganaPlain definition}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequencies"}}
+    {{~#if (op ">" definition.frequencies.length 0)~}}
+        <ul style="text-align: left;">
+        {{~#each definition.frequencies~}}
+            <li>
+            {{~#if (op "!==" ../definition.type "kanji")~}}
+                {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
+                    {{~furigana expression reading~}}
+                ) {{/if~}}
+            {{~/if~}}
+            {{~dictionary}}: {{frequency~}}
+            </li>
+        {{~/each~}}
+        </ul>
+    {{~/if~}}
+{{/inline}}
+
 {{~> (lookup . "marker") ~}}`.trimStart()
         }
     ];
