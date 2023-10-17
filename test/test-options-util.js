@@ -1348,19 +1348,19 @@ async function testFieldTemplatesUpdate(extDir) {
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
         {{~#scope~}}
-            {{~#set "any" false}}{{/set~}}
+            {{~set "any" false~}}
             {{~#each definitionTags~}}
                 {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
                     {{~#if (get "any")}}, {{else}}<i>({{/if~}}
                     {{name}}
-                    {{~#set "any" true}}{{/set~}}
+                    {{~set "any" true~}}
                 {{~/if~}}
             {{~/each~}}
             {{~#unless noDictionaryTag~}}
                 {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
                     {{~#if (get "any")}}, {{else}}<i>({{/if~}}
                     {{dictionary}}
-                    {{~#set "any" true}}{{/set~}}
+                    {{~set "any" true~}}
                 {{~/if~}}
             {{~/unless~}}
             {{~#if (get "any")}})</i> {{/if~}}
@@ -1374,7 +1374,109 @@ async function testFieldTemplatesUpdate(extDir) {
     {{~else~}}
         <ul>{{#each glossary}}<li>{{formatGlossary ../dictionary .}}</li>{{/each}}</ul>
     {{~/if~}}
-    {{~#set "previousDictionary" dictionary~}}{{~/set~}}
+    {{~set "previousDictionary" dictionary~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart()
+        },
+        // block helper update: set and get
+        {
+            oldVersion: 20,
+            newVersion: 21,
+            old: `
+{{#*inline "pitch-accent-item-disambiguation"}}
+    {{~#scope~}}
+        {{~#set "exclusive" (spread exclusiveExpressions exclusiveReadings)}}{{/set~}}
+        {{~#if (op ">" (property (get "exclusive") "length") 0)~}}
+            {{~#set "separator" ""~}}{{/set~}}
+            <em>({{#each (get "exclusive")~}}
+                {{~#get "separator"}}{{/get~}}{{{.}}}
+            {{~/each}} only) </em>
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{#*inline "stroke-count"}}
+    {{~#scope~}}
+        {{~#set "found" false}}{{/set~}}
+        {{~#each definition.stats.misc~}}
+            {{~#if (op "===" name "strokes")~}}
+                {{~#set "found" true}}{{/set~}}
+                Stroke count: {{value}}
+            {{~/if~}}
+        {{~/each~}}
+        {{~#if (op "!" (get "found"))~}}
+            Stroke count: Unknown
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{#*inline "part-of-speech"}}
+    {{~#scope~}}
+        {{~#if (op "!==" definition.type "kanji")~}}
+            {{~#set "first" true}}{{/set~}}
+            {{~#each definition.expressions~}}
+                {{~#each wordClasses~}}
+                    {{~#unless (get (concat "used_" .))~}}
+                        {{~> part-of-speech-pretty . ~}}
+                        {{~#unless (get "first")}}, {{/unless~}}
+                        {{~#set (concat "used_" .) true~}}{{~/set~}}
+                        {{~#set "first" false~}}{{~/set~}}
+                    {{~/unless~}}
+                {{~/each~}}
+            {{~/each~}}
+            {{~#if (get "first")~}}Unknown{{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+            expected: `
+{{#*inline "pitch-accent-item-disambiguation"}}
+    {{~#scope~}}
+        {{~set "exclusive" (spread exclusiveExpressions exclusiveReadings)~}}
+        {{~#if (op ">" (property (get "exclusive") "length") 0)~}}
+            {{~set "separator" ""~}}
+            <em>({{#each (get "exclusive")~}}
+                {{~get "separator"~}}{{{.}}}
+            {{~/each}} only) </em>
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{#*inline "stroke-count"}}
+    {{~#scope~}}
+        {{~set "found" false~}}
+        {{~#each definition.stats.misc~}}
+            {{~#if (op "===" name "strokes")~}}
+                {{~set "found" true~}}
+                Stroke count: {{value}}
+            {{~/if~}}
+        {{~/each~}}
+        {{~#if (op "!" (get "found"))~}}
+            Stroke count: Unknown
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{#*inline "part-of-speech"}}
+    {{~#scope~}}
+        {{~#if (op "!==" definition.type "kanji")~}}
+            {{~set "first" true~}}
+            {{~#each definition.expressions~}}
+                {{~#each wordClasses~}}
+                    {{~#unless (get (concat "used_" .))~}}
+                        {{~> part-of-speech-pretty . ~}}
+                        {{~#unless (get "first")}}, {{/unless~}}
+                        {{~set (concat "used_" .) true~}}
+                        {{~set "first" false~}}
+                    {{~/unless~}}
+                {{~/each~}}
+            {{~/each~}}
+            {{~#if (get "first")~}}Unknown{{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
 {{/inline}}
 
 {{~> (lookup . "marker") ~}}`.trimStart()

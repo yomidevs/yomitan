@@ -351,7 +351,7 @@ Gets a value from the custom state stack.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#get <i>name</i>}}{{/get}}</code>
+  <code>{{get <i>name</i>}}</code>
 
   * _`name`_ <br>
     The name of the variable to get.
@@ -360,7 +360,7 @@ Gets a value from the custom state stack.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#get "some-text"}}{{/get}}
+  {{get "some-text"}}
   ```
 
   Output:
@@ -378,7 +378,7 @@ Assigns a value to the custom state stack.
   <summary>Syntax:</summary>
 
   <code>{{#set <i>name</i>}}<i>value</i>{{/get}}</code><br>
-  <code>{{#set <i>name</i> <i>value</i>}}{{/get}}</code><br>
+  <code>{{set <i>name</i> <i>value</i>}}</code><br>
 
   * _`name`_ <br>
     The name of the variable to assign.
@@ -390,7 +390,7 @@ Assigns a value to the custom state stack.
 
   ```handlebars
   {{#set "some-text"}}This is the value of some-text!{{/set~}}
-  {{~#set "some-number" 32}}{{/set}}
+  {{~set "some-number" 32}}
   ```
 
   Output:
@@ -419,14 +419,14 @@ and variable lookups will start from the most recent scope and work backwards un
   <summary>Example:</summary>
 
   ```handlebars
-  {{~#set "key" 32}}{{/set~}}
-  {{~#get "key"}}{{/get~}},
+  {{~set "key" 32~}}
+  {{~get "key"~}},
   {{~#scope~}}
-    {{~#get "key"}}{{/get~}},
-    {{~#set "key" 64}}{{/set~}}
-    {{~#get "key"}}{{/get~}},
+    {{~#get "key"~}},
+    {{~#set "key" 64~}}
+    {{~#get "key"~}},
   {{~/scope~}}
-  {{~#get "key"}}{{/get~}}
+  {{~get "key"~}}
   ```
 
   Output:

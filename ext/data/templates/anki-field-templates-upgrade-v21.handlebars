@@ -1,3 +1,14 @@
+{{<<<<<<<}}
+{{~#set "any" false}}{{/set~}}
+{{=======}}
+{{~set "any" false~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "any" true}}{{/set~}}
+{{=======}}
+{{~set "any" true~}}
+{{>>>>>>>}}
 
 {{<<<<<<<}}
 {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
@@ -15,6 +26,12 @@
 <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
 {{=======}}
 <ul>{{#each glossary}}<li>{{formatGlossary ../dictionary .}}</li>{{/each}}</ul>
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "previousDictionary" dictionary~}}{{~/set~}}
+{{=======}}
+{{~set "previousDictionary" dictionary~}}
 {{>>>>>>>}}
 
 {{<<<<<<<}}
@@ -45,4 +62,48 @@
 {{~#furigana expression reading~}}{{~/furigana~}}
 {{=======}}
 {{~furigana expression reading~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "exclusive" (spread exclusiveExpressions exclusiveReadings)}}{{/set~}}
+{{=======}}
+{{~set "exclusive" (spread exclusiveExpressions exclusiveReadings)~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "separator" ""~}}{{/set~}}
+{{=======}}
+{{~set "separator" ""~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#get "separator"}}{{/get~}}{{{.}}}
+{{=======}}
+{{~get "separator"~}}{{{.}}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "found" false}}{{/set~}}
+{{=======}}
+{{~set "found" false~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "found" true}}{{/set~}}
+{{=======}}
+{{~set "found" true~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "first" true}}{{/set~}}
+{{=======}}
+{{~set "first" true~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+                        {{~#set (concat "used_" .) true~}}{{~/set~}}
+                        {{~#set "first" false~}}{{~/set~}}
+{{=======}}
+                        {{~set (concat "used_" .) true~}}
+                        {{~set "first" false~}}
 {{>>>>>>>}}
