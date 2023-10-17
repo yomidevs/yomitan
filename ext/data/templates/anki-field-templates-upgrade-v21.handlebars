@@ -1,5 +1,23 @@
 
 {{<<<<<<<}}
+{{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
+{{=======}}
+{{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
+{{=======}}
+{{#each glossary}}{{formatGlossary ../dictionary .}}{{#unless @last}} | {{/unless}}{{/each}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+<ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
+{{=======}}
+<ul>{{#each glossary}}<li>{{formatGlossary ../dictionary .}}</li>{{/each}}</ul>
+{{>>>>>>>}}
+
+{{<<<<<<<}}
 <span class="expression-{{termFrequency}}">{{~#furigana}}{{{.}}}{{/furigana~}}</span>
 {{=======}}
 <span class="expression-{{termFrequency}}">{{~furigana .~}}</span>

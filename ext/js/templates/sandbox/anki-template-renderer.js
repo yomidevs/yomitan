@@ -497,7 +497,7 @@ class AnkiTemplateRenderer {
         this._normalizeHtml(container, styleApplier, datasetKeyIgnorePattern);
         const result = container.innerHTML;
         container.textContent = '';
-        return result;
+        return this._safeString(result);
     }
 
     _normalizeHtml(root, styleApplier, datasetKeyIgnorePattern) {
@@ -550,9 +550,8 @@ class AnkiTemplateRenderer {
         return instance;
     }
 
-    _formatGlossary(context, dictionary, options) {
+    _formatGlossary(context, dictionary, content, options) {
         const data = options.data.root;
-        const content = options.fn(context);
         if (typeof content === 'string') { return this._stringToMultiLineHtml(this._escape(content)); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }
         switch (content.type) {

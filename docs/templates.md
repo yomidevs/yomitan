@@ -657,7 +657,7 @@ structured-content generation.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#formatGlossary <i>dictionary</i>}}{{{definitionEntry}}}{{/pitchCategories}}</code><br>
+  <code>{{formatGlossary <i>dictionary</i> <i>definitionEntry</i>}}</code><br>
 
   * _`dictionary`_ <br>
     The dictionary that the glossary entry belongs to.
@@ -668,7 +668,7 @@ structured-content generation.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
+  {{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
   ```
 
   Output:
