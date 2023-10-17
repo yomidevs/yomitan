@@ -14,7 +14,7 @@ This function can be helpful for debugging values when creating templates.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#dumpObject}}<i>&lt;object&gt;</i>{{/dumpObject}}</code>
+  <code>{{dumpObject <i>object</i>}}</code>
 
   * _`object`_ <br>
     The object to convert.
@@ -23,7 +23,7 @@ This function can be helpful for debugging values when creating templates.
   <summary>Example:</summary>
 
   ```handlebars
-  <pre>{{#dumpObject}}{{.}}{{/dumpObject}}</pre>
+  <pre>{{dumpObject .}}</pre>
   ```
 
   Output:

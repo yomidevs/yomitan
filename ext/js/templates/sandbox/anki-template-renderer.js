@@ -134,8 +134,8 @@ class AnkiTemplateRenderer {
 
     // Template helpers
 
-    _dumpObject(context, options) {
-        const dump = JSON.stringify(options.fn(context), null, 4);
+    _dumpObject(context, object) {
+        const dump = JSON.stringify(object, null, 4);
         return this._escape(dump);
     }
 
