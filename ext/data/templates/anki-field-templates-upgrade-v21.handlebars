@@ -35,6 +35,12 @@
 {{>>>>>>>}}
 
 {{<<<<<<<}}
+[sound:{{#getMedia "audio"}}{{/getMedia}}]
+{{=======}}
+[sound:{{getMedia "audio"}}]
+{{>>>>>>>}}
+
+{{<<<<<<<}}
 <span class="expression-{{termFrequency}}">{{~#furigana}}{{{.}}}{{/furigana~}}</span>
 {{=======}}
 <span class="expression-{{termFrequency}}">{{~furigana .~}}</span>
@@ -56,6 +62,24 @@
 {{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
 {{=======}}
 {{furiganaPlain definition}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+<img src="{{#getMedia "screenshot"}}{{/getMedia}}" />
+{{=======}}
+<img src="{{getMedia "screenshot"}}" />
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+<img src="{{#getMedia "clipboardImage"}}{{/getMedia}}" />
+{{=======}}
+<img src="{{getMedia "clipboardImage"}}" />
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText"}}{{/getMedia}}{{/if~}}
+{{=======}}
+{{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
 {{>>>>>>>}}
 
 {{<<<<<<<}}
@@ -106,4 +130,16 @@
 {{=======}}
                         {{~set (concat "used_" .) true~}}
                         {{~set "first" false~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#if (hasMedia "selectionText")}}{{#getMedia "selectionText"}}{{/getMedia}}{{/if~}}
+{{=======}}
+{{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "textFurigana" definition.cloze.sentence escape=false}}{{/getMedia}}
+{{=======}}
+{{getMedia "textFurigana" definition.cloze.sentence escape=false}}
 {{>>>>>>>}}

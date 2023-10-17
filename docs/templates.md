@@ -686,8 +686,8 @@ These functions are used together in order to request media and other types of o
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#hasMedia <i>type</i> <i>args</i>...}}{{/hasMedia}}</code><br>
-  <code>{{#getMedia <i>type</i> <i>args</i>... <i>[escape=true|false]</i>}}{{/getMedia}}</code><br>
+  <code>{{hasMedia <i>type</i> <i>args</i>...}}</code><br>
+  <code>{{getMedia <i>type</i> <i>args</i>... <i>[escape=true|false]</i>}}</code><br>
 
   * _`type`_ <br>
     The type of media to check for.
@@ -710,19 +710,19 @@ These functions are used together in order to request media and other types of o
   <summary>Examples:</summary>
 
   ```handlebars
-  {{#if (hasMedia "audio")}}The audio file name is: {{#getMedia "audio"}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "audio")}}The audio file name is: {{getMedia "audio"}}{{/if}}
 
-  {{#if (hasMedia "screenshot")}}The screenshot file name is: {{#getMedia "screenshot"}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "screenshot")}}The screenshot file name is: {{getMedia "screenshot"}}{{/if}}
 
-  {{#if (hasMedia "clipboardImage")}}The clipboard image file name is: {{#getMedia "clipboardImage"}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "clipboardImage")}}The clipboard image file name is: {{getMedia "clipboardImage"}}{{/if}}
 
-  {{#if (hasMedia "clipboardText")}}The clipboard text is: {{#getMedia "clipboardText"}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "clipboardText")}}The clipboard text is: {{getMedia "clipboardText"}}{{/if}}
 
-  {{#if (hasMedia "selectionText")}}The selection text is: {{#getMedia "selectionText"}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "selectionText")}}The selection text is: {{getMedia "selectionText"}}{{/if}}
 
-  {{#if (hasMedia "textFurigana" "日本語")}}This is an example of text with generated furigana: {{#getMedia "textFurigana" "日本語" escape=false}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "textFurigana" "日本語")}}This is an example of text with generated furigana: {{getMedia "textFurigana" "日本語" escape=false}}{{/if}}
 
-  {{#if (hasMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary")}}The remapped file name for image.png is: {{#getMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary"}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary")}}The remapped file name for image.png is: {{getMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary"}}{{/if}}
   ```
 
   Output:

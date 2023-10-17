@@ -1480,6 +1480,88 @@ async function testFieldTemplatesUpdate(extDir) {
 {{/inline}}
 
 {{~> (lookup . "marker") ~}}`.trimStart()
+        },
+        // block helper update: hasMedia and getMedia
+        {
+            oldVersion: 20,
+            newVersion: 21,
+            old: `
+{{#*inline "audio"}}
+    {{~#if (hasMedia "audio")~}}
+        [sound:{{#getMedia "audio"}}{{/getMedia}}]
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "screenshot"}}
+    {{~#if (hasMedia "screenshot")~}}
+        <img src="{{#getMedia "screenshot"}}{{/getMedia}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-image"}}
+    {{~#if (hasMedia "clipboardImage")~}}
+        <img src="{{#getMedia "clipboardImage"}}{{/getMedia}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText"}}{{/getMedia}}{{/if~}}
+{{/inline}}
+
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{#getMedia "selectionText"}}{{/getMedia}}{{/if~}}
+{{/inline}}
+
+{{#*inline "sentence-furigana"}}
+    {{~#if definition.cloze~}}
+        {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
+            {{#getMedia "textFurigana" definition.cloze.sentence escape=false}}{{/getMedia}}
+        {{~else~}}
+            {{definition.cloze.sentence}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+            expected: `
+{{#*inline "audio"}}
+    {{~#if (hasMedia "audio")~}}
+        [sound:{{getMedia "audio"}}]
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "screenshot"}}
+    {{~#if (hasMedia "screenshot")~}}
+        <img src="{{getMedia "screenshot"}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-image"}}
+    {{~#if (hasMedia "clipboardImage")~}}
+        <img src="{{getMedia "clipboardImage"}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
+{{/inline}}
+
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
+{{/inline}}
+
+{{#*inline "sentence-furigana"}}
+    {{~#if definition.cloze~}}
+        {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
+            {{getMedia "textFurigana" definition.cloze.sentence escape=false}}
+        {{~else~}}
+            {{definition.cloze.sentence}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart()
         }
     ];
 

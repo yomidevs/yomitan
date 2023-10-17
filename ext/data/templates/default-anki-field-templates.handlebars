@@ -32,7 +32,7 @@
 
 {{#*inline "audio"}}
     {{~#if (hasMedia "audio")~}}
-        [sound:{{#getMedia "audio"}}{{/getMedia}}]
+        [sound:{{getMedia "audio"}}]
     {{~/if~}}
 {{/inline}}
 
@@ -174,7 +174,7 @@
 
 {{#*inline "screenshot"}}
     {{~#if (hasMedia "screenshot")~}}
-        <img src="{{#getMedia "screenshot"}}{{/getMedia}}" />
+        <img src="{{getMedia "screenshot"}}" />
     {{~/if~}}
 {{/inline}}
 
@@ -231,12 +231,12 @@
 
 {{#*inline "clipboard-image"}}
     {{~#if (hasMedia "clipboardImage")~}}
-        <img src="{{#getMedia "clipboardImage"}}{{/getMedia}}" />
+        <img src="{{getMedia "clipboardImage"}}" />
     {{~/if~}}
 {{/inline}}
 
 {{#*inline "clipboard-text"}}
-    {{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText"}}{{/getMedia}}{{/if~}}
+    {{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
 {{/inline}}
 
 {{#*inline "conjugation"}}
@@ -316,13 +316,13 @@
 {{/inline}}
 
 {{#*inline "selection-text"}}
-    {{~#if (hasMedia "selectionText")}}{{#getMedia "selectionText"}}{{/getMedia}}{{/if~}}
+    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
 {{/inline}}
 
 {{#*inline "sentence-furigana"}}
     {{~#if definition.cloze~}}
         {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
-            {{#getMedia "textFurigana" definition.cloze.sentence escape=false}}{{/getMedia}}
+            {{getMedia "textFurigana" definition.cloze.sentence escape=false}}
         {{~else~}}
             {{definition.cloze.sentence}}
         {{~/if~}}
