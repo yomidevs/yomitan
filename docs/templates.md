@@ -147,7 +147,7 @@ Uses a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScr
   <summary>Syntax:</summary>
 
   <code>{{#regexReplace <i>regex</i> <i>replacement</i> <i>[flags]</i>}}<i>text-to-modify</i>{{/regexReplace}}</code><br>
-  <code>{{#regexReplace <i>regex</i> <i>replacement</i> <i>[flags]</i> <i>[text-to-modify]...</i>}}{{/regexReplace}}</code><br>
+  <code>{{regexReplace <i>regex</i> <i>replacement</i> <i>[flags]</i> <i>[text-to-modify]...</i>}}</code><br>
 
   * _`regex`_ <br>
     The raw string used to create the regular expression. This value is passed to the [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/RegExp) constructor.
@@ -181,7 +181,7 @@ Uses a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScr
   <summary>Syntax:</summary>
 
   <code>{{#regexMatch <i>regex</i> <i>[flags]</i>}}<i>text-to-modify</i>{{/regexMatch}}</code><br>
-  <code>{{#regexMatch <i>regex</i> <i>[flags]</i> <i>[text-to-modify]...</i>}}{{/regexMatch}}</code><br>
+  <code>{{regexMatch <i>regex</i> <i>[flags]</i> <i>[text-to-modify]...</i>}}</code><br>
 
   * _`regex`_ <br>
     The raw string used to create the regular expression. This value is passed to the [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/RegExp) constructor.

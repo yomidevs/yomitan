@@ -226,7 +226,7 @@ class AnkiTemplateRenderer {
         const options = args[argCount];
         let value = typeof options.fn === 'function' ? options.fn(context) : '';
         if (argCount > 3) {
-            value = `${args.slice(3).join('')}${value}`;
+            value = `${args.slice(3, -1).join('')}${value}`;
         }
         if (argCount > 1) {
             try {
@@ -250,7 +250,7 @@ class AnkiTemplateRenderer {
         const options = args[argCount];
         let value = typeof options.fn === 'function' ? options.fn(context) : '';
         if (argCount > 2) {
-            value = `${args.slice(2).join('')}${value}`;
+            value = `${args.slice(2, -1).join('')}${value}`;
         }
         if (argCount > 0) {
             try {
