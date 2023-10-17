@@ -1562,6 +1562,24 @@ async function testFieldTemplatesUpdate(extDir) {
 {{/inline}}
 
 {{~> (lookup . "marker") ~}}`.trimStart()
+        },
+        // block helper update: pronunciation
+        {
+            oldVersion: 20,
+            newVersion: 21,
+            old: `
+{{#*inline "pitch-accent-item"}}
+    {{~#pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}{{~/pronunciation~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+            expected: `
+{{#*inline "pitch-accent-item"}}
+    {{~pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart()
         }
     ];
 

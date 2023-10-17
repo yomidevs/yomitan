@@ -754,7 +754,7 @@ same as the system used for generating popup and search page dictionary entries.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#pronunciation <i>format=string</i> <i>reading=string</i> <i>downstepPosition=integer</i> <i>[nasalPositions=array]</i> <i>[devoicePositions=array]</i>}}{{/pronunciation}}</code><br>
+  <code>{{pronunciation <i>format=string</i> <i>reading=string</i> <i>downstepPosition=integer</i> <i>[nasalPositions=array]</i> <i>[devoicePositions=array]</i>}}</code><br>
 
   * _`format`_ <br>
     The format of the HTML to generate. This can be any of the following values:
@@ -774,7 +774,7 @@ same as the system used for generating popup and search page dictionary entries.
   <summary>Example:</summary>
 
   ```handlebars
-  {{~#pronunciation format='text' reading='よむ' downstepPosition=1~}}{{~/pronunciation~}}
+  {{~pronunciation format='text' reading='よむ' downstepPosition=1~}}
   ```
 </details>
 
