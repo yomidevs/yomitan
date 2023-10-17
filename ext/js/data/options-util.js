@@ -470,7 +470,8 @@ class OptionsUtil {
             {async: false, update: this._updateVersion17.bind(this)},
             {async: false, update: this._updateVersion18.bind(this)},
             {async: false, update: this._updateVersion19.bind(this)},
-            {async: false, update: this._updateVersion20.bind(this)}
+            {async: false, update: this._updateVersion20.bind(this)},
+            {async: true,  update: this._updateVersion21.bind(this)}
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -995,6 +996,11 @@ class OptionsUtil {
                 general.popupOuterTheme = 'light';
             }
         }
+        return options;
+    }
+
+    async _updateVersion21(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v21.handlebars');
         return options;
     }
 }

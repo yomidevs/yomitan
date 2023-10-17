@@ -622,7 +622,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 20,
+        version: 21,
         global: {
             database: {
                 prefixWildcardsSupported: false
@@ -689,7 +689,8 @@ async function testFieldTemplatesUpdate(extDir) {
         {version: 8,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
         {version: 10, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars')},
         {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')},
-        {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')}
+        {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')},
+        {version: 21, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v21.handlebars')}
     ];
     const getUpdateAdditions = (startVersion, targetVersion) => {
         let value = '';
@@ -1214,6 +1215,16 @@ async function testFieldTemplatesUpdate(extDir) {
 {{! End Pitch Accents }}
 
 <<<UPDATE-ADDITIONS>>>
+{{~> (lookup . "marker") ~}}`.trimStart()
+        },
+        // block helper update
+        {
+            oldVersion: 20,
+            newVersion: 21,
+            old: `
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+            expected: `
 {{~> (lookup . "marker") ~}}`.trimStart()
         }
     ];
