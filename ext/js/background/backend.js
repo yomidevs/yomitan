@@ -2289,38 +2289,33 @@ class Backend {
 
     // https://developer.chrome.com/docs/extensions/reference/offscreen/
     async _setupOffscreenDocument() {
-        // Check all windows controlled by the service worker to see if one
-        // of them is the offscreen document with the given path
         if (await this._hasOffscreenDocument()) {
             return;
         }
-
-        // create offscreen document
         if (this._creatingOffscreen) {
             await this._creatingOffscreen;
-        } else {
-            this._creatingOffscreen = chrome.offscreen.createDocument({
-                url: 'offscreen.html',
-                reasons: ['CLIPBOARD'],
-                justification: 'reason for needing the document'
-            });
-            await this._creatingOffscreen;
-            this._creatingOffscreen = null;
+            return;
         }
+
+        this._creatingOffscreen = chrome.offscreen.createDocument({
+            url: 'offscreen.html',
+            reasons: ['CLIPBOARD'],
+            justification: 'reason for needing the document'
+        });
+        await this._creatingOffscreen;
+        this._creatingOffscreen = null;
     }
     async _hasOffscreenDocument() {
         const offscreenUrl = chrome.runtime.getURL('offscreen.html');
-        if (chrome.runtime.getContexts) {
-            const contexts = await chrome.runtime.getContexts({
-                contextTypes: ['OFFSCREEN_DOCUMENT'],
-                documentUrls: [offscreenUrl]
-            });
-            return Boolean(contexts.length);
-        } else {
+        if (!chrome.runtime.getContexts) { // chrome version <116
             const matchedClients = await clients.matchAll();
-            return await matchedClients.some((client) => {
-                client.url.includes(chrome.runtime.id);
-            });
+            return !!(await matchedClients.some((client) => client.url === offscreenUrl));
         }
+
+        const contexts = await chrome.runtime.getContexts({
+            contextTypes: ['OFFSCREEN_DOCUMENT'],
+            documentUrls: [offscreenUrl]
+        });
+        return !!contexts.length;
     }
 }
