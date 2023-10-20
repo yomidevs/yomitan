@@ -2309,7 +2309,7 @@ class Backend {
         const offscreenUrl = chrome.runtime.getURL('offscreen.html');
         if (!chrome.runtime.getContexts) { // chrome version <116
             const matchedClients = await clients.matchAll();
-            return !!(await matchedClients.some((client) => client.url === offscreenUrl));
+            return await matchedClients.some((client) => client.url === offscreenUrl);
         }
 
         const contexts = await chrome.runtime.getContexts({
