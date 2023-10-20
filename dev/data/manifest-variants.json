@@ -167,6 +167,15 @@
                     "pattern": "^(.*)(?:\\.\\s*)?$",
                     "patternFlags": "",
                     "replacement": "$1. This is a development build."
+                },
+                {
+                    "action": "add",
+                    "path": [
+                        "permissions"
+                    ],
+                    "items": [
+                        "offscreen"
+                    ]
                 }
             ]
         },

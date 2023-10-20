@@ -57,12 +57,19 @@ class Backend {
         });
         this._anki = new AnkiConnect();
         this._mecab = new Mecab();
-        this._clipboardReader = new ClipboardReader({
-            // eslint-disable-next-line no-undef
-            document: (typeof document === 'object' && document !== null ? document : null),
-            pasteTargetSelector: '#clipboard-paste-target',
-            richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
-        });
+
+        this._clipboardReader = {
+            getText: this._getTextOffscreen.bind(this)
+        };
+        if (!chrome || !chrome.offscreen) {
+            this._clipboardReader = new ClipboardReader({
+                // eslint-disable-next-line no-undef
+                document: (typeof document === 'object' && document !== null ? document : null),
+                pasteTargetSelector: '#clipboard-paste-target',
+                richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
+            });
+        }
+
         this._clipboardMonitor = new ClipboardMonitor({
             japaneseUtil: this._japaneseUtil,
             clipboardReader: this._clipboardReader
@@ -96,6 +103,8 @@ class Backend {
         this._logErrorLevel = null;
         this._permissions = null;
         this._permissionsUtil = new PermissionsUtil();
+
+        this._creatingOffscreen = null;
 
         this._messageHandlers = new Map([
             ['requestBackendReadySignal',    {async: false, contentScript: true,  handler: this._onApiRequestBackendReadySignal.bind(this)}],
@@ -555,6 +564,21 @@ class Backend {
 
     async _onApiClipboardGet() {
         return this._clipboardReader.getText(false);
+    }
+
+    async _getTextOffscreen(useRichText) {
+        await this._setupOffscreenDocument();
+        return new Promise((resolve, reject) => {
+            const callback = (response) => {
+                try {
+                    resolve(this._getMessageResponseResult(response));
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            chrome.runtime.sendMessage({action: 'clipboardGetOffscreen', params: {useRichText}}, callback);
+        });
     }
 
     async _onApiGetDisplayTemplatesHtml() {
@@ -2261,5 +2285,42 @@ class Backend {
         targetPort.onDisconnect.addListener(cleanup);
 
         return {targetTabId, targetFrameId};
+    }
+
+    // https://developer.chrome.com/docs/extensions/reference/offscreen/
+    async _setupOffscreenDocument() {
+        // Check all windows controlled by the service worker to see if one
+        // of them is the offscreen document with the given path
+        if (await this._hasOffscreenDocument()) {
+            return;
+        }
+
+        // create offscreen document
+        if (this._creatingOffscreen) {
+            await this._creatingOffscreen;
+        } else {
+            this._creatingOffscreen = chrome.offscreen.createDocument({
+                url: 'offscreen.html',
+                reasons: ['CLIPBOARD'],
+                justification: 'reason for needing the document'
+            });
+            await this._creatingOffscreen;
+            this._creatingOffscreen = null;
+        }
+    }
+    async _hasOffscreenDocument() {
+        const offscreenUrl = chrome.runtime.getURL('offscreen.html');
+        if (chrome.runtime.getContexts) {
+            const contexts = await chrome.runtime.getContexts({
+                contextTypes: ['OFFSCREEN_DOCUMENT'],
+                documentUrls: [offscreenUrl]
+            });
+            return Boolean(contexts.length);
+        } else {
+            const matchedClients = await clients.matchAll();
+            return await matchedClients.some((client) => {
+                client.url.includes(chrome.runtime.id);
+            });
+        }
     }
 }
