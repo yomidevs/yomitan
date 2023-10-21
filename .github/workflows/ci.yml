@@ -45,8 +45,8 @@ jobs:
         run: npm run build
 
       - name: Validate manifest.json of the extension
-        uses: cardinalby/schema-validator-action@8407573c2627c5159428cf9fa3770d13b2360a27 # v3
+        uses: cardinalby/schema-validator-action@76c68bfc941bd2dc82859f2528984999d1df36a4 # v3.1.0
         with:
           file: ext/manifest.json
           schema: "https://json.schemastore.org/chrome-manifest.json"
-          mode: lax
+          fixSchemas: true
