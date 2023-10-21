@@ -58,16 +58,18 @@ class Backend {
         this._anki = new AnkiConnect();
         this._mecab = new Mecab();
 
-        this._clipboardReader = {
-            getText: this._getTextOffscreen.bind(this)
-        };
-        if (!chrome || !chrome.offscreen) {
+        if (!chrome.offscreen) {
             this._clipboardReader = new ClipboardReader({
                 // eslint-disable-next-line no-undef
                 document: (typeof document === 'object' && document !== null ? document : null),
                 pasteTargetSelector: '#clipboard-paste-target',
                 richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
             });
+        } else {
+            this._clipboardReader = {
+                getText: this._getTextOffscreen.bind(this),
+                getImage: this._getImageOffscreen.bind(this)
+            };
         }
 
         this._clipboardMonitor = new ClipboardMonitor({
@@ -227,6 +229,9 @@ class Backend {
 
             await this._requestBuilder.prepare();
             await this._environment.prepare();
+            if (chrome.offscreen) {
+                await this._setupOffscreenDocument();
+            }
             this._clipboardReader.browser = this._environment.getInfo().browser;
 
             try {
@@ -564,21 +569,6 @@ class Backend {
 
     async _onApiClipboardGet() {
         return this._clipboardReader.getText(false);
-    }
-
-    async _getTextOffscreen(useRichText) {
-        await this._setupOffscreenDocument();
-        return new Promise((resolve, reject) => {
-            const callback = (response) => {
-                try {
-                    resolve(this._getMessageResponseResult(response));
-                } catch (error) {
-                    reject(error);
-                }
-            };
-
-            chrome.runtime.sendMessage({action: 'clipboardGetOffscreen', params: {useRichText}}, callback);
-        });
     }
 
     async _onApiGetDisplayTemplatesHtml() {
@@ -1634,6 +1624,20 @@ class Backend {
         return await (json ? response.json() : response.text());
     }
 
+    _sendMessagePromise(...args) {
+        return new Promise((resolve, reject) => {
+            const callback = (response) => {
+                try {
+                    resolve(this._getMessageResponseResult(response));
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            chrome.runtime.sendMessage(...args, callback);
+        });
+    }
+
     _sendMessageIgnoreResponse(...args) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
         chrome.runtime.sendMessage(...args, callback);
@@ -2244,6 +2248,14 @@ class Backend {
         return results;
     }
 
+    async _getTextOffscreen(useRichText) {
+        return this._sendMessagePromise({action: 'clipboardGetTextOffscreen', params: {useRichText}});
+    }
+
+    async _getImageOffscreen() {
+        return this._sendMessagePromise({action: 'clipboardGetImageOffscreen'});
+    }
+
     _onApiOpenCrossFramePort({targetTabId, targetFrameId}, sender) {
         const sourceTabId = (sender && sender.tab ? sender.tab.id : null);
         if (typeof sourceTabId !== 'number') {
@@ -2300,7 +2312,7 @@ class Backend {
         this._creatingOffscreen = chrome.offscreen.createDocument({
             url: 'offscreen.html',
             reasons: ['CLIPBOARD'],
-            justification: 'reason for needing the document'
+            justification: 'Access to the clipboard'
         });
         await this._creatingOffscreen;
         this._creatingOffscreen = null;

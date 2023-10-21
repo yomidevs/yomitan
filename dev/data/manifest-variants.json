@@ -82,7 +82,8 @@
             "unlimitedStorage",
             "webRequest",
             "declarativeNetRequest",
-            "scripting"
+            "scripting",
+            "offscreen"
         ],
         "optional_permissions": [
             "clipboardRead",
@@ -167,15 +168,6 @@
                     "pattern": "^(.*)(?:\\.\\s*)?$",
                     "patternFlags": "",
                     "replacement": "$1. This is a development build."
-                },
-                {
-                    "action": "add",
-                    "path": [
-                        "permissions"
-                    ],
-                    "items": [
-                        "offscreen"
-                    ]
                 }
             ]
         },
@@ -263,6 +255,13 @@
                         "permissions"
                     ],
                     "item": "declarativeNetRequest"
+                },
+                {
+                    "action": "remove",
+                    "path": [
+                        "permissions"
+                    ],
+                    "item": "offscreen"
                 }
             ],
             "excludeFiles": [
@@ -336,6 +335,13 @@
                         "permissions"
                     ],
                     "item": "webRequestBlocking"
+                },
+                {
+                    "action": "remove",
+                    "path": [
+                        "permissions"
+                    ],
+                    "item": "offscreen"
                 },
                 {
                     "action": "delete",

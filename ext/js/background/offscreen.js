@@ -37,7 +37,8 @@ class Offscreen {
         });
 
         this._messageHandlers = new Map([
-            ['clipboardGetOffscreen',                 {async: true,  contentScript: true,  handler: this._getTextHandler.bind(this)}]
+            ['clipboardGetTextOffscreen',                 {async: true,  contentScript: true,  handler: this._getTextHandler.bind(this)}],
+            ['clipboardGetImageOffscreen',                 {async: true,  contentScript: true,  handler: this._getImageHandler.bind(this)}]
         ]);
 
         const onMessage = this._onMessage.bind(this);
@@ -46,6 +47,10 @@ class Offscreen {
 
     _getTextHandler({useRichText}) {
         return this._clipboardReader.getText(useRichText);
+    }
+
+    _getImageHandler() {
+        return this._clipboardReader.getImage();
     }
 
     _onMessage({action, params}, sender, callback) {
