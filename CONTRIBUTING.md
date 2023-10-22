@@ -2,22 +2,22 @@
 
 Issues reported on [GitHub](https://github.com/themoeway/yomitan/issues) should include information about:
 
-* What the problem, question, or request is.
-* What browser is being used.
-* What version of Yomitan is being used.
-* If applicable, an export of the settings file.
+- What the problem, question, or request is.
+- What browser is being used.
+- What version of Yomitan is being used.
+- If applicable, an export of the settings file.
 
 # Development
 
 Contributions are welcome from any developers who would like to help out.
 Below are a few guidelines to ensure contributions have a good level of quality and consistency:
 
-* Open GitHub issues to discuss large features before writing code.
-* Follow the [conventions and style](#style) of the existing code.
-* Test changes using the continuous integration tests included in the repository.
-* Write clean, modern ES6 code (`const`/`let`, `async`/`await`, arrow functions, etc.)
-* Large pull requests without a clear scope will not be merged.
-* Incomplete or non-standalone features will not be merged.
+- Open GitHub issues to discuss large features before writing code.
+- Follow the [conventions and style](#style) of the existing code.
+- Test changes using the continuous integration tests included in the repository.
+- Write clean, modern ES6 code (`const`/`let`, `async`/`await`, arrow functions, etc.)
+- Large pull requests without a clear scope will not be merged.
+- Incomplete or non-standalone features will not be merged.
 
 ## Setup
 
@@ -37,23 +37,23 @@ loaded as an unpacked extension by Chrome. This way, development does not requir
 and most changes will be automatically updated by the browser. Depending on what files were changed,
 the extension may sometimes need to be reloaded before the changes take effect.
 
-
 There are two scripts to build the extension to a packaged file for various build targets:
-* [build.bat](build.bat) on Windows
-* [build.sh](build.sh) on Linux
+
+- [build.bat](build.bat) on Windows
+- [build.sh](build.sh) on Linux
 
 Both of these files are convenience scripts which invoke <code>node [dev/build.js](dev/build.js)</code>.
 The build script can produce several different build files based on manifest configurations defined in
 [manifest-variants.json](dev/data/manifest-variants.json).
 Several command line arguments are available for these scripts:
 
-* `[target]` - Builds a specific target.
-* `--all` - Builds all targets specified in [manifest-variants.json](dev/data/manifest-variants.json).
-* `--default` - Restores the default manifest file.
-* `--manifest <target>` - Overwrites `ext/manifest.json` with the manifest variant for the specified build target.
-* `--dry-run` - Runs the full build process (excluding zip building), checking that the configuration is valid.
-* `--dry-run-build-zip` - If `--dry-run` is also specified, zip building will also be performed in memory; no files are created.
-* `--yomitan-version <version>` - Sets the version number in the extension manifest. Defaults to 0.0.0.0 if not set.
+- `[target]` - Builds a specific target.
+- `--all` - Builds all targets specified in [manifest-variants.json](dev/data/manifest-variants.json).
+- `--default` - Restores the default manifest file.
+- `--manifest <target>` - Overwrites `ext/manifest.json` with the manifest variant for the specified build target.
+- `--dry-run` - Runs the full build process (excluding zip building), checking that the configuration is valid.
+- `--dry-run-build-zip` - If `--dry-run` is also specified, zip building will also be performed in memory; no files are created.
+- `--yomitan-version <version>` - Sets the version number in the extension manifest. Defaults to 0.0.0.0 if not set.
 
 If no arguments are specified, the command is equivalent to `build.bat --all`.
 
@@ -75,6 +75,8 @@ The generated `ext/manfiest.json` should not be committed.
 Linting rules are defined for a few types of files, and validation is performed as part of the standard tests
 run by `npm test` and the continuous integration process.
 
-* [.eslintrc.json](.eslintrc.json) rules are used for JavaScript files.
-* [.stylelintrc.json](.stylelintrc.json) rules are used for CSS files.
-* [.htmlvalidate.json](.htmlvalidate.json) rules are used for HTML files.
+- [.eslintrc.json](.eslintrc.json) rules are used for JavaScript files.
+- [.stylelintrc.json](.stylelintrc.json) rules are used for CSS files.
+- [.htmlvalidate.json](.htmlvalidate.json) rules are used for HTML files.
+
+In addition, the [Markdown All in One VSCode extension](https://github.com/yzhang-gh/vscode-markdown) is used for formatting markdown files and automatically updating the table of contents.
