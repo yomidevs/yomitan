@@ -1009,6 +1009,7 @@ class OptionsUtil {
             }
         }
 
+        // test harness doesn't have chrome.storage
         if (customTemplates && isObject(chrome.storage)) {
             chrome.storage.session.set({'needsCustomTemplatesWarning': true});
             await this._createTab(chrome.runtime.getURL('/welcome.html'));
