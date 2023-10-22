@@ -75,7 +75,7 @@ jobs:
                       "updates": [
                           {
                               "version": "${{ github.event.release.name }}",
-                              "update_link": "${{ steps.uploadReleaseAsset.browser_download_url }}"
+                              "update_link": "${{ steps.uploadReleaseAsset.outputs.browser_download_url }}"
                           }
                       ]
                   }
@@ -84,6 +84,7 @@ jobs:
           EOF
 
       - name: Commit files
+        continue-on-error: true
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
