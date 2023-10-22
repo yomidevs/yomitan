@@ -201,7 +201,7 @@
 
 /* Links */
 .gloss-link-text {
-    vertical-align: middle;
+    vertical-align: baseline;
 }
 .gloss-link-external-icon {
     display: inline-block;
