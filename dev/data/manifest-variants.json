@@ -229,7 +229,7 @@
                     "value": {
                         "gecko": {
                             "id": "{cb7c0bec-7085-4f84-8422-7b55a7c4467c}",
-                            "strict_min_version": "102.0"
+                            "strict_min_version": "115.0"
                         }
                     }
                 },
