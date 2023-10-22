@@ -235,9 +235,9 @@ Creates a set of all unique tags for the definition and returns a text represent
 </details>
 
 
-### `eachUpTo`
+### `#eachUpTo`
 
-Similar to the built-in `each` function, but iterates up to a maximum count.
+Similar to the built-in `#each` function, but iterates up to a maximum count.
 If the iterable is falsy or empty, the `else` condition will be used.
 
 <details>
@@ -314,7 +314,7 @@ If an unknown operator is specified, the `undefined` value is returned.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#op <i>operator</i> <i>operand1</i> <i>[operand2]</i> <i>[operand3]</i>}}{{/op}}</code>
+  <code>{{op <i>operator</i> <i>operand1</i> <i>[operand2]</i> <i>[operand3]</i>}}</code>
 
   * _`operator`_ <br>
     One of the unary, binary, or ternary operators.
@@ -329,7 +329,7 @@ If an unknown operator is specified, the `undefined` value is returned.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#if (op "===" value1 value2)}}Values are equal{{/op~}}<br>
+  {{#if (op "===" value1 value2)}}Values are equal{{/if~}}<br>
   {{~#op "-" value1}}{{/op~}}<br>
   {{~op "?:" value1 "a" "b"}}
   ```
@@ -399,7 +399,7 @@ Assigns a value to the custom state stack.
 </details>
 
 
-### `scope`
+### `#scope`
 
 Pushes a new variable scope to the custom state stack.
 Variable assignments are applied to the most recent scope,
@@ -538,7 +538,7 @@ Returns an array of the mora for a kana string.
 
 ### `typeof`
 
-Returns the type of a value.
+Returns the type of a value. Use of `#typeof` in the block form may be nonportable.
 
 <details>
   <summary>Syntax:</summary>
