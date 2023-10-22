@@ -1,4 +1,100 @@
 {{<<<<<<<}}
+{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}
+{{=======}}
+{{formatGlossary ../dictionary .}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#furigana}}{{{.}}}{{/furigana~}}
+{{=======}}
+{{~furigana .~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#furigana}}{{{definition}}}{{/furigana}}
+{{=======}}
+{{furigana definition}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#furigana expression reading~}}{{~/furigana~}}
+{{=======}}
+{{~furigana expression reading~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#furigana expression reading}}{{/furigana~}}
+{{=======}}
+{{~furigana expression reading~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}
+{{=======}}
+{{~furiganaPlain .~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
+{{=======}}
+{{furiganaPlain definition}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#furiganaPlain expression reading~}}{{~/furiganaPlain~}}
+{{=======}}
+{{~furiganaPlain expression reading~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#furiganaPlain expression reading}}{{/furiganaPlain~}}
+{{=======}}
+{{~furiganaPlain expression reading~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "audio"}}{{/getMedia}}
+{{=======}}
+{{getMedia "audio"}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "screenshot"}}{{/getMedia}}
+{{=======}}
+{{getMedia "screenshot"}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "clipboardImage"}}{{/getMedia}}
+{{=======}}
+{{getMedia "clipboardImage"}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "clipboardText"}}{{/getMedia}}
+{{=======}}
+{{getMedia "clipboardText"}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "selectionText"}}{{/getMedia}}
+{{=======}}
+{{getMedia "selectionText"}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "textFurigana" definition.cloze.sentence escape=false}}{{/getMedia}}
+{{=======}}
+{{getMedia "textFurigana" definition.cloze.sentence escape=false}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}{{~/pronunciation~}}
+{{=======}}
+{{~pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
 {{~#set "any" false}}{{/set~}}
 {{=======}}
 {{~set "any" false~}}
@@ -11,87 +107,9 @@
 {{>>>>>>>}}
 
 {{<<<<<<<}}
-{{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
-{{=======}}
-{{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-{{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
-{{=======}}
-{{#each glossary}}{{formatGlossary ../dictionary .}}{{#unless @last}} | {{/unless}}{{/each}}
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-<ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
-{{=======}}
-<ul>{{#each glossary}}<li>{{formatGlossary ../dictionary .}}</li>{{/each}}</ul>
-{{>>>>>>>}}
-
-{{<<<<<<<}}
 {{~#set "previousDictionary" dictionary~}}{{~/set~}}
 {{=======}}
 {{~set "previousDictionary" dictionary~}}
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-[sound:{{#getMedia "audio"}}{{/getMedia}}]
-{{=======}}
-[sound:{{getMedia "audio"}}]
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-<span class="expression-{{termFrequency}}">{{~#furigana}}{{{.}}}{{/furigana~}}</span>
-{{=======}}
-<span class="expression-{{termFrequency}}">{{~furigana .~}}</span>
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-{{#furigana}}{{{definition}}}{{/furigana}}
-{{=======}}
-{{furigana definition}}
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-<span class="expression-{{termFrequency}}">{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}</span>
-{{=======}}
-<span class="expression-{{termFrequency}}">{{~furiganaPlain .~}}</span>
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-{{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
-{{=======}}
-{{furiganaPlain definition}}
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-<img src="{{#getMedia "screenshot"}}{{/getMedia}}" />
-{{=======}}
-<img src="{{getMedia "screenshot"}}" />
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-<img src="{{#getMedia "clipboardImage"}}{{/getMedia}}" />
-{{=======}}
-<img src="{{getMedia "clipboardImage"}}" />
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-{{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText"}}{{/getMedia}}{{/if~}}
-{{=======}}
-{{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-{{~#pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}{{~/pronunciation~}}
-{{=======}}
-{{~pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-{{~#furigana expression reading~}}{{~/furigana~}}
-{{=======}}
-{{~furigana expression reading~}}
 {{>>>>>>>}}
 
 {{<<<<<<<}}
@@ -107,9 +125,9 @@
 {{>>>>>>>}}
 
 {{<<<<<<<}}
-{{~#get "separator"}}{{/get~}}{{{.}}}
+{{~#get "separator"}}{{/get~}}
 {{=======}}
-{{~get "separator"~}}{{{.}}}
+{{~get "separator"~}}
 {{>>>>>>>}}
 
 {{<<<<<<<}}
@@ -131,21 +149,13 @@
 {{>>>>>>>}}
 
 {{<<<<<<<}}
-                        {{~#set (concat "used_" .) true~}}{{~/set~}}
-                        {{~#set "first" false~}}{{~/set~}}
+{{~#set "first" false~}}{{~/set~}}
 {{=======}}
-                        {{~set (concat "used_" .) true~}}
-                        {{~set "first" false~}}
+{{~set "first" false~}}
 {{>>>>>>>}}
 
 {{<<<<<<<}}
-{{~#if (hasMedia "selectionText")}}{{#getMedia "selectionText"}}{{/getMedia}}{{/if~}}
+{{~#set (concat "used_" .) true~}}{{~/set~}}
 {{=======}}
-{{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
-{{>>>>>>>}}
-
-{{<<<<<<<}}
-{{#getMedia "textFurigana" definition.cloze.sentence escape=false}}{{/getMedia}}
-{{=======}}
-{{getMedia "textFurigana" definition.cloze.sentence escape=false}}
+{{~set (concat "used_" .) true~}}
 {{>>>>>>>}}
