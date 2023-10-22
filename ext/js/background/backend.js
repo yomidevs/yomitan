@@ -2127,20 +2127,12 @@ class Backend {
     }
 
     async _openWelcomeGuidePageOnce() {
-        if (isObject(chrome.storage) && isObject(chrome.storage.session)) {
-            // Chrome
-            chrome.storage.session.get(['openedWelcomePage']).then((result) => {
-                if (!result.openedWelcomePage) {
-                    this._openWelcomeGuidePage();
-                    chrome.storage.session.set({'openedWelcomePage': true});
-                }
-            });
-        } else {
-            // Firefox (storage.session is not supported yet)
-            // NOTE: This means that the welcome page will repeatedly open in Firefox
-            // until they support storage.session.
-            this._openWelcomeGuidePage();
-        }
+        chrome.storage.session.get(['openedWelcomePage']).then((result) => {
+            if (!result.openedWelcomePage) {
+                this._openWelcomeGuidePage();
+                chrome.storage.session.set({'openedWelcomePage': true});
+            }
+        });
     }
 
     async _openWelcomeGuidePage() {

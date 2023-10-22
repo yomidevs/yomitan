@@ -622,7 +622,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 20,
+        version: 21,
         global: {
             database: {
                 prefixWildcardsSupported: false
@@ -689,7 +689,8 @@ async function testFieldTemplatesUpdate(extDir) {
         {version: 8,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
         {version: 10, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars')},
         {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')},
-        {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')}
+        {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')},
+        {version: 21, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v21.handlebars')}
     ];
     const getUpdateAdditions = (startVersion, targetVersion) => {
         let value = '';
@@ -1214,6 +1215,370 @@ async function testFieldTemplatesUpdate(extDir) {
 {{! End Pitch Accents }}
 
 <<<UPDATE-ADDITIONS>>>
+{{~> (lookup . "marker") ~}}`.trimStart()
+        },
+        // block helper update: furigana and furiganaPlain
+        {
+            oldVersion: 20,
+            newVersion: 21,
+            old: `
+{{#*inline "furigana"}}
+    {{~#if merge~}}
+        {{~#each definition.expressions~}}
+            <span class="expression-{{termFrequency}}">{{~#furigana}}{{{.}}}{{/furigana~}}</span>
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{#furigana}}{{{definition}}}{{/furigana}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "furigana-plain"}}
+    {{~#if merge~}}
+        {{~#each definition.expressions~}}
+            <span class="expression-{{termFrequency}}">{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}</span>
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequencies"}}
+    {{~#if (op ">" definition.frequencies.length 0)~}}
+        <ul style="text-align: left;">
+        {{~#each definition.frequencies~}}
+            <li>
+            {{~#if (op "!==" ../definition.type "kanji")~}}
+                {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
+                    {{~#furigana expression reading~}}{{~/furigana~}}
+                ) {{/if~}}
+            {{~/if~}}
+            {{~dictionary}}: {{frequency~}}
+            </li>
+        {{~/each~}}
+        </ul>
+    {{~/if~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+            expected: `
+{{#*inline "furigana"}}
+    {{~#if merge~}}
+        {{~#each definition.expressions~}}
+            <span class="expression-{{termFrequency}}">{{~furigana .~}}</span>
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{furigana definition}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "furigana-plain"}}
+    {{~#if merge~}}
+        {{~#each definition.expressions~}}
+            <span class="expression-{{termFrequency}}">{{~furiganaPlain .~}}</span>
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{furiganaPlain definition}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequencies"}}
+    {{~#if (op ">" definition.frequencies.length 0)~}}
+        <ul style="text-align: left;">
+        {{~#each definition.frequencies~}}
+            <li>
+            {{~#if (op "!==" ../definition.type "kanji")~}}
+                {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
+                    {{~furigana expression reading~}}
+                ) {{/if~}}
+            {{~/if~}}
+            {{~dictionary}}: {{frequency~}}
+            </li>
+        {{~/each~}}
+        </ul>
+    {{~/if~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart()
+        },
+        // block helper update: formatGlossary
+        {
+            oldVersion: 20,
+            newVersion: 21,
+            old: `
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~#set "any" false}}{{/set~}}
+            {{~#each definitionTags~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~#set "any" true}}{{/set~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#unless noDictionaryTag~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{dictionary}}
+                    {{~#set "any" true}}{{/set~}}
+                {{~/if~}}
+            {{~/unless~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
+    {{~else~}}
+        <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
+    {{~/if~}}
+    {{~#set "previousDictionary" dictionary~}}{{~/set~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+            expected: `
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~set "any" false~}}
+            {{~#each definitionTags~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~set "any" true~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#unless noDictionaryTag~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{dictionary}}
+                    {{~set "any" true~}}
+                {{~/if~}}
+            {{~/unless~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{formatGlossary ../dictionary .}}{{#unless @last}} | {{/unless}}{{/each}}
+    {{~else~}}
+        <ul>{{#each glossary}}<li>{{formatGlossary ../dictionary .}}</li>{{/each}}</ul>
+    {{~/if~}}
+    {{~set "previousDictionary" dictionary~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart()
+        },
+        // block helper update: set and get
+        {
+            oldVersion: 20,
+            newVersion: 21,
+            old: `
+{{#*inline "pitch-accent-item-disambiguation"}}
+    {{~#scope~}}
+        {{~#set "exclusive" (spread exclusiveExpressions exclusiveReadings)}}{{/set~}}
+        {{~#if (op ">" (property (get "exclusive") "length") 0)~}}
+            {{~#set "separator" ""~}}{{/set~}}
+            <em>({{#each (get "exclusive")~}}
+                {{~#get "separator"}}{{/get~}}{{{.}}}
+            {{~/each}} only) </em>
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{#*inline "stroke-count"}}
+    {{~#scope~}}
+        {{~#set "found" false}}{{/set~}}
+        {{~#each definition.stats.misc~}}
+            {{~#if (op "===" name "strokes")~}}
+                {{~#set "found" true}}{{/set~}}
+                Stroke count: {{value}}
+            {{~/if~}}
+        {{~/each~}}
+        {{~#if (op "!" (get "found"))~}}
+            Stroke count: Unknown
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{#*inline "part-of-speech"}}
+    {{~#scope~}}
+        {{~#if (op "!==" definition.type "kanji")~}}
+            {{~#set "first" true}}{{/set~}}
+            {{~#each definition.expressions~}}
+                {{~#each wordClasses~}}
+                    {{~#unless (get (concat "used_" .))~}}
+                        {{~> part-of-speech-pretty . ~}}
+                        {{~#unless (get "first")}}, {{/unless~}}
+                        {{~#set (concat "used_" .) true~}}{{~/set~}}
+                        {{~#set "first" false~}}{{~/set~}}
+                    {{~/unless~}}
+                {{~/each~}}
+            {{~/each~}}
+            {{~#if (get "first")~}}Unknown{{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+            expected: `
+{{#*inline "pitch-accent-item-disambiguation"}}
+    {{~#scope~}}
+        {{~set "exclusive" (spread exclusiveExpressions exclusiveReadings)~}}
+        {{~#if (op ">" (property (get "exclusive") "length") 0)~}}
+            {{~set "separator" ""~}}
+            <em>({{#each (get "exclusive")~}}
+                {{~get "separator"~}}{{{.}}}
+            {{~/each}} only) </em>
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{#*inline "stroke-count"}}
+    {{~#scope~}}
+        {{~set "found" false~}}
+        {{~#each definition.stats.misc~}}
+            {{~#if (op "===" name "strokes")~}}
+                {{~set "found" true~}}
+                Stroke count: {{value}}
+            {{~/if~}}
+        {{~/each~}}
+        {{~#if (op "!" (get "found"))~}}
+            Stroke count: Unknown
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{#*inline "part-of-speech"}}
+    {{~#scope~}}
+        {{~#if (op "!==" definition.type "kanji")~}}
+            {{~set "first" true~}}
+            {{~#each definition.expressions~}}
+                {{~#each wordClasses~}}
+                    {{~#unless (get (concat "used_" .))~}}
+                        {{~> part-of-speech-pretty . ~}}
+                        {{~#unless (get "first")}}, {{/unless~}}
+                        {{~set (concat "used_" .) true~}}
+                        {{~set "first" false~}}
+                    {{~/unless~}}
+                {{~/each~}}
+            {{~/each~}}
+            {{~#if (get "first")~}}Unknown{{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart()
+        },
+        // block helper update: hasMedia and getMedia
+        {
+            oldVersion: 20,
+            newVersion: 21,
+            old: `
+{{#*inline "audio"}}
+    {{~#if (hasMedia "audio")~}}
+        [sound:{{#getMedia "audio"}}{{/getMedia}}]
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "screenshot"}}
+    {{~#if (hasMedia "screenshot")~}}
+        <img src="{{#getMedia "screenshot"}}{{/getMedia}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-image"}}
+    {{~#if (hasMedia "clipboardImage")~}}
+        <img src="{{#getMedia "clipboardImage"}}{{/getMedia}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText"}}{{/getMedia}}{{/if~}}
+{{/inline}}
+
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{#getMedia "selectionText"}}{{/getMedia}}{{/if~}}
+{{/inline}}
+
+{{#*inline "sentence-furigana"}}
+    {{~#if definition.cloze~}}
+        {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
+            {{#getMedia "textFurigana" definition.cloze.sentence escape=false}}{{/getMedia}}
+        {{~else~}}
+            {{definition.cloze.sentence}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+            expected: `
+{{#*inline "audio"}}
+    {{~#if (hasMedia "audio")~}}
+        [sound:{{getMedia "audio"}}]
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "screenshot"}}
+    {{~#if (hasMedia "screenshot")~}}
+        <img src="{{getMedia "screenshot"}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-image"}}
+    {{~#if (hasMedia "clipboardImage")~}}
+        <img src="{{getMedia "clipboardImage"}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
+{{/inline}}
+
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
+{{/inline}}
+
+{{#*inline "sentence-furigana"}}
+    {{~#if definition.cloze~}}
+        {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
+            {{getMedia "textFurigana" definition.cloze.sentence escape=false}}
+        {{~else~}}
+            {{definition.cloze.sentence}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart()
+        },
+        // block helper update: pronunciation
+        {
+            oldVersion: 20,
+            newVersion: 21,
+            old: `
+{{#*inline "pitch-accent-item"}}
+    {{~#pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}{{~/pronunciation~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+            expected: `
+{{#*inline "pitch-accent-item"}}
+    {{~pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
+{{/inline}}
+
 {{~> (lookup . "marker") ~}}`.trimStart()
         }
     ];

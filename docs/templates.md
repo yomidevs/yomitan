@@ -14,7 +14,7 @@ This function can be helpful for debugging values when creating templates.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#dumpObject}}<i>&lt;object&gt;</i>{{/dumpObject}}</code>
+  <code>{{dumpObject <i>object</i>}}</code>
 
   * _`object`_ <br>
     The object to convert.
@@ -23,7 +23,7 @@ This function can be helpful for debugging values when creating templates.
   <summary>Example:</summary>
 
   ```handlebars
-  <pre>{{#dumpObject}}{{.}}{{/dumpObject}}</pre>
+  <pre>{{dumpObject .}}</pre>
   ```
 
   Output:
@@ -49,8 +49,8 @@ Converts a definition or expression/reading pair to its furigana representation.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#furigana}}<i>&lt;definition&gt;</i>{{/furigana}}</code><br>
-  <code>{{#furigana <i>expression</i> <i>reading</i>}}{{/furigana}}</code><br>
+  <code>{{furigana <i>definition</i>}}</code><br>
+  <code>{{furigana <i>expression</i> <i>reading</i>}}</code><br>
 
   * _`definition`_ <br>
     The definition to convert.
@@ -63,8 +63,8 @@ Converts a definition or expression/reading pair to its furigana representation.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#furigana}}{{.}}{{/furigana}}
-  {{#furigana "読む" "よむ"}}{{/furigana}}
+  {{furigana .}}
+  {{furigana "読む" "よむ"}}
   ```
 
   Output:
@@ -84,8 +84,8 @@ Converts a definition or expression/reading pair to its simplified furigana repr
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#furiganaPlain}}<i>&lt;definition&gt;</i>{{/furigana}}</code>
-  <code>{{#furiganaPlain <i>expression</i> <i>reading</i>}}{{/furiganaPlain}}</code><br>
+  <code>{{furiganaPlain <i>definition</i>}}</code>
+  <code>{{furiganaPlain <i>expression</i> <i>reading</i>}}</code><br>
 
   * _`definition`_ <br>
     The definition to convert.
@@ -98,8 +98,8 @@ Converts a definition or expression/reading pair to its simplified furigana repr
   <summary>Example:</summary>
 
   ```handlebars
-  {{~#furiganaPlain~}}{{.}}{{~/furiganaPlain~}}
-  {{#furiganaPlain "読む" "よむ"}}{{/furiganaPlain}}
+  {{~furiganaPlain .~}}
+  {{furiganaPlain "読む" "よむ"}}
   ```
 
   Output:
@@ -122,11 +122,11 @@ Replaces newline characters with a forced HTML line break `<br>`.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#kanjiLinks~}}
+  {{#multiLine~}}
   some
   multiline
   text
-  {{~/kanjiLinks}}
+  {{~/multiLine}}
   ```
 
   Output:
@@ -147,7 +147,7 @@ Uses a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScr
   <summary>Syntax:</summary>
 
   <code>{{#regexReplace <i>regex</i> <i>replacement</i> <i>[flags]</i>}}<i>text-to-modify</i>{{/regexReplace}}</code><br>
-  <code>{{#regexReplace <i>regex</i> <i>replacement</i> <i>[flags]</i> <i>[text-to-modify]...</i>}}{{/regexReplace}}</code><br>
+  <code>{{regexReplace <i>regex</i> <i>replacement</i> <i>[flags]</i> <i>[text-to-modify]...</i>}}</code><br>
 
   * _`regex`_ <br>
     The raw string used to create the regular expression. This value is passed to the [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/RegExp) constructor.
@@ -181,7 +181,7 @@ Uses a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScr
   <summary>Syntax:</summary>
 
   <code>{{#regexMatch <i>regex</i> <i>[flags]</i>}}<i>text-to-modify</i>{{/regexMatch}}</code><br>
-  <code>{{#regexMatch <i>regex</i> <i>[flags]</i> <i>[text-to-modify]...</i>}}{{/regexMatch}}</code><br>
+  <code>{{regexMatch <i>regex</i> <i>[flags]</i> <i>[text-to-modify]...</i>}}</code><br>
 
   * _`regex`_ <br>
     The raw string used to create the regular expression. This value is passed to the [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/RegExp) constructor.
@@ -212,7 +212,7 @@ Creates a set of all unique tags for the definition and returns a text represent
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#mergeTags <i>definition</i> <i>isGroupMode</i> <i>isMergeMode</i>}}{{/mergeTags}}</code>
+  <code>{{mergeTags <i>definition</i> <i>isGroupMode</i> <i>isMergeMode</i>}}</code>
 
   * _`definition`_ <br>
     The root definition object.
@@ -225,7 +225,7 @@ Creates a set of all unique tags for the definition and returns a text represent
   <summary>Example:</summary>
 
   ```handlebars
-  {{~#mergeTags definition group merge}}{{/mergeTags~}}
+  {{~mergeTags definition group merge~}}
   ```
 
   Output:
@@ -235,9 +235,9 @@ Creates a set of all unique tags for the definition and returns a text represent
 </details>
 
 
-### `eachUpTo`
+### `#eachUpTo`
 
-Similar to the built-in `each` function, but iterates up to a maximum count.
+Similar to the built-in `#each` function, but iterates up to a maximum count.
 If the iterable is falsy or empty, the `else` condition will be used.
 
 <details>
@@ -279,7 +279,7 @@ This allows it to be used similar to an [`Array.concat`](https://developer.mozil
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#spread <i>iterable1</i> <i>iterable2</i> <i>...</i> <i>iterableN</i>}}{{/spread}}</code>
+  <code>{{spread <i>iterable1</i> <i>iterable2</i> <i>...</i> <i>iterableN</i>}}</code>
 
   * _`iterableN`_ <br>
     A variable amount of iterable objects to combine into a single array.
@@ -314,7 +314,7 @@ If an unknown operator is specified, the `undefined` value is returned.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#op <i>operator</i> <i>operand1</i> <i>[operand2]</i> <i>[operand3]</i>}}{{/op}}</code>
+  <code>{{op <i>operator</i> <i>operand1</i> <i>[operand2]</i> <i>[operand3]</i>}}</code>
 
   * _`operator`_ <br>
     One of the unary, binary, or ternary operators.
@@ -329,9 +329,9 @@ If an unknown operator is specified, the `undefined` value is returned.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#if (op "===" value1 value2)}}Values are equal{{/op~}}<br>
+  {{#if (op "===" value1 value2)}}Values are equal{{/if~}}<br>
   {{~#op "-" value1}}{{/op~}}<br>
-  {{~#op "?:" value1 "a" "b"}}{{/op}}
+  {{~op "?:" value1 "a" "b"}}
   ```
 
   Output:
@@ -351,7 +351,7 @@ Gets a value from the custom state stack.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#get <i>name</i>}}{{/get}}</code>
+  <code>{{get <i>name</i>}}</code>
 
   * _`name`_ <br>
     The name of the variable to get.
@@ -360,7 +360,7 @@ Gets a value from the custom state stack.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#get "some-text"}}{{/get}}
+  {{get "some-text"}}
   ```
 
   Output:
@@ -378,7 +378,7 @@ Assigns a value to the custom state stack.
   <summary>Syntax:</summary>
 
   <code>{{#set <i>name</i>}}<i>value</i>{{/get}}</code><br>
-  <code>{{#set <i>name</i> <i>value</i>}}{{/get}}</code><br>
+  <code>{{set <i>name</i> <i>value</i>}}</code><br>
 
   * _`name`_ <br>
     The name of the variable to assign.
@@ -390,7 +390,7 @@ Assigns a value to the custom state stack.
 
   ```handlebars
   {{#set "some-text"}}This is the value of some-text!{{/set~}}
-  {{~#set "some-number" 32}}{{/set}}
+  {{~set "some-number" 32}}
   ```
 
   Output:
@@ -399,7 +399,7 @@ Assigns a value to the custom state stack.
 </details>
 
 
-### `scope`
+### `#scope`
 
 Pushes a new variable scope to the custom state stack.
 Variable assignments are applied to the most recent scope,
@@ -419,14 +419,14 @@ and variable lookups will start from the most recent scope and work backwards un
   <summary>Example:</summary>
 
   ```handlebars
-  {{~#set "key" 32}}{{/set~}}
-  {{~#get "key"}}{{/get~}},
+  {{~set "key" 32~}}
+  {{~get "key"~}},
   {{~#scope~}}
-    {{~#get "key"}}{{/get~}},
-    {{~#set "key" 64}}{{/set~}}
-    {{~#get "key"}}{{/get~}},
+    {{~#get "key"~}},
+    {{~#set "key" 64~}}
+    {{~#get "key"~}},
   {{~/scope~}}
-  {{~#get "key"}}{{/get~}}
+  {{~get "key"~}}
   ```
 
   Output:
@@ -443,7 +443,7 @@ Repeatedly gets a property of an object.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#property <i>object</i> <i>property1</i> <i>property2</i> <i>...</i> <i>propertyN</i>}}{{/property}}</code>
+  <code>{{property <i>object</i> <i>property1</i> <i>property2</i> <i>...</i> <i>propertyN</i>}}</code>
 
   * _`object`_ <br>
     The initial object to use.
@@ -494,7 +494,7 @@ Returns whether or not a mora will have a high pitch, given the index of the mor
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#isMoraPitchHigh <i>index</i> <i>position</i>}}{{/isMoraPitchHigh}}</code>
+  <code>{{isMoraPitchHigh <i>index</i> <i>position</i>}}</code>
 </details>
 <details>
   <summary>Example:</summary>
@@ -517,7 +517,7 @@ Returns an array of the mora for a kana string.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#getKanaMorae <i>kana-string</i>}}{{/getKanaMorae}}</code>
+  <code>{{getKanaMorae <i>kana-string</i>}}</code>
 </details>
 <details>
   <summary>Example:</summary>
@@ -538,12 +538,12 @@ Returns an array of the mora for a kana string.
 
 ### `typeof`
 
-Returns the type of a value.
+Returns the type of a value. Use of `#typeof` in the block form may be nonportable.
 
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#typeof <i>value</i>}}{{/typeof}}</code><br>
+  <code>{{typeof <i>value</i>}}</code><br>
   <code>{{#typeof}}<i>value</i>{{/typeof}}</code><br>
 
   * _`value`_ <br>
@@ -553,8 +553,8 @@ Returns the type of a value.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#typeof "よみちゃん"}}{{/typeof}}
-  {{#typeof 1}}{{/typeof}}
+  {{typeof "よみちゃん"}}
+  {{typeof 1}}
   {{#typeof}}よみちゃん{{/typeof}}
   ```
 
@@ -574,7 +574,7 @@ Joins the arguments to a single string with a separator, flattening any argument
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#join <i>separator</i> <i>value1</i> <i>value2</i> <i>valueN</i>...}}{{/join}}</code><br>
+  <code>{{join <i>separator</i> <i>value1</i> <i>value2</i> <i>valueN</i>...}}</code><br>
 
   * _`separator`_ <br>
     The separator string to use between values.
@@ -585,8 +585,8 @@ Joins the arguments to a single string with a separator, flattening any argument
   <summary>Example:</summary>
 
   ```handlebars
-  {{#set "index" 32}}{{/set~}}
-  {{~#join "_" "yomichan" (get "index") "value"}}{{/join}}
+  {{set "index" 32~}}
+  {{~join "_" "yomichan" (get "index") "value"}}
   ```
 
   Output:
@@ -603,7 +603,7 @@ Joins the arguments to a single string, without flattening arguments that are ar
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#concat <i>value1</i> <i>value1</i> <i>valueN</i>...}}{{/concat}}</code><br>
+  <code>{{concat <i>value1</i> <i>value1</i> <i>valueN</i>...}}</code><br>
 
   * _`valueN`_ <br>
     A value to join into the resulting string
@@ -612,8 +612,8 @@ Joins the arguments to a single string, without flattening arguments that are ar
   <summary>Example:</summary>
 
   ```handlebars
-  {{#set "index" 32}}{{/set~}}
-  {{~#concat "yomichan_" (get "index") "_value"}}{{/concat}}
+  {{set "index" 32~}}
+  {{~concat "yomichan_" (get "index") "_value"}}
   ```
 
   Output:
@@ -630,7 +630,7 @@ Returns an array representing the different pitch categories for a specific term
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#pitchCategories @root}}{{/pitchCategories}}</code><br>
+  <code>{{pitchCategories @root}}</code><br>
 
   * _`@root`_ <br>
     The argument passed should always be the root data object.
@@ -657,7 +657,7 @@ structured-content generation.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#formatGlossary <i>dictionary</i>}}{{{definitionEntry}}}{{/pitchCategories}}</code><br>
+  <code>{{formatGlossary <i>dictionary</i> <i>definitionEntry</i>}}</code><br>
 
   * _`dictionary`_ <br>
     The dictionary that the glossary entry belongs to.
@@ -668,7 +668,7 @@ structured-content generation.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
+  {{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
   ```
 
   Output:
@@ -686,8 +686,8 @@ These functions are used together in order to request media and other types of o
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#hasMedia <i>type</i> <i>args</i>...}}{{/hasMedia}}</code><br>
-  <code>{{#getMedia <i>type</i> <i>args</i>... <i>[escape=true|false]</i>}}{{/getMedia}}</code><br>
+  <code>{{hasMedia <i>type</i> <i>args</i>...}}</code><br>
+  <code>{{getMedia <i>type</i> <i>args</i>... <i>[escape=true|false]</i>}}</code><br>
 
   * _`type`_ <br>
     The type of media to check for.
@@ -710,19 +710,19 @@ These functions are used together in order to request media and other types of o
   <summary>Examples:</summary>
 
   ```handlebars
-  {{#if (hasMedia "audio")}}The audio file name is: {{#getMedia "audio"}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "audio")}}The audio file name is: {{getMedia "audio"}}{{/if}}
 
-  {{#if (hasMedia "screenshot")}}The screenshot file name is: {{#getMedia "screenshot"}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "screenshot")}}The screenshot file name is: {{getMedia "screenshot"}}{{/if}}
 
-  {{#if (hasMedia "clipboardImage")}}The clipboard image file name is: {{#getMedia "clipboardImage"}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "clipboardImage")}}The clipboard image file name is: {{getMedia "clipboardImage"}}{{/if}}
 
-  {{#if (hasMedia "clipboardText")}}The clipboard text is: {{#getMedia "clipboardText"}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "clipboardText")}}The clipboard text is: {{getMedia "clipboardText"}}{{/if}}
 
-  {{#if (hasMedia "selectionText")}}The selection text is: {{#getMedia "selectionText"}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "selectionText")}}The selection text is: {{getMedia "selectionText"}}{{/if}}
 
-  {{#if (hasMedia "textFurigana" "日本語")}}This is an example of text with generated furigana: {{#getMedia "textFurigana" "日本語" escape=false}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "textFurigana" "日本語")}}This is an example of text with generated furigana: {{getMedia "textFurigana" "日本語" escape=false}}{{/if}}
 
-  {{#if (hasMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary")}}The remapped file name for image.png is: {{#getMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary"}}{{/getMedia}}{{/if}}
+  {{#if (hasMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary")}}The remapped file name for image.png is: {{getMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary"}}{{/if}}
   ```
 
   Output:
@@ -754,7 +754,7 @@ same as the system used for generating popup and search page dictionary entries.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#pronunciation <i>format=string</i> <i>reading=string</i> <i>downstepPosition=integer</i> <i>[nasalPositions=array]</i> <i>[devoicePositions=array]</i>}}{{/pronunciation}}</code><br>
+  <code>{{pronunciation <i>format=string</i> <i>reading=string</i> <i>downstepPosition=integer</i> <i>[nasalPositions=array]</i> <i>[devoicePositions=array]</i>}}</code><br>
 
   * _`format`_ <br>
     The format of the HTML to generate. This can be any of the following values:
@@ -774,7 +774,7 @@ same as the system used for generating popup and search page dictionary entries.
   <summary>Example:</summary>
 
   ```handlebars
-  {{~#pronunciation format='text' reading='よむ' downstepPosition=1~}}{{~/pronunciation~}}
+  {{~pronunciation format='text' reading='よむ' downstepPosition=1~}}
   ```
 </details>
 
@@ -786,7 +786,7 @@ Converts katakana text to hiragana.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#hiragana <i>value</i> <i>[keepProlongedSoundMarks=true|false]</i>}}{{/hiragana}}</code><br>
+  <code>{{hiragana <i>value</i> <i>[keepProlongedSoundMarks=true|false]</i>}}</code><br>
   <code>{{#hiragana <i>[keepProlongedSoundMarks=true|false]</i>}}<i>value</i>{{/hiragana}}</code><br>
 
   * _`value`_ <br>
@@ -799,7 +799,7 @@ Converts katakana text to hiragana.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#hiragana "よみちゃん ヨミちゃん ヨミチャン"}}{{/hiragana}}
+  {{hiragana "よみちゃん ヨミちゃん ヨミチャン"}}
   {{#hiragana}}よみちゃん ヨミちゃん ヨミチャン{{/hiragana}}
   {{#hiragana}}ローマ字{{/hiragana}}
   {{#hiragana keepProlongedSoundMarks=true}}ローマ字{{/hiragana}}
@@ -822,7 +822,7 @@ Converts hiragana text to katakana.
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#katakana <i>text</i>}}{{/katakana}}</code><br>
+  <code>{{katakana <i>text</i>}}</code><br>
   <code>{{#katakana}}<i>text</i>{{/katakana}}</code><br>
 
   * _`text`_ <br>
@@ -832,7 +832,7 @@ Converts hiragana text to katakana.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#katakana "よみちゃん ヨミちゃん ヨミチャン"}}{{/katakana}}
+  {{katakana "よみちゃん ヨミちゃん ヨミチャン"}}
   {{#katakana}}よみちゃん ヨミちゃん ヨミチャン{{/katakana}}
   ```
 
@@ -840,62 +840,5 @@ Converts hiragana text to katakana.
   ```html
   ヨミチャン ヨミチャン ヨミチャン
   ヨミチャン ヨミチャン ヨミチャン
-  ```
-</details>
-
-
-## Legacy Helpers
-
-Yomichan has historically used Handlebars templates to generate the HTML used on the search page and results popup.
-To simplify the and improve Yomichan's capabilities, the HTML elements are now generated directly using a different process.
-
-As such, there are several leftover Handlebars helpers that do not have much utility for Anki templates, but are kept for compatibility purposes.
-
-
-### `kanjiLinks`
-
-Replaces kanji characters in the text with linkified versions.
-
-<details>
-  <summary>Syntax:</summary>
-
-  <code>{{#kanjiLinks}}<i>text</i>{{/kanjiLinks}}</code>
-</details>
-<details>
-  <summary>Example:</summary>
-
-  ```handlebars
-  {{#kanjiLinks}}読む{{/kanjiLinks}}
-  ```
-
-  Output:
-  ```html
-  <a href="#" class="kanji-link">読</a>む
-  ```
-
-  Preview:
-  <pre><a href="#" class="kanji-link">読</a>む</pre>
-</details>
-
-
-### `sanitizeCssClass`
-
-Sanitizes text so it can be used as a CSS class name.
-
-<details>
-  <summary>Syntax:</summary>
-
-  <code>{{#sanitizeCssClass}}<i>text</i>{{/sanitizeCssClass}}</code>
-</details>
-<details>
-  <summary>Example:</summary>
-
-  ```handlebars
-  {{#sanitizeCssClass}}some text with many types of characters !@#$%^ 読む{{/sanitizeCssClass}}
-  ```
-
-  Output:
-  ```html
-  some_text_with_many_types_of_characters________読む
   ```
 </details>

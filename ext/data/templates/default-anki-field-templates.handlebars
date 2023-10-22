@@ -1,19 +1,19 @@
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
         {{~#scope~}}
-            {{~#set "any" false}}{{/set~}}
+            {{~set "any" false~}}
             {{~#each definitionTags~}}
                 {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
                     {{~#if (get "any")}}, {{else}}<i>({{/if~}}
                     {{name}}
-                    {{~#set "any" true}}{{/set~}}
+                    {{~set "any" true~}}
                 {{~/if~}}
             {{~/each~}}
             {{~#unless noDictionaryTag~}}
                 {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
                     {{~#if (get "any")}}, {{else}}<i>({{/if~}}
                     {{dictionary}}
-                    {{~#set "any" true}}{{/set~}}
+                    {{~set "any" true~}}
                 {{~/if~}}
             {{~/unless~}}
             {{~#if (get "any")}})</i> {{/if~}}
@@ -21,18 +21,18 @@
         {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
     {{~/unless~}}
     {{~#if (op "<=" glossary.length 1)~}}
-        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
+        {{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
     {{~else if @root.compactGlossaries~}}
-        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
+        {{#each glossary}}{{formatGlossary ../dictionary .}}{{#unless @last}} | {{/unless}}{{/each}}
     {{~else~}}
-        <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
+        <ul>{{#each glossary}}<li>{{formatGlossary ../dictionary .}}</li>{{/each}}</ul>
     {{~/if~}}
-    {{~#set "previousDictionary" dictionary~}}{{~/set~}}
+    {{~set "previousDictionary" dictionary~}}
 {{/inline}}
 
 {{#*inline "audio"}}
     {{~#if (hasMedia "audio")~}}
-        [sound:{{#getMedia "audio"}}{{/getMedia}}]
+        [sound:{{getMedia "audio"}}]
     {{~/if~}}
 {{/inline}}
 
@@ -78,22 +78,22 @@
 {{#*inline "furigana"}}
     {{~#if merge~}}
         {{~#each definition.expressions~}}
-            <span class="expression-{{termFrequency}}">{{~#furigana}}{{{.}}}{{/furigana~}}</span>
+            <span class="expression-{{termFrequency}}">{{~furigana .~}}</span>
             {{~#unless @last}}、{{/unless~}}
         {{~/each~}}
     {{~else~}}
-        {{#furigana}}{{{definition}}}{{/furigana}}
+        {{furigana definition}}
     {{~/if~}}
 {{/inline}}
 
 {{#*inline "furigana-plain"}}
     {{~#if merge~}}
         {{~#each definition.expressions~}}
-            <span class="expression-{{termFrequency}}">{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}</span>
+            <span class="expression-{{termFrequency}}">{{~furiganaPlain .~}}</span>
             {{~#unless @last}}、{{/unless~}}
         {{~/each~}}
     {{~else~}}
-        {{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
+        {{furiganaPlain definition}}
     {{~/if~}}
 {{/inline}}
 
@@ -174,7 +174,7 @@
 
 {{#*inline "screenshot"}}
     {{~#if (hasMedia "screenshot")~}}
-        <img src="{{#getMedia "screenshot"}}{{/getMedia}}" />
+        <img src="{{getMedia "screenshot"}}" />
     {{~/if~}}
 {{/inline}}
 
@@ -184,16 +184,16 @@
 
 {{! Pitch Accents }}
 {{#*inline "pitch-accent-item"}}
-    {{~#pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}{{~/pronunciation~}}
+    {{~pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
 {{/inline}}
 
 {{#*inline "pitch-accent-item-disambiguation"}}
     {{~#scope~}}
-        {{~#set "exclusive" (spread exclusiveExpressions exclusiveReadings)}}{{/set~}}
+        {{~set "exclusive" (spread exclusiveExpressions exclusiveReadings)~}}
         {{~#if (op ">" (property (get "exclusive") "length") 0)~}}
-            {{~#set "separator" ""~}}{{/set~}}
+            {{~set "separator" ""~}}
             <em>({{#each (get "exclusive")~}}
-                {{~#get "separator"}}{{/get~}}{{{.}}}
+                {{~get "separator"~}}{{{.}}}
             {{~/each}} only) </em>
         {{~/if~}}
     {{~/scope~}}
@@ -231,12 +231,12 @@
 
 {{#*inline "clipboard-image"}}
     {{~#if (hasMedia "clipboardImage")~}}
-        <img src="{{#getMedia "clipboardImage"}}{{/getMedia}}" />
+        <img src="{{getMedia "clipboardImage"}}" />
     {{~/if~}}
 {{/inline}}
 
 {{#*inline "clipboard-text"}}
-    {{~#if (hasMedia "clipboardText")}}{{#getMedia "clipboardText"}}{{/getMedia}}{{/if~}}
+    {{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
 {{/inline}}
 
 {{#*inline "conjugation"}}
@@ -255,7 +255,7 @@
             <li>
             {{~#if (op "!==" ../definition.type "kanji")~}}
                 {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
-                    {{~#furigana expression reading~}}{{~/furigana~}}
+                    {{~furigana expression reading~}}
                 ) {{/if~}}
             {{~/if~}}
             {{~dictionary}}: {{frequency~}}
@@ -267,10 +267,10 @@
 
 {{#*inline "stroke-count"}}
     {{~#scope~}}
-        {{~#set "found" false}}{{/set~}}
+        {{~set "found" false~}}
         {{~#each definition.stats.misc~}}
             {{~#if (op "===" name "strokes")~}}
-                {{~#set "found" true}}{{/set~}}
+                {{~set "found" true~}}
                 Stroke count: {{value}}
             {{~/if~}}
         {{~/each~}}
@@ -295,14 +295,14 @@
 {{#*inline "part-of-speech"}}
     {{~#scope~}}
         {{~#if (op "!==" definition.type "kanji")~}}
-            {{~#set "first" true}}{{/set~}}
+            {{~set "first" true~}}
             {{~#each definition.expressions~}}
                 {{~#each wordClasses~}}
                     {{~#unless (get (concat "used_" .))~}}
                         {{~> part-of-speech-pretty . ~}}
                         {{~#unless (get "first")}}, {{/unless~}}
-                        {{~#set (concat "used_" .) true~}}{{~/set~}}
-                        {{~#set "first" false~}}{{~/set~}}
+                        {{~set (concat "used_" .) true~}}
+                        {{~set "first" false~}}
                     {{~/unless~}}
                 {{~/each~}}
             {{~/each~}}
@@ -316,13 +316,13 @@
 {{/inline}}
 
 {{#*inline "selection-text"}}
-    {{~#if (hasMedia "selectionText")}}{{#getMedia "selectionText"}}{{/getMedia}}{{/if~}}
+    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
 {{/inline}}
 
 {{#*inline "sentence-furigana"}}
     {{~#if definition.cloze~}}
         {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
-            {{#getMedia "textFurigana" definition.cloze.sentence escape=false}}{{/getMedia}}
+            {{getMedia "textFurigana" definition.cloze.sentence escape=false}}
         {{~else~}}
             {{definition.cloze.sentence}}
         {{~/if~}}
