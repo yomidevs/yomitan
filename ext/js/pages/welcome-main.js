@@ -58,6 +58,13 @@ async function setupGenericSettingsController(genericSettingController) {
 
         setupEnvironmentInfo();
 
+        chrome.storage.session.get({'needsCustomTemplatesWarning': false}).then((result) => {
+            if (result.needsCustomTemplatesWarning) {
+                document.documentElement.dataset.warnCustomTemplates = 'true';
+                chrome.storage.session.remove(['needsCustomTemplatesWarning']);
+            }
+        });
+
         const preparePromises = [];
 
         const modalController = new ModalController();

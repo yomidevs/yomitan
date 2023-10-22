@@ -1001,6 +1001,33 @@ class OptionsUtil {
 
     async _updateVersion21(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v21.handlebars');
+
+        let customTemplates = false;
+        for (const {options: profileOptions} of options.profiles) {
+            if (profileOptions.anki.fieldTemplates !== null) {
+                customTemplates = true;
+            }
+        }
+
+        if (customTemplates && isObject(chrome.storage)) {
+            chrome.storage.session.set({'needsCustomTemplatesWarning': true});
+            await this._createTab(chrome.runtime.getURL('/welcome.html'));
+            chrome.storage.session.set({'openedWelcomePage': true});
+        }
+
         return options;
+    }
+
+    _createTab(url) {
+        return new Promise((resolve, reject) => {
+            chrome.tabs.create({url}, (tab) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(tab);
+                }
+            });
+        });
     }
 }

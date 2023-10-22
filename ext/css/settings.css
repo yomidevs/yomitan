@@ -2167,6 +2167,13 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     display: none;
 }
 
+.warn-custom-templates-notification {
+    border: 1px solid var(--danger-color);
+}
+:root:not([data-warn-custom-templates=true]) .warn-custom-templates-notification {
+    display: none;
+}
+
 .test-anki-note-viewer-container {
     margin-top: 0.85em;
     display: flex;
