@@ -23,6 +23,11 @@
   Yomichan will sometimes need to inject stylesheets into webpages in order to
   properly display the search popup.
 
+* `offscreen` __(Manifest v3 only)_ <br>
+  Yomitan uses this permission to create a secondary backend document that has DOM access, given that Manifest v3
+  service workers do not. Service workers can then reach out to out to this document in order to complete
+  actions that require access to DOM APIs, such as any that require clipboard access.
+
 * `clipboardWrite` <br>
   Yomichan supports simulating the `Ctrl+C` (copy to clipboard) keyboard shortcut
   when a definitions popup is open and focused.

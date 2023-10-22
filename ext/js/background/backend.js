@@ -57,12 +57,21 @@ class Backend {
         });
         this._anki = new AnkiConnect();
         this._mecab = new Mecab();
-        this._clipboardReader = new ClipboardReader({
-            // eslint-disable-next-line no-undef
-            document: (typeof document === 'object' && document !== null ? document : null),
-            pasteTargetSelector: '#clipboard-paste-target',
-            richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
-        });
+
+        if (!chrome.offscreen) {
+            this._clipboardReader = new ClipboardReader({
+                // eslint-disable-next-line no-undef
+                document: (typeof document === 'object' && document !== null ? document : null),
+                pasteTargetSelector: '#clipboard-paste-target',
+                richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
+            });
+        } else {
+            this._clipboardReader = {
+                getText: this._getTextOffscreen.bind(this),
+                getImage: this._getImageOffscreen.bind(this)
+            };
+        }
+
         this._clipboardMonitor = new ClipboardMonitor({
             japaneseUtil: this._japaneseUtil,
             clipboardReader: this._clipboardReader
@@ -96,6 +105,8 @@ class Backend {
         this._logErrorLevel = null;
         this._permissions = null;
         this._permissionsUtil = new PermissionsUtil();
+
+        this._creatingOffscreen = null;
 
         this._messageHandlers = new Map([
             ['requestBackendReadySignal',    {async: false, contentScript: true,  handler: this._onApiRequestBackendReadySignal.bind(this)}],
@@ -218,6 +229,9 @@ class Backend {
 
             await this._requestBuilder.prepare();
             await this._environment.prepare();
+            if (chrome.offscreen) {
+                await this._setupOffscreenDocument();
+            }
             this._clipboardReader.browser = this._environment.getInfo().browser;
 
             try {
@@ -1610,6 +1624,20 @@ class Backend {
         return await (json ? response.json() : response.text());
     }
 
+    _sendMessagePromise(...args) {
+        return new Promise((resolve, reject) => {
+            const callback = (response) => {
+                try {
+                    resolve(this._getMessageResponseResult(response));
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            chrome.runtime.sendMessage(...args, callback);
+        });
+    }
+
     _sendMessageIgnoreResponse(...args) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
         chrome.runtime.sendMessage(...args, callback);
@@ -2220,6 +2248,14 @@ class Backend {
         return results;
     }
 
+    async _getTextOffscreen(useRichText) {
+        return this._sendMessagePromise({action: 'clipboardGetTextOffscreen', params: {useRichText}});
+    }
+
+    async _getImageOffscreen() {
+        return this._sendMessagePromise({action: 'clipboardGetImageOffscreen'});
+    }
+
     _onApiOpenCrossFramePort({targetTabId, targetFrameId}, sender) {
         const sourceTabId = (sender && sender.tab ? sender.tab.id : null);
         if (typeof sourceTabId !== 'number') {
@@ -2261,5 +2297,37 @@ class Backend {
         targetPort.onDisconnect.addListener(cleanup);
 
         return {targetTabId, targetFrameId};
+    }
+
+    // https://developer.chrome.com/docs/extensions/reference/offscreen/
+    async _setupOffscreenDocument() {
+        if (await this._hasOffscreenDocument()) {
+            return;
+        }
+        if (this._creatingOffscreen) {
+            await this._creatingOffscreen;
+            return;
+        }
+
+        this._creatingOffscreen = chrome.offscreen.createDocument({
+            url: 'offscreen.html',
+            reasons: ['CLIPBOARD'],
+            justification: 'Access to the clipboard'
+        });
+        await this._creatingOffscreen;
+        this._creatingOffscreen = null;
+    }
+    async _hasOffscreenDocument() {
+        const offscreenUrl = chrome.runtime.getURL('offscreen.html');
+        if (!chrome.runtime.getContexts) { // chrome version <116
+            const matchedClients = await clients.matchAll();
+            return await matchedClients.some((client) => client.url === offscreenUrl);
+        }
+
+        const contexts = await chrome.runtime.getContexts({
+            contextTypes: ['OFFSCREEN_DOCUMENT'],
+            documentUrls: [offscreenUrl]
+        });
+        return !!contexts.length;
     }
 }

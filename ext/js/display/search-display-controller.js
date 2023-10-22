@@ -44,7 +44,7 @@ class SearchDisplayController {
         this._clipboardMonitor = new ClipboardMonitor({
             japaneseUtil,
             clipboardReader: {
-                getText: async () => (await yomichan.api.clipboardGet())
+                getText: yomichan.api.clipboardGet.bind(yomichan.api)
             }
         });
         this._messageHandlers = new Map();
