@@ -275,6 +275,9 @@
             ],
             "excludeFiles": [
                 "sw.js",
+                "offscreen.html",
+                "js/background/offscreen.js",
+                "js/background/offscreen-main.js",
                 "js/dom/simple-dom-parser.js",
                 "lib/parse5.js"
             ]
@@ -323,6 +326,9 @@
             ],
             "excludeFiles": [
                 "sw.js",
+                "offscreen.html",
+                "js/background/offscreen.js",
+                "js/background/offscreen-main.js",
                 "js/dom/simple-dom-parser.js",
                 "lib/parse5.js"
             ]
