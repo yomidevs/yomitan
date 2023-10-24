@@ -114,6 +114,7 @@ class OptionsUtil {
 
         if (typeof options !== 'undefined') {
             options = await this.update(options);
+            await this.save(options);
         } else {
             options = this.getDefault();
         }
