@@ -4,7 +4,7 @@
             "updates": [
                 {
                     "version": "",
-                    "update_link": ""
+                    "update_link": "https://github.com/themoeway/yomitan/releases/download/23.10.24.0/yomitan-firefox-dev.xpi"
                 }
             ]
         }
