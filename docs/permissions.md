@@ -9,8 +9,13 @@
   `unlimitedStorage` is used to help prevent web browsers from unexpectedly
   deleting dictionary data.
 
-* `webRequest` and `webRequestBlocking` _(Firefox only)_ <br>
-  Yomichan uses these permissions to ensure certain requests have valid and secure headers.
+* `webRequest` <br>
+  Yomichan uses this permission to collect audio or create Anki notes using
+  [AnkiConnect](https://ankiweb.net/shared/info/2055492159).
+  It is also required to surface error information from failed requests.
+
+* `webRequestBlocking` _(Firefox only)_ <br>
+  Yomichan uses this permission to ensure certain requests have valid and secure headers.
   This sometimes involves removing or changing the `Origin` request header,
   as this can be used to fingerprint browser configuration.
 
