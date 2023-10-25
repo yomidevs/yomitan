@@ -81,6 +81,7 @@
             "clipboardWrite",
             "unlimitedStorage",
             "declarativeNetRequest",
+            "webRequest",
             "scripting",
             "offscreen"
         ],
@@ -246,15 +247,6 @@
                     ],
                     "items": [
                         "nativeMessaging"
-                    ]
-                },
-                {
-                    "action": "add",
-                    "path": [
-                        "permissions"
-                    ],
-                    "items": [
-                        "webRequest"
                     ]
                 },
                 {
