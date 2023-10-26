@@ -129,8 +129,6 @@ language is not English, you may consider also importing the English version for
   - [jmdict_swedish.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_swedish.zip)
 - **[JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese names)
   - [jmnedict.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmnedict.zip)
-- **KireiCake (upstream project dead)** (Japanese slang)
-  - [kireicake.zip](https://github.com/themoeway/yomitan/raw/dictionaries/kireicake.zip)
 - **[KANJIDIC](http://nihongo.monash.edu/kanjidic2/index.html)** (Japanese kanji)
   - [kanjidic_english.zip](https://github.com/themoeway/yomitan/raw/dictionaries/kanjidic_english.zip)
   - [kanjidic_french.zip](https://github.com/themoeway/yomitan/raw/dictionaries/kanjidic_french.zip)
