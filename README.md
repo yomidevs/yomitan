@@ -111,7 +111,8 @@ form (e.g. `{{set "key" "value"}}`). The default templates and helper documentat
 
 There are several free Japanese dictionaries available for Yomitan, with two of them having glossaries available in
 different languages. You must download and import the dictionaries you wish to use in order to enable Yomitan
-definition lookups. If you have proprietary EPWING dictionaries that you would like to use, check the [Yomitan Import](https://github.com/themoeway/yomitan-import) page to learn how to convert and import them into Yomitan.
+definition lookups. If you have proprietary EPWING dictionaries that you would like to use, check the [Yomitan
+Import](https://github.com/themoeway/yomitan-import) page to learn how to convert and import them into Yomitan.
 
 Be aware that the non-English dictionaries contain fewer entries than their English counterparts. Even if your primary
 language is not English, you may consider also importing the English version for better coverage.
