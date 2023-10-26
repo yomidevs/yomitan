@@ -47,10 +47,10 @@ class PersistentStorageController {
     _onPersistentStorageCheckboxChange(e) {
         const node = e.currentTarget;
         if (node.checked) {
-            node.checked = false;
+            node.checked = true;
             this._attemptPersistStorage();
         } else {
-            node.checked = true;
+            node.checked = false;
         }
     }
 
