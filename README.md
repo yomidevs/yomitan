@@ -138,8 +138,6 @@ language is not English, you may consider also importing the English version for
   - [kanjidic_spanish.zip](https://github.com/themoeway/yomitan/raw/dictionaries/kanjidic_spanish.zip)
 - **[Innocent Corpus](https://web.archive.org/web/20190309073023/https://forum.koohii.com/thread-9459.html#pid168613)** (Term and kanji frequencies across 5000+ novels)
   - [innocent_corpus.zip](https://github.com/themoeway/yomitan/raw/dictionaries/innocent_corpus.zip)
-- **[Kanjium](https://github.com/mifunetoshiro/kanjium)** (Pitch dictionary, see [related project page](https://github.com/toasted-nutbread/yomichan-pitch-accent-dictionary) for details)
-  - [kanjium_pitch_accents.zip](https://github.com/themoeway/yomitan/raw/dictionaries/kanjium_pitch_accents.zip)
 
 ## Basic Usage
 
