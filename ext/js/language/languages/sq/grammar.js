@@ -50,7 +50,8 @@ window.languages.sq.getDeinflectionReasons = async () => {
             suffixInflection('n', '', [], ['noun'])
         ]],
         ['plural', [
-            suffixInflection('e', '', [], ['noun'])
+            suffixInflection('e', '', [], ['noun']),
+            suffixInflection('t', '', [], ['noun']) // pijet
         ]],
         // Verbs
         [['present', 'indicative', 'second-person', 'singular'], [
@@ -142,6 +143,7 @@ window.languages.sq.getDeinflectionReasons = async () => {
             suffixInflection('uan', 'oj', [], ['verb']), // ndihmuan
             suffixInflection('uan', 'uaj', [], ['verb']), // paguan
             suffixInflection('në', 'j', [], ['verb']), // fshinë
+            suffixInflection('ye', 'ej', [], ['verb']), // u kthye ?
             conjugationIISuffixInflection('ën', '', [], ['verb']) // vendosën, hapën
         ]],
         [['imperative', 'second-person', 'singular', 'present'], [
@@ -156,7 +158,8 @@ window.languages.sq.getDeinflectionReasons = async () => {
         ['participle', [
             suffixInflection('uar', 'oj', [], ['verb']),
             suffixInflection('ur', '', [], ['verb']),
-            suffixInflection('rë', 'j', [], ['verb']) // fshirë
+            suffixInflection('rë', 'j', [], ['verb']), // fshirë,
+            suffixInflection('yer', 'ej', [], ['verb']) // shkëlqyer
         ]],
         ['mediopassive', [
             suffixInflection('hem', 'h', ['verb'], ['verb']),
@@ -179,6 +182,11 @@ window.languages.sq.getDeinflectionReasons = async () => {
         ]],
         [['optative', 'third-person', 'plural', 'present'], [
             suffixInflection('fshin', 'j', [], ['verb']) // ndihmofshin
+        ]],
+        [['noun'], [
+            suffixInflection('im', 'oj', [], ['verb']), // gëzim, zbulim
+            suffixInflection('im', 'ej', [], ['verb']), // përkthim
+            suffixInflection('je', '', [], ['verb']) // lëvizje
         ]]
     ]);
 };
