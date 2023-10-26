@@ -51,6 +51,19 @@ window.languages.ru.textTransformations = [
                 .replace(/е/g, 'ё');
         }
     },
+    {
+        id: 'removeDiacritics',
+        name: 'Remove diacritics',
+        description: 'A\u0301 → A, a\u0301 → a',
+        options: {
+            false: 'Disabled',
+            true: 'Enabled',
+            variant: 'Use both variants'
+        },
+        transform: (text) => {
+            return text.replace(/\u0301/g, '');
+        }
+    },
     decapitalize,
     capitalizeFirstLetter
 ];
