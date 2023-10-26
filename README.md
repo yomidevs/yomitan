@@ -26,7 +26,7 @@ Yomitan provides advanced features not available in other browser-based dictiona
 - On-demand audio playback for select dictionary definitions.
 - Kanji stroke order diagrams are just a click away for most characters.
 - Custom search page for easily executing custom search queries.
-- Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via the [Yomichan Import](https://foosoft.net/projects/yomichan-import) tool.
+- Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via the [Yomitan Import](https://github.com/themoeway/yomitan-import) tool.
 - Automatic note creation for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 - Clean, modern code makes it easy for developers to [contribute](https://github.com/themoeway/yomitan/blob/master/CONTRIBUTING.md) new features.
 
@@ -39,6 +39,8 @@ Yomitan provides advanced features not available in other browser-based dictiona
 
 - [Installation](#installation)
 - [Migrating from Yomichan](#migrating-from-yomichan)
+  - [Exporting Data](#exporting-data)
+  - [Custom Templates](#custom-templates)
 - [Dictionaries](#dictionaries)
 - [Basic Usage](#basic-usage)
   - [Importing Dictionaries](#importing-dictionaries)
@@ -109,8 +111,8 @@ form (e.g. `{{set "key" "value"}}`). The default templates and helper documentat
 
 There are several free Japanese dictionaries available for Yomitan, with two of them having glossaries available in
 different languages. You must download and import the dictionaries you wish to use in order to enable Yomitan
-definition lookups. If you have proprietary EPWING dictionaries that you would like to use, check the [Yomichan
-Import](https://foosoft.net/projects/yomichan-import) page to learn how to convert and import them into Yomitan.
+definition lookups. If you have proprietary EPWING dictionaries that you would like to use, check the [Yomitan
+Import](https://github.com/themoeway/yomitan-import) page to learn how to convert and import them into Yomitan.
 
 Be aware that the non-English dictionaries contain fewer entries than their English counterparts. Even if your primary
 language is not English, you may consider also importing the English version for better coverage.
@@ -205,8 +207,8 @@ similar to the ones pictured below. These dictionaries are often sought after by
 and excellent coverage of the Japanese language.
 
 Unfortunately, as most of the dictionaries released in this format are proprietary, they are unable to be bundled with
-Yomitan. Instead, you will need to procure these dictionaries yourself and import them using [Yomichan
-Import](https://foosoft.net/projects/yomichan-import). Check the project page for additional details.
+Yomitan. Instead, you will need to procure these dictionaries yourself and import them using [Yomitan
+Import](https://github.com/themoeway/yomitan-import). Check the project page for additional details.
 
 ![Pocket EPWING dictionaries](img/epwing-devices.jpg)
 
