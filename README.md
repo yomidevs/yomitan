@@ -39,6 +39,8 @@ Yomitan provides advanced features not available in other browser-based dictiona
 
 - [Installation](#installation)
 - [Migrating from Yomichan](#migrating-from-yomichan)
+  - [Exporting Data](#exporting-data)
+  - [Custom Templates](#custom-templates)
 - [Dictionaries](#dictionaries)
 - [Basic Usage](#basic-usage)
   - [Importing Dictionaries](#importing-dictionaries)
@@ -94,12 +96,12 @@ Due to security concerns, an alternate implementation of Handlebars is being use
 This revealed a bug in four of Yomitan's template helpers, which have now been fixed in the default templates. If your
 custom templates use the following helpers, please ensure their use matches the corrected forms.
 
-Helper | Example | Corrected
--------|---------|----------
-`formatGlossary` | `{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}` | `{{formatGlossary ../dictionary .}}`
-`furigana` | `{{#furigana}}{{{definition}}}{{/furigana}}` | `{{furigana definition}}`
-`furiganaPlain` | `{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}` | `{{~furiganaPlain .~}}`
-`dumpObject` | `{{#dumpObject}}{{{.}}}{{/dumpObject}}` | `{{dumpObject .}}`
+| Helper           | Example                                                       | Corrected                            |
+| ---------------- | ------------------------------------------------------------- | ------------------------------------ |
+| `formatGlossary` | `{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}` | `{{formatGlossary ../dictionary .}}` |
+| `furigana`       | `{{#furigana}}{{{definition}}}{{/furigana}}`                  | `{{furigana definition}}`            |
+| `furiganaPlain`  | `{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}`               | `{{~furiganaPlain .~}}`              |
+| `dumpObject`     | `{{#dumpObject}}{{{.}}}{{/dumpObject}}`                       | `{{dumpObject .}}`                   |
 
 Authors of custom templates may be interested to know that other helpers previously used and documented in the block
 form (e.g. `{{#set "key" "value"}}{{/set}}`), while not broken by this change, may also be replaced with the less verbose
