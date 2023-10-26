@@ -112,6 +112,8 @@ class Translator {
             if (pronunciations.length > 1) { this._sortTermDictionaryEntrySimpleData(pronunciations); }
         }
 
+        console.log(dictionaryEntries);
+
         return {dictionaryEntries, originalTextLength};
     }
 
@@ -311,6 +313,7 @@ class Translator {
         deinflections.forEach((deinflection) => {
             const {databaseEntries} = deinflection;
             databaseEntries.forEach((entry) => {
+                console.log(entry);
                 const {definitionTags, term, formOf, inflectionHypotheses}  = entry;
                 if (definitionTags.includes('non-lemma')) {
                     const lemma = formOf || '';

@@ -1054,6 +1054,7 @@ export class Backend {
     }
 
     _onChangedLanguage(options) {
+        console.log('onchangedlanguage options', options);
         const {language} = options.general;
         if (!options.languages[language]) {
             this._modifySetting({
