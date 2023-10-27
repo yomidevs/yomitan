@@ -36,10 +36,17 @@ class TextTransformationsController {
     async _onOptionsChanged({options}) {
         if (options.general.language !== this._language) {
             this._language = options.general.language;
+
+            const settingsItems = document.querySelectorAll('.text-transformation');
+            settingsItems.forEach((transformation) => {
+                transformation.remove();
+            });
+
             this._transformations = await yomichan.api.getTextTransformations(this._language);
             this._transformations.forEach((transformation) => {
                 const settingsItem = document.createElement('div');
                 settingsItem.classList.add('settings-item');
+                settingsItem.classList.add('text-transformation');
 
                 const innerWrappableDiv = document.createElement('div');
                 innerWrappableDiv.classList.add('settings-item-inner', 'settings-item-inner-wrappable');
