@@ -73,7 +73,8 @@
                             "sentenceParsing",
                             "inputs",
                             "clipboard",
-                            "accessibility"
+                            "accessibility",
+                            "languages"
                         ],
                         "properties": {
                             "general": {
@@ -118,7 +119,8 @@
                                     "frequencyDisplayMode",
                                     "termDisplayMode",
                                     "sortFrequencyDictionary",
-                                    "sortFrequencyDictionaryOrder"
+                                    "sortFrequencyDictionaryOrder",
+                                    "language"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -670,14 +672,6 @@
                                         "minimum": 1,
                                         "default": 16
                                     },
-                                    "searchResolution": {
-                                        "type": "string",
-                                        "enum": [
-                                            "letter",
-                                            "word"
-                                        ],
-                                        "default": "letter"
-                                    },
                                     "deepDomScan": {
                                         "type": "boolean",
                                         "default": false
@@ -730,9 +724,18 @@
                                 "type": "object",
                                 "required": [
                                     "collapseEmphaticSequences",
-                                    "textReplacements"
+                                    "textReplacements",
+                                    "searchResolution"
                                 ],
                                 "properties": {
+                                    "searchResolution": {
+                                        "type": "string",
+                                        "enum": [
+                                            "letter",
+                                            "word"
+                                        ],
+                                        "default": "letter"
+                                    },
                                     "collapseEmphaticSequences": {
                                         "type": "string",
                                         "enum": ["false", "true", "full"],
@@ -808,6 +811,11 @@
                                                 "default": "false"
                                             }
                                         }
+                                    }
+                                },
+                                "default": {
+                                    "ja": {
+                                      "textTransformations": {}
                                     }
                                 }
                             },

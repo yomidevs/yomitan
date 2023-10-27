@@ -1054,7 +1054,6 @@ export class Backend {
     }
 
     _onChangedLanguage(options) {
-        console.log('onchangedlanguage options', options);
         const {language} = options.general;
         if (!options.languages[language]) {
             this._modifySetting({
@@ -2100,8 +2099,8 @@ export class Backend {
                 language
             },
             scanning: {alphanumeric},
-            parsing: {searchResolution},
             translation: {
+                searchResolution,
                 collapseEmphaticSequences,
                 textReplacements: textReplacementsOptions,
                 deinflectionSource,

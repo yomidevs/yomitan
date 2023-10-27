@@ -424,7 +424,7 @@ class OptionsUtil {
             options = (async ? await result : result);
         }
 
-        options.version = 20;
+        options.version = targetVersion;
         return options;
     }
 
@@ -981,13 +981,7 @@ class OptionsUtil {
     _updateVersion21(options) {
         // Version 21 changes:
         //  Added languages
-        for (const profile of options.profiles) {
-            if (!profile.options.languages){
-                profile.options.languages = {
-                    'ja': {}
-                };
-            }
-        }
+        console.log('Updating to version 21');
 
         return options;
     }
