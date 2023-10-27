@@ -170,7 +170,7 @@ class AnkiNoteDataCreator {
         if (dictionaryEntry.type === 'term') {
             for (const {dictionary, pronunciations} of DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry)) {
                 const pitches = [];
-                const pitchAccentPronunciations = pronunciations.filter((type) => type === 'pitch-accent');
+                const pitchAccentPronunciations = pronunciations.filter(({type}) => type === 'pitch-accent');
                 for (const {terms, reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings, type} of pitchAccentPronunciations) {
                     pitches.push({
                         expressions: terms,

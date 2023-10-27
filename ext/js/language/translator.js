@@ -112,8 +112,6 @@ class Translator {
             if (pronunciations.length > 1) { this._sortTermDictionaryEntrySimpleData(pronunciations); }
         }
 
-        console.log(dictionaryEntries);
-
         return {dictionaryEntries, originalTextLength};
     }
 
