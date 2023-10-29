@@ -9,12 +9,7 @@
   `unlimitedStorage` is used to help prevent web browsers from unexpectedly
   deleting dictionary data.
 
-* `webRequest` and `webRequestBlocking` _(Firefox only)_ <br>
-  Yomichan uses these permissions to ensure certain requests have valid and secure headers.
-  This sometimes involves removing or changing the `Origin` request header,
-  as this can be used to fingerprint browser configuration.
-
-* `declarativeNetRequest` _(Chrome only)_ <br>
+* `declarativeNetRequest` <br>
   Yomichan uses this permission to ensure certain requests have valid and secure headers.
   This sometimes involves removing or changing the `Origin` request header,
   as this can be used to fingerprint browser configuration.

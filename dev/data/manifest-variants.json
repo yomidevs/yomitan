@@ -249,31 +249,6 @@
                     ]
                 },
                 {
-                    "action": "add",
-                    "path": [
-                        "permissions"
-                    ],
-                    "items": [
-                        "webRequest"
-                    ]
-                },
-                {
-                    "action": "add",
-                    "path": [
-                        "permissions"
-                    ],
-                    "items": [
-                        "webRequestBlocking"
-                    ]
-                },
-                {
-                    "action": "remove",
-                    "path": [
-                        "permissions"
-                    ],
-                    "item": "declarativeNetRequest"
-                },
-                {
                     "action": "remove",
                     "path": [
                         "permissions"
