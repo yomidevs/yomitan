@@ -263,7 +263,7 @@ class RequestBuilder {
     async _clearDynamicRules() {
         if (!isObject(chrome.declarativeNetRequest)) { return; }
 
-        const rules = this._getDynamicRules();
+        const rules = await this._getDynamicRules();
 
         if (rules.length === 0) { return; }
 
