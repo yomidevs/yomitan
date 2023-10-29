@@ -31,8 +31,9 @@ class Environment {
     }
 
     async _loadEnvironmentInfo() {
-        const browser = await this._getBrowser();
         const os = await this._getOperatingSystem();
+        const browser = await this._getBrowser(os);
+
         return {
             browser,
             platform: {os}
@@ -64,7 +65,7 @@ class Environment {
         });
     }
 
-    async _getBrowser() {
+    async _getBrowser(os) {
         try {
             if (chrome.runtime.getURL('/').startsWith('ms-browser-extension://')) {
                 return 'edge-legacy';
@@ -76,16 +77,11 @@ class Environment {
             // NOP
         }
         if (typeof browser !== 'undefined') {
-            try {
-                const info = await browser.runtime.getBrowserInfo();
-                if (info.name === 'Fennec') {
-                    return 'firefox-mobile';
-                }
-            } catch (e) {
-                // NOP
-            }
             if (this._isSafari()) {
                 return 'safari';
+            }
+            if (os === 'android') {
+                return 'firefox-mobile';
             }
             return 'firefox';
         } else {

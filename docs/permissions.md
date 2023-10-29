@@ -27,15 +27,14 @@
   Yomichan supports simulating the `Ctrl+C` (copy to clipboard) keyboard shortcut
   when a definitions popup is open and focused.
 
-* `clipboardRead` (optional) <br>
+* `clipboardRead` _(optional)_ <br>
   Yomichan supports automatically opening a search window when Japanese text is copied to the clipboard
   while the browser is running, depending on how certain settings are configured.
   This allows Yomichan to support scanning text from external applications, provided there is a way
   to copy text from those applications to the clipboard.
 
-* `nativeMessaging` (optional on Chrome) <br>
+* `nativeMessaging` _(optional, unavailable on Firefox for Android)_ <br>
   Yomichan has the ability to communicate with an optional native messaging component in order to support
   parsing large blocks of Japanese text using
   [MeCab](https://en.wikipedia.org/wiki/MeCab).
   The installation of this component is optional and is not included by default.
-  This permission is optional on Chrome, but required on Firefox, because Firefox does not permit it to be optional.
