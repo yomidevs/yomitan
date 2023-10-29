@@ -42,6 +42,7 @@ class RequestBuilder {
     async prepare() {
         try {
             await this._clearDynamicRules();
+            await this._clearSessionRules();
         } catch (e) {
             // NOP
         }
@@ -260,6 +261,21 @@ class RequestBuilder {
         }
     }
 
+    async _clearSessionRules() {
+        if (!isObject(chrome.declarativeNetRequest)) { return; }
+
+        const rules = await this._getSessionRules();
+
+        if (rules.length === 0) { return; }
+
+        const removeRuleIds = [];
+        for (const {id} of rules) {
+            removeRuleIds.push(id);
+        }
+
+        await this._updateSessionRules({removeRuleIds});
+    }
+
     async _clearDynamicRules() {
         if (!isObject(chrome.declarativeNetRequest)) { return; }
 
@@ -311,15 +327,41 @@ class RequestBuilder {
                 }
             }];
 
-            await this._updateDynamicRules({addRules});
+            await this._updateSessionRules({addRules});
             try {
                 return await fetch(url, init);
             } finally {
-                await this._tryUpdateDynamicRules({removeRuleIds: [id]});
+                await this._tryUpdateSessionRules({removeRuleIds: [id]});
             }
         } finally {
             this._ruleIds.delete(id);
         }
+    }
+
+    _getSessionRules() {
+        return new Promise((resolve, reject) => {
+            chrome.declarativeNetRequest.getSessionRules((result) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+    }
+
+    _updateSessionRules(options) {
+        return new Promise((resolve, reject) => {
+            chrome.declarativeNetRequest.updateSessionRules(options, () => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve();
+                }
+            });
+        });
     }
 
     _getDynamicRules() {
@@ -348,9 +390,9 @@ class RequestBuilder {
         });
     }
 
-    async _tryUpdateDynamicRules(options) {
+    async _tryUpdateSessionRules(options) {
         try {
-            await this._updateDynamicRules(options);
+            await this._updateSessionRules(options);
             return true;
         } catch (e) {
             return false;
