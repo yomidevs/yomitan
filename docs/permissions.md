@@ -9,13 +9,8 @@
   `unlimitedStorage` is used to help prevent web browsers from unexpectedly
   deleting dictionary data.
 
-* `webRequest` <br>
-  Yomichan uses this permission to collect audio or create Anki notes using
-  [AnkiConnect](https://ankiweb.net/shared/info/2055492159).
-  It is also required to surface error information from failed requests.
-
-* `webRequestBlocking` _(Firefox only)_ <br>
-  Yomichan uses this permission to ensure certain requests have valid and secure headers.
+* `webRequest` and `webRequestBlocking` _(Firefox only)_ <br>
+  Yomichan uses these permissions to ensure certain requests have valid and secure headers.
   This sometimes involves removing or changing the `Origin` request header,
   as this can be used to fingerprint browser configuration.
 
@@ -24,11 +19,11 @@
   This sometimes involves removing or changing the `Origin` request header,
   as this can be used to fingerprint browser configuration.
 
-* `scripting` _(Manifest V3 only)_ <br>
-  Yomichan will sometimes need to inject stylesheets into webpages in order to
+* `scripting` <br>
+  Yomichan needs to inject content scripts and stylesheets into webpages in order to
   properly display the search popup.
 
-* `offscreen` __(Chrome only)_ <br>
+* `offscreen` _(Chrome only)_ <br>
   Yomitan uses this permission to create a secondary backend document that has DOM access, given that Manifest v3
   service workers do not. Service workers can then reach out to out to this document in order to complete
   actions that require access to DOM APIs, such as any that require clipboard access.
