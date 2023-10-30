@@ -230,7 +230,8 @@ class DictionaryImportController {
         const profileCount = optionsFull.profiles.length;
         for (let i = 0; i < profileCount; ++i) {
             const {options} = optionsFull.profiles[i];
-            const value = DictionaryController.createDefaultDictionarySettings(title, true);
+            const enabled = i === optionsFull.profileCurrent;
+            const value = DictionaryController.createDefaultDictionarySettings(title, enabled);
             const path1 = `profiles[${i}].options.dictionaries`;
             targets.push({action: 'push', path: path1, items: [value]});
 
