@@ -171,21 +171,12 @@ class Database {
             const objectStoreOrIndex = indexName !== null ? objectStore.index(indexName) : objectStore;
 
             const onGetKeys = (keys) => {
-                // splitting the deletion into batches to help with extension crashing on large dictionaries
-                // may require mulitple delete attempts
-                transaction.commit();
                 try {
                     if (typeof filterKeys === 'function') {
                         keys = filterKeys(keys);
                     }
-                    const batchSize = 100000;
-                    for (let i=0; i*batchSize < keys.length; i += 1) {
-                        const transaction2 = this._readWriteTransaction([objectStoreName], resolve, reject);
-                        const objectStore2 = transaction2.objectStore(objectStoreName);
-                        const batchKeys = keys.slice(i*batchSize, (i+1)*batchSize);
-                        this._bulkDeleteInternal(objectStore2, batchKeys, onProgress);
-                        transaction2.commit();
-                    }
+                    this._bulkDeleteInternal(objectStore, keys, onProgress);
+                    transaction.commit();
                 } catch (e) {
                     reject(e);
                 }
