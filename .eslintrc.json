@@ -461,6 +461,8 @@
         },
         {
             "files": [
+                "integration.spec.js",
+                "playwright-util.js",
                 "visual.spec.js"
             ],
             "env": {

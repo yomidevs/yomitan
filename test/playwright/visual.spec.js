@@ -16,40 +16,20 @@
  */
 
 const path = require('path');
-const {test: base, chromium} = require('@playwright/test');
-const root = path.join(__dirname, '..', '..');
 
-export const test = base.extend({
-    context: async ({ }, use) => {
-        const pathToExtension = path.join(root, 'ext');
-        const context = await chromium.launchPersistentContext('', {
-            // headless: false,
-            args: [
-                '--headless=new',
-                `--disable-extensions-except=${pathToExtension}`,
-                `--load-extension=${pathToExtension}`
-            ]
-        });
-        await use(context);
-        await context.close();
-    },
-    extensionId: async ({context}, use) => {
-        let [background] = context.serviceWorkers();
-        if (!background) {
-            background = await context.waitForEvent('serviceworker');
-        }
+const {
+    test,
+    expect,
+    root
+} = require('./playwright-util');
 
-        const extensionId = background.url().split('/')[2];
-        await use(extensionId);
-    }
-});
-const expect = test.expect;
-
-test('visual', async ({context, page, extensionId}) => {
+test.beforeEach(async ({context}) => {
     // wait for the on-install welcome.html tab to load, which becomes the foreground tab
     const welcome = await context.waitForEvent('page');
     welcome.close(); // close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
+});
 
+test('visual', async ({page, extensionId}) => {
     // open settings
     await page.goto(`chrome-extension://${extensionId}/settings.html`);
 

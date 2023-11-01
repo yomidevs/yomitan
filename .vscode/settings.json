@@ -3,5 +3,8 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
     },
-    "eslint.format.enable": true
+    "eslint.format.enable": true,
+    "playwright.env": {
+        "PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS": 1
+    }
 }
