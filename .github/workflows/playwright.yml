@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install CJK fonts
-        uses: awalsh128/cache-apt-pkgs-action@1850ee53f6e706525805321a3f2f863dcf73c962 # v1.3.0
+        uses: awalsh128/cache-apt-pkgs-action@44c33b32f808cdddd5ac0366d70595ed63661ed8 # v1.3.1
         with:
           packages: fonts-ipafont-mincho
           execute_install_scripts: true
