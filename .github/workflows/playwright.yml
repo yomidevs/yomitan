@@ -9,6 +9,8 @@ jobs:
   playwright:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    env:
+      PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS: 1
     steps:
       - name: Remove all fonts
         run: rm -rf /usr/share/fonts
@@ -66,8 +68,6 @@ jobs:
 
       - name: "[PR] Generate new screenshots & compare against master"
         id: playwright
-        env:
-          PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS: 1
         run: |
           npx playwright test 2>&1 | tee ./playwright-output || true
         continue-on-error: true
