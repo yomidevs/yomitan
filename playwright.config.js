@@ -62,8 +62,18 @@ module.exports = defineConfig({
     /* Configure projects for major browsers */
     projects: [
         {
+            name: 'playwright setup',
+            testMatch: /global\.setup\.js/,
+            teardown: 'playwright teardown'
+        },
+        {
+            name: 'playwright teardown',
+            testMatch: /global\.teardown\.js/
+        },
+        {
             name: 'chromium',
-            use: {...devices['Desktop Chrome']}
+            use: {...devices['Desktop Chrome']},
+            dependencies: ['playwright setup']
         }
 
         // {

@@ -171,6 +171,27 @@
             ]
         },
         {
+            "name": "chrome-playwright",
+            "inherit": "chrome-dev",
+            "fileName": "yomitan-chrome-playwright.zip",
+            "modifications": [
+                {
+                    "action": "remove",
+                    "path": [
+                        "optional_permissions"
+                    ],
+                    "item": "clipboardRead"
+                },
+                {
+                    "action": "add",
+                    "path": [
+                        "permissions"
+                    ],
+                    "items": ["clipboardRead"]
+                }
+            ]
+        },
+        {
             "name": "firefox",
             "inherit": "base",
             "fileName": "yomitan-firefox.zip",
