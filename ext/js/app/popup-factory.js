@@ -269,7 +269,6 @@ class PopupFactory {
             sourceRect.bottom += offset.y;
         }
 
-        console.log('PopupFactory._onApiShowContent() details:', details);
         return await popup.showContent(details, displayDetails);
     }
 

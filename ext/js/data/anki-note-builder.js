@@ -47,7 +47,6 @@ class AnkiNoteBuilder {
         compactTags=false,
         mediaOptions=null
     }) {
-        // console.log('anki-note-builder.js::createNote fields', fields);
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
         if (duplicateScope === 'deck-root') {
@@ -76,7 +75,6 @@ class AnkiNoteBuilder {
         }
 
         const formattedFieldValues = await Promise.all(formattedFieldValuePromises);
-        // console.log('anki-note-builder.js::createNote formattedFieldValues', formattedFieldValues);
         const uniqueRequirements = new Map();
         const noteFields = {};
         for (let i = 0, ii = fields.length; i < ii; ++i) {
@@ -107,7 +105,6 @@ class AnkiNoteBuilder {
             }
         };
 
-        // console.log('anki-note-builder.js::createNote', note);
         return {note, errors: allErrors, requirements: [...uniqueRequirements.values()]};
     }
 
@@ -166,17 +163,11 @@ class AnkiNoteBuilder {
     }
 
     async _formatField(field, commonData, template) {
-        // console.log('anki-note-builder.js::_formatField', field);
-        // console.log(commonData); // some object
-        // console.log(template); // long html
-
         const errors = [];
         const requirements = [];
         const value = await this._stringReplaceAsync(field, this._markerPattern, async (g0, marker) => {
             try {
-                // console.log('anki-note-builder.js::_formatField::try', marker);
                 const {result, requirements: fieldRequirements} = await this._renderTemplateBatched(template, commonData, marker);
-                // console.log('anki-note-builder.js::_formatField::try::result', result);
                 requirements.push(...fieldRequirements);
                 return result;
             } catch (e) {
@@ -190,7 +181,6 @@ class AnkiNoteBuilder {
     }
 
     async _stringReplaceAsync(str, regex, replacer) {
-        // console.log('anki-note-builder.js::_stringReplaceAsync', str, regex);
         let match;
         let index = 0;
         const parts = [];
@@ -218,9 +208,6 @@ class AnkiNoteBuilder {
     }
 
     _renderTemplateBatched(template, commonData, marker) {
-        if (marker === 'phonetic-transcriptions'){
-            // console.log('anki-note-builder.js::_renderTemplateBatched', commonData, marker);
-        }
         const {promise, resolve, reject} = deferPromise();
         const {commonDataRequestsMap} = this._getBatchedTemplateGroup(template);
         let requests = commonDataRequestsMap.get(commonData);
@@ -293,10 +280,6 @@ class AnkiNoteBuilder {
     }
 
     async _injectMedia(dictionaryEntry, requirements, mediaOptions) {
-        // console.log('anki-note-builder.js::_injectMedia()');
-        // console.log('1', dictionaryEntry); // object similar to commondata below
-        // console.log('2', requirements);
-        // console.log('3', mediaOptions);
         const timestamp = Date.now();
 
         // Parse requirements

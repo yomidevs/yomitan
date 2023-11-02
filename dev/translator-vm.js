@@ -48,10 +48,10 @@ class TranslatorVM extends DatabaseVM {
             'js/general/regex-util.js',
             'js/general/text-source-map.js',
             'js/language/deinflector.js',
-            'js/language/sandbox/dictionary-data-util.js',
-            'js/language/dictionary-importer.js',
-            'js/language/dictionary-database.js',
-            'js/language/sandbox/japanese-util.js',
+            'js/dictionary/dictionary-data-util.js',
+            'js/dictionary/dictionary-importer.js',
+            'js/dictionary/dictionary-database.js',
+            'js/language/languages/ja/japanese-util.js',
             'js/language/translator.js',
             'js/media/media-util.js'
         ]);
@@ -94,6 +94,8 @@ class TranslatorVM extends DatabaseVM {
             japaneseUtil: this._japaneseUtil,
             database: dictionaryDatabase
         });
+
+        // should not work
         const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect_ja.json')));
         this._translator.prepare(deinflectionReasons);
 

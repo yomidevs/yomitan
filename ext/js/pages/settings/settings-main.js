@@ -45,6 +45,7 @@
  * SortFrequencyDictionaryController
  * StatusFooter
  * StorageController
+ * TextTransformationsController
  * TranslationTextReplacementsController
  */
 
@@ -55,8 +56,6 @@ async function setupGenericSettingsController(genericSettingController) {
 
 (async () => {
     try {
-        console.log('settings-main.js');
-
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 
@@ -134,6 +133,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const secondarySearchDictionaryController = new SecondarySearchDictionaryController(settingsController);
         secondarySearchDictionaryController.prepare();
+
+        const textTransformationsController = new TextTransformationsController(settingsController);
+        textTransformationsController.prepare();
 
         const translationTextReplacementsController = new TranslationTextReplacementsController(settingsController);
         translationTextReplacementsController.prepare();

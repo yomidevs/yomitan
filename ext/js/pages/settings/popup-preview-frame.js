@@ -33,6 +33,7 @@ class PopupPreviewFrame {
         this._themeChangeTimeout = null;
         this._textSource = null;
         this._optionsContext = null;
+        this._options = null;
         this._exampleText = null;
         this._exampleTextInput = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
@@ -46,10 +47,22 @@ class PopupPreviewFrame {
     }
 
     async prepare() {
+        // Overwrite API functions
+        this._apiOptionsGetOld = yomichan.api.optionsGet.bind(yomichan.api);
+        yomichan.api.optionsGet = this._apiOptionsGet.bind(this);
+        await this._getOptions();
+
+
         this._exampleText = document.querySelector('#example-text');
         this._exampleTextInput = document.querySelector('#example-text-input');
+        this._setExampleText();
 
-        if (this._exampleTextInput !== null && typeof wanakana !== 'undefined') {
+        if (
+            this._exampleTextInput !== null
+            && typeof wanakana !== 'undefined'
+            && this._options
+            && this._options.general.language === 'ja' // generalize
+        ) {
             wanakana.bind(this._exampleTextInput);
         }
 
@@ -60,10 +73,6 @@ class PopupPreviewFrame {
         this._exampleText.addEventListener('click', this._onExampleTextClick.bind(this), false);
         this._exampleTextInput.addEventListener('blur', this._onExampleTextInputBlur.bind(this), false);
         this._exampleTextInput.addEventListener('input', this._onExampleTextInputInput.bind(this), false);
-
-        // Overwrite API functions
-        this._apiOptionsGetOld = yomichan.api.optionsGet.bind(yomichan.api);
-        yomichan.api.optionsGet = this._apiOptionsGet.bind(this);
 
         // Overwrite frontend
         this._frontend = new Frontend({
@@ -92,6 +101,33 @@ class PopupPreviewFrame {
 
     // Private
 
+    async _setExampleText() {
+        const options = this._options;
+
+        const lang = options.general.language;
+
+        const example = this._getExampleText(lang);
+
+        this._exampleTextInput.lang = lang;
+        this._exampleText.lang = lang;
+
+        this._setText(example, true);
+    }
+
+    _getExampleText(lang) {
+        switch (lang) {
+            case 'de':
+                return 'gelesen';
+            case 'en':
+                return "don't read";
+            case 'ja':
+                return '読め';
+            case 'ru':
+                return 'читать';
+            case 'sq':
+                return 'ndihmojmë';
+        }
+    }
     async _apiOptionsGet(...args) {
         const options = await this._apiOptionsGetOld(...args);
         options.general.enable = true;
@@ -201,7 +237,13 @@ class PopupPreviewFrame {
         if (this._frontend === null) { return; }
         this._frontend.setOptionsContextOverride(optionsContext);
         await this._frontend.updateOptions();
-        await this._updateSearch();
+        await this._getOptions(optionsContext);
+        this._setExampleText();
+    }
+
+    async _getOptions(optionsContext = {current: true}) {
+        this._options = await yomichan.api.optionsGet(optionsContext);
+        return this._options;
     }
 
     async _updateSearch() {

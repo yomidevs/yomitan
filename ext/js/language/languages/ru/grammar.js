@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022  Yomichan Authors
+ * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,27 +16,7 @@
  */
 
 /* global
- * DictionaryWorkerHandler
- */
-
-self.importScripts(
-    '/lib/jszip.min.js',
-    '/js/core.js',
-    '/js/data/database.js',
-    '/js/data/json-schema.js',
-    '/js/general/cache-map.js',
-    '/js/language/dictionary-database.js',
-    '/js/language/dictionary-importer.js',
-    '/js/language/dictionary-worker-handler.js',
-    '/js/language/dictionary-worker-media-loader.js',
-    '/js/media/media-util.js'
-);
-
-(() => {
-    try {
-        const dictionaryWorkerHandler = new DictionaryWorkerHandler();
-        dictionaryWorkerHandler.prepare();
-    } catch (e) {
-        log.error(e);
-    }
-})();
+*/
+window.languages.ru.getDeinflectionReasons = async () => {
+    return new Map([]);
+};

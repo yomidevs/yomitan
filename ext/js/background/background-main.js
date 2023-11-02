@@ -19,6 +19,8 @@
  * Backend
  */
 
+import {Backend} from './backend.js';
+
 (() => {
     yomichan.prepare(true);
 

@@ -309,13 +309,7 @@ class OptionsUtil {
             },
 
             translation: {
-                convertHalfWidthCharacters: 'false',
-                convertNumericCharacters: 'false',
-                convertAlphabeticCharacters: 'false',
-                convertHiraganaToKatakana: 'false',
-                convertKatakanaToHiragana: 'variant',
-                collapseEmphaticSequences: 'false',
-                decapitalize: 'true',
+                collapseEmphaticSequences: 'false'
             },
 
             dictionaries: {},
@@ -455,7 +449,8 @@ class OptionsUtil {
             {async: false, update: this._updateVersion17.bind(this)},
             {async: false, update: this._updateVersion18.bind(this)},
             {async: false, update: this._updateVersion19.bind(this)},
-            {async: false, update: this._updateVersion20.bind(this)}
+            {async: false, update: this._updateVersion20.bind(this)},
+            {async: false, update: this._updateVersion21.bind(this)}
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -980,6 +975,14 @@ class OptionsUtil {
                 general.popupOuterTheme = 'light';
             }
         }
+        return options;
+    }
+
+    _updateVersion21(options) {
+        // Version 21 changes:
+        //  Added languages
+        console.log('Updating to version 21');
+
         return options;
     }
 }

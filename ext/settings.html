@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Yomichan Settings</title>
+    <title>Yezichak Settings</title>
     <link rel="flag.png" sizes="16x16">
     <link rel="flag.png" sizes="19x19">
     <link rel="flag.png" sizes="32x32">
@@ -23,6 +23,7 @@
     <div class="sidebar"><div class="sidebar-inner">
         <div class="sidebar-body">
             <a href="#!profile"          class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="profile"></span></span><span class="outline-item-label">Profile</span></a>
+            <a href="#!language"         class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="translation"></span></span><span class="outline-item-label">Language</span></a>
             <a href="#!dictionaries"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="book"></span><span class="outline-item-left-warning-badge no-dictionaries-enabled-warning" hidden><div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div></span></span><span class="outline-item-label">Dictionaries</span></a>
             <a href="#!general"          class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="cog"></span></span><span class="outline-item-label">General</span></a>
             <a href="#!scanning"         class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="scanning"></span></span><span class="outline-item-label">Scanning</span></a>
@@ -50,7 +51,7 @@
                     }'
                 ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </span><span class="outline-item-label">Advanced</span></label>
-            <a href="/info.html" class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="question-mark"></span></span><span class="outline-item-label">About Yomichan</span></a>
+            <a href="/info.html" class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="question-mark"></span></span><span class="outline-item-label">About Yezichak</span></a>
         </div>
     </div></div>
 </div>
@@ -58,7 +59,7 @@
 
     <span tabindex="-1" id="content-scroll-focus"></span>
 
-    <h1>Yomichan Settings</h1>
+    <h1>Yezichak Settings</h1>
 
     <!-- Notifications -->
     <div class="settings-group settings-group-top-margin page-loading-stalled-notification">
@@ -111,6 +112,62 @@
         </div></div>
     </div>
 
+    <!-- Language -->
+    <div class="heading-container">
+        <div class="heading-container-icon"><span class="icon" data-icon="translation"></span></div>
+        <div class="heading-container-left"><h2 id="language"><a href="#!language">Language</a></h2></div>
+    </div>
+    <div class="settings-group">
+        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Language</div>
+                <div class="settings-item-description">The language you are reading with this profile</div>
+            </div>
+            <div class="settings-item-right">
+                <select 
+                    id="language-select"
+                    data-setting="general.language"
+                >
+                    <option value="sq">Albanian</option>
+                    <option value="en">English</option>
+                    <option value="de">German</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ru">Russian</option>
+                </select>
+            </div>
+        </div></div>
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Deinflection source</div>
+                <div class="settings-item-description" lang="en">
+                    <p>
+                        Deinflect via algorithm or dictionary lookup.
+                    </p>
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <select data-setting="translation.deinflectionSource">
+                    <option value="algorithm">Algorithm 🧩</option>
+                    <option value="both">Both 📖 🧩</option>
+                    <option value="dictionary">Dictionary 📖</option>
+                </select>
+            </div>
+        </div></div>
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Part of speech filtering</div>
+                <div class="settings-item-description" lang="en">
+                    <p>
+                        Filter algorithm deinflections using part of speech tags.
+                    </p>
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" data-setting="translation.deinflectionPosFilter"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+    </div>
+
     <!-- Dictionaries -->
     <div class="heading-container">
         <div class="heading-container-icon"><span class="icon" data-icon="book"></span></div>
@@ -136,13 +193,13 @@
                     <div class="settings-item-label">Storage</div>
                     <div class="settings-item-description">
                         <span class="storage-use-invalid">
-                            Yomichan is using an indeterminate amount of storage.
+                            Yezichak is using an indeterminate amount of storage.
                         </span>
                         <span class="storage-use-finite" hidden>
-                            Yomichan is using approximately <span class="storage-usage">?</span> of <span class="storage-quota">?</span>.
+                            Yezichak is using approximately <span class="storage-usage">?</span> of <span class="storage-quota">?</span>.
                         </span>
                         <span class="storage-use-infinite" hidden>
-                            Yomichan is permitted unlimited storage.
+                            Yezichak is permitted unlimited storage.
                         </span>
                     </div>
                 </div>
@@ -167,7 +224,7 @@
             <div class="settings-item-children more" hidden>
                 <p>
                     Web browsers will sometimes clear stored data if the device is running low on storage space.
-                    This can result in the imported dictionaries being deleted unexpectedly, causing Yomichan to stop functioning.
+                    This can result in the imported dictionaries being deleted unexpectedly, causing Yezichak to stop functioning.
                     Enabling persistent storage tells the browser that the data should not be deleted in those circumstances.
                 </p>
                 <p data-show-for-browser="firefox firefox-mobile" class="storage-use-invalid" hidden>
@@ -182,7 +239,7 @@
                     It may not be possible to enable Persistent Storage on Firefox for Android.
                 </p>
                 <p data-show-for-browser="chrome edge">
-                    Chromium-based browsers should not need to enable this setting since the Yomichan extension has
+                    Chromium-based browsers should not need to enable this setting since the Yezichak extension has
                     the <code>unlimitedStorage</code> permission, which should prevent data deletion.<sup><a href="https://bugs.chromium.org/p/chromium/issues/detail?id=680392#c15" target="_blank" rel="noopener">[1]</a></sup>
                 </p>
                 <p>
@@ -572,18 +629,6 @@
             </div>
             <div class="settings-item-right">
                 <input type="number" data-setting="scanning.length" min="1" step="1">
-            </div>
-        </div></div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Dictionary search resolution</div>
-                <div class="settings-item-description" lang="en"><p>"A dog"&#x3000;&rarr;&#x3000;search for "A dog","A do", "A d", "A"</p> or <p>"A dog"&#x3000;&rarr;&#x3000;"A dog", "A"</p></div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="parsing.searchResolution">
-                    <option value="letter">Letter</option>
-                    <option value="word">Word</option>
-                </select>
             </div>
         </div></div>
         <div class="settings-item advanced-only">
@@ -1349,7 +1394,7 @@
         </div>
         <div class="heading-description more" hidden>
             <p>
-                Yomichan is able to scan the sentence surrounding a term and parse individual words
+                Yezichak is able to scan the sentence surrounding a term and parse individual words
                 of the query on the <a href="/search.html" target="_blank" rel="noopener">search page</a>.
                 This information can also be added to Anki cards to provide additional context.
             </p>
@@ -1516,78 +1561,25 @@
             </p>
         </div>
     </div>
-    <div class="settings-group advanced-only">
+    <div class="settings-group advanced-only" id="text-transformations">
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Dictionary search resolution</div>
+                <div class="settings-item-description" lang="en"><p>"A dog"&#x3000;&rarr;&#x3000;search for "A dog","A do", "A d", "A"</p> or <p>"A dog"&#x3000;&rarr;&#x3000;"A dog", "A"</p></div>
+            </div>
+            <div class="settings-item-right">
+                <select data-setting="translation.searchResolution">
+                    <option value="letter">Letter</option>
+                    <option value="word">Word</option>
+                </select>
+            </div>
+        </div></div>
         <div class="settings-item settings-item-button" data-modal-action="show,translation-text-replacement-patterns"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure custom text replacement patterns&hellip;</div>
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Convert half width characters to full width</div>
-                <div class="settings-item-description" lang="ja">ﾖﾐﾁｬﾝ&#x3000;&rarr;&#x3000;ヨミチャン</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.convertHalfWidthCharacters">
-                    <option value="false">Disabled</option>
-                    <option value="true">Enabled</option>
-                    <option value="variant">Use both variants</option>
-                </select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Convert numeric characters to full width</div>
-                <div class="settings-item-description" lang="ja">1234&#x3000;&rarr;&#x3000;１２３４</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.convertNumericCharacters">
-                    <option value="false">Disabled</option>
-                    <option value="true">Enabled</option>
-                    <option value="variant">Use both variants</option>
-                </select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Convert alphabetic characters to hiragana</div>
-                <div class="settings-item-description" lang="ja">yomichan&#x3000;&rarr;&#x3000;よみちゃん</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.convertAlphabeticCharacters">
-                    <option value="false">Disabled</option>
-                    <option value="true">Enabled</option>
-                    <option value="variant">Use both variants</option>
-                </select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Convert hiragana to katakana</div>
-                <div class="settings-item-description" lang="ja">よみちゃん&#x3000;&rarr;&#x3000;ヨミチャン</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.convertHiraganaToKatakana">
-                    <option value="false">Disabled</option>
-                    <option value="true">Enabled</option>
-                    <option value="variant">Use both variants</option>
-                </select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Convert katakana to hiragana</div>
-                <div class="settings-item-description" lang="ja">ヨミチャン&#x3000;&rarr;&#x3000;よみちゃん</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.convertKatakanaToHiragana">
-                    <option value="false">Disabled</option>
-                    <option value="true">Enabled</option>
-                    <option value="variant">Use both variants</option>
-                </select>
             </div>
         </div></div>
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
@@ -1603,19 +1595,6 @@
                 </select>
             </div>
         </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Decapitalize latin text</div>
-                <div class="settings-item-description" lang="ja">CAPITALIZED TEXT&#x3000;&rarr;&#x3000;capitalized text</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.decapitalize">
-                    <option value="false">Disabled</option>
-                    <option value="true">Enabled</option>
-                    <option value="variant">Use both variants</option>
-                </select>
-            </div>
-        </div></div>
     </div>
 
     <!-- Anki -->
@@ -1627,7 +1606,7 @@
         </div>
         <div class="heading-description more" hidden>
             <p>
-                Yomichan supports automatic flashcard creation for <a href="https://apps.ankiweb.net/" target="_blank" rel="noopener noreferrer">Anki</a>,
+                Yezichak supports automatic flashcard creation for <a href="https://apps.ankiweb.net/" target="_blank" rel="noopener noreferrer">Anki</a>,
                 a free application designed to assist in remembering information.
                 This feature requires installation of the <a href="https://foosoft.net/projects/anki-connect/" target="_blank" rel="noopener noreferrer">AnkiConnect</a> plugin.
             </p>
@@ -1664,7 +1643,7 @@
             <div class="settings-item-children" data-show-for-os="mac">
                 <p class="warning-text">
                     <strong>Notice for macOS users:</strong>
-                    If Yomichan has issues connecting to AnkiConnect, it may be necessary to adjust adjust some system settings.
+                    If Yezichak has issues connecting to AnkiConnect, it may be necessary to adjust adjust some system settings.
                     See <a href="https://foosoft.net/projects/anki-connect/#notes-for-mac-os-x-users" target="_blank" rel="noopener noreferrer">this link</a> for details.
                 </p>
             </div>
@@ -1938,12 +1917,12 @@
         </div>
         <div class="heading-description more" hidden>
             <p>
-                Yomichan can watch the system copy clipboard for Japanese text and automatically search the
+                Yezichak can watch the system copy clipboard for Japanese text and automatically search the
                 text on the search page.
-                This can be useful for using Yomichan to scan text from external applications.
+                This can be useful for using Yezichak to scan text from external applications.
             </p>
             <p>
-                This feature requires Yomichan to have clipboard reading permissions, and when this option is enabled,
+                This feature requires Yezichak to have clipboard reading permissions, and when this option is enabled,
                 the clipboard will be frequently checked for new text.
             </p>
             <p>
@@ -2016,12 +1995,12 @@
             <div class="settings-item-left">
                 <div class="settings-item-label">
                     <p>
-                        Yomichan has two categories of keyboard shortcuts:
+                        Yezichak has two categories of keyboard shortcuts:
                     </p>
                     <ul>
                         <li>
                             <strong>Standard</strong> keyboard shortcuts are controlled by the extension, and can be added, removed,
-                            and configured to work on webpages that Yomichan functions on.
+                            and configured to work on webpages that Yezichak functions on.
                         </li>
                         <li>
                             <strong>Native</strong> keyboard shortcuts are controlled by the web browser, and function globally
@@ -2058,7 +2037,7 @@
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">
-                    Yomichan can import and export settings files which can be used to restore settings, share settings across devices, and to help to debug problems.
+                    Yezichak can import and export settings files which can be used to restore settings, share settings across devices, and to help to debug problems.
                     These files will only contain settings and will not contain dictionaries.
                     Dictionaries must be imported separately.
                 </div>
@@ -2105,9 +2084,9 @@
                     Google Docs now uses
                     <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas" target="_blank" rel="noopener noreferrer">canvas-based</a>
                     rendering to display content<sup><a href="https://workspaceupdates.googleblog.com/2021/05/Google-Docs-Canvas-Based-Rendering-Update.html" target="_blank" rel="noopener noreferrer">[2]</a></sup>
-                    which prevents Yomichan from being able to scan text using the standard methods.
+                    which prevents Yezichak from being able to scan text using the standard methods.
                     Enabling this option will force Google Docs webpages to expose some additional text
-                    information which should allow Yomichan to still work.
+                    information which should allow Yezichak to still work.
                 </p>
                 <p class="danger-text">
                     Google has changed this compatibility implementation several times, and the changes do not seem to be announced or documented.
@@ -2143,7 +2122,7 @@
                     On <a href="https://caniuse.com/shadowdomv1" target="_blank" rel="noopener noreferrer">supported browsers</a>,
                     a popup's <code>iframe</code> element will be embeded inside of a container with a closed <a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM" target="_blank" rel="noopener noreferrer">shadow DOM</a>.
                     This container prevents scripts running on the underlying web page from being able to discover the <code>iframe</code>,
-                    which helps avoid situations where the web page might try to modify or use the Yomichan popup for an unintended purpose.
+                    which helps avoid situations where the web page might try to modify or use the Yezichak popup for an unintended purpose.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -2168,7 +2147,7 @@
                     directly changing the location of the <code>iframe</code>'s internal document, rather than using
                     the <code>iframe</code>'s <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-src" target="_blank" rel="noopener noreferrer"><code>src</code></a>
                     attribute. This results in the extension URL not being exposed to the underling web page, and thus making it harder
-                    to detect the presence of Yomichan.
+                    to detect the presence of Yezichak.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -3293,7 +3272,7 @@
                 </tr>
                 <tr>
                     <td><code class="anki-field-marker">{cloze-body}</code></td>
-                    <td>Original inflected term as it appeared before being reduced to dictionary form by Yomichan.</td>
+                    <td>Original inflected term as it appeared before being reduced to dictionary form by Yezichak.</td>
                 </tr>
                 <tr>
                     <td><code class="anki-field-marker">{cloze-prefix}</code></td>
@@ -3446,7 +3425,7 @@
     <div class="modal-header"><div class="modal-title">Reset Settings</div></div>
     <div class="modal-body">
         <p class="danger-text">
-            You are about to reset all Yomichan settings back to their default values.
+            You are about to reset all Yezichak settings back to their default values.
             This will delete all custom profiles you may have created.
             <strong>This action cannot be undone.</strong>
         </p>
@@ -3678,18 +3657,18 @@
 
             <ul data-show-for-browser="chrome">
                 <li>Open <a tabindex="0" data-special-url="chrome://extensions/shortcuts">chrome://extensions/shortcuts</a> in a new tab.</li>
-                <li>Find the <em>Yomichan</em> section and configure the shortcuts.</li>
+                <li>Find the <em>Yezichak</em> section and configure the shortcuts.</li>
             </ul>
 
             <ul data-show-for-browser="edge">
                 <li>Open <a tabindex="0" data-special-url="edge://extensions/shortcuts">edge://extensions/shortcuts</a> in a new tab.</li>
-                <li>Find the <em>Yomichan</em> section and configure the shortcuts.</li>
+                <li>Find the <em>Yezichak</em> section and configure the shortcuts.</li>
             </ul>
 
             <ul data-show-for-browser="firefox">
                 <li>Open the extensions page (<a tabindex="0" data-select-on-click="">about:addons</a>)</li>
                 <li>Click the button on the right with the gear icon, then click <em>Manage Extension Shortcuts</em>.</li>
-                <li>Find the <em>Yomichan</em> section and configure the shortcuts.</li>
+                <li>Find the <em>Yezichak</em> section and configure the shortcuts.</li>
             </ul>
         </div>
         <div class="modal-separator-line"></div>
@@ -3855,11 +3834,12 @@
 <script src="/js/general/cache-map.js"></script>
 <script src="/js/general/object-property-accessor.js"></script>
 <script src="/js/general/task-accumulator.js"></script>
+<script src="/js/general/helpers.js"></script>
 <script src="/js/input/hotkey-util.js"></script>
-<script src="/js/language/dictionary-importer-media-loader.js"></script>
-<script src="/js/language/dictionary-worker.js"></script>
-<script src="/js/language/sandbox/dictionary-data-util.js"></script>
-<script src="/js/language/sandbox/japanese-util.js"></script>
+<script src="/js/dictionary/dictionary-importer-media-loader.js"></script>
+<script src="/js/dictionary/dictionary-worker.js"></script>
+<script src="/js/dictionary/dictionary-data-util.js"></script>
+<script src="/js/language/languages/ja/japanese-util.js"></script>
 <script src="/js/media/audio-system.js"></script>
 <script src="/js/media/text-to-speech-audio.js"></script>
 <script src="/js/pages/common/extension-content-controller.js"></script>
@@ -3894,6 +3874,7 @@
 <script src="/js/pages/settings/status-footer.js"></script>
 <script src="/js/pages/settings/storage-controller.js"></script>
 <script src="/js/pages/settings/translation-text-replacements-controller.js"></script>
+<script src="/js/pages/settings/text-transformations-controller.js"></script>
 <script src="/js/templates/template-patcher.js"></script>
 <script src="/js/templates/template-renderer-proxy.js"></script>
 

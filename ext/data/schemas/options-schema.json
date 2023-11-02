@@ -73,7 +73,8 @@
                             "sentenceParsing",
                             "inputs",
                             "clipboard",
-                            "accessibility"
+                            "accessibility",
+                            "languages"
                         ],
                         "properties": {
                             "general": {
@@ -118,7 +119,8 @@
                                     "frequencyDisplayMode",
                                     "termDisplayMode",
                                     "sortFrequencyDictionary",
-                                    "sortFrequencyDictionaryOrder"
+                                    "sortFrequencyDictionaryOrder",
+                                    "language"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -133,6 +135,10 @@
                                     "debugInfo": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "language": {
+                                        "type": "string",
+                                        "default": "ja"
                                     },
                                     "maxResults": {
                                         "type": "integer",
@@ -666,14 +672,6 @@
                                         "minimum": 1,
                                         "default": 16
                                     },
-                                    "searchResolution":{
-                                        "type": "string",
-                                        "enum": [
-                                            "letter",
-                                            "word"
-                                        ],
-                                        "default": "letter"
-                                    },
                                     "deepDomScan": {
                                         "type": "boolean",
                                         "default": false
@@ -725,49 +723,22 @@
                             "translation": {
                                 "type": "object",
                                 "required": [
-                                    "convertHalfWidthCharacters",
-                                    "convertNumericCharacters",
-                                    "convertAlphabeticCharacters",
-                                    "convertHiraganaToKatakana",
-                                    "convertKatakanaToHiragana",
                                     "collapseEmphaticSequences",
-                                    "decapitalize",
-                                    "textReplacements"
+                                    "textReplacements",
+                                    "searchResolution"
                                 ],
                                 "properties": {
-                                    "convertHalfWidthCharacters": {
+                                    "searchResolution": {
                                         "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "false"
-                                    },
-                                    "convertNumericCharacters": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "false"
-                                    },
-                                    "convertAlphabeticCharacters": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "false"
-                                    },
-                                    "convertHiraganaToKatakana": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "false"
-                                    },
-                                    "convertKatakanaToHiragana": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "variant"
+                                        "enum": [
+                                            "letter",
+                                            "word"
+                                        ],
+                                        "default": "letter"
                                     },
                                     "collapseEmphaticSequences": {
                                         "type": "string",
                                         "enum": ["false", "true", "full"],
-                                        "default": "false"
-                                    },
-                                    "decapitalize": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
                                         "default": "false"
                                     },
                                     "textReplacements": {
@@ -809,6 +780,42 @@
                                                 }
                                             }
                                         }
+                                    },
+                                    "deinflectionSource":{
+                                        "type": "string",
+                                        "enum": ["algorithm", "dictionary", "both"],
+                                        "default": "algorithm"
+                                    },
+                                    "deinflectionPosFitler":{
+                                        "type": "boolean",
+                                        "default": true
+                                    }
+                                }
+                            },
+                            "languages": {
+                                "type": "object",
+                                "propertyNames": {
+                                    "type": "string"
+                                },
+                                "additionalProperties": {
+                                    "type": "object",
+                                    "properties": {
+                                        "textTransformations": {
+                                            "type": "object",
+                                            "propertyNames": {
+                                                "type": "string"
+                                            },
+                                            "additionalProperties": {
+                                                "type": "string",
+                                                "enum": ["false", "true", "variant"],
+                                                "default": "false"
+                                            }
+                                        }
+                                    }
+                                },
+                                "default": {
+                                    "ja": {
+                                      "textTransformations": {}
                                     }
                                 }
                             },

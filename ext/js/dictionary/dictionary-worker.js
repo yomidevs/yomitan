@@ -46,7 +46,7 @@ class DictionaryWorker {
 
     _invoke(action, params, transfer, onProgress, formatResult) {
         return new Promise((resolve, reject) => {
-            const worker = new Worker('/js/language/dictionary-worker-main.js', {});
+            const worker = new Worker('/js/dictionary/dictionary-worker-main.js', {});
             const details = {
                 complete: false,
                 worker,

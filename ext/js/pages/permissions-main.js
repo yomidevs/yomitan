@@ -64,8 +64,6 @@ function setupPermissionsToggles() {
 
 (async () => {
     try {
-        console.log('permissions-main.js: Initializing');
-
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 

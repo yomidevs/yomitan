@@ -53,44 +53,7 @@ class TextToSpeechAudio {
 
             speechSynthesis.cancel();
 
-            try {
-                console.log('starting recording');
-
-                // Create an audio context and a source node from the utterance
-                const audioCtx = new AudioContext();
-                const sourceNode = audioCtx.createMediaStreamSource(new MediaStream([this._utterance]));
-
-                // Create a destination node and connect the source node to it
-                const destNode = audioCtx.createMediaStreamDestination();
-                sourceNode.connect(destNode);
-
-                // Start playing the audio
-                const mediaRecorder = new MediaRecorder(destNode.stream);
-                mediaRecorder.start();
-
-                console.log('started recording');
-            } catch (error) {
-                console.error(error);
-            }
-
             speechSynthesis.speak(this._utterance);
-
-            // Stop recording when speech synthesis is finished
-            // this._utterance.onend = () => {
-            //     console.log('stopping recording');
-            //     mediaRecorder.stop();
-
-            //     // When recording is stopped, create a downloadable audio file
-            //     mediaRecorder.ondataavailable = (event) => {
-            //         const blob = new Blob([event.data], {type: 'audio/mp3'});
-            //         const url = URL.createObjectURL(blob);
-            //         const link = document.createElement('a');
-            //         link.href = url;
-            //         link.download = 'speech.mp3';
-            //         document.body.appendChild(link);
-            //         link.click();
-            //     };
-            // };
         } catch (e) {
             // NOP
         }

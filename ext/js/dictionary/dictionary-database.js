@@ -353,7 +353,6 @@ class DictionaryDatabase {
             let completeCount = 0;
             const requiredCompleteCount = itemCount * indexCount;
             const onGetAll = (rows, data) => {
-                // console.log('dictionary-database.js _findMultiBulk() onGetAll() rows', rows)
                 for (const row of rows) {
                     if (predicate(row, data.item)) {
                         results.push(createResult(row, data));
@@ -424,7 +423,9 @@ class DictionaryDatabase {
             score: row.score,
             dictionary: row.dictionary,
             id: row.id,
-            sequence: typeof sequence === 'number' ? sequence : -1
+            sequence: typeof sequence === 'number' ? sequence : -1,
+            formOf: row.formOf || null,
+            inflectionHypotheses: row.inflectionHypotheses || null
         };
     }
 

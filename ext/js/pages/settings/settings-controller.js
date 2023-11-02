@@ -155,7 +155,7 @@ class SettingsController extends EventDispatcher {
     }
 
     _onOptionsUpdated({source}) {
-        if (source === this._source) { return; }
+        // if (source === this._source) { return; }
         this._onOptionsUpdatedInternal(true);
     }
 

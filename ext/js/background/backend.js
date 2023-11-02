@@ -25,6 +25,7 @@
  * ClipboardReader
  * DictionaryDatabase
  * Environment
+ * LanguageUtil
  * JapaneseUtil
  * Mecab
  * MediaUtil
@@ -36,25 +37,26 @@
  * ScriptManager
  * Translator
  * wanakana
- * deinflectionReasonsJa
- * deinflectionReasonsEn
  * fetchAsset
  */
+
+import {LanguageUtil} from '../language/language-util.js';
 
 /**
  * This class controls the core logic of the extension, including API calls
  * and various forms of communication between browser tabs and external applications.
  */
-
-class Backend {
+export class Backend {
     /**
      * Creates a new instance.
      */
     constructor() {
+        this._languageUtil = new LanguageUtil();
         this._japaneseUtil = new JapaneseUtil(wanakana);
         this._environment = new Environment();
         this._dictionaryDatabase = new DictionaryDatabase();
         this._translator = new Translator({
+            languageUtil: this._languageUtil,
             japaneseUtil: this._japaneseUtil,
             database: this._dictionaryDatabase
         });
@@ -142,7 +144,8 @@ class Backend {
             ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
             ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}],
             ['findAnkiNotes',                {async: true,  contentScript: true,  handler: this._onApiFindAnkiNotes.bind(this)}],
-            ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}]
+            ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}],
+            ['getTextTransformations',       {async: true,  contentScript: true,  handler: this._onApiGetTextTransformations.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -231,13 +234,12 @@ class Backend {
                 log.error(e);
             }
 
-            const deinflectionReasons = Object.assign({}, deinflectionReasonsJa, await deinflectionReasonsEn());
-
-            this._translator.prepare(deinflectionReasons);
-
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await fetchAsset('/data/templates/default-anki-field-templates.handlebars')).trim();
             this._options = await this._optionsUtil.load();
+
+            await this._languageUtil.prepare();
+            this._translator.prepare();
 
             this._applyOptions('background');
 
@@ -434,10 +436,9 @@ class Backend {
     async _onApiTermsFind({text, details, optionsContext}) {
         const options = this._getProfileOptions(optionsContext);
         const {general: {resultOutputMode: mode, maxResults}} = options;
-        const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
+        const findTermsOptions = await this._getTranslatorFindTermsOptions(mode, details, options);
         const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
         dictionaryEntries.splice(maxResults);
-        console.log('backend.js::_onApiTermsFind dictionaryEntries:', dictionaryEntries);
         return {dictionaryEntries, originalTextLength};
     }
 
@@ -519,7 +520,6 @@ class Backend {
     }
 
     async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails}) {
-        console.log('backend.js: _onApiInjectAnkiNoteMedia');
         return await this._injectAnkNoteMedia(
             this._anki,
             timestamp,
@@ -564,7 +564,8 @@ class Backend {
     }
 
     async _onApiGetTermAudioInfoList({source, term, reading}) {
-        return await this._audioDownloader.getTermAudioInfoList(source, term, reading);
+        const language = this._getProfileLanguage({current: true});
+        return await this._audioDownloader.getTermAudioInfoList(source, term, reading, language);
     }
 
     _onApiSendMessageToFrame({frameId: targetFrameId, action, params}, sender) {
@@ -800,6 +801,10 @@ class Backend {
         }
     }
 
+    async _onApiGetTextTransformations({language}){
+        return await this._languageUtil.getTextTransformations(language);
+    }
+
     // Command handlers
 
     async _onCommandOpenSearchPage(params) {
@@ -1021,7 +1026,7 @@ class Backend {
         );
     }
 
-    _applyOptions(source) {
+    async _applyOptions(source) {
         const options = this._getProfileOptions({current: true});
         this._updateBadge();
 
@@ -1043,7 +1048,24 @@ class Backend {
 
         this._accessibilityController.update(this._getOptionsFull(false));
 
+        this._onChangedLanguage(options);
+
         this._sendMessageAllTabsIgnoreResponse('Yomichan.optionsUpdated', {source});
+    }
+
+    _onChangedLanguage(options) {
+        const {language} = options.general;
+        if (!options.languages[language]) {
+            this._modifySetting({
+                action: 'set',
+                path: `languages.${language}`,
+                value: {
+                    textTransformations: {}
+                },
+                scope: 'profile',
+                optionsContext: {current: true}
+            });
+        }
     }
 
     _getOptionsFull(useSchema=false) {
@@ -1053,6 +1075,10 @@ class Backend {
 
     _getProfileOptions(optionsContext, useSchema=false) {
         return this._getProfile(optionsContext, useSchema).options;
+    }
+
+    _getProfileLanguage(optionsContext, useSchema=false) {
+        return this._getProfileOptions(optionsContext, useSchema).general.language;
     }
 
     _getProfile(optionsContext, useSchema=false) {
@@ -1128,48 +1154,53 @@ class Backend {
     }
 
     async _textParseScanning(text, scanLength, optionsContext) {
-        const jp = this._japaneseUtil;
-        const mode = 'simple';
         const options = this._getProfileOptions(optionsContext);
-        const details = {matchType: 'exact', deinflect: true};
-        const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
-        const results = [];
-        let previousUngroupedSegment = null;
-        let i = 0;
-        const ii = text.length;
-        while (i < ii) {
-            const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
-                mode,
-                text.substring(i, i + scanLength),
-                findTermsOptions
-            );
-            const codePoint = text.codePointAt(i);
-            const character = String.fromCodePoint(codePoint);
-            if (
-                dictionaryEntries.length > 0 &&
-                originalTextLength > 0 &&
-                (originalTextLength !== character.length || jp.isCodePointJapanese(codePoint))
-            ) {
-                previousUngroupedSegment = null;
-                const {headwords: [{term, reading}]} = dictionaryEntries[0];
-                const source = text.substring(i, i + originalTextLength);
-                const textSegments = [];
-                for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(term, reading, source)) {
-                    textSegments.push({text: text2, reading: reading2});
-                }
-                results.push(textSegments);
-                i += originalTextLength;
-            } else {
-                if (previousUngroupedSegment === null) {
-                    previousUngroupedSegment = {text: character, reading: ''};
-                    results.push([previousUngroupedSegment]);
+
+        if (options.general.language === 'ja') {
+            const jp = this._japaneseUtil;
+            const mode = 'simple';
+            const details = {matchType: 'exact', deinflect: true};
+            const findTermsOptions = await this._getTranslatorFindTermsOptions(mode, details, options);
+            const results = [];
+            let previousUngroupedSegment = null;
+            let i = 0;
+            const ii = text.length;
+            while (i < ii) {
+                const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
+                    mode,
+                    text.substring(i, i + scanLength),
+                    findTermsOptions
+                );
+                const codePoint = text.codePointAt(i);
+                const character = String.fromCodePoint(codePoint);
+                if (
+                    dictionaryEntries.length > 0 &&
+                    originalTextLength > 0 &&
+                    (originalTextLength !== character.length || jp.isCodePointJapanese(codePoint))
+                ) {
+                    previousUngroupedSegment = null;
+                    const {headwords: [{term, reading}]} = dictionaryEntries[0];
+                    const source = text.substring(i, i + originalTextLength);
+                    const textSegments = [];
+                    for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(term, reading, source)) {
+                        textSegments.push({text: text2, reading: reading2});
+                    }
+                    results.push(textSegments);
+                    i += originalTextLength;
                 } else {
-                    previousUngroupedSegment.text += character;
+                    if (previousUngroupedSegment === null) {
+                        previousUngroupedSegment = {text: character, reading: ''};
+                        results.push([previousUngroupedSegment]);
+                    } else {
+                        previousUngroupedSegment.text += character;
+                    }
+                    i += character.length;
                 }
-                i += character.length;
             }
+            return results;
+        } else {
+            return [[{'text': text, 'reading': text}]];
         }
-        return results;
     }
 
     async _textParseMecab(text) {
@@ -1325,7 +1356,10 @@ class Backend {
             case 'set':
             {
                 const {path, value} = target;
-                if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                if (typeof path !== 'string') {
+                    console.error('_modifySetting invalid path', path);
+                    throw new Error('Invalid path');
+                }
                 const pathArray = ObjectPropertyAccessor.getPathArray(path);
                 accessor.set(pathArray, value);
                 return accessor.get(pathArray);
@@ -1606,9 +1640,7 @@ class Backend {
     }
 
     _waitUntilTabFrameIsReady(tabId, frameId, timeout=null) {
-        console.log('backend.js: _waitUntilTabFrameIsReady ');
         return new Promise((resolve, reject) => {
-            console.log('backend.js: _waitUntilTabFrameIsReady promise');
             let timer = null;
             let onMessage = (message, sender) => {
                 if (
@@ -1754,8 +1786,6 @@ class Backend {
     }
 
     async _injectAnkNoteMedia(ankiConnect, timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails) {
-        console.log('backend.js: _injectAnkNoteMedia');
-
         let screenshotFileName = null;
         let clipboardImageFileName = null;
         let clipboardText = null;
@@ -1817,8 +1847,6 @@ class Backend {
     }
 
     async _injectAnkiNoteAudio(ankiConnect, timestamp, definitionDetails, details) {
-        console.log('backend.js: _injectAnkiNoteAudio');
-
         const {type, term, reading} = definitionDetails;
         if (
             type === 'kanji' ||
@@ -1830,6 +1858,8 @@ class Backend {
         }
 
         const {sources, preferredAudioIndex, idleTimeout} = details;
+        const language = this._getProfileLanguage({current: true});
+
         let data;
         let contentType;
         try {
@@ -1838,6 +1868,7 @@ class Backend {
                 preferredAudioIndex,
                 term,
                 reading,
+                language,
                 idleTimeout
             ));
         } catch (e) {
@@ -2055,27 +2086,30 @@ class Backend {
      * @param {object} options The options.
      * @returns {FindTermsOptions} An options object.
      */
-    _getTranslatorFindTermsOptions(mode, details, options) {
-        console.log("backend.js", options)
+    async _getTranslatorFindTermsOptions(mode, details, options) {
         let {matchType, deinflect} = details;
         if (typeof matchType !== 'string') { matchType = 'exact'; }
         if (typeof deinflect !== 'boolean') { deinflect = true; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
-            general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder},
+            general: {
+                mainDictionary,
+                sortFrequencyDictionary,
+                sortFrequencyDictionaryOrder,
+                language
+            },
             scanning: {alphanumeric},
-            parsing: {searchResolution},
             translation: {
-                convertHalfWidthCharacters,
-                convertNumericCharacters,
-                convertAlphabeticCharacters,
-                convertHiraganaToKatakana,
-                convertKatakanaToHiragana,
+                searchResolution,
                 collapseEmphaticSequences,
-                decapitalize,
-                textReplacements: textReplacementsOptions
+                textReplacements: textReplacementsOptions,
+                deinflectionSource,
+                deinflectionPosFilter
             }
         } = options;
+
+        const textTransformations = await this._getTranslatorTextTransformations(options, language);
+
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
         let excludeDictionaryDefinitions = null;
         if (mode === 'merge' && !enabledDictionaryMap.has(mainDictionary)) {
@@ -2094,17 +2128,15 @@ class Backend {
             sortFrequencyDictionary,
             sortFrequencyDictionaryOrder,
             removeNonJapaneseCharacters: !alphanumeric,
-            convertHalfWidthCharacters,
-            convertNumericCharacters,
-            convertAlphabeticCharacters,
-            convertHiraganaToKatakana,
-            convertKatakanaToHiragana,
             collapseEmphaticSequences,
             searchResolution,
-            decapitalize,
             textReplacements,
             enabledDictionaryMap,
-            excludeDictionaryDefinitions
+            excludeDictionaryDefinitions,
+            textTransformations,
+            deinflectionSource,
+            deinflectionPosFilter,
+            language
         };
     }
 
@@ -2152,6 +2184,25 @@ class Backend {
             textReplacements.unshift(null);
         }
         return textReplacements;
+    }
+
+    async _getTranslatorTextTransformations(options, language) {
+        const textTransformationsOptions = options?.languages?.[language]?.textTransformations || {};
+        const textTransformations = await this._languageUtil.getTextTransformations(language);
+
+        const textTransformationsResult = Object.keys(textTransformationsOptions).reduce((result, key) => {
+            const value = textTransformationsOptions[key];
+            const transformation = textTransformations.find((t) => t.id === key);
+            if (transformation) {
+                result[key] = {
+                    ...transformation,
+                    setting: value
+                };
+            }
+            return result;
+        }, {});
+
+        return textTransformationsResult;
     }
 
     async _openWelcomeGuidePage() {

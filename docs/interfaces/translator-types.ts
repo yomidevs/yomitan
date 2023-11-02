@@ -70,26 +70,6 @@ namespace Translation {
          */
         removeNonJapaneseCharacters: boolean;
         /**
-         * Whether or not half-width characters should be converted to full-width characters.
-         */
-        convertHalfWidthCharacters: FindTermsVariantMode;
-        /**
-         * Whether or not ASCII numeric characters should be converted to full-width numeric characters.
-         */
-        convertNumericCharacters: FindTermsVariantMode;
-        /**
-         * Whether or not alphabetic characters should be converted to kana.
-         */
-        convertAlphabeticCharacters: FindTermsVariantMode;
-        /**
-         * Whether or not hiragana characters should be converted to katakana.
-         */
-        convertHiraganaToKatakana: FindTermsVariantMode;
-        /**
-         * Whether or not katakana characters should be converted to hiragana.
-         */
-        convertKatakanaToHiragana: FindTermsVariantMode;
-        /**
          * How emphatic character sequences should be collapsed.
          */
         collapseEmphaticSequences: FindTermsEmphaticSequencesMode;

@@ -47,7 +47,6 @@ class Yomichan extends EventDispatcher {
      * Creates a new instance. The instance should not be used until it has been fully prepare()'d.
      */
     constructor() {
-        console.log('Yomichan constructor');
         super();
 
         try {
@@ -123,8 +122,6 @@ class Yomichan extends EventDispatcher {
      * @param {boolean} [isBackground=false] Assigns whether this instance is being used from the background page/service worker.
      */
     async prepare(isBackground=false) {
-        console.log('yomichan.js prepare()');
-
         this._isBackground = isBackground;
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
 
@@ -146,7 +143,6 @@ class Yomichan extends EventDispatcher {
      * setup has completed.
      */
     ready() {
-        console.log('yomichan.js ready()');
         this._isReady = true;
         this.sendMessage({action: 'yomichanReady'});
     }
@@ -167,12 +163,10 @@ class Yomichan extends EventDispatcher {
      * @throws {Error} Errors thrown by `chrome.runtime.sendMessage()` are re-thrown.
      */
     sendMessage(...args) {
-        const action = args[0].action;
-        console.log('yomichan.js sendMessage()', action);
-        // console.log(action);
-        if (action === 'termsFind'){
-            console.log('TERMS FIND', args[0]);
-        }
+        // const action = args[0].action;
+        // if (action === 'termsFind'){
+        //     console.log('TERMS FIND', args[0]);
+        // }
         try {
             return chrome.runtime.sendMessage(...args);
         } catch (e) {
@@ -253,7 +247,6 @@ class Yomichan extends EventDispatcher {
     }
 
     async _onForwardLog({error, level, context}) {
-        console.log('yomichan.js _onForwardLog()');
         try {
             await this._api.log(serializeError(error), level, context);
         } catch (e) {
@@ -265,5 +258,4 @@ class Yomichan extends EventDispatcher {
 /**
  * The default Yomichan class instance.
  */
-console.log('yomichan.js creating default instance');
 const yomichan = new Yomichan();

@@ -17,7 +17,6 @@
 
 class API {
     constructor(yomichan) {
-        console.log('API.constructor()');
         this._yomichan = yomichan;
     }
 
@@ -179,6 +178,10 @@ class API {
 
     loadExtensionScripts(files) {
         return this._invoke('loadExtensionScripts', {files});
+    }
+
+    getTextTransformations(language){
+        return this._invoke('getTextTransformations', {language});
     }
 
     // Utilities

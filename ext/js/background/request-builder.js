@@ -30,7 +30,6 @@ class RequestBuilder {
      * Creates a new instance.
      */
     constructor() {
-        console.log('RequestBuilder constructor');
         this._onBeforeSendHeadersExtraInfoSpec = ['blocking', 'requestHeaders', 'extraHeaders'];
         this._textEncoder = new TextEncoder();
         this._ruleIds = new Set();
@@ -54,7 +53,6 @@ class RequestBuilder {
      * @returns {Promise<Response>} The response of the `fetch` call.
      */
     async fetchAnonymous(url, init) {
-        fetch(1, 2);
         if (isObject(chrome.declarativeNetRequest)) {
             return await this._fetchAnonymousDeclarative(url, init);
         }

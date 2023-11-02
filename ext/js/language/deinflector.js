@@ -15,80 +15,68 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 class Deinflector {
-    constructor(reasons) {
-        // console.log('Deinflector::constructor() reasons = ', reasons);
-        this.reasons = Deinflector.normalizeReasons(reasons);
+    constructor(languageUtil) {
+        this._languageUtil = languageUtil;
     }
 
-    deinflect(source) {
-        // const start = performance.now();
-
-        // console.log('\tDeinflector::deinflect() source = ', source);
-
+    async deinflect(source, options) {
+        const checkRules = options.deinflectionPosFilter;
         const results = [this._createDeinflection(source, 0, [])];
 
-        // console.log('\tDeinflector::deinflect() results = ', results);
-
         for (let i = 0; i < results.length && i < 200; ++i) {
-
-            // console.log(`\t\t${i} deinflecting ${results[i].term}`);
-
             const {rules, term, reasons} = results[i];
-            for (const [reason, variants] of this.reasons) {
-                // if(reason == 'past') console.log("\treason = ", reason, "variants = ", variants);
+            const deinflectionReasons = Deinflector.normalizeReasons(await this._languageUtil.getDeinflectionReasons(options.language));
+            for (const [reason, variants] of deinflectionReasons) {
                 for (const [inflected, uninflect, rulesIn, rulesOut] of variants) {
-                    // if(reason == 'past') console.log(inflected, inflected.test(term))
                     if (
-                        (rules !== 0 && (rules & rulesIn) === 0) ||
+                        (checkRules && !this._rulesFit(rules, rulesIn)) ||
                         !inflected.test(term)
                     ) {
                         continue;
                     }
 
-                    // console.log(`\t\t${reason}, ${inflected}`)
-
                     results.push(this._createDeinflection(
                         uninflect(term),
                         rulesOut,
-                        [reason, ...reasons]
+                        [...reason, ...reasons]
                     ));
                 }
             }
         }
 
-        // const end = performance.now();
-        // console.log(`\tDeinflector::deinflect() performance = ${end - start}ms`);
-        
         return results;
     }
 
+    _rulesFit(rules1, rules2) {
+        return rules1 === 0 || (rules1 & rules2) !== 0;
+    }
+
     _createDeinflection(term, rules, reasons) {
-        // console.log('Deinflector::_createDeinflection() term = ', term, 'rules = ', rules, 'reasons = ', reasons);
         return {term, rules, reasons};
     }
 
     static normalizeReasons(reasons) {
-        // console.log('Deinflector::normalizeReasons() reasons = ', reasons);
-        const normalizedReasons = [];
-        for (const [reason, reasonInfo] of Object.entries(reasons)) {
-            const variants = [];
-            for (const {inflected, uninflect, rulesIn, rulesOut} of reasonInfo) {
-                variants.push([
-                    inflected,
-                    uninflect,
-                    this.rulesToRuleFlags(rulesIn),
-                    this.rulesToRuleFlags(rulesOut)
-                ]);
+        const normalizedReasons = new Map();
+
+        for (let [reason, reasonInfo] of reasons) {
+            if (!Array.isArray(reason)) {
+                reason = [reason];
             }
-            normalizedReasons.push([reason, variants]);
+            const variants = reasonInfo.map(({inflected, uninflect, rulesIn, rulesOut}) => [
+                inflected,
+                uninflect,
+                this.rulesToRuleFlags(rulesIn),
+                this.rulesToRuleFlags(rulesOut)
+            ]);
+            normalizedReasons.set(reason, variants);
         }
+
         return normalizedReasons;
     }
 
     static rulesToRuleFlags(rules) {
-        // console.log(rules, this._ruleTypes)
-        // console.log('Deinflector::rulesToRuleFlags() rules = ', rules);
         const ruleTypes = this._ruleTypes;
         let value = 0;
         for (const rule of rules) {
@@ -100,17 +88,20 @@ class Deinflector {
     }
 }
 
+// TODO: generalize, extract to language-specific file?
 // eslint-disable-next-line no-underscore-dangle
 Deinflector._ruleTypes = new Map([
-    // ['v',    0b0000011111], // Verb // does not work for some reason, breaks both 'his' and 'belongs' 
-    ['v1',    0b0000000001], // Verb ichidan
-    ['v5',    0b0000000010], // Verb godan
-    ['vs',    0b0000000100], // Verb suru
-    ['vk',    0b0000001000], // Verb kuru
-    ['vz',    0b0000010000], // Verb zuru
-    // ['adj',  0b0000100000], // Adjective
-    ['adj-i', 0b0000100000], // Adjective i
-    ['iru',   0b0001000000], // Intermediate -iru endings for progressive or perfect tens
-    // ['n',     0b0010000000], // Noun
-    // ['pn',   0b0100000000], // Pronoun
+    ['v',       0b0000011111], // Verb
+    ['verb',    0b0000011111], // Verb
+    ['v1',      0b0000000001], // Verb ichidan
+    ['v5',      0b0000000010], // Verb godan
+    ['vs',      0b0000000100], // Verb suru
+    ['vk',      0b0000001000], // Verb kuru
+    ['vz',      0b0000010000], // Verb zuru
+    ['adj',     0b0000100000], // Adjective
+    ['adj-i',   0b0000100000], // Adjective i
+    ['iru',     0b0001000000], // Intermediate -iru endings for progressive or perfect tens
+    ['n',       0b0010000000], // Noun
+    ['noun',    0b0010000000], // Noun'
+    ['pn',      0b0100000000] // Pronoun
 ]);

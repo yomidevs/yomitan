@@ -25,8 +25,6 @@
 
 class AudioDownloader {
     constructor({japaneseUtil, requestBuilder}) {
-        console.log('audio-downloader.js: constructor');
-
         this._japaneseUtil = japaneseUtil;
         this._requestBuilder = requestBuilder;
         this._customAudioListSchema = null;
@@ -41,25 +39,23 @@ class AudioDownloader {
         ]);
     }
 
-    async getTermAudioInfoList(source, term, reading) {
+    async getTermAudioInfoList(source, term, reading, language) {
         const handler = this._getInfoHandlers.get(source.type);
         if (typeof handler === 'function') {
             try {
-                return await handler(term, reading, source);
+                return await handler(term, reading, source, language);
             } catch (e) {
+                console.error(e);
                 // NOP
             }
         }
         return [];
     }
 
-    async downloadTermAudio(sources, preferredAudioIndex, term, reading, idleTimeout) {
-        console.log('audio-downloader.js: downloadTermAudio()');
-        console.log('sources', sources);
+    async downloadTermAudio(sources, preferredAudioIndex, term, reading, language, idleTimeout) {
         const errors = [];
         for (const source of sources) {
-            let infoList = await this.getTermAudioInfoList(source, term, reading);
-            console.log('infoList', infoList);
+            let infoList = await this.getTermAudioInfoList(source, term, reading, language);
 
             if (typeof preferredAudioIndex === 'number') {
                 infoList = (preferredAudioIndex >= 0 && preferredAudioIndex < infoList.length ? [infoList[preferredAudioIndex]] : []);
@@ -102,7 +98,7 @@ class AudioDownloader {
             params.set('kana', reading);
         }
 
-        const url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.toString()}`;
+        const url = `https://assets.languagepod101.com/dictionary/ja/audiomp3.php?${params.toString()}`;
         return [{type: 'url', url}];
     }
 
@@ -202,13 +198,13 @@ class AudioDownloader {
         return [{type: 'tts', text: reading, voice: voice}];
     }
 
-    async _getInfoCustom(term, reading, {url}) {
-        url = this._getCustomUrl(term, reading, url);
+    async _getInfoCustom(term, reading, {url}, language) {
+        url = this._getCustomUrl(term, reading, language, url);
         return [{type: 'url', url}];
     }
 
-    async _getInfoCustomJson(term, reading, {url}) {
-        url = this._getCustomUrl(term, reading, url);
+    async _getInfoCustomJson(term, reading, {url}, language) {
+        url = this._getCustomUrl(term, reading, language, url);
 
         const response = await this._requestBuilder.fetchAnonymous(url, {
             method: 'GET',
@@ -240,11 +236,12 @@ class AudioDownloader {
         return results;
     }
 
-    _getCustomUrl(term, reading, url) {
+    _getCustomUrl(term, reading, language, url) {
         if (typeof url !== 'string') {
             throw new Error('No custom URL defined');
         }
-        const data = {term, reading};
+
+        const data = {term, reading, language};
         return url.replace(/\{([^}]*)\}/g, (m0, m1) => (Object.prototype.hasOwnProperty.call(data, m1) ? `${data[m1]}` : m0));
     }
 

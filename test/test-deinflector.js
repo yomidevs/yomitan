@@ -17,7 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const assert = require('assert');   
+const assert = require('assert');
 const {testMain} = require('../dev/util');
 const {VM} = require('../dev/vm');
 
@@ -48,7 +48,7 @@ function hasTermReasons(Deinflector, deinflector, source, expectedTerm, expected
 
 async function testDeinflections(language) {
     let data = [];
-    switch(language){
+    switch (language){ // TODO: move to languages folder
         case 'en':
             data = [
                 {
@@ -65,17 +65,17 @@ async function testDeinflections(language) {
                         {term: 'turn down', source: 'turned you down', reasons: ['past', 'interposed object']},
                         {term: 'bring up', source: 'brought their son up', reasons: ['past (irregular)', 'interposed object']},
 
-                        {term: 'take after', source: 'takes after', reasons: ['3 sg present']},
+                        {term: 'take after', source: 'takes after', reasons: ['3 sg present']}
                     ]
                 },
                 {
                     valid: false,
                     tests: [
                         {term: 'turn off', source: 'turned you down. off', reasons: ['past']},
-                        {term: 'take after', source: 'take him after', reasons: ['interposed object']},
+                        {term: 'take after', source: 'take him after', reasons: ['interposed object']}
                     ]
                 }
-            ]
+            ];
             break;
         default:
             data = [
@@ -953,19 +953,13 @@ async function testDeinflections(language) {
     vm.execute(['js/general/helpers.js']);
     vm.execute(['js/language/deinflection-ruleset.js']);
     vm.execute(['js/language/deinflector.js']);
-    vm.execute(['js/language/Japanese.js']);
-    vm.execute(['js/language/english/grammar.js']);
+    vm.execute(['js/language/language-util.js']);
 
-    const [deinflectionReasonsJa] = vm.get(['deinflectionReasonsJa']);
-    const [deinflectionReasonsEn] = vm.get(['deinflectionReasonsEn']);
+    const [LanguageUtil] = vm.get(['LanguageUtil']);
     const [Deinflector] = vm.get(['Deinflector']);
 
-    const deinflectionReasons = {
-        'ja': deinflectionReasonsJa,
-        'en': await deinflectionReasonsEn()
-    }
-    
-    const deinflector = new Deinflector(deinflectionReasons[language]);
+    const languageUtil = new LanguageUtil();
+    const deinflector = new Deinflector(languageUtil);
 
     for (const {valid, tests} of data) {
         for (const {source, term, rule, reasons} of tests) {
@@ -993,6 +987,8 @@ function main() {
     const language = args[2] || 'ja';
 
     testDeinflections(language);
+
+    console.log(language, 'tests passed');
 }
 
 
