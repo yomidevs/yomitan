@@ -81,7 +81,6 @@
             "clipboardWrite",
             "unlimitedStorage",
             "declarativeNetRequest",
-            "webRequest",
             "scripting",
             "offscreen"
         ],
@@ -230,40 +229,11 @@
                         "gecko": {
                             "id": "{cb7c0bec-7085-4f84-8422-7b55a7c4467c}",
                             "strict_min_version": "115.0"
+                        },
+                        "gecko_android": {
+                            "strict_min_version": "115.0"
                         }
                     }
-                },
-                {
-                    "action": "remove",
-                    "path": [
-                        "optional_permissions"
-                    ],
-                    "item": "nativeMessaging"
-                },
-                {
-                    "action": "add",
-                    "path": [
-                        "permissions"
-                    ],
-                    "items": [
-                        "nativeMessaging"
-                    ]
-                },
-                {
-                    "action": "add",
-                    "path": [
-                        "permissions"
-                    ],
-                    "items": [
-                        "webRequestBlocking"
-                    ]
-                },
-                {
-                    "action": "remove",
-                    "path": [
-                        "permissions"
-                    ],
-                    "item": "declarativeNetRequest"
                 },
                 {
                     "action": "remove",
@@ -349,13 +319,6 @@
                     "path": [
                         "permissions"
                     ],
-                    "item": "webRequestBlocking"
-                },
-                {
-                    "action": "remove",
-                    "path": [
-                        "permissions"
-                    ],
                     "item": "offscreen"
                 },
                 {
@@ -382,6 +345,9 @@
             ],
             "excludeFiles": [
                 "sw.js",
+                "offscreen.html",
+                "js/background/offscreen.js",
+                "js/background/offscreen-main.js",
                 "js/dom/simple-dom-parser.js",
                 "lib/parse5.js"
             ]
