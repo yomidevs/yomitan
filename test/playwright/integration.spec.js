@@ -31,7 +31,7 @@ const {createDictionaryArchive} = require('../../dev/util');
 test.beforeEach(async ({context}) => {
     // wait for the on-install welcome.html tab to load, which becomes the foreground tab
     const welcome = await context.waitForEvent('page');
-    welcome.close(); // close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
+    await welcome.close(); // close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
 });
 
 test('search clipboard', async ({page, extensionId}) => {
@@ -82,8 +82,11 @@ test('anki add', async ({context, page, extensionId}) => {
 
     // add to anki deck
     await page.goto(`chrome-extension://${extensionId}/search.html`);
-    await page.waitForTimeout(500); // race
-    await page.locator('#search-textbox').fill('読む');
+    await expect(async () => {
+        await page.locator('#search-textbox').clear();
+        await page.locator('#search-textbox').fill('読む');
+        await expect(page.locator('#search-textbox')).toHaveValue('読む');
+    }).toPass({timeout: 5000});
     await page.locator('#search-textbox').press('Enter');
     await page.locator('[data-mode="term-kanji"]').click();
     const addNoteReqBody = await addNotePromise;
