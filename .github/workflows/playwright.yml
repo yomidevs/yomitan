@@ -66,6 +66,8 @@ jobs:
 
       - name: "[PR] Generate new screenshots & compare against master"
         id: playwright
+        env:
+          PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS: 1
         run: |
           npx playwright test 2>&1 | tee ./playwright-output || true
         continue-on-error: true
