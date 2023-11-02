@@ -35,20 +35,20 @@
         "sourceDir": "ext"
     },
     "devDependencies": {
-        "@playwright/test": "^1.38.1",
+        "@playwright/test": "^1.39.0",
         "ajv": "^8.11.0",
         "browserify": "^17.0.0",
         "css": "^3.0.0",
-        "eslint": "^8.50.0",
+        "eslint": "^8.52.0",
         "eslint-plugin-header": "^3.1.1",
         "eslint-plugin-jsdoc": "^46.8.2",
-        "eslint-plugin-jsonc": "^2.9.0",
+        "eslint-plugin-jsonc": "^2.10.0",
         "eslint-plugin-no-unsanitized": "^4.0.1",
         "fake-indexeddb": "^4.0.2",
-        "html-validate": "^8.5.0",
+        "html-validate": "^8.7.0",
         "jsdom": "^22.1.0",
         "parse5": "^7.1.2",
-        "stylelint": "^15.10.3",
+        "stylelint": "^15.11.0",
         "stylelint-config-recommended": "^13.0.0"
     }
 }
