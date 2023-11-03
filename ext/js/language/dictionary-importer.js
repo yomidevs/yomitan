@@ -18,7 +18,6 @@
 
 /* global
  * JSZip
- * JsonSchema
  * MediaUtil
  */
 
@@ -51,8 +50,10 @@ class DictionaryImporter {
 
         const index = JSON.parse(await indexFile.async('string'));
 
-        const indexSchema = await this._getSchema('/data/schemas/dictionary-index-schema.json');
-        this._validateJsonSchema(index, indexSchema, indexFileName);
+        const ajvSchemas = await import('/lib/validate-schemas.js');
+        if (!ajvSchemas.dictionaryIndex(index)) {
+            throw this._formatAjvSchemaError(ajvSchemas.dictionaryIndex, indexFileName);
+        }
 
         const dictionaryTitle = index.title;
         const version = index.format || index.version;
@@ -75,8 +76,7 @@ class DictionaryImporter {
 
         // Load schemas
         this._progressNextStep(0);
-        const dataBankSchemaPaths = this._getDataBankSchemaPaths(version);
-        const dataBankSchemas = await Promise.all(dataBankSchemaPaths.map((path) => this._getSchema(path)));
+        const dataBankSchemas = this._getDataBankSchemas(version);
 
         // Files
         const termFiles      = this._getArchiveFiles(archive, 'term_bank_?.json');
@@ -87,11 +87,11 @@ class DictionaryImporter {
 
         // Load data
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
-        const termList      = await this._readFileSequence(termFiles,      convertTermBankEntry,      dataBankSchemas[0], dictionaryTitle);
-        const termMetaList  = await this._readFileSequence(termMetaFiles,  convertTermMetaBankEntry,  dataBankSchemas[1], dictionaryTitle);
-        const kanjiList     = await this._readFileSequence(kanjiFiles,     convertKanjiBankEntry,     dataBankSchemas[2], dictionaryTitle);
-        const kanjiMetaList = await this._readFileSequence(kanjiMetaFiles, convertKanjiMetaBankEntry, dataBankSchemas[3], dictionaryTitle);
-        const tagList       = await this._readFileSequence(tagFiles,       convertTagBankEntry,       dataBankSchemas[4], dictionaryTitle);
+        const termList      = await this._readFileSequence(ajvSchemas, termFiles,      convertTermBankEntry,      dataBankSchemas[0], dictionaryTitle);
+        const termMetaList  = await this._readFileSequence(ajvSchemas, termMetaFiles,  convertTermMetaBankEntry,  dataBankSchemas[1], dictionaryTitle);
+        const kanjiList     = await this._readFileSequence(ajvSchemas, kanjiFiles,     convertKanjiBankEntry,     dataBankSchemas[2], dictionaryTitle);
+        const kanjiMetaList = await this._readFileSequence(ajvSchemas, kanjiMetaFiles, convertKanjiMetaBankEntry, dataBankSchemas[3], dictionaryTitle);
+        const tagList       = await this._readFileSequence(ajvSchemas, tagFiles,       convertTagBankEntry,       dataBankSchemas[4], dictionaryTitle);
         this._addOldIndexTags(index, tagList, dictionaryTitle);
 
         // Prefix wildcard support
@@ -214,68 +214,27 @@ class DictionaryImporter {
         return summary;
     }
 
-    async _getSchema(fileName) {
-        const schema = await this._fetchJsonAsset(fileName);
-        return new JsonSchema(schema);
-    }
-
-    _validateJsonSchema(value, schema, fileName) {
-        try {
-            schema.validate(value);
-        } catch (e) {
-            throw this._formatSchemaError(e, fileName);
-        }
-    }
-
-    _formatSchemaError(e, fileName) {
-        const valuePathString = this._getSchemaErrorPathString(e.valueStack, 'dictionary');
-        const schemaPathString = this._getSchemaErrorPathString(e.schemaStack, 'schema');
-
-        const e2 = new Error(`Dictionary has invalid data in '${fileName}' for value '${valuePathString}', validated against '${schemaPathString}': ${e.message}`);
-        e2.data = e;
+    _formatAjvSchemaError(schema, fileName) {
+        const e2 = new Error(`Dictionary has invalid data in '${fileName}'`);
+        e2.data = schema.errors;
 
         return e2;
     }
 
-    _getSchemaErrorPathString(infoList, base='') {
-        let result = base;
-        for (const {path} of infoList) {
-            const pathArray = Array.isArray(path) ? path : [path];
-            for (const pathPart of pathArray) {
-                if (pathPart === null) {
-                    result = base;
-                } else {
-                    switch (typeof pathPart) {
-                        case 'string':
-                            if (result.length > 0) {
-                                result += '.';
-                            }
-                            result += pathPart;
-                            break;
-                        case 'number':
-                            result += `[${pathPart}]`;
-                            break;
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    _getDataBankSchemaPaths(version) {
+    _getDataBankSchemas(version) {
         const termBank = (
             version === 1 ?
-            '/data/schemas/dictionary-term-bank-v1-schema.json' :
-            '/data/schemas/dictionary-term-bank-v3-schema.json'
+            'dictionaryTermBankV1' :
+            'dictionaryTermBankV3'
         );
-        const termMetaBank = '/data/schemas/dictionary-term-meta-bank-v3-schema.json';
+        const termMetaBank = 'dictionaryTermMetaBankV3';
         const kanjiBank = (
             version === 1 ?
-            '/data/schemas/dictionary-kanji-bank-v1-schema.json' :
-            '/data/schemas/dictionary-kanji-bank-v3-schema.json'
+            'dictionaryKanjiBankV1' :
+            'dictionaryKanjiBankV3'
         );
-        const kanjiMetaBank = '/data/schemas/dictionary-kanji-meta-bank-v3-schema.json';
-        const tagBank = '/data/schemas/dictionary-tag-bank-v3-schema.json';
+        const kanjiMetaBank = 'dictionaryKanjiMetaBankV3';
+        const tagBank = 'dictionaryTagBankV3';
 
         return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
     }
@@ -539,28 +498,20 @@ class DictionaryImporter {
         return results;
     }
 
-    async _readFileSequence(files, convertEntry, schema, dictionaryTitle) {
+    async _readFileSequence(ajvSchemas, files, convertEntry, schemaName, dictionaryTitle) {
         const progressData = this._progressData;
-        let count = 0;
         let startIndex = 0;
-        if (typeof this._onProgress === 'function') {
-            schema.progressInterval = 1000;
-            schema.progress = (s) => {
-                const index = s.getValueStackLength() > 1 ? s.getValueStackItem(1).path : 0;
-                progressData.index = startIndex + (index / count);
-                this._progress();
-            };
-        }
 
         const results = [];
         for (const file of files) {
             const entries = JSON.parse(await file.async('string'));
 
-            count = Array.isArray(entries) ? Math.max(entries.length, 1) : 1;
             startIndex = progressData.index;
             this._progress();
 
-            this._validateJsonSchema(entries, schema, file.name);
+            if (!ajvSchemas[schemaName](entries)) {
+                throw this._formatAjvSchemaError(ajvSchemas[schemaName], file.name);
+            }
 
             progressData.index = startIndex + 1;
             this._progress();

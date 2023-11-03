@@ -5,7 +5,7 @@
         "plugin:jsonc/recommended-with-json"
     ],
     "parserOptions": {
-        "ecmaVersion": 9,
+        "ecmaVersion": 11,
         "sourceType": "script",
         "ecmaFeatures": {
             "globalReturn": false,
@@ -401,7 +401,8 @@
                 "DynamicProperty": "readonly",
                 "EventDispatcher": "readonly",
                 "EventListenerCollection": "readonly",
-                "Logger": "readonly"
+                "Logger": "readonly",
+                "import": "readonly"
             }
         },
         {

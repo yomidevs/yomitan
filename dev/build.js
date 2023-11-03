@@ -24,7 +24,8 @@ const childProcess = require('child_process');
 const util = require('./util');
 const {getAllFiles, getArgs, testMain} = util;
 const {ManifestUtil} = require('./manifest-util');
-
+const Ajv = require('ajv');
+const standaloneCode = require('ajv/dist/standalone').default;
 
 async function createZip(directory, excludeFiles, outputFileName, sevenZipExes, onUpdate, dryRun) {
     try {
@@ -129,6 +130,19 @@ async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath,
         readline.cursorTo(process.stdout, 0);
         process.stdout.write(message);
     };
+
+    process.stdout.write('Building schema validators using ajv\n');
+    const schemaDir = path.join(extDir, 'data/schemas/');
+    const schemaFileNames = fs.readdirSync(schemaDir);
+    const schemas = schemaFileNames.map((schemaFileName) => JSON.parse(fs.readFileSync(path.join(schemaDir, schemaFileName))));
+    const ajv = new Ajv({schemas: schemas, code: {source: true, esm: true}});
+    const moduleCode = standaloneCode(ajv);
+
+    // https://github.com/ajv-validator/ajv/issues/2209
+    const patchedModuleCode = moduleCode.replaceAll('require("ajv/dist/runtime/ucs2length").default', 'import("/lib/ucs2length.js").default');
+
+    fs.writeFileSync(path.join(extDir, 'lib/validate-schemas.js'), patchedModuleCode);
+
 
     process.stdout.write(`Version: ${yomitanVersion}...\n`);
 

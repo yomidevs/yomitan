@@ -36,7 +36,8 @@
     },
     "devDependencies": {
         "@playwright/test": "^1.39.0",
-        "ajv": "^8.11.0",
+        "@types/node": "^20.8.10",
+        "ajv": "^8.12.0",
         "browserify": "^17.0.0",
         "css": "^3.0.0",
         "eslint": "^8.52.0",
