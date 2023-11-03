@@ -6,7 +6,7 @@
 [![Discord Server](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC)\
 **Important note:** Yomitan is still not recommended for use, as we are still trying to complete the transition to Manifest V3 (which is required of all new browser extensions), and there are [some critical bugs remaining](https://github.com/themoeway/yomitan/issues?q=is%3Aopen+is%3Aissue+label%3Apriority%2Fhigh). This is also why there is no stable release of yomitan yet.
 
-> :wave: **This project is a community fork of yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023).
+> :wave: **This project is a community fork of Yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023).
 >
 > The primary goal is to **keep the project alive and working on latest browser versions and doing bugfixes**. (Feature improvements are considered secondary.)
 >
