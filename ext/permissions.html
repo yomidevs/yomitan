@@ -49,33 +49,6 @@
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label"><code>webRequest</code></div>
-                <div class="settings-item-description">
-                    <p>
-                        Yomitan uses this permission to collect audio or create Anki notes using
-                        <a href="https://ankiweb.net/shared/info/2055492159" target="_blank" rel="noopener noreferrer">AnkiConnect</a>.
-                        It is also required to surface error information from failed requests.
-                    </p>
-                </div>
-            </div>
-        </div></div>
-        <div class="settings-item" data-show-for-browser="firefox firefox-mobile"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label"><code>webRequestBlocking</code></div>
-                <div class="settings-item-description">
-                    <p>
-                        Yomitan uses this permission to ensure certain requests have valid and secure headers.
-                        This sometimes involves removing or changing the <code>Origin</code> request header,
-                        as this can be used to fingerprint browser configuration.
-                    </p>
-                    <p>
-                        Example: <code class="overflow-wrap">Origin: <span class="extension-id-example"></span></code>
-                    </p>
-                </div>
-            </div>
-        </div></div>
-        <div class="settings-item" data-show-for-browser="chrome edge"><div class="settings-item-inner">
-            <div class="settings-item-left">
                 <div class="settings-item-label"><code>declarativeNetRequest</code></div>
                 <div class="settings-item-description">
                     <p>
@@ -89,11 +62,11 @@
                 </div>
             </div>
         </div></div>
-        <div class="settings-item" data-show-for-manifest-version="3"><div class="settings-item-inner">
+        <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label"><code>scripting</code></div>
                 <div class="settings-item-description">
-                    Yomitan will sometimes need to inject stylesheets into webpages in order to
+                    Yomitan needs to inject content scripts and stylesheets into webpages in order to
                     properly display the search popup.
                 </div>
             </div>
@@ -121,9 +94,9 @@
                 <label class="toggle"><input type="checkbox" class="permissions-toggle" data-required-permissions="clipboardRead"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
+        <div class="settings-item" data-hide-for-browser="firefox-mobile"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label"><code>nativeMessaging</code> <span class="light" data-show-for-browser="chrome edge">(optional)</span></div>
+                <div class="settings-item-label"><code>nativeMessaging</code> <span class="light">(optional)</span></div>
                 <div class="settings-item-description">
                     Yomitan has the ability to communicate with an optional native messaging component in order to support
                     parsing large blocks of Japanese text using
@@ -133,18 +106,6 @@
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" class="permissions-toggle" data-required-permissions="nativeMessaging"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item" data-hide-for-manifest-version="3"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label"><code>webNavigation</code> <span class="light">(optional)</span></div>
-                <div class="settings-item-description">
-                    Yomitan may require this permission to inject content scripts for certain browsers
-                    if Google Docs accessibility mode is enabled.
-                </div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" class="permissions-toggle" data-required-permissions="webNavigation"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">
