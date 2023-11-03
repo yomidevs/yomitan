@@ -114,28 +114,13 @@ different languages. You must download and import the dictionaries you wish to u
 definition lookups. If you have proprietary EPWING dictionaries that you would like to use, check the [Yomichan
 Import](https://foosoft.net/projects/yomichan-import) page to learn how to convert and import them into Yomitan.
 
-Be aware that the non-English dictionaries contain fewer entries than their English counterparts. Even if your primary
+Be aware that non-English dictionaries contain fewer entries than their English counterparts. Even if your primary
 language is not English, you may consider also importing the English version for better coverage.
 
-- **[JMdict](https://www.edrdg.org/jmdict/edict_doc.html)** (Japanese vocabulary)
-  - [jmdict_dutch.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_dutch.zip)
-  - [jmdict_english.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_english.zip)
-  - [jmdict_french.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_french.zip)
-  - [jmdict_german.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_german.zip)
-  - [jmdict_hungarian.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_hungarian.zip)
-  - [jmdict_russian.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_russian.zip)
-  - [jmdict_slovenian.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_slovenian.zip)
-  - [jmdict_spanish.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_spanish.zip)
-  - [jmdict_swedish.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_swedish.zip)
-- **[JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese names)
-  - [jmnedict.zip](https://github.com/themoeway/yomitan/raw/dictionaries/jmnedict.zip)
-- **[KANJIDIC](http://nihongo.monash.edu/kanjidic2/index.html)** (Japanese kanji)
-  - [kanjidic_english.zip](https://github.com/themoeway/yomitan/raw/dictionaries/kanjidic_english.zip)
-  - [kanjidic_french.zip](https://github.com/themoeway/yomitan/raw/dictionaries/kanjidic_french.zip)
-  - [kanjidic_portuguese.zip](https://github.com/themoeway/yomitan/raw/dictionaries/kanjidic_portuguese.zip)
-  - [kanjidic_spanish.zip](https://github.com/themoeway/yomitan/raw/dictionaries/kanjidic_spanish.zip)
-- **[Innocent Corpus](https://web.archive.org/web/20190309073023/https://forum.koohii.com/thread-9459.html#pid168613)** (Term and kanji frequencies across 5000+ novels)
-  - [innocent_corpus.zip](https://github.com/themoeway/yomitan/raw/dictionaries/innocent_corpus.zip)
+- [Jitendex](https://github.com/stephenmk/Jitendex) - Jitendex is an improved version of JMdict for Yomitan. It features better formatting and some other improvements, and is actively being improved by its author.
+- [JMdict](https://github.com/themoeway/jmdict-yomitan#jmdict-for-yomitan-1) - There are daily automatically updated builds of JMdict for Yomitan available in this repository. It is available in multiple languages and formats, but we recommend installing the more modern Jitendex for English users.
+- [JMnedict](https://github.com/themoeway/jmdict-yomitan#jmnedict-for-yomitan) - JMnedict is a dictionary that lists readings of person/place/organization names and other proper nouns.
+- [KANJIDIC](https://github.com/themoeway/jmdict-yomitan#kanjidic-for-yomitan) - KANJIDIC is an English dictionary listing readings, meanings, and other info about kanji characters.
 
 ## Basic Usage
 
