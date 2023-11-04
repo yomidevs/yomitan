@@ -19,6 +19,5 @@
 (async () => {
     const src = chrome.runtime.getURL('js/app/content-script-main.js');
     // eslint-disable-next-line no-unsanitized/method
-    const contentMain = await import(src);
-    contentMain.main();
+    await import(src);
 })();
