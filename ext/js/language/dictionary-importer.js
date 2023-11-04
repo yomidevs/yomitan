@@ -17,7 +17,7 @@
  */
 
 import * as ajvSchemas from '../../lib/validate-schemas.js';
-import {BlobWriter, TextWriter, Uint8ArrayReader, ZipReader} from '../../lib/zip.js';
+import {configure, BlobWriter, TextWriter, Uint8ArrayReader, ZipReader} from '../../lib/zip.js';
 import {stringReverse} from '../core.js';
 import {MediaUtil} from '../media/media-util.js';
 export class DictionaryImporter {
@@ -36,6 +36,13 @@ export class DictionaryImporter {
         }
 
         this._progressReset();
+
+        configure({
+            workerScripts: {
+                deflate: ['../../lib/z-worker.js'],
+                inflate: ['../../lib/z-worker.js']
+            }
+        });
 
         // Read archive
         const zipFileReader = new Uint8ArrayReader(new Uint8Array(archiveContent));
