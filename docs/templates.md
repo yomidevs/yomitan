@@ -538,7 +538,7 @@ Returns an array of the mora for a kana string.
 
 ### `typeof`
 
-Returns the type of a value. Use of `#typeof` in the block form may be nonportable.
+Returns the type of a value. `#typeof` in the block form will always return `'string'`.
 
 <details>
   <summary>Syntax:</summary>
