@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class ClipboardMonitor extends EventDispatcher {
+import {EventDispatcher} from '../core.js';
+
+export class ClipboardMonitor extends EventDispatcher {
     constructor({japaneseUtil, clipboardReader}) {
         super();
         this._japaneseUtil = japaneseUtil;

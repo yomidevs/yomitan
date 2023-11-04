@@ -18,49 +18,35 @@
 
 const fs = require('fs');
 const path = require('path');
-const browserify = require('browserify');
+const esbuild = require('esbuild');
 
-async function buildParse5() {
-    const parse5Path = require.resolve('parse5');
-    const cwd = process.cwd();
-    try {
-        const baseDir = path.dirname(parse5Path);
-        process.chdir(baseDir); // This is necessary to ensure relative source map file names are consistent
-        return await new Promise((resolve, reject) => {
-            browserify({
-                entries: [parse5Path],
-                standalone: 'parse5',
-                debug: true,
-                baseDir
-            }).bundle((error, result) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result);
-                }
-            });
-        });
-    } finally {
-        process.chdir(cwd);
+async function buildLib(p) {
+    await esbuild.build({
+        entryPoints: [p],
+        bundle: true,
+        minify: false,
+        sourcemap: true,
+        target: 'es2020',
+        format: 'esm',
+        outfile: path.join(__dirname, '..', 'ext', 'lib', path.basename(p)),
+        external: ['fs']
+    });
+}
+
+async function buildLibs() {
+    const devLibPath = path.join(__dirname, 'lib');
+    const files = await fs.promises.readdir(devLibPath, {
+        withFileTypes: true
+    });
+    for (const f of files) {
+        if (f.isFile()) {
+            await buildLib(path.join(devLibPath, f.name));
+        }
     }
 }
 
-function getBuildTargets() {
-    const extLibPath = path.join(__dirname, '..', 'ext', 'lib');
-    return [
-        {path: path.join(extLibPath, 'parse5.js'), build: buildParse5}
-    ];
-}
-
-async function main() {
-    for (const {path: path2, build} of getBuildTargets()) {
-        const content = await build();
-        fs.writeFileSync(path2, content);
-    }
-}
-
-if (require.main === module) { main(); }
+if (require.main === module) { buildLibs(); }
 
 module.exports = {
-    getBuildTargets
+    buildLibs
 };

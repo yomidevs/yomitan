@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class StorageController {
+import {yomichan} from '../../yomichan.js';
+
+export class StorageController {
     constructor(persistentStorageController) {
         this._persistentStorageController = persistentStorageController;
         this._mostRecentStorageEstimate = null;

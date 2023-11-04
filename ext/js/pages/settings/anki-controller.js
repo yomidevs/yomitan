@@ -16,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AnkiConnect
- * AnkiUtil
- * ObjectPropertyAccessor
- * SelectorObserver
- */
+import {AnkiConnect} from '../../comm/anki-connect.js';
+import {EventListenerCollection, log} from '../../core.js';
+import {AnkiUtil} from '../../data/anki-util.js';
+import {SelectorObserver} from '../../dom/selector-observer.js';
+import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
+import {yomichan} from '../../yomichan.js';
 
-class AnkiController {
+export class AnkiController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._ankiConnect = new AnkiConnect();

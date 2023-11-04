@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- */
+import {EventDispatcher, EventListenerCollection, clone, isObject, log, promiseTimeout} from '../core.js';
+import {DocumentUtil} from '../dom/document-util.js';
+import {yomichan} from '../yomichan.js';
 
-class TextScanner extends EventDispatcher {
+export class TextScanner extends EventDispatcher {
     constructor({
         node,
         getSearchContext,

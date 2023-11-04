@@ -16,10 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* globals
- * AnkiTemplateRenderer
- * TemplateRendererFrameApi
- */
+import {AnkiTemplateRenderer} from './anki-template-renderer.js';
+import {TemplateRendererFrameApi} from './template-renderer-frame-api.js';
 
 (async () => {
     const ankiTemplateRenderer = new AnkiTemplateRenderer();

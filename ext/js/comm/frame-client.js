@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class FrameClient {
+import {deferPromise, generateId, isObject} from '../core.js';
+
+export class FrameClient {
     constructor() {
         this._secret = null;
         this._token = null;

@@ -16,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AnkiUtil
- * TemplateRendererProxy
- */
+import {deferPromise, deserializeError} from '../core.js';
+import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
+import {yomichan} from '../yomichan.js';
+import {AnkiUtil} from './anki-util.js';
 
-class AnkiNoteBuilder {
+export class AnkiNoteBuilder {
     constructor({japaneseUtil}) {
         this._japaneseUtil = japaneseUtil;
         this._markerPattern = AnkiUtil.cloneFieldMarkerPattern(true);

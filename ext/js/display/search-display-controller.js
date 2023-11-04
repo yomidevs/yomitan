@@ -16,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * ClipboardMonitor
- * wanakana
- */
+import * as wanakana from '../../lib/wanakana.js';
+import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
+import {EventListenerCollection, invokeMessageHandler} from '../core.js';
+import {yomichan} from '../yomichan.js';
 
-class SearchDisplayController {
+export class SearchDisplayController {
     constructor(tabId, frameId, display, displayAudio, japaneseUtil, searchPersistentStateController) {
         this._tabId = tabId;
         this._frameId = frameId;

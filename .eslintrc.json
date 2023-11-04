@@ -6,7 +6,7 @@
     ],
     "parserOptions": {
         "ecmaVersion": 11,
-        "sourceType": "script",
+        "sourceType": "module",
         "ecmaFeatures": {
             "globalReturn": false,
             "impliedStrict": true
@@ -50,6 +50,7 @@
         "no-case-declarations": "error",
         "no-const-assign": "error",
         "no-constant-condition": "off",
+        "no-console": "warn",
         "no-global-assign": "error",
         "no-param-reassign": "off",
         "no-prototype-builtins": "error",
@@ -250,6 +251,7 @@
         "jsdoc/multiline-blocks": "error",
         "jsdoc/no-bad-blocks": "error",
         "jsdoc/no-multi-asterisks": "error",
+        "jsdoc/no-undefined-types": 1,
         "jsdoc/require-asterisk-prefix": "error",
         "jsdoc/require-hyphen-before-param-description": [
             "error",
@@ -384,26 +386,7 @@
                 "ext/js/accessibility/google-docs.js",
                 "ext/js/**/sandbox/**/*.js"
             ],
-            "globals": {
-                "serializeError": "readonly",
-                "deserializeError": "readonly",
-                "isObject": "readonly",
-                "stringReverse": "readonly",
-                "promiseTimeout": "readonly",
-                "escapeRegExp": "readonly",
-                "deferPromise": "readonly",
-                "clone": "readonly",
-                "deepEqual": "readonly",
-                "generateId": "readonly",
-                "promiseAnimationFrame": "readonly",
-                "invokeMessageHandler": "readonly",
-                "log": "readonly",
-                "DynamicProperty": "readonly",
-                "EventDispatcher": "readonly",
-                "EventListenerCollection": "readonly",
-                "Logger": "readonly",
-                "import": "readonly"
-            }
+            "globals": {}
         },
         {
             "files": [
@@ -444,6 +427,14 @@
                 "es2017": true,
                 "node": true,
                 "webextensions": false
+            }
+        },
+        {
+            "files": [
+                "ext/js/language/dictionary-worker-main.js"
+            ],
+            "parserOptions": {
+                "sourceType": "module"
             }
         },
         {

@@ -19,7 +19,7 @@
 /**
  * Class which is used to observe elements matching a selector in specific element.
  */
-class SelectorObserver {
+export class SelectorObserver {
     /**
      * @function OnAddedCallback
      * @param {Element} element The element which was added.

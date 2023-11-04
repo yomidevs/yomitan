@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class TaskAccumulator {
+import {log} from '../core.js';
+
+export class TaskAccumulator {
     constructor(runTasks) {
         this._deferPromise = null;
         this._activePromise = null;

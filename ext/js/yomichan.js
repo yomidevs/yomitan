@@ -16,10 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * API
- * CrossFrameAPI
- */
+import {API} from './comm/api.js';
+import {CrossFrameAPI} from './comm/cross-frame-api.js';
+import {EventDispatcher, deferPromise, invokeMessageHandler, log, serializeError} from './core.js';
 
 // Set up chrome alias if it's not available (Edge Legacy)
 if ((() => {
@@ -239,4 +238,4 @@ class Yomichan extends EventDispatcher {
 /**
  * The default Yomichan class instance.
  */
-const yomichan = new Yomichan();
+export const yomichan = new Yomichan();

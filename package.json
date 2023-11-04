@@ -37,19 +37,26 @@
     "devDependencies": {
         "@playwright/test": "^1.39.0",
         "@types/node": "^20.8.10",
+        "@zip.js/zip.js": "^2.7.30",
         "ajv": "^8.12.0",
         "browserify": "^17.0.0",
         "css": "^3.0.0",
+        "dexie": "^3.2.4",
+        "dexie-export-import": "^4.0.7",
+        "esbuild": "^0.19.5",
         "eslint": "^8.52.0",
         "eslint-plugin-header": "^3.1.1",
         "eslint-plugin-jsdoc": "^46.8.2",
         "eslint-plugin-jsonc": "^2.10.0",
         "eslint-plugin-no-unsanitized": "^4.0.1",
         "fake-indexeddb": "^5.0.1",
+        "handlebars": "^4.7.8",
         "html-validate": "^8.7.0",
         "jsdom": "^22.1.0",
+        "jszip": "^3.10.1",
         "parse5": "^7.1.2",
         "stylelint": "^15.11.0",
-        "stylelint-config-recommended": "^13.0.0"
+        "stylelint-config-recommended": "^13.0.0",
+        "wanakana": "^5.2.0"
     }
 }

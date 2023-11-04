@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Frontend
- * HotkeyHandler
- * PopupFactory
- */
+import {log} from '../core.js';
+import {HotkeyHandler} from '../input/hotkey-handler.js';
+import {yomichan} from '../yomichan.js';
+import {Frontend} from './frontend.js';
+import {PopupFactory} from './popup-factory.js';
 
 (async () => {
     try {

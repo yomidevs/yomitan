@@ -16,6 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {EventDispatcher, EventListenerCollection, deserializeError, invokeMessageHandler, log, serializeError} from '../core.js';
+import {yomichan} from '../yomichan.js';
+
 class CrossFrameAPIPort extends EventDispatcher {
     constructor(otherTabId, otherFrameId, port, messageHandlers) {
         super();
@@ -217,7 +220,7 @@ class CrossFrameAPIPort extends EventDispatcher {
     }
 }
 
-class CrossFrameAPI {
+export class CrossFrameAPI {
     constructor() {
         this._ackTimeout = 3000; // 3 seconds
         this._responseTimeout = 10000; // 10 seconds

@@ -16,10 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {isObject} from '../core.js';
 /**
  * This class is used to manage script injection into content tabs.
  */
-class ScriptManager {
+export class ScriptManager {
     /**
      * Creates a new instance of the class.
      */

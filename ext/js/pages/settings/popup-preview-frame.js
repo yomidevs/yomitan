@@ -16,13 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Frontend
- * TextSourceRange
- * wanakana
- */
+import * as wanakana from '../../../lib/wanakana.js';
+import {Frontend} from '../../app/frontend.js';
+import {TextSourceRange} from '../../dom/text-source-range.js';
+import {yomichan} from '../../yomichan.js';
 
-class PopupPreviewFrame {
+export class PopupPreviewFrame {
     constructor(tabId, frameId, popupFactory, hotkeyHandler) {
         this._tabId = tabId;
         this._frameId = frameId;

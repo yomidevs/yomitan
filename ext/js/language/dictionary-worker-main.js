@@ -16,22 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DictionaryWorkerHandler
- */
-
-self.importScripts(
-    '/lib/jszip.min.js',
-    '/js/core.js',
-    '/js/data/database.js',
-    '/js/data/json-schema.js',
-    '/js/general/cache-map.js',
-    '/js/language/dictionary-database.js',
-    '/js/language/dictionary-importer.js',
-    '/js/language/dictionary-worker-handler.js',
-    '/js/language/dictionary-worker-media-loader.js',
-    '/js/media/media-util.js'
-);
+import {log} from '../core.js';
+import {DictionaryWorkerHandler} from './dictionary-worker-handler.js';
 
 (() => {
     try {

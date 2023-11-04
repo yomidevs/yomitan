@@ -16,10 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 /**
  * Class which caches a map of values, keeping the most recently accessed values.
  */
-class CacheMap {
+export class CacheMap {
     /**
      * Creates a new CacheMap.
      * @param {number} maxSize The maximum number of entries able to be stored in the cache.

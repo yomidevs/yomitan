@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * ProfileConditionsUI
- */
+import {clone, EventListenerCollection} from '../../core.js';
+import {yomichan} from '../../yomichan.js';
+import {ProfileConditionsUI} from './profile-conditions-ui.js';
 
-class ProfileController {
+export class ProfileController {
     constructor(settingsController, modalController) {
         this._settingsController = settingsController;
         this._modalController = modalController;

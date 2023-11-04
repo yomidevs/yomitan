@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class TextSourceMap {
+export class TextSourceMap {
     constructor(source, mapping=null) {
         this._source = source;
         this._mapping = (mapping !== null ? TextSourceMap.normalizeMapping(mapping) : null);

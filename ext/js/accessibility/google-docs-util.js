@@ -16,15 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- * TextSourceRange
- */
+import {DocumentUtil} from '../dom/document-util.js';
+import {TextSourceElement} from '../dom/text-source-element.js';
+import {TextSourceRange} from '../dom/text-source-range.js';
 
 /**
  * This class is a helper for handling Google Docs content in content scripts.
  */
-class GoogleDocsUtil {
+export class GoogleDocsUtil {
     /**
      * Scans the document for text or elements with text information at the given coordinate.
      * Coordinates are provided in [client space](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems).

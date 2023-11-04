@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class SearchPersistentStateController extends EventDispatcher {
+import {EventDispatcher} from '../core.js';
+
+export class SearchPersistentStateController extends EventDispatcher {
     constructor() {
         super();
         this._mode = null;

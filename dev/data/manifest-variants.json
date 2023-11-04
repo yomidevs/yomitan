@@ -28,7 +28,8 @@
             "default_popup": "action-popup.html"
         },
         "background": {
-            "service_worker": "sw.js"
+            "service_worker": "sw.js",
+            "type": "module"
         },
         "content_scripts": [
             {
@@ -41,28 +42,7 @@
                 "match_about_blank": true,
                 "all_frames": true,
                 "js": [
-                    "js/core.js",
-                    "js/yomichan.js",
-                    "js/app/frontend.js",
-                    "js/app/popup.js",
-                    "js/app/popup-factory.js",
-                    "js/app/popup-proxy.js",
-                    "js/app/popup-window.js",
-                    "js/app/theme-controller.js",
-                    "js/comm/api.js",
-                    "js/comm/cross-frame-api.js",
-                    "js/comm/frame-ancestry-handler.js",
-                    "js/comm/frame-client.js",
-                    "js/comm/frame-offset-forwarder.js",
-                    "js/data/sandbox/string-util.js",
-                    "js/dom/dom-text-scanner.js",
-                    "js/dom/document-util.js",
-                    "js/dom/text-source-element.js",
-                    "js/dom/text-source-range.js",
-                    "js/input/hotkey-handler.js",
-                    "js/language/text-scanner.js",
-                    "js/script/dynamic-loader.js",
-                    "js/app/content-script-main.js"
+                    "js/app/content-script-wrapper.js"
                 ]
             }
         ],
@@ -118,7 +98,8 @@
             {
                 "resources": [
                     "popup.html",
-                    "template-renderer.html"
+                    "template-renderer.html",
+                    "js/*"
                 ],
                 "matches": [
                     "<all_urls>"
@@ -187,7 +168,9 @@
                     "path": [
                         "permissions"
                     ],
-                    "items": ["clipboardRead"]
+                    "items": [
+                        "clipboardRead"
+                    ]
                 }
             ]
         },

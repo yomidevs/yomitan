@@ -16,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DictionaryController
- * DictionaryWorker
- */
+import {deserializeError, log} from '../../core.js';
+import {DictionaryWorker} from '../../language/dictionary-worker.js';
+import {yomichan} from '../../yomichan.js';
+import {DictionaryController} from './dictionary-controller.js';
 
-class DictionaryImportController {
+export class DictionaryImportController {
     constructor(settingsController, modalController, statusFooter) {
         this._settingsController = settingsController;
         this._modalController = modalController;

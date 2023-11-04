@@ -16,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class FrameEndpoint {
+import {EventListenerCollection, generateId, isObject} from '../core.js';
+import {yomichan} from '../yomichan.js';
+
+export class FrameEndpoint {
     constructor() {
         this._secret = generateId(16);
         this._token = null;

@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class TemplateRendererProxy {
+import {deserializeError, generateId} from '../core.js';
+
+export class TemplateRendererProxy {
     constructor() {
         this._frame = null;
         this._frameNeedsLoad = true;

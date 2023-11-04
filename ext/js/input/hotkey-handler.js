@@ -16,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- */
+import {EventDispatcher, EventListenerCollection} from '../core.js';
+import {DocumentUtil} from '../dom/document-util.js';
+import {yomichan} from '../yomichan.js';
 
 /**
  * Class which handles hotkey events and actions.
  */
-class HotkeyHandler extends EventDispatcher {
+export class HotkeyHandler extends EventDispatcher {
     /**
      * Information describing a hotkey.
      * @typedef {object} HotkeyDefinition

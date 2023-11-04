@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AnkiNoteBuilder
- * AnkiUtil
- * PopupMenu
- */
+import {EventListenerCollection, deferPromise, isObject} from '../core.js';
+import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
+import {AnkiUtil} from '../data/anki-util.js';
+import {PopupMenu} from '../dom/popup-menu.js';
+import {yomichan} from '../yomichan.js';
 
-class DisplayAnki {
+export class DisplayAnki {
     constructor(display, displayAudio, japaneseUtil) {
         this._display = display;
         this._displayAudio = displayAudio;

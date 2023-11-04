@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class ScrollElement {
+export class ScrollElement {
     constructor(node) {
         this._node = node;
         this._animationRequestId = null;

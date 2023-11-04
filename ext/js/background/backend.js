@@ -16,34 +16,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AccessibilityController
- * AnkiConnect
- * AnkiUtil
- * ArrayBufferUtil
- * AudioDownloader
- * ClipboardMonitor
- * ClipboardReader
- * DictionaryDatabase
- * Environment
- * JapaneseUtil
- * Mecab
- * MediaUtil
- * ObjectPropertyAccessor
- * OptionsUtil
- * PermissionsUtil
- * ProfileConditionsUtil
- * RequestBuilder
- * ScriptManager
- * Translator
- * wanakana
- */
+import * as wanakana from '../../lib/wanakana.js';
+import {AccessibilityController} from '../accessibility/accessibility-controller.js';
+import {AnkiConnect} from '../comm/anki-connect.js';
+import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
+import {ClipboardReader} from '../comm/clipboard-reader.js';
+import {Mecab} from '../comm/mecab.js';
+import {clone, deferPromise, deserializeError, generateId, invokeMessageHandler, isObject, log, promiseTimeout, serializeError} from '../core.js';
+import {AnkiUtil} from '../data/anki-util.js';
+import {OptionsUtil} from '../data/options-util.js';
+import {PermissionsUtil} from '../data/permissions-util.js';
+import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {Environment} from '../extension/environment.js';
+import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
+import {DictionaryDatabase} from '../language/dictionary-database.js';
+import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
+import {Translator} from '../language/translator.js';
+import {AudioDownloader} from '../media/audio-downloader.js';
+import {MediaUtil} from '../media/media-util.js';
+import {yomichan} from '../yomichan.js';
+import {ProfileConditionsUtil} from './profile-conditions-util.js';
+import {RequestBuilder} from './request-builder.js';
+import {ScriptManager} from './script-manager.js';
 
 /**
  * This class controls the core logic of the extension, including API calls
  * and various forms of communication between browser tabs and external applications.
  */
-class Backend {
+export class Backend {
     /**
      * Creates a new instance.
      */

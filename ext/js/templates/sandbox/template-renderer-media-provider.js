@@ -20,7 +20,7 @@
  * Handlebars
  */
 
-class TemplateRendererMediaProvider {
+export class TemplateRendererMediaProvider {
     constructor() {
         this._requirements = null;
     }

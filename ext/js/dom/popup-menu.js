@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class PopupMenu extends EventDispatcher {
+import {EventDispatcher, EventListenerCollection} from '../core.js';
+
+export class PopupMenu extends EventDispatcher {
     constructor(sourceElement, containerNode) {
         super();
         this._sourceElement = sourceElement;

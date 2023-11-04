@@ -19,7 +19,7 @@
 /**
  * This class is used to control theme attributes on DOM elements.
  */
-class ThemeController {
+export class ThemeController {
     /**
      * Creates a new instance of the class.
      * @param {?Element} element A DOM element which theme properties are applied to.

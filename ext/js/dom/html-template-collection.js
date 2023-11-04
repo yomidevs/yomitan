@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class HtmlTemplateCollection {
+export class HtmlTemplateCollection {
     constructor(source) {
         this._templates = new Map();
 

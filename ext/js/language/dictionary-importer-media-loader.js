@@ -16,10 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {EventListenerCollection} from '../core.js';
+
 /**
  * Class used for loading and validating media during the dictionary import process.
  */
-class DictionaryImporterMediaLoader {
+export class DictionaryImporterMediaLoader {
     /**
      * Attempts to load an image using an ArrayBuffer and a media type to return details about it.
      * @param {ArrayBuffer} content The binary content for the image, encoded as an ArrayBuffer.

@@ -16,15 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * ClipboardReader
- */
+import {ClipboardReader} from '../comm/clipboard-reader.js';
+import {invokeMessageHandler} from '../core.js';
+import {yomichan} from '../yomichan.js';
 
 /**
  * This class controls the core logic of the extension, including API calls
  * and various forms of communication between browser tabs and external applications.
  */
-class Offscreen {
+export class Offscreen {
     /**
      * Creates a new instance.
      */

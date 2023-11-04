@@ -16,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class OptionToggleHotkeyHandler {
+import {deserializeError} from '../core.js';
+import {yomichan} from '../yomichan.js';
+
+export class OptionToggleHotkeyHandler {
     constructor(display) {
         this._display = display;
         this._notification = null;

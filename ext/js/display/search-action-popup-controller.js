@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class SearchActionPopupController {
+export class SearchActionPopupController {
     constructor(searchPersistentStateController) {
         this._searchPersistentStateController = searchPersistentStateController;
     }

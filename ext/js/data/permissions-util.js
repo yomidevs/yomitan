@@ -16,11 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AnkiUtil
- */
+import {AnkiUtil} from './anki-util.js';
 
-class PermissionsUtil {
+export class PermissionsUtil {
     constructor() {
         this._ankiFieldMarkersRequiringClipboardPermission = new Set([
             'clipboard-image',

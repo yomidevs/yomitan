@@ -16,11 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * FrameAncestryHandler
- */
+import {yomichan} from '../yomichan.js';
+import {FrameAncestryHandler} from './frame-ancestry-handler.js';
 
-class FrameOffsetForwarder {
+export class FrameOffsetForwarder {
     constructor(frameId) {
         this._frameId = frameId;
         this._frameAncestryHandler = new FrameAncestryHandler(frameId);

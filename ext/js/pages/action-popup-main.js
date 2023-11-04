@@ -16,12 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * HotkeyHelpController
- * PermissionsUtil
- */
+import {PermissionsUtil} from '../data/permissions-util.js';
+import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
+import {yomichan} from '../yomichan.js';
 
-class DisplayController {
+export class DisplayController {
     constructor() {
         this._optionsFull = null;
         this._permissionsUtil = new PermissionsUtil();

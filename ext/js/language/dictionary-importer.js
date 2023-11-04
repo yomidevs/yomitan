@@ -16,12 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * JSZip
- * MediaUtil
- */
-
-class DictionaryImporter {
+import * as ajvSchemas from '../../lib/validate-schemas.js';
+import {BlobWriter, TextWriter, Uint8ArrayReader, ZipReader} from '../../lib/zip.js';
+import {stringReverse} from '../core.js';
+import {MediaUtil} from '../media/media-util.js';
+export class DictionaryImporter {
     constructor(mediaLoader, onProgress) {
         this._mediaLoader = mediaLoader;
         this._onProgress = typeof onProgress === 'function' ? onProgress : () => {};
@@ -39,18 +38,25 @@ class DictionaryImporter {
         this._progressReset();
 
         // Read archive
-        const archive = await JSZip.loadAsync(archiveContent);
-
+        const zipFileReader = new Uint8ArrayReader(new Uint8Array(archiveContent));
+        const zipReader = new ZipReader(zipFileReader);
+        const zipEntries = await zipReader.getEntries();
+        const zipEntriesObject = {};
+        for (const entry of zipEntries) {
+            zipEntriesObject[entry.filename] = entry;
+        }
         // Read and validate index
         const indexFileName = 'index.json';
-        const indexFile = archive.file(indexFileName);
+        const indexFile = zipEntriesObject[indexFileName];
         if (!indexFile) {
             throw new Error('No dictionary index found in archive');
         }
 
-        const index = JSON.parse(await indexFile.async('string'));
+        const indexContent = await indexFile.getData(
+            new TextWriter()
+        );
+        const index = JSON.parse(indexContent);
 
-        const ajvSchemas = await import('/lib/validate-schemas.js');
         if (!ajvSchemas.dictionaryIndex(index)) {
             throw this._formatAjvSchemaError(ajvSchemas.dictionaryIndex, indexFileName);
         }
@@ -79,19 +85,19 @@ class DictionaryImporter {
         const dataBankSchemas = this._getDataBankSchemas(version);
 
         // Files
-        const termFiles      = this._getArchiveFiles(archive, 'term_bank_?.json');
-        const termMetaFiles  = this._getArchiveFiles(archive, 'term_meta_bank_?.json');
-        const kanjiFiles     = this._getArchiveFiles(archive, 'kanji_bank_?.json');
-        const kanjiMetaFiles = this._getArchiveFiles(archive, 'kanji_meta_bank_?.json');
-        const tagFiles       = this._getArchiveFiles(archive, 'tag_bank_?.json');
+        const termFiles      = this._getArchiveFiles(zipEntriesObject, 'term_bank_?.json');
+        const termMetaFiles  = this._getArchiveFiles(zipEntriesObject, 'term_meta_bank_?.json');
+        const kanjiFiles     = this._getArchiveFiles(zipEntriesObject, 'kanji_bank_?.json');
+        const kanjiMetaFiles = this._getArchiveFiles(zipEntriesObject, 'kanji_meta_bank_?.json');
+        const tagFiles       = this._getArchiveFiles(zipEntriesObject, 'tag_bank_?.json');
 
         // Load data
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
-        const termList      = await this._readFileSequence(ajvSchemas, termFiles,      convertTermBankEntry,      dataBankSchemas[0], dictionaryTitle);
-        const termMetaList  = await this._readFileSequence(ajvSchemas, termMetaFiles,  convertTermMetaBankEntry,  dataBankSchemas[1], dictionaryTitle);
-        const kanjiList     = await this._readFileSequence(ajvSchemas, kanjiFiles,     convertKanjiBankEntry,     dataBankSchemas[2], dictionaryTitle);
-        const kanjiMetaList = await this._readFileSequence(ajvSchemas, kanjiMetaFiles, convertKanjiMetaBankEntry, dataBankSchemas[3], dictionaryTitle);
-        const tagList       = await this._readFileSequence(ajvSchemas, tagFiles,       convertTagBankEntry,       dataBankSchemas[4], dictionaryTitle);
+        const termList      = await this._readFileSequence(termFiles,      convertTermBankEntry,      dataBankSchemas[0], dictionaryTitle);
+        const termMetaList  = await this._readFileSequence(termMetaFiles,  convertTermMetaBankEntry,  dataBankSchemas[1], dictionaryTitle);
+        const kanjiList     = await this._readFileSequence(kanjiFiles,     convertKanjiBankEntry,     dataBankSchemas[2], dictionaryTitle);
+        const kanjiMetaList = await this._readFileSequence(kanjiMetaFiles, convertKanjiMetaBankEntry, dataBankSchemas[3], dictionaryTitle);
+        const tagList       = await this._readFileSequence(tagFiles,       convertTagBankEntry,       dataBankSchemas[4], dictionaryTitle);
         this._addOldIndexTags(index, tagList, dictionaryTitle);
 
         // Prefix wildcard support
@@ -124,7 +130,7 @@ class DictionaryImporter {
 
         // Async requirements
         this._progressNextStep(requirements.length);
-        const {media} = await this._resolveAsyncRequirements(requirements, archive);
+        const {media} = await this._resolveAsyncRequirements(requirements, zipEntriesObject);
 
         // Add dictionary descriptor
         this._progressNextStep(termList.length + termMetaList.length + kanjiList.length + kanjiMetaList.length + tagList.length + media.length);
@@ -294,9 +300,9 @@ class DictionaryImporter {
         return target;
     }
 
-    async _resolveAsyncRequirements(requirements, archive) {
+    async _resolveAsyncRequirements(requirements, zipEntriesObject) {
         const media = new Map();
-        const context = {archive, media};
+        const context = {zipEntriesObject, media};
 
         for (const requirement of requirements) {
             await this._resolveAsyncRequirement(context, requirement);
@@ -386,13 +392,16 @@ class DictionaryImporter {
         }
 
         // Find file in archive
-        const file = context.archive.file(path);
+        const file = context.zipEntriesObject[path];
         if (file === null) {
             throw createError('Could not find image');
         }
 
         // Load file content
-        let content = await file.async('arraybuffer');
+        let content = await (await file.getData(
+            new BlobWriter()
+        )).arrayBuffer();
+
         const mediaType = MediaUtil.getImageMediaTypeFromFileName(path);
         if (mediaType === null) {
             throw createError('Could not determine media type for image');
@@ -484,33 +493,35 @@ class DictionaryImporter {
         }
     }
 
-    _getArchiveFiles(archive, fileNameFormat) {
+    _getArchiveFiles(zipEntriesObject, fileNameFormat) {
         const indexPosition = fileNameFormat.indexOf('?');
         const prefix = fileNameFormat.substring(0, indexPosition);
         const suffix = fileNameFormat.substring(indexPosition + 1);
         const results = [];
-        for (let i = 1; true; ++i) {
-            const fileName = `${prefix}${i}${suffix}`;
-            const file = archive.file(fileName);
-            if (!file) { break; }
-            results.push(file);
+        for (const f of Object.keys(zipEntriesObject)) {
+            if (f.startsWith(prefix) && f.endsWith(suffix)) {
+                results.push(zipEntriesObject[f]);
+            }
         }
         return results;
     }
 
-    async _readFileSequence(ajvSchemas, files, convertEntry, schemaName, dictionaryTitle) {
+    async _readFileSequence(files, convertEntry, schemaName, dictionaryTitle) {
         const progressData = this._progressData;
         let startIndex = 0;
 
         const results = [];
-        for (const file of files) {
-            const entries = JSON.parse(await file.async('string'));
+        for (const fileName of Object.keys(files)) {
+            const content = await files[fileName].getData(
+                new TextWriter()
+            );
+            const entries = JSON.parse(content);
 
             startIndex = progressData.index;
             this._progress();
 
             if (!ajvSchemas[schemaName](entries)) {
-                throw this._formatAjvSchemaError(ajvSchemas[schemaName], file.name);
+                throw this._formatAjvSchemaError(ajvSchemas[schemaName], fileName);
             }
 
             progressData.index = startIndex + 1;

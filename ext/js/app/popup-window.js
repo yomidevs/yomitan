@@ -16,10 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {EventDispatcher} from '../core.js';
+import {yomichan} from '../yomichan.js';
+import {Popup} from './popup.js';
+
 /**
  * This class represents a popup that is hosted in a new native window.
  */
-class PopupWindow extends EventDispatcher {
+export class PopupWindow extends EventDispatcher {
     /**
      * Creates a new instance.
      * @param {object} details Details about how to set up the instance.

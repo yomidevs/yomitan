@@ -16,14 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AnkiUtil
- */
+import {isObject} from '../core.js';
+import {AnkiUtil} from '../data/anki-util.js';
 
 /**
  * This class controls communication with Anki via the AnkiConnect plugin.
  */
-class AnkiConnect {
+export class AnkiConnect {
     /**
      * Creates a new instance.
      */

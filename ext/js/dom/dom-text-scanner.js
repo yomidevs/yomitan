@@ -16,14 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * StringUtil
- */
+import {StringUtil} from '../data/sandbox/string-util.js';
 
 /**
  * A class used to scan text in a document.
  */
-class DOMTextScanner {
+export class DOMTextScanner {
     /**
      * Creates a new instance of a DOMTextScanner.
      * @param {Node} node The DOM Node to start at.

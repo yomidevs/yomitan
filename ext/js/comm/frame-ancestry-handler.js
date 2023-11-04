@@ -16,13 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {generateId} from '../core.js';
+import {yomichan} from '../yomichan.js';
+
 /**
  * This class is used to return the ancestor frame IDs for the current frame.
  * This is a workaround to using the `webNavigation.getAllFrames` API, which
  * would require an additional permission that is otherwise unnecessary.
  * It is also used to track the correlation between child frame elements and their IDs.
  */
-class FrameAncestryHandler {
+export class FrameAncestryHandler {
     /**
      * Creates a new instance.
      * @param {number} frameId The frame ID of the current frame the instance is instantiated in.

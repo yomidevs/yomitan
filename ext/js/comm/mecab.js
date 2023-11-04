@@ -16,11 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {EventListenerCollection} from '../core.js';
+
 /**
  * This class is used to connect Yomichan to a native component that is
  * used to parse text into individual terms.
  */
-class Mecab {
+export class Mecab {
     /**
      * The resulting data from an invocation of `parseText`.
      * @typedef {object} ParseResult

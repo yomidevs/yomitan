@@ -16,11 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Modal
- */
+import {Modal} from './modal.js';
 
-class ModalController {
+export class ModalController {
     constructor() {
         this._modals = [];
         this._modalMap = new Map();

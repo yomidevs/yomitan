@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class NativeSimpleDOMParser {
+export class NativeSimpleDOMParser {
     constructor(content) {
         this._document = new DOMParser().parseFromString(content, 'text/html');
     }

@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class PopupWindowController {
+import {yomichan} from '../../yomichan.js';
+
+export class PopupWindowController {
     prepare() {
         const testLink = document.querySelector('#test-window-open-link');
         testLink.addEventListener('click', this._onTestWindowOpenLinkClick.bind(this), false);

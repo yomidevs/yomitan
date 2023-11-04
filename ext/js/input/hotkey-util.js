@@ -19,7 +19,7 @@
 /**
  * Utility class to help display hotkeys and convert to/from commands.
  */
-class HotkeyUtil {
+export class HotkeyUtil {
     /**
      * Creates a new instance.
      * @param {?string} os The operating system for this instance.

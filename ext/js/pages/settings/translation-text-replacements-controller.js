@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class TranslationTextReplacementsController {
+import {EventListenerCollection} from '../../core.js';
+
+export class TranslationTextReplacementsController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._entryContainer = null;

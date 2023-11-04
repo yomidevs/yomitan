@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class SentenceTerminationCharactersController {
+import {EventListenerCollection} from '../../core.js';
+
+export class SentenceTerminationCharactersController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._entries = [];

@@ -26,6 +26,7 @@ const {getAllFiles, getArgs, testMain} = util;
 const {ManifestUtil} = require('./manifest-util');
 const Ajv = require('ajv');
 const standaloneCode = require('ajv/dist/standalone').default;
+const buildLibs = require('./build-libs.js').buildLibs;
 
 async function createZip(directory, excludeFiles, outputFileName, sevenZipExes, onUpdate, dryRun) {
     try {
@@ -215,6 +216,7 @@ async function main(argv) {
     const manifestPath = path.join(extDir, 'manifest.json');
 
     try {
+        await buildLibs();
         const variantNames = (
             argv.length === 0 || args.get('all') ?
             manifestUtil.getVariants().filter(({buildable}) => buildable !== false).map(({name}) => name) :

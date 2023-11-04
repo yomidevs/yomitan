@@ -16,19 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DictionaryController
- * DictionaryImportController
- * DocumentFocusController
- * ExtensionContentController
- * GenericSettingController
- * ModalController
- * RecommendedPermissionsController
- * ScanInputsSimpleController
- * SettingsController
- * SettingsDisplayController
- * StatusFooter
- */
+import {log} from '../core.js';
+import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {yomichan} from '../yomichan.js';
+import {ExtensionContentController} from './common/extension-content-controller.js';
+import {DictionaryController} from './settings/dictionary-controller.js';
+import {DictionaryImportController} from './settings/dictionary-import-controller.js';
+import {GenericSettingController} from './settings/generic-setting-controller.js';
+import {ModalController} from './settings/modal-controller.js';
+import {RecommendedPermissionsController} from './settings/recommended-permissions-controller.js';
+import {ScanInputsSimpleController} from './settings/scan-inputs-simple-controller.js';
+import {SettingsController} from './settings/settings-controller.js';
+import {SettingsDisplayController} from './settings/settings-display-controller.js';
+import {StatusFooter} from './settings/status-footer.js';
 
 async function setupEnvironmentInfo() {
     const {manifest_version: manifestVersion} = chrome.runtime.getManifest();
