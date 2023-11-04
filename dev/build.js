@@ -140,10 +140,9 @@ async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath,
     const moduleCode = standaloneCode(ajv);
 
     // https://github.com/ajv-validator/ajv/issues/2209
-    const patchedModuleCode = moduleCode.replaceAll('require("ajv/dist/runtime/ucs2length").default', 'import("/lib/ucs2length.js").default');
+    const patchedModuleCode = moduleCode.replaceAll(/const (func[\d]*) = require\("ajv\/dist\/runtime\/ucs2length"\).default;/gi, 'function $1(str){const len = str.length;let length = 0;let pos = 0;let value;while(pos < len){length++;value = str.charCodeAt(pos++);if(value >= 0xd800 && value <= 0xdbff && pos < len){value = str.charCodeAt(pos);if((value & 0xfc00) === 0xdc00)pos++;}}return length;}');
 
     fs.writeFileSync(path.join(extDir, 'lib/validate-schemas.js'), patchedModuleCode);
-
 
     process.stdout.write(`Version: ${yomitanVersion}...\n`);
 
