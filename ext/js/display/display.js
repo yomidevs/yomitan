@@ -1652,6 +1652,9 @@ export class Display extends EventDispatcher {
                 Object.assign(result, result2);
             }
         }
+
+        // eslint-disable-next-line no-console
+        console.log(result);
     }
 
     _triggerContentClear() {
