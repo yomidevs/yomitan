@@ -187,6 +187,13 @@
                     ]
                 },
                 {
+                    "action": "delete",
+                    "path": [
+                        "background",
+                        "type"
+                    ]
+                },
+                {
                     "action": "set",
                     "path": [
                         "background",
@@ -251,9 +258,7 @@
                 "sw.js",
                 "offscreen.html",
                 "js/background/offscreen.js",
-                "js/background/offscreen-main.js",
-                "js/dom/simple-dom-parser.js",
-                "lib/parse5.js"
+                "js/background/offscreen-main.js"
             ]
         },
         {
@@ -302,9 +307,7 @@
                 "sw.js",
                 "offscreen.html",
                 "js/background/offscreen.js",
-                "js/background/offscreen-main.js",
-                "js/dom/simple-dom-parser.js",
-                "lib/parse5.js"
+                "js/background/offscreen-main.js"
             ]
         },
         {
