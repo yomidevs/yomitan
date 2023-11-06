@@ -5,23 +5,23 @@
     "description": "Dictionary lookup with Anki integration",
     "author": "Alex Yatskov",
     "icons": {
-        "16": "images/flag.png",
-        "19": "images/flag.png",
-        "32": "images/flag.png",
-        "38": "images/flag.png",
-        "48": "images/flag.png",
-        "64": "images/flag.png",
-        "128": "images/flag.png"
+        "16": "images/tongue.png",
+        "19": "images/tongue.png",
+        "32": "images/tongue.png",
+        "38": "images/tongue.png",
+        "48": "images/tongue.png",
+        "64": "images/tongue.png",
+        "128": "images/tongue.png"
     },
     "browser_action": {
         "default_icon": {
-            "16": "images/flag.png",
-            "19": "images/flag.png",
-            "32": "images/flag.png",
-            "38": "images/flag.png",
-            "48": "images/flag.png",
-            "64": "images/flag.png",
-            "128": "images/flag.png"
+            "16": "images/tongue.png",
+            "19": "images/tongue.png",
+            "32": "images/tongue.png",
+            "38": "images/tongue.png",
+            "48": "images/tongue.png",
+            "64": "images/tongue.png",
+            "128": "images/tongue.png"
         },
         "default_title": "Yomichan",
         "default_popup": "action-popup.html"
