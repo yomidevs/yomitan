@@ -120,10 +120,18 @@ class PopupPreviewFrame {
                 return 'gelesen';
             case 'en':
                 return "don't read";
+            case 'es':
+                return 'acabar de';
+            case 'fr':
+                return 'lire';
+            case 'hr':
+                return 'čitaše';
             case 'ja':
                 return '読め';
             case 'ru':
                 return 'читать';
+            case 'sr':
+                return 'читаше';
             case 'sq':
                 return 'ndihmojmë';
         }

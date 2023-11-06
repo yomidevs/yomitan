@@ -311,7 +311,6 @@ class Translator {
         deinflections.forEach((deinflection) => {
             const {databaseEntries} = deinflection;
             databaseEntries.forEach((entry) => {
-                console.log(entry);
                 const {definitionTags, term, formOf, inflectionHypotheses}  = entry;
                 if (definitionTags.includes('non-lemma')) {
                     const lemma = formOf || '';

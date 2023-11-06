@@ -46,6 +46,8 @@ export class LanguageUtil {
             if (!window.languages[language].deinflectionReasons) {
                 if (!window.languages[language].getDeinflectionReasons) {
                     await loadModule(`/js/language/languages/${language}/grammar.js`);
+                    window.languages[language].getDeinflectionReasons ??= () => [];
+                    console.log(window.languages[language].getDeinflectionReasons)
                 }
                 window.languages[language].deinflectionReasons = await window.languages[language].getDeinflectionReasons();
             }
