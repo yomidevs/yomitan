@@ -305,16 +305,17 @@ class DisplayGenerator {
     }
 
     _createInflectionHypothesis(inflectionHypothesis) {
+        const {source, inflections} = inflectionHypothesis;
+        if (!Array.isArray(inflections) || inflections.length === 0) { return null; }
         const fragment = this._templates.instantiateFragment('inflection-list');
         const node = fragment.querySelector('.inflection-list');
 
         const sourceIcon = document.createElement('span');
         sourceIcon.style.marginRight = '0.5em';
-        sourceIcon.textContent = this._getIconForInflectionSource(inflectionHypothesis.source);
+        sourceIcon.textContent = this._getIconForInflectionSource(source);
 
         node.appendChild(sourceIcon);
 
-        const inflections = inflectionHypothesis.inflections;
         this._appendMultiple(node, this._createTermInflection.bind(this), inflections);
         return fragment;
     }
