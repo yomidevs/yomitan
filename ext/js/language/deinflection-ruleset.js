@@ -45,7 +45,7 @@ function infixInflection(inflectedInfix, deinflectedInfix, rulesIn, rulesOut){
 }
 
 function separatedPrefix(prefix, rulesIn, rulesOut) {
-    const regex = new RegExp(`^(\\w+) .+ ${prefix}$`);
+    const regex = new RegExp(`^(\\p{L}+) .+ ${prefix}$`, 'u');
     return {
         inflected: regex,
         uninflect: (term) => {
