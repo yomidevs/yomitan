@@ -20,7 +20,7 @@
 */
 
 window.languages.de.getDeinflectionReasons = async () => {
-    const separablePrefixes = [
+    const separablePrefixes = [ // https://www.dartmouth.edu/~deutsch/Grammatik/Wortbildung/Separables.html
         'ab',
         'an',
         'auf',

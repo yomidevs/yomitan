@@ -126,6 +126,8 @@ class PopupPreviewFrame {
                 return 'lire';
             case 'ja':
                 return '読め';
+            case 'pt':
+                return 'ler';
             case 'ru':
                 return 'читать';
             case 'sh':
