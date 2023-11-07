@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const assert = require('assert');
-const {testMain} = require('../dev/util');
+import {JSDOM} from 'jsdom';
+import {expect, test} from 'vitest';
 
 /**
  * This function tests the following bug:
@@ -25,17 +25,18 @@ const {testMain} = require('../dev/util');
  * - https://github.com/dperini/nwsapi/issues/48
  */
 function testJSDOMSelectorBug() {
+    test('JSDOMSelectorBug', () => {
     // nwsapi is used by JSDOM
-    const {JSDOM} = require('jsdom');
-    const dom = new JSDOM();
-    const {document} = dom.window;
-    const div = document.createElement('div');
-    div.innerHTML = '<div class="b"><div class="c"></div></div>';
-    const c = div.querySelector('.c');
-    assert.doesNotThrow(() => { c.matches('.a:nth-last-of-type(1) .b .c'); });
+        const dom = new JSDOM();
+        const {document} = dom.window;
+        const div = document.createElement('div');
+        div.innerHTML = '<div class="b"><div class="c"></div></div>';
+        const c = div.querySelector('.c');
+        expect(() => c.matches('.a:nth-last-of-type(1) .b .c')).not.toThrow();
+    });
 }
 
-function testJSDOM() {
+export function testJSDOM() {
     testJSDOMSelectorBug();
 }
 
@@ -43,8 +44,4 @@ function main() {
     testJSDOM();
 }
 
-module.exports = {
-    testJSDOM
-};
-
-if (require.main === module) { testMain(main); }
+main();

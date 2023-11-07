@@ -16,13 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const path = require('path');
-const {createDictionaryArchive, testMain} = require('../dev/util');
-const dictionaryValidate = require('../dev/dictionary-validate');
+import {fileURLToPath} from 'node:url';
+import path from 'path';
+import {expect, test} from 'vitest';
+import * as dictionaryValidate from '../dev/dictionary-validate.js';
+import {createDictionaryArchive} from '../dev/util.js';
 
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function createTestDictionaryArchive(dictionary, dictionaryName) {
-    const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', dictionary);
+    const dictionaryDirectory = path.join(dirname, 'data', 'dictionaries', dictionary);
     return createDictionaryArchive(dictionaryDirectory, dictionaryName);
 }
 
@@ -41,26 +44,16 @@ async function main() {
     const schemas = dictionaryValidate.getSchemas();
 
     for (const {name, valid} of dictionaries) {
-        const archive = createTestDictionaryArchive(name);
+        test(`${name} is ${valid ? 'valid' : 'invalid'}`, async () => {
+            const archive = createTestDictionaryArchive(name);
 
-        let error = null;
-        try {
-            await dictionaryValidate.validateDictionary(null, archive, schemas);
-        } catch (e) {
-            error = e;
-        }
-
-        if (valid) {
-            if (error !== null) {
-                throw error;
+            if (valid) {
+                await expect(dictionaryValidate.validateDictionary(null, archive, schemas)).resolves.not.toThrow();
+            } else {
+                await expect(dictionaryValidate.validateDictionary(null, archive, schemas)).rejects.toThrow();
             }
-        } else {
-            if (error === null) {
-                throw new Error(`Expected dictionary ${name} to be invalid`);
-            }
-        }
+        });
     }
 }
 
-
-if (require.main === module) { testMain(main); }
+await main();

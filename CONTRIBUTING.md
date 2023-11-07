@@ -42,7 +42,7 @@ There are two scripts to build the extension to a packaged file for various buil
 - [build.bat](build.bat) on Windows
 - [build.sh](build.sh) on Linux
 
-Both of these files are convenience scripts which invoke <code>node [dev/build.js](dev/build.js)</code>.
+Both of these files are convenience scripts which invoke <code>node [dev/bin/build.js](dev/bin/build.js)</code>.
 The build script can produce several different build files based on manifest configurations defined in
 [manifest-variants.json](dev/data/manifest-variants.json).
 Several command line arguments are available for these scripts:

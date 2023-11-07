@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2023  Yomitan Authors
- * Copyright (C) 2022  Yomichan Authors
+ * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,27 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const assert = require('assert');
-const {getBuildTargets} = require('../dev/build-libs');
+import {testDictionaryFiles} from '../dictionary-validate.js';
 
 async function main() {
-    try {
-        for (const {path: path2, build} of getBuildTargets()) {
-            let expectedContent = await build();
-            if (typeof expectedContent !== 'string') {
-                // Buffer
-                expectedContent = expectedContent.toString('utf8');
-            }
-            const actualContent = fs.readFileSync(path2, {encoding: 'utf8'});
-            assert.strictEqual(actualContent, expectedContent);
-        }
-    } catch (e) {
-        console.error(e);
-        process.exit(-1);
+    const dictionaryFileNames = process.argv.slice(2);
+    if (dictionaryFileNames.length === 0) {
+        console.log([
+            'Usage:',
+            '  node dictionary-validate [--ajv] <dictionary-file-names>...'
+        ].join('\n'));
         return;
     }
-    process.exit(0);
+
+    let mode = null;
+    if (dictionaryFileNames[0] === '--ajv') {
+        mode = 'ajv';
+        dictionaryFileNames.splice(0, 1);
+    }
+
+    await testDictionaryFiles(mode, dictionaryFileNames);
 }
 
-if (require.main === module) { main(); }
+main();

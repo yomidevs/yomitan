@@ -16,19 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const path = require('path');
-const childProcess = require('child_process');
+import childProcess from 'child_process';
+import fs from 'fs';
+import {fileURLToPath} from 'node:url';
+import path from 'path';
 
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function clone(value) {
     return JSON.parse(JSON.stringify(value));
 }
 
 
-class ManifestUtil {
+export class ManifestUtil {
     constructor() {
-        const fileName = path.join(__dirname, 'data', 'manifest-variants.json');
+        const fileName = path.join(dirname, 'data', 'manifest-variants.json');
         const {manifest, variants, defaultVariant} = JSON.parse(fs.readFileSync(fileName));
         this._manifest = manifest;
         this._variants = variants;
@@ -74,7 +76,7 @@ class ManifestUtil {
     _evaluateModificationCommand(data) {
         const {command, args, trim} = data;
         const {stdout, stderr, status} = childProcess.spawnSync(command, args, {
-            cwd: __dirname,
+            cwd: dirname,
             stdio: 'pipe',
             shell: false
         });
@@ -263,7 +265,3 @@ class ManifestUtil {
     }
 }
 
-
-module.exports = {
-    ManifestUtil
-};

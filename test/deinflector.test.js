@@ -16,14 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const path = require('path');
-const assert = require('assert');
-const {testMain} = require('../dev/util');
-const {VM} = require('../dev/vm');
+import fs from 'fs';
+import path from 'path';
+import {describe, expect, test} from 'vitest';
+import {Deinflector} from '../ext/js/language/deinflector.js';
 
-
-function hasTermReasons(Deinflector, deinflector, source, expectedTerm, expectedRule, expectedReasons) {
+function hasTermReasons(deinflector, source, expectedTerm, expectedRule, expectedReasons) {
     for (const {term, reasons, rules} of deinflector.deinflect(source, source)) {
         if (term !== expectedTerm) { continue; }
         if (typeof expectedRule !== 'undefined') {
@@ -917,30 +915,27 @@ function testDeinflections() {
         }
     ];
 
-    const vm = new VM();
-    vm.execute(['js/language/deinflector.js']);
-    const [Deinflector] = vm.get(['Deinflector']);
-
     const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect.json')));
     const deinflector = new Deinflector(deinflectionReasons);
 
-    for (const {valid, tests} of data) {
-        for (const {source, term, rule, reasons} of tests) {
-            const {has, reasons: actualReasons} = hasTermReasons(Deinflector, deinflector, source, term, rule, reasons);
-            let message = `${source} ${valid ? 'does not have' : 'has'} term candidate ${JSON.stringify(term)}`;
-            if (typeof rule !== 'undefined') {
-                message += ` with rule ${JSON.stringify(rule)}`;
+    describe('deinflections', () => {
+        for (const {valid, tests} of data) {
+            for (const {source, term, rule, reasons} of tests) {
+                const {has} = hasTermReasons(deinflector, source, term, rule, reasons);
+                let message = `${source} ${valid ? 'has' : 'does not have'} term candidate ${JSON.stringify(term)}`;
+                if (typeof rule !== 'undefined') {
+                    message += ` with rule ${JSON.stringify(rule)}`;
+                }
+                if (typeof reasons !== 'undefined') {
+                    message += (typeof rule !== 'undefined' ? ' and' : ' with');
+                    message += ` reasons ${JSON.stringify(reasons)}`;
+                }
+                test(`${message}`, () => {
+                    expect(has).toStrictEqual(valid);
+                });
             }
-            if (typeof reasons !== 'undefined') {
-                message += (typeof rule !== 'undefined' ? ' and' : ' with');
-                message += ` reasons ${JSON.stringify(reasons)}`;
-            }
-            if (actualReasons !== null) {
-                message += ` (actual reasons: ${JSON.stringify(actualReasons)})`;
-            }
-            assert.strictEqual(has, valid, message);
         }
-    }
+    });
 }
 
 
@@ -949,4 +944,4 @@ function main() {
 }
 
 
-if (require.main === module) { testMain(main); }
+main();

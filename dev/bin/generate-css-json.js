@@ -16,29 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const path = require('path');
-const assert = require('assert');
-const {testMain} = require('../dev/util');
-const {ManifestUtil} = require('../dev/manifest-util');
-
-
-function loadManifestString() {
-    const manifestPath = path.join(__dirname, '..', 'ext', 'manifest.json');
-    return fs.readFileSync(manifestPath, {encoding: 'utf8'});
-}
-
-function validateManifest() {
-    const manifestUtil = new ManifestUtil();
-    const manifest1 = loadManifestString();
-    const manifest2 = ManifestUtil.createManifestString(manifestUtil.getManifest());
-    assert.strictEqual(manifest1, manifest2, 'Manifest data does not match.');
-}
-
+import fs from 'fs';
+import {formatRulesJson, generateRules, getTargets} from '../generate-css-json.js';
 
 function main() {
-    validateManifest();
+    for (const {cssFile, overridesCssFile, outputPath} of getTargets()) {
+        const json = formatRulesJson(generateRules(cssFile, overridesCssFile));
+        fs.writeFileSync(outputPath, json, {encoding: 'utf8'});
+    }
 }
 
-
-if (require.main === module) { testMain(main); }
+main();

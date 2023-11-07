@@ -16,53 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const url = require('url');
-const path = require('path');
-const assert = require('assert');
-const {testMain} = require('../dev/util');
-const {VM} = require('../dev/vm');
+import fs from 'fs';
+import url, {fileURLToPath} from 'node:url';
+import path from 'path';
+import {expect, test, vi} from 'vitest';
+import {OptionsUtil} from '../ext/js/data/options-util.js';
+import {TemplatePatcher} from '../ext/js/templates/template-patcher.js';
 
-
-function createVM(extDir) {
-    const chrome = {
-        runtime: {
-            getURL(path2) {
-                return url.pathToFileURL(path.join(extDir, path2.replace(/^\//, ''))).href;
-            }
-        }
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+vi.stubGlobal('fetch', async function fetch(url2) {
+    const filePath = url.fileURLToPath(url2);
+    await Promise.resolve();
+    const content = fs.readFileSync(filePath, {encoding: null});
+    return {
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        text: async () => Promise.resolve(content.toString('utf8')),
+        json: async () => Promise.resolve(JSON.parse(content.toString('utf8')))
     };
-
-    async function fetch(url2) {
-        const filePath = url.fileURLToPath(url2);
-        await Promise.resolve();
-        const content = fs.readFileSync(filePath, {encoding: null});
-        return {
-            ok: true,
-            status: 200,
-            statusText: 'OK',
-            text: async () => Promise.resolve(content.toString('utf8')),
-            json: async () => Promise.resolve(JSON.parse(content.toString('utf8')))
-        };
+});
+vi.stubGlobal('chrome', {
+    runtime: {
+        getURL: (path2) => {
+            return url.pathToFileURL(path.join(dirname, '..', 'ext', path2.replace(/^\//, ''))).href;
+        }
     }
-
-    const vm = new VM({chrome, fetch});
-    vm.execute([
-        'js/core.js',
-        'js/general/cache-map.js',
-        'js/data/json-schema.js',
-        'js/templates/template-patcher.js',
-        'js/data/options-util.js'
-    ]);
-
-    return vm;
-}
-
-
-function clone(value) {
-    return JSON.parse(JSON.stringify(value));
-}
-
+});
 
 function createProfileOptionsTestData1() {
     return {
@@ -632,131 +612,130 @@ function createOptionsUpdatedTestData1() {
 }
 
 
-async function testUpdate(extDir) {
-    const vm = createVM(extDir);
-    const [OptionsUtil] = vm.get(['OptionsUtil']);
-    const optionsUtil = new OptionsUtil();
-    await optionsUtil.prepare();
+async function testUpdate() {
+    test('Update', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
 
-    const options = createOptionsTestData1();
-    const optionsUpdated = clone(await optionsUtil.update(options));
-    const optionsExpected = createOptionsUpdatedTestData1();
-    assert.deepStrictEqual(optionsUpdated, optionsExpected);
+        const options = createOptionsTestData1();
+        const optionsUpdated = structuredClone(await optionsUtil.update(options));
+        const optionsExpected = createOptionsUpdatedTestData1();
+        expect(optionsUpdated).toStrictEqual(optionsExpected);
+    });
 }
 
-async function testDefault(extDir) {
-    const data = [
-        (options) => options,
-        (options) => {
-            delete options.profiles[0].options.audio.autoPlay;
-        },
-        (options) => {
-            options.profiles[0].options.audio.autoPlay = void 0;
+async function testDefault() {
+    test('Default', async () => {
+        const data = [
+            (options) => options,
+            (options) => {
+                delete options.profiles[0].options.audio.autoPlay;
+            },
+            (options) => {
+                options.profiles[0].options.audio.autoPlay = void 0;
+            }
+        ];
+
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+
+        for (const modify of data) {
+            const options = optionsUtil.getDefault();
+
+            const optionsModified = structuredClone(options);
+            modify(optionsModified);
+
+            const optionsUpdated = await optionsUtil.update(structuredClone(optionsModified));
+            expect(structuredClone(optionsUpdated)).toStrictEqual(structuredClone(options));
         }
-    ];
-
-    const vm = createVM(extDir);
-    const [OptionsUtil] = vm.get(['OptionsUtil']);
-    const optionsUtil = new OptionsUtil();
-    await optionsUtil.prepare();
-
-    for (const modify of data) {
-        const options = optionsUtil.getDefault();
-
-        const optionsModified = clone(options);
-        modify(optionsModified);
-
-        const optionsUpdated = await optionsUtil.update(clone(optionsModified));
-        assert.deepStrictEqual(clone(optionsUpdated), clone(options));
-    }
+    });
 }
 
-async function testFieldTemplatesUpdate(extDir) {
-    const vm = createVM(extDir);
-    const [OptionsUtil, TemplatePatcher] = vm.get(['OptionsUtil', 'TemplatePatcher']);
-    const optionsUtil = new OptionsUtil();
-    await optionsUtil.prepare();
+async function testFieldTemplatesUpdate() {
+    test('FieldTemplatesUpdate', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
 
-    const templatePatcher = new TemplatePatcher();
-    const loadDataFile = (fileName) => {
-        const content = fs.readFileSync(path.join(extDir, fileName), {encoding: 'utf8'});
-        return templatePatcher.parsePatch(content).addition;
-    };
-    const updates = [
-        {version: 2,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v2.handlebars')},
-        {version: 4,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars')},
-        {version: 6,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars')},
-        {version: 8,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
-        {version: 10, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars')},
-        {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')},
-        {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')},
-        {version: 21, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v21.handlebars')}
-    ];
-    const getUpdateAdditions = (startVersion, targetVersion) => {
-        let value = '';
-        for (const {version, changes} of updates) {
-            if (version <= startVersion || version > targetVersion || changes.length === 0) { continue; }
-            if (value.length > 0) { value += '\n'; }
-            value += changes;
-        }
-        return value;
-    };
+        const templatePatcher = new TemplatePatcher();
+        const loadDataFile = (fileName) => {
+            const content = fs.readFileSync(path.join(dirname, '..', 'ext', fileName), {encoding: 'utf8'});
+            return templatePatcher.parsePatch(content).addition;
+        };
+        const updates = [
+            {version: 2,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v2.handlebars')},
+            {version: 4,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars')},
+            {version: 6,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars')},
+            {version: 8,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
+            {version: 10, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars')},
+            {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')},
+            {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')},
+            {version: 21, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v21.handlebars')}
+        ];
+        const getUpdateAdditions = (startVersion, targetVersion) => {
+            let value = '';
+            for (const {version, changes} of updates) {
+                if (version <= startVersion || version > targetVersion || changes.length === 0) { continue; }
+                if (value.length > 0) { value += '\n'; }
+                value += changes;
+            }
+            return value;
+        };
 
-    const data = [
+        const data = [
         // Standard format
-        {
-            oldVersion: 0,
-            newVersion: 12,
-            old: `
+            {
+                oldVersion: 0,
+                newVersion: 12,
+                old: `
 {{#*inline "character"}}
     {{~definition.character~}}
 {{/inline}}
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-            expected: `
+                expected: `
 {{#*inline "character"}}
     {{~definition.character~}}
 {{/inline}}
 
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
-        },
-        // Non-standard marker format
-        {
-            oldVersion: 0,
-            newVersion: 12,
-            old: `
+            },
+            // Non-standard marker format
+            {
+                oldVersion: 0,
+                newVersion: 12,
+                old: `
 {{#*inline "character"}}
     {{~definition.character~}}
 {{/inline}}
 
 {{~> (lookup . "marker2") ~}}`.trimStart(),
 
-            expected: `
+                expected: `
 {{#*inline "character"}}
     {{~definition.character~}}
 {{/inline}}
 
 {{~> (lookup . "marker2") ~}}
 <<<UPDATE-ADDITIONS>>>`.trimStart()
-        },
-        // Empty test
-        {
-            oldVersion: 0,
-            newVersion: 12,
-            old: `
+            },
+            // Empty test
+            {
+                oldVersion: 0,
+                newVersion: 12,
+                old: `
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-            expected: `
+                expected: `
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
-        },
-        // Definition tags update
-        {
-            oldVersion: 0,
-            newVersion: 12,
-            old: `
+            },
+            // Definition tags update
+            {
+                oldVersion: 0,
+                newVersion: 12,
+                old: `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
         {{~#if definitionTags~}}<i>({{#each definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
@@ -779,7 +758,7 @@ async function testFieldTemplatesUpdate(extDir) {
 {{~> (lookup . "marker") ~}}
 `.trimStart(),
 
-            expected: `
+                expected: `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
         {{~#scope~}}
@@ -824,12 +803,12 @@ async function testFieldTemplatesUpdate(extDir) {
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}
 `.trimStart()
-        },
-        // glossary and glossary-brief update
-        {
-            oldVersion: 7,
-            newVersion: 12,
-            old: `
+            },
+            // glossary and glossary-brief update
+            {
+                oldVersion: 7,
+                newVersion: 12,
+                old: `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
         {{~#scope~}}
@@ -895,7 +874,7 @@ async function testFieldTemplatesUpdate(extDir) {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-            expected: `
+                expected: `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
         {{~#scope~}}
@@ -964,12 +943,12 @@ async function testFieldTemplatesUpdate(extDir) {
 
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
-        },
-        // formatGlossary update
-        {
-            oldVersion: 12,
-            newVersion: 13,
-            old: `
+            },
+            // formatGlossary update
+            {
+                oldVersion: 12,
+                newVersion: 13,
+                old: `
 {{#*inline "example"}}
     {{~#if (op "<=" glossary.length 1)~}}
         {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{/each}}
@@ -982,7 +961,7 @@ async function testFieldTemplatesUpdate(extDir) {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-            expected: `
+                expected: `
 {{#*inline "example"}}
     {{~#if (op "<=" glossary.length 1)~}}
         {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
@@ -995,12 +974,12 @@ async function testFieldTemplatesUpdate(extDir) {
 
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
-        },
-        // hasMedia/getMedia update
-        {
-            oldVersion: 12,
-            newVersion: 13,
-            old: `
+            },
+            // hasMedia/getMedia update
+            {
+                oldVersion: 12,
+                newVersion: 13,
+                old: `
 {{#*inline "audio"}}
     {{~#if definition.audioFileName~}}
         [sound:{{definition.audioFileName}}]
@@ -1023,7 +1002,7 @@ async function testFieldTemplatesUpdate(extDir) {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-            expected: `
+                expected: `
 {{#*inline "audio"}}
     {{~#if (hasMedia "audio")~}}
         [sound:{{#getMedia "audio"}}{{/getMedia}}]
@@ -1048,12 +1027,12 @@ async function testFieldTemplatesUpdate(extDir) {
 
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
-        },
-        // hasMedia/getMedia update
-        {
-            oldVersion: 12,
-            newVersion: 13,
-            old: `
+            },
+            // hasMedia/getMedia update
+            {
+                oldVersion: 12,
+                newVersion: 13,
+                old: `
 {{! Pitch Accents }}
 {{#*inline "pitch-accent-item-downstep-notation"}}
     {{~#scope~}}
@@ -1166,7 +1145,7 @@ async function testFieldTemplatesUpdate(extDir) {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-            expected: `
+                expected: `
 {{! Pitch Accents }}
 {{#*inline "pitch-accent-item"}}
     {{~#pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}{{~/pronunciation~}}
@@ -1216,12 +1195,12 @@ async function testFieldTemplatesUpdate(extDir) {
 
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
-        },
-        // block helper update: furigana and furiganaPlain
-        {
-            oldVersion: 20,
-            newVersion: 21,
-            old: `
+            },
+            // block helper update: furigana and furiganaPlain
+            {
+                oldVersion: 20,
+                newVersion: 21,
+                old: `
 {{#*inline "furigana"}}
     {{~#if merge~}}
         {{~#each definition.expressions~}}
@@ -1263,7 +1242,7 @@ async function testFieldTemplatesUpdate(extDir) {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-            expected: `
+                expected: `
 {{#*inline "furigana"}}
     {{~#if merge~}}
         {{~#each definition.expressions~}}
@@ -1304,12 +1283,12 @@ async function testFieldTemplatesUpdate(extDir) {
 {{/inline}}
 
 {{~> (lookup . "marker") ~}}`.trimStart()
-        },
-        // block helper update: formatGlossary
-        {
-            oldVersion: 20,
-            newVersion: 21,
-            old: `
+            },
+            // block helper update: formatGlossary
+            {
+                oldVersion: 20,
+                newVersion: 21,
+                old: `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
         {{~#scope~}}
@@ -1344,7 +1323,7 @@ async function testFieldTemplatesUpdate(extDir) {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-            expected: `
+                expected: `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
         {{~#scope~}}
@@ -1378,12 +1357,12 @@ async function testFieldTemplatesUpdate(extDir) {
 {{/inline}}
 
 {{~> (lookup . "marker") ~}}`.trimStart()
-        },
-        // block helper update: set and get
-        {
-            oldVersion: 20,
-            newVersion: 21,
-            old: `
+            },
+            // block helper update: set and get
+            {
+                oldVersion: 20,
+                newVersion: 21,
+                old: `
 {{#*inline "pitch-accent-item-disambiguation"}}
     {{~#scope~}}
         {{~#set "exclusive" (spread exclusiveExpressions exclusiveReadings)}}{{/set~}}
@@ -1432,7 +1411,7 @@ async function testFieldTemplatesUpdate(extDir) {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-            expected: `
+                expected: `
 {{#*inline "pitch-accent-item-disambiguation"}}
     {{~#scope~}}
         {{~set "exclusive" (spread exclusiveExpressions exclusiveReadings)~}}
@@ -1480,12 +1459,12 @@ async function testFieldTemplatesUpdate(extDir) {
 {{/inline}}
 
 {{~> (lookup . "marker") ~}}`.trimStart()
-        },
-        // block helper update: hasMedia and getMedia
-        {
-            oldVersion: 20,
-            newVersion: 21,
-            old: `
+            },
+            // block helper update: hasMedia and getMedia
+            {
+                oldVersion: 20,
+                newVersion: 21,
+                old: `
 {{#*inline "audio"}}
     {{~#if (hasMedia "audio")~}}
         [sound:{{#getMedia "audio"}}{{/getMedia}}]
@@ -1524,7 +1503,7 @@ async function testFieldTemplatesUpdate(extDir) {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-            expected: `
+                expected: `
 {{#*inline "audio"}}
     {{~#if (hasMedia "audio")~}}
         [sound:{{getMedia "audio"}}]
@@ -1562,48 +1541,47 @@ async function testFieldTemplatesUpdate(extDir) {
 {{/inline}}
 
 {{~> (lookup . "marker") ~}}`.trimStart()
-        },
-        // block helper update: pronunciation
-        {
-            oldVersion: 20,
-            newVersion: 21,
-            old: `
+            },
+            // block helper update: pronunciation
+            {
+                oldVersion: 20,
+                newVersion: 21,
+                old: `
 {{#*inline "pitch-accent-item"}}
     {{~#pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}{{~/pronunciation~}}
 {{/inline}}
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-            expected: `
+                expected: `
 {{#*inline "pitch-accent-item"}}
     {{~pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
 {{/inline}}
 
 {{~> (lookup . "marker") ~}}`.trimStart()
+            }
+        ];
+
+        const updatesPattern = /<<<UPDATE-ADDITIONS>>>/g;
+        for (const {old, expected, oldVersion, newVersion} of data) {
+            const options = createOptionsTestData1();
+            options.profiles[0].options.anki.fieldTemplates = old;
+            options.version = oldVersion;
+
+            const expected2 = expected.replace(updatesPattern, getUpdateAdditions(oldVersion, newVersion));
+
+            const optionsUpdated = structuredClone(await optionsUtil.update(options, newVersion));
+            const fieldTemplatesActual = optionsUpdated.profiles[0].options.anki.fieldTemplates;
+            expect(fieldTemplatesActual).toStrictEqual(expected2);
         }
-    ];
-
-    const updatesPattern = /<<<UPDATE-ADDITIONS>>>/g;
-    for (const {old, expected, oldVersion, newVersion} of data) {
-        const options = createOptionsTestData1();
-        options.profiles[0].options.anki.fieldTemplates = old;
-        options.version = oldVersion;
-
-        const expected2 = expected.replace(updatesPattern, getUpdateAdditions(oldVersion, newVersion));
-
-        const optionsUpdated = clone(await optionsUtil.update(options, newVersion));
-        const fieldTemplatesActual = optionsUpdated.profiles[0].options.anki.fieldTemplates;
-        assert.deepStrictEqual(fieldTemplatesActual, expected2);
-    }
+    });
 }
 
 
 async function main() {
-    const extDir = path.join(__dirname, '..', 'ext');
-    await testUpdate(extDir);
-    await testDefault(extDir);
-    await testFieldTemplatesUpdate(extDir);
+    await testUpdate();
+    await testDefault();
+    await testFieldTemplatesUpdate();
 }
 
-
-if (require.main === module) { testMain(main); }
+await main();

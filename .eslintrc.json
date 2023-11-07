@@ -5,7 +5,7 @@
         "plugin:jsonc/recommended-with-json"
     ],
     "parserOptions": {
-        "ecmaVersion": 11,
+        "ecmaVersion": 2022,
         "sourceType": "module",
         "ecmaFeatures": {
             "globalReturn": false,
@@ -14,7 +14,7 @@
     },
     "env": {
         "browser": true,
-        "es2018": true,
+        "es2022": true,
         "webextensions": true
     },
     "plugins": [
@@ -24,7 +24,8 @@
         "jsonc"
     ],
     "ignorePatterns": [
-        "/ext/lib/"
+        "/ext/lib/",
+        "/dev/lib/handlebars/"
     ],
     "rules": {
         "arrow-parens": [
@@ -181,6 +182,7 @@
                 "after": true
             }
         ],
+        "no-implicit-globals": "error",
         "no-trailing-spaces": "error",
         "no-whitespace-before-property": "error",
         "object-curly-spacing": [
@@ -379,31 +381,6 @@
         },
         {
             "files": [
-                "ext/**/*.js"
-            ],
-            "excludedFiles": [
-                "ext/js/core.js",
-                "ext/js/accessibility/google-docs.js",
-                "ext/js/**/sandbox/**/*.js"
-            ],
-            "globals": {}
-        },
-        {
-            "files": [
-                "ext/**/*.js"
-            ],
-            "excludedFiles": [
-                "ext/js/core.js",
-                "ext/js/accessibility/google-docs.js",
-                "ext/js/yomichan.js",
-                "ext/js/**/sandbox/**/*.js"
-            ],
-            "globals": {
-                "yomichan": "readonly"
-            }
-        },
-        {
-            "files": [
                 "ext/js/yomichan.js"
             ],
             "globals": {
@@ -415,57 +392,26 @@
                 "test/**/*.js",
                 "dev/**/*.js"
             ],
-            "excludedFiles": [
+            "env": {
+                "browser": false,
+                "node": true,
+                "webextensions": false
+            }
+        },
+        {
+            "files": [
                 "test/data/html/*.js"
             ],
             "parserOptions": {
-                "ecmaVersion": 8,
-                "sourceType": "module"
+                "sourceType": "script"
             },
             "env": {
-                "browser": false,
-                "es2017": true,
-                "node": true,
-                "webextensions": false
-            }
-        },
-        {
-            "files": [
-                "ext/js/language/dictionary-worker-main.js"
-            ],
-            "parserOptions": {
-                "sourceType": "module"
-            }
-        },
-        {
-            "files": [
-                "playwright.config.js"
-            ],
-            "env": {
-                "browser": false,
-                "es2017": true,
-                "node": true,
+                "browser": true,
+                "node": false,
                 "webextensions": false
             },
             "rules": {
-                "no-undefined": "off"
-            }
-        },
-        {
-            "files": [
-                "integration.spec.js",
-                "playwright-util.js",
-                "visual.spec.js"
-            ],
-            "env": {
-                "browser": false,
-                "es2017": true,
-                "node": true,
-                "webextensions": false
-            },
-            "rules": {
-                "no-undefined": "off",
-                "no-empty-pattern": "off"
+                "no-implicit-globals": "off"
             }
         },
         {
@@ -506,13 +452,13 @@
             "env": {
                 "browser": false,
                 "serviceworker": true,
-                "es2017": true,
                 "webextensions": true
             },
             "globals": {
                 "FileReader": "readonly",
                 "Intl": "readonly",
-                "crypto": "readonly"
+                "crypto": "readonly",
+                "AbortController": "readonly"
             }
         },
         {
@@ -530,29 +476,52 @@
             "env": {
                 "browser": false,
                 "worker": true,
-                "es2017": true,
                 "webextensions": true
             }
         },
         {
             "files": [
-                "ext/js/**/*.js"
+                "playwright.config.js"
             ],
-            "excludedFiles": [
-                "ext/js/core.js",
-                "ext/js/**/*main.js"
-            ],
+            "env": {
+                "browser": false,
+                "node": true,
+                "webextensions": false
+            },
             "rules": {
-                "no-implicit-globals": "error"
+                "no-undefined": "off"
             }
         },
         {
             "files": [
-                "ext/js/**/*.js"
+                "integration.spec.js",
+                "playwright-util.js",
+                "visual.spec.js"
             ],
-            "globals": {
-                "AbortController": "readonly"
+            "env": {
+                "browser": false,
+                "node": true,
+                "webextensions": false
+            },
+            "rules": {
+                "no-undefined": "off",
+                "no-empty-pattern": "off"
             }
+        },
+        {
+            "files": [
+                "test/**"
+            ],
+            "plugins": [
+                "vitest"
+            ],
+            "extends": [
+                "plugin:vitest/recommended"
+            ],
+            "rules": {
+                "vitest/prefer-to-be": "off"
+            },
+            "env": {}
         }
     ]
 }

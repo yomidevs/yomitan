@@ -1652,6 +1652,8 @@ export class Display extends EventDispatcher {
                 Object.assign(result, result2);
             }
         }
+
+        console.log(result);
     }
 
     _triggerContentClear() {

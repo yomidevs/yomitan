@@ -16,13 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const path = require('path');
-const assert = require('assert');
-const {JSDOM} = require('jsdom');
-const {testMain} = require('../dev/util');
-const {VM} = require('../dev/vm');
-
+import fs from 'fs';
+import {JSDOM} from 'jsdom';
+import path from 'path';
+import {expect, test} from 'vitest';
+import {DOMTextScanner} from '../ext/js/dom/dom-text-scanner.js';
 
 function createJSDOM(fileName) {
     const domSource = fs.readFileSync(fileName, {encoding: 'utf8'});
@@ -87,74 +85,77 @@ function createAbsoluteGetComputedStyle(window) {
 }
 
 
-async function testDomTextScanner(dom, {DOMTextScanner}) {
+async function testDomTextScanner(dom) {
     const document = dom.window.document;
-    for (const testElement of document.querySelectorAll('y-test')) {
-        let testData = JSON.parse(testElement.dataset.testData);
-        if (!Array.isArray(testData)) {
-            testData = [testData];
-        }
-        for (const testDataItem of testData) {
-            let {
-                node,
-                offset,
-                length,
-                forcePreserveWhitespace,
-                generateLayoutContent,
-                reversible,
-                expected: {
-                    node: expectedNode,
-                    offset: expectedOffset,
-                    content: expectedContent,
-                    remainder: expectedRemainder
+
+    test('DomTextScanner', () => {
+        for (const testElement of document.querySelectorAll('y-test')) {
+            let testData = JSON.parse(testElement.dataset.testData);
+            if (!Array.isArray(testData)) {
+                testData = [testData];
+            }
+            for (const testDataItem of testData) {
+                let {
+                    node,
+                    offset,
+                    length,
+                    forcePreserveWhitespace,
+                    generateLayoutContent,
+                    reversible,
+                    expected: {
+                        node: expectedNode,
+                        offset: expectedOffset,
+                        content: expectedContent,
+                        remainder: expectedRemainder
+                    }
+                } = testDataItem;
+
+                node = querySelectorTextNode(testElement, node);
+                expectedNode = querySelectorTextNode(testElement, expectedNode);
+
+                // Standard test
+                {
+                    const scanner = new DOMTextScanner(node, offset, forcePreserveWhitespace, generateLayoutContent);
+                    scanner.seek(length);
+
+                    const {node: actualNode1, offset: actualOffset1, content: actualContent1, remainder: actualRemainder1} = scanner;
+                    expect(actualContent1).toStrictEqual(expectedContent);
+                    expect(actualOffset1).toStrictEqual(expectedOffset);
+                    expect(actualNode1).toStrictEqual(expectedNode);
+                    expect(actualRemainder1).toStrictEqual(expectedRemainder || 0);
                 }
-            } = testDataItem;
 
-            node = querySelectorTextNode(testElement, node);
-            expectedNode = querySelectorTextNode(testElement, expectedNode);
+                // Substring tests
+                for (let i = 1; i <= length; ++i) {
+                    const scanner = new DOMTextScanner(node, offset, forcePreserveWhitespace, generateLayoutContent);
+                    scanner.seek(length - i);
 
-            // Standard test
-            {
-                const scanner = new DOMTextScanner(node, offset, forcePreserveWhitespace, generateLayoutContent);
-                scanner.seek(length);
+                    const {content: actualContent} = scanner;
+                    expect(actualContent).toStrictEqual(expectedContent.substring(0, expectedContent.length - i));
+                }
 
-                const {node: actualNode1, offset: actualOffset1, content: actualContent1, remainder: actualRemainder1} = scanner;
-                assert.strictEqual(actualContent1, expectedContent);
-                assert.strictEqual(actualOffset1, expectedOffset);
-                assert.strictEqual(actualNode1, expectedNode);
-                assert.strictEqual(actualRemainder1, expectedRemainder || 0);
-            }
+                if (reversible === false) { continue; }
 
-            // Substring tests
-            for (let i = 1; i <= length; ++i) {
-                const scanner = new DOMTextScanner(node, offset, forcePreserveWhitespace, generateLayoutContent);
-                scanner.seek(length - i);
+                // Reversed test
+                {
+                    const scanner = new DOMTextScanner(expectedNode, expectedOffset, forcePreserveWhitespace, generateLayoutContent);
+                    scanner.seek(-length);
 
-                const {content: actualContent} = scanner;
-                assert.strictEqual(actualContent, expectedContent.substring(0, expectedContent.length - i));
-            }
+                    const {content: actualContent} = scanner;
+                    expect(actualContent).toStrictEqual(expectedContent);
+                }
 
-            if (reversible === false) { continue; }
+                // Reversed substring tests
+                for (let i = 1; i <= length; ++i) {
+                    const scanner = new DOMTextScanner(expectedNode, expectedOffset, forcePreserveWhitespace, generateLayoutContent);
+                    scanner.seek(-(length - i));
 
-            // Reversed test
-            {
-                const scanner = new DOMTextScanner(expectedNode, expectedOffset, forcePreserveWhitespace, generateLayoutContent);
-                scanner.seek(-length);
-
-                const {content: actualContent} = scanner;
-                assert.strictEqual(actualContent, expectedContent);
-            }
-
-            // Reversed substring tests
-            for (let i = 1; i <= length; ++i) {
-                const scanner = new DOMTextScanner(expectedNode, expectedOffset, forcePreserveWhitespace, generateLayoutContent);
-                scanner.seek(-(length - i));
-
-                const {content: actualContent} = scanner;
-                assert.strictEqual(actualContent, expectedContent.substring(i));
+                    const {content: actualContent} = scanner;
+                    expect(actualContent).toStrictEqual(expectedContent.substring(i));
+                }
             }
         }
-    }
+    });
 }
 
 
@@ -162,16 +163,7 @@ async function testDocument1() {
     const dom = createJSDOM(path.join(__dirname, 'data', 'html', 'test-dom-text-scanner.html'));
     const window = dom.window;
     try {
-        const {document, Node, Range} = window;
-
         window.getComputedStyle = createAbsoluteGetComputedStyle(window);
-
-        const vm = new VM({document, window, Range, Node});
-        vm.execute([
-            'js/data/sandbox/string-util.js',
-            'js/dom/dom-text-scanner.js'
-        ]);
-        const DOMTextScanner = vm.get('DOMTextScanner');
 
         await testDomTextScanner(dom, {DOMTextScanner});
     } finally {
@@ -184,5 +176,4 @@ async function main() {
     await testDocument1();
 }
 
-
-if (require.main === module) { testMain(main); }
+await main();

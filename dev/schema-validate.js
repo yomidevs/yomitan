@@ -16,21 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const {performance} = require('perf_hooks');
-const {VM} = require('./vm');
-
-const vm = new VM();
-vm.execute([
-    'js/core.js',
-    'js/general/cache-map.js',
-    'js/data/json-schema.js'
-]);
-const JsonSchema = vm.get('JsonSchema');
+import Ajv from 'ajv';
+import {JsonSchema} from '../ext/js/data/json-schema.js';
 
 class JsonSchemaAjv {
     constructor(schema) {
-        const Ajv = require('ajv');
         const ajv = new Ajv({
             meta: false,
             strictTuples: false,
@@ -49,53 +39,9 @@ class JsonSchemaAjv {
     }
 }
 
-function createJsonSchema(mode, schema) {
+export function createJsonSchema(mode, schema) {
     switch (mode) {
         case 'ajv': return new JsonSchemaAjv(schema);
         default: return new JsonSchema(schema);
     }
 }
-
-function main() {
-    const args = process.argv.slice(2);
-    if (args.length < 2) {
-        console.log([
-            'Usage:',
-            '  node schema-validate [--ajv] <schema-file-name> <data-file-names>...'
-        ].join('\n'));
-        return;
-    }
-
-    let mode = null;
-    if (args[0] === '--ajv') {
-        mode = 'ajv';
-        args.splice(0, 1);
-    }
-
-    const schemaSource = fs.readFileSync(args[0], {encoding: 'utf8'});
-    const schema = JSON.parse(schemaSource);
-
-    for (const dataFileName of args.slice(1)) {
-        const start = performance.now();
-        try {
-            console.log(`Validating ${dataFileName}...`);
-            const dataSource = fs.readFileSync(dataFileName, {encoding: 'utf8'});
-            const data = JSON.parse(dataSource);
-            createJsonSchema(mode, schema).validate(data);
-            const end = performance.now();
-            console.log(`No issues detected (${((end - start) / 1000).toFixed(2)}s)`);
-        } catch (e) {
-            const end = performance.now();
-            console.log(`Encountered an error (${((end - start) / 1000).toFixed(2)}s)`);
-            console.warn(e);
-        }
-    }
-}
-
-
-if (require.main === module) { main(); }
-
-
-module.exports = {
-    createJsonSchema
-};

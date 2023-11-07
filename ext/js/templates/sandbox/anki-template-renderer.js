@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {Handlebars} from '../../../lib/handlebars.js';
 import {AnkiNoteDataCreator} from '../../data/sandbox/anki-note-data-creator.js';
 import {PronunciationGenerator} from '../../display/sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';
@@ -25,19 +26,6 @@ import {JapaneseUtil} from '../../language/sandbox/japanese-util.js';
 import {AnkiTemplateRendererContentManager} from './anki-template-renderer-content-manager.js';
 import {TemplateRendererMediaProvider} from './template-renderer-media-provider.js';
 import {TemplateRenderer} from './template-renderer.js';
-
-/* global
- * AnkiNoteDataCreator
- * AnkiTemplateRendererContentManager
- * CssStyleApplier
- * DictionaryDataUtil
- * Handlebars
- * JapaneseUtil
- * PronunciationGenerator
- * StructuredContentGenerator
- * TemplateRenderer
- * TemplateRendererMediaProvider
- */
 
 /**
  * This class contains all Anki-specific template rendering functionality. It is built on

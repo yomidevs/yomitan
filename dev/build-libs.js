@@ -16,9 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const path = require('path');
-const esbuild = require('esbuild');
+import Ajv from 'ajv';
+import standaloneCode from 'ajv/dist/standalone/index.js';
+import esbuild from 'esbuild';
+import fs from 'fs';
+import path from 'path';
+import {fileURLToPath} from 'url';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+const extDir = path.join(dirname, '..', 'ext');
 
 async function buildLib(p) {
     await esbuild.build({
@@ -28,13 +34,13 @@ async function buildLib(p) {
         sourcemap: true,
         target: 'es2020',
         format: 'esm',
-        outfile: path.join(__dirname, '..', 'ext', 'lib', path.basename(p)),
+        outfile: path.join(extDir, 'lib', path.basename(p)),
         external: ['fs']
     });
 }
 
-async function buildLibs() {
-    const devLibPath = path.join(__dirname, 'lib');
+export async function buildLibs() {
+    const devLibPath = path.join(dirname, 'lib');
     const files = await fs.promises.readdir(devLibPath, {
         withFileTypes: true
     });
@@ -43,10 +49,15 @@ async function buildLibs() {
             await buildLib(path.join(devLibPath, f.name));
         }
     }
+
+    const schemaDir = path.join(extDir, 'data/schemas/');
+    const schemaFileNames = fs.readdirSync(schemaDir);
+    const schemas = schemaFileNames.map((schemaFileName) => JSON.parse(fs.readFileSync(path.join(schemaDir, schemaFileName))));
+    const ajv = new Ajv({schemas: schemas, code: {source: true, esm: true}});
+    const moduleCode = standaloneCode(ajv);
+
+    // https://github.com/ajv-validator/ajv/issues/2209
+    const patchedModuleCode = "import {ucs2length} from './ucs2length.js';" + moduleCode.replaceAll('require("ajv/dist/runtime/ucs2length").default', 'ucs2length');
+
+    fs.writeFileSync(path.join(extDir, 'lib/validate-schemas.js'), patchedModuleCode);
 }
-
-if (require.main === module) { buildLibs(); }
-
-module.exports = {
-    buildLibs
-};

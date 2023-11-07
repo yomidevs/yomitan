@@ -16,17 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const path = require('path');
-const assert = require('assert');
-const readline = require('readline');
-const childProcess = require('child_process');
-const util = require('./util');
-const {getAllFiles, getArgs, testMain} = util;
-const {ManifestUtil} = require('./manifest-util');
-const Ajv = require('ajv');
-const standaloneCode = require('ajv/dist/standalone').default;
-const buildLibs = require('./build-libs.js').buildLibs;
+import assert from 'assert';
+import childProcess from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import readline from 'readline';
+import {fileURLToPath} from 'url';
+import {buildLibs} from '../build-libs.js';
+import {ManifestUtil} from '../manifest-util.js';
+import {getAllFiles, getArgs, testMain} from '../util.js';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function createZip(directory, excludeFiles, outputFileName, sevenZipExes, onUpdate, dryRun) {
     try {
@@ -61,7 +61,7 @@ async function createZip(directory, excludeFiles, outputFileName, sevenZipExes, 
 }
 
 async function createJSZip(directory, excludeFiles, outputFileName, onUpdate, dryRun) {
-    const JSZip = util.JSZip;
+    const JSZip = null;
     const files = getAllFiles(directory);
     removeItemsFromArray(files, excludeFiles);
     const zip = new JSZip();
@@ -132,19 +132,6 @@ async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath,
         process.stdout.write(message);
     };
 
-    process.stdout.write('Building schema validators using ajv\n');
-    const schemaDir = path.join(extDir, 'data/schemas/');
-    const schemaFileNames = fs.readdirSync(schemaDir);
-    const schemas = schemaFileNames.map((schemaFileName) => JSON.parse(fs.readFileSync(path.join(schemaDir, schemaFileName))));
-    const ajv = new Ajv({schemas: schemas, code: {source: true, esm: true}});
-    const moduleCode = standaloneCode(ajv);
-
-    // https://github.com/ajv-validator/ajv/issues/2209
-    const patchedModuleCode = moduleCode.replaceAll('require("ajv/dist/runtime/ucs2length").default', 'import("/lib/ucs2length.js").default');
-
-    fs.writeFileSync(path.join(extDir, 'lib/validate-schemas.js'), patchedModuleCode);
-
-
     process.stdout.write(`Version: ${yomitanVersion}...\n`);
 
     for (const variantName of variantNames) {
@@ -193,7 +180,7 @@ function ensureFilesExist(directory, files) {
 }
 
 
-async function main(argv) {
+export async function main(argv) {
     const args = getArgs(argv, new Map([
         ['all', false],
         ['default', false],
@@ -210,7 +197,7 @@ async function main(argv) {
 
     const manifestUtil = new ManifestUtil();
 
-    const rootDir = path.join(__dirname, '..');
+    const rootDir = path.join(dirname, '..', '..');
     const extDir = path.join(rootDir, 'ext');
     const buildDir = path.join(rootDir, 'builds');
     const manifestPath = path.join(extDir, 'manifest.json');
@@ -234,12 +221,4 @@ async function main(argv) {
     }
 }
 
-
-if (require.main === module) {
-    testMain(main, process.argv.slice(2));
-}
-
-
-module.exports = {
-    main
-};
+testMain(main, process.argv.slice(2));
