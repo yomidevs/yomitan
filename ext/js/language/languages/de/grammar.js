@@ -16,7 +16,86 @@
  */
 
 /* global
+ * separatedPrefix
 */
+
 window.languages.de.getDeinflectionReasons = async () => {
-    return new Map([]);
+    const separablePrefixes = [
+        'ab',
+        'an',
+        'auf',
+        'aus',
+        'auseinander',
+        'bei',
+        'da',
+        'dabei',
+        'dar',
+        'daran',
+        'dazwischen',
+        'durch',
+        'ein',
+        'empor',
+        'entgegen',
+        'entlang',
+        'entzwei',
+        'fehl',
+        'fern',
+        'fest',
+        'fort',
+        'frei',
+        'gegenüber',
+        'gleich',
+        'heim',
+        'her',
+        'herab',
+        'heran',
+        'herauf',
+        'heraus',
+        'herbei',
+        'herein',
+        'herüber',
+        'herum',
+        'herunter',
+        'hervor',
+        'hin',
+        'hinab',
+        'hinauf',
+        'hinaus',
+        'hinein',
+        'hinterher',
+        'hinunter',
+        'hinweg',
+        'hinzu',
+        'hoch',
+        'los',
+        'mit',
+        'nach',
+        'nebenher',
+        'nieder',
+        'statt',
+        'um',
+        'vor',
+        'voran',
+        'voraus',
+        'vorbei',
+        'vorüber',
+        'vorweg',
+        'weg',
+        'weiter',
+        'wieder',
+        'zu',
+        'zurecht',
+        'zurück',
+        'zusammen'
+    ];
+
+    const separablePrefixInflections = separablePrefixes.map((prefix) => {
+        return separatedPrefix(prefix, [], []);
+    });
+
+    return new Map([
+        ['separated-prefix', [
+            ...separablePrefixInflections
+        ]]
+    ]);
 };

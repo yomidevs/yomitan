@@ -44,6 +44,18 @@ function infixInflection(inflectedInfix, deinflectedInfix, rulesIn, rulesOut){
     };
 }
 
+function separatedPrefix(prefix, rulesIn, rulesOut) {
+    const regex = new RegExp(`^(\\w+) .+ ${prefix}$`);
+    return {
+        inflected: regex,
+        uninflect: (term) => {
+            return term.replace(regex, '$1 ' + prefix);
+        },
+        rulesIn,
+        rulesOut
+    };
+}
+
 function wholeWordInflection(inflected, deinflected, rulesIn, rulesOut){
     return {
         inflected: new RegExp('^' + inflected + '$'),
