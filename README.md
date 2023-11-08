@@ -1,17 +1,12 @@
-# Yezichak
+# Yezichak 👅
 
-Yezichak is a fork of yomichan meant to work with languages other than Japanese. It turns your web browser into a tool for building language proficiency by helping you to decipher texts which would be otherwise too difficult to tackle. This extension is similar to
-[Rikaichamp](https://addons.mozilla.org/en-US/firefox/addon/rikaichamp/) for Firefox and
-[Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp?hl=en) for Chrome, but it
-stands apart in its goal of being an all-encompassing learning tool as opposed to a mere browser-based dictionary.
+Yezichak is a fork of yomichan meant to work with languages other than Japanese. It turns your web browser into a tool for building language proficiency by helping you to decipher texts which would be otherwise too difficult to tackle. 
 
 Yezichak provides advanced features not available in other browser-based dictionaries:
 
 *   Interactive popup definition window for displaying search results.
 *   On-demand audio playback for select dictionary definitions.
-*   Kanji stroke order diagrams are just a click away for most characters.
 *   Custom search page for easily executing custom search queries.
-*   Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via the [Yomichan Import](https://foosoft.net/projects/yomichan-import) tool.
 *   Automatic note creation for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 *   Clean, modern code makes it easy for developers to [contribute](https://github.com/FooSoft/yomichan/blob/master/CONTRIBUTING.md) new features.
 
@@ -36,41 +31,24 @@ Yezichak provides advanced features not available in other browser-based diction
 
 ## Installation
 
+### Get the code
+
+#### Install git and clone the repository (recommended)
+
+https://www.qamadness.com/knowledge-base/how-to-install-git-and-clone-a-repository/
+
+#### Or download the zip file
+This requires less setup if you don't have git, but you won't be able to easily update the code.
+
+<img src="resources/images/download-zip.png" alt="">
+
+
+### Load the ext folder as an unpacked extension
 https://developer.chrome.com/docs/extensions/mv3/getstarted/development-basics/#load-unpacked
 
 ## Dictionaries
 
-There are several free Japanese dictionaries available for Yezichak, with two of them having glossaries available in
-different languages. You must download and import the dictionaries you wish to use in order to enable Yezichak
-definition lookups. If you have proprietary EPWING dictionaries that you would like to use, check the [Yomichan
-Import](https://foosoft.net/projects/yomichan-import) page to learn how to convert and import them into Yezichak.
-
-Be aware that the non-English dictionaries contain fewer entries than their English counterparts. Even if your primary
-language is not English, you may consider also importing the English version for better coverage.
-
-*   **[JMdict](https://www.edrdg.org/jmdict/edict_doc.html)** (Japanese vocabulary)
-    *   [jmdict\_dutch.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/jmdict_dutch.zip)
-    *   [jmdict\_english.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/jmdict_english.zip)
-    *   [jmdict\_french.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/jmdict_french.zip)
-    *   [jmdict\_german.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/jmdict_german.zip)
-    *   [jmdict\_hungarian.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/jmdict_hungarian.zip)
-    *   [jmdict\_russian.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/jmdict_russian.zip)
-    *   [jmdict\_slovenian.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/jmdict_slovenian.zip)
-    *   [jmdict\_spanish.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/jmdict_spanish.zip)
-    *   [jmdict\_swedish.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/jmdict_swedish.zip)
-*   **[JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese names)
-    *   [jmnedict.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/jmnedict.zip)
-*   **[KireiCake](https://kireicake.com/rikaicakes/)** (Japanese slang)
-    *   [kireicake.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/kireicake.zip)
-*   **[KANJIDIC](http://nihongo.monash.edu/kanjidic2/index.html)** (Japanese kanji)
-    *   [kanjidic\_english.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/kanjidic_english.zip)
-    *   [kanjidic\_french.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/kanjidic_french.zip)
-    *   [kanjidic\_portuguese.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/kanjidic_portuguese.zip)
-    *   [kanjidic\_spanish.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/kanjidic_spanish.zip)
-*   **[Innocent Corpus](https://web.archive.org/web/20190309073023/https://forum.koohii.com/thread-9459.html#pid168613)** (Term and kanji frequencies across 5000+ novels)
-    *   [innocent\_corpus.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/innocent_corpus.zip)
-*   **[Kanjium](https://github.com/mifunetoshiro/kanjium)** (Pitch dictionary, see [related project page](https://github.com/toasted-nutbread/yomichan-pitch-accent-dictionary) for details)
-    *   [kanjium_pitch_accents.zip](https://github.com/FooSoft/yomichan/raw/dictionaries/kanjium_pitch_accents.zip)
+To get dictionaries, visit the #dictionaries channel in the [Yezichak Discord server](https://discord.gg/kd4YXFaV).
 
 ## Basic Usage
 
@@ -84,9 +62,9 @@ language is not English, you may consider also importing the English version for
     *   The <img src="ext/images/profile.svg" alt="" width="16" height="16"> _profile_ button will appear when multiple profiles exist, allowing the current profile to be quickly changed.
 
 
-2.  Import the dictionaries you wish to use for term and kanji searches. If you do not have any dictionaries installed
-    or enabled, Yezichak will warn you that it is not ready for use by displaying an orange exclamation mark over its
-    icon. This exclamation mark will disappear once you have installed and enabled at least one dictionary.
+2.  Import the dictionaries you wish to search. 
+    If you do not have any dictionaries installed or enabled, Yezichak will warn you that it is not ready for use by displaying an orange exclamation mark over its icon. 
+    This exclamation mark will disappear once you have installed and enabled at least one dictionary.
 
     <img src="resources/images/settings-dictionaries-popup.png" alt="">
 
@@ -95,28 +73,17 @@ language is not English, you may consider also importing the English version for
     will open. This window can be dismissed by clicking anywhere outside of it.
 
     <img src="resources/images/search-popup-terms.png" alt="">
+    
 
-4.  Click on the <img src="ext/images/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is
-    not available, you will hear a short click instead. You can configure the sources used to retrieve audio samples in
-    the options page.
 
-5.  Click on individual kanji in the term definition results to view additional information about those characters,
-    including stroke order diagrams, readings, meanings, as well as other useful data.
+### Audio
 
-    <img src="resources/images/search-popup-kanji.png" alt="">
+    The recommended setup is to use the [Yomichan Forvo Server](https://ankiweb.net/shared/info/580654285) Anki add-on, and add a *Custom Audio (JSON)* audio source with the URL `http://localhost:8770?term={term}&language={language}`.
 
-## Custom Dictionaries
+    <img src="resources/images/audio-setup.png" alt="">
 
-Yezichak supports the use of custom dictionaries, including the esoteric but popular
-[EPWING](https://ja.wikipedia.org/wiki/EPWING) format. They were often utilized in portable electronic dictionaries
-similar to the ones pictured below. These dictionaries are often sought after by language learners for their correctness
-and excellent coverage of the Japanese language.
+    Once a working audio source is in plance, you can click on the <img src="ext/images/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is not available, you will hear a short click instead. 
 
-Unfortunately, as most of the dictionaries released in this format are proprietary, they are unable to be bundled with
-Yezichak. Instead, you will need to procure these dictionaries yourself and import them using [Yomichan
-Import](https://foosoft.net/projects/yomichan-import). Check the project page for additional details.
-
-![Pocket EPWING dictionaries](img/epwing-devices.jpg)
 
 ## Anki Integration
 
@@ -126,7 +93,7 @@ Check the respective project page for more information about how to set up this 
 
 ### Flashcard Configuration
 
-Before flashcards can be automatically created, you must configure the templates used to create term and/or kanji notes.
+Before flashcards can be automatically created, you must configure the templates used to create notes.
 If you are unfamiliar with Anki deck and model management, this would be a good time to reference the [Anki
 Manual](https://docs.ankiweb.net/#/). In short, you must specify what information should be included in the
 flashcards that Yezichak creates through AnkiConnect.
@@ -145,6 +112,7 @@ Flashcard fields can be configured with the following steps:
 
     Marker | Description
     -------|------------
+    `{expression}` | The term you are adding.
     `{audio}` | Audio sample of a native speaker's pronunciation in MP3 format (if available).
     `{clipboard-image}` | An image which is stored in the system clipboard, if present.
     `{clipboard-text}` | Text which is stored in the system clipboard, if present.
@@ -154,49 +122,24 @@ Flashcard fields can be configured with the following steps:
     `{conjugation}` | Conjugation path from the raw inflected term to the source term.
     `{dictionary}` | Name of the dictionary from which the card is being created (unavailable in *grouped* mode).
     `{document-title}` | Title of the web page that the term appeared in.
-    `{expression}` | Term expressed as kanji (will be displayed in kana if kanji is not available).
     `{frequencies}` | Frequency information for the term.
-    `{furigana}` | Term expressed as kanji with furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).
-    `{furigana-plain}` | Term expressed as kanji with furigana displayed next to it in brackets (e.g. 日本語[にほんご]).
     `{glossary}` | List of definitions for the term (output format depends on whether running in *grouped* mode).
     `{glossary-brief}` | List of definitions for the term in a more compact format.
     `{glossary-no-dictionary}` | List of definitions for the term, except the dictionary tag is omitted.
     `{part-of-speech}` | Part of speech information for the term.
-    `{pitch-accents}` | List of pitch accent downstep notations for the term.
-    `{pitch-accent-graphs}` | List of pitch accent graphs for the term.
-    `{pitch-accent-positions}` | List of accent downstep positions for the term as a number.
-    `{reading}` | Kana reading for the term (empty for terms where the expression is the reading).
     `{screenshot}` | Screenshot of the web page taken at the time the term was added.
     `{search-query}` | The full search query shown on the search page.
     `{selection-text}` | The selected text on the search page or popup.
     `{sentence}` | Sentence, quote, or phrase that the term appears in from the source content.
-    `{sentence-furigana}` | Sentence, quote, or phrase that the term appears in from the source content, with furigana added.
     `{tags}` | Grammar and usage tags providing information about the term (unavailable in *grouped* mode).
     `{url}` | Address of the web page in which the term appeared in.
-
-    #### Markers for Kanji Cards
-
-    Marker | Description
-    -------|------------
-    `{character}` | Unicode glyph representing the current kanji.
-    `{clipboard-image}` | An image which is stored in the system clipboard, if present.
-    `{clipboard-text}` | Text which is stored in the system clipboard, if present.
-    `{cloze-body}` | Raw, inflected parent term as it appeared before being reduced to dictionary form by Yezichak.
-    `{cloze-prefix}` | Fragment of the containing `{sentence}` starting at the beginning of `{sentence}` until the beginning of `{cloze-body}`.
-    `{cloze-suffix}` | Fragment of the containing `{sentence}` starting at the end of `{cloze-body}` until the end of `{sentence}`.
-    `{dictionary}` | Name of the dictionary from which the card is being created.
-    `{document-title}` | Title of the web page that the kanji appeared in.
-    `{frequencies}` | Frequency information for the kanji.
-    `{glossary}` | List of definitions for the kanji.
-    `{kunyomi}` | Kunyomi (Japanese reading) for the kanji expressed as katakana.
-    `{onyomi}` | Onyomi (Chinese reading) for the kanji expressed as hiragana.
-    `{screenshot}` | Screenshot of the web page taken at the time the kanji was added.
-    `{search-query}` | The full search query shown on the search page.
-    `{selection-text}` | The selected text on the search page or popup.
-    `{sentence}` | Sentence, quote, or phrase that the character appears in from the source content.
-    `{sentence-furigana}` | Sentence, quote, or phrase that the character appears in from the source content, with furigana added.
-    `{stroke-count}` | Number of strokes that the kanji character has.
-    `{url}` | Address of the web page in which the kanji appeared in.
+    `{furigana}` | Term expressed as kanji with furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).
+    `{furigana-plain}` | Term expressed as kanji with furigana displayed next to it in brackets (e.g. 日本語[にほんご]).
+    `{sentence-furigana}` | Sentence, quote, or phrase that the term appears in from the source content, with furigana added.
+    `{pitch-accents}` | List of pitch accent downstep notations for the term.
+    `{pitch-accent-graphs}` | List of pitch accent graphs for the term.
+    `{pitch-accent-positions}` | List of accent downstep positions for the term as a number.
+    `{reading}` | Kana reading for the term (empty for terms where the expression is the reading).
 
 When creating your model for Yezichak, *make sure that you pick a unique field to be first*; fields that will
 contain `{expression}` or `{character}` are ideal candidates for this. Anki does not allow duplicate flashcards to be
@@ -209,7 +152,7 @@ be able to create a flashcard for <ruby>箸<rt>はし</rt></ruby> because they s
 Once Yezichak is configured, it becomes trivial to create new flashcards with a single click. You will see the following
 icons next to term definitions:
 
-*   Clicking ![](img/btn-add-expression.png) adds the current expression as kanji (e.g. 食べる).
+*   Clicking ![](img/btn-add-expression.png) adds the current expression as a term (e.g. 食べる).
 *   Clicking ![](img/btn-add-reading.png) adds the current expression as hiragana or katakana (e.g. たべる).
 
 Below are some troubleshooting tips you can try if you are unable to create new flashcards:
@@ -265,13 +208,6 @@ one of the following solutions should work for you:
 *   As a last resort, try using the [Refresh Firefox](https://support.mozilla.org/en-US/kb/reset-preferences-fix-problems)
     feature to reset your user profile. It appears that the Firefox profile system can corrupt itself preventing
     IndexedDB from being accessible to Yezichak.
-
-**Will you add support for online dictionaries?**
-
-Online dictionaries will not be implemented because it is not possible to support them in a robust way. In order to
-perform deinflection, Yezichak must execute dozens of database queries for every single word. Factoring in
-network latency and the fragility of web scraping, it would not be possible to maintain a good and consistent user
-experience.
 
 **Is it possible to use Yezichak with files saved locally on my computer with Chrome?**
 
