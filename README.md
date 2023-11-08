@@ -83,11 +83,11 @@ To get dictionaries, visit the #dictionaries channel in the [Yezichak Discord se
 
 ### Audio
 
-    The recommended setup is to use the [Yomichan Forvo Server](https://ankiweb.net/shared/info/580654285) Anki add-on, and add a *Custom Audio (JSON)* audio source with the URL `http://localhost:8770?term={term}&language={language}`.
+The recommended setup is to use the [Yomichan Forvo Server](https://ankiweb.net/shared/info/580654285) Anki add-on, and add a *Custom Audio (JSON)* audio source with the URL `http://localhost:8770?term={term}&language={language}`.
 
-    <img src="resources/images/audio-setup.png" alt="">
+<img src="resources/images/audio-setup.png" alt="">
 
-    Once a working audio source is in plance, you can click on the <img src="ext/images/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is not available, you will hear a short click instead. 
+Once a working audio source is in plance, you can click on the <img src="ext/images/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is not available, you will hear a short click instead. 
 
 
 ## Anki Integration
