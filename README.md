@@ -51,6 +51,10 @@ This requires less setup if you don't have git, but you won't be able to easily 
 ### Load the ext folder as an unpacked extension
 https://developer.chrome.com/docs/extensions/mv3/getstarted/development-basics/#load-unpacked
 
+### Importing settings
+If you have settings you want to keep from another version of Yomichan, you can try exporting them from that version and importing them into Yezichak.
+The import/export feature is in the Backup section at the bottom of the Settings page.
+
 ## Dictionaries
 
 To get dictionaries, visit the #dictionaries channel in the [Yezichak Discord server](https://discord.gg/kd4YXFaV).
