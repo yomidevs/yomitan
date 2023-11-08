@@ -118,6 +118,8 @@ class PopupPreviewFrame {
         switch (lang) {
             case 'de':
                 return 'gelesen';
+            case 'el':
+                return 'διαβάζω';
             case 'en':
                 return "don't read";
             case 'es':
