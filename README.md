@@ -91,7 +91,7 @@ The recommended setup is to use the [Yomichan Forvo Server](https://ankiweb.net/
 
 <img src="resources/images/audio-setup.png" alt="">
 
-Once a working audio source is in plance, you can click on the <img src="ext/images/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is not available, you will hear a short click instead. 
+Once a working audio source is in place, you can click on the <img src="ext/images/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is not available, you will hear a short click instead. 
 
 
 ## Anki Integration
