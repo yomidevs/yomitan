@@ -47,7 +47,6 @@ This requires less setup if you don't have git, but you won't be able to easily 
 
 <img src="resources/images/download-zip.png" alt="">
 
-
 ### Load the ext folder as an unpacked extension
 https://developer.chrome.com/docs/extensions/mv3/getstarted/development-basics/#load-unpacked
 
@@ -70,7 +69,6 @@ To get dictionaries, visit the #dictionaries channel in the [Yezichak Discord se
     *   The <img src="ext/images/question-mark-circle.svg" alt="" width="16" height="16"> _question mark_ button will open the Information page.
     *   The <img src="ext/images/profile.svg" alt="" width="16" height="16"> _profile_ button will appear when multiple profiles exist, allowing the current profile to be quickly changed.
 
-
 2.  Import the dictionaries you wish to search. 
     If you do not have any dictionaries installed or enabled, Yezichak will warn you that it is not ready for use by displaying an orange exclamation mark over its icon. 
     This exclamation mark will disappear once you have installed and enabled at least one dictionary.
@@ -83,8 +81,6 @@ To get dictionaries, visit the #dictionaries channel in the [Yezichak Discord se
 
     <img src="resources/images/search-popup-terms.png" alt="">
     
-
-
 ### Audio
 
 The recommended setup is to use the [Yomichan Forvo Server](https://ankiweb.net/shared/info/580654285) Anki add-on, and add a *Custom Audio (JSON)* audio source with the URL `http://localhost:8770?term={term}&language={language}`.
@@ -92,7 +88,6 @@ The recommended setup is to use the [Yomichan Forvo Server](https://ankiweb.net/
 <img src="resources/images/audio-setup.png" alt="">
 
 Once a working audio source is in place, you can click on the <img src="ext/images/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is not available, you will hear a short click instead. 
-
 
 ## Anki Integration
 
@@ -170,6 +165,10 @@ Below are some troubleshooting tips you can try if you are unable to create new 
 *   If all of the buttons appear grayed out, then you should double-check your deck and model configuration settings.
 *   If no icons appear at all, make sure that Anki is running in the background and that [AnkiConnect](https://foosoft.net/projects/anki-connect) has been installed.
 
+## Multiple languages
+
+If you are learning multiple languages, it is recommended that you create a separate profile for each language. 
+This will allow you to configure different dictionaries and Anki settings for each language, among other things.
 ## Keyboard Shortcuts
 
 The following shortcuts are globally available:
@@ -229,7 +228,6 @@ will likely never be possible to use Yezichak with PDF files.
 Yezichak is able to delete individual dictionaries, but keep in mind that this process can be *very* slow and can
 cause the browser to become unresponsive. The time it takes to delete a single dictionary can sometimes be roughly
 the same as the time it originally took to import, which can be significant for certain large dictionaries.
-
 
 ## Licenses
 
