@@ -126,7 +126,7 @@ class DictionaryDataUtil {
                 }
                 groupedPronunciation.terms.add(term);
             }
-            for (const {ipa} of phoneticTranscriptions) {
+            for (const {ipa, tags = []} of phoneticTranscriptions) {
                 let groupedPronunciation = this._findExistingGroupedPronunciation(reading, null, null, null, null, dictionaryGroupedPronunciationList);
                 if (groupedPronunciation === null) {
                     groupedPronunciation = {
@@ -134,7 +134,7 @@ class DictionaryDataUtil {
                         terms: new Set(),
                         reading,
                         ipa,
-                        tags: [],
+                        tags,
                         exclusiveTerms: [],
                         exclusiveReadings: []
                     };
