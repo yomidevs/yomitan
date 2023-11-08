@@ -18,8 +18,13 @@ Yezichak provides advanced features not available in other browser-based diction
 ## Table of Contents
 
 *   [Installation](#installation)
+    *  [Get the code](#get-the-code)
+        *   [Using Git](#install-git-and-clone-the-repository-recommended)
+        *   [No git](#or-download-the-zip-file)
+    *   [Load the extension](#load-the-ext-folder-as-an-unpacked-extension)
 *   [Dictionaries](#dictionaries)
 *   [Basic Usage](#basic-usage)
+    *   [Audio](#audio)
 *   [Custom Dictionaries](#custom-dictionaries)
 *   [Anki Integration](#anki-integration)
     *   [Flashcard Configuration](#flashcard-configuration)
