@@ -20,10 +20,6 @@ import {EventListenerCollection, log} from '../../core.js';
 import {DictionaryWorker} from '../../language/dictionary-worker.js';
 import {yomichan} from '../../yomichan.js';
 
-/* global
- * DictionaryWorker
- */
-
 class DictionaryEntry {
     constructor(dictionaryController, fragment, index, dictionaryInfo) {
         this._dictionaryController = dictionaryController;

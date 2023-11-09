@@ -21,11 +21,6 @@ import {PopupMenu} from '../dom/popup-menu.js';
 import {AudioSystem} from '../media/audio-system.js';
 import {yomichan} from '../yomichan.js';
 
-/* global
- * AudioSystem
- * PopupMenu
- */
-
 export class DisplayAudio {
     constructor(display) {
         this._display = display;

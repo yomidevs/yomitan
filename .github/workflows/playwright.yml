@@ -9,8 +9,6 @@ jobs:
   playwright:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    env:
-      PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS: 1
     steps:
       - name: Remove all fonts
         run: rm -rf /usr/share/fonts
