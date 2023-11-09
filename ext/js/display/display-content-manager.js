@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * ArrayBufferUtil
- */
+import {EventListenerCollection} from '../core.js';
+import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {yomichan} from '../yomichan.js';
 
 /**
  * A callback used when a media file has been loaded.
@@ -35,7 +35,7 @@
 /**
  * The content manager which is used when generating HTML display content.
  */
-class DisplayContentManager {
+export class DisplayContentManager {
     /**
      * Creates a new instance of the class.
      * @param {Display} display The display instance that owns this object.

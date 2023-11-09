@@ -16,9 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Backend
- */
+import {yomichan} from '../yomichan.js';
+import {Backend} from './backend.js';
 
 (() => {
     yomichan.prepare(true);

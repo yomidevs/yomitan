@@ -16,14 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * JsonSchema
- */
+import {JsonSchema} from '../data/json-schema.js';
 
 /**
  * Utility class to help processing profile conditions.
  */
-class ProfileConditionsUtil {
+export class ProfileConditionsUtil {
     /**
      * A group of conditions.
      * @typedef {object} ProfileConditionGroup

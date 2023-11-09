@@ -16,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * HotkeyUtil
- * KeyboardMouseInputField
- */
+import {EventListenerCollection, isObject} from '../../core.js';
+import {HotkeyUtil} from '../../input/hotkey-util.js';
+import {yomichan} from '../../yomichan.js';
+import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
-class ExtensionKeyboardShortcutController {
+export class ExtensionKeyboardShortcutController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._resetButton = null;

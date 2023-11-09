@@ -16,18 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Display
- * DisplayAnki
- * DisplayAudio
- * DocumentFocusController
- * HotkeyHandler
- * JapaneseUtil
- * SearchActionPopupController
- * SearchDisplayController
- * SearchPersistentStateController
- * wanakana
- */
+import * as wanakana from '../../lib/wanakana.js';
+import {log} from '../core.js';
+import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {HotkeyHandler} from '../input/hotkey-handler.js';
+import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
+import {yomichan} from '../yomichan.js';
+import {DisplayAnki} from './display-anki.js';
+import {DisplayAudio} from './display-audio.js';
+import {Display} from './display.js';
+import {SearchActionPopupController} from './search-action-popup-controller.js';
+import {SearchDisplayController} from './search-display-controller.js';
+import {SearchPersistentStateController} from './search-persistent-state-controller.js';
 
 (async () => {
     try {

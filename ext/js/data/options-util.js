@@ -16,12 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * JsonSchema
- * TemplatePatcher
- */
+import {escapeRegExp, isObject} from '../core.js';
+import {TemplatePatcher} from '../templates/template-patcher.js';
+import {JsonSchema} from './json-schema.js';
 
-class OptionsUtil {
+export class OptionsUtil {
     constructor() {
         this._templatePatcher = null;
         this._optionsSchema = null;

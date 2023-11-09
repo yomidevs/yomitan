@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class PopupPreviewController {
+export class PopupPreviewController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');

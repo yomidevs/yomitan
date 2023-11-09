@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * HtmlTemplateCollection
- * OptionsUtil
- * PermissionsUtil
- */
+import {EventDispatcher, EventListenerCollection, generateId, isObject} from '../../core.js';
+import {OptionsUtil} from '../../data/options-util.js';
+import {PermissionsUtil} from '../../data/permissions-util.js';
+import {HtmlTemplateCollection} from '../../dom/html-template-collection.js';
+import {yomichan} from '../../yomichan.js';
 
-class SettingsController extends EventDispatcher {
+export class SettingsController extends EventDispatcher {
     constructor() {
         super();
         this._profileIndex = 0;

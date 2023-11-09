@@ -16,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DictionaryDataUtil
- * HtmlTemplateCollection
- * PronunciationGenerator
- * StructuredContentGenerator
- */
+import {isObject} from '../core.js';
+import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
+import {DictionaryDataUtil} from '../language/sandbox/dictionary-data-util.js';
+import {yomichan} from '../yomichan.js';
+import {PronunciationGenerator} from './sandbox/pronunciation-generator.js';
+import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
 
-class DisplayGenerator {
+export class DisplayGenerator {
     constructor({japaneseUtil, contentManager, hotkeyHelpController=null}) {
         this._japaneseUtil = japaneseUtil;
         this._contentManager = contentManager;

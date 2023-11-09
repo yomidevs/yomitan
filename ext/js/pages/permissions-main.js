@@ -16,16 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentFocusController
- * ExtensionContentController
- * ModalController
- * PermissionsOriginController
- * PermissionsToggleController
- * PersistentStorageController
- * SettingsController
- * SettingsDisplayController
- */
+import {log, promiseTimeout} from '../core.js';
+import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {yomichan} from '../yomichan.js';
+import {ExtensionContentController} from './common/extension-content-controller.js';
+import {ModalController} from './settings/modal-controller.js';
+import {PermissionsOriginController} from './settings/permissions-origin-controller.js';
+import {PermissionsToggleController} from './settings/permissions-toggle-controller.js';
+import {PersistentStorageController} from './settings/persistent-storage-controller.js';
+import {SettingsController} from './settings/settings-controller.js';
+import {SettingsDisplayController} from './settings/settings-display-controller.js';
 
 async function setupEnvironmentInfo() {
     const {manifest_version: manifestVersion} = chrome.runtime.getManifest();

@@ -16,10 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 /**
  * This class provides some general utility functions for regular expressions.
  */
-class RegexUtil {
+export class RegexUtil {
     /**
      * Applies string.replace using a regular expression and replacement string as arguments.
      * A source map of the changes is also maintained.

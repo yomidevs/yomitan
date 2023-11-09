@@ -16,14 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * MediaUtil
- */
+import {MediaUtil} from '../media/media-util.js';
 
 /**
  * Class which can read text and images from the clipboard.
  */
-class ClipboardReader {
+export class ClipboardReader {
     /**
      * Creates a new instances of a clipboard reader.
      * @param {object} details Details about how to set up the instance.

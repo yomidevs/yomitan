@@ -16,11 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Environment
- */
+import {Environment} from '../../extension/environment.js';
 
-class ExtensionContentController {
+export class ExtensionContentController {
     prepare() {
         this._prepareSpecialUrls();
         this._prepareExtensionIdExamples();

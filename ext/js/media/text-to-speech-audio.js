@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class TextToSpeechAudio {
+export class TextToSpeechAudio {
     constructor(text, voice) {
         this._text = text;
         this._voice = voice;

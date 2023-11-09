@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * TextScanner
- */
+import {EventDispatcher, log} from '../core.js';
+import {TextScanner} from '../language/text-scanner.js';
+import {yomichan} from '../yomichan.js';
 
-class QueryParser extends EventDispatcher {
+export class QueryParser extends EventDispatcher {
     constructor({getSearchContext, japaneseUtil}) {
         super();
         this._getSearchContext = getSearchContext;

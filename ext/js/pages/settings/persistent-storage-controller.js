@@ -16,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class PersistentStorageController {
+import {isObject} from '../../core.js';
+import {yomichan} from '../../yomichan.js';
+
+export class PersistentStorageController {
     constructor() {
         this._persistentStorageCheckbox = false;
     }

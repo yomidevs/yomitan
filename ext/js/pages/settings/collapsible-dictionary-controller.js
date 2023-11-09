@@ -16,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class CollapsibleDictionaryController {
+import {EventListenerCollection} from '../../core.js';
+import {yomichan} from '../../yomichan.js';
+
+export class CollapsibleDictionaryController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._getDictionaryInfoToken = null;

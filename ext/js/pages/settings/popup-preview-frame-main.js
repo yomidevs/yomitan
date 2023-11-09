@@ -16,6 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {PopupFactory} from '../../app/popup-factory.js';
+import {log} from '../../core.js';
+import {HotkeyHandler} from '../../input/hotkey-handler.js';
+import {yomichan} from '../../yomichan.js';
+import {PopupPreviewFrame} from './popup-preview-frame.js';
+
 /* global
  * HotkeyHandler
  * PopupFactory

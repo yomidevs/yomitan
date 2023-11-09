@@ -19,7 +19,7 @@
 /**
  * MediaUtil is a class containing helper methods related to media processing.
  */
-class MediaUtil {
+export class MediaUtil {
     /**
      * Gets the file extension of a file path. URL search queries and hash
      * fragments are not handled.

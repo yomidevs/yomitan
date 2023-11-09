@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class MecabController {
+import {yomichan} from '../../yomichan.js';
+
+export class MecabController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._testButton = null;

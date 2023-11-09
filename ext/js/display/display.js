@@ -16,26 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DisplayContentManager
- * DisplayGenerator
- * DisplayHistory
- * DisplayNotification
- * ElementOverflowController
- * FrameEndpoint
- * Frontend
- * HotkeyHelpController
- * OptionToggleHotkeyHandler
- * PopupFactory
- * PopupMenu
- * QueryParser
- * ScrollElement
- * TextScanner
- * ThemeController
- * dynamicLoader
- */
+import {Frontend} from '../app/frontend.js';
+import {PopupFactory} from '../app/popup-factory.js';
+import {ThemeController} from '../app/theme-controller.js';
+import {FrameEndpoint} from '../comm/frame-endpoint.js';
+import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, isObject, log, promiseTimeout} from '../core.js';
+import {PopupMenu} from '../dom/popup-menu.js';
+import {ScrollElement} from '../dom/scroll-element.js';
+import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
+import {TextScanner} from '../language/text-scanner.js';
+import {dynamicLoader} from '../script/dynamic-loader.js';
+import {yomichan} from '../yomichan.js';
+import {DisplayContentManager} from './display-content-manager.js';
+import {DisplayGenerator} from './display-generator.js';
+import {DisplayHistory} from './display-history.js';
+import {DisplayNotification} from './display-notification.js';
+import {ElementOverflowController} from './element-overflow-controller.js';
+import {OptionToggleHotkeyHandler} from './option-toggle-hotkey-handler.js';
+import {QueryParser} from './query-parser.js';
 
-class Display extends EventDispatcher {
+export class Display extends EventDispatcher {
     /**
      * Information about how popup content should be shown, specifically related to the inner popup content.
      * @typedef {object} ContentDetails

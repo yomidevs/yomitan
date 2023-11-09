@@ -16,11 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AudioSystem
- */
+import {EventDispatcher, EventListenerCollection} from '../../core.js';
+import {AudioSystem} from '../../media/audio-system.js';
 
-class AudioController extends EventDispatcher {
+export class AudioController extends EventDispatcher {
     constructor(settingsController, modalController) {
         super();
         this._settingsController = settingsController;

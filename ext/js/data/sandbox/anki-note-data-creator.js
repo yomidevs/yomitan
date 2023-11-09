@@ -16,15 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DictionaryDataUtil
- */
+import {DictionaryDataUtil} from '../../language/sandbox/dictionary-data-util.js';
 
 /**
  * This class is used to convert the internal dictionary entry format to the
  * format used by Anki, for backwards compatibility.
  */
-class AnkiNoteDataCreator {
+export class AnkiNoteDataCreator {
     /**
      * Creates a new instance.
      * @param {JapaneseUtil} japaneseUtil An instance of `JapaneseUtil`.

@@ -16,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AnkiNoteBuilder
- * JapaneseUtil
- */
+import {isObject} from '../../core.js';
+import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
+import {JapaneseUtil} from '../../language/sandbox/japanese-util.js';
+import {yomichan} from '../../yomichan.js';
 
-class AnkiTemplatesController {
+export class AnkiTemplatesController {
     constructor(settingsController, modalController, ankiController) {
         this._settingsController = settingsController;
         this._modalController = modalController;

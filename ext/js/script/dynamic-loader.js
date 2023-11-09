@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const dynamicLoader = (() => {
+import {yomichan} from '../yomichan.js';
+
+export const dynamicLoader = (() => {
     const injectedStylesheets = new Map();
     const injectedStylesheetsWithParent = new WeakMap();
 
@@ -146,6 +148,7 @@ const dynamicLoader = (() => {
         yomichan.on(sentinelEventName, sentinelEventCallback);
 
         try {
+            script.type = 'module';
             script.async = false;
             script.src = '/js/script/dynamic-loader-sentinel.js';
             parent.appendChild(script);

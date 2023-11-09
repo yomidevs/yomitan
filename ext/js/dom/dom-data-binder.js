@@ -16,13 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- * SelectorObserver
- * TaskAccumulator
- */
+import {TaskAccumulator} from '../general/task-accumulator.js';
+import {DocumentUtil} from './document-util.js';
+import {SelectorObserver} from './selector-observer.js';
 
-class DOMDataBinder {
+export class DOMDataBinder {
     constructor({selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError=null}) {
         this._selector = selector;
         this._createElementMetadata = createElementMetadata;

@@ -1,4 +1,5 @@
 {
+    "$id": "dictionaryIndex",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "description": "Index file containing information about the data contained in the dictionary.",

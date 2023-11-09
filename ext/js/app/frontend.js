@@ -16,17 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- * GoogleDocsUtil
- * TextScanner
- * TextSourceRange
- */
+import {GoogleDocsUtil} from '../accessibility/google-docs-util.js';
+import {EventListenerCollection, invokeMessageHandler, isObject, log, promiseAnimationFrame} from '../core.js';
+import {DocumentUtil} from '../dom/document-util.js';
+import {TextSourceElement} from '../dom/text-source-element.js';
+import {TextSourceRange} from '../dom/text-source-range.js';
+import {HotkeyHandler} from '../input/hotkey-handler.js';
+import {TextScanner} from '../language/text-scanner.js';
+import {yomichan} from '../yomichan.js';
+import {PopupFactory} from './popup-factory.js';
+import {Popup} from './popup.js';
 
 /**
  * This is the main class responsible for scanning and handling webpage content.
  */
-class Frontend {
+export class Frontend {
     /**
      * Creates a new instance.
      * @param {object} details Details about how to set up the instance.

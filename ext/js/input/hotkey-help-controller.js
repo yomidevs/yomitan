@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * HotkeyUtil
- */
+import {isObject} from '../core.js';
+import {yomichan} from '../yomichan.js';
+import {HotkeyUtil} from './hotkey-util.js';
 
-class HotkeyHelpController {
+export class HotkeyHelpController {
     constructor() {
         this._hotkeyUtil = new HotkeyUtil();
         this._localActionHotseys = new Map();

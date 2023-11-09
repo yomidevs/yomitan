@@ -16,10 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentFocusController
- * ExtensionContentController
- */
+import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {ExtensionContentController} from './common/extension-content-controller.js';
 
 (() => {
     const documentFocusController = new DocumentFocusController();

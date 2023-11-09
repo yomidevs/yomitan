@@ -20,7 +20,7 @@
  * This class is used to generate `fetch()` requests on the background page
  * with additional controls over anonymity and error handling.
  */
-class RequestBuilder {
+export class RequestBuilder {
     /**
      * A progress callback for a fetch read.
      * @callback ProgressCallback

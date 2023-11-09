@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * BackupController
- * DocumentFocusController
- * SettingsController
- */
+import {log, promiseTimeout} from '../core.js';
+import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {yomichan} from '../yomichan.js';
+import {BackupController} from './settings/backup-controller.js';
+import {SettingsController} from './settings/settings-controller.js';
 
 function getBrowserDisplayName(browser) {
     switch (browser) {

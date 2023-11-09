@@ -16,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * ArrayBufferUtil
- * Dexie
- * DictionaryController
- * OptionsUtil
- */
+import * as Dexie from '../../../lib/dexie.js';
+import {isObject, log} from '../../core.js';
+import {OptionsUtil} from '../../data/options-util.js';
+import {ArrayBufferUtil} from '../../data/sandbox/array-buffer-util.js';
+import {yomichan} from '../../yomichan.js';
+import {DictionaryController} from './dictionary-controller.js';
 
-class BackupController {
+export class BackupController {
     constructor(settingsController, modalController) {
         this._settingsController = settingsController;
         this._modalController = modalController;

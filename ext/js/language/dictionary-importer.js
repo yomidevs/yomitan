@@ -16,13 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * JSZip
- * JsonSchema
- * MediaUtil
- */
-
-class DictionaryImporter {
+import * as ajvSchemas from '../../lib/validate-schemas.js';
+import {BlobWriter, TextWriter, Uint8ArrayReader, ZipReader, configure} from '../../lib/zip.js';
+import {stringReverse} from '../core.js';
+import {MediaUtil} from '../media/media-util.js';
+export class DictionaryImporter {
     constructor(mediaLoader, onProgress) {
         this._mediaLoader = mediaLoader;
         this._onProgress = typeof onProgress === 'function' ? onProgress : () => {};
@@ -39,20 +37,36 @@ class DictionaryImporter {
 
         this._progressReset();
 
-        // Read archive
-        const archive = await JSZip.loadAsync(archiveContent);
+        configure({
+            workerScripts: {
+                deflate: ['../../lib/z-worker.js'],
+                inflate: ['../../lib/z-worker.js']
+            }
+        });
 
+        // Read archive
+        const zipFileReader = new Uint8ArrayReader(new Uint8Array(archiveContent));
+        const zipReader = new ZipReader(zipFileReader);
+        const zipEntries = await zipReader.getEntries();
+        const zipEntriesObject = {};
+        for (const entry of zipEntries) {
+            zipEntriesObject[entry.filename] = entry;
+        }
         // Read and validate index
         const indexFileName = 'index.json';
-        const indexFile = archive.file(indexFileName);
+        const indexFile = zipEntriesObject[indexFileName];
         if (!indexFile) {
             throw new Error('No dictionary index found in archive');
         }
 
-        const index = JSON.parse(await indexFile.async('string'));
+        const indexContent = await indexFile.getData(
+            new TextWriter()
+        );
+        const index = JSON.parse(indexContent);
 
-        const indexSchema = await this._getSchema('/data/schemas/dictionary-index-schema.json');
-        this._validateJsonSchema(index, indexSchema, indexFileName);
+        if (!ajvSchemas.dictionaryIndex(index)) {
+            throw this._formatAjvSchemaError(ajvSchemas.dictionaryIndex, indexFileName);
+        }
 
         const dictionaryTitle = index.title;
         const version = index.format || index.version;
@@ -75,15 +89,14 @@ class DictionaryImporter {
 
         // Load schemas
         this._progressNextStep(0);
-        const dataBankSchemaPaths = this._getDataBankSchemaPaths(version);
-        const dataBankSchemas = await Promise.all(dataBankSchemaPaths.map((path) => this._getSchema(path)));
+        const dataBankSchemas = this._getDataBankSchemas(version);
 
         // Files
-        const termFiles      = this._getArchiveFiles(archive, 'term_bank_?.json');
-        const termMetaFiles  = this._getArchiveFiles(archive, 'term_meta_bank_?.json');
-        const kanjiFiles     = this._getArchiveFiles(archive, 'kanji_bank_?.json');
-        const kanjiMetaFiles = this._getArchiveFiles(archive, 'kanji_meta_bank_?.json');
-        const tagFiles       = this._getArchiveFiles(archive, 'tag_bank_?.json');
+        const termFiles      = this._getArchiveFiles(zipEntriesObject, 'term_bank_?.json');
+        const termMetaFiles  = this._getArchiveFiles(zipEntriesObject, 'term_meta_bank_?.json');
+        const kanjiFiles     = this._getArchiveFiles(zipEntriesObject, 'kanji_bank_?.json');
+        const kanjiMetaFiles = this._getArchiveFiles(zipEntriesObject, 'kanji_meta_bank_?.json');
+        const tagFiles       = this._getArchiveFiles(zipEntriesObject, 'tag_bank_?.json');
 
         // Load data
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
@@ -124,7 +137,7 @@ class DictionaryImporter {
 
         // Async requirements
         this._progressNextStep(requirements.length);
-        const {media} = await this._resolveAsyncRequirements(requirements, archive);
+        const {media} = await this._resolveAsyncRequirements(requirements, zipEntriesObject);
 
         // Add dictionary descriptor
         this._progressNextStep(termList.length + termMetaList.length + kanjiList.length + kanjiMetaList.length + tagList.length + media.length);
@@ -214,68 +227,27 @@ class DictionaryImporter {
         return summary;
     }
 
-    async _getSchema(fileName) {
-        const schema = await this._fetchJsonAsset(fileName);
-        return new JsonSchema(schema);
-    }
-
-    _validateJsonSchema(value, schema, fileName) {
-        try {
-            schema.validate(value);
-        } catch (e) {
-            throw this._formatSchemaError(e, fileName);
-        }
-    }
-
-    _formatSchemaError(e, fileName) {
-        const valuePathString = this._getSchemaErrorPathString(e.valueStack, 'dictionary');
-        const schemaPathString = this._getSchemaErrorPathString(e.schemaStack, 'schema');
-
-        const e2 = new Error(`Dictionary has invalid data in '${fileName}' for value '${valuePathString}', validated against '${schemaPathString}': ${e.message}`);
-        e2.data = e;
+    _formatAjvSchemaError(schema, fileName) {
+        const e2 = new Error(`Dictionary has invalid data in '${fileName}'`);
+        e2.data = schema.errors;
 
         return e2;
     }
 
-    _getSchemaErrorPathString(infoList, base='') {
-        let result = base;
-        for (const {path} of infoList) {
-            const pathArray = Array.isArray(path) ? path : [path];
-            for (const pathPart of pathArray) {
-                if (pathPart === null) {
-                    result = base;
-                } else {
-                    switch (typeof pathPart) {
-                        case 'string':
-                            if (result.length > 0) {
-                                result += '.';
-                            }
-                            result += pathPart;
-                            break;
-                        case 'number':
-                            result += `[${pathPart}]`;
-                            break;
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    _getDataBankSchemaPaths(version) {
+    _getDataBankSchemas(version) {
         const termBank = (
             version === 1 ?
-            '/data/schemas/dictionary-term-bank-v1-schema.json' :
-            '/data/schemas/dictionary-term-bank-v3-schema.json'
+            'dictionaryTermBankV1' :
+            'dictionaryTermBankV3'
         );
-        const termMetaBank = '/data/schemas/dictionary-term-meta-bank-v3-schema.json';
+        const termMetaBank = 'dictionaryTermMetaBankV3';
         const kanjiBank = (
             version === 1 ?
-            '/data/schemas/dictionary-kanji-bank-v1-schema.json' :
-            '/data/schemas/dictionary-kanji-bank-v3-schema.json'
+            'dictionaryKanjiBankV1' :
+            'dictionaryKanjiBankV3'
         );
-        const kanjiMetaBank = '/data/schemas/dictionary-kanji-meta-bank-v3-schema.json';
-        const tagBank = '/data/schemas/dictionary-tag-bank-v3-schema.json';
+        const kanjiMetaBank = 'dictionaryKanjiMetaBankV3';
+        const tagBank = 'dictionaryTagBankV3';
 
         return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
     }
@@ -335,9 +307,9 @@ class DictionaryImporter {
         return target;
     }
 
-    async _resolveAsyncRequirements(requirements, archive) {
+    async _resolveAsyncRequirements(requirements, zipEntriesObject) {
         const media = new Map();
-        const context = {archive, media};
+        const context = {zipEntriesObject, media};
 
         for (const requirement of requirements) {
             await this._resolveAsyncRequirement(context, requirement);
@@ -427,13 +399,16 @@ class DictionaryImporter {
         }
 
         // Find file in archive
-        const file = context.archive.file(path);
+        const file = context.zipEntriesObject[path];
         if (file === null) {
             throw createError('Could not find image');
         }
 
         // Load file content
-        let content = await file.async('arraybuffer');
+        let content = await (await file.getData(
+            new BlobWriter()
+        )).arrayBuffer();
+
         const mediaType = MediaUtil.getImageMediaTypeFromFileName(path);
         if (mediaType === null) {
             throw createError('Could not determine media type for image');
@@ -525,42 +500,36 @@ class DictionaryImporter {
         }
     }
 
-    _getArchiveFiles(archive, fileNameFormat) {
+    _getArchiveFiles(zipEntriesObject, fileNameFormat) {
         const indexPosition = fileNameFormat.indexOf('?');
         const prefix = fileNameFormat.substring(0, indexPosition);
         const suffix = fileNameFormat.substring(indexPosition + 1);
         const results = [];
-        for (let i = 1; true; ++i) {
-            const fileName = `${prefix}${i}${suffix}`;
-            const file = archive.file(fileName);
-            if (!file) { break; }
-            results.push(file);
+        for (const f of Object.keys(zipEntriesObject)) {
+            if (f.startsWith(prefix) && f.endsWith(suffix)) {
+                results.push(zipEntriesObject[f]);
+            }
         }
         return results;
     }
 
-    async _readFileSequence(files, convertEntry, schema, dictionaryTitle) {
+    async _readFileSequence(files, convertEntry, schemaName, dictionaryTitle) {
         const progressData = this._progressData;
-        let count = 0;
         let startIndex = 0;
-        if (typeof this._onProgress === 'function') {
-            schema.progressInterval = 1000;
-            schema.progress = (s) => {
-                const index = s.getValueStackLength() > 1 ? s.getValueStackItem(1).path : 0;
-                progressData.index = startIndex + (index / count);
-                this._progress();
-            };
-        }
 
         const results = [];
-        for (const file of files) {
-            const entries = JSON.parse(await file.async('string'));
+        for (const fileName of Object.keys(files)) {
+            const content = await files[fileName].getData(
+                new TextWriter()
+            );
+            const entries = JSON.parse(content);
 
-            count = Array.isArray(entries) ? Math.max(entries.length, 1) : 1;
             startIndex = progressData.index;
             this._progress();
 
-            this._validateJsonSchema(entries, schema, file.name);
+            if (!ajvSchemas[schemaName](entries)) {
+                throw this._formatAjvSchemaError(ajvSchemas[schemaName], fileName);
+            }
 
             progressData.index = startIndex + 1;
             this._progress();

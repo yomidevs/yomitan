@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class StructuredContentGenerator {
+export class StructuredContentGenerator {
     constructor(contentManager, japaneseUtil, document) {
         this._contentManager = contentManager;
         this._japaneseUtil = japaneseUtil;

@@ -16,11 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- */
+import {DocumentUtil} from '../../dom/document-util.js';
 
-class NestedPopupsController {
+export class NestedPopupsController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._popupNestingMaxDepth = 0;

@@ -16,17 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * FrameOffsetForwarder
- * Popup
- * PopupProxy
- * PopupWindow
- */
+import {FrameOffsetForwarder} from '../comm/frame-offset-forwarder.js';
+import {generateId} from '../core.js';
+import {yomichan} from '../yomichan.js';
+import {PopupProxy} from './popup-proxy.js';
+import {PopupWindow} from './popup-window.js';
+import {Popup} from './popup.js';
 
 /**
  * A class which is used to generate and manage popups.
  */
-class PopupFactory {
+export class PopupFactory {
     /**
      * Creates a new instance.
      * @param {number} frameId The frame ID of the host frame.

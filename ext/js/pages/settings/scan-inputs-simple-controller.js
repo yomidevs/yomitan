@@ -16,12 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * HotkeyUtil
- * ScanInputsController
- */
+import {HotkeyUtil} from '../../input/hotkey-util.js';
+import {yomichan} from '../../yomichan.js';
+import {ScanInputsController} from './scan-inputs-controller.js';
 
-class ScanInputsSimpleController {
+export class ScanInputsSimpleController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._middleMouseButtonScan = null;

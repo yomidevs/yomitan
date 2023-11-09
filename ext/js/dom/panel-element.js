@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class PanelElement extends EventDispatcher {
+import {EventDispatcher} from '../core.js';
+
+export class PanelElement extends EventDispatcher {
     constructor({node, closingAnimationDuration}) {
         super();
         this._node = node;

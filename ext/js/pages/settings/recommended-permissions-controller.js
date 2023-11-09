@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class RecommendedPermissionsController {
+import {EventListenerCollection} from '../../core.js';
+
+export class RecommendedPermissionsController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._originToggleNodes = null;

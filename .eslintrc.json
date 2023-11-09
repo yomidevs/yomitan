@@ -5,8 +5,8 @@
         "plugin:jsonc/recommended-with-json"
     ],
     "parserOptions": {
-        "ecmaVersion": 9,
-        "sourceType": "script",
+        "ecmaVersion": 2022,
+        "sourceType": "module",
         "ecmaFeatures": {
             "globalReturn": false,
             "impliedStrict": true
@@ -14,7 +14,7 @@
     },
     "env": {
         "browser": true,
-        "es2018": true,
+        "es2022": true,
         "webextensions": true
     },
     "plugins": [
@@ -24,7 +24,8 @@
         "jsonc"
     ],
     "ignorePatterns": [
-        "/ext/lib/"
+        "/ext/lib/",
+        "/dev/lib/handlebars/"
     ],
     "rules": {
         "arrow-parens": [
@@ -50,6 +51,7 @@
         "no-case-declarations": "error",
         "no-const-assign": "error",
         "no-constant-condition": "off",
+        "no-console": "warn",
         "no-global-assign": "error",
         "no-param-reassign": "off",
         "no-prototype-builtins": "error",
@@ -180,6 +182,7 @@
                 "after": true
             }
         ],
+        "no-implicit-globals": "error",
         "no-trailing-spaces": "error",
         "no-whitespace-before-property": "error",
         "object-curly-spacing": [
@@ -250,6 +253,7 @@
         "jsdoc/multiline-blocks": "error",
         "jsdoc/no-bad-blocks": "error",
         "jsdoc/no-multi-asterisks": "error",
+        "jsdoc/no-undefined-types": 1,
         "jsdoc/require-asterisk-prefix": "error",
         "jsdoc/require-hyphen-before-param-description": [
             "error",
@@ -377,49 +381,6 @@
         },
         {
             "files": [
-                "ext/**/*.js"
-            ],
-            "excludedFiles": [
-                "ext/js/core.js",
-                "ext/js/accessibility/google-docs.js",
-                "ext/js/**/sandbox/**/*.js"
-            ],
-            "globals": {
-                "serializeError": "readonly",
-                "deserializeError": "readonly",
-                "isObject": "readonly",
-                "stringReverse": "readonly",
-                "promiseTimeout": "readonly",
-                "escapeRegExp": "readonly",
-                "deferPromise": "readonly",
-                "clone": "readonly",
-                "deepEqual": "readonly",
-                "generateId": "readonly",
-                "promiseAnimationFrame": "readonly",
-                "invokeMessageHandler": "readonly",
-                "log": "readonly",
-                "DynamicProperty": "readonly",
-                "EventDispatcher": "readonly",
-                "EventListenerCollection": "readonly",
-                "Logger": "readonly"
-            }
-        },
-        {
-            "files": [
-                "ext/**/*.js"
-            ],
-            "excludedFiles": [
-                "ext/js/core.js",
-                "ext/js/accessibility/google-docs.js",
-                "ext/js/yomichan.js",
-                "ext/js/**/sandbox/**/*.js"
-            ],
-            "globals": {
-                "yomichan": "readonly"
-            }
-        },
-        {
-            "files": [
                 "ext/js/yomichan.js"
             ],
             "globals": {
@@ -431,49 +392,26 @@
                 "test/**/*.js",
                 "dev/**/*.js"
             ],
-            "excludedFiles": [
+            "env": {
+                "browser": false,
+                "node": true,
+                "webextensions": false
+            }
+        },
+        {
+            "files": [
                 "test/data/html/*.js"
             ],
             "parserOptions": {
-                "ecmaVersion": 8,
-                "sourceType": "module"
+                "sourceType": "script"
             },
             "env": {
-                "browser": false,
-                "es2017": true,
-                "node": true,
-                "webextensions": false
-            }
-        },
-        {
-            "files": [
-                "playwright.config.js"
-            ],
-            "env": {
-                "browser": false,
-                "es2017": true,
-                "node": true,
+                "browser": true,
+                "node": false,
                 "webextensions": false
             },
             "rules": {
-                "no-undefined": "off"
-            }
-        },
-        {
-            "files": [
-                "integration.spec.js",
-                "playwright-util.js",
-                "visual.spec.js"
-            ],
-            "env": {
-                "browser": false,
-                "es2017": true,
-                "node": true,
-                "webextensions": false
-            },
-            "rules": {
-                "no-undefined": "off",
-                "no-empty-pattern": "off"
+                "no-implicit-globals": "off"
             }
         },
         {
@@ -514,13 +452,13 @@
             "env": {
                 "browser": false,
                 "serviceworker": true,
-                "es2017": true,
                 "webextensions": true
             },
             "globals": {
                 "FileReader": "readonly",
                 "Intl": "readonly",
-                "crypto": "readonly"
+                "crypto": "readonly",
+                "AbortController": "readonly"
             }
         },
         {
@@ -538,29 +476,52 @@
             "env": {
                 "browser": false,
                 "worker": true,
-                "es2017": true,
                 "webextensions": true
             }
         },
         {
             "files": [
-                "ext/js/**/*.js"
+                "playwright.config.js"
             ],
-            "excludedFiles": [
-                "ext/js/core.js",
-                "ext/js/**/*main.js"
-            ],
+            "env": {
+                "browser": false,
+                "node": true,
+                "webextensions": false
+            },
             "rules": {
-                "no-implicit-globals": "error"
+                "no-undefined": "off"
             }
         },
         {
             "files": [
-                "ext/js/**/*.js"
+                "integration.spec.js",
+                "playwright-util.js",
+                "visual.spec.js"
             ],
-            "globals": {
-                "AbortController": "readonly"
+            "env": {
+                "browser": false,
+                "node": true,
+                "webextensions": false
+            },
+            "rules": {
+                "no-undefined": "off",
+                "no-empty-pattern": "off"
             }
+        },
+        {
+            "files": [
+                "test/**"
+            ],
+            "plugins": [
+                "vitest"
+            ],
+            "extends": [
+                "plugin:vitest/recommended"
+            ],
+            "rules": {
+                "vitest/prefer-to-be": "off"
+            },
+            "env": {}
         }
     ]
 }

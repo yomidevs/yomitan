@@ -20,7 +20,7 @@
  * This class is used to apply CSS styles to elements using a consistent method
  * that is the same across different browsers.
  */
-class CssStyleApplier {
+export class CssStyleApplier {
     /**
      * A CSS rule.
      * @typedef {object} CssRule

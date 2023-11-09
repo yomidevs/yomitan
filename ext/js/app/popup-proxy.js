@@ -16,11 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {FrameOffsetForwarder} from '../comm/frame-offset-forwarder.js';
+import {EventDispatcher, log} from '../core.js';
+import {yomichan} from '../yomichan.js';
+import {Popup} from './popup.js';
+
 /**
  * This class is a proxy for a Popup that is hosted in a different frame.
  * It effectively forwards all API calls to the underlying Popup.
  */
-class PopupProxy extends EventDispatcher {
+export class PopupProxy extends EventDispatcher {
     /**
      * Creates a new instance.
      * @param {object} details Details about how to set up the instance.

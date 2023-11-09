@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * PanelElement
- */
+import {EventListenerCollection, generateId} from '../core.js';
+import {PanelElement} from '../dom/panel-element.js';
+import {yomichan} from '../yomichan.js';
 
-class DisplayProfileSelection {
+export class DisplayProfileSelection {
     constructor(display) {
         this._display = display;
         this._profielList = document.querySelector('#profile-list');

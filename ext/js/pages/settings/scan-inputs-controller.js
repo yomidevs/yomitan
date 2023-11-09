@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * KeyboardMouseInputField
- */
+import {EventListenerCollection} from '../../core.js';
+import {yomichan} from '../../yomichan.js';
+import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
-class ScanInputsController {
+export class ScanInputsController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._os = null;

@@ -16,12 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Handlebars
- * handlebarsCompileFnName
- */
+import {Handlebars} from '../../../lib/handlebars.js';
 
-class TemplateRenderer {
+export class TemplateRenderer {
     constructor() {
         this._cache = new Map();
         this._cacheMaxSize = 5;
@@ -31,7 +28,6 @@ class TemplateRenderer {
     }
 
     registerHelpers(helpers) {
-        Handlebars.partials = Handlebars.templates;
         for (const [name, helper] of helpers) {
             this._registerHelper(name, helper);
         }
@@ -84,7 +80,7 @@ class TemplateRenderer {
         let instance = cache.get(template);
         if (typeof instance === 'undefined') {
             this._updateCacheSize(this._cacheMaxSize - 1);
-            instance = Handlebars[handlebarsCompileFnName](template);
+            instance = Handlebars.compileAST(template);
             cache.set(template, instance);
         }
 

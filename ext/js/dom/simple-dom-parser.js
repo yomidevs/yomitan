@@ -16,11 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* globals
- * parse5
- */
+import * as parse5 from '../../lib/parse5.js';
 
-class SimpleDOMParser {
+export class SimpleDOMParser {
     constructor(content) {
         this._document = parse5.parse(content);
         this._patternHtmlWhitespace = /[\t\r\n\f ]+/g;

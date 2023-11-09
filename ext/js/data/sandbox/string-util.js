@@ -19,7 +19,7 @@
 /**
  * Class containing generic string utility functions.
  */
-class StringUtil {
+export class StringUtil {
     /**
      * Reads code points from a string in the forward direction.
      * @param {string} text The text to read the code points from.

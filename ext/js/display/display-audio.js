@@ -16,12 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {EventListenerCollection} from '../core.js';
+import {PopupMenu} from '../dom/popup-menu.js';
+import {AudioSystem} from '../media/audio-system.js';
+import {yomichan} from '../yomichan.js';
+
 /* global
  * AudioSystem
  * PopupMenu
  */
 
-class DisplayAudio {
+export class DisplayAudio {
     constructor(display) {
         this._display = display;
         this._audioPlaying = null;

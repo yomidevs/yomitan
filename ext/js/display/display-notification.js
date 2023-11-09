@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class DisplayNotification {
+import {EventListenerCollection} from '../core.js';
+
+export class DisplayNotification {
     constructor(container, node) {
         this._container = container;
         this._node = node;

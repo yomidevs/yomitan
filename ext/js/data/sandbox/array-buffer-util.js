@@ -19,7 +19,7 @@
 /**
  * Class containing generic ArrayBuffer utility functions.
  */
-class ArrayBufferUtil {
+export class ArrayBufferUtil {
     /**
      * Decodes the contents of an ArrayBuffer using UTF8.
      * @param {ArrayBuffer} arrayBuffer The input ArrayBuffer.

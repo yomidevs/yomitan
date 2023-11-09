@@ -16,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class SecondarySearchDictionaryController {
+import {EventListenerCollection} from '../../core.js';
+import {yomichan} from '../../yomichan.js';
+
+export class SecondarySearchDictionaryController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._getDictionaryInfoToken = null;

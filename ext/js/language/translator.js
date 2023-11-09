@@ -16,16 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Deinflector
- * RegexUtil
- * TextSourceMap
- */
+import {RegexUtil} from '../general/regex-util.js';
+import {TextSourceMap} from '../general/text-source-map.js';
+import {Deinflector} from './deinflector.js';
+import {DictionaryDatabase} from './dictionary-database.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.
  */
-class Translator {
+export class Translator {
     /**
      * Information about how popup content should be shown, specifically related to the outer popup frame.
      * @typedef {object} TermFrequency

@@ -16,11 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * PanelElement
- */
+import {PanelElement} from '../../dom/panel-element.js';
 
-class Modal extends PanelElement {
+export class Modal extends PanelElement {
     constructor(node) {
         super({
             node,

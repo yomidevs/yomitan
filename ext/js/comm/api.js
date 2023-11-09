@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class API {
+import {deferPromise, deserializeError, isObject} from '../core.js';
+
+export class API {
     constructor(yomichan) {
         this._yomichan = yomichan;
     }

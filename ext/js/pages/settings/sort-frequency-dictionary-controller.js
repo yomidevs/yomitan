@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class SortFrequencyDictionaryController {
+import {yomichan} from '../../yomichan.js';
+
+export class SortFrequencyDictionaryController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._sortFrequencyDictionarySelect = null;

@@ -16,17 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- * FrameClient
- * ThemeController
- * dynamicLoader
- */
+import {FrameClient} from '../comm/frame-client.js';
+import {DynamicProperty, EventDispatcher, EventListenerCollection, deepEqual} from '../core.js';
+import {DocumentUtil} from '../dom/document-util.js';
+import {dynamicLoader} from '../script/dynamic-loader.js';
+import {yomichan} from '../yomichan.js';
+import {ThemeController} from './theme-controller.js';
 
 /**
  * This class is the container which hosts the display of search results.
  */
-class Popup extends EventDispatcher {
+export class Popup extends EventDispatcher {
     /**
      * Information about how popup content should be shown, specifically related to the outer popup frame.
      * @typedef {object} ContentDetails

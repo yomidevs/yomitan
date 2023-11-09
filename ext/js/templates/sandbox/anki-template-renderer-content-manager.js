@@ -31,7 +31,7 @@
 /**
  * The content manager which is used when generating content for Anki.
  */
-class AnkiTemplateRendererContentManager {
+export class AnkiTemplateRendererContentManager {
     /**
      * Creates a new instance of the class.
      * @param {TemplateRendererMediaProvider} mediaProvider The media provider for the object.

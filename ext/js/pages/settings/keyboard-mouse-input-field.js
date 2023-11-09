@@ -16,12 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- * HotkeyUtil
- */
+import {EventDispatcher, EventListenerCollection} from '../../core.js';
+import {DocumentUtil} from '../../dom/document-util.js';
+import {HotkeyUtil} from '../../input/hotkey-util.js';
 
-class KeyboardMouseInputField extends EventDispatcher {
+export class KeyboardMouseInputField extends EventDispatcher {
     constructor(inputNode, mouseButton, os, isPointerTypeSupported=null) {
         super();
         this._inputNode = inputNode;

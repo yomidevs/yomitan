@@ -16,6 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {EventListenerCollection, log} from '../../core.js';
+import {DictionaryWorker} from '../../language/dictionary-worker.js';
+import {yomichan} from '../../yomichan.js';
+
 /* global
  * DictionaryWorker
  */
@@ -245,7 +249,7 @@ class DictionaryExtraInfo {
     }
 }
 
-class DictionaryController {
+export class DictionaryController {
     constructor(settingsController, modalController, statusFooter) {
         this._settingsController = settingsController;
         this._modalController = modalController;

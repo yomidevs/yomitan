@@ -16,13 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- * PopupMenu
- * SelectorObserver
- */
+import {DocumentUtil} from '../../dom/document-util.js';
+import {PopupMenu} from '../../dom/popup-menu.js';
+import {SelectorObserver} from '../../dom/selector-observer.js';
 
-class SettingsDisplayController {
+export class SettingsDisplayController {
     constructor(settingsController, modalController) {
         this._settingsController = settingsController;
         this._modalController = modalController;
