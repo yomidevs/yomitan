@@ -16,9 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Handlebars
- */
+import {Handlebars} from '../../../lib/handlebars.js';
 
 export class TemplateRendererMediaProvider {
     constructor() {

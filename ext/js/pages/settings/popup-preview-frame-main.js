@@ -22,12 +22,6 @@ import {HotkeyHandler} from '../../input/hotkey-handler.js';
 import {yomichan} from '../../yomichan.js';
 import {PopupPreviewFrame} from './popup-preview-frame.js';
 
-/* global
- * HotkeyHandler
- * PopupFactory
- * PopupPreviewFrame
- */
-
 (async () => {
     try {
         await yomichan.prepare();
