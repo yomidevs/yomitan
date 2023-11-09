@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const path = require('path');
+import path from 'path';
 
-const {
-    test,
+import {
     expect,
-    root
-} = require('./playwright-util');
+    root,
+    test
+} from './playwright-util';
 
 test.beforeEach(async ({context}) => {
     // wait for the on-install welcome.html tab to load, which becomes the foreground tab

@@ -15,18 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const path = require('path');
-const {
-    test,
+import path from 'path';
+import {createDictionaryArchive} from '../../dev/util';
+import {
     expect,
-    root,
-    mockModelFieldNames,
-    mockModelFieldsToAnkiValues,
     expectedAddNoteBody,
     mockAnkiRouteHandler,
+    mockModelFieldNames,
+    mockModelFieldsToAnkiValues,
+    root,
+    test,
     writeToClipboardFromPage
-} = require('./playwright-util');
-const {createDictionaryArchive} = require('../../dev/util');
+} from './playwright-util';
 
 test.beforeEach(async ({context}) => {
     // wait for the on-install welcome.html tab to load, which becomes the foreground tab

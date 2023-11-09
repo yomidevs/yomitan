@@ -15,10 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const path = require('path');
-const {test: base, chromium} = require('@playwright/test');
+import {test as base, chromium} from '@playwright/test';
+import path from 'path';
+import {fileURLToPath} from 'url';
 
-export const root = path.join(__dirname, '..', '..');
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+export const root = path.join(dirname, '..', '..');
 
 export const test = base.extend({
     context: async ({ }, use) => {

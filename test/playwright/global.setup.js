@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const {test: setup} = require('@playwright/test');
-const {ManifestUtil} = require('../../dev/manifest-util');
-const {root} = require('./playwright-util');
-const path = require('path');
-const fs = require('fs');
+import {test as setup} from '@playwright/test';
+import fs from 'fs';
+import path from 'path';
+import {ManifestUtil} from '../../dev/manifest-util';
+import {root} from './playwright-util';
 
 const manifestPath = path.join(root, 'ext/manifest.json');
 const copyManifestPath = path.join(root, 'ext/manifest-old.json');
