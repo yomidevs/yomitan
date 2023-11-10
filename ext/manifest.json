@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Yezichak",
-    "version": "22.10.23.0",
+    "version": "23.11.10.0",
     "description": "Dictionary lookup with Anki integration",
     "author": "Alex Yatskov",
     "icons": {
