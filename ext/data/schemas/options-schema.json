@@ -157,12 +157,12 @@
                                     "popupWidth": {
                                         "type": "number",
                                         "minimum": 0,
-                                        "default": 400
+                                        "default": 500
                                     },
                                     "popupHeight": {
                                         "type": "number",
                                         "minimum": 0,
-                                        "default": 250
+                                        "default": 300
                                     },
                                     "popupHorizontalOffset": {
                                         "type": "number",
@@ -922,7 +922,7 @@
                                             "type": "string"
                                         },
                                         "default": [
-                                            "yomichan"
+                                            "yezichak"
                                         ]
                                     },
                                     "screenshot": {
