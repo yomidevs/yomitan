@@ -13,7 +13,7 @@ assignees: ''
 **Browser version**
 (e.g. Firefox 83.0)
 
-**Yomichan version**
+**Yomitan version**
 (e.g. 20.11.1.1)
 
 **Exported settings file**
