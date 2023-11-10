@@ -27,17 +27,6 @@ import {DisplayProfileSelection} from './display-profile-selection.js';
 import {DisplayResizer} from './display-resizer.js';
 import {Display} from './display.js';
 
-/* global
- * Display
- * DisplayAnki
- * DisplayAudio
- * DisplayProfileSelection
- * DisplayResizer
- * DocumentFocusController
- * HotkeyHandler
- * JapaneseUtil
- */
-
 (async () => {
     try {
         const documentFocusController = new DocumentFocusController();
