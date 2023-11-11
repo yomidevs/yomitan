@@ -17,11 +17,11 @@
  */
 
 import * as Dexie from '../../../lib/dexie.js';
-import { isObject, log } from '../../core.js';
-import { OptionsUtil } from '../../data/options-util.js';
-import { ArrayBufferUtil } from '../../data/sandbox/array-buffer-util.js';
-import { yomitan } from '../../yomitan.js';
-import { DictionaryController } from './dictionary-controller.js';
+import {isObject, log} from '../../core.js';
+import {OptionsUtil} from '../../data/options-util.js';
+import {ArrayBufferUtil} from '../../data/sandbox/array-buffer-util.js';
+import {yomitan} from '../../yomitan.js';
+import {DictionaryController} from './dictionary-controller.js';
 
 export class BackupController {
     constructor(settingsController, modalController) {
