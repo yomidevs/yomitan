@@ -18,4 +18,4 @@
 
 import {yomichan} from '../yomichan.js';
 
-yomichan.trigger('dynamicLoaderSentinel', {script: document.currentScript});
+yomichan.trigger('dynamicLoaderSentinel', {script: import.meta.url});
