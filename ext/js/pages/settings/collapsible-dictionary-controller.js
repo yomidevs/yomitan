@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 
 export class CollapsibleDictionaryController {
     constructor(settingsController) {
@@ -35,7 +35,7 @@ export class CollapsibleDictionaryController {
 
         await this._onDatabaseUpdated();
 
-        yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+        yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._settingsController.on('dictionarySettingsReordered', this._onDictionarySettingsReordered.bind(this));
     }

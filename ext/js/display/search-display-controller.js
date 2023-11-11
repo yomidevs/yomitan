@@ -19,7 +19,7 @@
 import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {EventListenerCollection, invokeMessageHandler} from '../core.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
 export class SearchDisplayController {
     constructor(tabId, frameId, display, displayAudio, japaneseUtil, searchPersistentStateController) {
@@ -44,7 +44,7 @@ export class SearchDisplayController {
         this._clipboardMonitor = new ClipboardMonitor({
             japaneseUtil,
             clipboardReader: {
-                getText: yomichan.api.clipboardGet.bind(yomichan.api)
+                getText: yomitan.api.clipboardGet.bind(yomitan.api)
             }
         });
         this._messageHandlers = new Map();
@@ -56,7 +56,7 @@ export class SearchDisplayController {
         this._searchPersistentStateController.on('modeChange', this._onModeChange.bind(this));
 
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-        yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
+        yomitan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
 
         this._display.on('optionsUpdated', this._onDisplayOptionsUpdated.bind(this));
         this._display.on('contentUpdateStart', this._onContentUpdateStart.bind(this));
@@ -225,7 +225,7 @@ export class SearchDisplayController {
     _onWanakanaEnableChange(e) {
         const value = e.target.checked;
         this._setWanakanaEnabled(value);
-        yomichan.api.modifySettings([{
+        yomitan.api.modifySettings([{
             action: 'set',
             path: 'general.enableWanakana',
             value,
@@ -335,7 +335,7 @@ export class SearchDisplayController {
 
         if (!modify) { return; }
 
-        await yomichan.api.modifySettings([{
+        await yomitan.api.modifySettings([{
             action: 'set',
             path: 'clipboard.enableSearchPageMonitor',
             value,

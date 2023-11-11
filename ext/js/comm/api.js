@@ -19,8 +19,8 @@
 import {deferPromise, deserializeError, isObject} from '../core.js';
 
 export class API {
-    constructor(yomichan) {
-        this._yomichan = yomichan;
+    constructor(yomitan) {
+        this._yomitan = yomitan;
     }
 
     optionsGet(optionsContext) {
@@ -299,7 +299,7 @@ export class API {
         const data = {action, params};
         return new Promise((resolve, reject) => {
             try {
-                this._yomichan.sendMessage(data, (response) => {
+                this._yomitan.sendMessage(data, (response) => {
                     this._checkLastError(chrome.runtime.lastError);
                     if (response !== null && typeof response === 'object') {
                         if (typeof response.error !== 'undefined') {

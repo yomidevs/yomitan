@@ -18,7 +18,7 @@
 
 import {log} from '../core.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {ExtensionContentController} from './common/extension-content-controller.js';
 import {DictionaryController} from './settings/dictionary-controller.js';
 import {DictionaryImportController} from './settings/dictionary-import-controller.js';
@@ -32,7 +32,7 @@ import {StatusFooter} from './settings/status-footer.js';
 
 async function setupEnvironmentInfo() {
     const {manifest_version: manifestVersion} = chrome.runtime.getManifest();
-    const {browser, platform} = await yomichan.api.getEnvironmentInfo();
+    const {browser, platform} = await yomitan.api.getEnvironmentInfo();
     document.documentElement.dataset.browser = browser;
     document.documentElement.dataset.os = platform.os;
     document.documentElement.dataset.manifestVersion = `${manifestVersion}`;
@@ -54,7 +54,7 @@ async function setupGenericSettingsController(genericSettingController) {
         const statusFooter = new StatusFooter(document.querySelector('.status-footer-container'));
         statusFooter.prepare();
 
-        await yomichan.prepare();
+        await yomitan.prepare();
 
         setupEnvironmentInfo();
 

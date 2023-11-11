@@ -19,14 +19,14 @@
 import {PopupFactory} from '../../app/popup-factory.js';
 import {log} from '../../core.js';
 import {HotkeyHandler} from '../../input/hotkey-handler.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 import {PopupPreviewFrame} from './popup-preview-frame.js';
 
 (async () => {
     try {
-        await yomichan.prepare();
+        await yomitan.prepare();
 
-        const {tabId, frameId} = await yomichan.api.frameInformationGet();
+        const {tabId, frameId} = await yomitan.api.frameInformationGet();
 
         const hotkeyHandler = new HotkeyHandler();
         hotkeyHandler.prepare();

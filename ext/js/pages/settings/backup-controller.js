@@ -17,11 +17,11 @@
  */
 
 import * as Dexie from '../../../lib/dexie.js';
-import {isObject, log} from '../../core.js';
-import {OptionsUtil} from '../../data/options-util.js';
-import {ArrayBufferUtil} from '../../data/sandbox/array-buffer-util.js';
-import {yomichan} from '../../yomichan.js';
-import {DictionaryController} from './dictionary-controller.js';
+import { isObject, log } from '../../core.js';
+import { OptionsUtil } from '../../data/options-util.js';
+import { ArrayBufferUtil } from '../../data/sandbox/array-buffer-util.js';
+import { yomitan } from '../../yomitan.js';
+import { DictionaryController } from './dictionary-controller.js';
 
 export class BackupController {
     constructor(settingsController, modalController) {
@@ -95,8 +95,8 @@ export class BackupController {
 
     async _getSettingsExportData(date) {
         const optionsFull = await this._settingsController.getOptionsFull();
-        const environment = await yomichan.api.getEnvironmentInfo();
-        const fieldTemplatesDefault = await yomichan.api.getDefaultAnkiFieldTemplates();
+        const environment = await yomitan.api.getEnvironmentInfo();
+        const fieldTemplatesDefault = await yomitan.api.getDefaultAnkiFieldTemplates();
         const permissions = await this._settingsController.permissionsUtil.getAllPermissions();
 
         // Format options
@@ -503,10 +503,10 @@ export class BackupController {
     }
 
     async _importDatabase(databaseName, file) {
-        await yomichan.api.purgeDatabase();
+        await yomitan.api.purgeDatabase();
         await Dexie.import(file, {progressCallback: this._databaseImportProgressCallback});
-        yomichan.api.triggerDatabaseUpdated('dictionary', 'import');
-        yomichan.trigger('storageChanged');
+        yomitan.api.triggerDatabaseUpdated('dictionary', 'import');
+        yomitan.trigger('storageChanged');
     }
 
     _onSettingsImportDatabaseClick() {

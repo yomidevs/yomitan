@@ -26,7 +26,7 @@ import {ScrollElement} from '../dom/scroll-element.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {TextScanner} from '../language/text-scanner.js';
 import {dynamicLoader} from '../script/dynamic-loader.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {DisplayContentManager} from './display-content-manager.js';
 import {DisplayGenerator} from './display-generator.js';
 import {DisplayHistory} from './display-history.js';
@@ -260,7 +260,7 @@ export class Display extends EventDispatcher {
 
         // State setup
         const {documentElement} = document;
-        const {browser} = await yomichan.api.getEnvironmentInfo();
+        const {browser} = await yomitan.api.getEnvironmentInfo();
         this._browser = browser;
 
         if (documentElement !== null) {
@@ -278,8 +278,8 @@ export class Display extends EventDispatcher {
         this._history.on('stateChanged', this._onStateChanged.bind(this));
         this._queryParser.on('searched', this._onQueryParserSearch.bind(this));
         this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
-        yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
-        yomichan.crossFrame.registerHandlers([
+        yomitan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
+        yomitan.crossFrame.registerHandlers([
             ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
@@ -326,7 +326,7 @@ export class Display extends EventDispatcher {
     }
 
     onError(error) {
-        if (yomichan.isExtensionUnloaded) { return; }
+        if (yomitan.isExtensionUnloaded) { return; }
         log.error(error);
     }
 
@@ -344,7 +344,7 @@ export class Display extends EventDispatcher {
     }
 
     async updateOptions() {
-        const options = await yomichan.api.optionsGet(this.getOptionsContext());
+        const options = await yomitan.api.optionsGet(this.getOptionsContext());
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
 
@@ -494,14 +494,14 @@ export class Display extends EventDispatcher {
         if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
             throw new Error('Content origin is same page');
         }
-        return await yomichan.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
+        return await yomitan.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
     }
 
     async invokeParentFrame(action, params={}) {
         if (this._parentFrameId === null || this._parentFrameId === this._frameId) {
             throw new Error('Invalid parent frame');
         }
-        return await yomichan.crossFrame.invoke(this._parentFrameId, action, params);
+        return await yomitan.crossFrame.invoke(this._parentFrameId, action, params);
     }
 
     getElementDictionaryEntryIndex(element) {
@@ -586,8 +586,8 @@ export class Display extends EventDispatcher {
     }
 
     _onMessageExtensionUnloaded() {
-        if (yomichan.isExtensionUnloaded) { return; }
-        yomichan.triggerExtensionUnloaded();
+        if (yomitan.isExtensionUnloaded) { return; }
+        yomitan.triggerExtensionUnloaded();
     }
 
     // Private
@@ -736,7 +736,7 @@ export class Display extends EventDispatcher {
             if (typeof documentTitle !== 'string') { documentTitle = document.title; }
             const optionsContext = this.getOptionsContext();
             const query = e.currentTarget.textContent;
-            const dictionaryEntries = await yomichan.api.kanjiFind(query, optionsContext);
+            const dictionaryEntries = await yomitan.api.kanjiFind(query, optionsContext);
             const details = {
                 focus: false,
                 historyMode: 'new',
@@ -914,7 +914,7 @@ export class Display extends EventDispatcher {
 
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
         if (isKanji) {
-            const dictionaryEntries = await yomichan.api.kanjiFind(source, optionsContext);
+            const dictionaryEntries = await yomitan.api.kanjiFind(source, optionsContext);
             return dictionaryEntries;
         } else {
             const findDetails = {};
@@ -932,7 +932,7 @@ export class Display extends EventDispatcher {
                 }
             }
 
-            const {dictionaryEntries} = await yomichan.api.termsFind(source, findDetails, optionsContext);
+            const {dictionaryEntries} = await yomitan.api.termsFind(source, findDetails, optionsContext);
             return dictionaryEntries;
         }
     }
@@ -1334,7 +1334,7 @@ export class Display extends EventDispatcher {
     }
 
     _closePopups() {
-        yomichan.trigger('closePopups');
+        yomitan.trigger('closePopups');
     }
 
     async _setOptionsContextIfDifferent(optionsContext) {
@@ -1549,7 +1549,7 @@ export class Display extends EventDispatcher {
     }
 
     _onContentTextScannerSearched({type, dictionaryEntries, sentence, textSource, optionsContext, error}) {
-        if (error !== null && !yomichan.isExtensionUnloaded) {
+        if (error !== null && !yomitan.isExtensionUnloaded) {
             log.error(error);
         }
 

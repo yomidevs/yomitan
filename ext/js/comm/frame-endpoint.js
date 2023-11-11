@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection, generateId, isObject} from '../core.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
 export class FrameEndpoint {
     constructor() {
@@ -32,7 +32,7 @@ export class FrameEndpoint {
             this._eventListeners.addEventListener(window, 'message', this._onMessage.bind(this), false);
             this._eventListenersSetup = true;
         }
-        yomichan.api.broadcastTab('frameEndpointReady', {secret: this._secret});
+        yomitan.api.broadcastTab('frameEndpointReady', {secret: this._secret});
     }
 
     authenticate(message) {
@@ -60,6 +60,6 @@ export class FrameEndpoint {
         this._token = token;
 
         this._eventListeners.removeAllEventListeners();
-        yomichan.api.sendMessageToFrame(hostFrameId, 'frameEndpointConnected', {secret, token});
+        yomitan.api.sendMessageToFrame(hostFrameId, 'frameEndpointConnected', {secret, token});
     }
 }

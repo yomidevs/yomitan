@@ -18,7 +18,7 @@
 
 import {EventDispatcher, EventListenerCollection} from '../core.js';
 import {DocumentUtil} from '../dom/document-util.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
 /**
  * Class which handles hotkey events and actions.
@@ -53,7 +53,7 @@ export class HotkeyHandler extends EventDispatcher {
     prepare() {
         this._isPrepared = true;
         this._updateEventHandlers();
-        yomichan.crossFrame.registerHandlers([
+        yomitan.crossFrame.registerHandlers([
             ['HotkeyHandler.forwardHotkey', {async: false, handler: this._onMessageForwardHotkey.bind(this)}]
         ]);
     }

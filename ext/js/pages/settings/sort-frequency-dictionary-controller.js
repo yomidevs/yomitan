@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 
 export class SortFrequencyDictionaryController {
     constructor(settingsController) {
@@ -36,7 +36,7 @@ export class SortFrequencyDictionaryController {
 
         await this._onDatabaseUpdated();
 
-        yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+        yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._sortFrequencyDictionarySelect.addEventListener('change', this._onSortFrequencyDictionarySelectChange.bind(this));
         this._sortFrequencyDictionaryOrderSelect.addEventListener('change', this._onSortFrequencyDictionaryOrderSelectChange.bind(this));
@@ -124,7 +124,7 @@ export class SortFrequencyDictionaryController {
         const lessCommonTerms = ['行なう', '論じる', '過す', '行方', '人口', '猫', '犬', '滝', '理', '暁'];
         const terms = [...moreCommonTerms, ...lessCommonTerms];
 
-        const frequencies = await yomichan.api.getTermFrequencies(
+        const frequencies = await yomitan.api.getTermFrequencies(
             terms.map((term) => ({term, reading: null})),
             [dictionary]
         );

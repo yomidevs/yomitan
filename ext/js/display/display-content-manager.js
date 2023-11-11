@@ -18,7 +18,7 @@
 
 import {EventListenerCollection} from '../core.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
 /**
  * A callback used when a media file has been loaded.
@@ -138,7 +138,7 @@ export class DisplayContentManager {
 
     async _getMediaData(path, dictionary, cachedData) {
         const token = this._token;
-        const data = (await yomichan.api.getMedia([{path, dictionary}]))[0];
+        const data = (await yomitan.api.getMedia([{path, dictionary}]))[0];
         if (token === this._token && data !== null) {
             const buffer = ArrayBufferUtil.base64ToArrayBuffer(data.content);
             const blob = new Blob([buffer], {type: data.mediaType});

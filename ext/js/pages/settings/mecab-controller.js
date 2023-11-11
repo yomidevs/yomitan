@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 
 export class MecabController {
     constructor(settingsController) {
@@ -48,7 +48,7 @@ export class MecabController {
             this._testButton.disabled = true;
             this._resultsContainer.textContent = '';
             this._resultsContainer.hidden = true;
-            await yomichan.api.testMecab();
+            await yomitan.api.testMecab();
             this._setStatus('Connection was successful', false);
         } catch (e) {
             this._setStatus(e.message, true);

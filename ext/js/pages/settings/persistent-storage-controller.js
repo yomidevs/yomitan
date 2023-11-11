@@ -17,7 +17,7 @@
  */
 
 import {isObject} from '../../core.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 
 export class PersistentStorageController {
     constructor() {
@@ -71,7 +71,7 @@ export class PersistentStorageController {
         const node = document.querySelector('#storage-persistent-fail-warning');
         if (node !== null) { node.hidden = isStoragePeristent; }
 
-        yomichan.trigger('storageChanged');
+        yomitan.trigger('storageChanged');
     }
 
     _isPersistentStorageSupported() {

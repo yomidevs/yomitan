@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
 export const dynamicLoader = (() => {
     const injectedStylesheets = new Map();
@@ -44,7 +44,7 @@ export const dynamicLoader = (() => {
     }
 
     async function loadStyle(id, type, value, useWebExtensionApi=false, parentNode=null) {
-        if (useWebExtensionApi && yomichan.isExtensionUrl(window.location.href)) {
+        if (useWebExtensionApi && yomitan.isExtensionUrl(window.location.href)) {
             // Permissions error will occur if trying to use the WebExtension API to inject into an extension page
             useWebExtensionApi = false;
         }
@@ -60,7 +60,7 @@ export const dynamicLoader = (() => {
         }
 
         if (type === 'file-content') {
-            value = await yomichan.api.getStylesheetContent(value);
+            value = await yomitan.api.getStylesheetContent(value);
             type = 'code';
             useWebExtensionApi = false;
         }
@@ -72,7 +72,7 @@ export const dynamicLoader = (() => {
             }
 
             setInjectedStylesheet(id, parentNode, null);
-            await yomichan.api.injectStylesheet(type, value);
+            await yomitan.api.injectStylesheet(type, value);
             return null;
         }
 
@@ -141,11 +141,11 @@ export const dynamicLoader = (() => {
         const sentinelEventName = 'dynamicLoaderSentinel';
         const sentinelEventCallback = (e) => {
             if (e.script !== script) { return; }
-            yomichan.off(sentinelEventName, sentinelEventCallback);
+            yomitan.off(sentinelEventName, sentinelEventCallback);
             parent.removeChild(script);
             resolve();
         };
-        yomichan.on(sentinelEventName, sentinelEventCallback);
+        yomitan.on(sentinelEventName, sentinelEventCallback);
 
         try {
             script.type = 'module';
@@ -153,7 +153,7 @@ export const dynamicLoader = (() => {
             script.src = '/js/script/dynamic-loader-sentinel.js';
             parent.appendChild(script);
         } catch (e) {
-            yomichan.off(sentinelEventName, sentinelEventCallback);
+            yomitan.off(sentinelEventName, sentinelEventCallback);
             reject(e);
         }
     }

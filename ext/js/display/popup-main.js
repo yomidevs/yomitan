@@ -20,7 +20,7 @@ import {log} from '../core.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {DisplayAnki} from './display-anki.js';
 import {DisplayAudio} from './display-audio.js';
 import {DisplayProfileSelection} from './display-profile-selection.js';
@@ -32,9 +32,9 @@ import {Display} from './display.js';
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 
-        await yomichan.prepare();
+        await yomitan.prepare();
 
-        const {tabId, frameId} = await yomichan.api.frameInformationGet();
+        const {tabId, frameId} = await yomitan.api.frameInformationGet();
 
         const japaneseUtil = new JapaneseUtil(null);
 
@@ -60,7 +60,7 @@ import {Display} from './display.js';
 
         document.documentElement.dataset.loaded = 'true';
 
-        yomichan.ready();
+        yomitan.ready();
     } catch (e) {
         log.error(e);
     }
