@@ -50,15 +50,15 @@ export class Backend {
     constructor() {
         this._japaneseUtil = new JapaneseUtil(wanakana);
         this._environment = new Environment();
-        this._dictionaryDatabase = new DictionaryDatabase();
-        this._translator = new Translator({
-            japaneseUtil: this._japaneseUtil,
-            database: this._dictionaryDatabase
-        });
         this._anki = new AnkiConnect();
         this._mecab = new Mecab();
 
         if (!chrome.offscreen) {
+            this._dictionaryDatabase = new DictionaryDatabase();
+            this._translator = new Translator({
+                japaneseUtil: this._japaneseUtil,
+                database: this._dictionaryDatabase
+            });
             this._clipboardReader = new ClipboardReader({
                 // eslint-disable-next-line no-undef
                 document: (typeof document === 'object' && document !== null ? document : null),
@@ -66,6 +66,19 @@ export class Backend {
                 richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
             });
         } else {
+            this._dictionaryDatabase = {
+                prepare: () => this._sendMessagePromise({action: 'databasePrepareOffscreen'}),
+                getDictionaryInfo: () => this._sendMessagePromise({action: 'getDictionaryInfoOffscreen'}),
+                purge: () => this._sendMessagePromise({action: 'databasePurgeOffscreen'}),
+                getMedia: this._getMediaOffscreen.bind(this)
+            };
+            this._translator = {
+                prepare: (deinflectionReasons) => this._sendMessagePromise({action: 'translatorPrepareOffscreen', params: {deinflectionReasons}}),
+                findKanji: this._findKanjiOffscreen.bind(this),
+                findTerms: this._findTermsOffscreen.bind(this),
+                getTermFrequencies: this._getTermFrequenciesOffscreen.bind(this),
+                clearDatabaseCaches: () => this._sendMessagePromise({action: 'clearDatabaseCachesOffscreen'})
+            };
             this._clipboardReader = {
                 getText: this._getTextOffscreen.bind(this),
                 getImage: this._getImageOffscreen.bind(this)
@@ -2238,6 +2251,44 @@ export class Backend {
             }
         }
         return results;
+    }
+
+    async _getMediaOffscreen(targets) {
+        const serializedMedia = await this._sendMessagePromise({action: 'databaseGetMediaOffscreen', params: {targets}});
+        const media = serializedMedia.map((m) => ({...m, content: ArrayBufferUtil.base64ToArrayBuffer(m.content)}));
+        return media;
+    }
+
+    async _findKanjiOffscreen(text, findKanjiOptions) {
+        const enabledDictionaryMapList = [...findKanjiOptions.enabledDictionaryMap];
+        const modifiedKanjiOptions = {
+            ...findKanjiOptions,
+            enabledDictionaryMap: enabledDictionaryMapList
+        };
+        return this._sendMessagePromise({action: 'findKanjiOffscreen', params: {text, findKanjiOptions: modifiedKanjiOptions}});
+    }
+
+    async _findTermsOffscreen(mode, text, findTermsOptions) {
+        const {enabledDictionaryMap, excludeDictionaryDefinitions, textReplacements} = findTermsOptions;
+        const enabledDictionaryMapList = [...enabledDictionaryMap];
+        const excludeDictionaryDefinitionsList = excludeDictionaryDefinitions ? [...excludeDictionaryDefinitions] : null;
+        const textReplacementsSerialized = textReplacements.map((group) => {
+            if (!group) {
+                return group;
+            }
+            return group.map((opt) => ({...opt, pattern: opt.pattern.toString()}));
+        });
+        const modifiedFindTermsOptions = {
+            ...findTermsOptions,
+            enabledDictionaryMap: enabledDictionaryMapList,
+            excludeDictionaryDefinitions: excludeDictionaryDefinitionsList,
+            textReplacementsOptions: textReplacementsSerialized
+        };
+        return this._sendMessagePromise({action: 'findTermsOffscreen', params: {mode, text, findTermsOptions: modifiedFindTermsOptions}});
+    }
+
+    async _getTermFrequenciesOffscreen(termReadingList, dictionaries) {
+        return this._sendMessagePromise({action: 'getTermFrequenciesOffscreen', params: {termReadingList, dictionaries}});
     }
 
     async _getTextOffscreen(useRichText) {
