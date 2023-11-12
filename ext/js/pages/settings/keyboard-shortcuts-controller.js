@@ -19,7 +19,7 @@
 import {EventListenerCollection} from '../../core.js';
 import {DocumentUtil} from '../../dom/document-util.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
 export class KeyboardShortcutController {
@@ -63,7 +63,7 @@ export class KeyboardShortcutController {
     }
 
     async prepare() {
-        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
+        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._os = os;
 
         this._addButton = document.querySelector('#hotkey-list-add');

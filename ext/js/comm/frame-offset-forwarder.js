@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {FrameAncestryHandler} from './frame-ancestry-handler.js';
 
 export class FrameOffsetForwarder {
@@ -27,7 +27,7 @@ export class FrameOffsetForwarder {
 
     prepare() {
         this._frameAncestryHandler.prepare();
-        yomichan.crossFrame.registerHandlers([
+        yomitan.crossFrame.registerHandlers([
             ['FrameOffsetForwarder.getChildFrameRect', {async: false, handler: this._onMessageGetChildFrameRect.bind(this)}]
         ]);
     }
@@ -43,7 +43,7 @@ export class FrameOffsetForwarder {
             let childFrameId = this._frameId;
             const promises = [];
             for (const frameId of ancestorFrameIds) {
-                promises.push(yomichan.crossFrame.invoke(frameId, 'FrameOffsetForwarder.getChildFrameRect', {frameId: childFrameId}));
+                promises.push(yomitan.crossFrame.invoke(frameId, 'FrameOffsetForwarder.getChildFrameRect', {frameId: childFrameId}));
                 childFrameId = frameId;
             }
 

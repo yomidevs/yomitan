@@ -18,7 +18,7 @@
 
 import {deserializeError, log} from '../../core.js';
 import {DictionaryWorker} from '../../language/dictionary-worker.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 import {DictionaryController} from './dictionary-controller.js';
 
 export class DictionaryImportController {
@@ -99,7 +99,7 @@ export class DictionaryImportController {
             this._setSpinnerVisible(true);
             if (purgeNotification !== null) { purgeNotification.hidden = false; }
 
-            await yomichan.api.purgeDatabase();
+            await yomitan.api.purgeDatabase();
             const errors = await this._clearDictionarySettings();
 
             if (errors.length > 0) {
@@ -215,7 +215,7 @@ export class DictionaryImportController {
     async _importDictionary(file, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
         const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
-        yomichan.api.triggerDatabaseUpdated('dictionary', 'import');
+        yomitan.api.triggerDatabaseUpdated('dictionary', 'import');
         const errors2 = await this._addDictionarySettings(result.sequenced, result.title);
 
         if (errors.length > 0) {
@@ -346,6 +346,6 @@ export class DictionaryImportController {
     }
 
     _triggerStorageChanged() {
-        yomichan.trigger('storageChanged');
+        yomitan.trigger('storageChanged');
     }
 }

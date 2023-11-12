@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 
 export class PopupWindowController {
     prepare() {
@@ -32,6 +32,6 @@ export class PopupWindowController {
     }
 
     async _testWindowOpen() {
-        await yomichan.api.getOrCreateSearchPopup({focus: true});
+        await yomitan.api.getOrCreateSearchPopup({focus: true});
     }
 }

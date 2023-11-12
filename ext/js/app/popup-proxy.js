@@ -18,7 +18,7 @@
 
 import {FrameOffsetForwarder} from '../comm/frame-offset-forwarder.js';
 import {EventDispatcher, log} from '../core.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {Popup} from './popup.js';
 
 /**
@@ -294,14 +294,14 @@ export class PopupProxy extends EventDispatcher {
     // Private
 
     _invoke(action, params={}) {
-        return yomichan.crossFrame.invoke(this._frameId, action, params);
+        return yomitan.crossFrame.invoke(this._frameId, action, params);
     }
 
     async _invokeSafe(action, params={}, defaultReturnValue) {
         try {
             return await this._invoke(action, params);
         } catch (e) {
-            if (!yomichan.isExtensionUnloaded) { throw e; }
+            if (!yomitan.isExtensionUnloaded) { throw e; }
             return defaultReturnValue;
         }
     }

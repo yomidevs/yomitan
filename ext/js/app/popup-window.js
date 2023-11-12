@@ -17,7 +17,7 @@
  */
 
 import {EventDispatcher} from '../core.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {Popup} from './popup.js';
 
 /**
@@ -138,7 +138,7 @@ export class PopupWindow extends EventDispatcher {
      * @returns {Promise<boolean>} `true` if the popup is visible, `false` otherwise.
      */
     async isVisible() {
-        return (this._popupTabId !== null && await yomichan.api.isTabSearchPopup(this._popupTabId));
+        return (this._popupTabId !== null && await yomitan.api.isTabSearchPopup(this._popupTabId));
     }
 
     /**
@@ -263,16 +263,16 @@ export class PopupWindow extends EventDispatcher {
     // Private
 
     async _invoke(open, action, params={}, defaultReturnValue) {
-        if (yomichan.isExtensionUnloaded) {
+        if (yomitan.isExtensionUnloaded) {
             return defaultReturnValue;
         }
 
         const frameId = 0;
         if (this._popupTabId !== null) {
             try {
-                return await yomichan.crossFrame.invokeTab(this._popupTabId, frameId, 'popupMessage', {action, params});
+                return await yomitan.crossFrame.invokeTab(this._popupTabId, frameId, 'popupMessage', {action, params});
             } catch (e) {
-                if (yomichan.isExtensionUnloaded) {
+                if (yomitan.isExtensionUnloaded) {
                     open = false;
                 }
             }
@@ -283,9 +283,9 @@ export class PopupWindow extends EventDispatcher {
             return defaultReturnValue;
         }
 
-        const {tabId} = await yomichan.api.getOrCreateSearchPopup({focus: 'ifCreated'});
+        const {tabId} = await yomitan.api.getOrCreateSearchPopup({focus: 'ifCreated'});
         this._popupTabId = tabId;
 
-        return await yomichan.crossFrame.invokeTab(this._popupTabId, frameId, 'popupMessage', {action, params});
+        return await yomitan.crossFrame.invokeTab(this._popupTabId, frameId, 'popupMessage', {action, params});
     }
 }

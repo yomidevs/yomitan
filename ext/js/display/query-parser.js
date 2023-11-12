@@ -18,7 +18,7 @@
 
 import {EventDispatcher, log} from '../core.js';
 import {TextScanner} from '../language/text-scanner.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
 export class QueryParser extends EventDispatcher {
     constructor({getSearchContext, japaneseUtil}) {
@@ -93,7 +93,7 @@ export class QueryParser extends EventDispatcher {
 
         const token = {};
         this._setTextToken = token;
-        this._parseResults = await yomichan.api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser);
+        this._parseResults = await yomitan.api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser);
         if (this._setTextToken !== token) { return; }
 
         this._refreshSelectedParser();
@@ -139,7 +139,7 @@ export class QueryParser extends EventDispatcher {
 
     _setSelectedParser(value) {
         const optionsContext = this._getOptionsContext();
-        yomichan.api.modifySettings([{
+        yomitan.api.modifySettings([{
             action: 'set',
             path: 'parsing.selectedParser',
             value,

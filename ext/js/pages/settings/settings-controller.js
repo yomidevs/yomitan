@@ -20,7 +20,7 @@ import {EventDispatcher, EventListenerCollection, generateId, isObject} from '..
 import {OptionsUtil} from '../../data/options-util.js';
 import {PermissionsUtil} from '../../data/permissions-util.js';
 import {HtmlTemplateCollection} from '../../dom/html-template-collection.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 
 export class SettingsController extends EventDispatcher {
     constructor() {
@@ -51,7 +51,7 @@ export class SettingsController extends EventDispatcher {
     }
 
     async prepare() {
-        yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
+        yomitan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         if (this._canObservePermissionsChanges()) {
             chrome.permissions.onAdded.addListener(this._onPermissionsChanged.bind(this));
             chrome.permissions.onRemoved.addListener(this._onPermissionsChanged.bind(this));
@@ -69,16 +69,16 @@ export class SettingsController extends EventDispatcher {
 
     async getOptions() {
         const optionsContext = this.getOptionsContext();
-        return await yomichan.api.optionsGet(optionsContext);
+        return await yomitan.api.optionsGet(optionsContext);
     }
 
     async getOptionsFull() {
-        return await yomichan.api.optionsGetFull();
+        return await yomitan.api.optionsGetFull();
     }
 
     async setAllSettings(value) {
         const profileIndex = value.profileCurrent;
-        await yomichan.api.setAllSettings(value, this._source);
+        await yomitan.api.setAllSettings(value, this._source);
         this._setProfileIndex(profileIndex, true);
     }
 
@@ -115,7 +115,7 @@ export class SettingsController extends EventDispatcher {
     }
 
     async getDictionaryInfo() {
-        return await yomichan.api.getDictionaryInfo();
+        return await yomitan.api.getDictionaryInfo();
     }
 
     getOptionsContext() {
@@ -186,12 +186,12 @@ export class SettingsController extends EventDispatcher {
 
     async _getSettings(targets, extraFields) {
         targets = this._setupTargets(targets, extraFields);
-        return await yomichan.api.getSettings(targets);
+        return await yomitan.api.getSettings(targets);
     }
 
     async _modifySettings(targets, extraFields) {
         targets = this._setupTargets(targets, extraFields);
-        return await yomichan.api.modifySettings(targets, this._source);
+        return await yomitan.api.modifySettings(targets, this._source);
     }
 
     _onBeforeUnload(e) {

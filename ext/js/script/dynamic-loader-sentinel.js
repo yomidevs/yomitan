@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
-yomichan.trigger('dynamicLoaderSentinel', {script: import.meta.url});
+
+yomitan.trigger('dynamicLoaderSentinel', {script: import.meta.url});

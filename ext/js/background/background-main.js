@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {Backend} from './backend.js';
 
 (() => {
-    yomichan.prepare(true);
+    yomitan.prepare(true);
 
     const backend = new Backend();
     backend.prepare();

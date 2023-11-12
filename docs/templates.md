@@ -2,7 +2,7 @@
 
 ## Helpers
 
-Yomichan supports several custom Handlebars helpers for rendering templates.
+Yomitan supports several custom Handlebars helpers for rendering templates.
 The source code for these templates can be found [here](../ext/js/templates/sandbox/anki-template-renderer.js).
 
 
@@ -586,12 +586,12 @@ Joins the arguments to a single string with a separator, flattening any argument
 
   ```handlebars
   {{set "index" 32~}}
-  {{~join "_" "yomichan" (get "index") "value"}}
+  {{~join "_" "yomitan" (get "index") "value"}}
   ```
 
   Output:
   ```html
-  yomichan_32_value
+  yomitan_32_value
   ```
 </details>
 
@@ -613,12 +613,12 @@ Joins the arguments to a single string, without flattening arguments that are ar
 
   ```handlebars
   {{set "index" 32~}}
-  {{~concat "yomichan_" (get "index") "_value"}}
+  {{~concat "yomitan_" (get "index") "_value"}}
   ```
 
   Output:
   ```html
-  yomichan_32_value
+  yomitan_32_value
   ```
 </details>
 
@@ -727,11 +727,11 @@ These functions are used together in order to request media and other types of o
 
   Output:
   ```html
-  The audio file name is: yomichan_audio_にほんご_日本語.mp3
+  The audio file name is: yomitan_audio_にほんご_日本語.mp3
 
-  The screenshot file name is: yomichan_browser_screenshot_にほんご_日本語.png
+  The screenshot file name is: yomitan_browser_screenshot_にほんご_日本語.png
 
-  The clipboard image file name is: yomichan_clipboard_image_にほんご_日本語.png
+  The clipboard image file name is: yomitan_clipboard_image_にほんご_日本語.png
 
   The clipboard text is: This is the clipboard text
 
@@ -741,7 +741,7 @@ These functions are used together in order to request media and other types of o
 
   This is an example of text with generated furigana: <ruby>日本語<rt>にほんご</rt></ruby>
 
-  The remapped file name for image.png is: yomichan_dictionary_media_1_にほんご_日本語.png
+  The remapped file name for image.png is: yomitan_dictionary_media_1_にほんご_日本語.png
   ```
 </details>
 

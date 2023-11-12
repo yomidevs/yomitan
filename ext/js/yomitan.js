@@ -40,9 +40,9 @@ if ((() => {
 }
 
 /**
- * The Yomichan class is a core component through which various APIs are handled and invoked.
+ * The Yomitan class is a core component through which various APIs are handled and invoked.
  */
-class Yomichan extends EventDispatcher {
+class Yomitan extends EventDispatcher {
     /**
      * Creates a new instance. The instance should not be used until it has been fully prepare()'d.
      */
@@ -53,7 +53,7 @@ class Yomichan extends EventDispatcher {
             const manifest = chrome.runtime.getManifest();
             this._extensionName = `${manifest.name} v${manifest.version}`;
         } catch (e) {
-            this._extensionName = 'Yomichan';
+            this._extensionName = 'Yomitan';
         }
 
         try {
@@ -74,12 +74,12 @@ class Yomichan extends EventDispatcher {
         this._isBackendReadyPromiseResolve = resolve;
 
         this._messageHandlers = new Map([
-            ['Yomichan.isReady',         {async: false, handler: this._onMessageIsReady.bind(this)}],
-            ['Yomichan.backendReady',    {async: false, handler: this._onMessageBackendReady.bind(this)}],
-            ['Yomichan.getUrl',          {async: false, handler: this._onMessageGetUrl.bind(this)}],
-            ['Yomichan.optionsUpdated',  {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
-            ['Yomichan.databaseUpdated', {async: false, handler: this._onMessageDatabaseUpdated.bind(this)}],
-            ['Yomichan.zoomChanged',     {async: false, handler: this._onMessageZoomChanged.bind(this)}]
+            ['Yomitan.isReady',         {async: false, handler: this._onMessageIsReady.bind(this)}],
+            ['Yomitan.backendReady',    {async: false, handler: this._onMessageBackendReady.bind(this)}],
+            ['Yomitan.getUrl',          {async: false, handler: this._onMessageGetUrl.bind(this)}],
+            ['Yomitan.optionsUpdated',  {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
+            ['Yomitan.databaseUpdated', {async: false, handler: this._onMessageDatabaseUpdated.bind(this)}],
+            ['Yomitan.zoomChanged',     {async: false, handler: this._onMessageZoomChanged.bind(this)}]
         ]);
     }
 
@@ -144,7 +144,7 @@ class Yomichan extends EventDispatcher {
      */
     ready() {
         this._isReady = true;
-        this.sendMessage({action: 'yomichanReady'});
+        this.sendMessage({action: 'yomitanReady'});
     }
 
     /**
@@ -236,6 +236,6 @@ class Yomichan extends EventDispatcher {
 }
 
 /**
- * The default Yomichan class instance.
+ * The default Yomitan class instance.
  */
-export const yomichan = new Yomichan();
+export const yomitan = new Yomitan();

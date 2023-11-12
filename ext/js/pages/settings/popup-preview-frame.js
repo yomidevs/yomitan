@@ -19,7 +19,7 @@
 import * as wanakana from '../../../lib/wanakana.js';
 import {Frontend} from '../../app/frontend.js';
 import {TextSourceRange} from '../../dom/text-source-range.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 
 export class PopupPreviewFrame {
     constructor(tabId, frameId, popupFactory, hotkeyHandler) {
@@ -62,8 +62,8 @@ export class PopupPreviewFrame {
         this._exampleTextInput.addEventListener('input', this._onExampleTextInputInput.bind(this), false);
 
         // Overwrite API functions
-        this._apiOptionsGetOld = yomichan.api.optionsGet.bind(yomichan.api);
-        yomichan.api.optionsGet = this._apiOptionsGet.bind(this);
+        this._apiOptionsGetOld = yomitan.api.optionsGet.bind(yomitan.api);
+        yomitan.api.optionsGet = this._apiOptionsGet.bind(this);
 
         // Overwrite frontend
         this._frontend = new Frontend({

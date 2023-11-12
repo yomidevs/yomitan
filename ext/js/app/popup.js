@@ -20,7 +20,7 @@ import {FrameClient} from '../comm/frame-client.js';
 import {DynamicProperty, EventDispatcher, EventListenerCollection, deepEqual} from '../core.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {dynamicLoader} from '../script/dynamic-loader.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {ThemeController} from './theme-controller.js';
 
 /**
@@ -113,7 +113,7 @@ export class Popup extends EventDispatcher {
         this._frameSizeContentScale = null;
         this._frameClient = null;
         this._frame = document.createElement('iframe');
-        this._frame.className = 'yomichan-popup';
+        this._frame.className = 'yomitan-popup';
         this._frame.style.width = '0';
         this._frame.style.height = '0';
 
@@ -208,7 +208,7 @@ export class Popup extends EventDispatcher {
         this._frame.addEventListener('scroll', (e) => e.stopPropagation());
         this._frame.addEventListener('load', this._onFrameLoad.bind(this));
         this._visible.on('change', this._onVisibleChange.bind(this));
-        yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
+        yomitan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         this._onVisibleChange({value: this.isVisibleSync()});
         this._themeController.prepare();
     }
@@ -359,7 +359,7 @@ export class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        const node = await dynamicLoader.loadStyle('yomichan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
+        const node = await dynamicLoader.loadStyle('yomitan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
         this.trigger('customOuterCssChanged', {node, useWebExtensionApi, inShadow});
     }
 
@@ -537,7 +537,7 @@ export class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        await dynamicLoader.loadStyle('yomichan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
+        await dynamicLoader.loadStyle('yomitan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
     }
 
     _observeFullscreen(observe) {
@@ -626,14 +626,14 @@ export class Popup extends EventDispatcher {
         if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
 
         const message = this._frameClient.createMessage({action, params});
-        return await yomichan.crossFrame.invoke(this._frameClient.frameId, 'popupMessage', message);
+        return await yomitan.crossFrame.invoke(this._frameClient.frameId, 'popupMessage', message);
     }
 
     async _invokeSafe(action, params={}, defaultReturnValue) {
         try {
             return await this._invoke(action, params);
         } catch (e) {
-            if (!yomichan.isExtensionUnloaded) { throw e; }
+            if (!yomitan.isExtensionUnloaded) { throw e; }
             return defaultReturnValue;
         }
     }
@@ -884,7 +884,7 @@ export class Popup extends EventDispatcher {
 
     async _setOptionsContext(optionsContext) {
         this._optionsContext = optionsContext;
-        const options = await yomichan.api.optionsGet(optionsContext);
+        const options = await yomitan.api.optionsGet(optionsContext);
         const {general} = options;
         this._themeController.theme = general.popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;

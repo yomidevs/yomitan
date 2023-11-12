@@ -23,7 +23,7 @@ import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../language/dictionary-database.js';
 import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
 import {Translator} from '../language/translator.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
 /**
  * This class controls the core logic of the extension, including API calls
@@ -139,11 +139,11 @@ export class Offscreen {
 
     _validatePrivilegedMessageSender(sender) {
         let {url} = sender;
-        if (typeof url === 'string' && yomichan.isExtensionUrl(url)) { return; }
+        if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
         const {tab} = url;
         if (typeof tab === 'object' && tab !== null) {
             ({url} = tab);
-            if (typeof url === 'string' && yomichan.isExtensionUrl(url)) { return; }
+            if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
         }
         throw new Error('Invalid message sender');
     }

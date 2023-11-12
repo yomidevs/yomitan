@@ -17,7 +17,7 @@
  */
 
 import {EventDispatcher, EventListenerCollection, deserializeError, invokeMessageHandler, log, serializeError} from '../core.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
 class CrossFrameAPIPort extends EventDispatcher {
     constructor(otherTabId, otherFrameId, port, messageHandlers) {
@@ -233,7 +233,7 @@ export class CrossFrameAPI {
 
     async prepare() {
         chrome.runtime.onConnect.addListener(this._onConnect.bind(this));
-        ({tabId: this._tabId, frameId: this._frameId} = await yomichan.api.frameInformationGet());
+        ({tabId: this._tabId, frameId: this._frameId} = await yomitan.api.frameInformationGet());
     }
 
     invoke(targetFrameId, action, params={}) {
@@ -304,7 +304,7 @@ export class CrossFrameAPI {
     }
 
     async _createCommPort(otherTabId, otherFrameId) {
-        await yomichan.api.openCrossFramePort(otherTabId, otherFrameId);
+        await yomitan.api.openCrossFramePort(otherTabId, otherFrameId);
 
         const tabPorts = this._commPorts.get(otherTabId);
         if (typeof tabPorts !== 'undefined') {

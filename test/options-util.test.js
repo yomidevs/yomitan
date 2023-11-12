@@ -133,7 +133,7 @@ function createProfileOptionsTestData1() {
         anki: {
             enable: false,
             server: 'http://127.0.0.1:8765',
-            tags: ['yomichan'],
+            tags: ['yomitan'],
             sentenceExt: 200,
             screenshot: {format: 'png', quality: 92},
             terms: {deck: '', model: '', fields: {}},
@@ -441,7 +441,7 @@ function createProfileOptionsUpdatedTestData1() {
         anki: {
             enable: false,
             server: 'http://127.0.0.1:8765',
-            tags: ['yomichan'],
+            tags: ['yomitan'],
             screenshot: {format: 'png', quality: 92},
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},

@@ -18,7 +18,7 @@
 
 import {EventListenerCollection, log} from '../../core.js';
 import {DictionaryWorker} from '../../language/dictionary-worker.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 
 class DictionaryEntry {
     constructor(dictionaryController, fragment, index, dictionaryInfo) {
@@ -284,7 +284,7 @@ export class DictionaryController {
         this._deleteDictionaryModal = this._modalController.getModal('dictionary-confirm-delete');
         this._allCheckbox = document.querySelector('#all-dictionaries-enabled');
 
-        yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+        yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._allCheckbox.addEventListener('change', this._onAllCheckboxChange.bind(this), false);
         document.querySelector('#dictionary-confirm-delete-button').addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
@@ -681,7 +681,7 @@ export class DictionaryController {
 
     async _deleteDictionaryInternal(dictionaryTitle, onProgress) {
         await new DictionaryWorker().deleteDictionary(dictionaryTitle, onProgress);
-        yomichan.api.triggerDatabaseUpdated('dictionary', 'delete');
+        yomitan.api.triggerDatabaseUpdated('dictionary', 'delete');
     }
 
     async _deleteDictionarySettings(dictionaryTitle) {
@@ -706,7 +706,7 @@ export class DictionaryController {
     }
 
     _triggerStorageChanged() {
-        yomichan.trigger('storageChanged');
+        yomitan.trigger('storageChanged');
     }
 
     _updateDictionaryEntryCount() {

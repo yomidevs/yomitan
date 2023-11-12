@@ -18,7 +18,7 @@
 
 import {EventListenerCollection, isObject} from '../../core.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
 export class ExtensionKeyboardShortcutController {
@@ -53,7 +53,7 @@ export class ExtensionKeyboardShortcutController {
             this._clearButton.addEventListener('click', this._onClearClick.bind(this));
         }
 
-        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
+        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._os = os;
         this._hotkeyUtil.os = os;
 
