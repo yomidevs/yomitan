@@ -159,7 +159,7 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
             deckName: 'deckName',
             modelName: 'modelName',
             fields,
-            tags: ['yomichan'],
+            tags: ['yomitan'],
             checkForDuplicates: true,
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,

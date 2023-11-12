@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 
 export class StorageController {
     constructor(persistentStorageController) {
@@ -41,7 +41,7 @@ export class StorageController {
         this._storageUseInvalidNodes = document.querySelectorAll('.storage-use-invalid');
 
         document.querySelector('#storage-refresh').addEventListener('click', this._onStorageRefreshButtonClick.bind(this), false);
-        yomichan.on('storageChanged', this._onStorageChanged.bind(this));
+        yomitan.on('storageChanged', this._onStorageChanged.bind(this));
 
         this._updateStats();
     }

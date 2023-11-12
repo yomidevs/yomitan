@@ -19,7 +19,7 @@
 import {isObject} from '../../core.js';
 import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
 import {JapaneseUtil} from '../../language/sandbox/japanese-util.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 
 export class AnkiTemplatesController {
     constructor(settingsController, modalController, ankiController) {
@@ -38,7 +38,7 @@ export class AnkiTemplatesController {
     }
 
     async prepare() {
-        this._defaultFieldTemplates = await yomichan.api.getDefaultAnkiFieldTemplates();
+        this._defaultFieldTemplates = await yomitan.api.getDefaultAnkiFieldTemplates();
 
         this._fieldTemplatesTextarea = document.querySelector('#anki-card-templates-textarea');
         this._compileResultInfo = document.querySelector('#anki-card-templates-compile-result');
@@ -136,7 +136,7 @@ export class AnkiTemplatesController {
 
     async _getDictionaryEntry(text, optionsContext) {
         if (this._cachedDictionaryEntryText !== text) {
-            const {dictionaryEntries} = await yomichan.api.termsFind(text, {}, optionsContext);
+            const {dictionaryEntries} = await yomitan.api.termsFind(text, {}, optionsContext);
             if (dictionaryEntries.length === 0) { return null; }
 
             this._cachedDictionaryEntryValue = dictionaryEntries[0];

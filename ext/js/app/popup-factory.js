@@ -18,7 +18,7 @@
 
 import {FrameOffsetForwarder} from '../comm/frame-offset-forwarder.js';
 import {generateId} from '../core.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {PopupProxy} from './popup-proxy.js';
 import {PopupWindow} from './popup-window.js';
 import {Popup} from './popup.js';
@@ -43,7 +43,7 @@ export class PopupFactory {
      */
     prepare() {
         this._frameOffsetForwarder.prepare();
-        yomichan.crossFrame.registerHandlers([
+        yomitan.crossFrame.registerHandlers([
             ['PopupFactory.getOrCreatePopup',     {async: true,  handler: this._onApiGetOrCreatePopup.bind(this)}],
             ['PopupFactory.setOptionsContext',    {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
             ['PopupFactory.hide',                 {async: false, handler: this._onApiHide.bind(this)}],
@@ -151,7 +151,7 @@ export class PopupFactory {
                 throw new Error('Invalid frameId');
             }
             const useFrameOffsetForwarder = (parentPopupId === null);
-            ({id, depth, frameId} = await yomichan.crossFrame.invoke(frameId, 'PopupFactory.getOrCreatePopup', {
+            ({id, depth, frameId} = await yomitan.crossFrame.invoke(frameId, 'PopupFactory.getOrCreatePopup', {
                 id,
                 parentPopupId,
                 frameId,

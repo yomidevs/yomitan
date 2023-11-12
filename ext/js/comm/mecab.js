@@ -19,7 +19,7 @@
 import {EventListenerCollection} from '../core.js';
 
 /**
- * This class is used to connect Yomichan to a native component that is
+ * This class is used to connect Yomitan to a native component that is
  * used to parse text into individual terms.
  */
 export class Mecab {
@@ -99,7 +99,7 @@ export class Mecab {
 
     /**
      * Gets the local API version being used.
-     * @returns {number} An integer representing the API version that Yomichan uses.
+     * @returns {number} An integer representing the API version that Yomitan uses.
      */
     getLocalVersion() {
         return this._version;
@@ -219,7 +219,7 @@ export class Mecab {
     }
 
     async _setupPort2() {
-        const port = chrome.runtime.connectNative('yomichan_mecab');
+        const port = chrome.runtime.connectNative('yomitan_mecab');
         this._eventListeners.addListener(port.onMessage, this._onMessage.bind(this));
         this._eventListeners.addListener(port.onDisconnect, this._onDisconnect.bind(this));
         this._port = port;
@@ -228,7 +228,7 @@ export class Mecab {
             const {version} = await this._invoke('get_version', {});
             this._remoteVersion = version;
             if (version !== this._version) {
-                throw new Error(`Unsupported MeCab native messenger version ${version}. Yomichan supports version ${this._version}.`);
+                throw new Error(`Unsupported MeCab native messenger version ${version}. Yomitan supports version ${this._version}.`);
             }
         } catch (e) {
             if (this._port === port) {

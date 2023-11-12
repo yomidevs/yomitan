@@ -18,7 +18,7 @@
 
 import {PermissionsUtil} from '../data/permissions-util.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
 export class DisplayController {
     constructor() {
@@ -34,7 +34,7 @@ export class DisplayController {
         this._setupButtonEvents('.action-open-search', 'openSearchPage', chrome.runtime.getURL('/search.html'), this._onSearchClick.bind(this));
         this._setupButtonEvents('.action-open-info', 'openInfoPage', chrome.runtime.getURL('/info.html'));
 
-        const optionsFull = await yomichan.api.optionsGetFull();
+        const optionsFull = await yomitan.api.optionsGetFull();
         this._optionsFull = optionsFull;
 
         this._setupHotkeys();
@@ -84,12 +84,12 @@ export class DisplayController {
                         const result = customHandler(e);
                         if (typeof result !== 'undefined') { return; }
                     }
-                    yomichan.api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
+                    yomitan.api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
                     e.preventDefault();
                 }, false);
                 node.addEventListener('auxclick', (e) => {
                     if (e.button !== 1) { return; }
-                    yomichan.api.commandExec(command, {mode: 'newTab'});
+                    yomitan.api.commandExec(command, {mode: 'newTab'});
                     e.preventDefault();
                 }, false);
             }
@@ -144,7 +144,7 @@ export class DisplayController {
 
     _setupOptions({options}) {
         const extensionEnabled = options.general.enable;
-        const onToggleChanged = () => yomichan.api.commandExec('toggleTextScanning');
+        const onToggleChanged = () => yomitan.api.commandExec('toggleTextScanning');
         for (const toggle of document.querySelectorAll('#enable-search,#enable-search2')) {
             toggle.checked = extensionEnabled;
             toggle.addEventListener('change', onToggleChanged, false);
@@ -192,7 +192,7 @@ export class DisplayController {
     }
 
     async _setPrimaryProfileIndex(value) {
-        return await yomichan.api.modifySettings(
+        return await yomitan.api.modifySettings(
             [{
                 action: 'set',
                 path: 'profileCurrent',
@@ -204,7 +204,7 @@ export class DisplayController {
 
     async _updateDictionariesEnabledWarnings(options) {
         const noDictionariesEnabledWarnings = document.querySelectorAll('.no-dictionaries-enabled-warning');
-        const dictionaries = await yomichan.api.getDictionaryInfo();
+        const dictionaries = await yomitan.api.getDictionaryInfo();
 
         const enabledDictionaries = new Set();
         for (const {name, enabled} of options.dictionaries) {
@@ -237,18 +237,18 @@ export class DisplayController {
     }
 
     async _isSafari() {
-        const {browser} = await yomichan.api.getEnvironmentInfo();
+        const {browser} = await yomitan.api.getEnvironmentInfo();
         return browser === 'safari';
     }
 }
 
 (async () => {
-    await yomichan.prepare();
+    await yomitan.prepare();
 
-    yomichan.api.logIndicatorClear();
+    yomitan.api.logIndicatorClear();
 
     const displayController = new DisplayController();
     displayController.prepare();
 
-    yomichan.ready();
+    yomitan.ready();
 })();

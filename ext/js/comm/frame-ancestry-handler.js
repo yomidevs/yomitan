@@ -17,7 +17,7 @@
  */
 
 import {generateId} from '../core.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
 /**
  * This class is used to return the ancestor frame IDs for the current frame.
@@ -118,7 +118,7 @@ export class FrameAncestryHandler {
                     clearTimeout(timer);
                     timer = null;
                 }
-                yomichan.crossFrame.unregisterHandler(responseMessageId);
+                yomitan.crossFrame.unregisterHandler(responseMessageId);
             };
             const onMessage = (params) => {
                 if (params.nonce !== nonce) { return null; }
@@ -148,7 +148,7 @@ export class FrameAncestryHandler {
             };
 
             // Start
-            yomichan.crossFrame.registerHandlers([[responseMessageId, {async: false, handler: onMessage}]]);
+            yomitan.crossFrame.registerHandlers([[responseMessageId, {async: false, handler: onMessage}]]);
             resetTimeout();
             const frameId = this._frameId;
             this._requestFrameInfo(targetWindow, frameId, frameId, uniqueId, nonce);
@@ -187,7 +187,7 @@ export class FrameAncestryHandler {
             const responseMessageId = `${this._responseMessageIdBase}${uniqueId}`;
 
             try {
-                const response = await yomichan.crossFrame.invoke(originFrameId, responseMessageId, responseParams);
+                const response = await yomitan.crossFrame.invoke(originFrameId, responseMessageId, responseParams);
                 if (response === null) { return; }
                 nonce = response.nonce;
             } catch (e) {

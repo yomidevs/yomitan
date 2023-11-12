@@ -17,7 +17,7 @@
  */
 
 import {isObject} from '../core.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {HotkeyUtil} from './hotkey-util.js';
 
 export class HotkeyHelpController {
@@ -29,7 +29,7 @@ export class HotkeyHelpController {
     }
 
     async prepare() {
-        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
+        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._hotkeyUtil.os = os;
         await this._setupGlobalCommands(this._globalActionHotkeys);
     }

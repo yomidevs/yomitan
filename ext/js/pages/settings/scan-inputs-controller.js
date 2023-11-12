@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
 export class ScanInputsController {
@@ -31,7 +31,7 @@ export class ScanInputsController {
     }
 
     async prepare() {
-        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
+        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._os = os;
 
         this._container = document.querySelector('#scan-input-list');

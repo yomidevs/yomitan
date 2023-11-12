@@ -34,7 +34,7 @@ import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {MediaUtil} from '../media/media-util.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {ProfileConditionsUtil} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {ScriptManager} from './script-manager.js';
@@ -225,7 +225,7 @@ export class Backend {
             }, 1000);
             this._updateBadge();
 
-            yomichan.on('log', this._onLog.bind(this));
+            yomitan.on('log', this._onLog.bind(this));
 
             await this._requestBuilder.prepare();
             await this._environment.prepare();
@@ -256,8 +256,8 @@ export class Backend {
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
 
-            this._sendMessageAllTabsIgnoreResponse('Yomichan.backendReady', {});
-            this._sendMessageIgnoreResponse({action: 'Yomichan.backendReady', params: {}});
+            this._sendMessageAllTabsIgnoreResponse('Yomitan.backendReady', {});
+            this._sendMessageIgnoreResponse({action: 'Yomitan.backendReady', params: {}});
         } catch (e) {
             log.error(e);
             throw e;
@@ -344,7 +344,7 @@ export class Backend {
     }
 
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
-        this._sendMessageTabIgnoreResponse(tabId, {action: 'Yomichan.zoomChanged', params: {oldZoomFactor, newZoomFactor}});
+        this._sendMessageTabIgnoreResponse(tabId, {action: 'Yomitan.zoomChanged', params: {oldZoomFactor, newZoomFactor}});
     }
 
     _onPermissionsChanged() {
@@ -360,7 +360,7 @@ export class Backend {
 
     _onApiRequestBackendReadySignal(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
-        const data = {action: 'Yomichan.backendReady', params: {}};
+        const data = {action: 'Yomitan.backendReady', params: {}};
         if (typeof sender.tab === 'undefined') {
             this._sendMessageIgnoreResponse(data);
             return false;
@@ -997,7 +997,7 @@ export class Backend {
 
         this._accessibilityController.update(this._getOptionsFull(false));
 
-        this._sendMessageAllTabsIgnoreResponse('Yomichan.optionsUpdated', {source});
+        this._sendMessageAllTabsIgnoreResponse('Yomitan.optionsUpdated', {source});
     }
 
     _getOptionsFull(useSchema=false) {
@@ -1328,11 +1328,11 @@ export class Backend {
 
     _validatePrivilegedMessageSender(sender) {
         let {url} = sender;
-        if (typeof url === 'string' && yomichan.isExtensionUrl(url)) { return; }
+        if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
         const {tab} = url;
         if (typeof tab === 'object' && tab !== null) {
             ({url} = tab);
-            if (typeof url === 'string' && yomichan.isExtensionUrl(url)) { return; }
+            if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
         }
         throw new Error('Invalid message sender');
     }
@@ -1432,7 +1432,7 @@ export class Backend {
         try {
             const {url} = await this._sendMessageTabPromise(
                 tabId,
-                {action: 'Yomichan.getUrl', params: {}},
+                {action: 'Yomitan.getUrl', params: {}},
                 {frameId: 0}
             );
             if (typeof url === 'string') {
@@ -1568,7 +1568,7 @@ export class Backend {
                     sender.tab.id !== tabId ||
                     sender.frameId !== frameId ||
                     !isObject(message) ||
-                    message.action !== 'yomichanReady'
+                    message.action !== 'yomitanReady'
                 ) {
                     return;
                 }
@@ -1589,7 +1589,7 @@ export class Backend {
 
             chrome.runtime.onMessage.addListener(onMessage);
 
-            this._sendMessageTabPromise(tabId, {action: 'Yomichan.isReady'}, {frameId})
+            this._sendMessageTabPromise(tabId, {action: 'Yomitan.isReady'}, {frameId})
                 .then(
                     (value) => {
                         if (!value) { return; }
@@ -1826,7 +1826,7 @@ export class Backend {
 
         let extension = MediaUtil.getFileExtensionFromAudioMediaType(contentType);
         if (extension === null) { extension = '.mp3'; }
-        let fileName = this._generateAnkiNoteMediaFileName('yomichan_audio', extension, timestamp, definitionDetails);
+        let fileName = this._generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp, definitionDetails);
         fileName = fileName.replace(/\]/g, '');
         fileName = await ankiConnect.storeMediaFile(fileName, data);
 
@@ -1843,7 +1843,7 @@ export class Backend {
             throw new Error('Unknown media type for screenshot image');
         }
 
-        let fileName = this._generateAnkiNoteMediaFileName('yomichan_browser_screenshot', extension, timestamp, definitionDetails);
+        let fileName = this._generateAnkiNoteMediaFileName('yomitan_browser_screenshot', extension, timestamp, definitionDetails);
         fileName = await ankiConnect.storeMediaFile(fileName, data);
 
         return fileName;
@@ -1861,7 +1861,7 @@ export class Backend {
             throw new Error('Unknown media type for clipboard image');
         }
 
-        let fileName = this._generateAnkiNoteMediaFileName('yomichan_clipboard_image', extension, timestamp, definitionDetails);
+        let fileName = this._generateAnkiNoteMediaFileName('yomitan_clipboard_image', extension, timestamp, definitionDetails);
         fileName = await ankiConnect.storeMediaFile(fileName, data);
 
         return fileName;
@@ -1897,7 +1897,7 @@ export class Backend {
             if (media !== null) {
                 const {content, mediaType} = media;
                 const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
-                fileName = this._generateAnkiNoteMediaFileName(`yomichan_dictionary_media_${i + 1}`, extension, timestamp, definitionDetails);
+                fileName = this._generateAnkiNoteMediaFileName(`yomitan_dictionary_media_${i + 1}`, extension, timestamp, definitionDetails);
                 try {
                     fileName = await ankiConnect.storeMediaFile(fileName, content);
                 } catch (e) {
@@ -2015,7 +2015,7 @@ export class Backend {
 
     _triggerDatabaseUpdated(type, cause) {
         this._translator.clearDatabaseCaches();
-        this._sendMessageAllTabsIgnoreResponse('Yomichan.databaseUpdated', {type, cause});
+        this._sendMessageAllTabsIgnoreResponse('Yomitan.databaseUpdated', {type, cause});
     }
 
     async _saveOptions(source) {

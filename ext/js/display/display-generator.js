@@ -19,7 +19,7 @@
 import {isObject} from '../core.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {DictionaryDataUtil} from '../language/sandbox/dictionary-data-util.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {PronunciationGenerator} from './sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
 
@@ -34,7 +34,7 @@ export class DisplayGenerator {
     }
 
     async prepare() {
-        const html = await yomichan.api.getDisplayTemplatesHtml();
+        const html = await yomitan.api.getDisplayTemplatesHtml();
         this._templates = new HtmlTemplateCollection(html);
         this.updateHotkeys();
     }

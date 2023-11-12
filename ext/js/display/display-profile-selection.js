@@ -18,7 +18,7 @@
 
 import {EventListenerCollection, generateId} from '../core.js';
 import {PanelElement} from '../dom/panel-element.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
 export class DisplayProfileSelection {
     constructor(display) {
@@ -35,7 +35,7 @@ export class DisplayProfileSelection {
     }
 
     async prepare() {
-        yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
+        yomitan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         this._profileButton.addEventListener('click', this._onProfileButtonClick.bind(this), false);
         this._profileListNeedsUpdate = true;
     }
@@ -67,7 +67,7 @@ export class DisplayProfileSelection {
 
     async _updateProfileList() {
         this._profileListNeedsUpdate = false;
-        const options = await yomichan.api.optionsGetFull();
+        const options = await yomitan.api.optionsGetFull();
 
         this._eventListeners.removeAllEventListeners();
         const displayGenerator = this._display.displayGenerator;
@@ -95,7 +95,7 @@ export class DisplayProfileSelection {
     }
 
     async _setProfileCurrent(index) {
-        await yomichan.api.modifySettings([{
+        await yomitan.api.modifySettings([{
             action: 'set',
             path: 'profileCurrent',
             value: index,

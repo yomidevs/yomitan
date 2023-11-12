@@ -18,7 +18,7 @@
 
 import {log} from '../../core.js';
 import {DocumentFocusController} from '../../dom/document-focus-controller.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 import {ExtensionContentController} from '../common/extension-content-controller.js';
 import {AnkiController} from './anki-controller.js';
 import {AnkiTemplatesController} from './anki-templates-controller.js';
@@ -70,7 +70,7 @@ async function setupGenericSettingsController(genericSettingController) {
             document.documentElement.dataset.loadingStalled = 'true';
         }, 1000);
 
-        await yomichan.prepare();
+        await yomitan.prepare();
 
         if (prepareTimer !== null) {
             clearTimeout(prepareTimer);

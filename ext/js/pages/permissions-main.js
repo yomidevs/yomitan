@@ -18,7 +18,7 @@
 
 import {log, promiseTimeout} from '../core.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {ExtensionContentController} from './common/extension-content-controller.js';
 import {ModalController} from './settings/modal-controller.js';
 import {PermissionsOriginController} from './settings/permissions-origin-controller.js';
@@ -29,7 +29,7 @@ import {SettingsDisplayController} from './settings/settings-display-controller.
 
 async function setupEnvironmentInfo() {
     const {manifest_version: manifestVersion} = chrome.runtime.getManifest();
-    const {browser, platform} = await yomichan.api.getEnvironmentInfo();
+    const {browser, platform} = await yomitan.api.getEnvironmentInfo();
     document.documentElement.dataset.browser = browser;
     document.documentElement.dataset.os = platform.os;
     document.documentElement.dataset.manifestVersion = `${manifestVersion}`;
@@ -73,7 +73,7 @@ function setupPermissionsToggles() {
 
         setupPermissionsToggles();
 
-        await yomichan.prepare();
+        await yomitan.prepare();
 
         setupEnvironmentInfo();
 

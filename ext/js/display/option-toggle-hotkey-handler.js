@@ -17,7 +17,7 @@
  */
 
 import {deserializeError} from '../core.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 
 export class OptionToggleHotkeyHandler {
     constructor(display) {
@@ -52,7 +52,7 @@ export class OptionToggleHotkeyHandler {
         try {
             const optionsContext = this._display.getOptionsContext();
 
-            const result = (await yomichan.api.getSettings([{
+            const result = (await yomitan.api.getSettings([{
                 scope: 'profile',
                 path,
                 optionsContext
@@ -69,7 +69,7 @@ export class OptionToggleHotkeyHandler {
 
             value = !value;
 
-            const result2 = (await yomichan.api.modifySettings([{
+            const result2 = (await yomitan.api.modifySettings([{
                 scope: 'profile',
                 action: 'set',
                 path,

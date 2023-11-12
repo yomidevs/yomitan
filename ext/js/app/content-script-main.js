@@ -18,15 +18,15 @@
 
 import {log} from '../core.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {Frontend} from './frontend.js';
 import {PopupFactory} from './popup-factory.js';
 
 (async () => {
     try {
-        await yomichan.prepare();
+        await yomitan.prepare();
 
-        const {tabId, frameId} = await yomichan.api.frameInformationGet();
+        const {tabId, frameId} = await yomitan.api.frameInformationGet();
         if (typeof frameId !== 'number') {
             throw new Error('Failed to get frameId');
         }
@@ -51,7 +51,7 @@ import {PopupFactory} from './popup-factory.js';
         });
         await frontend.prepare();
 
-        yomichan.ready();
+        yomitan.ready();
     } catch (e) {
         log.error(e);
     }

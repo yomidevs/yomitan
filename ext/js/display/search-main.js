@@ -21,7 +21,7 @@ import {log} from '../core.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
-import {yomichan} from '../yomichan.js';
+import {yomitan} from '../yomitan.js';
 import {DisplayAnki} from './display-anki.js';
 import {DisplayAudio} from './display-audio.js';
 import {Display} from './display.js';
@@ -40,9 +40,9 @@ import {SearchPersistentStateController} from './search-persistent-state-control
         const searchActionPopupController = new SearchActionPopupController(searchPersistentStateController);
         searchActionPopupController.prepare();
 
-        await yomichan.prepare();
+        await yomitan.prepare();
 
-        const {tabId, frameId} = await yomichan.api.frameInformationGet();
+        const {tabId, frameId} = await yomitan.api.frameInformationGet();
 
         const japaneseUtil = new JapaneseUtil(wanakana);
 
@@ -65,7 +65,7 @@ import {SearchPersistentStateController} from './search-persistent-state-control
 
         document.documentElement.dataset.loaded = 'true';
 
-        yomichan.ready();
+        yomitan.ready();
     } catch (e) {
         log.error(e);
     }

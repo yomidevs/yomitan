@@ -17,7 +17,7 @@
  */
 
 import {clone, EventListenerCollection} from '../../core.js';
-import {yomichan} from '../../yomichan.js';
+import {yomitan} from '../../yomitan.js';
 import {ProfileConditionsUI} from './profile-conditions-ui.js';
 
 export class ProfileController {
@@ -53,7 +53,7 @@ export class ProfileController {
     }
 
     async prepare() {
-        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
+        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._profileConditionsUI.os = os;
 
         this._profileActiveSelect = document.querySelector('#profile-active-select');
