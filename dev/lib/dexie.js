@@ -14,4 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-export * from 'dexie';
+import Dexie from 'dexie';
+import 'dexie-export-import';
+
+export {Dexie};

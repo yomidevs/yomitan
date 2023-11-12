@@ -6,5 +6,6 @@
         "source.fixAll.eslint": true,
     },
     "eslint.format.enable": true,
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
     "javascript.preferences.importModuleSpecifierEnding": "js",
 }

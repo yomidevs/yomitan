@@ -18,4 +18,5 @@
 
 import {yomitan} from '../yomitan.js';
 
-yomitan.trigger('dynamicLoaderSentinel', {script: document.currentScript});
+
+yomitan.trigger('dynamicLoaderSentinel', {script: import.meta.url});

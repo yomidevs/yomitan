@@ -126,6 +126,7 @@ export const dynamicLoader = (() => {
                 if (node !== null) { continue; }
 
                 const script = document.createElement('script');
+                script.type = 'module';
                 script.async = false;
                 script.src = url;
                 parent.appendChild(script);
@@ -140,7 +141,7 @@ export const dynamicLoader = (() => {
 
         const sentinelEventName = 'dynamicLoaderSentinel';
         const sentinelEventCallback = (e) => {
-            if (e.script !== script) { return; }
+            if (e.script !== script.src) { return; }
             yomitan.off(sentinelEventName, sentinelEventCallback);
             parent.removeChild(script);
             resolve();
