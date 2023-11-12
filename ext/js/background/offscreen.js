@@ -48,17 +48,17 @@ export class Offscreen {
         });
 
         this._messageHandlers = new Map([
-            ['clipboardGetTextOffscreen',                 {async: true,  contentScript: true,  handler: this._getTextHandler.bind(this)}],
-            ['clipboardGetImageOffscreen',                 {async: true,  contentScript: true,  handler: this._getImageHandler.bind(this)}],
-            ['databasePrepareOffscreen',                 {async: true,  contentScript: true,  handler: this._prepareDatabaseHandler.bind(this)}],
-            ['getDictionaryInfoOffscreen',                 {async: true,  contentScript: true,  handler: this._getDictionaryInfoHandler.bind(this)}],
-            ['databasePurgeOffscreen',                 {async: true,  contentScript: true,  handler: this._purgeDatabaseHandler.bind(this)}],
-            ['databaseGetMediaOffscreen',                 {async: true,  contentScript: true,  handler: this._getMediaHandler.bind(this)}],
-            ['translatorPrepareOffscreen',                 {async: false,  contentScript: true,  handler: this._prepareTranslatorHandler.bind(this)}],
-            ['findKanjiOffscreen',                 {async: true,  contentScript: true,  handler: this._findKanjiHandler.bind(this)}],
-            ['findTermsOffscreen',                 {async: true,  contentScript: true,  handler: this._findTermsHandler.bind(this)}],
-            ['getTermFrequenciesOffscreen',                 {async: true,  contentScript: true,  handler: this._getTermFrequenciesHandler.bind(this)}],
-            ['clearDatabaseCachesOffscreen',                 {async: false,  contentScript: true,  handler: this._clearDatabaseCachesHandler.bind(this)}]
+            ['clipboardGetTextOffscreen',    {async: true,  contentScript: true,  handler: this._getTextHandler.bind(this)}],
+            ['clipboardGetImageOffscreen',   {async: true,  contentScript: true,  handler: this._getImageHandler.bind(this)}],
+            ['databasePrepareOffscreen',     {async: true,  contentScript: true,  handler: this._prepareDatabaseHandler.bind(this)}],
+            ['getDictionaryInfoOffscreen',   {async: true,  contentScript: true,  handler: this._getDictionaryInfoHandler.bind(this)}],
+            ['databasePurgeOffscreen',       {async: true,  contentScript: true,  handler: this._purgeDatabaseHandler.bind(this)}],
+            ['databaseGetMediaOffscreen',    {async: true,  contentScript: true,  handler: this._getMediaHandler.bind(this)}],
+            ['translatorPrepareOffscreen',   {async: false,  contentScript: true,  handler: this._prepareTranslatorHandler.bind(this)}],
+            ['findKanjiOffscreen',           {async: true,  contentScript: true,  handler: this._findKanjiHandler.bind(this)}],
+            ['findTermsOffscreen',           {async: true,  contentScript: true,  handler: this._findTermsHandler.bind(this)}],
+            ['getTermFrequenciesOffscreen',  {async: true,  contentScript: true,  handler: this._getTermFrequenciesHandler.bind(this)}],
+            ['clearDatabaseCachesOffscreen', {async: false,  contentScript: true,  handler: this._clearDatabaseCachesHandler.bind(this)}]
 
         ]);
 
