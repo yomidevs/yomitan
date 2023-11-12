@@ -116,7 +116,10 @@ export class Offscreen {
             if (!group) {
                 return group;
             }
-            return group.map((opt) => ({...opt, pattern: new RegExp(opt.pattern)}));
+            return group.map((opt) => {
+                const [, pattern, flags] = opt.pattern.match(/\/(.*?)\/([a-z]*)?$/i); // https://stackoverflow.com/a/33642463
+                return {...opt, pattern: new RegExp(pattern, flags ?? '')};
+            });
         });
         return this._translator.findTerms(mode, text, findTermsOptions);
     }

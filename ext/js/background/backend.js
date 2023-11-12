@@ -2282,7 +2282,7 @@ export class Backend {
             ...findTermsOptions,
             enabledDictionaryMap: enabledDictionaryMapList,
             excludeDictionaryDefinitions: excludeDictionaryDefinitionsList,
-            textReplacementsOptions: textReplacementsSerialized
+            textReplacements: textReplacementsSerialized
         };
         return this._sendMessagePromise({action: 'findTermsOffscreen', params: {mode, text, findTermsOptions: modifiedFindTermsOptions}});
     }
