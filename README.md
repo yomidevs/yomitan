@@ -56,7 +56,7 @@ The import/export feature is in the Backup section at the bottom of the Settings
 
 ## Dictionaries
 
-To get dictionaries, visit the #dictionaries channel in the [Yezichak Discord server](https://discord.gg/kd4YXFaV).
+To get dictionaries, visit the #dictionaries channel in the [Yezichak Discord server](https://discord.gg/WuqdTDQWd).
 
 ## Basic Usage
 
