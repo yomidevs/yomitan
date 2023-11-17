@@ -186,7 +186,7 @@ You should be able to replicate your exact Yomitan setup across devices by expor
 
 Click the `Show advanced options` toggle switch in the bottom left corner of the Settings page to enable advanced options.
 
-### Parse sentence using MeCab
+### Parse sentences using MeCab
 
 MeCab is a third-party program which uses its own dictionaries and parsing algorithm to decompose sentences into individual words. MeCab may provide more accurate parsing results than Yomitan's internal parser.
 
