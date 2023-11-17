@@ -4,11 +4,11 @@ Yezichak is a fork of yomichan meant to work with languages other than Japanese.
 
 Yezichak provides advanced features not available in other browser-based dictionaries:
 
-*   Interactive popup definition window for displaying search results.
-*   On-demand audio playback for select dictionary definitions.
-*   Custom search page for easily executing custom search queries.
-*   Automatic note creation for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
-*   Clean, modern code makes it easy for developers to [contribute](https://github.com/FooSoft/yomichan/blob/master/CONTRIBUTING.md) new features.
+*   Support for many languages
+*   Interactive popup definition window for displaying search results
+*   On-demand audio playback
+*   Automatic note creation for the [Anki](https://apps.ankiweb.net/) flashcard program
+*   Clean, modern code makes it easy for developers to contribute new features
 
 [![Term definitions](img/ss-terms-thumb.png)](img/ss-terms.png)
 [![Kanji information](img/ss-kanji-thumb.png)](img/ss-kanji.png)
