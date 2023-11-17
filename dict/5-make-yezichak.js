@@ -66,6 +66,7 @@ let taggedTermCount = 0;
 for (const [lemma, infoMap] of allInfo) {
     function debug(word) {
         if (lemma === DEBUG_WORD) {
+            console.log('-------------------');
             console.log(word);
         }
     }
@@ -84,7 +85,6 @@ for (const [lemma, infoMap] of allInfo) {
 
         glosses.forEach((gloss) => {
             debug(gloss);
-            if (typeof gloss !== 'string') { return; }
 
             function addGlossToEntries(joinedTags) {
                 if (entries[joinedTags]) {
@@ -105,16 +105,22 @@ for (const [lemma, infoMap] of allInfo) {
                 }
             }
 
+            if (typeof gloss !== 'string') { 
+                addGlossToEntries(lemmaTags.join(' '));
+                return; 
+            }
+
             const regex = /^\(([^()]+)\) ?/;
             const parenthesesContent = gloss.match(regex)?.[1];
 
-            if (parenthesesContent) { taggedTermCount++; }
-
-            debug(parenthesesContent);
+            if (parenthesesContent) {
+                taggedTermCount++;
+                debug(parenthesesContent);
+            }
 
             const parenthesesTags = parenthesesContent
-        ? parenthesesContent.replace(/ or /g, ', ').split(', ').filter(Boolean)
-        : [];
+                ? parenthesesContent.replace(/ or /g, ', ').split(', ').filter(Boolean)
+                : [];
 
             const unrecognizedTags = [];
             const recognizedTags = [];
