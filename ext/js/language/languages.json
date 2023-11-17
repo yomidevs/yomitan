@@ -9,5 +9,6 @@
     {"iso": "pt", "language": "Portuguese", "flag": "🇧🇷🇵🇹"},
     {"iso": "ru", "language": "Russian", "flag": "🇷🇺"},
     {"iso": "sq", "language": "Albanian", "flag": "🇦🇱"},
-    {"iso": "sh", "language": "Serbo-Croatian", "flag": "🇷🇸🇭🇷"}
+    {"iso": "sh", "language": "Serbo-Croatian", "flag": "🇷🇸🇭🇷"},
+    {"iso": "id", "language": "Indonesian", "flag": "🇮🇩"}
 ]

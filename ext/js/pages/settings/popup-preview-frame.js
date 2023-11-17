@@ -126,6 +126,8 @@ class PopupPreviewFrame {
                 return 'acabar de';
             case 'fr':
                 return 'lire';
+            case 'id':
+                return 'membaca';
             case 'it':
                 return 'leggere';
             case 'ja':

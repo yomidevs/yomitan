@@ -40,6 +40,7 @@ const blacklistedTags = [
   'includes-article',
   'obsolete',
   'archaic',
+  'used-in-the-form'
 ];
 
 const uniqueTags = [];
