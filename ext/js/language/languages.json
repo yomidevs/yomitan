@@ -1,13 +1,13 @@
 [
-    "de",
-    "el",
-    "en",
-    "es",
-    "fr",
-    "it",
-    "ja",
-    "pt",
-    "ru",
-    "sq",
-    "sh"
+    {"iso": "de", "language": "German", "flag": "🇩🇪"},
+    {"iso": "el", "language": "Greek", "flag": "🇬🇷"},
+    {"iso": "en", "language": "English", "flag": "🇺🇸🇬🇧"},
+    {"iso": "es", "language": "Spanish", "flag": "🇪🇸"},
+    {"iso": "fr", "language": "French", "flag": "🇫🇷"},
+    {"iso": "it", "language": "Italian", "flag": "🇮🇹"},
+    {"iso": "ja", "language": "Japanese", "flag": "🇯🇵"},
+    {"iso": "pt", "language": "Portuguese", "flag": "🇧🇷🇵🇹"},
+    {"iso": "ru", "language": "Russian", "flag": "🇷🇺"},
+    {"iso": "sq", "language": "Albanian", "flag": "🇦🇱"},
+    {"iso": "sh", "language": "Serbo-Croatian", "flag": "🇷🇸🇭🇷"}
 ]

@@ -9,11 +9,13 @@
    
 2. create a .env file based on .env.example
 
-3. run ./auto.sh German de
+3. if your language is not in /ext/js/language/languages.json, add it
 
-4. if everything runs, dictionaries should be in data/language/de
+4. run ./auto.sh German
 
-5. (optional) data/language/de should contain files with skipped tags for ipa and terms,
-   you may want to add some to tag_bank json file and rerun ./auto.sh
+5. if everything runs, dictionaries should be in data/language/de
 
-6. import the zipped dictionaries into yezichak in your browser
+6. (optional) data/language/de should contain files with skipped tags for ipa and terms,
+   you may want to add some to tag_bank_ipa.json or tag_bank_term.json and rerun ./auto.sh
+
+7. import the zipped dictionaries into yezichak in your browser

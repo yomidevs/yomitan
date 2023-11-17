@@ -280,7 +280,7 @@ writeFileSync(`data/language/${language_short}/skippedIpaTags.json`, JSON.string
 console.log('total tagged terms', taggedTermCount, 'skipped term tags', Object.values(skippedTermTags).reduce((a, b) => a + b, 0));
 writeFileSync(`data/language/${language_short}/skippedTermTags.json`, JSON.stringify(sortBreakdown(skippedTermTags), null, 2));
 
-console.log('5-make-yomichan.js: Done!');
+console.log('5-make-yezichak.js: Done!');
 
 function writeInBatches(inputArray, filenamePrefix, batchSize = 100000) {
     let bankIndex = 0;

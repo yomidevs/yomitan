@@ -30,10 +30,9 @@ export class LanguageUtil {
 
     async prepare() {
         const languages = JSON.parse(await fetchAsset('/js/language/languages.json'));
-
         window.languages = window.languages || {};
-        languages.forEach((language) => {
-            window.languages[language] = window.languages[language] || {};
+        languages.forEach(({iso}) => {
+            window.languages[iso] = window.languages[iso] || {};
         });
     }
 
