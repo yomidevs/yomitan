@@ -45,13 +45,13 @@ Yomitan provides advanced features not available in other browser-based dictiona
 - [Basic Usage](#basic-usage)
   - [Importing Dictionaries](#importing-dictionaries)
   - [Importing and Exporting Personal Configuration](#importing-and-exporting-personal-configuration)
-- [Advanced Usage](#advanced-usage)
-  - [Parse sentences using MeCab](#parse-sentences-using-mecab)
 - [Custom Dictionaries](#custom-dictionaries)
 - [Anki Integration](#anki-integration)
   - [Flashcard Configuration](#flashcard-configuration)
   - [Flashcard Creation](#flashcard-creation)
 - [Keyboard Shortcuts](#keyboard-shortcuts)
+- [Advanced Options](#advanced-options)
+  - [Parse sentences using MeCab](#parse-sentences-using-mecab)
 - [Frequently Asked Questions](#frequently-asked-questions)
 - [Licenses](#licenses)
 - [Third-Party Libraries](#third-party-libraries)
@@ -181,17 +181,6 @@ Yomitan also supports exporting and importing your entire collection of dictiona
 Note that you can also similarly export and import your Yomitan settings from the `Backup` section of the Settings page.
 
 You should be able to replicate your exact Yomitan setup across devices by exporting your settings and dictionary collection from the source device then importing those from the destination.
-
-## Advanced Usage
-
-Click the `Show advanced options` toggle switch in the bottom left corner of the Settings page to enable advanced options.
-
-### Parse sentences using MeCab
-
-[MeCab](https://taku910.github.io/mecab/) is a third-party program which uses its own dictionaries and parsing algorithm to decompose sentences into individual words. MeCab may provide more accurate parsing results than Yomitan's internal parser.
-
-In order for Yomitan to use it, both MeCab and a native messaging component must be installed.
-A setup guide can be found <a href="https://github.com/starxeras/yomitan-mecab-installer/blob/master/README.md" target="_blank" rel="noopener noreferrer">here</a>.
 
 ## Custom Dictionaries
 
@@ -331,6 +320,17 @@ The following shortcuts are available on search results:
 | <kbd>Alt</kbd> + <kbd>r</kbd>    | Add current term as reading to Anki.    |
 | <kbd>Alt</kbd> + <kbd>p</kbd>    | Play audio for current term.            |
 | <kbd>Alt</kbd> + <kbd>k</kbd>    | Add current kanji to Anki.              |
+
+## Advanced Options
+
+Click the `Show advanced options` toggle switch in the bottom left corner of the Settings page to enable advanced options.
+
+### Parse sentences using MeCab
+
+[MeCab](https://taku910.github.io/mecab/) is a third-party program which uses its own dictionaries and parsing algorithm to decompose sentences into individual words. MeCab may provide more accurate parsing results than Yomitan's internal parser.
+
+In order for Yomitan to use it, both MeCab and a native messaging component must be installed.
+A setup guide can be found [here](https://github.com/starxeras/yomitan-mecab-installer/blob/master/README.md).
 
 ## Frequently Asked Questions
 
