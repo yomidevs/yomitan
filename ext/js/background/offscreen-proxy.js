@@ -143,7 +143,7 @@ export class TranslatorProxy {
             ...findTermsOptions,
             enabledDictionaryMap: enabledDictionaryMapList,
             excludeDictionaryDefinitions: excludeDictionaryDefinitionsList,
-            textReplacementsOptions: textReplacementsSerialized
+            textReplacements: textReplacementsSerialized
         };
         return this._offscreen.sendMessagePromise({action: 'findTermsOffscreen', params: {mode, text, findTermsOptions: modifiedFindTermsOptions}});
     }
