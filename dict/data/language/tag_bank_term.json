@@ -28,6 +28,13 @@
 		0
 	],
 	[
+		"ref-pron",
+		"",
+		-3,
+		"takes a reflexive pronoun",
+		0
+	],
+	[
 		"po",
 		"",
 		-3,
@@ -984,6 +991,20 @@
 		"",
 		0,
 		"computer science",
+		0
+	],
+	[
+		"ecc",
+		"",
+		0,
+		"ecclesiastical",
+		0
+	],
+	[
+		"cards",
+		"",
+		0,
+		"card games",
 		0
 	]
 ]
