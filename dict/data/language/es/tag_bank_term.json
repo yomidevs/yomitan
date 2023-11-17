@@ -1,0 +1,33 @@
+[
+    ["🇪🇸", "dialect", 0, "Spain", 0],
+    ["🌎", "dialect", 0, "Latin America", 0],
+    ["🇲🇽", "dialect", 0, "Mexico", 0],
+    ["🇦🇷", "dialect", 0, "Argentina", 0],
+    ["🇺🇾", "dialect", 0, "Uruguay", 0],
+    ["🇵🇪", "dialect", 0, "Peru", 0],
+    ["🇻🇪", "dialect", 0, "Venezuela", 0],
+    ["🇨🇱", "dialect", 0, "Chile", 0],
+    ["🇨🇴", "dialect", 0, "Colombia", 0],
+    ["🇸🇻", "dialect", 0, "El Salvador", 0],
+    ["🇵🇷", "dialect", 0, "Puerto Rico", 0],
+    ["🇨🇺", "dialect", 0, "Cuba", 0],
+    ["🇨🇷", "dialect", 0, "Costa Rica", 0],
+    ["🇧🇴", "dialect", 0, "Bolivia", 0],
+    ["🇭🇳", "dialect", 0, "Honduras", 0],
+    ["🇩🇴", "dialect", 0, "Dominican Republic", 0],
+    ["🇪🇨", "dialect", 0, "Ecuador", 0],
+    ["🇵🇦", "dialect", 0, "Panama", 0],
+    ["🇵🇾", "dialect", 0, "Paraguay", 0],
+    ["🇬🇹", "dialect", 0, "Guatemala", 0],
+    ["🇵🇭", "dialect", 0, "Philippines", 0],
+    ["🇧🇿", "dialect", 0, "Belize", 0],
+    ["🇳🇮", "dialect", 0, "Nicaragua", 0],
+    ["🇺🇸", "dialect", 0, "United States", 0],
+    [
+        "bull",
+        "",
+        0,
+        "bullfighting",
+        0
+    ]
+]
