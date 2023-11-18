@@ -323,7 +323,7 @@ The following shortcuts are available on search results:
 
 ## Advanced Options
 
-Click the `Show advanced options` toggle switch in the bottom left corner of the Settings page to enable advanced options.
+Click the `Advanced` toggle switch in the bottom left corner of the Settings page to enable advanced options.
 
 ### Parse sentences using MeCab
 
