@@ -12,7 +12,7 @@
 >
 > Since the owner requested forks be uniquely named, we have chosen a new name: _yomitan_. (_-tan_ is an honorific used for anthropomorphic moe characters.) While we've renamed the codebase and made judicious use of find-and-replace, it is entirely the hard work of foosoft and numerous other open source contributors from 2016-2023 and we do not claim any credit.
 >
-> Since this is a distributed effort, we highly welcome new contributors! Feel free to browse the issue tracker, and you can find us on [TheMoeWay Discord](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980)
+> Since this is a distributed effort, we highly welcome new contributors! Feel free to browse the issue tracker, and you can find us on [TheMoeWay Discord](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
 
 Yomitan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
 which would be otherwise too difficult tackle. This extension is similar to
@@ -50,6 +50,8 @@ Yomitan provides advanced features not available in other browser-based dictiona
   - [Flashcard Configuration](#flashcard-configuration)
   - [Flashcard Creation](#flashcard-creation)
 - [Keyboard Shortcuts](#keyboard-shortcuts)
+- [Advanced Options](#advanced-options)
+  - [Parse sentences using MeCab](#parse-sentences-using-mecab)
 - [Frequently Asked Questions](#frequently-asked-questions)
 - [Licenses](#licenses)
 - [Third-Party Libraries](#third-party-libraries)
@@ -318,6 +320,17 @@ The following shortcuts are available on search results:
 | <kbd>Alt</kbd> + <kbd>r</kbd>    | Add current term as reading to Anki.    |
 | <kbd>Alt</kbd> + <kbd>p</kbd>    | Play audio for current term.            |
 | <kbd>Alt</kbd> + <kbd>k</kbd>    | Add current kanji to Anki.              |
+
+## Advanced Options
+
+Click the `Advanced` toggle switch in the bottom left corner of the Settings page to enable advanced options.
+
+### Parse sentences using MeCab
+
+[MeCab](https://taku910.github.io/mecab/) is a third-party program which uses its own dictionaries and parsing algorithm to decompose sentences into individual words. MeCab may provide more accurate parsing results than Yomitan's internal parser.
+
+In order for Yomitan to use it, both MeCab and a native messaging component must be installed.
+A setup guide can be found [here](https://github.com/themoeway/yomitan-mecab-installer/blob/master/README.md).
 
 ## Frequently Asked Questions
 
