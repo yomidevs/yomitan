@@ -420,6 +420,8 @@
                 "ext/js/yomitan.js",
                 "ext/js/accessibility/accessibility-controller.js",
                 "ext/js/background/backend.js",
+                "ext/js/background/offscreen.js",
+                "ext/js/background/offscreen-proxy.js",
                 "ext/js/background/profile-conditions-util.js",
                 "ext/js/background/request-builder.js",
                 "ext/js/background/script-manager.js",

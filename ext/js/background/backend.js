@@ -35,6 +35,7 @@ import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {MediaUtil} from '../media/media-util.js';
 import {yomitan} from '../yomitan.js';
+import {OffscreenProxy, DictionaryDatabaseProxy, TranslatorProxy, ClipboardReaderProxy} from './offscreen-proxy.js';
 import {ProfileConditionsUtil} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {ScriptManager} from './script-manager.js';
@@ -50,15 +51,15 @@ export class Backend {
     constructor() {
         this._japaneseUtil = new JapaneseUtil(wanakana);
         this._environment = new Environment();
-        this._dictionaryDatabase = new DictionaryDatabase();
-        this._translator = new Translator({
-            japaneseUtil: this._japaneseUtil,
-            database: this._dictionaryDatabase
-        });
         this._anki = new AnkiConnect();
         this._mecab = new Mecab();
 
         if (!chrome.offscreen) {
+            this._dictionaryDatabase = new DictionaryDatabase();
+            this._translator = new Translator({
+                japaneseUtil: this._japaneseUtil,
+                database: this._dictionaryDatabase
+            });
             this._clipboardReader = new ClipboardReader({
                 // eslint-disable-next-line no-undef
                 document: (typeof document === 'object' && document !== null ? document : null),
@@ -66,10 +67,10 @@ export class Backend {
                 richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
             });
         } else {
-            this._clipboardReader = {
-                getText: this._getTextOffscreen.bind(this),
-                getImage: this._getImageOffscreen.bind(this)
-            };
+            this._offscreen = new OffscreenProxy();
+            this._dictionaryDatabase = new DictionaryDatabaseProxy(this._offscreen);
+            this._translator = new TranslatorProxy(this._offscreen);
+            this._clipboardReader = new ClipboardReaderProxy(this._offscreen);
         }
 
         this._clipboardMonitor = new ClipboardMonitor({
@@ -105,8 +106,6 @@ export class Backend {
         this._logErrorLevel = null;
         this._permissions = null;
         this._permissionsUtil = new PermissionsUtil();
-
-        this._creatingOffscreen = null;
 
         this._messageHandlers = new Map([
             ['requestBackendReadySignal',    {async: false, contentScript: true,  handler: this._onApiRequestBackendReadySignal.bind(this)}],
@@ -230,7 +229,7 @@ export class Backend {
             await this._requestBuilder.prepare();
             await this._environment.prepare();
             if (chrome.offscreen) {
-                await this._setupOffscreenDocument();
+                await this._offscreen.prepare();
             }
             this._clipboardReader.browser = this._environment.getInfo().browser;
 
@@ -752,6 +751,49 @@ export class Backend {
         for (const file of files) {
             await this._scriptManager.injectScript(file, tabId, frameId, false);
         }
+    }
+
+    _onApiOpenCrossFramePort({targetTabId, targetFrameId}, sender) {
+        const sourceTabId = (sender && sender.tab ? sender.tab.id : null);
+        if (typeof sourceTabId !== 'number') {
+            throw new Error('Port does not have an associated tab ID');
+        }
+        const sourceFrameId = sender.frameId;
+        if (typeof sourceFrameId !== 'number') {
+            throw new Error('Port does not have an associated frame ID');
+        }
+
+        const sourceDetails = {
+            name: 'cross-frame-communication-port',
+            otherTabId: targetTabId,
+            otherFrameId: targetFrameId
+        };
+        const targetDetails = {
+            name: 'cross-frame-communication-port',
+            otherTabId: sourceTabId,
+            otherFrameId: sourceFrameId
+        };
+        let sourcePort = chrome.tabs.connect(sourceTabId, {frameId: sourceFrameId, name: JSON.stringify(sourceDetails)});
+        let targetPort = chrome.tabs.connect(targetTabId, {frameId: targetFrameId, name: JSON.stringify(targetDetails)});
+
+        const cleanup = () => {
+            this._checkLastError(chrome.runtime.lastError);
+            if (targetPort !== null) {
+                targetPort.disconnect();
+                targetPort = null;
+            }
+            if (sourcePort !== null) {
+                sourcePort.disconnect();
+                sourcePort = null;
+            }
+        };
+
+        sourcePort.onMessage.addListener((message) => { targetPort.postMessage(message); });
+        targetPort.onMessage.addListener((message) => { sourcePort.postMessage(message); });
+        sourcePort.onDisconnect.addListener(cleanup);
+        targetPort.onDisconnect.addListener(cleanup);
+
+        return {targetTabId, targetFrameId};
     }
 
     // Command handlers
@@ -1624,20 +1666,6 @@ export class Backend {
         return await (json ? response.json() : response.text());
     }
 
-    _sendMessagePromise(...args) {
-        return new Promise((resolve, reject) => {
-            const callback = (response) => {
-                try {
-                    resolve(this._getMessageResponseResult(response));
-                } catch (error) {
-                    reject(error);
-                }
-            };
-
-            chrome.runtime.sendMessage(...args, callback);
-        });
-    }
-
     _sendMessageIgnoreResponse(...args) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
         chrome.runtime.sendMessage(...args, callback);
@@ -2238,88 +2266,5 @@ export class Backend {
             }
         }
         return results;
-    }
-
-    async _getTextOffscreen(useRichText) {
-        return this._sendMessagePromise({action: 'clipboardGetTextOffscreen', params: {useRichText}});
-    }
-
-    async _getImageOffscreen() {
-        return this._sendMessagePromise({action: 'clipboardGetImageOffscreen'});
-    }
-
-    _onApiOpenCrossFramePort({targetTabId, targetFrameId}, sender) {
-        const sourceTabId = (sender && sender.tab ? sender.tab.id : null);
-        if (typeof sourceTabId !== 'number') {
-            throw new Error('Port does not have an associated tab ID');
-        }
-        const sourceFrameId = sender.frameId;
-        if (typeof sourceFrameId !== 'number') {
-            throw new Error('Port does not have an associated frame ID');
-        }
-
-        const sourceDetails = {
-            name: 'cross-frame-communication-port',
-            otherTabId: targetTabId,
-            otherFrameId: targetFrameId
-        };
-        const targetDetails = {
-            name: 'cross-frame-communication-port',
-            otherTabId: sourceTabId,
-            otherFrameId: sourceFrameId
-        };
-        let sourcePort = chrome.tabs.connect(sourceTabId, {frameId: sourceFrameId, name: JSON.stringify(sourceDetails)});
-        let targetPort = chrome.tabs.connect(targetTabId, {frameId: targetFrameId, name: JSON.stringify(targetDetails)});
-
-        const cleanup = () => {
-            this._checkLastError(chrome.runtime.lastError);
-            if (targetPort !== null) {
-                targetPort.disconnect();
-                targetPort = null;
-            }
-            if (sourcePort !== null) {
-                sourcePort.disconnect();
-                sourcePort = null;
-            }
-        };
-
-        sourcePort.onMessage.addListener((message) => { targetPort.postMessage(message); });
-        targetPort.onMessage.addListener((message) => { sourcePort.postMessage(message); });
-        sourcePort.onDisconnect.addListener(cleanup);
-        targetPort.onDisconnect.addListener(cleanup);
-
-        return {targetTabId, targetFrameId};
-    }
-
-    // https://developer.chrome.com/docs/extensions/reference/offscreen/
-    async _setupOffscreenDocument() {
-        if (await this._hasOffscreenDocument()) {
-            return;
-        }
-        if (this._creatingOffscreen) {
-            await this._creatingOffscreen;
-            return;
-        }
-
-        this._creatingOffscreen = chrome.offscreen.createDocument({
-            url: 'offscreen.html',
-            reasons: ['CLIPBOARD'],
-            justification: 'Access to the clipboard'
-        });
-        await this._creatingOffscreen;
-        this._creatingOffscreen = null;
-    }
-    async _hasOffscreenDocument() {
-        const offscreenUrl = chrome.runtime.getURL('offscreen.html');
-        if (!chrome.runtime.getContexts) { // chrome version <116
-            const matchedClients = await clients.matchAll();
-            return await matchedClients.some((client) => client.url === offscreenUrl);
-        }
-
-        const contexts = await chrome.runtime.getContexts({
-            contextTypes: ['OFFSCREEN_DOCUMENT'],
-            documentUrls: [offscreenUrl]
-        });
-        return !!contexts.length;
     }
 }
