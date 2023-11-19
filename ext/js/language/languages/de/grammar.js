@@ -17,6 +17,7 @@
 
 /* global
  * separatedPrefix
+ * suffixInflection
 */
 
 window.languages.de.getDeinflectionReasons = async () => {
@@ -96,6 +97,10 @@ window.languages.de.getDeinflectionReasons = async () => {
     return new Map([
         ['separated-prefix', [
             ...separablePrefixInflections
-        ]]
+        ]],
+        ['nominalization', [
+            suffixInflection('ung', 'en', [], []),
+            suffixInflection('lung', 'eln', [], []),
+        ]],
     ]);
 };
