@@ -106,11 +106,16 @@ window.languages.de.getDeinflectionReasons = async () => {
             suffixInflection('ung', 'en', [], []),
             suffixInflection('lung', 'eln', [], []),
         ]],
-        [
-            'zu-infinitive', [
+        ['zu-infinitive', [
                 ...zuInfinitiveInflections
-            ]
-        ]
+        ]],
+        ['negative', [
+                prefixInflection('un', '', [], ['adjective']),
+        ]],
+        ['-able', [
+                suffixInflection('bar', 'en', [], ['verb']),
+                suffixInflection('bar', 'n', [], ['verb']), // lieferbar
+        ]]
     ]);
 
 
