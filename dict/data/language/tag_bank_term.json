@@ -1,44 +1,233 @@
 [
+	[
+		"non-lemma",
+		"",
+		10,
+		"non-lemma",
+		-10
+	],
+	[
+		"masc",
+		"",
+		-1,
+		"masculine",
+		1
+	],
+	[
+		"fem",
+		"",
+		-1,
+		"feminine",
+		1
+	],
+	[
+		"neut",
+		"",
+		-1,
+		"neuter",
+		1
+	],
+	[
+		"n",
+		"partOfSpeech",
+		-1,
+		"noun",
+		1
+	],
+	[
+		"adj",
+		"partOfSpeech",
+		-1,
+		"adj",
+		1
+	],
+	[
+		"v",
+		"partOfSpeech",
+		-1,
+		"verb",
+		1
+	],
+	[
+		"name",
+		"partOfSpeech",
+		-1,
+		"name",
+		1
+	],
+	[
+		"adv",
+		"partOfSpeech",
+		-1,
+		"adv",
+		1
+	],
+	[
+        "phrase",
+        "partOfSpeech",
+        -1,
+        "phrase",
+        1
+    ],
+    [
+        "intj",
+        "partOfSpeech",
+        -1,
+        "intj",
+        1
+    ],
+	[
+		"det",
+		"partOfSpeech",
+		-1,
+		"det",
+		1
+	],
+	[
+		"artic",
+		"partOfSpeech",
+		-1,
+		"article",
+		1
+	],
+    [
+        "prep",
+        "partOfSpeech",
+        -1,
+        "prep",
+        1
+    ],
+	[
+		"postp",
+		"partOfSpeech",
+		-1,
+		"postp",
+		1
+	],
+    [
+        "suf",
+        "partOfSpeech",
+        -1,
+        "suffix",
+        1
+    ],
+    [
+        "pref",
+        "partOfSpeech",
+        -1,
+        "prefix",
+        1
+    ],
+    [
+        "pron",
+        "partOfSpeech",
+        -1,
+        "pron",
+        1
+    ],
+    [
+        "prov",
+        "partOfSpeech",
+        -1,
+        "proverb",
+        1
+    ],
+    [
+        "num",
+        "partOfSpeech",
+        -1,
+        "num",
+        1
+    ],
+	[
+		"conj",
+		"partOfSpeech",
+		-1,
+		"conj",
+		1
+	],
+	[
+		"prep-phrase",
+		"partOfSpeech",
+		-1,
+		"prep_phrase",
+		1
+	],
+	[
+		"contr",
+		"",
+		0,
+		"contraction",
+		0
+	],
+	[
+		"part",
+		"partOfSpeech",
+		-1,
+		"particle",
+		1
+	],
     [
         "vt",
         "partOfSpeech",
-        -3,
+        -1,
         "transitive",
-        0
+        1
     ],
     [
         "vi",
         "partOfSpeech",
-        -3,
+        -1,
         "intransitive",
-        0
+        1
     ],
     [
         "vr",
         "partOfSpeech",
-        -3,
+        -1,
         "reflexive",
-        0
+        1
     ],
 	[
 		"vdt",
 		"partOfSpeech",
-		-3,
+		-1,
 		"ditransitive",
-		0
+		1
 	],
 	[
 		"ref-pron",
 		"",
-		-3,
+		0,
 		"takes a reflexive pronoun",
 		0
 	],
 	[
-		"po",
+		"pl-only",
 		"",
-		-3,
+		0,
 		"plural only",
+		0
+	],
+	[
+		"sg-only",
+		"",
+		0,
+		"singular only",
+		0
+	],
+	[
+		"impf-only",
+		"",
+		0,
+		"imperfective only",
+		0
+	],
+	[
+		"pf-only",
+		"",
+		0,
+		"perfective only",
 		0
 	],
 	[
@@ -56,6 +245,13 @@
 		0
 	],
 	[
+		"poss",
+		"",
+		0,
+		"possessive",
+		0
+	],
+	[
 		"hypo",
 		"",
 		0,
@@ -67,6 +263,90 @@
 		"",
 		0,
 		"auxiliary",
+		0
+	],
+	[
+		"char",
+		"",
+		0,
+		"character",
+		0
+	],
+	[
+		"punct",
+		"",
+		0,
+		"punct",
+		0
+	],
+	[
+		"interfix",
+		"",
+		0,
+		"interfix",
+		0
+	],
+	[
+		"infix",
+		"",
+		0,
+		"infix",
+		0
+	],
+	[
+		"circumfix",
+		"",
+		0,
+		"circumfix",
+		0
+	],
+	[
+		"circumpos",
+		"",
+		0,
+		"circumpos",
+		0
+	],
+	[
+		"symb",
+		"",
+		0,
+		"symbol",
+		0
+	],
+	[
+		"non-std",
+		"",
+		0,
+		"nonstandard",
+		0
+	],
+	[
+		"rail",
+		"",
+		0,
+		"rail transport",
+		0
+	],
+	[
+		"impers",
+		"",
+		0,
+		"impersonal",
+		0
+	],
+	[
+		"pers",
+		"",
+		0,
+		"personal",
+		0
+	],
+	[
+		"cop",
+		"",
+		0,
+		"copulative",
 		0
 	],
     [
@@ -114,9 +394,9 @@
     [
         "arch",
         "",
-        -4,
+        4,
         "archaic",
-        0
+        -4
     ],
     [
         "music",
@@ -174,6 +454,13 @@
         "colloquial",
         0
     ],
+	[
+		"vern",
+		"",
+		0,
+		"vernacular",
+		0
+	],
     [
         "dated",
         "",
@@ -212,23 +499,23 @@
     [
         "idio",
         "",
-        -5,
+        0,
         "idiomatic",
         0
     ],
     [
         "inf",
         "",
-        -5,
+        0,
         "informal",
         0
     ],
     [
         "🪨",
         "",
-        -5,
+        1,
         "mineralogy",
-        0
+        -1
     ],
     [
         "physics",
@@ -335,6 +622,41 @@
         "slang",
         0
     ],
+	[
+		"net-sl",
+		"",
+		0,
+		"Internet slang",
+		0
+	],
+	[
+		"crim-sl",
+		"",
+		0,
+		"criminal slang",
+		0
+	],
+	[
+		"mil-sl",
+		"",
+		0,
+		"military slang",
+		0
+	],
+	[
+		"fan-sl",
+		"",
+		0,
+		"fandom slang",
+		0
+	],
+	[
+		"youth-sl",
+		"",
+		0,
+		"youth slang",
+		0
+	],
     [
         "🚢",
         "",
@@ -373,9 +695,9 @@
     [
         "rare",
         "",
-        0,
+        1,
         "rare",
-        0
+        -1
     ],
     [
         "offens",
@@ -567,13 +889,6 @@
 		0
 	],
 	[
-		"net-sl",
-		"",
-		0,
-		"Internet slang",
-		0
-	],
-	[
 		"txt-msg",
 		"",
 		0,
@@ -728,20 +1043,6 @@
 		0
 	],
 	[
-		"crim-sl",
-		"",
-		0,
-		"criminal slang",
-		0
-	],
-	[
-		"mil-sl",
-		"",
-		0,
-		"military slang",
-		0
-	],
-	[
 		"avio",
 		"",
 		0,
@@ -865,13 +1166,6 @@
 		"",
 		0,
 		"surgery",
-		0
-	],
-	[
-		"fan-sl",
-		"",
-		0,
-		"fandom slang",
 		0
 	],
 	[
@@ -1015,10 +1309,66 @@
 		0
 	],
 	[
+		"Prot✝️",
+		"",
+		0,
+		"Protestantism",
+		0
+	],
+	[
 		"Hind🛕",
 		"",
 		0,
 		"Hinduism",
+		0
+	],
+	[
+		"journ📰",
+		"",
+		0,
+		"journalism",
+		0
+	],
+	[
+		"bus💼",
+		"",
+		0,
+		"business",
+		0
+	],
+	[
+		"vehic",
+		"",
+		0,
+		"vehicles",
+		0
+	],
+	[
+		"gymn",
+		"",
+		0,
+		"gymnastics",
+		0
+	],
+	[
+		"mine⛏️",
+		"",
+		0,
+		"mining",
+		0
+	],
+	[
+		"school",
+		"",
+		0,
+		"school",
+		0
+	],
+	[
+		"firearm",
+		"",
+		0,
+		"firearms",
 		0
 	]
 ]

@@ -1,5 +1,12 @@
 [
    [
+     "🇩🇪",
+     "",
+     0,
+     "Germany",
+     0
+   ],
+   [
      "🇦🇹",
      "",
      0,
@@ -26,5 +33,61 @@
     0,
     "Nazism",
     0
-   ]
+   ],
+   [
+    "🇩🇪⬇️",
+    "",
+    0,
+    "Southern German",
+    0
+   ],
+   [
+    "🇩🇪⬆️",
+    "",
+    0,
+    "Northern Germany",
+    0
+   ],
+   [
+    "🇩🇪➡️",
+    "",
+    0,
+    "East Germany",
+    0
+   ],
+   [
+    "🇩🇪⬅️",
+    "",
+    0,
+    "western Germany",
+    0
+   ],
+   [
+    "🇩🇪🎯⬆️",
+    "",
+    0,
+    "northern and central Germany",
+    0
+    ],
+    [
+      "aux-hab",
+      "",
+      0,
+      "auxiliary haben",
+      0
+    ],
+    [
+      "aux-sein",
+      "",
+      0,
+      "auxiliary sein",
+      0
+    ],
+    [
+      "rotwelsch",
+      "",
+      0,
+      "Rotwelsch",
+      0
+    ]
  ]
