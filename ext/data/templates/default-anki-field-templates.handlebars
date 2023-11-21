@@ -21,12 +21,14 @@
             {{~/scope~}}
             {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
         {{~/unless~}}
-        {{~#if (op "<=" glossary.length 1)~}}
-            {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
-        {{~else if @root.compactGlossaries~}}
+        {{~#if  @root.compactGlossaries~}}
             {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
         {{~else~}}
-            <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
+            <ul>
+                {{#each glossary}}
+                    <li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>
+                {{/each}}
+            </ul>
         {{~/if~}}
         {{~#set "previousDictionary" dictionary~}}{{~/set~}}
     {{~/if~}}
@@ -103,12 +105,12 @@
     <div style="text-align: left;">
     {{~#scope~}}
         {{~#if (op "===" definition.type "term")~}}
-            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag targetDictionary=targetDictionary ~}}
+            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
         {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
             {{~#if (op ">" definition.definitions.length 1)~}}
-                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag targetDictionary=../targetDictionary ~}}{{~/each~}}
+                <ol>{{~#each definition.definitions~}}<li>{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}</li>{{~/each~}}</ol>
             {{~else~}}
-                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag targetDictionary=../targetDictionary ~}}{{~/each~}}
+                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/each~}}
             {{~/if~}}
         {{~else if (op "===" definition.type "kanji")~}}
             {{~#if (op ">" definition.glossary.length 1)~}}
