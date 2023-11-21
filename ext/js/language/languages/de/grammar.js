@@ -90,17 +90,28 @@ window.languages.de.getDeinflectionReasons = async () => {
         'zusammen'
     ];
 
-    const separablePrefixInflections = separablePrefixes.map((prefix) => {
+    const separatedPrefixInflections = separablePrefixes.map((prefix) => {
         return separatedPrefix(prefix, [], []);
+    });
+
+    const zuInfinitiveInflections = separablePrefixes.map((prefix) => {
+        return prefixInflection(prefix+'zu', prefix, [], ['verb'])
     });
 
     return new Map([
         ['separated-prefix', [
-            ...separablePrefixInflections
+            ...separatedPrefixInflections
         ]],
         ['nominalization', [
             suffixInflection('ung', 'en', [], []),
             suffixInflection('lung', 'eln', [], []),
         ]],
+        [
+            'zu-infinitive', [
+                ...zuInfinitiveInflections
+            ]
+        ]
     ]);
+
+
 };
