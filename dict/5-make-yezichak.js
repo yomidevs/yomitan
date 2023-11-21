@@ -56,14 +56,13 @@ const yzkTags = {
     dict: {}
 };
 
-const allPOS = new Set();
 const skippedIpaTags = {};
 const skippedTermTags = {};
-const allInfo = Object.entries(lemmaDict);
+
 let ipaCount = 0;
 let taggedTermCount = 0;
 
-for (const [lemma, infoMap] of allInfo) {
+for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
     function debug(word) {
         if (lemma === DEBUG_WORD) {
             console.log('-------------------');
@@ -74,8 +73,6 @@ for (const [lemma, infoMap] of allInfo) {
     const ipa = [];
 
     for (const [pos, info] of Object.entries(infoMap)) {
-        allPOS.add(pos);
-
         const {glosses} = info;
 
         const lemmaTags = [pos, ...(info.tags || [])];
@@ -122,25 +119,30 @@ for (const [lemma, infoMap] of allInfo) {
                 ? parenthesesContent.replace(/ or /g, ', ').split(', ').filter(Boolean)
                 : [];
 
-            const unrecognizedTags = [];
             const recognizedTags = [];
+            const allEntryTags = [...lemmaTags, ...parenthesesTags];
 
-            parenthesesTags.forEach((tag) => {
-                tag = tag.replace(/chiefly /g, '');
+            unrecognizedTags = allEntryTags
+            .map((tag) => {
+                tag = tag.replace(/^chiefly /, '');
                 const fullTag = termTags.find((x) => x[3] === tag);
-                if (fullTag){
+
+                if (fullTag) {
                     recognizedTags.push(fullTag[0]);
                     yzkTags.dict[tag] = fullTag;
+                    return null;
                 } else {
-                    unrecognizedTags.push(tag);
-                    skippedTermTags[parenthesesContent] = (skippedTermTags[parenthesesContent] || 0) + 1;
+                    incrementCounter(tag, skippedTermTags)
+                    if(tag === pos) incrementCounter("pos-" + tag, skippedTermTags)
+                    return tag;
                 }
-            });
+            })
+            .filter((tag) => tag !== null);
 
             const leftoverTags = unrecognizedTags.length ? `(${unrecognizedTags.join(', ')}) ` : '';
             gloss = gloss.replace(regex, leftoverTags);
 
-            addGlossToEntries([...lemmaTags, ...recognizedTags].join(' '));
+            addGlossToEntries(recognizedTags.join(' '));
         });
 
         debug(entries);
@@ -158,7 +160,7 @@ for (const [lemma, infoMap] of allInfo) {
                     yzkTags.ipa[tag] = fullTag;
                     return fullTag[0];
                 } else {
-                    skippedIpaTags[tag] = (skippedIpaTags[tag] || 0) + 1;
+                    incrementCounter(tag, skippedIpaTags)
                 }
             })
             .filter(Boolean);
@@ -242,15 +244,6 @@ for (const [form, allInfo] of Object.entries(formDict)) {
     }
 }
 
-allPOS.forEach((pos) => {
-    yzkTags.dict[pos] = [pos, 'partOfSpeech', -3, pos, 0];
-});
-
-['non-lemma', 'masculine', 'feminine', 'neuter'].forEach((tag) => {
-    yzkTags.dict[tag] = [tag, '', -3, tag, 0];
-});
-
-
 yzk.dict = [...yzk.lemma, ...yzk.form];
 
 const tempPath = 'data/temp';
@@ -307,4 +300,8 @@ function escapeRegExp(text) {
 
 function sortBreakdown(obj){
     return Object.fromEntries(Object.entries(obj).sort((a, b) => b[1] - a[1]));
+}
+
+function incrementCounter(key, counter) {
+    counter[key] = (counter[key] || 0) + 1;
 }
