@@ -211,7 +211,7 @@ class Translator {
         let originalTextLength = 0;
         const dictionaryEntries = [];
         const ids = new Set();
-        for (const {databaseEntries, originalText, transformedText, deinflectedText, reasons, isDictionaryDeinflection} of deinflections) {
+        for (const {databaseEntries, originalText, transformedText, deinflectedText, inflectionHypotheses, isDictionaryDeinflection} of deinflections) {
             if (databaseEntries.length === 0) { continue; }
             if (!isDictionaryDeinflection) {
                 originalTextLength = Math.max(originalTextLength, originalText.length);
@@ -226,21 +226,19 @@ class Translator {
                         const existingHypotheses = existingEntry.inflectionHypotheses;
 
                         const newHypotheses = [];
-                        reasons.forEach((reason) => {
-                            const duplicate = existingHypotheses.find((hypothesis) => this._areInflectionHyphothesesEqual(hypothesis.inflections, reason));
+                        inflectionHypotheses.forEach(({source, inflections}) => {
+                            const duplicate = existingHypotheses.find((hypothesis) => this._areInflectionHyphothesesEqual(hypothesis.inflections, inflections));
                             if (!duplicate) {
-                                newHypotheses.push(reason);
-                            } else if (
-                                duplicate.source === 'dictionary' && !isDictionaryDeinflection ||
-                                duplicate.source === 'algorithm' && isDictionaryDeinflection
-                            ) {
+                                newHypotheses.push({source, inflections});
+                            } 
+                            else if (duplicate.source != source) {
                                 duplicate.source = 'both';
                             }
                         });
 
                         existingEntry.inflectionHypotheses = [
                             ...existingEntry.inflectionHypotheses,
-                            ...this._addDeinflectionSourceToHypotheses(newHypotheses, isDictionaryDeinflection)
+                            ...newHypotheses
                         ];
                     }
 
@@ -249,7 +247,6 @@ class Translator {
                 // TODO: make configurable
                 if (databaseEntry.definitionTags.includes('non-lemma')) { continue; }
 
-                const inflectionHypotheses = this._addDeinflectionSourceToHypotheses(reasons, isDictionaryDeinflection);
                 const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionHypotheses, true, enabledDictionaryMap);
                 dictionaryEntries.push(dictionaryEntry);
                 ids.add(id);
@@ -309,14 +306,20 @@ class Translator {
     async _getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType) {
         const dictionaryDeinflections = [];
         deinflections.forEach((deinflection) => {
-            const {databaseEntries} = deinflection;
+            const {originalText, transformedText, inflectionHypotheses: algHypotheses, databaseEntries} = deinflection;
             databaseEntries.forEach((entry) => {
                 const {definitionTags, term, formOf, inflectionHypotheses}  = entry;
                 if (definitionTags.includes('non-lemma')) {
                     const lemma = formOf || '';
-                    const hypotheses = inflectionHypotheses || [];
+                    const hypotheses = (inflectionHypotheses || [])
+                        .flatMap((hypothesis) => algHypotheses.map(({inflections}) => {
+                            return {
+                                source: inflections.length === 0 ? 'dictionary' : 'both',
+                                inflections: [...inflections, ...hypothesis]
+                            }
+                        }));
 
-                    const dictionaryDeinflection = this._createDeinflection(term, term, lemma, 0, hypotheses, []);
+                    const dictionaryDeinflection = this._createDeinflection(originalText, transformedText, lemma, 0, hypotheses, []);
                     dictionaryDeinflection.isDictionaryDeinflection = true;
                     dictionaryDeinflections.push(dictionaryDeinflection);
                 }
@@ -404,7 +407,11 @@ class Translator {
 
                 if (options.deinflectionSource !== 'dictionary'){
                     for (const {term, rules, reasons} of await this._deinflector.deinflect(source, options)) {
-                        deinflections.push(this._createDeinflection(rawSource, source, term, rules, [reasons], []));
+                        const inflectionHypotheses =  {
+                                source: 'algorithm',
+                                inflections: reasons
+                        };
+                        deinflections.push(this._createDeinflection(rawSource, source, term, rules, [inflectionHypotheses], []));
                     }
                 } else {
                     deinflections.push(this._createDeinflection(rawSource, source, source, 0, [], []));
@@ -465,8 +472,8 @@ class Translator {
         return options.textReplacements;
     }
 
-    _createDeinflection(originalText, transformedText, deinflectedText, rules, reasons, databaseEntries) {
-        return {originalText, transformedText, deinflectedText, rules, reasons, databaseEntries};
+    _createDeinflection(originalText, transformedText, deinflectedText, rules, inflectionHypotheses, databaseEntries) {
+        return {originalText, transformedText, deinflectedText, rules, inflectionHypotheses, databaseEntries};
     }
 
     // Term dictionary entry grouping
@@ -1572,6 +1579,10 @@ class Translator {
 
             // Sort by dictionary order
             i = v1.dictionaryIndex - v2.dictionaryIndex;
+            if (i !== 0) { return i; }
+
+            const scoreFromTags = (v) => v.tags.reduce((a, b) => a + b.score, 0);
+            i = scoreFromTags(v2) - scoreFromTags(v1);
             if (i !== 0) { return i; }
 
             // Sort by original order
