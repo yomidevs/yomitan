@@ -402,12 +402,13 @@ Required licensing notices for this project follow below:
 
 ## Third-Party Libraries
 
-Yomitan uses several third-party libraries to function. Below are links to homepages, snapshots, and licenses of the exact
-versions packaged.
+Yomitan uses several third-party libraries to function.
 
-- Handlebars: To retain Handlebars templating without unsafe-eval, a fork of handlebars by Kibana is being used. [homepage](https://github.com/Aquafina-water-bottle/handlebars-noeval) - [snapshot](https://raw.githubusercontent.com/Aquafina-water-bottle/handlebars-noeval/10efaac28d8d2e8d7e503347281eff1a90aa3f31/handlebars.min.js) - [license](https://github.com/Aquafina-water-bottle/handlebars-noeval/blob/10efaac28d8d2e8d7e503347281eff1a90aa3f31/src/hb/LICENSE)
-- JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://github.com/Stuk/jszip/blob/v3.9.1/dist/jszip.min.js) - [license](https://github.com/Stuk/jszip/blob/v3.9.1/LICENSE.markdown)
-- WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://unpkg.com/wanakana@4.0.2/umd/wanakana.min.js) - [license](https://github.com/WaniKani/WanaKana/blob/4.0.2/LICENSE)
-- parse5: [homepage](https://github.com/inikulin/parse5) - [snapshot](https://github.com/inikulin/parse5/tree/v7.1.2/packages/parse5) - [license](https://github.com/inikulin/parse5/blob/v7.1.2/LICENSE) _(Only used in MV3 build)_
-- Dexie: [homepage](https://dexie.org/) - [snapshot](https://unpkg.com/dexie@3.2.4/dist/dexie.min.js) - [license](https://unpkg.com/dexie@3.2.4/LICENSE)
-- dexie-export-import: [homepage](https://www.npmjs.com/package/dexie-export-import) - [snapshot](https://unpkg.com/dexie-export-import@4.0.7/dist/dexie-export-import.js) - [license](https://unpkg.com/dexie-export-import@4.0.7/LICENSE)
+| Name                | Installed version | License type | Link                                                     |
+| :------------------ | :---------------- | :----------- | :------------------------------------------------------- |
+| @zip.js/zip.js      | 2.7.31            | BSD-3-Clause | git+https://github.com/gildas-lormeau/zip.js.git         |
+| dexie               | 3.2.4             | Apache-2.0   | git+https://github.com/dfahlander/Dexie.js.git           |
+| dexie-export-import | 4.0.7             | Apache-2.0   | git+https://github.com/dexie/Dexie.js.git                |
+| handlebars          | 4.7.8             | MIT          | git+https://github.com/handlebars-lang/handlebars.js.git |
+| parse5              | 7.1.2             | MIT          | git://github.com/inikulin/parse5.git                     |
+| wanakana            | 5.3.1             | MIT          | git+ssh://git@github.com/WaniKani/WanaKana.git           |
