@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build Legal
+        run: npm run license-report
+
       - name: Build
         run: npm run-script build -- --all --yomitan-version ${{ github.ref_name }}
         shell: bash

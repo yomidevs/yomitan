@@ -17,7 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm ci
+      - name: Build Legal
+        run: npm run license-report
       - uses: lycheeverse/lychee-action@ec3ed119d4f44ad2673a7232460dc7dff59d2421
         with:
           fail: true
           jobSummary: false
+          args: --exclude-path 'node_modules' --verbose --no-progress './**/*.md' './**/*.html' './**/*.rst'

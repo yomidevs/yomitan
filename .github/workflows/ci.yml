@@ -48,6 +48,9 @@ jobs:
         env:
           CI: true
 
+      - name: Build Legal
+        run: npm run license-report
+
       - name: Build
         run: npm run build
 
