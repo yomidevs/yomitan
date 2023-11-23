@@ -82,11 +82,10 @@ for entry in "${entries[@]}"; do
   export language_short="$iso"
 
   # Calculate URL
-  filename="kaikki.org-dictionary-$language.json"
-  if [ "$language" = "Serbo-Croatian" ]; then
-    filename="kaikki.org-dictionary-SerboCroatian.json"
-  fi
-
+  language_no_special_chars=$(echo "$language" | tr -d '[:space:]-')
+  # Append the modified language to the filename
+  filename="kaikki.org-dictionary-$language_no_special_chars.json"
+  
   export filename
 
   url="https://kaikki.org/dictionary/$language/$filename"
@@ -146,7 +145,7 @@ for entry in "${entries[@]}"; do
     [ ! -f "$ipa_file" ] || \
     [ "$force_yez" = true ]; then
     echo "Creating Yezichak dict and IPA files"
-    if node 5-make-yezichak.js; then
+    if node --max-old-space-size=4096 5-make-yezichak.js; then
       zip -j "$dict_file" data/temp/dict/index.json data/temp/dict/tag_bank_1.json data/temp/dict/term_bank_*.json
       zip -j "$ipa_file" data/temp/ipa/index.json data/temp/ipa/tag_bank_1.json data/temp/ipa/term_meta_bank_*.json
     else

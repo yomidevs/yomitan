@@ -1,5 +1,6 @@
 [
     {"iso": "sq", "language": "Albanian",       "flag": "🇦🇱",   "exampleText": "ndihmojme"},
+    {"iso": "grc", "language": "Ancient Greek", "flag":"🏺",    "exampleText": "γράφω"},
     {"iso": "en", "language": "English",        "flag": "🇺🇸🇬🇧", "exampleText": "don't read"},
     {"iso": "fr", "language": "French",         "flag": "🇫🇷",   "exampleText": "lire"},
     {"iso": "de", "language": "German",         "flag": "🇩🇪",   "exampleText": "gelesen"},
@@ -7,6 +8,7 @@
     {"iso": "id", "language": "Indonesian",     "flag": "🇮🇩",   "exampleText": "membaca"},
     {"iso": "it", "language": "Italian",        "flag": "🇮🇹",   "exampleText": "leggere"},
     {"iso": "ja", "language": "Japanese",       "flag": "🇯🇵",   "exampleText": "読め"},
+    {"iso": "la", "language": "Latin",          "flag": "🏛",   "exampleText": "legere"},
     {"iso": "fa", "language": "Persian",        "flag": "🇮🇷",   "exampleText": "خواندن"},
     {"iso": "pt", "language": "Portuguese",     "flag": "🇧🇷🇵🇹", "exampleText": "ler"},
     {"iso": "ru", "language": "Russian",        "flag": "🇷🇺",   "exampleText": "читать"},

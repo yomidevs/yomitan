@@ -64,8 +64,10 @@ let ipaCount = 0;
 let taggedTermCount = 0;
 
 for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
+    normalizedLemma = normalizeOrthography(lemma);
+    
     function debug(word) {
-        if (lemma === DEBUG_WORD) {
+        if (normalizedLemma === DEBUG_WORD) {
             console.log('-------------------');
             console.log(word);
         }
@@ -89,8 +91,8 @@ for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
                     entries[joinedTags][5].push(gloss);
                 } else {
                     entries[joinedTags] = [
-                        lemma, // term
-                        lemma, // reading
+                        normalizedLemma, // term
+                        normalizedLemma, // reading
                         joinedTags, // definition_tags
                         pos, // rules
                         0, // frequency
@@ -178,10 +180,10 @@ for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
 
     if (mergedIpas.length) {
         yzk.ipa.push([
-            lemma,
+            normalizedLemma,
             'ipa',
             {
-                reading: lemma,
+                reading: normalizedLemma,
                 ipa: mergedIpas
             }
         ]);
@@ -230,7 +232,7 @@ for (const [form, allInfo] of Object.entries(formDict)) {
             }
 
             yzk.form.push([
-                form,
+                normalizeOrthography(form),
                 '',
                 'non-lemma',
                 '',
@@ -238,7 +240,7 @@ for (const [form, allInfo] of Object.entries(formDict)) {
                 [''],
                 0,
                 '',
-                lemma,
+                normalizeOrthography(lemma),
                 uniqueHypotheses
             ]);
         }
@@ -305,4 +307,22 @@ function sortBreakdown(obj){
 
 function incrementCounter(key, counter) {
     counter[key] = (counter[key] || 0) + 1;
+}
+
+
+function normalizeOrthography(term) {
+    switch (language_short) {
+        case 'la':
+            const diacriticMap = {
+                'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u', 'ȳ': 'y',
+                'Ā': 'A', 'Ē': 'E', 'Ī': 'I', 'Ō': 'O', 'Ū': 'U', 'Ȳ': 'Y',
+                'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ý': 'y',
+                'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U', 'Ý': 'Y'
+            };
+            return term.replace(/[āēīōūȳáéíóúýĀĒĪŌŪȲÁÉÍÓÚÝ]/g, (match) => diacriticMap[match] || match);
+        case 'ru':
+            return term.replace(/́/g, '');
+        default:
+            return term;
+    }
 }
