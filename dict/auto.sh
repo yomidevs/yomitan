@@ -67,7 +67,6 @@ declare -a entries="($(
 
 # Iterate over the array
 for entry in "${entries[@]}"; do
-  echo "$entry"
   # Extract values from the object
   iso=$(echo "${entry}" | jq -r '.iso')
   language=$(echo "${entry}" | jq -r '.language')

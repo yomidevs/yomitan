@@ -1,0 +1,22 @@
+[
+    ["🇦🇫", "dialect", 0, "Dari", 0],
+    ["🇮🇷", "dialect", 0, "Iran", 0],
+    ["🇮🇷", "dialect", 0, "in Iran", 0],
+    ["🇦🇫KA", "dialect", 0, "Kabuli", 0],
+    ["🇹🇯", "dialect", 0, "Tajik", 0],
+    ["🇹🇯", "dialect", 0, "Tajiki", 0],
+    ["🇮🇷TE", "dialect", 0, "Tehrani", 0],
+    ["🇮🇷TE", "dialect", 0, "Tehran", 0],
+    ["zoro", "", 0, "Zoroastrianism", 0],
+    ["Dasht", "", 0, "Dashtestan", 0],
+    ["Khesht", "", 0, "Khesht", 0],
+    ["Kaz", "", 0, "Kazerun", 0],
+    ["Konar", "", 0, "Konartakhteh", 0],
+    ["Sist", "", 0, "Sistani", 0],
+    ["Bush", "", 0, "Bushehr", 0],
+    ["iran-myth", "", 0, "Iranian mythology", 0],
+    ["Transox", "", 0, "Transoxianan", 0],
+    ["Isf", "", 0, "Isfahan", 0],
+    ["Shiraz", "", 0, "Shiraz", 0],
+    ["classic", "dialect", 0, "Classical Persian", 0]
+]

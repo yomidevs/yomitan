@@ -847,14 +847,14 @@
 		0
 	],
 	[
-		"lit",
+		"ltrry",
 		"",
 		0,
 		"literary",
 		0
 	],
 	[
-		"lit📚",
+		"📚lit",
 		"",
 		0,
 		"literature",
@@ -1369,6 +1369,83 @@
 		"",
 		0,
 		"firearms",
+		0
+	],
+	[
+		"mech",
+		"",
+		0,
+		"mechanics",
+		0
+	],
+	[
+		"polite",
+		"",
+		0,
+		"polite",
+		0
+	],
+	[
+		"defer",
+		"",
+		0,
+		"deferential",
+		0
+	],
+	[
+		"interr",
+		"",
+		0,
+		"interrogative",
+		0
+	],
+	[
+		"arithm",
+		"",
+		0,
+		"arithmetic",
+		0
+	],
+	[
+		"astrophys",
+		"",
+		0,
+		"astrophysics",
+		0
+	],
+	[
+		"astrol",
+		"",
+		0,
+		"astrology",
+		0
+	],
+	[
+		"rome-myth",
+		"",
+		0,
+		"Roman mythology",
+		0
+	],
+	[
+		"ltrl",
+		"",
+		0,
+		"literal",
+		0
+	],
+	[
+		"ltrly",
+		"",
+		0,
+		"literally",
+		0
+	],
+	[
+		"✒️clgphy",
+		"",
+		0,
+		"calligraphy",
 		0
 	]
 ]
