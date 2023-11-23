@@ -34,6 +34,7 @@ class PopupPreviewFrame {
         this._textSource = null;
         this._optionsContext = null;
         this._options = null;
+        this._exampleTexts = [];
         this._exampleText = null;
         this._exampleTextInput = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
@@ -52,9 +53,10 @@ class PopupPreviewFrame {
         yomichan.api.optionsGet = this._apiOptionsGet.bind(this);
         await this._getOptions();
 
-
         this._exampleText = document.querySelector('#example-text');
         this._exampleTextInput = document.querySelector('#example-text-input');
+        const languages = await yomichan.api.getLanguages();
+        this._exampleTexts = Object.fromEntries(languages.map(({iso, exampleText}) => ([iso, exampleText])));
         this._setExampleText();
 
         if (
@@ -106,7 +108,7 @@ class PopupPreviewFrame {
 
         const lang = options.general.language;
 
-        const example = this._getExampleText(lang);
+        const example = this._exampleTexts[lang];
 
         this._exampleTextInput.lang = lang;
         this._exampleText.lang = lang;
@@ -114,34 +116,6 @@ class PopupPreviewFrame {
         this._setText(example, true);
     }
 
-    _getExampleText(lang) {
-        switch (lang) {
-            case 'de':
-                return 'gelesen';
-            case 'el':
-                return 'διαβάζω';
-            case 'en':
-                return "don't read";
-            case 'es':
-                return 'acabar de';
-            case 'fr':
-                return 'lire';
-            case 'id':
-                return 'membaca';
-            case 'it':
-                return 'leggere';
-            case 'ja':
-                return '読め';
-            case 'pt':
-                return 'ler';
-            case 'ru':
-                return 'читать';
-            case 'sh':
-                return 'čitaše';
-            case 'sq':
-                return 'ndihmojmë';
-        }
-    }
     async _apiOptionsGet(...args) {
         const options = await this._apiOptionsGetOld(...args);
         options.general.enable = true;

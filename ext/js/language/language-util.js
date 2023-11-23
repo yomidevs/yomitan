@@ -25,22 +25,22 @@
 
 export class LanguageUtil {
     constructor() {
-        this.language = null;
+        this.languages = [];
     }
 
     async prepare() {
-        const languages = JSON.parse(await fetchAsset('/js/language/languages.json'));
+        this.languages = JSON.parse(await fetchAsset('/js/language/languages.json'));
         window.languages = window.languages || {};
-        languages.forEach(({iso}) => {
+        this.languages.forEach(({iso}) => {
             window.languages[iso] = window.languages[iso] || {};
         });
     }
 
-    async getLanguages() {
-        return window.languages;
+    getLanguages() {
+        return this.languages;
     }
 
-    async getDeinflectionReasons(language = this.language) {
+    async getDeinflectionReasons(language) {
         try {
             if (!window.languages[language].deinflectionReasons) {
                 if (!window.languages[language].getDeinflectionReasons) {
@@ -56,7 +56,7 @@ export class LanguageUtil {
         }
     }
 
-    async getTextTransformations(language = this.language) {
+    async getTextTransformations(language) {
         try {
             if (!window.languages[language].textTransformations) {
                 await loadModule(`/js/language/languages/${language}/constants.js`);

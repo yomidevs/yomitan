@@ -145,7 +145,8 @@ export class Backend {
             ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}],
             ['findAnkiNotes',                {async: true,  contentScript: true,  handler: this._onApiFindAnkiNotes.bind(this)}],
             ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}],
-            ['getTextTransformations',       {async: true,  contentScript: true,  handler: this._onApiGetTextTransformations.bind(this)}]
+            ['getTextTransformations',       {async: true,  contentScript: true,  handler: this._onApiGetTextTransformations.bind(this)}],
+            ['getLanguages',                 {async: true,  contentScript: true,  handler: this._onApiGetLanguages.bind(this)}],
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -803,6 +804,10 @@ export class Backend {
 
     async _onApiGetTextTransformations({language}){
         return await this._languageUtil.getTextTransformations(language);
+    }
+
+    async _onApiGetLanguages() {
+        return await this._languageUtil.getLanguages();
     }
 
     // Command handlers

@@ -28,6 +28,7 @@
  * ExtensionKeyboardShortcutController
  * GenericSettingController
  * KeyboardShortcutController
+ * LanguagesController
  * MecabController
  * ModalController
  * NestedPopupsController
@@ -133,6 +134,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const secondarySearchDictionaryController = new SecondarySearchDictionaryController(settingsController);
         secondarySearchDictionaryController.prepare();
+
+        const languagesController = new LanguagesController(settingsController);
+        languagesController.prepare();
 
         const textTransformationsController = new TextTransformationsController(settingsController);
         textTransformationsController.prepare();

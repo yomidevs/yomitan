@@ -184,6 +184,10 @@ class API {
         return this._invoke('getTextTransformations', {language});
     }
 
+    getLanguages(){
+        return this._invoke('getLanguages');
+    }
+
     // Utilities
 
     _createActionPort(timeout=5000) {
