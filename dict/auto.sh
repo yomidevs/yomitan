@@ -10,32 +10,46 @@ export DICT_NAME
 
 # Check for the language and language_short arguments
 if [ -z "$1" ]; then
-  echo "Usage: $0 <language> [f][d][a]"
+  echo "Usage: $0 <language> [flags]"
   exit 1
 fi
 
 # Parse flags
-force_run=false
 all_languages=false
 redownload=false
+force_tidy=false
+force_freq=false
+force_yez=false
+force=false
 
-flags=('f' 'd' 'a')
-
+flags=('a' 'd' 't' 'f' 'y' 'F')
 for flag in "${flags[@]}"; do
   case "$2" in 
     *"$flag"*) 
       case "$flag" in
-        'f') force_run=true ;;
-        'd') redownload=true ;;
         'a') all_languages=true ;;
+        'd') redownload=true ;;
+        't') force_tidy=true ;;
+        'f') force_freq=true ;;
+        'y') force_yez=true ;;
+        'F') force=true ;;
       esac
       ;;
   esac
 done
 
-echo "force_run: $force_run"
-echo "redownload: $redownload"
-echo "all_languages: $all_languages"
+if [ "$force" = true ]; then
+  force_tidy=true
+  force_freq=true
+  force_yez=true
+fi
+
+echo "[a] all_languages: $all_languages"
+echo "[d] redownload: $redownload"
+echo "[F] force: $force"
+echo "[t] force_tidy: $force_tidy"
+echo "[f] force_freq: $force_freq"
+echo "[y] force_yez: $force_yez"
 
 # Step 1: Install dependencies
 npm i
@@ -47,8 +61,13 @@ languages=$(jq '.' ../ext/js/language/languages.json)
 
 export lang="$1"
 
-# Iterate over each object in the array
-for entry in $(echo "${languages}" | jq -c '.[]'); do
+declare -a entries="($(
+  jq -r '.[] | @json | @sh' ../ext/js/language/languages.json
+))"
+
+# Iterate over the array
+for entry in "${entries[@]}"; do
+  echo "$entry"
   # Extract values from the object
   iso=$(echo "${entry}" | jq -r '.iso')
   language=$(echo "${entry}" | jq -r '.language')
@@ -84,7 +103,10 @@ for entry in $(echo "${languages}" | jq -c '.[]'); do
   fi
 
   # Step 4: Run tidy-up.js if the tidy files don't exist
-  if [ ! -f "data/tidy/$language_short-forms.json" ] || [ ! -f "data/tidy/$language_short-lemmas.json" ] || [ "$force_run" = true ]; then
+  if \
+    [ ! -f "data/tidy/$language_short-forms.json" ] || \
+    [ ! -f "data/tidy/$language_short-lemmas.json" ] || \
+    [ "$force_tidy" = true ]; then
     echo "Tidying up $filename"
     node --max-old-space-size=4096 2-tidy-up.js
   else
@@ -92,7 +114,9 @@ for entry in $(echo "${languages}" | jq -c '.[]'); do
   fi
 
   # Step 5 (optional): Create an array of sentences
-  if [ ! -f "data/sentences/$language_short-sentences.json" ] || [ "$force_run" = true ]; then
+  if \
+    [ ! -f "data/sentences/$language_short-sentences.json" ] || \
+    [ "$force_freq" = true ]; then
     if [ -d "$OPENSUBS_PATH" ]; then
       echo "Creating sentences file"
       python3 3-opensubs-to-freq.py
@@ -104,7 +128,9 @@ for entry in $(echo "${languages}" | jq -c '.[]'); do
   fi
 
   # Step 6: Create a frequency list
-  if [ ! -f "data/freq/$language_short-freq.json" ] || [ "$force_run" = true ]; then
+  if \
+    [ ! -f "data/freq/$language_short-freq.json" ] || \
+    [ "$force_freq" = true ]; then
     echo "Creating frequency file"
     node 4-create-freq.js
   else
@@ -116,7 +142,10 @@ for entry in $(echo "${languages}" | jq -c '.[]'); do
   freq_file="$DICT_NAME-freq-$language_short.zip"
 
   # Step 7: Create Yezichak files
-  if [ ! -f "$dict_file" ] || [ ! -f "$ipa_file" ] || [ "$force_run" = true ]; then
+  if \
+    [ ! -f "$dict_file" ] || \
+    [ ! -f "$ipa_file" ] || \
+    [ "$force_yez" = true ]; then
     echo "Creating Yezichak dict and IPA files"
     if node 5-make-yezichak.js; then
       zip -j "$dict_file" data/temp/dict/index.json data/temp/dict/tag_bank_1.json data/temp/dict/term_bank_*.json
@@ -129,7 +158,9 @@ for entry in $(echo "${languages}" | jq -c '.[]'); do
   fi
 
   # Step 8: Convert frequency list to rank-based Yezichak format
-  if [ ! -f "$freq_file" ] || [ "$force_run" = true ]; then
+  if \
+    [ ! -f "$freq_file" ] || \
+    [ "$force_yez" = true ]; then
     echo "Creating Yezichak freq files"
     if python3 6-freq-to-rank.py; then
       zip -j "$freq_file" data/temp/freq/index.json data/temp/freq/term_meta_bank_*.json
