@@ -30,19 +30,20 @@ const formDict = JSON.parse(readFileSync(`data/tidy/${language_short}-forms.json
 if (!existsSync(`data/language/${language_short}`)) {
     mkdirSync(`data/language/${language_short}`, {recursive: true});
 }
-const ipaTags = existsSync(`data/language/${language_short}/tag_bank_ipa.json`)
-  ? JSON.parse(readFileSync(`data/language/${language_short}/tag_bank_ipa.json`))
-  : [];
 
-const commonTermTags = existsSync('data/language/tag_bank_term.json')
-  ? JSON.parse(readFileSync('data/language/tag_bank_term.json'))
-  : [];
+function loadJson(file) {
+    return existsSync(file) ? JSON.parse(readFileSync(file)) : [];
+}
 
-const languageTermTags = existsSync(`data/language/${language_short}/tag_bank_term.json`)
-  ? JSON.parse(readFileSync(`data/language/${language_short}/tag_bank_term.json`))
-  : [];
-
+const commonTermTags = loadJson('data/language/tag_bank_term.json');
+const languageTermTags = loadJson(`data/language/${language_short}/tag_bank_term.json`);
 const termTags = [...commonTermTags, ...languageTermTags];
+
+const commonIpaTags = loadJson('data/language/tag_bank_ipa.json');
+const languageIpaTags = loadJson(`data/language/${language_short}/tag_bank_ipa.json`);
+const ipaTags = [...commonIpaTags, ...languageIpaTags];
+
+
 
 const yzk = {
     lemma: [],

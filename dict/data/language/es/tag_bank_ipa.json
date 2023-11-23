@@ -3,6 +3,5 @@
     ["🌎", "dialect", 0, "Latin-America", 0],
     ["🇲🇽", "dialect", 0, "Mexico", 0],
     ["🇦🇷", "dialect", 0, "Argentina", 0],
-    ["🇺🇾", "dialect", 0, "Uruguay", 0],
-    ["col", "register", 0, "colloquial", 0]
+    ["🇺🇾", "dialect", 0, "Uruguay", 0]
 ]  

@@ -1,7 +1,3 @@
 [
-    ["frm", "register", 0, "formal", 0],
-    ["std", "register", 0, "standard", 0],
-    ["col", "register", 0, "colloquial", 0],
-    ["unc", "frequency", 0, "uncommon", 0],
     ["🇨🇾", "dialect", 0, "Cypriot", 0]
 ]  
