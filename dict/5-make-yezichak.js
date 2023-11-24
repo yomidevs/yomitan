@@ -43,7 +43,36 @@ const commonIpaTags = loadJson('data/language/tag_bank_ipa.json');
 const languageIpaTags = loadJson(`data/language/${language_short}/tag_bank_ipa.json`);
 const ipaTags = [...commonIpaTags, ...languageIpaTags];
 
+const tagModifiers = [
+    ['chiefly', 'chief'],
+    ['usually', 'usu'],
+    ['often', 'oft'],
+    ['sometimes', 'some'],
+    ['now', 'now'],
+    ['especially', 'esp'],
+]
 
+function findModifiedTag(tag){
+    let modifiedTag = null;
+    tagModifiers.forEach((modifier) => {
+        const regex = new RegExp(`^${modifier[0]} `);
+        if (regex.test(tag)){
+            fullTag = termTags.find((x) => x[3] === tag.replace(regex, ''));
+            if (fullTag){
+                modifiedTag = [
+                    `${modifier[1]}-${fullTag[0]}`,
+                    fullTag[1],
+                    fullTag[2],
+                    `${modifier[0]} ${fullTag[3]}`,
+                    fullTag[4]
+                ]
+                console.log(modifiedTag)
+            }
+        }
+    })
+
+    return modifiedTag;
+}
 
 const yzk = {
     lemma: [],
@@ -127,7 +156,6 @@ for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
 
             unrecognizedTags = allEntryTags
             .map((tag) => {
-                tag = tag.replace(/^chiefly /, '');
                 const fullTag = termTags.find((x) => x[3] === tag);
 
                 if (fullTag) {
@@ -135,9 +163,16 @@ for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
                     yzkTags.dict[tag] = fullTag;
                     return null;
                 } else {
-                    incrementCounter(tag, skippedTermTags)
-                    if(tag === pos) incrementCounter("pos-" + tag, skippedTermTags)
-                    return tag;
+                    const modifiedTag = findModifiedTag(tag);
+                    if (modifiedTag){
+                        recognizedTags.push(modifiedTag[0]);
+                        yzkTags.dict[tag] = modifiedTag;
+                        return null;
+                    }  else {
+                        incrementCounter(tag, skippedTermTags)
+                        if(tag === pos) incrementCounter("pos-" + tag, skippedTermTags)
+                        return tag;
+                    }
                 }
             })
             .filter((tag) => tag !== null);
@@ -279,7 +314,7 @@ for (const folder of folders) {
 console.log('total ipas', ipaCount, 'skipped ipa tags', Object.values(skippedIpaTags).reduce((a, b) => a + b, 0));
 writeFileSync(`data/language/${language_short}/skippedIpaTags.json`, JSON.stringify(sortBreakdown(skippedIpaTags), null, 2));
 
-console.log('total tagged terms', taggedTermCount, 'skipped term tags', Object.values(skippedTermTags).reduce((a, b) => a + b, 0));
+console.log('total tagged terms', taggedTermCount, 'skipped term tags', Object.values(skippedTermTags).reduce((a, b) => a + (parseInt(b) || 0), 0));
 writeFileSync(`data/language/${language_short}/skippedTermTags.json`, JSON.stringify(sortBreakdown(skippedTermTags), null, 2));
 
 console.log('5-make-yezichak.js: Done!');

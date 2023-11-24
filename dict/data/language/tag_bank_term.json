@@ -7,6 +7,20 @@
 		-10
 	],
 	[
+		"r",
+		"partOfSpeech",
+		-1,
+		"root",
+		1
+	],
+	[
+		"pos-r",
+		"partOfSpeech",
+		-1,
+		"pos-root",
+		1
+	],
+	[
 		"masc",
 		"",
 		-1,
@@ -210,6 +224,13 @@
 		0
 	],
 	[
+		"pl",
+		"",
+		0,
+		"plural",
+		0
+	],
+	[
 		"sg-only",
 		"",
 		0,
@@ -228,6 +249,20 @@
 		"",
 		0,
 		"perfective only",
+		0
+	],
+	[
+		"def",
+		"",
+		0,
+		"definite",
+		0
+	],
+	[
+		"indef",
+		"",
+		0,
+		"indefinite",
 		0
 	],
 	[
@@ -699,6 +734,13 @@
         "rare",
         -1
     ],
+	[
+		"cmn",
+		"",
+		0,
+		"common",
+		0
+	],
     [
         "offens",
         "",
@@ -784,7 +826,7 @@
 		0
 	],
 	[
-		"uncommon",
+		"uncmmn",
 		"",
 		0,
 		"uncommon",
@@ -1239,6 +1281,13 @@
 		0
 	],
 	[
+		"BDSM",
+		"",
+		0,
+		"BDSM",
+		0
+	],
+	[
 		"metal",
 		"",
 		0,
@@ -1481,6 +1530,41 @@
 		"",
 		0,
 		"textiles",
+		0
+	],
+	[
+		"txnmy",
+		"",
+		0,
+		"taxonomy",
+		0
+	],
+	[
+		"ethn-slr",
+		"",
+		0,
+		"ethnic slur",
+		0
+	],
+	[
+		"rlg-slr",
+		"",
+		0,
+		"religious slur",
+		0
+	],
+	[
+		"🫀",
+		"",
+		0,
+		"cardiology",
+		0
+	],
+	[
+		"📐trig",
+		"",
+		0,
+		"trigonometry",
 		0
 	]
 ]
