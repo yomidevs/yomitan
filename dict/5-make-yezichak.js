@@ -66,7 +66,6 @@ function findModifiedTag(tag){
                     `${modifier[0]} ${fullTag[3]}`,
                     fullTag[4]
                 ]
-                console.log(modifiedTag)
             }
         }
     })

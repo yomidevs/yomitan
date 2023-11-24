@@ -44,6 +44,10 @@ if [ "$force" = true ]; then
   force_yez=true
 fi
 
+if [ "$force_tidy" = true ] || [ "$force_freq" = true ]; then
+  force_yez=true
+fi
+
 echo "[a] all_languages: $all_languages"
 echo "[d] redownload: $redownload"
 echo "[F] force: $force"
@@ -141,8 +145,8 @@ for entry in "${entries[@]}"; do
 
   # Step 7: Create Yezichak files
   if \
-    [ ! -f "$dict_file" ] || \
-    [ ! -f "$ipa_file" ] || \
+    [ ! -f "data/language/$language_short/$dict_file" ] || \
+    [ ! -f "data/language/$language_short/$ipa_file" ] || \
     [ "$force_yez" = true ]; then
     echo "Creating Yezichak dict and IPA files"
     if node --max-old-space-size=4096 5-make-yezichak.js; then
@@ -157,7 +161,7 @@ for entry in "${entries[@]}"; do
 
   # Step 8: Convert frequency list to rank-based Yezichak format
   if \
-    [ ! -f "$freq_file" ] || \
+    [ ! -f "data/language/$language_short/$freq_file" ] || \
     [ "$force_yez" = true ]; then
     echo "Creating Yezichak freq files"
     if python3 6-freq-to-rank.py; then
