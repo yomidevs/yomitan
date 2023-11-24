@@ -93,8 +93,12 @@ class Translator {
         }
 
         if (mode === 'simple') {
-            this._clearTermTags(dictionaryEntries);
-        } else {
+            if (sortFrequencyDictionary == null) {
+                this._clearTermTags(dictionaryEntries);
+            } else {
+                await this._addSortFreqTagOnly(dictionaryEntries, enabledDictionaryMap, sortFrequencyDictionary);
+            }
+        } else {    
             await this._addTermMeta(dictionaryEntries, enabledDictionaryMap);
             await this._expandTermTags(dictionaryEntries);
         }
@@ -728,6 +732,18 @@ class Translator {
             });
         }
         return tagTargets;
+    }
+
+    _pickFromMap(sourceMap, keysToPick) {
+        // Just a helper to get a subset of the source map with only the picked keys present.
+        return keysToPick
+            .filter(key => sourceMap.has(key))
+            .reduce((subMap, key) => subMap.set(key, sourceMap.get(key)), new Map());
+    }
+
+    async _addSortFreqTagOnly(dictionaryEntries, enabledDictionaryMap, sortFrequencyDictionary) {
+        const dictMapWithOnlySortDict = this._pickFromMap(enabledDictionaryMap, [sortFrequencyDictionary]);
+        await this._addTermMeta(dictionaryEntries, dictMapWithOnlySortDict);
     }
 
     _clearTermTags(dictionaryEntries) {
