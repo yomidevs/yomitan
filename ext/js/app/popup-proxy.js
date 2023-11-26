@@ -16,10 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {FrameOffsetForwarder} from '../comm/frame-offset-forwarder.js';
 import {EventDispatcher, log} from '../core.js';
 import {yomitan} from '../yomitan.js';
-import {Popup} from './popup.js';
 
 /**
  * This class is a proxy for a Popup that is hosted in a different frame.
@@ -32,7 +30,7 @@ export class PopupProxy extends EventDispatcher {
      * @param {string} details.id The ID of the popup.
      * @param {number} details.depth The depth of the popup.
      * @param {number} details.frameId The ID of the host frame.
-     * @param {FrameOffsetForwarder} details.frameOffsetForwarder A `FrameOffsetForwarder` instance which is used to determine frame positioning.
+     * @param {import('../comm/frame-offset-forwarder.js').FrameOffsetForwarder} details.frameOffsetForwarder A `FrameOffsetForwarder` instance which is used to determine frame positioning.
      */
     constructor({
         id,
@@ -64,7 +62,7 @@ export class PopupProxy extends EventDispatcher {
     /**
      * The parent of the popup, which is always `null` for `PopupProxy` instances,
      * since any potential parent popups are in a different frame.
-     * @type {Popup}
+     * @type {import('./popup.js').Popup}
      */
     get parent() {
         return null;
@@ -72,7 +70,7 @@ export class PopupProxy extends EventDispatcher {
 
     /**
      * Attempts to set the parent popup.
-     * @param {Popup} _value The parent to assign.
+     * @param {import('./popup.js').Popup} _value The parent to assign.
      * @throws {Error} Throws an error, since this class doesn't support a direct parent.
      */
     set parent(_value) {
@@ -82,7 +80,7 @@ export class PopupProxy extends EventDispatcher {
     /**
      * The popup child popup, which is always null for `PopupProxy` instances,
      * since any potential child popups are in a different frame.
-     * @type {Popup}
+     * @type {import('./popup.js').Popup}
      */
     get child() {
         return null;
@@ -90,7 +88,7 @@ export class PopupProxy extends EventDispatcher {
 
     /**
      * Attempts to set the child popup.
-     * @param {Popup} _child The child to assign.
+     * @param {import('./popup.js').Popup} _child The child to assign.
      * @throws {Error} Throws an error, since this class doesn't support children.
      */
     set child(_child) {
@@ -99,7 +97,7 @@ export class PopupProxy extends EventDispatcher {
 
     /**
      * The depth of the popup.
-     * @type {numer}
+     * @type {number}
      */
     get depth() {
         return this._depth;
@@ -193,8 +191,8 @@ export class PopupProxy extends EventDispatcher {
 
     /**
      * Shows and updates the positioning and content of the popup.
-     * @param {Popup.ContentDetails} details Settings for the outer popup.
-     * @param {Display.ContentDetails} displayDetails The details parameter passed to `Display.setContent`.
+     * @param {import('./popup.js').ContentDetails} details Settings for the outer popup.
+     * @param {import('./../display/display.js').ContentDetails} displayDetails The details parameter passed to `Display.setContent`.
      * @returns {Promise<void>}
      */
     async showContent(details, displayDetails) {
@@ -266,7 +264,7 @@ export class PopupProxy extends EventDispatcher {
 
     /**
      * Gets the rectangle of the DOM frame, synchronously.
-     * @returns {Popup.ValidRect} The rect.
+     * @returns {import('./popup.js').ValidRect} The rect.
      *   `valid` is `false` for `PopupProxy`, since the DOM node is hosted in a different frame.
      */
     getFrameRect() {

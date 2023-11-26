@@ -52,7 +52,7 @@ export async function buildLibs() {
 
     const schemaDir = path.join(extDir, 'data/schemas/');
     const schemaFileNames = fs.readdirSync(schemaDir);
-    const schemas = schemaFileNames.map((schemaFileName) => JSON.parse(fs.readFileSync(path.join(schemaDir, schemaFileName))));
+    const schemas = schemaFileNames.map((schemaFileName) => JSON.parse(fs.readFileSync(path.join(schemaDir, schemaFileName)).toString()));
     const ajv = new Ajv({schemas: schemas, code: {source: true, esm: true}});
     const moduleCode = standaloneCode(ajv);
 

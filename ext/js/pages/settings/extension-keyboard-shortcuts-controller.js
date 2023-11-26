@@ -24,8 +24,11 @@ import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 export class ExtensionKeyboardShortcutController {
     constructor(settingsController) {
         this._settingsController = settingsController;
+        /** @type {HTMLButtonElement} */
         this._resetButton = null;
+        /** @type {HTMLButtonElement} */
         this._clearButton = null;
+        /** @type {HTMLDivElement} */
         this._listContainer = null;
         this._hotkeyUtil = new HotkeyUtil();
         this._os = null;
@@ -81,15 +84,15 @@ export class ExtensionKeyboardShortcutController {
     async updateCommand(name, key, modifiers) {
         // Firefox-only; uses Promise API
         const shortcut = this._hotkeyUtil.convertInputToCommand(key, modifiers);
-        return await chrome.commands.update({name, shortcut});
+        return await browser.commands.update({name, shortcut});
     }
 
     canResetCommands() {
-        return isObject(chrome.commands) && typeof chrome.commands.reset === 'function';
+        return isObject(browser.commands) && typeof browser.commands.reset === 'function';
     }
 
     canModifyCommands() {
-        return isObject(chrome.commands) && typeof chrome.commands.update === 'function';
+        return isObject(browser.commands) && typeof browser.commands.update === 'function';
     }
 
     // Add
@@ -183,7 +186,7 @@ export class ExtensionKeyboardShortcutController {
 
     async _resetCommand(name) {
         // Firefox-only; uses Promise API
-        return await chrome.commands.reset(name);
+        return await browser.commands.reset(name);
     }
 }
 

@@ -36,12 +36,19 @@ export class AnkiController {
         });
         this._stringComparer = new Intl.Collator(); // Locale does not matter
         this._getAnkiDataPromise = null;
-        this._ankiErrorContainer = null;
+
+        /** @type {HTMLDivElement} */
+        this._ankiErrorContainer = null; // @todo Is this still used? It doesn't seem to exist in the HTML
+        /** @type {HTMLSpanElement} */
         this._ankiErrorMessageNode = null;
         this._ankiErrorMessageNodeDefaultContent = '';
+        /** @type {HTMLDivElement} */
         this._ankiErrorMessageDetailsNode = null;
+        /** @type {HTMLDivElement} */
         this._ankiErrorMessageDetailsContainer = null;
+        /** @type {HTMLAnchorElement} */
         this._ankiErrorMessageDetailsToggle = null;
+        /** @type {HTMLParagraphElement} */
         this._ankiErrorInvalidResponseInfo = null;
         this._ankiCardPrimary = null;
         this._ankiError = null;
@@ -253,12 +260,14 @@ export class AnkiController {
     }
 
     _setupFieldMenus() {
+        /** @type {[string[], string][]} */
         const fieldMenuTargets = [
             [['terms'], '#anki-card-terms-field-menu-template'],
             [['kanji'], '#anki-card-kanji-field-menu-template'],
             [['terms', 'kanji'], '#anki-card-all-field-menu-template']
         ];
         for (const [types, selector] of fieldMenuTargets) {
+            /** @type {HTMLTemplateElement} */
             const element = document.querySelector(selector);
             if (element === null) { continue; }
 
@@ -409,6 +418,7 @@ export class AnkiController {
     }
 
     _setAnkiNoteViewerStatus(visible, error) {
+        /** @type {HTMLDivElement} */
         const node = document.querySelector('#test-anki-note-viewer-results');
         if (visible) {
             const success = (error === null);
@@ -783,9 +793,9 @@ class AnkiCardController {
                 pattern += name.replace(hyphenPattern, '[-_ ]*');
             }
             pattern += ')$';
-            pattern = new RegExp(pattern, 'i');
 
-            if (pattern.test(fieldName)) {
+            const regex = new RegExp(pattern, 'i');
+            if (regex.test(fieldName)) {
                 return `{${marker}}`;
             }
         }

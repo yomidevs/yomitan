@@ -181,8 +181,8 @@ export class DisplayGenerator {
             const disambiguationHeadwords = [];
             const {headwords: headwordIndices} = tagNode.dataset;
             if (typeof headwordIndices === 'string' && headwordIndices.length > 0) {
-                for (let headwordIndex of headwordIndices.split(' ')) {
-                    headwordIndex = Number.parseInt(headwordIndex, 10);
+                for (const headwordIndexString of headwordIndices.split(' ')) {
+                    const headwordIndex = Number.parseInt(headwordIndexString, 10);
                     if (!Number.isNaN(headwordIndex) && headwordIndex >= 0 && headwordIndex < headwords.length) {
                         disambiguationHeadwords.push(headwords[headwordIndex]);
                     }

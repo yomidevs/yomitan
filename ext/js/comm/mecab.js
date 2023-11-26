@@ -27,7 +27,7 @@ export class Mecab {
      * The resulting data from an invocation of `parseText`.
      * @typedef {object} ParseResult
      * @property {string} name The dictionary name for the parsed result.
-     * @property {ParseTerm[]} lines The resulting parsed terms.
+     * @property {ParseFragment[][]} lines The resulting parsed terms.
      */
 
     /**
@@ -107,7 +107,7 @@ export class Mecab {
 
     /**
      * Gets the version of the MeCab component.
-     * @returns {?number} The version of the MeCab component, or `null` if the component was not found.
+     * @returns {Promise<?number>} The version of the MeCab component, or `null` if the component was not found.
      */
     async getVersion() {
         try {
@@ -135,7 +135,7 @@ export class Mecab {
      * ]
      * ```
      * @param {string} text The string to parse.
-     * @returns {ParseResult[]} A collection of parsing results of the text.
+     * @returns {Promise<ParseResult[]>} A collection of parsing results of the text.
      */
     async parseText(text) {
         await this._setupPort();

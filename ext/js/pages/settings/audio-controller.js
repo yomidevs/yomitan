@@ -25,9 +25,12 @@ export class AudioController extends EventDispatcher {
         this._settingsController = settingsController;
         this._modalController = modalController;
         this._audioSystem = new AudioSystem();
+        /** @type {HTMLDivElement} */
         this._audioSourceContainer = null;
+        /** @type {HTMLButtonElement} */
         this._audioSourceAddButton = null;
         this._audioSourceEntries = [];
+        /** @type {HTMLInputElement} */
         this._voiceTestTextInput = null;
         this._voices = [];
     }

@@ -254,13 +254,20 @@ export class DictionaryController {
         this._dictionaryEntries = [];
         this._databaseStateToken = null;
         this._checkingIntegrity = false;
+        /** @type {HTMLButtonElement} */
         this._checkIntegrityButton = null;
+        /** @type {HTMLDivElement} */
         this._dictionaryEntryContainer = null;
+        /** @type {HTMLSpanElement} */
         this._dictionaryInstallCountNode = null;
+        /** @type {HTMLSpanElement} */
         this._dictionaryEnabledCountNode = null;
+        /** @type {NodeListOf<HTMLDivElement>} */
         this._noDictionariesInstalledWarnings = null;
+        /** @type {NodeListOf<HTMLDivElement>} */
         this._noDictionariesEnabledWarnings = null;
         this._deleteDictionaryModal = null;
+        /** @type {HTMLInputElement} */
         this._allCheckbox = null;
         this._extraInfo = null;
         this._isDeleting = false;
@@ -528,8 +535,9 @@ export class DictionaryController {
         let {index} = modal.node.dataset;
         index = Number.parseInt(index, 10);
 
-        let target = document.querySelector('#dictionary-move-location').value;
-        target = Number.parseInt(target, 10) - 1;
+        /** @type {HTMLInputElement} */
+        const dictionaryMoveLocation = document.querySelector('#dictionary-move-location');
+        const target = Number.parseInt(dictionaryMoveLocation.value, 10) - 1;
 
         if (!Number.isFinite(target) || !Number.isFinite(index) || index === target) { return; }
 
@@ -631,9 +639,13 @@ export class DictionaryController {
 
         const statusFooter = this._statusFooter;
         const progressSelector = '.dictionary-delete-progress';
+        /** @type {NodeListOf<HTMLDivElement>} */
         const progressContainers = document.querySelectorAll(`#dictionaries-modal ${progressSelector}`);
+        /** @type {NodeListOf<HTMLDivElement>} */
         const progressBars = document.querySelectorAll(`${progressSelector} .progress-bar`);
+        /** @type {NodeListOf<HTMLDivElement>} */
         const infoLabels = document.querySelectorAll(`${progressSelector} .progress-info`);
+        /** @type {NodeListOf<HTMLDivElement>} */
         const statusLabels = document.querySelectorAll(`${progressSelector} .progress-status`);
         const prevention = this._settingsController.preventPageExit();
         try {
@@ -674,7 +686,9 @@ export class DictionaryController {
 
     _setButtonsEnabled(value) {
         value = !value;
-        for (const node of document.querySelectorAll('.dictionary-database-mutating-input')) {
+        /** @type {NodeListOf<HTMLButtonElement>} */
+        const dictionaryDatabaseMutatingInput = document.querySelectorAll('.dictionary-database-mutating-input');
+        for (const node of dictionaryDatabaseMutatingInput) {
             node.disabled = value;
         }
     }

@@ -21,10 +21,15 @@ import {EventListenerCollection} from '../../core.js';
 export class PermissionsOriginController {
     constructor(settingsController) {
         this._settingsController = settingsController;
+        /** @type {HTMLDivElement} */
         this._originContainer = null;
+        /** @type {HTMLDivElement} */
         this._originEmpty = null;
+        /** @type {NodeListOf<HTMLInputElement>} */
         this._originToggleNodes = null;
+        /** @type {HTMLInputElement} */
         this._addOriginInput = null;
+        /** @type {HTMLDivElement} */
         this._errorContainer = null;
         this._originContainerChildren = [];
         this._eventListeners = new EventListenerCollection();

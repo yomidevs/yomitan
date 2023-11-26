@@ -68,7 +68,7 @@ export class FrameAncestryHandler {
      * Gets the frame ancestry information for the current frame. If the frame is the
      * root frame, an empty array is returned. Otherwise, an array of frame IDs is returned,
      * starting from the nearest ancestor.
-     * @returns {number[]} An array of frame IDs corresponding to the ancestors of the current frame.
+     * @returns {Promise<number[]>} An array of frame IDs corresponding to the ancestors of the current frame.
      */
     async getFrameAncestryInfo() {
         if (this._getFrameAncestryInfoPromise === null) {
@@ -235,7 +235,7 @@ export class FrameAncestryHandler {
         const frameTypes = ['iframe', 'frame', 'embed'];
         for (const frameType of frameTypes) {
             for (const frame of document.getElementsByTagName(frameType)) {
-                if (frame.contentWindow === contentWindow) {
+                if (frame instanceof HTMLIFrameElement && frame.contentWindow === contentWindow) {
                     return frame;
                 }
             }
@@ -249,16 +249,19 @@ export class FrameAncestryHandler {
             while (walker.nextNode()) {
                 const element = walker.currentNode;
 
-                if (element.contentWindow === contentWindow) {
+                if ((element instanceof HTMLIFrameElement || element instanceof HTMLObjectElement) && element.contentWindow === contentWindow) {
                     return element;
                 }
 
-                const shadowRoot = (
-                    element.shadowRoot ||
-                    element.openOrClosedShadowRoot // Available to Firefox 63+ for WebExtensions
-                );
-                if (shadowRoot) {
-                    rootElements.push(shadowRoot);
+                if (element instanceof HTMLElement) {
+                    const shadowRoot = (
+                        element.shadowRoot ||
+                        // @ts-ignore
+                        element.openOrClosedShadowRoot // Available to Firefox 63+ for WebExtensions
+                    );
+                    if (shadowRoot) {
+                        rootElements.push(shadowRoot);
+                    }
                 }
             }
         }

@@ -23,7 +23,9 @@ import {ScanInputsController} from './scan-inputs-controller.js';
 export class ScanInputsSimpleController {
     constructor(settingsController) {
         this._settingsController = settingsController;
+        /** @type {HTMLInputElement} */
         this._middleMouseButtonScan = null;
+        /** @type {HTMLSelectElement} */
         this._mainScanModifierKeyInput = null;
         this._mainScanModifierKeyInputHasOther = false;
         this._hotkeyUtil = new HotkeyUtil();

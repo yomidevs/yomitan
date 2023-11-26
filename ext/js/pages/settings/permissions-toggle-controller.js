@@ -21,6 +21,7 @@ import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js'
 export class PermissionsToggleController {
     constructor(settingsController) {
         this._settingsController = settingsController;
+        /** @type {NodeListOf<HTMLInputElement>} */
         this._toggles = null;
     }
 

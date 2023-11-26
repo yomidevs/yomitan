@@ -152,7 +152,6 @@ export class ThemeController {
     /**
      * Event handler for when the preferred browser theme changes.
      * @param {MediaQueryList|MediaQueryListEvent} detail The object containing event details.
-     * @param {boolean} detail.matches The object containing event details.
      */
     _onPrefersColorSchemeDarkChange({matches}) {
         this._browserTheme = (matches ? 'dark' : 'light');

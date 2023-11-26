@@ -36,6 +36,7 @@ if ((() => {
     }
     return (hasBrowser && !hasChrome);
 })()) {
+    // @ts-ignore
     chrome = browser;
 }
 

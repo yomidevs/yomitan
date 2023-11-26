@@ -21,7 +21,9 @@ import {yomitan} from '../../yomitan.js';
 export class MecabController {
     constructor(settingsController) {
         this._settingsController = settingsController;
+        /** @type {HTMLButtonElement} */
         this._testButton = null;
+        /** @type {HTMLDivElement} */
         this._resultsContainer = null;
         this._testActive = false;
     }

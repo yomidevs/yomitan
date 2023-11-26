@@ -166,7 +166,7 @@ export class AnkiConnect {
      * Stores a file with the specified base64-encoded content inside Anki's media folder.
      * @param {string} fileName The name of the file.
      * @param {string} content The base64-encoded content of the file.
-     * @returns {?string} The actual file name used to store the file, which may be different; or `null` if the file was not stored.
+     * @returns {Promise<?string>} The actual file name used to store the file, which may be different; or `null` if the file was not stored.
      * @throws {Error} An error is thrown is this object is not enabled.
      */
     async storeMediaFile(fileName, content) {
@@ -180,7 +180,7 @@ export class AnkiConnect {
     /**
      * Finds notes matching a query.
      * @param {string} query Searches for notes matching a query.
-     * @returns {number[]} An array of note IDs.
+     * @returns {Promise<number[]>} An array of note IDs.
      * @see https://docs.ankiweb.net/searching.html
      */
     async findNotes(query) {
@@ -244,7 +244,7 @@ export class AnkiConnect {
      * Gets information about the AnkiConnect APIs available.
      * @param {string[]} scopes A list of scopes to get information about.
      * @param {?string[]} actions A list of actions to check for
-     * @returns {object} Information about the APIs.
+     * @returns {Promise<object>} Information about the APIs.
      */
     async apiReflect(scopes, actions=null) {
         return await this._invoke('apiReflect', {scopes, actions});
@@ -253,7 +253,7 @@ export class AnkiConnect {
     /**
      * Checks whether a specific API action exists.
      * @param {string} action The action to check for.
-     * @returns {boolean} Whether or not the action exists.
+     * @returns {Promise<boolean>} Whether or not the action exists.
      */
     async apiExists(action) {
         const {actions} = await this.apiReflect(['actions'], [action]);

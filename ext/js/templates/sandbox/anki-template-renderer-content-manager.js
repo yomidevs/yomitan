@@ -34,7 +34,7 @@
 export class AnkiTemplateRendererContentManager {
     /**
      * Creates a new instance of the class.
-     * @param {TemplateRendererMediaProvider} mediaProvider The media provider for the object.
+     * @param {import('./template-renderer-media-provider.js').TemplateRendererMediaProvider} mediaProvider The media provider for the object.
      * @param {object} data The data object passed to the Handlebars template renderer.
      *   See {@link AnkiNoteDataCreator.create}'s return value for structure information.
      */
@@ -73,7 +73,7 @@ export class AnkiTemplateRendererContentManager {
 
     /**
      * Sets up attributes and events for a link element.
-     * @param {Element} element The link element.
+     * @param {HTMLAnchorElement} element The link element.
      * @param {string} href The URL.
      * @param {boolean} internal Whether or not the URL is an internal or external link.
      */

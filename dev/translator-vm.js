@@ -35,6 +35,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 export class TranslatorVM {
     constructor() {
         global.chrome = {
+            // @ts-ignore
             runtime: {
                 getURL: (path2) => {
                     return url.pathToFileURL(path.join(dirname, '..', 'ext', path2.replace(/^\//, ''))).href;
@@ -81,7 +82,7 @@ export class TranslatorVM {
             japaneseUtil: this._japaneseUtil,
             database: dictionaryDatabase
         });
-        const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(myDirname, '..', 'ext', 'data/deinflect.json')));
+        const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(myDirname, '..', 'ext', 'data/deinflect.json')).toString());
         this._translator.prepare(deinflectionReasons);
 
         // Assign properties

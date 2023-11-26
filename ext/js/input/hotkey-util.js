@@ -185,6 +185,7 @@ export class HotkeyUtil {
         for (let i = 0; i < count; ++i) {
             const modifier = modifiers[i];
             const match = pattern.exec(modifier);
+            /** @type {[string, number, number, number]} */
             let info;
             if (match !== null) {
                 info = [modifier, 1, Number.parseInt(match[1], 10), i];

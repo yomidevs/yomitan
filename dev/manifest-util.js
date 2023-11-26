@@ -31,7 +31,7 @@ function clone(value) {
 export class ManifestUtil {
     constructor() {
         const fileName = path.join(dirname, 'data', 'manifest-variants.json');
-        const {manifest, variants, defaultVariant} = JSON.parse(fs.readFileSync(fileName));
+        const {manifest, variants, defaultVariant} = JSON.parse(fs.readFileSync(fileName).toString());
         this._manifest = manifest;
         this._variants = variants;
         this._defaultVariant = defaultVariant;

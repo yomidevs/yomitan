@@ -33,7 +33,9 @@ export class PopupPreviewFrame {
         this._themeChangeTimeout = null;
         this._textSource = null;
         this._optionsContext = null;
+        /** @type {HTMLDivElement} */
         this._exampleText = null;
+        /** @type {HTMLInputElement} */
         this._exampleTextInput = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 

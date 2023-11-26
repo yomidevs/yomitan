@@ -36,7 +36,7 @@ export class OffscreenProxy {
 
         this._creatingOffscreen = chrome.offscreen.createDocument({
             url: 'offscreen.html',
-            reasons: ['CLIPBOARD'],
+            reasons: [chrome.offscreen.Reason.CLIPBOARD],
             justification: 'Access to the clipboard'
         });
         await this._creatingOffscreen;

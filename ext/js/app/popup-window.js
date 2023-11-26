@@ -18,7 +18,6 @@
 
 import {EventDispatcher} from '../core.js';
 import {yomitan} from '../yomitan.js';
-import {Popup} from './popup.js';
 
 /**
  * This class represents a popup that is hosted in a new native window.
@@ -58,7 +57,7 @@ export class PopupWindow extends EventDispatcher {
     /**
      * The parent of the popup, which is always `null` for `PopupWindow` instances,
      * since any potential parent popups are in a different frame.
-     * @param {Popup} _value The parent to assign.
+     * @param {import('./popup.js').Popup} _value The parent to assign.
      * @throws {Error} Throws an error, since this class doesn't support children.
      */
     set parent(_value) {
@@ -68,7 +67,7 @@ export class PopupWindow extends EventDispatcher {
     /**
      * The popup child popup, which is always null for `PopupWindow` instances,
      * since any potential child popups are in a different frame.
-     * @type {Popup}
+     * @type {import('./popup.js').Popup}
      */
     get child() {
         return null;
@@ -76,7 +75,7 @@ export class PopupWindow extends EventDispatcher {
 
     /**
      * Attempts to set the child popup.
-     * @param {Popup} _value The child to assign.
+     * @param {import('./popup.js').Popup} _value The child to assign.
      * @throws Throws an error, since this class doesn't support children.
      */
     set child(_value) {
@@ -85,7 +84,7 @@ export class PopupWindow extends EventDispatcher {
 
     /**
      * The depth of the popup.
-     * @type {numer}
+     * @type {number}
      */
     get depth() {
         return this._depth;
@@ -173,8 +172,8 @@ export class PopupWindow extends EventDispatcher {
 
     /**
      * Shows and updates the positioning and content of the popup.
-     * @param {Popup.ContentDetails} _details Settings for the outer popup.
-     * @param {Display.ContentDetails} displayDetails The details parameter passed to `Display.setContent`.
+     * @param {import('./popup.js').ContentDetails} _details Settings for the outer popup.
+     * @param {import('./../display/display.js').ContentDetails} displayDetails The details parameter passed to `Display.setContent`.
      * @returns {Promise<void>}
      */
     async showContent(_details, displayDetails) {
@@ -235,7 +234,7 @@ export class PopupWindow extends EventDispatcher {
 
     /**
      * Gets the rectangle of the DOM frame, synchronously.
-     * @returns {Popup.ValidRect} The rect.
+     * @returns {import('./popup.js').ValidRect} The rect.
      *   `valid` is `false` for `PopupProxy`, since the DOM node is hosted in a different frame.
      */
     getFrameRect() {

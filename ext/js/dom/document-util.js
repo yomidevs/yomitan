@@ -16,23 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection} from '../core.js';
 import {DOMTextScanner} from './dom-text-scanner.js';
 import {TextSourceElement} from './text-source-element.js';
 import {TextSourceRange} from './text-source-range.js';
 
 /**
+ * Options to configure how element detection is performed.
+ * @typedef {object} GetRangeFromPointOptions
+ * @property {boolean} deepContentScan Whether or deep content scanning should be performed. When deep content scanning is enabled,
+ *   some transparent overlay elements will be ignored when looking for the element at the input position.
+ * @property {boolean} normalizeCssZoom Whether or not zoom coordinates should be normalized.
+ */
+
+/**
  * This class contains utility functions related to the HTML document.
  */
 export class DocumentUtil {
-    /**
-     * Options to configure how element detection is performed.
-     * @typedef {object} GetRangeFromPointOptions
-     * @property {boolean} deepContentScan Whether or deep content scanning should be performed. When deep content scanning is enabled,
-     *   some transparent overlay elements will be ignored when looking for the element at the input position.
-     * @property {boolean} normalizeCssZoom Whether or not zoom coordinates should be normalized.
-     */
-
     /**
      * Scans the document for text or elements with text information at the given coordinate.
      * Coordinates are provided in [client space](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems).
@@ -65,21 +64,16 @@ export class DocumentUtil {
         let imposterSourceElement = null;
         if (elements.length > 0) {
             const element = elements[0];
-            switch (element.nodeName.toUpperCase()) {
-                case 'IMG':
-                case 'BUTTON':
-                case 'SELECT':
-                    return TextSourceElement.create(element);
-                case 'INPUT':
-                    if (element.type === 'text') {
-                        imposterSourceElement = element;
-                        [imposter, imposterContainer] = this._createImposter(element, false);
-                    }
-                    break;
-                case 'TEXTAREA':
+            if (element instanceof HTMLImageElement || element instanceof HTMLButtonElement || element instanceof HTMLSelectElement) {
+                return TextSourceElement.create(element);
+            } else if (element instanceof HTMLInputElement) {
+                if (element.type === 'text') {
                     imposterSourceElement = element;
-                    [imposter, imposterContainer] = this._createImposter(element, true);
-                    break;
+                    [imposter, imposterContainer] = this._createImposter(element, false);
+                }
+            } else if (element instanceof HTMLTextAreaElement) {
+                imposterSourceElement = element;
+                [imposter, imposterContainer] = this._createImposter(element, true);
             }
         }
 
@@ -129,7 +123,7 @@ export class DocumentUtil {
      *   ```js
      *   new Map([ [character: string, [otherCharacter: string, includeCharacterAtEnd: boolean]], ... ])
      *   ```
-     * @returns {{sentence: string, offset: number}} The sentence and the offset to the original source.
+     * @returns {{text: string, offset: number}} The sentence and the offset to the original source.
      */
     static extractSentence(source, layoutAwareScan, extent, terminateAtNewlines, terminatorMap, forwardQuoteMap, backwardQuoteMap) {
         // Scan text
@@ -321,7 +315,7 @@ export class DocumentUtil {
     static isPointInSelection(x, y, selection) {
         for (let i = 0; i < selection.rangeCount; ++i) {
             const range = selection.getRangeAt(i);
-            if (this.isPointInAnyRect(x, y, range.getClientRects())) {
+            if (this.isPointInAnyRect(x, y, Array.from(range.getClientRects()))) {
                 return true;
             }
         }
@@ -366,8 +360,8 @@ export class DocumentUtil {
 
     /**
      * Adds a fullscreen change event listener. This function handles all of the browser-specific variants.
-     * @param {Function} onFullscreenChanged The event callback.
-     * @param {?EventListenerCollection} eventListenerCollection An optional `EventListenerCollection` to add the registration to.
+     * @param {EventListenerOrEventListenerObject} onFullscreenChanged The event callback.
+     * @param {?import('../core.js').EventListenerCollection} eventListenerCollection An optional `EventListenerCollection` to add the registration to.
      */
     static addFullscreenChangeEventListener(onFullscreenChanged, eventListenerCollection=null) {
         const target = document;
@@ -394,8 +388,11 @@ export class DocumentUtil {
     static getFullscreenElement() {
         return (
             document.fullscreenElement ||
+            // @ts-ignore
             document.msFullscreenElement ||
+            // @ts-ignore
             document.mozFullScreenElement ||
+            // @ts-ignore
             document.webkitFullscreenElement ||
             null
         );
@@ -422,6 +419,7 @@ export class DocumentUtil {
      * @returns {?Node} The next node, or `null` if there is no next node.
      */
     static getNextNode(node) {
+        /** @type {Node} */
         let next = node.firstChild;
         if (next === null) {
             while (true) {
@@ -444,11 +442,10 @@ export class DocumentUtil {
      * @returns {boolean} `true` if any element node matches the selector, `false` otherwise.
      */
     static anyNodeMatchesSelector(nodes, selector) {
-        const ELEMENT_NODE = Node.ELEMENT_NODE;
         for (let node of nodes) {
             for (; node !== null; node = node.parentNode) {
-                if (node.nodeType !== ELEMENT_NODE) { continue; }
-                if (node.matches(selector)) { return true; }
+                if (!(node instanceof Element)) { continue; }
+                if (node instanceof Element && node.matches(selector)) { return true; }
                 break;
             }
         }
@@ -462,11 +459,10 @@ export class DocumentUtil {
      * @returns {boolean} `true` if every element node matches the selector, `false` otherwise.
      */
     static everyNodeMatchesSelector(nodes, selector) {
-        const ELEMENT_NODE = Node.ELEMENT_NODE;
         for (let node of nodes) {
             while (true) {
                 if (node === null) { return false; }
-                if (node.nodeType === ELEMENT_NODE && node.matches(selector)) { break; }
+                if (node instanceof Element && node.matches(selector)) { break; }
                 node = node.parentNode;
             }
         }
@@ -497,7 +493,11 @@ export class DocumentUtil {
             case 'SELECT':
                 return true;
             default:
-                return element.isContentEditable;
+                if ('isContentEditable' in element && element.isContentEditable) {
+                    return true;
+                } else {
+                    return false;
+                }
         }
     }
 
@@ -506,7 +506,7 @@ export class DocumentUtil {
      * @param {DOMRect[]} rects The DOMRects to offset.
      * @param {number} x The horizontal offset amount.
      * @param {number} y The vertical offset amount.
-     * @returns {DOMRect} The DOMRects with the offset applied.
+     * @returns {DOMRect[]} The DOMRects with the offset applied.
      */
     static offsetDOMRects(rects, x, y) {
         const results = [];
@@ -555,12 +555,12 @@ export class DocumentUtil {
 
     /**
      * Converts a value from an element to a number.
-     * @param {string} value A string representation of a number.
+     * @param {string} stringValue A string representation of a number.
      * @param {object} constraints An object which might contain `min`, `max`, and `step` fields which are used to constrain the value.
      * @returns {number} The parsed and constrained number.
      */
-    static convertElementValueToNumber(value, constraints) {
-        value = parseFloat(value);
+    static convertElementValueToNumber(stringValue, constraints) {
+        let value = parseFloat(stringValue);
         if (!Number.isFinite(value)) { value = 0; }
 
         let {min, max, step} = constraints;

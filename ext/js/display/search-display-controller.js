@@ -28,11 +28,17 @@ export class SearchDisplayController {
         this._display = display;
         this._displayAudio = displayAudio;
         this._searchPersistentStateController = searchPersistentStateController;
+        /** @type {HTMLButtonElement} */
         this._searchButton = document.querySelector('#search-button');
+        /** @type {HTMLButtonElement} */
         this._searchBackButton = document.querySelector('#search-back-button');
+        /** @type {HTMLTextAreaElement} */
         this._queryInput = document.querySelector('#search-textbox');
+        /** @type {HTMLDivElement} */
         this._introElement = document.querySelector('#intro');
+        /** @type {HTMLInputElement} */
         this._clipboardMonitorEnableCheckbox = document.querySelector('#clipboard-monitor-enable');
+        /** @type {HTMLInputElement} */
         this._wanakanaEnableCheckbox = document.querySelector('#wanakana-enable');
         this._queryInputEvents = new EventListenerCollection();
         this._queryInputEventsSetup = false;

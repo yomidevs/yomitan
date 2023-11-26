@@ -159,7 +159,7 @@ export class CssStyleApplier {
 
     /**
      * Converts an array of CSS rules to a CSS string.
-     * @param {CssRule[]} styles An array of CSS rules.
+     * @param {CssDeclaration[]} styles An array of CSS rules.
      * @returns {string} The CSS string.
      */
     _getCssText(styles) {

@@ -45,9 +45,8 @@ async function isAllowedFileSchemeAccess() {
 
 function setupPermissionsToggles() {
     const manifest = chrome.runtime.getManifest();
-    let optionalPermissions = manifest.optional_permissions;
-    if (!Array.isArray(optionalPermissions)) { optionalPermissions = []; }
-    optionalPermissions = new Set(optionalPermissions);
+    const manifestOptionalPermissions = manifest.optional_permissions;
+    const optionalPermissions = !Array.isArray(manifestOptionalPermissions) ? new Set() : new Set(manifestOptionalPermissions);
 
     const hasAllPermisions = (set, values) => {
         for (const value of values) {
@@ -56,7 +55,9 @@ function setupPermissionsToggles() {
         return true;
     };
 
-    for (const toggle of document.querySelectorAll('.permissions-toggle')) {
+    /** @type {NodeListOf<HTMLInputElement>} */
+    const toggles = document.querySelectorAll('.permissions-toggle');
+    for (const toggle of toggles) {
         let permissions = toggle.dataset.requiredPermissions;
         permissions = (typeof permissions === 'string' && permissions.length > 0 ? permissions.split(' ') : []);
         toggle.disabled = !hasAllPermisions(optionalPermissions, permissions);
@@ -77,6 +78,7 @@ function setupPermissionsToggles() {
 
         setupEnvironmentInfo();
 
+        /** @type {HTMLInputElement[]} */
         const permissionsCheckboxes = [
             document.querySelector('#permission-checkbox-allow-in-private-windows'),
             document.querySelector('#permission-checkbox-allow-file-url-access')

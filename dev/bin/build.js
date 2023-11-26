@@ -127,7 +127,7 @@ async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath,
             message += ` (${metadata.currentFile})`;
         }
 
-        readline.clearLine(process.stdout);
+        readline.clearLine(process.stdout, 0);
         readline.cursorTo(process.stdout, 0);
         process.stdout.write(message);
     };

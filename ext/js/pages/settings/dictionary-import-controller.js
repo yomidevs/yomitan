@@ -27,13 +27,20 @@ export class DictionaryImportController {
         this._modalController = modalController;
         this._statusFooter = statusFooter;
         this._modifying = false;
+        /** @type {HTMLButtonElement} */
         this._purgeButton = null;
+        /** @type {HTMLButtonElement} */
         this._purgeConfirmButton = null;
+        /** @type {HTMLButtonElement} */
         this._importFileButton = null;
+        /** @type {HTMLInputElement} */
         this._importFileInput = null;
         this._purgeConfirmModal = null;
+        /** @type {HTMLDivElement} */
         this._errorContainer = null;
+        /** @type {HTMLDivElement} */
         this._spinner = null;
+        /** @type {HTMLDivElement} */
         this._purgeNotification = null;
         this._errorToStringOverrides = [
             [
@@ -54,8 +61,8 @@ export class DictionaryImportController {
         this._importFileInput = document.querySelector('#dictionary-import-file-input');
         this._purgeConfirmModal = this._modalController.getModal('dictionary-confirm-delete-all');
         this._errorContainer = document.querySelector('#dictionary-error');
-        this._spinner = document.querySelector('#dictionary-spinner');
-        this._purgeNotification = document.querySelector('#dictionary-delete-all-status');
+        this._spinner = document.querySelector('#dictionary-spinner'); // @todo Does this still exist?
+        this._purgeNotification = document.querySelector('#dictionary-delete-all-status'); // @todo Does this still exist?
 
         this._purgeButton.addEventListener('click', this._onPurgeButtonClick.bind(this), false);
         this._purgeConfirmButton.addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
@@ -120,11 +127,16 @@ export class DictionaryImportController {
         if (this._modifying) { return; }
 
         const statusFooter = this._statusFooter;
+        /** @type {HTMLDivElement} */
         const importInfo = document.querySelector('#dictionary-import-info');
         const progressSelector = '.dictionary-import-progress';
+        /** @type {NodeListOf<HTMLDivElement>} */
         const progressContainers = document.querySelectorAll(`#dictionaries-modal ${progressSelector}`);
+        /** @type {NodeListOf<HTMLDivElement>} */
         const progressBars = document.querySelectorAll(`${progressSelector} .progress-bar`);
+        /** @type {NodeListOf<HTMLDivElement>} */
         const infoLabels = document.querySelectorAll(`${progressSelector} .progress-info`);
+        /** @type {NodeListOf<HTMLDivElement>} */
         const statusLabels = document.querySelectorAll(`${progressSelector} .progress-status`);
 
         const prevention = this._preventPageExit();
@@ -329,7 +341,9 @@ export class DictionaryImportController {
 
     _setButtonsEnabled(value) {
         value = !value;
-        for (const node of document.querySelectorAll('.dictionary-database-mutating-input')) {
+        /** @type {NodeListOf<HTMLButtonElement>} */
+        const dictionaryDatabaseMutatingInput = document.querySelectorAll('.dictionary-database-mutating-input');
+        for (const node of dictionaryDatabaseMutatingInput) {
             node.disabled = value;
         }
     }

@@ -24,47 +24,47 @@ import {yomitan} from '../yomitan.js';
 import {ThemeController} from './theme-controller.js';
 
 /**
+ * Information about how popup content should be shown, specifically related to the outer popup frame.
+ * @typedef {object} ContentDetails
+ * @property {?object} optionsContext The options context for the content to show.
+ * @property {Rect[]} sourceRects The rectangles of the source content.
+ * @property {'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | 'sideways-lr'} writingMode The normalized CSS writing-mode value of the source content.
+ */
+
+/**
+ * A rectangle representing a DOM region, similar to DOMRect.
+ * @typedef {object} Rect
+ * @property {number} left The left position of the rectangle.
+ * @property {number} top The top position of the rectangle.
+ * @property {number} right The right position of the rectangle.
+ * @property {number} bottom The bottom position of the rectangle.
+ */
+
+/**
+ * A rectangle representing a DOM region, similar to DOMRect but with a `valid` property.
+ * @typedef {object} ValidRect
+ * @property {number} left The left position of the rectangle.
+ * @property {number} top The top position of the rectangle.
+ * @property {number} right The right position of the rectangle.
+ * @property {number} bottom The bottom position of the rectangle.
+ * @property {boolean} valid Whether or not the rectangle is valid.
+ */
+
+/**
+ * A rectangle representing a DOM region for placing the popup frame.
+ * @typedef {object} SizeRect
+ * @property {number} left The left position of the rectangle.
+ * @property {number} top The top position of the rectangle.
+ * @property {number} width The width of the rectangle.
+ * @property {number} height The height of the rectangle.
+ * @property {boolean} after Whether or not the rectangle is positioned to the right of the source rectangle.
+ * @property {boolean} below Whether or not the rectangle is positioned below the source rectangle.
+ */
+
+/**
  * This class is the container which hosts the display of search results.
  */
 export class Popup extends EventDispatcher {
-    /**
-     * Information about how popup content should be shown, specifically related to the outer popup frame.
-     * @typedef {object} ContentDetails
-     * @property {?object} optionsContext The options context for the content to show.
-     * @property {Rect[]} sourceRects The rectangles of the source content.
-     * @property {'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | 'sideways-lr'} writingMode The normalized CSS writing-mode value of the source content.
-     */
-
-    /**
-     * A rectangle representing a DOM region, similar to DOMRect.
-     * @typedef {object} Rect
-     * @property {number} left The left position of the rectangle.
-     * @property {number} top The top position of the rectangle.
-     * @property {number} right The right position of the rectangle.
-     * @property {number} bottom The bottom position of the rectangle.
-     */
-
-    /**
-     * A rectangle representing a DOM region, similar to DOMRect but with a `valid` property.
-     * @typedef {object} ValidRect
-     * @property {number} left The left position of the rectangle.
-     * @property {number} top The top position of the rectangle.
-     * @property {number} right The right position of the rectangle.
-     * @property {number} bottom The bottom position of the rectangle.
-     * @property {boolean} valid Whether or not the rectangle is valid.
-     */
-
-    /**
-     * A rectangle representing a DOM region for placing the popup frame.
-     * @typedef {object} SizeRect
-     * @property {number} left The left position of the rectangle.
-     * @property {number} top The top position of the rectangle.
-     * @property {number} width The width of the rectangle.
-     * @property {number} height The height of the rectangle.
-     * @property {boolean} after Whether or not the rectangle is positioned to the right of the source rectangle.
-     * @property {boolean} below Whether or not the rectangle is positioned below the source rectangle.
-     */
-
     /**
      * Creates a new instance.
      * @param {object} details The details used to construct the new instance.
@@ -117,6 +117,7 @@ export class Popup extends EventDispatcher {
         this._frame.style.width = '0';
         this._frame.style.height = '0';
 
+        /** @type {HTMLIFrameElement|HTMLDivElement} */
         this._container = this._frame;
         this._shadow = null;
 
@@ -167,7 +168,7 @@ export class Popup extends EventDispatcher {
 
     /**
      * The depth of the popup.
-     * @type {numer}
+     * @type {number}
      */
     get depth() {
         return this._depth;
@@ -287,7 +288,7 @@ export class Popup extends EventDispatcher {
     /**
      * Shows and updates the positioning and content of the popup.
      * @param {ContentDetails} details Settings for the outer popup.
-     * @param {Display.ContentDetails} displayDetails The details parameter passed to `Display.setContent`.
+     * @param {import('./../display/display.js').ContentDetails} displayDetails The details parameter passed to `Display.setContent`.
      * @returns {Promise<void>}
      */
     async showContent(details, displayDetails) {
@@ -659,6 +660,7 @@ export class Popup extends EventDispatcher {
         if (
             fullscreenElement === null ||
             fullscreenElement.shadowRoot ||
+            // @ts-ignore
             fullscreenElement.openOrClosedShadowRoot // Available to Firefox 63+ for WebExtensions
         ) {
             return defaultParent;

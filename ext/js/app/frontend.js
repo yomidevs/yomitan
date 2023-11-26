@@ -19,13 +19,9 @@
 import {GoogleDocsUtil} from '../accessibility/google-docs-util.js';
 import {EventListenerCollection, invokeMessageHandler, isObject, log, promiseAnimationFrame} from '../core.js';
 import {DocumentUtil} from '../dom/document-util.js';
-import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
-import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {TextScanner} from '../language/text-scanner.js';
 import {yomitan} from '../yomitan.js';
-import {PopupFactory} from './popup-factory.js';
-import {Popup} from './popup.js';
 
 /**
  * This is the main class responsible for scanning and handling webpage content.
@@ -35,17 +31,17 @@ export class Frontend {
      * Creates a new instance.
      * @param {object} details Details about how to set up the instance.
      * @param {string} details.pageType The type of page, one of 'web', 'popup', or 'search'.
-     * @param {PopupFactory} details.popupFactory A PopupFactory instance to use for generating popups.
+     * @param {import('./popup-factory.js').PopupFactory} details.popupFactory A PopupFactory instance to use for generating popups.
      * @param {number} details.depth The nesting depth value of the popup.
      * @param {number} details.tabId The tab ID of the host tab.
      * @param {number} details.frameId The frame ID of the host frame.
      * @param {?string} details.parentPopupId The popup ID of the parent popup if one exists, otherwise null.
      * @param {?number} details.parentFrameId The frame ID of the parent popup if one exists, otherwise null.
      * @param {boolean} details.useProxyPopup Whether or not proxy popups should be used.
-     * @param {boolean} details.canUseWindowPopup Whether or not window popups can be used.
+     * @param {boolean} [details.canUseWindowPopup] Whether or not window popups can be used.
      * @param {boolean} details.allowRootFramePopupProxy Whether or not popups can be hosted in the root frame.
-     * @param {boolean} details.childrenSupported Whether popups can create child popups or not.
-     * @param {HotkeyHandler} details.hotkeyHandler A HotkeyHandler instance.
+     * @param {boolean} [details.childrenSupported] Whether popups can create child popups or not.
+     * @param {import('../input/hotkey-handler.js').HotkeyHandler} details.hotkeyHandler A HotkeyHandler instance.
      */
     constructor({
         pageType,
@@ -125,7 +121,7 @@ export class Frontend {
 
     /**
      * Gets the popup instance.
-     * @type {Popup}
+     * @type {import('./popup.js').Popup}
      */
     get popup() {
         return this._popup;
@@ -194,7 +190,7 @@ export class Frontend {
 
     /**
      * Performs a new search on a specific source.
-     * @param {TextSourceRange|TextSourceElement} textSource The text source to search.
+     * @param {TextSourceRange|import('../dom/text-source-element.js').TextSourceElement} textSource The text source to search.
      */
     async setTextSource(textSource) {
         this._textScanner.setCurrentTextSource(null);

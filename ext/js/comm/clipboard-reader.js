@@ -56,7 +56,7 @@ export class ClipboardReader {
     /**
      * Gets the text in the clipboard.
      * @param {boolean} useRichText Whether or not to use rich text for pasting, when possible.
-     * @returns {string} A string containing the clipboard text.
+     * @returns {Promise<string>} A string containing the clipboard text.
      * @throws {Error} Error if not supported.
      */
     async getText(useRichText) {
@@ -106,7 +106,7 @@ export class ClipboardReader {
 
     /**
      * Gets the first image in the clipboard.
-     * @returns {string} A string containing a data URL of the image file, or null if no image was found.
+     * @returns {Promise<string>} A string containing a data URL of the image file, or null if no image was found.
      * @throws {Error} Error if not supported.
      */
     async getImage() {

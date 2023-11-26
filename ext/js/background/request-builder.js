@@ -121,7 +121,7 @@ export class RequestBuilder {
             if (typeof onProgress === 'function') {
                 onProgress(true);
             }
-            return result;
+            return new Uint8Array(result);
         }
 
         const contentLengthString = response.headers.get('Content-Length');

@@ -21,7 +21,8 @@ import {yomitan} from '../../yomitan.js';
 
 export class PersistentStorageController {
     constructor() {
-        this._persistentStorageCheckbox = false;
+        /** @type {HTMLInputElement} */
+        this._persistentStorageCheckbox = null;
     }
 
     async prepare() {
@@ -30,7 +31,8 @@ export class PersistentStorageController {
 
         if (!this._isPersistentStorageSupported()) { return; }
 
-        const info = document.querySelector('#storage-persistent-info');
+        /** @type {HTMLDivElement} */
+        const info = document.querySelector('#storage-persistent-info'); // @todo Does this exist?
         if (info !== null) { info.hidden = false; }
 
         const isStoragePeristent = await this.isStoragePeristent();
@@ -68,7 +70,8 @@ export class PersistentStorageController {
 
         this._updateCheckbox(isStoragePeristent);
 
-        const node = document.querySelector('#storage-persistent-fail-warning');
+        /** @type {HTMLDivElement} */
+        const node = document.querySelector('#storage-persistent-fail-warning'); // @todo Does this exist?
         if (node !== null) { node.hidden = isStoragePeristent; }
 
         yomitan.trigger('storageChanged');

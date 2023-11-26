@@ -17,7 +17,6 @@
  */
 
 import {DocumentUtil} from '../dom/document-util.js';
-import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
 
 /**
@@ -29,8 +28,8 @@ export class GoogleDocsUtil {
      * Coordinates are provided in [client space](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems).
      * @param {number} x The x coordinate to search at.
      * @param {number} y The y coordinate to search at.
-     * @param {GetRangeFromPointOptions} options Options to configure how element detection is performed.
-     * @returns {?TextSourceRange|TextSourceElement} A range for the hovered text or element, or `null` if no applicable content was found.
+     * @param {import('../dom/document-util.js').GetRangeFromPointOptions} options Options to configure how element detection is performed.
+     * @returns {?TextSourceRange|import('../dom/text-source-element.js').TextSourceElement} A range for the hovered text or element, or `null` if no applicable content was found.
      */
     static getRangeFromPoint(x, y, {normalizeCssZoom}) {
         const styleNode = this._getStyleNode();
@@ -106,7 +105,7 @@ export class GoogleDocsUtil {
             const mid = Math.floor((start + end) / 2);
             range.setStart(textNode, mid);
             range.setEnd(textNode, end);
-            if (DocumentUtil.isPointInAnyRect(x, y, range.getClientRects())) {
+            if (DocumentUtil.isPointInAnyRect(x, y, Array.from(range.getClientRects()))) {
                 start = mid;
             } else {
                 end = mid;

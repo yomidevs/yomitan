@@ -60,6 +60,7 @@ function getOperatingSystemDisplayName(os) {
         const {name, version} = manifest;
         const {browser, platform: {os}} = await yomitan.api.getEnvironmentInfo();
 
+        /** @type {HTMLAnchorElement} */
         const thisVersionLink = document.querySelector('#release-notes-this-version-link');
         thisVersionLink.href = thisVersionLink.dataset.hrefFormat.replace(/\{version\}/g, version);
 
@@ -79,7 +80,10 @@ function getOperatingSystemDisplayName(os) {
 
             document.querySelector('#anki-connect-version').textContent = (ankiConnectVersion !== null ? `${ankiConnectVersion}` : 'Unknown');
             document.querySelector('#anki-connect-version-container').hasError = `${ankiConnectVersion === null}`;
-            document.querySelector('#anki-connect-version-unknown-message').hidden = (ankiConnectVersion !== null);
+
+            /** @type {HTMLElement} */
+            const ankiConnectVersionUnknownMessage = document.querySelector('#anki-connect-version-unknown-message');
+            ankiConnectVersionUnknownMessage.hidden = (ankiConnectVersion !== null);
         })();
 
         (async () => {
@@ -105,7 +109,9 @@ function getOperatingSystemDisplayName(os) {
                 fragment.appendChild(node);
             }
 
-            document.querySelector('#installed-dictionaries-none').hidden = (dictionaryInfos.length !== 0);
+            /** @type {HTMLElement} */
+            const installedDictionariesNone = document.querySelector('#installed-dictionaries-none');
+            installedDictionariesNone.hidden = (dictionaryInfos.length !== 0);
             const container = document.querySelector('#installed-dictionaries');
             container.textContent = '';
             container.appendChild(fragment);

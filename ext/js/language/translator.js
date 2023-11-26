@@ -19,7 +19,6 @@
 import {RegexUtil} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {Deinflector} from './deinflector.js';
-import {DictionaryDatabase} from './dictionary-database.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.
@@ -38,8 +37,8 @@ export class Translator {
     /**
      * Creates a new Translator instance.
      * @param {object} details The details for the class.
-     * @param {JapaneseUtil} details.japaneseUtil An instance of JapaneseUtil.
-     * @param {DictionaryDatabase} details.database An instance of DictionaryDatabase.
+     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} details.japaneseUtil An instance of JapaneseUtil.
+     * @param {import('./dictionary-database.js').DictionaryDatabase} details.database An instance of DictionaryDatabase.
      */
     constructor({japaneseUtil, database}) {
         this._japaneseUtil = japaneseUtil;
@@ -72,7 +71,7 @@ export class Translator {
      *   One of: 'group', 'merge', 'split', 'simple'
      * @param {string} text The text to find terms for.
      * @param {Translation.FindTermsOptions} options A object describing settings about the lookup.
-     * @returns {{dictionaryEntries: Translation.TermDictionaryEntry[], originalTextLength: number}} An object containing dictionary entries and the length of the original source text.
+     * @returns {Promise<{dictionaryEntries: Translation.TermDictionaryEntry[], originalTextLength: number}>} An object containing dictionary entries and the length of the original source text.
      */
     async findTerms(mode, text, options) {
         const {enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder} = options;
@@ -126,7 +125,7 @@ export class Translator {
      *   but is typically just one character, which is a single kanji. If the string is multiple
      *   characters long, each character will be searched in the database.
      * @param {Translation.FindKanjiOptions} options A object describing settings about the lookup.
-     * @returns {Translation.KanjiDictionaryEntry[]} An array of definitions. See the _createKanjiDefinition() function for structure details.
+     * @returns {Promise<Translation.KanjiDictionaryEntry[]>} An array of definitions. See the _createKanjiDefinition() function for structure details.
      */
     async findKanji(text, options) {
         const {enabledDictionaryMap} = options;
@@ -165,7 +164,7 @@ export class Translator {
      * @param {{term: string, reading: string|null}[]} termReadingList An array of `{term, reading}` pairs. If reading is null,
      *   the reading won't be compared.
      * @param {Iterable<string>} dictionaries An array of dictionary names.
-     * @returns {TermFrequency[]} An array of term frequencies.
+     * @returns {Promise<TermFrequency[]>} An array of term frequencies.
      */
     async getTermFrequencies(termReadingList, dictionaries) {
         const dictionarySet = new Set();
@@ -1066,7 +1065,7 @@ export class Translator {
     // Term data
 
     _createTag(databaseTag, name, dictionary) {
-        const {category, notes, order, score} = (databaseTag !== null ? databaseTag : {});
+        const {category=undefined, notes=undefined, order=undefined, score=undefined} = (databaseTag !== null ? databaseTag : {});
         return {
             name,
             category: (typeof category === 'string' && category.length > 0 ? category : 'default'),

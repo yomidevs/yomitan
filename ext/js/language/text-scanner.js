@@ -443,7 +443,7 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
-    _onMouseOut() {
+    _onMouseOut(_e) {
         this._scanTimerClear();
     }
 
@@ -648,7 +648,7 @@ export class TextScanner extends EventDispatcher {
         return this._onMouseMove(e);
     }
 
-    _onMousePointerUp() {
+    _onMousePointerUp(_e) {
         // NOP
     }
 
@@ -660,7 +660,7 @@ export class TextScanner extends EventDispatcher {
         return this._onMouseOut(e);
     }
 
-    _onTouchPointerOver() {
+    _onTouchPointerOver(_e) {
         // NOP
     }
 
@@ -689,7 +689,7 @@ export class TextScanner extends EventDispatcher {
         return this._onPrimaryTouchEnd(e, 0, 0, false);
     }
 
-    _onTouchPointerOut() {
+    _onTouchPointerOut(_e) {
         // NOP
     }
 
@@ -728,7 +728,7 @@ export class TextScanner extends EventDispatcher {
         this._onPenPointerOut(e);
     }
 
-    _onPenPointerOut() {
+    _onPenPointerOut(_e) {
         this._penPointerState = 0;
         this._preventScroll = false;
         this._preventNextContextMenu = false;

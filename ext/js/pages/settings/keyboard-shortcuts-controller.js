@@ -27,11 +27,16 @@ export class KeyboardShortcutController {
         this._settingsController = settingsController;
         this._entries = [];
         this._os = null;
+        /** @type {HTMLButtonElement} */
         this._addButton = null;
+        /** @type {HTMLButtonElement} */
         this._resetButton = null;
+        /** @type {HTMLDivElement} */
         this._listContainer = null;
+        /** @type {HTMLDivElement} */
         this._emptyIndicator = null;
         this._stringComparer = new Intl.Collator('en-US'); // Invariant locale
+        /** @type {HTMLDivElement} */
         this._scrollContainer = null;
         this._actionDetails = new Map([
             ['',                                 {scopes: new Set()}],
@@ -534,7 +539,7 @@ class KeyboardShortcutHotkeyEntry {
 
         const {action, argument} = this._data;
         const details = this._parent.getActionDetails(action);
-        const {argument: argumentDetails} = typeof details !== 'undefined' ? details : {};
+        const {argument: argumentDetails=undefined} = typeof details !== 'undefined' ? details : {};
 
         this._argumentContainer.textContent = '';
         if (typeof argumentDetails !== 'undefined') {
@@ -571,7 +576,7 @@ class KeyboardShortcutHotkeyEntry {
         let okay = true;
         const {action, argument} = this._data;
         const details = this._parent.getActionDetails(action);
-        const {argument: argumentDetails} = typeof details !== 'undefined' ? details : {};
+        const {argument: argumentDetails=undefined} = typeof details !== 'undefined' ? details : {};
 
         if (typeof argumentDetails !== 'undefined') {
             const {template} = argumentDetails;

@@ -20,9 +20,13 @@ export class PopupPreviewController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
+        /** @type {HTMLIFrameElement} */
         this._frame = null;
+        /** @type {HTMLTextAreaElement} */
         this._customCss = null;
+        /** @type {HTMLTextAreaElement} */
         this._customOuterCss = null;
+        /** @type {HTMLDivElement} */
         this._previewFrameContainer = null;
     }
 

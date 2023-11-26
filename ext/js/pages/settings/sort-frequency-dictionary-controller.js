@@ -21,9 +21,13 @@ import {yomitan} from '../../yomitan.js';
 export class SortFrequencyDictionaryController {
     constructor(settingsController) {
         this._settingsController = settingsController;
+        /** @type {HTMLSelectElement} */
         this._sortFrequencyDictionarySelect = null;
+        /** @type {HTMLSelectElement} */
         this._sortFrequencyDictionaryOrderSelect = null;
+        /** @type {HTMLDivElement} */
         this._sortFrequencyDictionaryOrderAutoButton = null;
+        /** @type {HTMLDivElement} */
         this._sortFrequencyDictionaryOrderContainerNode = null;
         this._getDictionaryInfoToken = null;
     }

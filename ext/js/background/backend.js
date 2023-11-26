@@ -35,7 +35,7 @@ import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {MediaUtil} from '../media/media-util.js';
 import {yomitan} from '../yomitan.js';
-import {OffscreenProxy, DictionaryDatabaseProxy, TranslatorProxy, ClipboardReaderProxy} from './offscreen-proxy.js';
+import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
 import {ProfileConditionsUtil} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {ScriptManager} from './script-manager.js';
@@ -674,6 +674,12 @@ export class Backend {
         await this._saveOptions(source);
     }
 
+    /**
+     * @param {object} params Parameters.
+     * @param {boolean|string} [params.focus] If true, the tab will be focused. If 'ifCreated', the tab will be focused if it was created.
+     * @param {?string} [params.text] If specified, the search query will be updated.
+     * @returns {Promise<object>} A promise which is resolved with the tab ID and window ID of the search popup.
+     */
     async _onApiGetOrCreateSearchPopup({focus=false, text=null}) {
         const {tab, created} = await this._getOrCreateSearchPopup();
         if (focus === true || (focus === 'ifCreated' && created)) {
@@ -802,6 +808,7 @@ export class Backend {
         const {mode='existingOrNewTab', query} = params || {};
 
         const baseUrl = chrome.runtime.getURL('/search.html');
+        /** @type {Record<string, string>} */
         const queryParams = {};
         if (query && query.length > 0) { queryParams.query = query; }
         const queryString = new URLSearchParams(queryParams).toString();
@@ -821,7 +828,7 @@ export class Backend {
         const openInTab = async () => {
             const tabInfo = await this._findTabs(1000, false, predicate, false);
             if (tabInfo !== null) {
-                const {tab} = tabInfo;
+                const [{tab}] = tabInfo;
                 await this._focusTab(tab);
                 if (queryParams.query) {
                     await this._updateSearchQuery(tab.id, queryParams.query, true);
@@ -960,7 +967,7 @@ export class Backend {
                 return false;
             }
         };
-        return await this._findTabs(1000, false, predicate, true);
+        return await this._findTabs(1000, false, predicate, true)[0];
     }
 
     _getSearchPopupWindowCreateData(url, options) {
@@ -1499,6 +1506,13 @@ export class Backend {
         });
     }
 
+    /**
+     * @param {number} timeout Delay in milliseconds
+     * @param {boolean} multiple Whether to return multiple results
+     * @param {Function} predicate Predicate function
+     * @param {boolean} predicateIsAsync Whether the predicate function is async
+     * @returns {Promise<Array<{tab: chrome.tabs.Tab, url: string}>>} Tab(s)
+     */
     async _findTabs(timeout, multiple, predicate, predicateIsAsync) {
         // This function works around the need to have the "tabs" permission to access tab.url.
         const tabs = await this._getAllTabs();
@@ -1552,7 +1566,7 @@ export class Backend {
                 promiseTimeout(timeout)
             ]);
             resolve();
-            return result;
+            return [result];
         }
     }
 
@@ -2058,7 +2072,7 @@ export class Backend {
      * @param {string} mode The display mode for the dictionary entries.
      * @param {{matchType: string, deinflect: boolean}} details Custom info for finding terms.
      * @param {object} options The options.
-     * @returns {FindTermsOptions} An options object.
+     * @returns {Translation.FindTermsOptions} An options object.
      */
     _getTranslatorFindTermsOptions(mode, details, options) {
         let {matchType, deinflect} = details;
@@ -2111,7 +2125,7 @@ export class Backend {
     /**
      * Creates an options object for use with `Translator.findKanji`.
      * @param {object} options The options.
-     * @returns {FindKanjiOptions} An options object.
+     * @returns {Translation.FindKanjiOptions} An options object.
      */
     _getTranslatorFindKanjiOptions(options) {
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
@@ -2131,6 +2145,11 @@ export class Backend {
         return enabledDictionaryMap;
     }
 
+    /**
+     * Creates a object for use in `_getTranslatorFindTermsOptions`.
+     * @param {*} textReplacementsOptions Options for text replacements.
+     * @returns {Translation.FindTermsTextReplacement[][]} An array of text replacement groups.
+     */
     _getTranslatorTextReplacements(textReplacementsOptions) {
         const textReplacements = [];
         for (const group of textReplacementsOptions.groups) {

@@ -35,17 +35,17 @@ import {ElementOverflowController} from './element-overflow-controller.js';
 import {OptionToggleHotkeyHandler} from './option-toggle-hotkey-handler.js';
 import {QueryParser} from './query-parser.js';
 
-export class Display extends EventDispatcher {
-    /**
-     * Information about how popup content should be shown, specifically related to the inner popup content.
-     * @typedef {object} ContentDetails
-     * @property {boolean} focus Whether or not the frame should be `focus()`'d.
-     * @property {HistoryParams} params An object containing key-value pairs representing the URL search params.
-     * @property {?HistoryState} state The semi-persistent state assigned to the navigation entry.
-     * @property {?HistoryContent} content The non-persistent content assigned to the navigation entry.
-     * @property {'clear'|'overwrite'|'new'} historyMode How the navigation history should be modified.
-     */
+/**
+ * Information about how popup content should be shown, specifically related to the inner popup content.
+ * @typedef {object} ContentDetails
+ * @property {boolean} focus Whether or not the frame should be `focus()`'d.
+ * @property {HistoryParams} params An object containing key-value pairs representing the URL search params.
+ * @property {?HistoryState} state The semi-persistent state assigned to the navigation entry.
+ * @property {?HistoryContent} content The non-persistent content assigned to the navigation entry.
+ * @property {'clear'|'overwrite'|'new'} historyMode How the navigation history should be modified.
+ */
 
+export class Display extends EventDispatcher {
     /**
      * An object containing key-value pairs representing the URL search params.
      * @typedef {object} HistoryParams
@@ -92,6 +92,7 @@ export class Display extends EventDispatcher {
         this._japaneseUtil = japaneseUtil;
         this._documentFocusController = documentFocusController;
         this._hotkeyHandler = hotkeyHandler;
+        /** @type {HTMLDivElement} */
         this._container = document.querySelector('#dictionary-entries');
         this._dictionaryEntries = [];
         this._dictionaryEntryNodes = [];
@@ -114,6 +115,7 @@ export class Display extends EventDispatcher {
         this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
         this._historyChangeIgnore = false;
         this._historyHasChanged = false;
+        // @todo Does this still get used? It doesn't seem to be in the HTML.
         this._navigationHeader = document.querySelector('#navigation-header');
         this._contentType = 'clear';
         this._defaultTitle = document.title;
@@ -121,21 +123,28 @@ export class Display extends EventDispatcher {
         this._query = '';
         this._fullQuery = '';
         this._queryOffset = 0;
+        /** @type {HTMLDivElement} */
         this._progressIndicator = document.querySelector('#progress-indicator');
         this._progressIndicatorTimer = null;
         this._progressIndicatorVisible = new DynamicProperty(false);
         this._queryParserVisible = false;
         this._queryParserVisibleOverride = null;
+        /** @type {HTMLDivElement} */
         this._queryParserContainer = document.querySelector('#query-parser-container');
         this._queryParser = new QueryParser({
             getSearchContext: this._getSearchContext.bind(this),
             japaneseUtil
         });
+        /** @type {HTMLDivElement} */
         this._contentScrollElement = document.querySelector('#content-scroll');
+        /** @type {HTMLDivElement} */
         this._contentScrollBodyElement = document.querySelector('#content-body');
         this._windowScroll = new ScrollElement(this._contentScrollElement);
+        /** @type {HTMLButtonElement} */
         this._closeButton = document.querySelector('#close-button');
+        /** @type {HTMLButtonElement} */
         this._navigationPreviousButton = document.querySelector('#navigate-previous-button');
+        /** @type {HTMLButtonElement} */
         this._navigationNextButton = document.querySelector('#navigate-next-button');
         this._frontend = null;
         this._frontendSetupPromise = null;
@@ -150,10 +159,12 @@ export class Display extends EventDispatcher {
         this._copyTextarea = null;
         this._contentTextScanner = null;
         this._tagNotification = null;
+        /** @type {HTMLDivElement} */
         this._footerNotificationContainer = document.querySelector('#content-footer');
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         this._elementOverflowController = new ElementOverflowController();
         this._frameVisible = (pageType === 'search');
+        /** @type {HTMLDivElement} */
         this._menuContainer = document.querySelector('#popup-menus');
         this._onEntryClickBind = this._onEntryClick.bind(this);
         this._onKanjiLookupBind = this._onKanjiLookup.bind(this);
@@ -1053,6 +1064,7 @@ export class Display extends EventDispatcher {
     }
 
     _setContentExtensionUnloaded() {
+        /** @type {HTMLDivElement} */
         const errorExtensionUnloaded = document.querySelector('#error-extension-unloaded');
 
         if (this._container !== null) {
@@ -1081,6 +1093,7 @@ export class Display extends EventDispatcher {
     }
 
     _setNoContentVisible(visible) {
+        /** @type {HTMLDivElement} */
         const noResults = document.querySelector('#no-results');
 
         if (noResults !== null) {

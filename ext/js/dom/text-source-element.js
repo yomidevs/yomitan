@@ -18,7 +18,6 @@
 
 import {StringUtil} from '../data/sandbox/string-util.js';
 import {DocumentUtil} from './document-util.js';
-import {TextSourceRange} from './text-source-range.js';
 
 /**
  * This class represents a text source that is attached to a HTML element, such as an <img>
@@ -141,7 +140,7 @@ export class TextSourceElement {
      * @returns {DOMRect[]} The rects.
      */
     getRects() {
-        return DocumentUtil.convertMultipleRectZoomCoordinates(this._element.getClientRects(), this._element);
+        return DocumentUtil.convertMultipleRectZoomCoordinates(Array.from(this._element.getClientRects()), this._element);
     }
 
     /**
@@ -169,7 +168,7 @@ export class TextSourceElement {
 
     /**
      * Checks whether another text source has the same starting point.
-     * @param {TextSourceElement|TextSourceRange} other The other source to test.
+     * @param {TextSourceElement|import('./text-source-range.js').TextSourceRange} other The other source to test.
      * @returns {boolean} `true` if the starting points are equivalent, `false` otherwise.
      */
     hasSameStart(other) {
@@ -207,23 +206,18 @@ export class TextSourceElement {
      */
     static _getElementContent(element) {
         let content;
-        switch (element.nodeName.toUpperCase()) {
-            case 'BUTTON':
-                content = element.textContent;
-                break;
-            case 'IMG':
-                content = element.getAttribute('alt') || '';
-                break;
-            case 'SELECT':
-                {
-                    const {selectedIndex, options} = element;
-                    const option = (selectedIndex >= 0 && selectedIndex < options.length ? options[selectedIndex] : null);
-                    content = (option !== null ? option.textContent : '');
-                }
-                break;
-            default:
+        if (element instanceof HTMLButtonElement) {
+            content = element.textContent;
+        } else if (element instanceof HTMLImageElement) {
+            content = element.getAttribute('alt') || '';
+        } else if (element instanceof HTMLSelectElement) {
+            const {selectedIndex, options} = element;
+            const option = (selectedIndex >= 0 && selectedIndex < options.length ? options[selectedIndex] : null);
+            content = (option !== null ? option.textContent : '');
+        } else {
+            if ('value' in element) {
                 content = `${element.value}`;
-                break;
+            }
         }
 
         // Remove zero-width space and zero-width non-joiner

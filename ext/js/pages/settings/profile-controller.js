@@ -26,14 +26,24 @@ export class ProfileController {
         this._modalController = modalController;
         this._profileConditionsUI = new ProfileConditionsUI(settingsController);
         this._profileConditionsIndex = null;
+
+        /** @type {HTMLSelectElement} */
         this._profileActiveSelect = null;
+        /** @type {HTMLSelectElement} */
         this._profileTargetSelect = null;
+        /** @type {HTMLSelectElement} */
         this._profileCopySourceSelect = null;
+        /** @type {HTMLElement} */
         this._removeProfileNameElement = null;
+        /** @type {HTMLButtonElement} */
         this._profileAddButton = null;
+        /** @type {HTMLButtonElement} */
         this._profileRemoveConfirmButton = null;
+        /** @type {HTMLButtonElement} */
         this._profileCopyConfirmButton = null;
+        /** @type {HTMLDivElement} */
         this._profileEntryListContainer = null;
+        /** @type {HTMLElement} */
         this._profileConditionsProfileName = null;
         this._profileRemoveModal = null;
         this._profileCopyModal = null;

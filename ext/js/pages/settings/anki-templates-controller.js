@@ -29,9 +29,13 @@ export class AnkiTemplatesController {
         this._cachedDictionaryEntryValue = null;
         this._cachedDictionaryEntryText = null;
         this._defaultFieldTemplates = null;
+        /** @type {HTMLTextAreaElement} */
         this._fieldTemplatesTextarea = null;
+        /** @type {HTMLDivElement} */
         this._compileResultInfo = null;
+        /** @type {HTMLInputElement} */
         this._renderFieldInput = null;
+        /** @type {HTMLDivElement} */
         this._renderResult = null;
         this._fieldTemplateResetModal = null;
         this._ankiNoteBuilder = new AnkiNoteBuilder({japaneseUtil: new JapaneseUtil(null)});

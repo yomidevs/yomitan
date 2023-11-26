@@ -384,7 +384,10 @@ export class BackupController {
     }
 
     _onSettingsImportClick() {
-        document.querySelector('#settings-import-file').click();
+        /** @type {HTMLInputElement} */
+        const settingsImportFile = document.querySelector('#settings-import-file');
+
+        settingsImportFile.click();
     }
 
     async _onSettingsImportFileChange(e) {
@@ -426,6 +429,7 @@ export class BackupController {
     // Exporting Dictionaries Database
 
     _databaseExportImportErrorMessage(message, isWarning=false) {
+        /** @type {HTMLDivElement} */
         const errorMessageContainer = document.querySelector('#db-ops-error-report');
         errorMessageContainer.style.display = 'block';
         errorMessageContainer.textContent = message;
@@ -441,6 +445,7 @@ export class BackupController {
 
     _databaseExportProgressCallback({totalRows, completedRows, done}) {
         console.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
+        /** @type {HTMLDivElement} */
         const messageContainer = document.querySelector('#db-ops-progress-report');
         messageContainer.style.display = 'block';
         messageContainer.textContent = `Export Progress: ${completedRows} of ${totalRows} rows completed`;
@@ -465,6 +470,7 @@ export class BackupController {
             return;
         }
 
+        /** @type {HTMLDivElement} */
         const errorMessageContainer = document.querySelector('#db-ops-error-report');
         errorMessageContainer.style.display = 'none';
 
@@ -490,6 +496,7 @@ export class BackupController {
 
     _databaseImportProgressCallback({totalRows, completedRows, done}) {
         console.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
+        /** @type {HTMLDivElement} */
         const messageContainer = document.querySelector('#db-ops-progress-report');
         messageContainer.style.display = 'block';
         messageContainer.style.color = '#4169e1';
@@ -510,7 +517,9 @@ export class BackupController {
     }
 
     _onSettingsImportDatabaseClick() {
-        document.querySelector('#settings-import-db').click();
+        /** @type {HTMLInputElement} */
+        const settingsImportDb = document.querySelector('#settings-import-db');
+        settingsImportDb.click();
     }
 
     async _onSettingsImportDatabaseChange(e) {
@@ -520,6 +529,7 @@ export class BackupController {
             return;
         }
 
+        /** @type {HTMLDivElement} */
         const errorMessageContainer = document.querySelector('#db-ops-error-report');
         errorMessageContainer.style.display = 'none';
 
@@ -535,6 +545,7 @@ export class BackupController {
             await this._importDatabase(this._dictionariesDatabaseName, file);
         } catch (error) {
             console.log(error);
+            /** @type {HTMLDivElement} */
             const messageContainer = document.querySelector('#db-ops-progress-report');
             messageContainer.style.color = 'red';
             this._databaseExportImportErrorMessage('Encountered errors when importing. Please restart the browser and try again. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.');

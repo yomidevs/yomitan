@@ -24,8 +24,11 @@ export class SentenceTerminationCharactersController {
         this._entries = [];
         this._addButton = null;
         this._resetButton = null;
+        /** @type {HTMLTableElement} */
         this._listTable = null;
+        /** @type {HTMLTableSectionElement} */
         this._listContainer = null;
+        /** @type {HTMLDivElement} */
         this._emptyIndicator = null;
     }
 

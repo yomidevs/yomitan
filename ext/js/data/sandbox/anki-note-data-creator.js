@@ -25,7 +25,7 @@ import {DictionaryDataUtil} from '../../language/sandbox/dictionary-data-util.js
 export class AnkiNoteDataCreator {
     /**
      * Creates a new instance.
-     * @param {JapaneseUtil} japaneseUtil An instance of `JapaneseUtil`.
+     * @param {import('../../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil An instance of `JapaneseUtil`.
      */
     constructor(japaneseUtil) {
         this._japaneseUtil = japaneseUtil;

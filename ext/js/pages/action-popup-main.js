@@ -49,7 +49,9 @@ export class DisplayController {
             this._setupOptions(primaryProfile);
         }
 
-        document.querySelector('.action-select-profile').hidden = (profiles.length <= 1);
+        /** @type {HTMLButtonElement} */
+        const actionSelectProfile = document.querySelector('.action-select-profile');
+        actionSelectProfile.hidden = (profiles.length <= 1);
 
         this._updateProfileSelect(profiles, profileCurrent);
 
@@ -145,7 +147,9 @@ export class DisplayController {
     _setupOptions({options}) {
         const extensionEnabled = options.general.enable;
         const onToggleChanged = () => yomitan.api.commandExec('toggleTextScanning');
-        for (const toggle of document.querySelectorAll('#enable-search,#enable-search2')) {
+        /** @type {NodeListOf<HTMLInputElement>} */
+        const toggles = document.querySelectorAll('#enable-search,#enable-search2');
+        for (const toggle of toggles) {
             toggle.checked = extensionEnabled;
             toggle.addEventListener('change', onToggleChanged, false);
         }
@@ -167,6 +171,7 @@ export class DisplayController {
     }
 
     _updateProfileSelect(profiles, profileCurrent) {
+        /** @type {HTMLSelectElement} */
         const select = document.querySelector('#profile-select');
         const optionGroup = document.querySelector('#profile-select-option-group');
         const fragment = document.createDocumentFragment();
@@ -203,6 +208,7 @@ export class DisplayController {
     }
 
     async _updateDictionariesEnabledWarnings(options) {
+        /** @type {NodeListOf<HTMLDivElement>} */
         const noDictionariesEnabledWarnings = document.querySelectorAll('.no-dictionaries-enabled-warning');
         const dictionaries = await yomitan.api.getDictionaryInfo();
 
@@ -230,6 +236,7 @@ export class DisplayController {
         const permissions = await this._permissionsUtil.getAllPermissions();
         if (this._permissionsUtil.hasRequiredPermissionsForOptions(permissions, options)) { return; }
 
+        /** @type {NodeListOf<HTMLAnchorElement|HTMLDivElement>} */
         const warnings = document.querySelectorAll('.action-open-permissions,.permissions-required-warning');
         for (const node of warnings) {
             node.hidden = false;

@@ -46,6 +46,14 @@ export class DisplayHistory extends EventDispatcher {
         this._useBrowserHistory = value;
     }
 
+    get clearable() {
+        return this._clearable;
+    }
+
+    set clearable(value) {
+        this._clearable = value;
+    }
+
     prepare() {
         window.addEventListener('popstate', this._onPopState.bind(this), false);
     }

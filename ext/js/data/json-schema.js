@@ -866,8 +866,14 @@ class JsonSchemaProxyHandler {
         return Object.getPrototypeOf(target);
     }
 
+    /**
+     * @returns {boolean} N/A
+     * @throws {Error} Not supported
+     */
     setPrototypeOf() {
         throw new Error('setPrototypeOf not supported');
+        // eslint-disable-next-line no-unreachable
+        return true;
     }
 
     isExtensible(target) {
@@ -883,8 +889,14 @@ class JsonSchemaProxyHandler {
         return Object.getOwnPropertyDescriptor(target, property);
     }
 
+    /**
+     * @returns {boolean} N/A
+     * @throws {Error} Not supported
+     */
     defineProperty() {
         throw new Error('defineProperty not supported');
+        // eslint-disable-next-line no-unreachable
+        return true;
     }
 
     has(target, property) {
@@ -914,7 +926,7 @@ class JsonSchemaProxyHandler {
     }
 
     set(target, property, value) {
-        if (typeof property === 'symbol') { throw new Error(`Cannot assign symbol property ${property}`); }
+        if (typeof property === 'symbol') { throw new Error(`Cannot assign symbol property ${property.toString()}`); }
 
         let propertySchema;
         if (Array.isArray(target)) {
@@ -959,8 +971,14 @@ class JsonSchemaProxyHandler {
         throw new Error('apply not supported');
     }
 
+    /**
+     * @returns {object} N/A
+     * @throws {Error} Not supported
+     */
     construct() {
         throw new Error('construct not supported');
+        // eslint-disable-next-line no-unreachable
+        return {};
     }
 
     // Private

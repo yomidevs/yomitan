@@ -25,8 +25,11 @@ export class NestedPopupsController {
     }
 
     async prepare() {
+        /** @type {HTMLInputElement} */
         this._nestedPopupsEnabled = document.querySelector('#nested-popups-enabled');
+        /** @type {HTMLInputElement} */
         this._nestedPopupsCount = document.querySelector('#nested-popups-count');
+        /** @type {HTMLDivElement} */
         this._nestedPopupsEnabledMoreOptions = document.querySelector('#nested-popups-enabled-more-options');
 
         const options = await this._settingsController.getOptions();

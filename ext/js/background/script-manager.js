@@ -178,10 +178,15 @@ export class ScriptManager {
 
     _injectStylesheetMV3(type, content, tabId, frameId, allFrames) {
         return new Promise((resolve, reject) => {
+            /** @type {chrome.scripting.StyleOrigin} */
+            const author = 'AUTHOR';
+            /** @type {chrome.scripting.StyleOrigin} */
+            const user = 'USER';
+
             const details = (
                 type === 'file' ?
-                {origin: 'AUTHOR', files: [content]} :
-                {origin: 'USER',   css: content}
+                {origin: author, files: [content], target: undefined} :
+                {origin: user,   css: content, target: undefined}
             );
             details.target = {
                 tabId,
@@ -284,15 +289,16 @@ export class ScriptManager {
             webNavigationEvent.addListener(onTabCommitted, filter);
             unregister = () => webNavigationEvent.removeListener(onTabCommitted);
         } else {
-            const onTabUpdated = (tabId, {status}, {url}) => {
-                if (typeof status === 'string' && typeof url === 'string') {
-                    this._injectContentScript(false, details2, status, url, tabId, void 0);
+            const onTabUpdated = (tabId, {status}, tab) => {
+                if (typeof status === 'string' && 'url' in tab && typeof tab.url === 'string') {
+                    this._injectContentScript(false, details2, status, tab.url, tabId, void 0);
                 }
             };
+            /** @type {{url: [string], properties: [browser.tabs.UpdatePropertyName]}} */
             const extraParameters = {url: [urlMatches], properties: ['status']};
             try {
                 // Firefox
-                chrome.tabs.onUpdated.addListener(onTabUpdated, extraParameters);
+                browser.tabs.onUpdated.addListener(onTabUpdated, extraParameters);
             } catch (e) {
                 // Chrome
                 details2.urlRegex = new RegExp(urlMatches);

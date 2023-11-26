@@ -21,8 +21,10 @@ import {EventListenerCollection} from '../../core.js';
 export class RecommendedPermissionsController {
     constructor(settingsController) {
         this._settingsController = settingsController;
+        /** @type {NodeListOf<HTMLInputElement>} */
         this._originToggleNodes = null;
         this._eventListeners = new EventListenerCollection();
+        /** @type {HTMLDivElement} */
         this._errorContainer = null;
     }
 

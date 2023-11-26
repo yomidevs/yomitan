@@ -29,7 +29,9 @@ export class DocumentFocusController {
      *   should be automatically focused on prepare.
      */
     constructor(autofocusElementSelector=null) {
+        /** @type {?HTMLElement} */
         this._autofocusElement = (autofocusElementSelector !== null ? document.querySelector(autofocusElementSelector) : null);
+        /** @type {HTMLElement} */
         this._contentScrollFocusElement = document.querySelector('#content-scroll-focus');
     }
 
@@ -46,7 +48,7 @@ export class DocumentFocusController {
 
     /**
      * Removes focus from a given element.
-     * @param {Element} element The element to remove focus from.
+     * @param {HTMLElement} element The element to remove focus from.
      */
     blurElement(element) {
         if (document.activeElement !== element) { return; }

@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {ScriptManager} from '../background/script-manager.js';
 import {log} from '../core.js';
 
 /**
@@ -25,7 +24,7 @@ import {log} from '../core.js';
 export class AccessibilityController {
     /**
      * Creates a new instance.
-     * @param {ScriptManager} scriptManager An instance of the `ScriptManager` class.
+     * @param {import('../background/script-manager.js').ScriptManager} scriptManager An instance of the `ScriptManager` class.
      */
     constructor(scriptManager) {
         this._scriptManager = scriptManager;

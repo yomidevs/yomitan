@@ -18,7 +18,6 @@
 
 import {DocumentUtil} from './document-util.js';
 import {DOMTextScanner} from './dom-text-scanner.js';
-import {TextSourceElement} from './text-source-element.js';
 
 /**
  * This class represents a text source that comes from text nodes in the document.
@@ -36,10 +35,10 @@ export class TextSourceRange {
      * @param {?Element} imposterElement The temporary imposter element.
      * @param {?Element} imposterSourceElement The source element which the imposter is imitating.
      *   Must not be `null` if imposterElement is specified.
-     * @param {?Rect[]} cachedRects A set of cached `DOMRect`s representing the rects of the text source,
+     * @param {?DOMRect[]} cachedRects A set of cached `DOMRect`s representing the rects of the text source,
      *   which can be used after the imposter element is removed from the page.
      *   Must not be `null` if imposterElement is specified.
-     * @param {?Rect} cachedSourceRect A cached `DOMRect` representing the rect of the `imposterSourceElement`,
+     * @param {?DOMRect} cachedSourceRect A cached `DOMRect` representing the rect of the `imposterSourceElement`,
      *   which can be used after the imposter element is removed from the page.
      *   Must not be `null` if imposterElement is specified.
      */
@@ -71,7 +70,7 @@ export class TextSourceRange {
 
     /**
      * The starting offset for the range.
-     * @type {Range}
+     * @type {number}
      */
     get rangeStartOffset() {
         return this._rangeStartOffset;
@@ -163,18 +162,21 @@ export class TextSourceRange {
      */
     getRects() {
         if (this._isImposterDisconnected()) { return this._getCachedRects(); }
-        return DocumentUtil.convertMultipleRectZoomCoordinates(this._range.getClientRects(), this._range.startContainer);
+        return DocumentUtil.convertMultipleRectZoomCoordinates(Array.from(this._range.getClientRects()), this._range.startContainer);
     }
 
     /**
      * Gets writing mode that is used for this element.
      * See: https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode.
-     * @returns {string} The rects.
+     * @returns {?string} The rects.
      */
     getWritingMode() {
         let node = this._isImposterDisconnected() ? this._imposterSourceElement : this._range.startContainer;
-        if (node !== null && node.nodeType !== Node.ELEMENT_NODE) { node = node.parentElement; }
-        return DocumentUtil.getElementWritingMode(node);
+        if (node !== null && !(node instanceof Element)) { node = node.parentElement; }
+        if (node instanceof Element) {
+            return DocumentUtil.getElementWritingMode(node);
+        }
+        return null;
     }
 
     /**
@@ -198,7 +200,7 @@ export class TextSourceRange {
 
     /**
      * Checks whether another text source has the same starting point.
-     * @param {TextSourceElement|TextSourceRange} other The other source to test.
+     * @param {import('./text-source-element.js').TextSourceElement|TextSourceRange} other The other source to test.
      * @returns {boolean} `true` if the starting points are equivalent, `false` otherwise.
      * @throws {Error} An exception can be thrown if `Range.compareBoundaryPoints` fails,
      *   which shouldn't happen, but the handler is kept in case of unexpected errors.
@@ -254,7 +256,7 @@ export class TextSourceRange {
      * @returns {TextSourceRange} A new instance of the class corresponding to the range.
      */
     static createFromImposter(range, imposterElement, imposterSourceElement) {
-        const cachedRects = DocumentUtil.convertMultipleRectZoomCoordinates(range.getClientRects(), range.startContainer);
+        const cachedRects = DocumentUtil.convertMultipleRectZoomCoordinates(Array.from(range.getClientRects()), range.startContainer);
         const cachedSourceRect = DocumentUtil.convertRectZoomCoordinates(imposterSourceElement.getBoundingClientRect(), imposterSourceElement);
         return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect);
     }
@@ -269,7 +271,7 @@ export class TextSourceRange {
 
     /**
      * Gets the cached rects for a disconnected imposter element.
-     * @returns {Rect[]} The rects for the element.
+     * @returns {DOMRect[]} The rects for the element.
      */
     _getCachedRects() {
         const sourceRect = DocumentUtil.convertRectZoomCoordinates(this._imposterSourceElement.getBoundingClientRect(), this._imposterSourceElement);

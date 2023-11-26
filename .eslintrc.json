@@ -61,8 +61,8 @@
                 "builtinGlobals": false
             }
         ],
+        "no-shadow-restricted-names": "error",
         "no-undef": "error",
-        "no-undefined": "error",
         "no-underscore-dangle": [
             "error",
             {
@@ -253,7 +253,6 @@
         "jsdoc/multiline-blocks": "error",
         "jsdoc/no-bad-blocks": "error",
         "jsdoc/no-multi-asterisks": "error",
-        "jsdoc/no-undefined-types": 1,
         "jsdoc/require-asterisk-prefix": "error",
         "jsdoc/require-hyphen-before-param-description": [
             "error",
