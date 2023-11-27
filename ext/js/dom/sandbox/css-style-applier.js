@@ -24,7 +24,7 @@ export class CssStyleApplier {
     /**
      * Creates a new instance of the class.
      * @param {string} styleDataUrl The local URL to the JSON file continaing the style rules.
-     *   The style rules should follow the format of {@link CssStyleApplierRawStyleData}.
+     *   The style rules should follow the format of `CssStyleApplierRawStyleData`.
      */
     constructor(styleDataUrl) {
         /** @type {string} */

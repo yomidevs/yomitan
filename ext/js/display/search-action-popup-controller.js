@@ -18,10 +18,10 @@
 
 export class SearchActionPopupController {
     /**
-     * @param {SearchPersistentStateController} searchPersistentStateController
+     * @param {import('./search-persistent-state-controller.js').SearchPersistentStateController} searchPersistentStateController
      */
     constructor(searchPersistentStateController) {
-        /** @type {SearchPersistentStateController} */
+        /** @type {import('./search-persistent-state-controller.js').SearchPersistentStateController} */
         this._searchPersistentStateController = searchPersistentStateController;
     }
 

@@ -18,6 +18,7 @@
 
 import {EventDispatcher, EventListenerCollection, clone, log} from '../core.js';
 import {DocumentUtil} from '../dom/document-util.js';
+import {TextSourceElement} from '../dom/text-source-element.js';
 import {yomitan} from '../yomitan.js';
 
 /**

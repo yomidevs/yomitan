@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deserializeError, isObject} from '../core.js';
+import {isObject} from '../core.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 
 export class OffscreenProxy {
@@ -158,15 +158,36 @@ export class TranslatorProxy {
 }
 
 export class ClipboardReaderProxy {
+    /**
+     * @param {OffscreenProxy} offscreen
+     */
     constructor(offscreen) {
+        /** @type {?import('environment').Browser} */
+        this._browser = null;
+        /** @type {OffscreenProxy} */
         this._offscreen = offscreen;
     }
 
-    async getText(useRichText) {
-        return this._offscreen.sendMessagePromise({action: 'clipboardGetTextOffscreen', params: {useRichText}});
+    /** @type {?import('environment').Browser} */
+    get browser() { return this._browser; }
+    set browser(value) {
+        if (this._browser === value) { return; }
+        this._browser = value;
+        this._offscreen.sendMessagePromise({action: 'clipboardSetBrowserOffsecreen', params: {value}});
     }
 
+    /**
+     * @param {boolean} useRichText
+     * @returns {Promise<string>}
+     */
+    async getText(useRichText) {
+        return await this._offscreen.sendMessagePromise({action: 'clipboardGetTextOffscreen', params: {useRichText}});
+    }
+
+    /**
+     * @returns {Promise<?string>}
+     */
     async getImage() {
-        return this._offscreen.sendMessagePromise({action: 'clipboardGetImageOffscreen'});
+        return await this._offscreen.sendMessagePromise({action: 'clipboardGetImageOffscreen'});
     }
 }

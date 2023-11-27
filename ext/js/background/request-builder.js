@@ -22,12 +22,6 @@
  */
 export class RequestBuilder {
     /**
-     * A progress callback for a fetch read.
-     * @callback ProgressCallback
-     * @param {boolean} complete Whether or not the data has been completely read.
-     */
-
-    /**
      * Creates a new instance.
      */
     constructor() {
@@ -109,14 +103,17 @@ export class RequestBuilder {
     /**
      * Reads the array buffer body of a fetch response, with an optional `onProgress` callback.
      * @param {Response} response The response of a `fetch` call.
-     * @param {ProgressCallback} onProgress The progress callback
+     * @param {?import('request-builder.js').ProgressCallback} onProgress The progress callback
      * @returns {Promise<Uint8Array>} The resulting binary data.
      */
     static async readFetchResponseArrayBuffer(response, onProgress) {
         let reader;
         try {
             if (typeof onProgress === 'function') {
-                reader = response.body.getReader();
+                const {body} = response;
+                if (body !== null) {
+                    reader = body.getReader();
+                }
             }
         } catch (e) {
             // Not supported

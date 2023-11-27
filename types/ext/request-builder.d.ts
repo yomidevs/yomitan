@@ -19,3 +19,5 @@ export type FetchEventListeners = {
     onBeforeSendHeaders: ((details: chrome.webRequest.WebRequestHeadersDetails) => (chrome.webRequest.BlockingResponse | void)) | null;
     onErrorOccurred: ((details: chrome.webRequest.WebResponseErrorDetails) => void) | null;
 };
+
+export type ProgressCallback = (complete: boolean) => void;

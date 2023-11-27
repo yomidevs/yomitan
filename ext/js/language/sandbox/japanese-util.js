@@ -466,7 +466,7 @@ export class JapaneseUtil {
 
     /**
      * @param {string} text
-     * @param {?TextSourceMap} [sourceMap]
+     * @param {?import('../../general/text-source-map.js').TextSourceMap} [sourceMap]
      * @returns {string}
      */
     convertHalfWidthKanaToFullWidth(text, sourceMap=null) {
@@ -513,7 +513,7 @@ export class JapaneseUtil {
 
     /**
      * @param {string} text
-     * @param {?TextSourceMap} sourceMap
+     * @param {?import('../../general/text-source-map.js').TextSourceMap} sourceMap
      * @returns {string}
      */
     convertAlphabeticToKana(text, sourceMap=null) {
@@ -676,7 +676,7 @@ export class JapaneseUtil {
     /**
      * @param {string} text
      * @param {boolean} fullCollapse
-     * @param {?TextSourceMap} [sourceMap]
+     * @param {?import('../../general/text-source-map.js').TextSourceMap} [sourceMap]
      * @returns {string}
      */
     collapseEmphaticSequences(text, fullCollapse, sourceMap=null) {
@@ -816,7 +816,7 @@ export class JapaneseUtil {
 
     /**
      * @param {string} text
-     * @param {?TextSourceMap} sourceMap
+     * @param {?import('../../general/text-source-map.js').TextSourceMap} sourceMap
      * @param {number} sourceMapStart
      * @returns {string}
      */

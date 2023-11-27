@@ -96,7 +96,7 @@ export class Backend {
         });
         /** @type {?import('settings').Options} */
         this._options = null;
-        /** @type {JsonSchema[]} */
+        /** @type {import('../data/json-schema.js').JsonSchema[]} */
         this._profileConditionsSchemaCache = [];
         /** @type {ProfileConditionsUtil} */
         this._profileConditionsUtil = new ProfileConditionsUtil();
@@ -665,7 +665,7 @@ export class Backend {
     async _onApiInjectStylesheet({type, value}, sender) {
         const {frameId, tab} = sender;
         if (typeof tab !== 'object' || tab === null || typeof tab.id !== 'number') { throw new Error('Invalid tab'); }
-        return await this._scriptManager.injectStylesheet(type, value, tab.id, frameId, false, true, 'document_start');
+        return await this._scriptManager.injectStylesheet(type, value, tab.id, frameId, false);
     }
 
     /** @type {import('api').Handler<import('api').GetStylesheetContentDetails, import('api').GetStylesheetContentResult>} */
@@ -895,13 +895,7 @@ export class Backend {
         }
     }
 
-    /**
-     *
-     * @param root0
-     * @param root0.targetTabId
-     * @param root0.targetFrameId
-     * @param sender
-     */
+    /** @type {import('api').Handler<import('api').OpenCrossFramePortDetails, import('api').OpenCrossFramePortResult, true>} */
     _onApiOpenCrossFramePort({targetTabId, targetFrameId}, sender) {
         const sourceTabId = (sender && sender.tab ? sender.tab.id : null);
         if (typeof sourceTabId !== 'number') {
@@ -922,7 +916,9 @@ export class Backend {
             otherTabId: sourceTabId,
             otherFrameId: sourceFrameId
         };
+        /** @type {?chrome.runtime.Port} */
         let sourcePort = chrome.tabs.connect(sourceTabId, {frameId: sourceFrameId, name: JSON.stringify(sourceDetails)});
+        /** @type {?chrome.runtime.Port} */
         let targetPort = chrome.tabs.connect(targetTabId, {frameId: targetFrameId, name: JSON.stringify(targetDetails)});
 
         const cleanup = () => {
@@ -937,8 +933,12 @@ export class Backend {
             }
         };
 
-        sourcePort.onMessage.addListener((message) => { targetPort.postMessage(message); });
-        targetPort.onMessage.addListener((message) => { sourcePort.postMessage(message); });
+        sourcePort.onMessage.addListener((message) => {
+            if (targetPort !== null) { targetPort.postMessage(message); }
+        });
+        targetPort.onMessage.addListener((message) => {
+            if (sourcePort !== null) { sourcePort.postMessage(message); }
+        });
         sourcePort.onDisconnect.addListener(cleanup);
         targetPort.onDisconnect.addListener(cleanup);
 

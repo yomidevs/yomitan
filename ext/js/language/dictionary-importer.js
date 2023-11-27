@@ -36,7 +36,7 @@ export class DictionaryImporter {
     }
 
     /**
-     * @param {DictionaryDatabase} dictionaryDatabase
+     * @param {import('./dictionary-database.js').DictionaryDatabase} dictionaryDatabase
      * @param {ArrayBuffer} archiveContent
      * @param {import('dictionary-importer').ImportDetails} details
      * @returns {Promise<import('dictionary-importer').ImportResult>}

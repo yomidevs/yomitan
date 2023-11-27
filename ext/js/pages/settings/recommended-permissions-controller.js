@@ -19,13 +19,21 @@
 import {EventListenerCollection} from '../../core.js';
 
 export class RecommendedPermissionsController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {?NodeListOf<HTMLInputElement>} */
         this._originToggleNodes = null;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {?HTMLElement} */
         this._errorContainer = null;
     }
 
+    /** */
     async prepare() {
         this._originToggleNodes = document.querySelectorAll('.recommended-permissions-toggle');
         this._errorContainer = document.querySelector('#recommended-permissions-error');
@@ -39,35 +47,53 @@ export class RecommendedPermissionsController {
 
     // Private
 
+    /**
+     * @param {import('settings-controller').PermissionsChangedEvent} details
+     */
     _onPermissionsChanged({permissions}) {
         this._eventListeners.removeAllEventListeners();
         const originsSet = new Set(permissions.origins);
-        for (const node of this._originToggleNodes) {
-            node.checked = originsSet.has(node.dataset.origin);
+        if (this._originToggleNodes !== null) {
+            for (const node of this._originToggleNodes) {
+                const {origin} = node.dataset;
+                node.checked = typeof origin === 'string' && originsSet.has(origin);
+            }
         }
     }
 
+    /**
+     * @param {Event} e
+     */
     _onOriginToggleChange(e) {
-        const node = e.currentTarget;
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const value = node.checked;
         node.checked = !value;
 
         const {origin} = node.dataset;
+        if (typeof origin !== 'string') { return; }
         this._setOriginPermissionEnabled(origin, value);
     }
 
+    /** */
     async _updatePermissions() {
         const permissions = await this._settingsController.permissionsUtil.getAllPermissions();
         this._onPermissionsChanged({permissions});
     }
 
+    /**
+     * @param {string} origin
+     * @param {boolean} enabled
+     * @returns {Promise<boolean>}
+     */
     async _setOriginPermissionEnabled(origin, enabled) {
         let added = false;
         try {
             added = await this._settingsController.permissionsUtil.setPermissionsGranted({origins: [origin]}, enabled);
         } catch (e) {
-            this._errorContainer.hidden = false;
-            this._errorContainer.textContent = e.message;
+            if (this._errorContainer !== null) {
+                this._errorContainer.hidden = false;
+                this._errorContainer.textContent = e instanceof Error ? e.message : `${e}`;
+            }
         }
         if (!added) { return false; }
         await this._updatePermissions();

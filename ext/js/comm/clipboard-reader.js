@@ -29,7 +29,7 @@ export class ClipboardReader {
     constructor({document=null, pasteTargetSelector=null, richContentPasteTargetSelector=null}) {
         /** @type {?Document} */
         this._document = document;
-        /** @type {?string} */
+        /** @type {?import('environment').Browser} */
         this._browser = null;
         /** @type {?HTMLTextAreaElement} */
         this._pasteTarget = null;
@@ -43,7 +43,7 @@ export class ClipboardReader {
 
     /**
      * Gets the browser being used.
-     * @type {?string}
+     * @type {?import('environment').Browser}
      */
     get browser() {
         return this._browser;

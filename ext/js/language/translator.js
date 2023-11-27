@@ -29,9 +29,9 @@ export class Translator {
      * @param {import('translator').ConstructorDetails} details The details for the class.
      */
     constructor({japaneseUtil, database}) {
-        /** @type {JapaneseUtil} */
+        /** @type {import('./sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
-        /** @type {DictionaryDatabase} */
+        /** @type {import('./dictionary-database.js').DictionaryDatabase} */
         this._database = database;
         /** @type {?Deinflector} */
         this._deinflector = null;

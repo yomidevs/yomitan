@@ -25,10 +25,10 @@ import {SimpleDOMParser} from '../dom/simple-dom-parser.js';
 
 export class AudioDownloader {
     /**
-     * @param {{japaneseUtil: JapaneseUtil, requestBuilder: RequestBuilder}} details
+     * @param {{japaneseUtil: import('../language/sandbox/japanese-util.js').JapaneseUtil, requestBuilder: RequestBuilder}} details
      */
     constructor({japaneseUtil, requestBuilder}) {
-        /** @type {JapaneseUtil} */
+        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {RequestBuilder} */
         this._requestBuilder = requestBuilder;
@@ -314,7 +314,7 @@ export class AudioDownloader {
      */
     async _downloadAudioFromUrl(url, sourceType, idleTimeout) {
         let signal;
-        /** @type {?(done: boolean) => void} */
+        /** @type {?import('request-builder.js').ProgressCallback} */
         let onProgress = null;
         /** @type {?number} */
         let idleTimer = null;

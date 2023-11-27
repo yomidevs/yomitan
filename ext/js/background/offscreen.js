@@ -50,6 +50,7 @@ export class Offscreen {
         this._messageHandlers = new Map([
             ['clipboardGetTextOffscreen',    {async: true,  contentScript: true,  handler: this._getTextHandler.bind(this)}],
             ['clipboardGetImageOffscreen',   {async: true,  contentScript: true,  handler: this._getImageHandler.bind(this)}],
+            ['clipboardSetBrowserOffsecreen', {async: false, contentScript: true, handler: this._setClipboardBrowser.bind(this)}],
             ['databasePrepareOffscreen',     {async: true,  contentScript: true,  handler: this._prepareDatabaseHandler.bind(this)}],
             ['getDictionaryInfoOffscreen',   {async: true,  contentScript: true,  handler: this._getDictionaryInfoHandler.bind(this)}],
             ['databasePurgeOffscreen',       {async: true,  contentScript: true,  handler: this._purgeDatabaseHandler.bind(this)}],
@@ -59,7 +60,6 @@ export class Offscreen {
             ['findTermsOffscreen',           {async: true,  contentScript: true,  handler: this._findTermsHandler.bind(this)}],
             ['getTermFrequenciesOffscreen',  {async: true,  contentScript: true,  handler: this._getTermFrequenciesHandler.bind(this)}],
             ['clearDatabaseCachesOffscreen', {async: false,  contentScript: true,  handler: this._clearDatabaseCachesHandler.bind(this)}]
-
         ]);
 
         const onMessage = this._onMessage.bind(this);
@@ -74,6 +74,13 @@ export class Offscreen {
 
     _getImageHandler() {
         return this._clipboardReader.getImage();
+    }
+
+    /**
+     * @param {{value: import('environment').Browser}} details
+     */
+    _setClipboardBrowser({value}) {
+        this._clipboardReader.browser = value;
     }
 
     _prepareDatabaseHandler() {

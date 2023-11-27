@@ -206,7 +206,7 @@ export class TextSourceRange {
 
     /**
      * Checks whether another text source has the same starting point.
-     * @param {TextSourceElement|TextSourceRange} other The other source to test.
+     * @param {import('text-source').TextSource} other The other source to test.
      * @returns {boolean} `true` if the starting points are equivalent, `false` otherwise.
      * @throws {Error} An exception can be thrown if `Range.compareBoundaryPoints` fails,
      *   which shouldn't happen, but the handler is kept in case of unexpected errors.

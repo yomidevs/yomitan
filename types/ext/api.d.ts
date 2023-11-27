@@ -444,6 +444,18 @@ export type LoadExtensionScriptsDetails = {
 
 export type LoadExtensionScriptsResult = void;
 
+// openCrossFramePort
+
+export type OpenCrossFramePortDetails = {
+    targetTabId: number;
+    targetFrameId: number;
+};
+
+export type OpenCrossFramePortResult = {
+    targetTabId: number;
+    targetFrameId: number;
+};
+
 // requestBackendReadySignal
 
 export type RequestBackendReadySignalDetails = Record<string, never>;

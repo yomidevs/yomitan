@@ -157,6 +157,8 @@ export class DictionaryWorker {
                 resolve(result2);
             } else {
                 // If formatResult is not provided, the response is assumed to be the same type
+                // For some reason, eslint thinks the TResponse type is undefined
+                // eslint-disable-next-line jsdoc/no-undefined-types
                 resolve(/** @type {TResponse} */ (/** @type {unknown} */ (result)));
             }
         }

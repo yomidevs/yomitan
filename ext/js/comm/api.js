@@ -415,9 +415,9 @@ export class API {
     }
 
     /**
-     *
-     * @param targetTabId
-     * @param targetFrameId
+     * @param {import('api').OpenCrossFramePortDetails['targetTabId']} targetTabId
+     * @param {import('api').OpenCrossFramePortDetails['targetFrameId']} targetFrameId
+     * @returns {Promise<import('api').OpenCrossFramePortResult>}
      */
     openCrossFramePort(targetTabId, targetFrameId) {
         return this._invoke('openCrossFramePort', {targetTabId, targetFrameId});

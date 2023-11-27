@@ -25,7 +25,7 @@ export class RegexUtil {
      * Applies string.replace using a regular expression and replacement string as arguments.
      * A source map of the changes is also maintained.
      * @param {string} text A string of the text to replace.
-     * @param {TextSourceMap} sourceMap An instance of `TextSourceMap` which corresponds to `text`.
+     * @param {import('./text-source-map.js').TextSourceMap} sourceMap An instance of `TextSourceMap` which corresponds to `text`.
      * @param {RegExp} pattern A regular expression to use as the replacement.
      * @param {string} replacement A replacement string that follows the format of the standard
      *   JavaScript regular expression replacement string.
