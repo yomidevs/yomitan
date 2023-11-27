@@ -23,17 +23,18 @@ export type DatabaseId = {
     id: number; // Automatic database primary key
 };
 
-export interface MediaDataBase<TContentType = unknown> {
+export type MediaDataBase<TContentType = unknown> = {
     dictionary: string;
     path: string;
     mediaType: string;
     width: number;
     height: number;
     content: TContentType;
-}
+};
 
-export interface MediaDataArrayBufferContent extends MediaDataBase<ArrayBuffer> {}
-export interface MediaDataStringContent extends MediaDataBase<string> {}
+export type MediaDataArrayBufferContent = MediaDataBase<ArrayBuffer>;
+
+export type MediaDataStringContent = MediaDataBase<string>;
 
 export type Media<T extends (ArrayBuffer | string) = ArrayBuffer> = {index: number} & MediaDataBase<T>;
 

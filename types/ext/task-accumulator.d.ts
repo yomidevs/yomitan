@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export interface Task<V> {
+export type Task<V> = {
     data: V;
     stale: boolean;
-}
+};

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export interface Node<K, V> {
+export type Node<K, V> = {
     key: K | null;
     value: V | null;
     previous: Node<K, V> | null;
     next: Node<K, V> | null;
-}
+};
