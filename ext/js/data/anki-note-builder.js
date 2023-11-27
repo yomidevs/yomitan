@@ -24,10 +24,10 @@ import {AnkiUtil} from './anki-util.js';
 
 export class AnkiNoteBuilder {
     /**
-     * @param {{japaneseUtil: JapaneseUtil}} details
+     * @param {{japaneseUtil: import('../language/sandbox/japanese-util.js').JapaneseUtil}} details
      */
     constructor({japaneseUtil}) {
-        /** @type {JapaneseUtil} */
+        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {RegExp} */
         this._markerPattern = AnkiUtil.cloneFieldMarkerPattern(true);

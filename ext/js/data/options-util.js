@@ -1144,6 +1144,9 @@ export class OptionsUtil {
         return options;
     }
 
+    /**
+     * @type {import('options-util').ModernUpdateFunctionAsync}
+     */
     async _updateVersion21(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v21.handlebars');
 
@@ -1163,6 +1166,10 @@ export class OptionsUtil {
         return options;
     }
 
+    /**
+     * @param {string} url
+     * @returns {Promise<chrome.tabs.Tab>}
+     */
     _createTab(url) {
         return new Promise((resolve, reject) => {
             chrome.tabs.create({url}, (tab) => {

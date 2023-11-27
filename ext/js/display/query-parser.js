@@ -31,7 +31,7 @@ export class QueryParser extends EventDispatcher {
         super();
         /** @type {import('display').GetSearchContextCallback} */
         this._getSearchContext = getSearchContext;
-        /** @type {JapaneseUtil} */
+        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {string} */
         this._text = '';

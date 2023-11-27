@@ -20,10 +20,10 @@ import {EventListenerCollection} from '../core.js';
 
 export class DisplayResizer {
     /**
-     * @param {Display} display
+     * @param {import('./display.js').Display} display
      */
     constructor(display) {
-        /** @type {Display} */
+        /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {?import('core').TokenObject} */
         this._token = null;

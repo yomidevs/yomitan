@@ -24,14 +24,14 @@ import {yomitan} from '../yomitan.js';
 
 export class DisplayAnki {
     /**
-     * @param {Display} display
-     * @param {DisplayAudio} displayAudio
-     * @param {JapaneseUtil} japaneseUtil
+     * @param {import('./display.js').Display} display
+     * @param {import('./display-audio.js').DisplayAudio} displayAudio
+     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      */
     constructor(display, displayAudio, japaneseUtil) {
-        /** @type {Display} */
+        /** @type {import('./display.js').Display} */
         this._display = display;
-        /** @type {DisplayAudio} */
+        /** @type {import('./display-audio.js').DisplayAudio} */
         this._displayAudio = displayAudio;
         /** @type {?string} */
         this._ankiFieldTemplates = null;
@@ -39,11 +39,11 @@ export class DisplayAnki {
         this._ankiFieldTemplatesDefault = null;
         /** @type {AnkiNoteBuilder} */
         this._ankiNoteBuilder = new AnkiNoteBuilder({japaneseUtil});
-        /** @type {?DisplayNotification} */
+        /** @type {?import('./display-notification.js').DisplayNotification} */
         this._errorNotification = null;
         /** @type {?EventListenerCollection} */
         this._errorNotificationEventListeners = null;
-        /** @type {?DisplayNotification} */
+        /** @type {?import('./display-notification.js').DisplayNotification} */
         this._tagsNotification = null;
         /** @type {?Promise<void>} */
         this._updateAdderButtonsPromise = null;

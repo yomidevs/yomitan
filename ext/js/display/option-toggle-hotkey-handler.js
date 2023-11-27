@@ -16,17 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {generateId} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {yomitan} from '../yomitan.js';
 
 export class OptionToggleHotkeyHandler {
     /**
-     * @param {Display} display
+     * @param {import('./display.js').Display} display
      */
     constructor(display) {
-        /** @type {Display} */
+        /** @type {import('./display.js').Display} */
         this._display = display;
-        /** @type {?DisplayNotification} */
+        /** @type {?import('./display-notification.js').DisplayNotification} */
         this._notification = null;
         /** @type {?number} */
         this._notificationHideTimer = null;

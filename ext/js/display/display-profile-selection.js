@@ -22,10 +22,10 @@ import {yomitan} from '../yomitan.js';
 
 export class DisplayProfileSelection {
     /**
-     * @param {Display} display
+     * @param {import('./display.js').Display} display
      */
     constructor(display) {
-        /** @type {Display} */
+        /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {HTMLElement} */
         this._profielList = /** @type {HTMLElement} */ (document.querySelector('#profile-list'));

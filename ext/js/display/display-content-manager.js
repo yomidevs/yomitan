@@ -26,10 +26,10 @@ import {yomitan} from '../yomitan.js';
 export class DisplayContentManager {
     /**
      * Creates a new instance of the class.
-     * @param {Display} display The display instance that owns this object.
+     * @param {import('./display.js').Display} display The display instance that owns this object.
      */
     constructor(display) {
-        /** @type {Display} */
+        /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {import('core').TokenObject} */
         this._token = {};

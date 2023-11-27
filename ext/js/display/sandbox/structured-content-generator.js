@@ -18,14 +18,14 @@
 
 export class StructuredContentGenerator {
     /**
-     * @param {DisplayContentManager|AnkiTemplateRendererContentManager} contentManager
-     * @param {JapaneseUtil} japaneseUtil
+     * @param {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} contentManager
+     * @param {import('../../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      * @param {Document} document
      */
     constructor(contentManager, japaneseUtil, document) {
-        /** @type {DisplayContentManager|AnkiTemplateRendererContentManager} */
+        /** @type {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} */
         this._contentManager = contentManager;
-        /** @type {JapaneseUtil} */
+        /** @type {import('../../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {Document} */
         this._document = document;

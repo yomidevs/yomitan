@@ -29,11 +29,11 @@ export class DisplayGenerator {
      * @param {import('display').DisplayGeneratorConstructorDetails} details
      */
     constructor({japaneseUtil, contentManager, hotkeyHelpController=null}) {
-        /** @type {JapaneseUtil} */
+        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
-        /** @type {DisplayContentManager} */
+        /** @type {import('./display-content-manager.js').DisplayContentManager} */
         this._contentManager = contentManager;
-        /** @type {?HotkeyHelpController} */
+        /** @type {?import('../input/hotkey-help-controller.js').HotkeyHelpController} */
         this._hotkeyHelpController = hotkeyHelpController;
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();

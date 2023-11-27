@@ -25,21 +25,21 @@ export class SearchDisplayController {
     /**
      * @param {number|undefined} tabId
      * @param {number|undefined} frameId
-     * @param {Display} display
-     * @param {DisplayAudio} displayAudio
-     * @param {JapaneseUtil} japaneseUtil
-     * @param {SearchPersistentStateController} searchPersistentStateController
+     * @param {import('./display.js').Display} display
+     * @param {import('./display-audio.js').DisplayAudio} displayAudio
+     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
+     * @param {import('./search-persistent-state-controller.js').SearchPersistentStateController} searchPersistentStateController
      */
     constructor(tabId, frameId, display, displayAudio, japaneseUtil, searchPersistentStateController) {
         /** @type {number|undefined} */
         this._tabId = tabId;
         /** @type {number|undefined} */
         this._frameId = frameId;
-        /** @type {Display} */
+        /** @type {import('./display.js').Display} */
         this._display = display;
-        /** @type {DisplayAudio} */
+        /** @type {import('./display-audio.js').DisplayAudio} */
         this._displayAudio = displayAudio;
-        /** @type {SearchPersistentStateController} */
+        /** @type {import('./search-persistent-state-controller.js').SearchPersistentStateController} */
         this._searchPersistentStateController = searchPersistentStateController;
         /** @type {HTMLButtonElement} */
         this._searchButton = /** @type {HTMLButtonElement} */ (document.querySelector('#search-button'));

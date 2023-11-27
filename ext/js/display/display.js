@@ -43,9 +43,9 @@ export class Display extends EventDispatcher {
      * @param {number|undefined} tabId
      * @param {number|undefined} frameId
      * @param {import('display').DisplayPageType} pageType
-     * @param {JapaneseUtil} japaneseUtil
-     * @param {DocumentFocusController} documentFocusController
-     * @param {HotkeyHandler} hotkeyHandler
+     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
+     * @param {import('../dom/document-focus-controller.js').DocumentFocusController} documentFocusController
+     * @param {import('../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
     constructor(tabId, frameId, pageType, japaneseUtil, documentFocusController, hotkeyHandler) {
         super();
@@ -55,11 +55,11 @@ export class Display extends EventDispatcher {
         this._frameId = frameId;
         /** @type {import('display').DisplayPageType} */
         this._pageType = pageType;
-        /** @type {JapaneseUtil} */
+        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
-        /** @type {DocumentFocusController} */
+        /** @type {import('../dom/document-focus-controller.js').DocumentFocusController} */
         this._documentFocusController = documentFocusController;
-        /** @type {HotkeyHandler} */
+        /** @type {import('../input/hotkey-handler.js').HotkeyHandler} */
         this._hotkeyHandler = hotkeyHandler;
         /** @type {HTMLElement} */
         this._container = /** @type {HTMLElement} */ (document.querySelector('#dictionary-entries'));
@@ -168,7 +168,7 @@ export class Display extends EventDispatcher {
         this._copyTextarea = null;
         /** @type {?TextScanner} */
         this._contentTextScanner = null;
-        /** @type {?DisplayNotification} */
+        /** @type {?import('./display-notification.js').DisplayNotification} */
         this._tagNotification = null;
         /** @type {HTMLElement} */
         this._footerNotificationContainer = /** @type {HTMLElement} */ (document.querySelector('#content-footer'));
@@ -235,7 +235,7 @@ export class Display extends EventDispatcher {
         this._updateQueryParser();
     }
 
-    /** @type {JapaneseUtil} */
+    /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
     get japaneseUtil() {
         return this._japaneseUtil;
     }
@@ -245,7 +245,7 @@ export class Display extends EventDispatcher {
         return this._depth;
     }
 
-    /** @type {HotkeyHandler} */
+    /** @type {import('../input/hotkey-handler.js').HotkeyHandler} */
     get hotkeyHandler() {
         return this._hotkeyHandler;
     }

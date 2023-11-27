@@ -23,10 +23,10 @@ import {yomitan} from '../yomitan.js';
 
 export class DisplayAudio {
     /**
-     * @param {Display} display
+     * @param {import('./display.js').Display} display
      */
     constructor(display) {
-        /** @type {Display} */
+        /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {?import('display-audio').GenericAudio} */
         this._audioPlaying = null;
