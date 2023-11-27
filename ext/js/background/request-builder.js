@@ -25,13 +25,9 @@ export class RequestBuilder {
      * Creates a new instance.
      */
     constructor() {
-        /**
-         *
-         */
+        /** @type {TextEncoder} */
         this._textEncoder = new TextEncoder();
-        /**
-         *
-         */
+        /** @type {Set<number>} */
         this._ruleIds = new Set();
     }
 
@@ -60,29 +56,32 @@ export class RequestBuilder {
 
         this._ruleIds.add(id);
         try {
+            /** @type {chrome.declarativeNetRequest.Rule[]} */
             const addRules = [{
                 id,
                 priority: 1,
                 condition: {
                     urlFilter: `|${this._escapeDnrUrl(url)}|`,
-                    resourceTypes: ['xmlhttprequest']
+                    resourceTypes: [
+                        /** @type {chrome.declarativeNetRequest.ResourceType} */ ('xmlhttprequest')
+                    ]
                 },
                 action: {
-                    type: 'modifyHeaders',
+                    type: /** @type {chrome.declarativeNetRequest.RuleActionType} */ ('modifyHeaders'),
                     requestHeaders: [
                         {
-                            operation: 'remove',
+                            operation: /** @type {chrome.declarativeNetRequest.HeaderOperation} */ ('remove'),
                             header: 'Cookie'
                         },
                         {
-                            operation: 'set',
+                            operation: /** @type {chrome.declarativeNetRequest.HeaderOperation} */ ('set'),
                             header: 'Origin',
                             value: originUrl
                         }
                     ],
                     responseHeaders: [
                         {
-                            operation: 'remove',
+                            operation: /** @type {chrome.declarativeNetRequest.HeaderOperation} */ ('remove'),
                             header: 'Set-Cookie'
                         }
                     ]
@@ -103,13 +102,14 @@ export class RequestBuilder {
     /**
      * Reads the array buffer body of a fetch response, with an optional `onProgress` callback.
      * @param {Response} response The response of a `fetch` call.
-     * @param {?import('request-builder.js').ProgressCallback} onProgress The progress callback
+     * @param {?(done: boolean) => void} onProgress The progress callback.
      * @returns {Promise<Uint8Array>} The resulting binary data.
      */
     static async readFetchResponseArrayBuffer(response, onProgress) {
+        /** @type {ReadableStreamDefaultReader<Uint8Array>|undefined} */
         let reader;
         try {
-            if (typeof onProgress === 'function') {
+            if (onProgress !== null) {
                 const {body} = response;
                 if (body !== null) {
                     reader = body.getReader();
@@ -121,15 +121,15 @@ export class RequestBuilder {
 
         if (typeof reader === 'undefined') {
             const result = await response.arrayBuffer();
-            if (typeof onProgress === 'function') {
+            if (onProgress !== null) {
                 onProgress(true);
             }
-            return result;
+            return new Uint8Array(result);
         }
 
         const contentLengthString = response.headers.get('Content-Length');
         const contentLength = contentLengthString !== null ? Number.parseInt(contentLengthString, 10) : null;
-        let target = Number.isFinite(contentLength) ? new Uint8Array(contentLength) : null;
+        let target = contentLength !== null && Number.isFinite(contentLength) ? new Uint8Array(contentLength) : null;
         let targetPosition = 0;
         let totalLength = 0;
         const targets = [];
@@ -137,7 +137,9 @@ export class RequestBuilder {
         while (true) {
             const {done, value} = await reader.read();
             if (done) { break; }
-            onProgress(false);
+            if (onProgress !== null) {
+                onProgress(false);
+            }
             if (target === null) {
                 targets.push({array: value, length: value.length});
             } else if (targetPosition + value.length > target.length) {
@@ -156,16 +158,16 @@ export class RequestBuilder {
             target = target.slice(0, totalLength);
         }
 
-        onProgress(true);
+        if (onProgress !== null) {
+            onProgress(true);
+        }
 
-        return target;
+        return /** @type {Uint8Array} */ (target);
     }
 
     // Private
 
-    /**
-     *
-     */
+    /** */
     async _clearSessionRules() {
         const rules = await this._getSessionRules();
 
@@ -180,7 +182,7 @@ export class RequestBuilder {
     }
 
     /**
-     *
+     * @returns {Promise<chrome.declarativeNetRequest.Rule[]>}
      */
     _getSessionRules() {
         return new Promise((resolve, reject) => {
@@ -196,8 +198,8 @@ export class RequestBuilder {
     }
 
     /**
-     *
-     * @param options
+     * @param {chrome.declarativeNetRequest.UpdateRuleOptions} options
+     * @returns {Promise<void>}
      */
     _updateSessionRules(options) {
         return new Promise((resolve, reject) => {
@@ -213,8 +215,8 @@ export class RequestBuilder {
     }
 
     /**
-     *
-     * @param options
+     * @param {chrome.declarativeNetRequest.UpdateRuleOptions} options
+     * @returns {Promise<boolean>}
      */
     async _tryUpdateSessionRules(options) {
         try {
@@ -225,9 +227,7 @@ export class RequestBuilder {
         }
     }
 
-    /**
-     *
-     */
+    /** */
     async _clearDynamicRules() {
         const rules = await this._getDynamicRules();
 
@@ -242,7 +242,7 @@ export class RequestBuilder {
     }
 
     /**
-     *
+     * @returns {Promise<chrome.declarativeNetRequest.Rule[]>}
      */
     _getDynamicRules() {
         return new Promise((resolve, reject) => {
@@ -258,8 +258,8 @@ export class RequestBuilder {
     }
 
     /**
-     *
-     * @param options
+     * @param {chrome.declarativeNetRequest.UpdateRuleOptions} options
+     * @returns {Promise<void>}
      */
     _updateDynamicRules(options) {
         return new Promise((resolve, reject) => {
@@ -275,7 +275,8 @@ export class RequestBuilder {
     }
 
     /**
-     *
+     * @returns {number}
+     * @throws {Error}
      */
     _getNewRuleId() {
         let id = 1;
@@ -288,8 +289,8 @@ export class RequestBuilder {
     }
 
     /**
-     *
-     * @param url
+     * @param {string} url
+     * @returns {string}
      */
     _getOriginURL(url) {
         const url2 = new URL(url);
@@ -297,16 +298,16 @@ export class RequestBuilder {
     }
 
     /**
-     *
-     * @param url
+     * @param {string} url
+     * @returns {string}
      */
     _escapeDnrUrl(url) {
         return url.replace(/[|*^]/g, (char) => this._urlEncodeUtf8(char));
     }
 
     /**
-     *
-     * @param text
+     * @param {string} text
+     * @returns {string}
      */
     _urlEncodeUtf8(text) {
         const array = this._textEncoder.encode(text);
@@ -318,9 +319,9 @@ export class RequestBuilder {
     }
 
     /**
-     *
-     * @param items
-     * @param totalLength
+     * @param {{array: Uint8Array, length: number}[]} items
+     * @param {number} totalLength
+     * @returns {Uint8Array}
      */
     static _joinUint8Arrays(items, totalLength) {
         if (items.length === 1) {
