@@ -25,15 +25,15 @@ import {DictionaryController} from './dictionary-controller.js';
 export class DictionaryImportController {
     /**
      * @param {import('./settings-controller.js').SettingsController} settingsController
-     * @param {ModalController} modalController
-     * @param {StatusFooter} statusFooter
+     * @param {import('./modal-controller.js').ModalController} modalController
+     * @param {import('./status-footer.js').StatusFooter} statusFooter
      */
     constructor(settingsController, modalController, statusFooter) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {ModalController} */
+        /** @type {import('./modal-controller.js').ModalController} */
         this._modalController = modalController;
-        /** @type {StatusFooter} */
+        /** @type {import('./status-footer.js').StatusFooter} */
         this._statusFooter = statusFooter;
         /** @type {boolean} */
         this._modifying = false;
@@ -45,7 +45,7 @@ export class DictionaryImportController {
         this._importFileButton = null;
         /** @type {?HTMLInputElement} */
         this._importFileInput = null;
-        /** @type {?Modal} */
+        /** @type {?import('./modal.js').Modal} */
         this._purgeConfirmModal = null;
         /** @type {?HTMLElement} */
         this._errorContainer = null;
@@ -95,7 +95,7 @@ export class DictionaryImportController {
      */
     _onPurgeButtonClick(e) {
         e.preventDefault();
-        /** @type {Modal} */ (this._purgeConfirmModal).setVisible(true);
+        /** @type {import('./modal.js').Modal} */ (this._purgeConfirmModal).setVisible(true);
     }
 
     /**
@@ -103,7 +103,7 @@ export class DictionaryImportController {
      */
     _onPurgeConfirmButtonClick(e) {
         e.preventDefault();
-        /** @type {Modal} */ (this._purgeConfirmModal).setVisible(false);
+        /** @type {import('./modal.js').Modal} */ (this._purgeConfirmModal).setVisible(false);
         this._purgeDatabase();
     }
 

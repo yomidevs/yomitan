@@ -20,10 +20,10 @@ import {yomitan} from '../../yomitan.js';
 
 export class StorageController {
     /**
-     * @param {PersistentStorageController} persistentStorageController
+     * @param {import('./persistent-storage-controller.js').PersistentStorageController} persistentStorageController
      */
     constructor(persistentStorageController) {
-    /** @type {PersistentStorageController} */
+    /** @type {import('./persistent-storage-controller.js').PersistentStorageController} */
         this._persistentStorageController = persistentStorageController;
         /** @type {?StorageEstimate} */
         this._mostRecentStorageEstimate = null;

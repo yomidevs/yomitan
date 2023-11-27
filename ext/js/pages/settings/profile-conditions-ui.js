@@ -17,12 +17,8 @@
  */
 
 import {EventDispatcher, EventListenerCollection} from '../../core.js';
+import {DocumentUtil} from '../../dom/document-util.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
-
-/* global
- * DocumentUtil
- * KeyboardMouseInputField
- */
 
 /**
  * @augments EventDispatcher<import('profile-conditions-ui').EventType>

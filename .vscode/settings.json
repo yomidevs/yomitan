@@ -2,7 +2,7 @@
     "markdown.extension.toc.levels": "1..3",
     "editor.codeActionsOnSave": {
         "source.addMissingImports": false,
-        "source.organizeImports": false,
+        "source.organizeImports": true,
         "source.fixAll.eslint": false
     },
     "eslint.format.enable": true,

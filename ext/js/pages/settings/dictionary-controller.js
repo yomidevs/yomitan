@@ -336,15 +336,15 @@ class DictionaryExtraInfo {
 export class DictionaryController {
     /**
      * @param {import('./settings-controller.js').SettingsController} settingsController
-     * @param {ModalController} modalController
-     * @param {StatusFooter} statusFooter
+     * @param {import('./modal-controller.js').ModalController} modalController
+     * @param {import('./status-footer.js').StatusFooter} statusFooter
      */
     constructor(settingsController, modalController, statusFooter) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {ModalController} */
+        /** @type {import('./modal-controller.js').ModalController} */
         this._modalController = modalController;
-        /** @type {StatusFooter} */
+        /** @type {import('./status-footer.js').StatusFooter} */
         this._statusFooter = statusFooter;
         /** @type {?import('dictionary-importer').Summary[]} */
         this._dictionaries = null;
@@ -366,7 +366,7 @@ export class DictionaryController {
         this._noDictionariesInstalledWarnings = null;
         /** @type {?NodeListOf<HTMLElement>} */
         this._noDictionariesEnabledWarnings = null;
-        /** @type {?Modal} */
+        /** @type {?import('./modal.js').Modal} */
         this._deleteDictionaryModal = null;
         /** @type {?HTMLInputElement} */
         this._allCheckbox = null;
@@ -376,7 +376,7 @@ export class DictionaryController {
         this._isDeleting = false;
     }
 
-    /** @type {ModalController} */
+    /** @type {import('./modal-controller.js').ModalController} */
     get modalController() {
         return this._modalController;
     }
@@ -418,7 +418,7 @@ export class DictionaryController {
      */
     deleteDictionary(dictionaryTitle) {
         if (this._isDeleting) { return; }
-        const modal = /** @type {Modal} */ (this._deleteDictionaryModal);
+        const modal = /** @type {import('./modal.js').Modal} */ (this._deleteDictionaryModal);
         modal.node.dataset.dictionaryTitle = dictionaryTitle;
         const nameElement = /** @type {Element} */ (modal.node.querySelector('#dictionary-confirm-delete-name'));
         nameElement.textContent = dictionaryTitle;
@@ -671,7 +671,7 @@ export class DictionaryController {
     _onDictionaryConfirmDelete(e) {
         e.preventDefault();
 
-        const modal = /** @type {Modal} */ (this._deleteDictionaryModal);
+        const modal = /** @type {import('./modal.js').Modal} */ (this._deleteDictionaryModal);
         modal.setVisible(false);
 
         const title = modal.node.dataset.dictionaryTitle;
@@ -691,7 +691,7 @@ export class DictionaryController {
 
     /** */
     _onDictionaryMoveButtonClick() {
-        const modal = /** @type {Modal} */ (this._modalController.getModal('dictionary-move-location'));
+        const modal = /** @type {import('./modal.js').Modal} */ (this._modalController.getModal('dictionary-move-location'));
         const {index} = modal.node.dataset;
         if (typeof index !== 'number') { return; }
         const indexNumber = Number.parseInt(index, 10);

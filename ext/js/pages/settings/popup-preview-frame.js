@@ -25,17 +25,17 @@ export class PopupPreviewFrame {
     /**
      * @param {number} tabId
      * @param {number} frameId
-     * @param {PopupFactory} popupFactory
-     * @param {HotkeyHandler} hotkeyHandler
+     * @param {import('../../app/popup-factory.js').PopupFactory} popupFactory
+     * @param {import('../../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
     constructor(tabId, frameId, popupFactory, hotkeyHandler) {
         /** @type {number} */
         this._tabId = tabId;
         /** @type {number} */
         this._frameId = frameId;
-        /** @type {PopupFactory} */
+        /** @type {import('../../app/popup-factory.js').PopupFactory} */
         this._popupFactory = popupFactory;
-        /** @type {HotkeyHandler} */
+        /** @type {import('../../input/hotkey-handler.js').HotkeyHandler} */
         this._hotkeyHandler = hotkeyHandler;
         /** @type {?Frontend} */
         this._frontend = null;

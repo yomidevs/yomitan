@@ -23,12 +23,12 @@ import {SelectorObserver} from '../../dom/selector-observer.js';
 export class SettingsDisplayController {
     /**
      * @param {import('./settings-controller.js').SettingsController} settingsController
-     * @param {ModalController} modalController
+     * @param {import('./modal-controller.js').ModalController} modalController
      */
     constructor(settingsController, modalController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {ModalController} */
+        /** @type {import('./modal-controller.js').ModalController} */
         this._modalController = modalController;
         /** @type {?HTMLElement} */
         this._contentNode = null;

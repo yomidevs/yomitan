@@ -267,7 +267,7 @@ class KeyboardShortcutHotkeyEntry {
         this._stringComparer = stringComparer;
         /** @type {?HTMLButtonElement} */
         this._enabledButton = null;
-        /** @type {?PopupMenu} */
+        /** @type {?import('../../dom/popup-menu.js').PopupMenu} */
         this._scopeMenu = null;
         /** @type {EventListenerCollection} */
         this._scopeMenuEventListeners = new EventListenerCollection();
@@ -629,7 +629,7 @@ class KeyboardShortcutHotkeyEntry {
     }
 
     /**
-     * @param {PopupMenu} menu
+     * @param {import('../../dom/popup-menu.js').PopupMenu} menu
      */
     _updateScopeMenuItems(menu) {
         this._scopeMenuEventListeners.removeAllEventListeners();

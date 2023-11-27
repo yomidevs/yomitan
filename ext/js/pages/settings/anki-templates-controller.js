@@ -24,15 +24,15 @@ import {yomitan} from '../../yomitan.js';
 export class AnkiTemplatesController {
     /**
      * @param {import('./settings-controller.js').SettingsController} settingsController
-     * @param {ModalController} modalController
-     * @param {AnkiController} ankiController
+     * @param {import('./modal-controller.js').ModalController} modalController
+     * @param {import('./anki-controller.js').AnkiController} ankiController
      */
     constructor(settingsController, modalController, ankiController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {ModalController} */
+        /** @type {import('./modal-controller.js').ModalController} */
         this._modalController = modalController;
-        /** @type {AnkiController} */
+        /** @type {import('./anki-controller.js').AnkiController} */
         this._ankiController = ankiController;
         /** @type {?import('dictionary').TermDictionaryEntry} */
         this._cachedDictionaryEntryValue = null;
@@ -48,7 +48,7 @@ export class AnkiTemplatesController {
         this._renderFieldInput = null;
         /** @type {?HTMLElement} */
         this._renderResult = null;
-        /** @type {?Modal} */
+        /** @type {?import('./modal.js').Modal} */
         this._fieldTemplateResetModal = null;
         /** @type {AnkiNoteBuilder} */
         this._ankiNoteBuilder = new AnkiNoteBuilder({japaneseUtil: new JapaneseUtil(null)});

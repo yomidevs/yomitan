@@ -23,12 +23,12 @@ import {ProfileConditionsUI} from './profile-conditions-ui.js';
 export class ProfileController {
     /**
      * @param {import('./settings-controller.js').SettingsController} settingsController
-     * @param {ModalController} modalController
+     * @param {import('./modal-controller.js').ModalController} modalController
      */
     constructor(settingsController, modalController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {ModalController} */
+        /** @type {import('./modal-controller.js').ModalController} */
         this._modalController = modalController;
         /** @type {ProfileConditionsUI} */
         this._profileConditionsUI = new ProfileConditionsUI(settingsController);
@@ -52,11 +52,11 @@ export class ProfileController {
         this._profileEntryListContainer = null;
         /** @type {?HTMLElement} */
         this._profileConditionsProfileName = null;
-        /** @type {?Modal} */
+        /** @type {?import('./modal.js').Modal} */
         this._profileRemoveModal = null;
-        /** @type {?Modal} */
+        /** @type {?import('./modal.js').Modal} */
         this._profileCopyModal = null;
-        /** @type {?Modal} */
+        /** @type {?import('./modal.js').Modal} */
         this._profileConditionsModal = null;
         /** @type {boolean} */
         this._profileEntriesSupported = false;
@@ -340,8 +340,8 @@ export class ProfileController {
         if (profile === null || this.profileCount <= 1) { return; }
 
         /** @type {HTMLElement} */ (this._removeProfileNameElement).textContent = profile.name;
-        /** @type {Modal} */ (this._profileRemoveModal).node.dataset.profileIndex = `${profileIndex}`;
-        /** @type {Modal} */ (this._profileRemoveModal).setVisible(true);
+        /** @type {import('./modal.js').Modal} */ (this._profileRemoveModal).node.dataset.profileIndex = `${profileIndex}`;
+        /** @type {import('./modal.js').Modal} */ (this._profileRemoveModal).setVisible(true);
     }
 
     /**
@@ -368,8 +368,8 @@ export class ProfileController {
         }
         select.value = `${copyFromIndex}`;
 
-        /** @type {Modal} */ (this._profileCopyModal).node.dataset.profileIndex = `${profileIndex}`;
-        /** @type {Modal} */ (this._profileCopyModal).setVisible(true);
+        /** @type {import('./modal.js').Modal} */ (this._profileCopyModal).node.dataset.profileIndex = `${profileIndex}`;
+        /** @type {import('./modal.js').Modal} */ (this._profileCopyModal).setVisible(true);
     }
 
     /**
@@ -453,7 +453,7 @@ export class ProfileController {
 
     /** */
     _onDeleteConfirm() {
-        const modal = /** @type {Modal} */ (this._profileRemoveModal);
+        const modal = /** @type {import('./modal.js').Modal} */ (this._profileRemoveModal);
         modal.setVisible(false);
         const {node} = modal;
         const profileIndex = node.dataset.profileIndex;
@@ -467,7 +467,7 @@ export class ProfileController {
 
     /** */
     _onCopyConfirm() {
-        const modal = /** @type {Modal} */ (this._profileCopyModal);
+        const modal = /** @type {import('./modal.js').Modal} */ (this._profileCopyModal);
         modal.setVisible(false);
         const {node} = modal;
         const destinationProfileIndex = node.dataset.profileIndex;

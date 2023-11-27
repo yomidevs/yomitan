@@ -26,12 +26,12 @@ import {DictionaryController} from './dictionary-controller.js';
 export class BackupController {
     /**
      * @param {import('./settings-controller.js').SettingsController} settingsController
-     * @param {?ModalController} modalController
+     * @param {?import('./modal-controller.js').ModalController} modalController
      */
     constructor(settingsController, modalController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {?ModalController} */
+        /** @type {?import('./modal-controller.js').ModalController} */
         this._modalController = modalController;
         /** @type {?import('core').TokenObject} */
         this._settingsExportToken = null;
@@ -39,11 +39,11 @@ export class BackupController {
         this._settingsExportRevoke = null;
         /** @type {number} */
         this._currentVersion = 0;
-        /** @type {?Modal} */
+        /** @type {?import('./modal.js').Modal} */
         this._settingsResetModal = null;
-        /** @type {?Modal} */
+        /** @type {?import('./modal.js').Modal} */
         this._settingsImportErrorModal = null;
-        /** @type {?Modal} */
+        /** @type {?import('./modal.js').Modal} */
         this._settingsImportWarningModal = null;
         /** @type {?OptionsUtil} */
         this._optionsUtil = null;
