@@ -31,7 +31,13 @@ export class RequestBuilder {
      * Creates a new instance.
      */
     constructor() {
+        /**
+         *
+         */
         this._textEncoder = new TextEncoder();
+        /**
+         *
+         */
         this._ruleIds = new Set();
     }
 
@@ -160,6 +166,9 @@ export class RequestBuilder {
 
     // Private
 
+    /**
+     *
+     */
     async _clearSessionRules() {
         const rules = await this._getSessionRules();
 
@@ -173,6 +182,9 @@ export class RequestBuilder {
         await this._updateSessionRules({removeRuleIds});
     }
 
+    /**
+     *
+     */
     _getSessionRules() {
         return new Promise((resolve, reject) => {
             chrome.declarativeNetRequest.getSessionRules((result) => {
@@ -186,6 +198,10 @@ export class RequestBuilder {
         });
     }
 
+    /**
+     *
+     * @param options
+     */
     _updateSessionRules(options) {
         return new Promise((resolve, reject) => {
             chrome.declarativeNetRequest.updateSessionRules(options, () => {
@@ -199,6 +215,10 @@ export class RequestBuilder {
         });
     }
 
+    /**
+     *
+     * @param options
+     */
     async _tryUpdateSessionRules(options) {
         try {
             await this._updateSessionRules(options);
@@ -208,6 +228,9 @@ export class RequestBuilder {
         }
     }
 
+    /**
+     *
+     */
     async _clearDynamicRules() {
         const rules = await this._getDynamicRules();
 
@@ -221,6 +244,9 @@ export class RequestBuilder {
         await this._updateDynamicRules({removeRuleIds});
     }
 
+    /**
+     *
+     */
     _getDynamicRules() {
         return new Promise((resolve, reject) => {
             chrome.declarativeNetRequest.getDynamicRules((result) => {
@@ -234,6 +260,10 @@ export class RequestBuilder {
         });
     }
 
+    /**
+     *
+     * @param options
+     */
     _updateDynamicRules(options) {
         return new Promise((resolve, reject) => {
             chrome.declarativeNetRequest.updateDynamicRules(options, () => {
@@ -247,6 +277,9 @@ export class RequestBuilder {
         });
     }
 
+    /**
+     *
+     */
     _getNewRuleId() {
         let id = 1;
         while (this._ruleIds.has(id)) {
@@ -257,15 +290,27 @@ export class RequestBuilder {
         return id;
     }
 
+    /**
+     *
+     * @param url
+     */
     _getOriginURL(url) {
         const url2 = new URL(url);
         return `${url2.protocol}//${url2.host}`;
     }
 
+    /**
+     *
+     * @param url
+     */
     _escapeDnrUrl(url) {
         return url.replace(/[|*^]/g, (char) => this._urlEncodeUtf8(char));
     }
 
+    /**
+     *
+     * @param text
+     */
     _urlEncodeUtf8(text) {
         const array = this._textEncoder.encode(text);
         let result = '';
@@ -275,6 +320,11 @@ export class RequestBuilder {
         return result;
     }
 
+    /**
+     *
+     * @param items
+     * @param totalLength
+     */
     static _joinUint8Arrays(items, totalLength) {
         if (items.length === 1) {
             const {array, length} = items[0];

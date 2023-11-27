@@ -24,9 +24,15 @@ import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js'
 import {yomitan} from '../../yomitan.js';
 
 export class AnkiController {
+    /**
+     * @param {SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {SettingsController} */
         this._settingsController = settingsController;
+        /** @type {AnkiConnect} */
         this._ankiConnect = new AnkiConnect();
+        /** @type {SelectorObserver<AnkiCardController>} */
         this._selectorObserver = new SelectorObserver({
             selector: '.anki-card',
             ignoreSelector: null,
@@ -34,52 +40,74 @@ export class AnkiController {
             onRemoved: this._removeCardController.bind(this),
             isStale: this._isCardControllerStale.bind(this)
         });
+        /** @type {Intl.Collator} */
         this._stringComparer = new Intl.Collator(); // Locale does not matter
+        /** @type {?Promise<import('anki-controller').AnkiData>} */
         this._getAnkiDataPromise = null;
+        /** @type {?HTMLElement} */
         this._ankiErrorContainer = null;
+        /** @type {?HTMLElement} */
         this._ankiErrorMessageNode = null;
+        /** @type {string} */
         this._ankiErrorMessageNodeDefaultContent = '';
+        /** @type {?HTMLElement} */
         this._ankiErrorMessageDetailsNode = null;
+        /** @type {?HTMLElement} */
         this._ankiErrorMessageDetailsContainer = null;
+        /** @type {?HTMLElement} */
         this._ankiErrorMessageDetailsToggle = null;
+        /** @type {?HTMLElement} */
         this._ankiErrorInvalidResponseInfo = null;
+        /** @type {?HTMLElement} */
         this._ankiCardPrimary = null;
+        /** @type {?Error} */
         this._ankiError = null;
+        /** @type {?import('core').TokenObject} */
         this._validateFieldsToken = null;
     }
 
+    /** @type {SettingsController} */
     get settingsController() {
         return this._settingsController;
     }
 
+    /** */
     async prepare() {
-        this._ankiErrorContainer = document.querySelector('#anki-error');
-        this._ankiErrorMessageNode = document.querySelector('#anki-error-message');
-        this._ankiErrorMessageNodeDefaultContent = this._ankiErrorMessageNode.textContent;
-        this._ankiErrorMessageDetailsNode = document.querySelector('#anki-error-message-details');
-        this._ankiErrorMessageDetailsContainer = document.querySelector('#anki-error-message-details-container');
-        this._ankiErrorMessageDetailsToggle = document.querySelector('#anki-error-message-details-toggle');
-        this._ankiErrorInvalidResponseInfo = document.querySelector('#anki-error-invalid-response-info');
-        this._ankiEnableCheckbox = document.querySelector('[data-setting="anki.enable"]');
-        this._ankiCardPrimary = document.querySelector('#anki-card-primary');
-        const ankiApiKeyInput = document.querySelector('#anki-api-key-input');
-        const ankiCardPrimaryTypeRadios = document.querySelectorAll('input[type=radio][name=anki-card-primary-type]');
+        this._ankiErrorContainer = /** @type {HTMLElement} */ (document.querySelector('#anki-error'));
+        this._ankiErrorMessageNode = /** @type {HTMLElement} */ (document.querySelector('#anki-error-message'));
+        const ankiErrorMessageNodeDefaultContent = this._ankiErrorMessageNode.textContent;
+        this._ankiErrorMessageNodeDefaultContent = typeof ankiErrorMessageNodeDefaultContent === 'string' ? ankiErrorMessageNodeDefaultContent : '';
+        this._ankiErrorMessageDetailsNode = /** @type {HTMLElement} */ (document.querySelector('#anki-error-message-details'));
+        this._ankiErrorMessageDetailsContainer = /** @type {HTMLElement} */ (document.querySelector('#anki-error-message-details-container'));
+        this._ankiErrorMessageDetailsToggle = /** @type {HTMLElement} */ (document.querySelector('#anki-error-message-details-toggle'));
+        this._ankiErrorInvalidResponseInfo = /** @type {HTMLElement} */ (document.querySelector('#anki-error-invalid-response-info'));
+        this._ankiEnableCheckbox = /** @type {?HTMLInputElement} */ (document.querySelector('[data-setting="anki.enable"]'));
+        this._ankiCardPrimary = /** @type {HTMLElement} */ (document.querySelector('#anki-card-primary'));
+        const ankiApiKeyInput = /** @type {HTMLElement} */ (document.querySelector('#anki-api-key-input'));
+        const ankiCardPrimaryTypeRadios = /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('input[type=radio][name=anki-card-primary-type]'));
+        const ankiErrorLog = /** @type {HTMLElement} */ (document.querySelector('#anki-error-log'));
 
         this._setupFieldMenus();
 
         this._ankiErrorMessageDetailsToggle.addEventListener('click', this._onAnkiErrorMessageDetailsToggleClick.bind(this), false);
-        if (this._ankiEnableCheckbox !== null) { this._ankiEnableCheckbox.addEventListener('settingChanged', this._onAnkiEnableChanged.bind(this), false); }
+        if (this._ankiEnableCheckbox !== null) {
+            this._ankiEnableCheckbox.addEventListener(
+                /** @type {string} */ ('settingChanged'),
+                /** @type {EventListener} */ (this._onAnkiEnableChanged.bind(this)),
+                false
+            );
+        }
         for (const input of ankiCardPrimaryTypeRadios) {
             input.addEventListener('change', this._onAnkiCardPrimaryTypeRadioChange.bind(this), false);
         }
 
-        const testAnkiNoteViewerButtons = document.querySelectorAll('.test-anki-note-viewer-button');
+        const testAnkiNoteViewerButtons = /** @type {NodeListOf<HTMLButtonElement>} */ (document.querySelectorAll('.test-anki-note-viewer-button'));
         const onTestAnkiNoteViewerButtonClick = this._onTestAnkiNoteViewerButtonClick.bind(this);
         for (const button of testAnkiNoteViewerButtons) {
             button.addEventListener('click', onTestAnkiNoteViewerButtonClick, false);
         }
 
-        document.querySelector('#anki-error-log').addEventListener('click', this._onAnkiErrorLogLinkClick.bind(this));
+        ankiErrorLog.addEventListener('click', this._onAnkiErrorLogLinkClick.bind(this));
 
         ankiApiKeyInput.addEventListener('focus', this._onApiKeyInputFocus.bind(this));
         ankiApiKeyInput.addEventListener('blur', this._onApiKeyInputBlur.bind(this));
@@ -94,6 +122,10 @@ export class AnkiController {
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
     }
 
+    /**
+     * @param {string} type
+     * @returns {string[]}
+     */
     getFieldMarkers(type) {
         switch (type) {
             case 'terms':
@@ -154,6 +186,9 @@ export class AnkiController {
         }
     }
 
+    /**
+     * @returns {Promise<import('anki-controller').AnkiData>}
+     */
     async getAnkiData() {
         let promise = this._getAnkiDataPromise;
         if (promise === null) {
@@ -164,23 +199,37 @@ export class AnkiController {
         return promise;
     }
 
+    /**
+     * @param {string} model
+     * @returns {Promise<string[]>}
+     */
     async getModelFieldNames(model) {
         return await this._ankiConnect.getModelFieldNames(model);
     }
 
+    /**
+     * @param {string} fieldValue
+     * @returns {string[]}
+     */
     getRequiredPermissions(fieldValue) {
         return this._settingsController.permissionsUtil.getRequiredPermissionsForAnkiFieldValue(fieldValue);
     }
 
     // Private
 
+    /** */
     async _updateOptions() {
         const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        const optionsContext = this._settingsController.getOptionsContext();
+        this._onOptionsChanged({options, optionsContext});
     }
 
+    /**
+     * @param {import('settings-controller').OptionsChangedEvent} details
+     */
     async _onOptionsChanged({options: {anki}}) {
-        let {apiKey} = anki;
+        /** @type {?string} */
+        let apiKey = anki.apiKey;
         if (apiKey === '') { apiKey = null; }
         this._ankiConnect.server = anki.server;
         this._ankiConnect.enabled = anki.enable;
@@ -190,44 +239,73 @@ export class AnkiController {
         this._selectorObserver.observe(document.documentElement, true);
     }
 
+    /** */
     _onAnkiErrorMessageDetailsToggleClick() {
-        const node = this._ankiErrorMessageDetailsContainer;
+        const node = /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsContainer);
         node.hidden = !node.hidden;
     }
 
+    /**
+     * @param {import('dom-data-binder').SettingChangedEvent} event
+     */
     _onAnkiEnableChanged({detail: {value}}) {
         if (this._ankiConnect.server === null) { return; }
-        this._ankiConnect.enabled = value;
+        this._ankiConnect.enabled = typeof value === 'boolean' && value;
 
         for (const cardController of this._selectorObserver.datas()) {
             cardController.updateAnkiState();
         }
     }
 
+    /**
+     * @param {Event} e
+     */
     _onAnkiCardPrimaryTypeRadioChange(e) {
-        const node = e.currentTarget;
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         if (!node.checked) { return; }
-
-        this._setAnkiCardPrimaryType(node.dataset.value, node.dataset.ankiCardMenu);
+        const {value, ankiCardMenu} = node.dataset;
+        if (typeof value !== 'string') { return; }
+        this._setAnkiCardPrimaryType(value, ankiCardMenu);
     }
 
+    /** */
     _onAnkiErrorLogLinkClick() {
         if (this._ankiError === null) { return; }
         console.log({error: this._ankiError});
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onTestAnkiNoteViewerButtonClick(e) {
-        this._testAnkiNoteViewerSafe(e.currentTarget.dataset.mode);
+        const element = /** @type {HTMLElement} */ (e.currentTarget);
+        const {mode} = element.dataset;
+        if (typeof mode !== 'string') { return; }
+        const mode2 = this._normalizeAnkiNoteGuiMode(mode);
+        if (mode2 === null) { return; }
+        this._testAnkiNoteViewerSafe(mode2);
     }
 
+    /**
+     * @param {Event} e
+     */
     _onApiKeyInputFocus(e) {
-        e.currentTarget.type = 'text';
+        const element = /** @type {HTMLInputElement} */ (e.currentTarget);
+        element.type = 'text';
     }
 
+    /**
+     * @param {Event} e
+     */
     _onApiKeyInputBlur(e) {
-        e.currentTarget.type = 'password';
+        const element = /** @type {HTMLInputElement} */ (e.currentTarget);
+        element.type = 'password';
     }
 
+    /**
+     * @param {string} ankiCardType
+     * @param {string} [ankiCardMenu]
+     */
     _setAnkiCardPrimaryType(ankiCardType, ankiCardMenu) {
         if (this._ankiCardPrimary === null) { return; }
         this._ankiCardPrimary.dataset.ankiCardType = ankiCardType;
@@ -238,28 +316,43 @@ export class AnkiController {
         }
     }
 
+    /**
+     * @param {Element} node
+     * @returns {AnkiCardController}
+     */
     _createCardController(node) {
-        const cardController = new AnkiCardController(this._settingsController, this, node);
+        const cardController = new AnkiCardController(this._settingsController, this, /** @type {HTMLElement} */ (node));
         cardController.prepare();
         return cardController;
     }
 
-    _removeCardController(node, cardController) {
+    /**
+     * @param {Element} _node
+     * @param {AnkiCardController} cardController
+     */
+    _removeCardController(_node, cardController) {
         cardController.cleanup();
     }
 
-    _isCardControllerStale(node, cardController) {
+    /**
+     * @param {Element} _node
+     * @param {AnkiCardController} cardController
+     * @returns {boolean}
+     */
+    _isCardControllerStale(_node, cardController) {
         return cardController.isStale();
     }
 
+    /** */
     _setupFieldMenus() {
+        /** @type {[types: string[], selector: string][]} */
         const fieldMenuTargets = [
             [['terms'], '#anki-card-terms-field-menu-template'],
             [['kanji'], '#anki-card-kanji-field-menu-template'],
             [['terms', 'kanji'], '#anki-card-all-field-menu-template']
         ];
         for (const [types, selector] of fieldMenuTargets) {
-            const element = document.querySelector(selector);
+            const element = /** @type {HTMLTemplateElement} */ (document.querySelector(selector));
             if (element === null) { continue; }
 
             let markers = [];
@@ -284,6 +377,9 @@ export class AnkiController {
         }
     }
 
+    /**
+     * @returns {Promise<import('anki-controller').AnkiData>}
+     */
     async _getAnkiData() {
         this._setAnkiStatusChanging();
         const [
@@ -305,85 +401,108 @@ export class AnkiController {
         return {deckNames, modelNames};
     }
 
+    /**
+     * @returns {Promise<[deckNames: string[], error: ?Error]>}
+     */
     async _getDeckNames() {
         try {
             const result = await this._ankiConnect.getDeckNames();
             this._sortStringArray(result);
             return [result, null];
         } catch (e) {
-            return [[], e];
+            return [[], e instanceof Error ? e : new Error(`${e}`)];
         }
     }
 
+    /**
+     * @returns {Promise<[modelNames: string[], error: ?Error]>}
+     */
     async _getModelNames() {
         try {
             const result = await this._ankiConnect.getModelNames();
             this._sortStringArray(result);
             return [result, null];
         } catch (e) {
-            return [[], e];
+            return [[], e instanceof Error ? e : new Error(`${e}`)];
         }
     }
 
+    /** */
     _setAnkiStatusChanging() {
-        this._ankiErrorMessageNode.textContent = this._ankiErrorMessageNodeDefaultContent;
-        this._ankiErrorMessageNode.classList.remove('danger-text');
+        const ankiErrorMessageNode = /** @type {HTMLElement} */ (this._ankiErrorMessageNode);
+        ankiErrorMessageNode.textContent = this._ankiErrorMessageNodeDefaultContent;
+        ankiErrorMessageNode.classList.remove('danger-text');
     }
 
+    /** */
     _hideAnkiError() {
+        const ankiErrorMessageNode = /** @type {HTMLElement} */ (this._ankiErrorMessageNode);
         if (this._ankiErrorContainer !== null) {
             this._ankiErrorContainer.hidden = true;
         }
-        this._ankiErrorMessageDetailsContainer.hidden = true;
-        this._ankiErrorMessageDetailsToggle.hidden = true;
-        this._ankiErrorInvalidResponseInfo.hidden = true;
-        this._ankiErrorMessageNode.textContent = (this._ankiConnect.enabled ? 'Connected' : 'Not enabled');
-        this._ankiErrorMessageNode.classList.remove('danger-text');
-        this._ankiErrorMessageDetailsNode.textContent = '';
+        /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsContainer).hidden = true;
+        /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsToggle).hidden = true;
+        /** @type {HTMLElement} */ (this._ankiErrorInvalidResponseInfo).hidden = true;
+        ankiErrorMessageNode.textContent = (this._ankiConnect.enabled ? 'Connected' : 'Not enabled');
+        ankiErrorMessageNode.classList.remove('danger-text');
+        /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsNode).textContent = '';
         this._ankiError = null;
     }
 
+    /**
+     * @param {Error} error
+     */
     _showAnkiError(error) {
+        const ankiErrorMessageNode = /** @type {HTMLElement} */ (this._ankiErrorMessageNode);
         this._ankiError = error;
 
         let errorString = typeof error === 'object' && error !== null ? error.message : null;
         if (!errorString) { errorString = `${error}`; }
         if (!/[.!?]$/.test(errorString)) { errorString += '.'; }
-        this._ankiErrorMessageNode.textContent = errorString;
-        this._ankiErrorMessageNode.classList.add('danger-text');
+        ankiErrorMessageNode.textContent = errorString;
+        ankiErrorMessageNode.classList.add('danger-text');
 
-        const data = error.data;
+        const data = error instanceof ExtensionError ? error.data : void 0;
         let details = '';
         if (typeof data !== 'undefined') {
             details += `${JSON.stringify(data, null, 4)}\n\n`;
         }
         details += `${error.stack}`.trimRight();
-        this._ankiErrorMessageDetailsNode.textContent = details;
+        /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsNode).textContent = details;
 
         if (this._ankiErrorContainer !== null) {
             this._ankiErrorContainer.hidden = false;
         }
-        this._ankiErrorMessageDetailsContainer.hidden = true;
-        this._ankiErrorInvalidResponseInfo.hidden = (errorString.indexOf('Invalid response') < 0);
-        this._ankiErrorMessageDetailsToggle.hidden = false;
+        /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsContainer).hidden = true;
+        /** @type {HTMLElement} */ (this._ankiErrorInvalidResponseInfo).hidden = (errorString.indexOf('Invalid response') < 0);
+        /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsToggle).hidden = false;
     }
 
+    /**
+     * @param {string[]} array
+     */
     _sortStringArray(array) {
         const stringComparer = this._stringComparer;
         array.sort((a, b) => stringComparer.compare(a, b));
     }
 
+    /**
+     * @param {import('settings').AnkiNoteGuiMode} mode
+     */
     async _testAnkiNoteViewerSafe(mode) {
         this._setAnkiNoteViewerStatus(false, null);
         try {
             await this._testAnkiNoteViewer(mode);
         } catch (e) {
-            this._setAnkiNoteViewerStatus(true, e);
+            this._setAnkiNoteViewerStatus(true, e instanceof Error ? e : new Error(`${e}`));
             return;
         }
         this._setAnkiNoteViewerStatus(true, null);
     }
 
+    /**
+     * @param {import('settings').AnkiNoteGuiMode} mode
+     */
     async _testAnkiNoteViewer(mode) {
         const queries = [
             '"よむ" deck:current',
@@ -408,8 +527,12 @@ export class AnkiController {
         await yomitan.api.noteView(noteId, mode, false);
     }
 
+    /**
+     * @param {boolean} visible
+     * @param {?Error} error
+     */
     _setAnkiNoteViewerStatus(visible, error) {
-        const node = document.querySelector('#test-anki-note-viewer-results');
+        const node = /** @type {HTMLElement} */ (document.querySelector('#test-anki-note-viewer-results'));
         if (visible) {
             const success = (error === null);
             node.textContent = success ? 'Success!' : error.message;
@@ -420,26 +543,61 @@ export class AnkiController {
         }
         node.hidden = !visible;
     }
+
+    /**
+     * @param {string} value
+     * @returns {?import('settings').AnkiNoteGuiMode}
+     */
+    _normalizeAnkiNoteGuiMode(value) {
+        switch (value) {
+            case 'browse':
+            case 'edit':
+                return value;
+            default:
+                return null;
+        }
+    }
 }
 
 class AnkiCardController {
+    /**
+     * @param {SettingsController} settingsController
+     * @param {AnkiController} ankiController
+     * @param {HTMLElement} node
+     */
     constructor(settingsController, ankiController, node) {
+        /** @type {SettingsController} */
         this._settingsController = settingsController;
+        /** @type {AnkiController} */
         this._ankiController = ankiController;
+        /** @type {HTMLElement} */
         this._node = node;
-        this._cardType = node.dataset.ankiCardType;
+        const {ankiCardType} = node.dataset;
+        /** @type {string} */
+        this._cardType = typeof ankiCardType === 'string' ? ankiCardType : 'terms';
+        /** @type {string|undefined} */
         this._cardMenu = node.dataset.ankiCardMenu;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {EventListenerCollection} */
         this._fieldEventListeners = new EventListenerCollection();
-        this._fields = null;
+        /** @type {import('settings').AnkiNoteFields} */
+        this._fields = {};
+        /** @type {?string} */
         this._modelChangingTo = null;
+        /** @type {?Element} */
         this._ankiCardFieldsContainer = null;
+        /** @type {boolean} */
         this._cleaned = false;
+        /** @type {import('anki-controller').FieldEntry[]} */
         this._fieldEntries = [];
+        /** @type {AnkiCardSelectController} */
         this._deckController = new AnkiCardSelectController();
+        /** @type {AnkiCardSelectController} */
         this._modelController = new AnkiCardSelectController();
     }
 
+    /** */
     async prepare() {
         const options = await this._settingsController.getOptions();
         const ankiOptions = options.anki;
@@ -448,8 +606,8 @@ class AnkiCardController {
         const cardOptions = this._getCardOptions(ankiOptions, this._cardType);
         if (cardOptions === null) { return; }
         const {deck, model, fields} = cardOptions;
-        this._deckController.prepare(this._node.querySelector('.anki-card-deck'), deck);
-        this._modelController.prepare(this._node.querySelector('.anki-card-model'), model);
+        this._deckController.prepare(/** @type {HTMLSelectElement} */ (this._node.querySelector('.anki-card-deck')), deck);
+        this._modelController.prepare(/** @type {HTMLSelectElement} */ (this._node.querySelector('.anki-card-model')), model);
         this._fields = fields;
 
         this._ankiCardFieldsContainer = this._node.querySelector('.anki-card-fields');
@@ -463,12 +621,14 @@ class AnkiCardController {
         await this.updateAnkiState();
     }
 
+    /** */
     cleanup() {
         this._cleaned = true;
         this._fieldEntries = [];
         this._eventListeners.removeAllEventListeners();
     }
 
+    /** */
     async updateAnkiState() {
         if (this._fields === null) { return; }
         const {deckNames, modelNames} = await this._ankiController.getAnkiData();
@@ -477,41 +637,70 @@ class AnkiCardController {
         this._modelController.setOptionValues(modelNames);
     }
 
+    /**
+     * @returns {boolean}
+     */
     isStale() {
         return (this._cardType !== this._node.dataset.ankiCardType);
     }
 
     // Private
 
+    /**
+     * @param {Event} e
+     */
     _onCardDeckChange(e) {
-        this._setDeck(e.currentTarget.value);
+        const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        this._setDeck(node.value);
     }
 
+    /**
+     * @param {Event} e
+     */
     _onCardModelChange(e) {
-        this._setModel(e.currentTarget.value);
+        const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        this._setModel(node.value);
     }
 
+    /**
+     * @param {number} index
+     * @param {Event} e
+     */
     _onFieldChange(index, e) {
-        const node = e.currentTarget;
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         this._validateFieldPermissions(node, index, true);
         this._validateField(node, index);
     }
 
+    /**
+     * @param {number} index
+     * @param {Event} e
+     */
     _onFieldInput(index, e) {
-        const node = e.currentTarget;
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         this._validateField(node, index);
     }
 
+    /**
+     * @param {number} index
+     * @param {import('dom-data-binder').SettingChangedEvent} e
+     */
     _onFieldSettingChanged(index, e) {
-        const node = e.currentTarget;
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         this._validateFieldPermissions(node, index, false);
     }
 
-    _onFieldMenuOpen({currentTarget: button, detail: {menu}}) {
-        let {index, fieldName} = button.dataset;
-        index = Number.parseInt(index, 10);
+    /**
+     * @param {import('popup-menu').MenuOpenEvent} event
+     */
+    _onFieldMenuOpen(event) {
+        const button = /** @type {HTMLElement} */ (event.currentTarget);
+        const {menu} = event.detail;
+        const {index, fieldName} = button.dataset;
+        const indexNumber = typeof index === 'string' ? Number.parseInt(index, 10) : 0;
+        if (typeof fieldName !== 'string') { return; }
 
-        const defaultValue = this._getDefaultFieldValue(fieldName, index, this._cardType, null);
+        const defaultValue = this._getDefaultFieldValue(fieldName, indexNumber, this._cardType, null);
         if (defaultValue === '') { return; }
 
         const match = /^\{([\w\W]+)\}$/.exec(defaultValue);
@@ -524,14 +713,28 @@ class AnkiCardController {
         item.classList.add('popup-menu-item-bold');
     }
 
-    _onFieldMenuClose({currentTarget: button, detail: {action, item}}) {
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} event
+     */
+    _onFieldMenuClose(event) {
+        const button = /** @type {HTMLElement} */ (event.currentTarget);
+        const {action, item} = event.detail;
         switch (action) {
             case 'setFieldMarker':
-                this._setFieldMarker(button, item.dataset.marker);
+                if (item !== null) {
+                    const {marker} = item.dataset;
+                    if (typeof marker === 'string') {
+                        this._setFieldMarker(button, marker);
+                    }
+                }
                 break;
         }
     }
 
+    /**
+     * @param {HTMLInputElement} node
+     * @param {number} index
+     */
     _validateField(node, index) {
         let valid = (node.dataset.hasPermissions !== 'false');
         if (valid && index === 0 && !AnkiUtil.stringContainsAnyFieldMarker(node.value)) {
@@ -540,12 +743,23 @@ class AnkiCardController {
         node.dataset.invalid = `${!valid}`;
     }
 
+    /**
+     * @param {Element} element
+     * @param {string} marker
+     */
     _setFieldMarker(element, marker) {
-        const input = element.closest('.anki-card-field-value-container').querySelector('.anki-card-field-value');
+        const container = element.closest('.anki-card-field-value-container');
+        if (container === null) { return; }
+        const input = /** @type {HTMLInputElement} */ (container.querySelector('.anki-card-field-value'));
         input.value = `{${marker}}`;
         input.dispatchEvent(new Event('change'));
     }
 
+    /**
+     * @param {import('settings').AnkiOptions} ankiOptions
+     * @param {string} cardType
+     * @returns {?import('settings').AnkiNoteOptions}
+     */
     _getCardOptions(ankiOptions, cardType) {
         switch (cardType) {
             case 'terms': return ankiOptions.terms;
@@ -554,6 +768,7 @@ class AnkiCardController {
         }
     }
 
+    /** */
     _setupFields() {
         this._fieldEventListeners.removeAllEventListeners();
 
@@ -563,15 +778,15 @@ class AnkiCardController {
         for (const [fieldName, fieldValue] of Object.entries(this._fields)) {
             const content = this._settingsController.instantiateTemplateFragment('anki-card-field');
 
-            const fieldNameContainerNode = content.querySelector('.anki-card-field-name-container');
+            const fieldNameContainerNode = /** @type {HTMLElement} */ (content.querySelector('.anki-card-field-name-container'));
             fieldNameContainerNode.dataset.index = `${index}`;
-            const fieldNameNode = content.querySelector('.anki-card-field-name');
+            const fieldNameNode = /** @type {HTMLElement} */ (content.querySelector('.anki-card-field-name'));
             fieldNameNode.textContent = fieldName;
 
-            const valueContainer = content.querySelector('.anki-card-field-value-container');
+            const valueContainer = /** @type {HTMLElement} */ (content.querySelector('.anki-card-field-value-container'));
             valueContainer.dataset.index = `${index}`;
 
-            const inputField = content.querySelector('.anki-card-field-value');
+            const inputField = /** @type {HTMLInputElement} */ (content.querySelector('.anki-card-field-value'));
             inputField.value = fieldValue;
             inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._cardType, 'fields', fieldName]);
             this._validateFieldPermissions(inputField, index, false);
@@ -581,7 +796,7 @@ class AnkiCardController {
             this._fieldEventListeners.addEventListener(inputField, 'settingChanged', this._onFieldSettingChanged.bind(this, index), false);
             this._validateField(inputField, index);
 
-            const menuButton = content.querySelector('.anki-card-field-value-menu-button');
+            const menuButton = /** @type {?HTMLElement} */ (content.querySelector('.anki-card-field-value-menu-button'));
             if (menuButton !== null) {
                 if (typeof this._cardMenu !== 'undefined') {
                     menuButton.dataset.menu = this._cardMenu;
@@ -602,15 +817,18 @@ class AnkiCardController {
 
         const ELEMENT_NODE = Node.ELEMENT_NODE;
         const container = this._ankiCardFieldsContainer;
-        for (const node of [...container.childNodes]) {
-            if (node.nodeType === ELEMENT_NODE && node.dataset.persistent === 'true') { continue; }
-            container.removeChild(node);
+        if (container !== null) {
+            for (const node of [...container.childNodes]) {
+                if (node.nodeType === ELEMENT_NODE && node instanceof HTMLElement && node.dataset.persistent === 'true') { continue; }
+                container.removeChild(node);
+            }
+            container.appendChild(totalFragment);
         }
-        container.appendChild(totalFragment);
 
         this._validateFields();
     }
 
+    /** */
     async _validateFields() {
         const token = {};
         this._validateFieldsToken = token;
@@ -633,6 +851,9 @@ class AnkiCardController {
         }
     }
 
+    /**
+     * @param {string} value
+     */
     async _setDeck(value) {
         if (this._deckController.value === value) { return; }
         this._deckController.value = value;
@@ -644,6 +865,9 @@ class AnkiCardController {
         }]);
     }
 
+    /**
+     * @param {string} value
+     */
     async _setModel(value) {
         const select = this._modelController.select;
         if (this._modelChangingTo !== null) {
@@ -671,12 +895,14 @@ class AnkiCardController {
         const cardOptions = this._getCardOptions(options.anki, cardType);
         const oldFields = cardOptions !== null ? cardOptions.fields : null;
 
+        /** @type {import('settings').AnkiNoteFields} */
         const fields = {};
         for (let i = 0, ii = fieldNames.length; i < ii; ++i) {
             const fieldName = fieldNames[i];
             fields[fieldName] = this._getDefaultFieldValue(fieldName, i, cardType, oldFields);
         }
 
+        /** @type {import('settings-modifications').Modification[]} */
         const targets = [
             {
                 action: 'set',
@@ -698,6 +924,9 @@ class AnkiCardController {
         this._setupFields();
     }
 
+    /**
+     * @param {string[]} permissions
+     */
     async _requestPermissions(permissions) {
         try {
             await this._settingsController.permissionsUtil.setPermissionsGranted({permissions}, true);
@@ -706,6 +935,11 @@ class AnkiCardController {
         }
     }
 
+    /**
+     * @param {HTMLInputElement} node
+     * @param {number} index
+     * @param {boolean} request
+     */
     async _validateFieldPermissions(node, index, request) {
         const fieldValue = node.value;
         const permissions = this._ankiController.getRequiredPermissions(fieldValue);
@@ -725,16 +959,19 @@ class AnkiCardController {
         this._validateField(node, index);
     }
 
+    /**
+     * @param {import('settings-controller').PermissionsChangedEvent} details
+     */
     _onPermissionsChanged({permissions: {permissions}}) {
         const permissionsSet = new Set(permissions);
         for (let i = 0, ii = this._fieldEntries.length; i < ii; ++i) {
             const {inputField} = this._fieldEntries[i];
-            let {requiredPermission} = inputField.dataset;
+            const {requiredPermission} = inputField.dataset;
             if (typeof requiredPermission !== 'string') { continue; }
-            requiredPermission = (requiredPermission.length === 0 ? [] : requiredPermission.split(' '));
+            const requiredPermissionArray = (requiredPermission.length === 0 ? [] : requiredPermission.split(' '));
 
             let hasPermissions = true;
-            for (const permission of requiredPermission) {
+            for (const permission of requiredPermissionArray) {
                 if (!permissionsSet.has(permission)) {
                     hasPermissions = false;
                     break;
@@ -746,6 +983,13 @@ class AnkiCardController {
         }
     }
 
+    /**
+     * @param {string} fieldName
+     * @param {number} index
+     * @param {string} cardType
+     * @param {?import('settings').AnkiNoteFields} oldFields
+     * @returns {string}
+     */
     _getDefaultFieldValue(fieldName, index, cardType, oldFields) {
         if (
             typeof oldFields === 'object' &&
@@ -783,9 +1027,9 @@ class AnkiCardController {
                 pattern += name.replace(hyphenPattern, '[-_ ]*');
             }
             pattern += ')$';
-            pattern = new RegExp(pattern, 'i');
+            const patternRegExp = new RegExp(pattern, 'i');
 
-            if (pattern.test(fieldName)) {
+            if (patternRegExp.test(fieldName)) {
                 return `{${marker}}`;
             }
         }
@@ -796,14 +1040,21 @@ class AnkiCardController {
 
 class AnkiCardSelectController {
     constructor() {
+        /** @type {?string} */
         this._value = null;
+        /** @type {?HTMLSelectElement} */
         this._select = null;
-        this._optionValues = null;
+        /** @type {string[]} */
+        this._optionValues = [];
+        /** @type {boolean} */
         this._hasExtraOption = false;
+        /** @type {boolean} */
         this._selectNeedsUpdate = false;
     }
 
+    /** @type {string} */
     get value() {
+        if (this._value === null) { throw new Error('Invalid value'); }
         return this._value;
     }
 
@@ -812,16 +1063,25 @@ class AnkiCardSelectController {
         this._updateSelect();
     }
 
+    /** @type {HTMLSelectElement} */
     get select() {
+        if (this._select === null) { throw new Error('Invalid value'); }
         return this._select;
     }
 
+    /**
+     * @param {HTMLSelectElement} select
+     * @param {string} value
+     */
     prepare(select, value) {
         this._select = select;
         this._value = value;
         this._updateSelect();
     }
 
+    /**
+     * @param {string[]} optionValues
+     */
     setOptionValues(optionValues) {
         this._optionValues = optionValues;
         this._selectNeedsUpdate = true;
@@ -830,8 +1090,11 @@ class AnkiCardSelectController {
 
     // Private
 
+    /** */
     _updateSelect() {
+        const select = this._select;
         const value = this._value;
+        if (select === null || value === null) { return; }
         let optionValues = this._optionValues;
         const hasOptionValues = Array.isArray(optionValues) && optionValues.length > 0;
 
@@ -844,7 +1107,6 @@ class AnkiCardSelectController {
             optionValues = [...optionValues, value];
         }
 
-        const select = this._select;
         if (this._selectNeedsUpdate || hasExtraOption !== this._hasExtraOption) {
             this._setSelectOptions(select, optionValues);
             select.value = value;
@@ -859,6 +1121,10 @@ class AnkiCardSelectController {
         }
     }
 
+    /**
+     * @param {HTMLSelectElement} select
+     * @param {string[]} optionValues
+     */
     _setSelectOptions(select, optionValues) {
         const fragment = document.createDocumentFragment();
         for (const optionValue of optionValues) {

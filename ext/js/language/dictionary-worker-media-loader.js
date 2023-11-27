@@ -27,12 +27,13 @@ export class DictionaryWorkerMediaLoader {
      * Creates a new instance of the media loader.
      */
     constructor() {
+        /** @type {Map<string, {resolve: (result: import('dictionary-worker-media-loader').ImageDetails) => void, reject: (reason?: import('core').RejectionReason) => void}>} */
         this._requests = new Map();
     }
 
     /**
      * Handles a response message posted to the worker thread.
-     * @param {{id: string, error: object|undefined, result: any|undefined}} params Details of the response.
+     * @param {import('dictionary-worker-media-loader').HandleMessageParams} params Details of the response.
      */
     handleMessage(params) {
         const {id} = params;
@@ -41,24 +42,19 @@ export class DictionaryWorkerMediaLoader {
         this._requests.delete(id);
         const {error} = params;
         if (typeof error !== 'undefined') {
-            request.reject(deserializeError(error));
+            request.reject(ExtensionError.deserialize(error));
         } else {
             request.resolve(params.result);
         }
     }
 
-    /**
-     * Attempts to load an image using an ArrayBuffer and a media type to return details about it.
-     * @param {ArrayBuffer} content The binary content for the image, encoded as an ArrayBuffer.
-     * @param {string} mediaType The media type for the image content.
-     * @returns {Promise<{content: ArrayBuffer, width: number, height: number}>} Details about the requested image content.
-     * @throws {Error} An error can be thrown if the image fails to load.
-     */
+    /** @type {import('dictionary-importer-media-loader').GetImageDetailsFunction} */
     getImageDetails(content, mediaType) {
         return new Promise((resolve, reject) => {
             const id = generateId(16);
             this._requests.set(id, {resolve, reject});
-            self.postMessage({
+            // This is executed in a Worker context, so the self needs to be force cast
+            /** @type {Worker} */ (/** @type {unknown} */ (self)).postMessage({
                 action: 'getImageDetails',
                 params: {id, content, mediaType}
             }, [content]);

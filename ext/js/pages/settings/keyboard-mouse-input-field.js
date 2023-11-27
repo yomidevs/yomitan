@@ -20,31 +20,58 @@ import {EventDispatcher, EventListenerCollection} from '../../core.js';
 import {DocumentUtil} from '../../dom/document-util.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
 
+/**
+ * @augments EventDispatcher<import('keyboard-mouse-input-field').EventType>
+ */
 export class KeyboardMouseInputField extends EventDispatcher {
+    /**
+     * @param {HTMLInputElement} inputNode
+     * @param {?HTMLButtonElement} mouseButton
+     * @param {?import('environment').OperatingSystem} os
+     * @param {?(pointerType: string) => boolean} [isPointerTypeSupported]
+     */
     constructor(inputNode, mouseButton, os, isPointerTypeSupported=null) {
         super();
+        /** @type {HTMLInputElement} */
         this._inputNode = inputNode;
+        /** @type {?HTMLButtonElement} */
         this._mouseButton = mouseButton;
+        /** @type {?(pointerType: string) => boolean} */
         this._isPointerTypeSupported = isPointerTypeSupported;
+        /** @type {HotkeyUtil} */
         this._hotkeyUtil = new HotkeyUtil(os);
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {?string} */
         this._key = null;
+        /** @type {import('input').Modifier[]} */
         this._modifiers = [];
+        /** @type {Set<number>} */
         this._penPointerIds = new Set();
+        /** @type {boolean} */
         this._mouseModifiersSupported = false;
+        /** @type {boolean} */
         this._keySupported = false;
     }
 
+    /** @type {import('input').Modifier[]} */
     get modifiers() {
         return this._modifiers;
     }
 
+    /**
+     * @param {?string} key
+     * @param {import('input').Modifier[]} modifiers
+     * @param {boolean} [mouseModifiersSupported]
+     * @param {boolean} [keySupported]
+     */
     prepare(key, modifiers, mouseModifiersSupported=false, keySupported=false) {
         this.cleanup();
 
         this._mouseModifiersSupported = mouseModifiersSupported;
         this._keySupported = keySupported;
         this.setInput(key, modifiers);
+        /** @type {import('event-listener-collection').AddEventListenerArgs[]} */
         const events = [
             [this._inputNode, 'keydown', this._onModifierKeyDown.bind(this), false],
             [this._inputNode, 'keyup', this._onModifierKeyUp.bind(this), false]
@@ -65,12 +92,17 @@ export class KeyboardMouseInputField extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {?string} key
+     * @param {import('input').Modifier[]} modifiers
+     */
     setInput(key, modifiers) {
         this._key = key;
         this._modifiers = this._sortModifiers(modifiers);
         this._updateDisplayString();
     }
 
+    /** */
     cleanup() {
         this._eventListeners.removeAllEventListeners();
         this._modifiers = [];
@@ -80,21 +112,31 @@ export class KeyboardMouseInputField extends EventDispatcher {
         this._penPointerIds.clear();
     }
 
+    /** */
     clearInputs() {
         this._updateModifiers([], null);
     }
 
     // Private
 
+    /**
+     * @param {import('input').Modifier[]} modifiers
+     * @returns {import('input').Modifier[]}
+     */
     _sortModifiers(modifiers) {
         return this._hotkeyUtil.sortModifiers(modifiers);
     }
 
+    /** */
     _updateDisplayString() {
         const displayValue = this._hotkeyUtil.getInputDisplayValue(this._key, this._modifiers);
         this._inputNode.value = displayValue;
     }
 
+    /**
+     * @param {KeyboardEvent} e
+     * @returns {Set<import('input').ModifierKey>}
+     */
     _getModifierKeys(e) {
         const modifiers = new Set(DocumentUtil.getActiveModifiers(e));
         // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey
@@ -115,6 +157,10 @@ export class KeyboardMouseInputField extends EventDispatcher {
         return modifiers;
     }
 
+    /**
+     * @param {string|undefined} keyName
+     * @returns {boolean}
+     */
     _isModifierKey(keyName) {
         switch (keyName) {
             case 'AltLeft':
@@ -133,9 +179,13 @@ export class KeyboardMouseInputField extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {KeyboardEvent} e
+     */
     _onModifierKeyDown(e) {
         e.preventDefault();
 
+        /** @type {string|undefined} */
         let key = e.code;
         if (key === 'Unidentified' || key === '') { key = void 0; }
         if (this._keySupported) {
@@ -153,15 +203,24 @@ export class KeyboardMouseInputField extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {KeyboardEvent} e
+     */
     _onModifierKeyUp(e) {
         e.preventDefault();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onMouseButtonMouseDown(e) {
         e.preventDefault();
         this._addModifiers(DocumentUtil.getActiveButtons(e));
     }
 
+    /**
+     * @param {PointerEvent} e
+     */
     _onMouseButtonPointerDown(e) {
         if (!e.isPrimary) { return; }
 
@@ -179,6 +238,9 @@ export class KeyboardMouseInputField extends EventDispatcher {
         this._addModifiers(DocumentUtil.getActiveButtons(e));
     }
 
+    /**
+     * @param {PointerEvent} e
+     */
     _onMouseButtonPointerOver(e) {
         const {pointerType, pointerId} = e;
         if (pointerType === 'pen') {
@@ -186,23 +248,39 @@ export class KeyboardMouseInputField extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {PointerEvent} e
+     */
     _onMouseButtonPointerOut(e) {
         const {pointerId} = e;
         this._penPointerIds.delete(pointerId);
     }
 
+    /**
+     * @param {PointerEvent} e
+     */
     _onMouseButtonPointerCancel(e) {
         this._onMouseButtonPointerOut(e);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onMouseButtonMouseUp(e) {
         e.preventDefault();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onMouseButtonContextMenu(e) {
         e.preventDefault();
     }
 
+    /**
+     * @param {Iterable<import('input').Modifier>} newModifiers
+     * @param {?string} [newKey]
+     */
     _addModifiers(newModifiers, newKey) {
         const modifiers = new Set(this._modifiers);
         for (const modifier of newModifiers) {
@@ -211,6 +289,10 @@ export class KeyboardMouseInputField extends EventDispatcher {
         this._updateModifiers([...modifiers], newKey);
     }
 
+    /**
+     * @param {import('input').Modifier[]} modifiers
+     * @param {?string} [newKey]
+     */
     _updateModifiers(modifiers, newKey) {
         modifiers = this._sortModifiers(modifiers);
 
@@ -226,10 +308,18 @@ export class KeyboardMouseInputField extends EventDispatcher {
 
         this._updateDisplayString();
         if (changed) {
-            this.trigger('change', {modifiers: this._modifiers, key: this._key});
+            /** @type {import('keyboard-mouse-input-field').ChangeEvent} */
+            const event = {modifiers: this._modifiers, key: this._key};
+            this.trigger('change', event);
         }
     }
 
+    /**
+     * @template T
+     * @param {T[]} array1
+     * @param {T[]} array2
+     * @returns {boolean}
+     */
     _areArraysEqual(array1, array2) {
         const length = array1.length;
         if (length !== array2.length) { return false; }

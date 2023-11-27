@@ -18,5 +18,4 @@
 
 import {yomitan} from '../yomitan.js';
 
-
-yomitan.trigger('dynamicLoaderSentinel', {script: import.meta.url});
+yomitan.trigger('dynamicLoaderSentinel', /** @type {import('dynamic-loader').DynamicLoaderSentinelDetails} */ ({scriptUrl: import.meta.url}));

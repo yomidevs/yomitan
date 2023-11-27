@@ -20,22 +20,42 @@ import {EventDispatcher, log} from '../core.js';
 import {TextScanner} from '../language/text-scanner.js';
 import {yomitan} from '../yomitan.js';
 
+/**
+ * @augments EventDispatcher<import('display').QueryParserEventType>
+ */
 export class QueryParser extends EventDispatcher {
+    /**
+     * @param {import('display').QueryParserConstructorDetails} details
+     */
     constructor({getSearchContext, japaneseUtil}) {
         super();
+        /** @type {import('display').GetSearchContextCallback} */
         this._getSearchContext = getSearchContext;
+        /** @type {JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
+        /** @type {string} */
         this._text = '';
+        /** @type {?import('core').TokenObject} */
         this._setTextToken = null;
+        /** @type {?string} */
         this._selectedParser = null;
+        /** @type {import('settings').ParsingReadingMode} */
         this._readingMode = 'none';
+        /** @type {number} */
         this._scanLength = 1;
+        /** @type {boolean} */
         this._useInternalParser = true;
+        /** @type {boolean} */
         this._useMecabParser = false;
+        /** @type {import('api').ParseTextResult} */
         this._parseResults = [];
-        this._queryParser = document.querySelector('#query-parser-content');
-        this._queryParserModeContainer = document.querySelector('#query-parser-mode-container');
-        this._queryParserModeSelect = document.querySelector('#query-parser-mode-select');
+        /** @type {HTMLElement} */
+        this._queryParser = /** @type {HTMLElement} */ (document.querySelector('#query-parser-content'));
+        /** @type {HTMLElement} */
+        this._queryParserModeContainer = /** @type {HTMLElement} */ (document.querySelector('#query-parser-mode-container'));
+        /** @type {HTMLSelectElement} */
+        this._queryParserModeSelect = /** @type {HTMLSelectElement} */ (document.querySelector('#query-parser-mode-select'));
+        /** @type {TextScanner} */
         this._textScanner = new TextScanner({
             node: this._queryParser,
             getSearchContext,
@@ -45,10 +65,12 @@ export class QueryParser extends EventDispatcher {
         });
     }
 
+    /** @type {string} */
     get text() {
         return this._text;
     }
 
+    /** */
     prepare() {
         this._textScanner.prepare();
         this._textScanner.on('clear', this._onTextScannerClear.bind(this));
@@ -56,6 +78,9 @@ export class QueryParser extends EventDispatcher {
         this._queryParserModeSelect.addEventListener('change', this._onParserChange.bind(this), false);
     }
 
+    /**
+     * @param {import('display').QueryParserOptions} display
+     */
     setOptions({selectedParser, termSpacing, readingMode, useInternalParser, useMecabParser, scanning}) {
         let selectedParserChanged = false;
         if (selectedParser === null || typeof selectedParser === 'string') {
@@ -87,10 +112,14 @@ export class QueryParser extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {string} text
+     */
     async setText(text) {
         this._text = text;
         this._setPreview(text);
 
+        /** @type {?import('core').TokenObject} */
         const token = {};
         this._setTextToken = token;
         this._parseResults = await yomitan.api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser);
@@ -104,32 +133,63 @@ export class QueryParser extends EventDispatcher {
 
     // Private
 
+    /** */
     _onTextScannerClear() {
         this._textScanner.clearSelection();
     }
 
+    /**
+     * @param {import('text-scanner').SearchedEventDetails} e
+     */
     _onSearched(e) {
         const {error} = e;
         if (error !== null) {
             log.error(error);
             return;
         }
-        if (e.type === null) { return; }
 
-        e.sentenceOffset = this._getSentenceOffset(e.textSource);
+        const {
+            textScanner,
+            type,
+            dictionaryEntries,
+            sentence,
+            inputInfo,
+            textSource,
+            optionsContext
+        } = e;
+        if (type === null || dictionaryEntries === null || sentence === null || optionsContext === null) { return; }
 
-        this.trigger('searched', e);
+        /** @type {import('display').QueryParserSearchedEvent} */
+        const event2 = {
+            textScanner,
+            type,
+            dictionaryEntries,
+            sentence,
+            inputInfo,
+            textSource,
+            optionsContext,
+            sentenceOffset: this._getSentenceOffset(e.textSource)
+        };
+        this.trigger('searched', event2);
     }
 
+    /**
+     * @param {Event} e
+     */
     _onParserChange(e) {
-        const value = e.currentTarget.value;
+        const element = /** @type {HTMLInputElement} */ (e.currentTarget);
+        const value = element.value;
         this._setSelectedParser(value);
     }
 
+    /**
+     * @returns {import('settings').OptionsContext}
+     */
     _getOptionsContext() {
         return this._getSearchContext().optionsContext;
     }
 
+    /** */
     _refreshSelectedParser() {
         if (this._parseResults.length > 0 && !this._getParseResult()) {
             const value = this._parseResults[0].id;
@@ -137,22 +197,33 @@ export class QueryParser extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {string} value
+     */
     _setSelectedParser(value) {
         const optionsContext = this._getOptionsContext();
-        yomitan.api.modifySettings([{
+        /** @type {import('settings-modifications').ScopedModificationSet} */
+        const modification = {
             action: 'set',
             path: 'parsing.selectedParser',
             value,
             scope: 'profile',
             optionsContext
-        }], 'search');
+        };
+        yomitan.api.modifySettings([modification], 'search');
     }
 
+    /**
+     * @returns {import('api').ParseTextResultItem|undefined}
+     */
     _getParseResult() {
         const selectedParser = this._selectedParser;
         return this._parseResults.find((r) => r.id === selectedParser);
     }
 
+    /**
+     * @param {string} text
+     */
     _setPreview(text) {
         const terms = [[{text, reading: ''}]];
         this._queryParser.textContent = '';
@@ -160,6 +231,7 @@ export class QueryParser extends EventDispatcher {
         this._queryParser.appendChild(this._createParseResult(terms));
     }
 
+    /** */
     _renderParserSelect() {
         const visible = (this._parseResults.length > 1);
         if (visible) {
@@ -168,6 +240,7 @@ export class QueryParser extends EventDispatcher {
         this._queryParserModeContainer.hidden = !visible;
     }
 
+    /** */
     _renderParseResult() {
         const parseResult = this._getParseResult();
         this._queryParser.textContent = '';
@@ -176,6 +249,11 @@ export class QueryParser extends EventDispatcher {
         this._queryParser.appendChild(this._createParseResult(parseResult.content));
     }
 
+    /**
+     * @param {HTMLSelectElement} select
+     * @param {import('api').ParseTextResult} parseResults
+     * @param {?string} selectedParser
+     */
     _updateParserModeSelect(select, parseResults, selectedParser) {
         const fragment = document.createDocumentFragment();
 
@@ -208,6 +286,10 @@ export class QueryParser extends EventDispatcher {
         select.selectedIndex = selectedIndex;
     }
 
+    /**
+     * @param {import('api').ParseTextLine[]} data
+     * @returns {DocumentFragment}
+     */
     _createParseResult(data) {
         let offset = 0;
         const fragment = document.createDocumentFragment();
@@ -229,6 +311,12 @@ export class QueryParser extends EventDispatcher {
         return fragment;
     }
 
+    /**
+     * @param {string} text
+     * @param {string} reading
+     * @param {number} offset
+     * @returns {HTMLElement}
+     */
     _createSegment(text, reading, offset) {
         const segmentNode = document.createElement('ruby');
         segmentNode.className = 'query-parser-segment';
@@ -249,6 +337,11 @@ export class QueryParser extends EventDispatcher {
         return segmentNode;
     }
 
+    /**
+     * @param {string} term
+     * @param {string} reading
+     * @returns {string}
+     */
     _convertReading(term, reading) {
         switch (this._readingMode) {
             case 'hiragana':
@@ -271,11 +364,15 @@ export class QueryParser extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {import('text-source').TextSource} textSource
+     * @returns {?number}
+     */
     _getSentenceOffset(textSource) {
         if (textSource.type === 'range') {
             const {range} = textSource;
             const node = this._getParentElement(range.startContainer);
-            if (node !== null) {
+            if (node !== null && node instanceof HTMLElement) {
                 const {offset} = node.dataset;
                 if (typeof offset === 'string') {
                     const value = Number.parseInt(offset, 10);
@@ -288,12 +385,16 @@ export class QueryParser extends EventDispatcher {
         return null;
     }
 
+    /**
+     * @param {?Node} node
+     * @returns {?Element}
+     */
     _getParentElement(node) {
         const {ELEMENT_NODE} = Node;
         while (true) {
-            node = node.parentNode;
             if (node === null) { return null; }
-            if (node.nodeType === ELEMENT_NODE) { return node; }
+            if (node.nodeType === ELEMENT_NODE) { return /** @type {Element} */ (node); }
+            node = node.parentNode;
         }
     }
 }

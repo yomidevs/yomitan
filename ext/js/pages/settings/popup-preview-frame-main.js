@@ -27,6 +27,12 @@ import {PopupPreviewFrame} from './popup-preview-frame.js';
         await yomitan.prepare();
 
         const {tabId, frameId} = await yomitan.api.frameInformationGet();
+        if (typeof tabId === 'undefined') {
+            throw new Error('Failed to get tabId');
+        }
+        if (typeof frameId === 'undefined') {
+            throw new Error('Failed to get frameId');
+        }
 
         const hotkeyHandler = new HotkeyHandler();
         hotkeyHandler.prepare();

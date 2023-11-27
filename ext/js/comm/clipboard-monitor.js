@@ -18,17 +18,32 @@
 
 import {EventDispatcher} from '../core.js';
 
+/**
+ * @augments EventDispatcher<import('clipboard-monitor').EventType>
+ */
 export class ClipboardMonitor extends EventDispatcher {
+    /**
+     * @param {{japaneseUtil: import('../language/sandbox/japanese-util.js').JapaneseUtil, clipboardReader: import('clipboard-monitor').ClipboardReaderLike}} details
+     */
     constructor({japaneseUtil, clipboardReader}) {
         super();
+        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
+        /** @type {import('clipboard-monitor').ClipboardReaderLike} */
         this._clipboardReader = clipboardReader;
+        /** @type {?number} */
         this._timerId = null;
+        /** @type {?import('core').TokenObject} */
         this._timerToken = null;
+        /** @type {number} */
         this._interval = 250;
+        /** @type {?string} */
         this._previousText = null;
     }
 
+    /**
+     * @returns {void}
+     */
     start() {
         this.stop();
 
@@ -36,6 +51,7 @@ export class ClipboardMonitor extends EventDispatcher {
         // hasn't been started during the await call. The check below the await call
         // will exit early if the reference has changed.
         let canChange = false;
+        /** @type {?import('core').TokenObject} */
         const token = {};
         const intervalCallback = async () => {
             this._timerId = null;
@@ -55,7 +71,7 @@ export class ClipboardMonitor extends EventDispatcher {
             ) {
                 this._previousText = text;
                 if (canChange && this._japaneseUtil.isStringPartiallyJapanese(text)) {
-                    this.trigger('change', {text});
+                    this.trigger('change', /** @type {import('clipboard-monitor').ChangeEvent} */ ({text}));
                 }
             }
 
@@ -68,6 +84,9 @@ export class ClipboardMonitor extends EventDispatcher {
         intervalCallback();
     }
 
+    /**
+     * @returns {void}
+     */
     stop() {
         this._timerToken = null;
         this._previousText = null;
@@ -77,6 +96,9 @@ export class ClipboardMonitor extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {?string} text
+     */
     setPreviousText(text) {
         this._previousText = text;
     }

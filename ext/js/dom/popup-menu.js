@@ -18,38 +18,58 @@
 
 import {EventDispatcher, EventListenerCollection} from '../core.js';
 
+/**
+ * @augments EventDispatcher<import('popup-menu').EventType>
+ */
 export class PopupMenu extends EventDispatcher {
+    /**
+     * @param {HTMLElement} sourceElement
+     * @param {HTMLElement} containerNode
+     */
     constructor(sourceElement, containerNode) {
         super();
+        /** @type {HTMLElement} */
         this._sourceElement = sourceElement;
+        /** @type {HTMLElement} */
         this._containerNode = containerNode;
-        this._node = containerNode.querySelector('.popup-menu');
-        this._bodyNode = containerNode.querySelector('.popup-menu-body');
+        /** @type {HTMLElement} */
+        this._node = /** @type {HTMLElement} */ (containerNode.querySelector('.popup-menu'));
+        /** @type {HTMLElement} */
+        this._bodyNode = /** @type {HTMLElement} */ (containerNode.querySelector('.popup-menu-body'));
+        /** @type {boolean} */
         this._isClosed = false;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {EventListenerCollection} */
         this._itemEventListeners = new EventListenerCollection();
     }
 
+    /** @type {HTMLElement} */
     get sourceElement() {
         return this._sourceElement;
     }
 
+    /** @type {HTMLElement} */
     get containerNode() {
         return this._containerNode;
     }
 
+    /** @type {HTMLElement} */
     get node() {
         return this._node;
     }
 
+    /** @type {HTMLElement} */
     get bodyNode() {
         return this._bodyNode;
     }
 
+    /** @type {boolean} */
     get isClosed() {
         return this._isClosed;
     }
 
+    /** */
     prepare() {
         this._setPosition();
         this._containerNode.focus();
@@ -61,17 +81,25 @@ export class PopupMenu extends EventDispatcher {
 
         PopupMenu.openMenus.add(this);
 
+        /** @type {import('popup-menu').MenuOpenEventDetails} */
+        const detail = {menu: this};
+
         this._sourceElement.dispatchEvent(new CustomEvent('menuOpen', {
             bubbles: false,
             cancelable: false,
-            detail: {menu: this}
+            detail
         }));
     }
 
+    /**
+     * @param {boolean} [cancelable]
+     * @returns {boolean}
+     */
     close(cancelable=true) {
-        return this._close(null, 'close', cancelable, {});
+        return this._close(null, 'close', cancelable, null);
     }
 
+    /** */
     updateMenuItems() {
         this._itemEventListeners.removeAllEventListeners();
         const items = this._bodyNode.querySelectorAll('.popup-menu-item');
@@ -81,12 +109,16 @@ export class PopupMenu extends EventDispatcher {
         }
     }
 
+    /** */
     updatePosition() {
         this._setPosition();
     }
 
     // Private
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onMenuContainerClick(e) {
         if (e.currentTarget !== e.target) { return; }
         if (this._close(null, 'outside', true, e)) {
@@ -95,8 +127,11 @@ export class PopupMenu extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onMenuItemClick(e) {
-        const item = e.currentTarget;
+        const item = /** @type {HTMLButtonElement} */ (e.currentTarget);
         if (item.disabled) { return; }
         if (this._close(item, 'item', true, e)) {
             e.stopPropagation();
@@ -104,10 +139,12 @@ export class PopupMenu extends EventDispatcher {
         }
     }
 
+    /** */
     _onWindowResize() {
-        this._close(null, 'resize', true, {});
+        this._close(null, 'resize', true, null);
     }
 
+    /** */
     _setPosition() {
         // Get flags
         let horizontal = 1;
@@ -187,11 +224,29 @@ export class PopupMenu extends EventDispatcher {
         menu.style.top = `${y}px`;
     }
 
+    /**
+     * @param {?HTMLElement} item
+     * @param {import('popup-menu').CloseReason} cause
+     * @param {boolean} cancelable
+     * @param {?MouseEvent} originalEvent
+     * @returns {boolean}
+     */
     _close(item, cause, cancelable, originalEvent) {
         if (this._isClosed) { return true; }
-        const action = (item !== null ? item.dataset.menuAction : null);
+        /** @type {?string} */
+        let action = null;
+        if (item !== null) {
+            const {menuAction} = item.dataset;
+            if (typeof menuAction === 'string') { action = menuAction; }
+        }
 
-        const {altKey=false, ctrlKey=false, metaKey=false, shiftKey=false} = originalEvent;
+        const {altKey, ctrlKey, metaKey, shiftKey} = (
+            originalEvent !== null ?
+            originalEvent :
+            {altKey: false, ctrlKey: false, metaKey: false, shiftKey: false}
+        );
+
+        /** @type {import('popup-menu').MenuCloseEventDetails} */
         const detail = {
             menu: this,
             item,

@@ -17,22 +17,32 @@
  */
 
 export class PopupPreviewController {
+    /**
+     * @param {SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {SettingsController} */
         this._settingsController = settingsController;
+        /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
+        /** @type {?HTMLIFrameElement} */
         this._frame = null;
+        /** @type {?HTMLTextAreaElement} */
         this._customCss = null;
+        /** @type {?HTMLTextAreaElement} */
         this._customOuterCss = null;
+        /** @type {?HTMLElement} */
         this._previewFrameContainer = null;
     }
 
+    /** */
     async prepare() {
         if (new URLSearchParams(location.search).get('popup-preview') === 'false') { return; }
 
-        this._frame = document.querySelector('#popup-preview-frame');
-        this._customCss = document.querySelector('#custom-popup-css');
-        this._customOuterCss = document.querySelector('#custom-popup-outer-css');
-        this._previewFrameContainer = document.querySelector('.preview-frame-container');
+        this._frame = /** @type {HTMLIFrameElement} */ (document.querySelector('#popup-preview-frame'));
+        this._customCss = /** @type {HTMLTextAreaElement} */ (document.querySelector('#custom-popup-css'));
+        this._customOuterCss = /** @type {HTMLTextAreaElement} */ (document.querySelector('#custom-popup-outer-css'));
+        this._previewFrameContainer = /** @type {HTMLElement} */ (document.querySelector('.preview-frame-container'));
 
         this._customCss.addEventListener('input', this._onCustomCssChange.bind(this), false);
         this._customCss.addEventListener('settingChanged', this._onCustomCssChange.bind(this), false);
@@ -46,25 +56,35 @@ export class PopupPreviewController {
 
     // Private
 
+    /** */
     _onFrameLoad() {
         this._onOptionsContextChange();
         this._onCustomCssChange();
         this._onCustomOuterCssChange();
     }
 
+    /** */
     _onCustomCssChange() {
-        this._invoke('PopupPreviewFrame.setCustomCss', {css: this._customCss.value});
+        const css = /** @type {HTMLTextAreaElement} */ (this._customCss).value;
+        this._invoke('PopupPreviewFrame.setCustomCss', {css});
     }
 
+    /** */
     _onCustomOuterCssChange() {
-        this._invoke('PopupPreviewFrame.setCustomOuterCss', {css: this._customOuterCss.value});
+        const css = /** @type {HTMLTextAreaElement} */ (this._customOuterCss).value;
+        this._invoke('PopupPreviewFrame.setCustomOuterCss', {css});
     }
 
+    /** */
     _onOptionsContextChange() {
         const optionsContext = this._settingsController.getOptionsContext();
         this._invoke('PopupPreviewFrame.updateOptionsContext', {optionsContext});
     }
 
+    /**
+     * @param {string} action
+     * @param {import('core').SerializableObject} params
+     */
     _invoke(action, params) {
         if (this._frame === null || this._frame.contentWindow === null) { return; }
         this._frame.contentWindow.postMessage({action, params}, this._targetOrigin);

@@ -24,12 +24,18 @@ import {createDictionaryArchive} from '../dev/util.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * @param {string} dictionary
+ * @param {string} [dictionaryName]
+ * @returns {import('jszip')}
+ */
 function createTestDictionaryArchive(dictionary, dictionaryName) {
     const dictionaryDirectory = path.join(dirname, 'data', 'dictionaries', dictionary);
     return createDictionaryArchive(dictionaryDirectory, dictionaryName);
 }
 
 
+/** */
 async function main() {
     const dictionaries = [
         {name: 'valid-dictionary1', valid: true},

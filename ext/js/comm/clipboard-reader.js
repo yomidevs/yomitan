@@ -24,17 +24,20 @@ import {MediaUtil} from '../media/media-util.js';
 export class ClipboardReader {
     /**
      * Creates a new instances of a clipboard reader.
-     * @param {object} details Details about how to set up the instance.
-     * @param {?Document} details.document The Document object to be used, or null for no support.
-     * @param {?string} details.pasteTargetSelector The selector for the paste target element.
-     * @param {?string} details.richContentPasteTargetSelector The selector for the rich content paste target element.
+     * @param {{document: ?Document, pasteTargetSelector: ?string, richContentPasteTargetSelector: ?string}} details Details about how to set up the instance.
      */
     constructor({document=null, pasteTargetSelector=null, richContentPasteTargetSelector=null}) {
+        /** @type {?Document} */
         this._document = document;
+        /** @type {?string} */
         this._browser = null;
+        /** @type {?HTMLTextAreaElement} */
         this._pasteTarget = null;
+        /** @type {?string} */
         this._pasteTargetSelector = pasteTargetSelector;
+        /** @type {?HTMLElement} */
         this._richContentPasteTarget = null;
+        /** @type {?string} */
         this._richContentPasteTargetSelector = richContentPasteTargetSelector;
     }
 
@@ -56,7 +59,7 @@ export class ClipboardReader {
     /**
      * Gets the text in the clipboard.
      * @param {boolean} useRichText Whether or not to use rich text for pasting, when possible.
-     * @returns {string} A string containing the clipboard text.
+     * @returns {Promise<string>} A string containing the clipboard text.
      * @throws {Error} Error if not supported.
      */
     async getText(useRichText) {
@@ -90,7 +93,7 @@ export class ClipboardReader {
             const target = this._getRichContentPasteTarget();
             target.focus();
             document.execCommand('paste');
-            const result = target.textContent;
+            const result = /** @type {string} */ (target.textContent);
             this._clearRichContent(target);
             return result;
         } else {
@@ -106,7 +109,7 @@ export class ClipboardReader {
 
     /**
      * Gets the first image in the clipboard.
-     * @returns {string} A string containing a data URL of the image file, or null if no image was found.
+     * @returns {Promise<?string>} A string containing a data URL of the image file, or null if no image was found.
      * @throws {Error} Error if not supported.
      */
     async getImage() {
@@ -155,35 +158,62 @@ export class ClipboardReader {
 
     // Private
 
+    /**
+     * @returns {boolean}
+     */
     _isFirefox() {
         return (this._browser === 'firefox' || this._browser === 'firefox-mobile');
     }
 
+    /**
+     * @param {Blob} file
+     * @returns {Promise<string>}
+     */
     _readFileAsDataURL(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
+            reader.onload = () => resolve(/** @type {string} */ (reader.result));
             reader.onerror = () => reject(reader.error);
             reader.readAsDataURL(file);
         });
     }
 
+    /**
+     * @returns {HTMLTextAreaElement}
+     */
     _getPasteTarget() {
-        if (this._pasteTarget === null) { this._pasteTarget = this._findPasteTarget(this._pasteTargetSelector); }
+        if (this._pasteTarget === null) {
+            this._pasteTarget = /** @type {HTMLTextAreaElement} */ (this._findPasteTarget(this._pasteTargetSelector));
+        }
         return this._pasteTarget;
     }
 
+    /**
+     * @returns {HTMLElement}
+     */
     _getRichContentPasteTarget() {
-        if (this._richContentPasteTarget === null) { this._richContentPasteTarget = this._findPasteTarget(this._richContentPasteTargetSelector); }
+        if (this._richContentPasteTarget === null) {
+            this._richContentPasteTarget = /** @type {HTMLElement} */ (this._findPasteTarget(this._richContentPasteTargetSelector));
+        }
         return this._richContentPasteTarget;
     }
 
+    /**
+     * @template {Element} T
+     * @param {?string} selector
+     * @returns {T}
+     * @throws {Error}
+     */
     _findPasteTarget(selector) {
-        const target = this._document.querySelector(selector);
+        if (selector === null) { throw new Error('Invalid selector'); }
+        const target = this._document !== null ? this._document.querySelector(selector) : null;
         if (target === null) { throw new Error('Clipboard paste target does not exist'); }
-        return target;
+        return /** @type {T} */ (target);
     }
 
+    /**
+     * @param {HTMLElement} element
+     */
     _clearRichContent(element) {
         for (const image of element.querySelectorAll('img')) {
             image.removeAttribute('src');

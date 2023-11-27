@@ -16,40 +16,65 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * @param {Element} element
+ */
 function requestFullscreen(element) {
     if (element.requestFullscreen) {
         element.requestFullscreen();
+        // @ts-ignore - Browser compatibility
     } else if (element.mozRequestFullScreen) {
+        // @ts-ignore - Browser compatibility
         element.mozRequestFullScreen();
+        // @ts-ignore - Browser compatibility
     } else if (element.webkitRequestFullscreen) {
+        // @ts-ignore - Browser compatibility
         element.webkitRequestFullscreen();
+        // @ts-ignore - Browser compatibility
     } else if (element.msRequestFullscreen) {
+        // @ts-ignore - Browser compatibility
         element.msRequestFullscreen();
     }
 }
 
+/** */
 function exitFullscreen() {
     if (document.exitFullscreen) {
         document.exitFullscreen();
+        // @ts-ignore - Browser compatibility
     } else if (document.mozCancelFullScreen) {
+        // @ts-ignore - Browser compatibility
         document.mozCancelFullScreen();
+        // @ts-ignore - Browser compatibility
     } else if (document.webkitExitFullscreen) {
+        // @ts-ignore - Browser compatibility
         document.webkitExitFullscreen();
+        // @ts-ignore - Browser compatibility
     } else if (document.msExitFullscreen) {
+        // @ts-ignore - Browser compatibility
         document.msExitFullscreen();
     }
 }
 
+/**
+ * @returns {?Element}
+ */
 function getFullscreenElement() {
     return (
         document.fullscreenElement ||
+        // @ts-ignore - Browser compatibility
         document.msFullscreenElement ||
+        // @ts-ignore - Browser compatibility
         document.mozFullScreenElement ||
+        // @ts-ignore - Browser compatibility
         document.webkitFullscreenElement ||
         null
     );
 }
 
+/**
+ * @param {Element} element
+ */
 function toggleFullscreen(element) {
     if (getFullscreenElement()) {
         exitFullscreen();
@@ -58,6 +83,10 @@ function toggleFullscreen(element) {
     }
 }
 
+/**
+ * @param {HTMLElement|DocumentFragment} container
+ * @param {?Element} [fullscreenElement]
+ */
 function setup(container, fullscreenElement=null) {
     const fullscreenLink = container.querySelector('.fullscreen-link');
     if (fullscreenLink !== null) {
@@ -65,6 +94,7 @@ function setup(container, fullscreenElement=null) {
             fullscreenElement = container.querySelector('.fullscreen-element');
         }
         fullscreenLink.addEventListener('click', (e) => {
+            if (fullscreenElement === null) { return; }
             toggleFullscreen(fullscreenElement);
             e.preventDefault();
             return false;
@@ -74,11 +104,15 @@ function setup(container, fullscreenElement=null) {
     const template = container.querySelector('template');
     const templateContentContainer = container.querySelector('.template-content-container');
     if (template !== null && templateContentContainer !== null) {
-        const mode = container.dataset.shadowMode;
-        const shadow = templateContentContainer.attachShadow({mode});
+        const mode = (container instanceof HTMLElement ? container.dataset.shadowMode : void 0);
+        const shadow = templateContentContainer.attachShadow({
+            mode: (mode === 'open' || mode === 'closed' ? mode : 'open')
+        });
 
         const containerStyles = document.querySelector('#container-styles');
-        shadow.appendChild(containerStyles.cloneNode(true));
+        if (containerStyles !== null) {
+            shadow.appendChild(containerStyles.cloneNode(true));
+        }
 
         const content = document.importNode(template.content, true);
         setup(content);

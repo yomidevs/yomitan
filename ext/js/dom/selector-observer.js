@@ -18,55 +18,35 @@
 
 /**
  * Class which is used to observe elements matching a selector in specific element.
+ * @template T
  */
 export class SelectorObserver {
     /**
-     * @function OnAddedCallback
-     * @param {Element} element The element which was added.
-     * @returns {*} Custom data which is assigned to element and passed to callbacks.
-     */
-
-    /**
-     * @function OnRemovedCallback
-     * @param {Element} element The element which was removed.
-     * @param {*} data The custom data corresponding to the element.
-     */
-
-    /**
-     * @function OnChildrenUpdatedCallback
-     * @param {Element} element The element which had its children updated.
-     * @param {*} data The custom data corresponding to the element.
-     */
-
-    /**
-     * @function IsStaleCallback
-     * @param {Element} element The element which had its children updated.
-     * @param {*} data The custom data corresponding to the element.
-     * @returns {boolean} Whether or not the data is stale for the element.
-     */
-
-    /**
      * Creates a new instance.
-     * @param {object} details The configuration for the object.
-     * @param {string} details.selector A string CSS selector used to find elements.
-     * @param {?string} details.ignoreSelector A string CSS selector used to filter elements, or `null` for no filtering.
-     * @param {OnAddedCallback} details.onAdded A function which is invoked for each element that is added that matches the selector.
-     * @param {?OnRemovedCallback} details.onRemoved A function which is invoked for each element that is removed, or `null`.
-     * @param {?OnChildrenUpdatedCallback} details.onChildrenUpdated A function which is invoked for each element which has its children updated, or `null`.
-     * @param {?IsStaleCallback} details.isStale A function which checks if the data is stale for a given element, or `null`.
-     *   If the element is stale, it will be removed and potentially re-added.
+     * @param {import('selector-observer').ConstructorDetails<T>} details The configuration for the object.
      */
     constructor({selector, ignoreSelector=null, onAdded=null, onRemoved=null, onChildrenUpdated=null, isStale=null}) {
+        /** @type {string} */
         this._selector = selector;
+        /** @type {?string} */
         this._ignoreSelector = ignoreSelector;
+        /** @type {?import('selector-observer').OnAddedCallback<T>} */
         this._onAdded = onAdded;
+        /** @type {?import('selector-observer').OnRemovedCallback<T>} */
         this._onRemoved = onRemoved;
+        /** @type {?import('selector-observer').OnChildrenUpdatedCallback<T>} */
         this._onChildrenUpdated = onChildrenUpdated;
+        /** @type {?import('selector-observer').IsStaleCallback<T>} */
         this._isStale = isStale;
+        /** @type {?Element} */
         this._observingElement = null;
+        /** @type {MutationObserver} */
         this._mutationObserver = new MutationObserver(this._onMutation.bind(this));
+        /** @type {Map<Node, import('selector-observer').Observer<T>>} */
         this._elementMap = new Map(); // Map([element => observer]...)
+        /** @type {Map<Node, Set<import('selector-observer').Observer<T>>>} */
         this._elementAncestorMap = new Map(); // Map([element => Set([observer]...)]...)
+        /** @type {boolean} */
         this._isObserving = false;
     }
 
@@ -100,9 +80,10 @@ export class SelectorObserver {
             subtree: true
         });
 
+        const {parentNode} = element;
         this._onMutation([{
             type: 'childList',
-            target: element.parentNode,
+            target: parentNode !== null ? parentNode : element,
             addedNodes: [element],
             removedNodes: []
         }]);
@@ -124,17 +105,19 @@ export class SelectorObserver {
 
     /**
      * Returns an iterable list of [element, data] pairs.
-     * @yields A sequence of [element, data] pairs.
+     * @yields {[element: Element, data: T]} A sequence of [element, data] pairs.
+     * @returns {Generator<[element: Element, data: T], void, unknown>}
      */
     *entries() {
-        for (const [element, {data}] of this._elementMap) {
+        for (const {element, data} of this._elementMap.values()) {
             yield [element, data];
         }
     }
 
     /**
      * Returns an iterable list of data for every element.
-     * @yields A sequence of data values.
+     * @yields {T} A sequence of data values.
+     * @returns {Generator<T, void, unknown>}
      */
     *datas() {
         for (const {data} of this._elementMap.values()) {
@@ -144,6 +127,9 @@ export class SelectorObserver {
 
     // Private
 
+    /**
+     * @param {(MutationRecord|import('selector-observer').MutationRecordLike)[]} mutationList
+     */
     _onMutation(mutationList) {
         for (const mutation of mutationList) {
             switch (mutation.type) {
@@ -157,6 +143,9 @@ export class SelectorObserver {
         }
     }
 
+    /**
+     * @param {MutationRecord|import('selector-observer').MutationRecordLike} record
+     */
     _onChildListMutation({addedNodes, removedNodes, target}) {
         const selector = this._selector;
         const ELEMENT_NODE = Node.ELEMENT_NODE;
@@ -171,10 +160,10 @@ export class SelectorObserver {
 
         for (const node of addedNodes) {
             if (node.nodeType !== ELEMENT_NODE) { continue; }
-            if (node.matches(selector)) {
-                this._createObserver(node);
+            if (/** @type {Element} */ (node).matches(selector)) {
+                this._createObserver(/** @type {Element} */ (node));
             }
-            for (const childNode of node.querySelectorAll(selector)) {
+            for (const childNode of /** @type {Element} */ (node).querySelectorAll(selector)) {
                 this._createObserver(childNode);
             }
         }
@@ -183,7 +172,7 @@ export class SelectorObserver {
             this._onChildrenUpdated !== null &&
             (addedNodes.length !== 0 || addedNodes.length !== 0)
         ) {
-            for (let node = target; node !== null; node = node.parentNode) {
+            for (let node = /** @type {?Node} */ (target); node !== null; node = node.parentNode) {
                 const observer = this._elementMap.get(node);
                 if (typeof observer !== 'undefined') {
                     this._onObserverChildrenUpdated(observer);
@@ -192,9 +181,12 @@ export class SelectorObserver {
         }
     }
 
+    /**
+     * @param {MutationRecord|import('selector-observer').MutationRecordLike} record
+     */
     _onAttributeMutation({target}) {
         const selector = this._selector;
-        const observers = this._elementAncestorMap.get(target);
+        const observers = this._elementAncestorMap.get(/** @type {Element} */ (target));
         if (typeof observers !== 'undefined') {
             for (const observer of observers) {
                 const element = observer.element;
@@ -208,15 +200,19 @@ export class SelectorObserver {
             }
         }
 
-        if (target.matches(selector)) {
-            this._createObserver(target);
+        if (/** @type {Element} */ (target).matches(selector)) {
+            this._createObserver(/** @type {Element} */ (target));
         }
     }
 
+    /**
+     * @param {Element} element
+     */
     _createObserver(element) {
         if (this._elementMap.has(element) || this._shouldIgnoreElement(element) || this._onAdded === null) { return; }
 
         const data = this._onAdded(element);
+        if (typeof data === 'undefined') { return; }
         const ancestors = this._getAncestors(element);
         const observer = {element, ancestors, data};
 
@@ -232,6 +228,9 @@ export class SelectorObserver {
         }
     }
 
+    /**
+     * @param {import('selector-observer').Observer<T>} observer
+     */
     _removeObserver(observer) {
         const {element, ancestors, data} = observer;
 
@@ -252,26 +251,42 @@ export class SelectorObserver {
         }
     }
 
+    /**
+     * @param {import('selector-observer').Observer<T>} observer
+     */
     _onObserverChildrenUpdated(observer) {
+        if (this._onChildrenUpdated === null) { return; }
         this._onChildrenUpdated(observer.element, observer.data);
     }
 
+    /**
+     * @param {import('selector-observer').Observer<T>} observer
+     * @returns {boolean}
+     */
     _isObserverStale(observer) {
         return (this._isStale !== null && this._isStale(observer.element, observer.data));
     }
 
+    /**
+     * @param {Element} element
+     * @returns {boolean}
+     */
     _shouldIgnoreElement(element) {
         return (this._ignoreSelector !== null && element.matches(this._ignoreSelector));
     }
 
+    /**
+     * @param {Node} node
+     * @returns {Node[]}
+     */
     _getAncestors(node) {
         const root = this._observingElement;
         const results = [];
-        while (true) {
-            results.push(node);
-            if (node === root) { break; }
-            node = node.parentNode;
-            if (node === null) { break; }
+        let n = /** @type {?Node} */ (node);
+        while (n !== null) {
+            results.push(n);
+            if (n === root) { break; }
+            n = n.parentNode;
         }
         return results;
     }

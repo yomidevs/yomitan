@@ -2,10 +2,34 @@
     "compilerOptions": {
         "module": "ES2020",
         "target": "ES2020",
-        "checkJs": false
+        "checkJs": true,
+        "moduleResolution": "node",
+        "strict": true,
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "strictPropertyInitialization": true,
+        "suppressImplicitAnyIndexErrors": false,
+        "skipLibCheck": false,
+        "baseUrl": ".",
+        "paths": {
+            "*": ["./types/ext/*"]
+        },
+        "types": [
+            "chrome",
+            "firefox-webext-browser",
+            "handlebars",
+            "jszip",
+            "parse5",
+            "wanakana"
+        ]
     },
+    "include": [
+        "ext/**/*.js",
+        "types/ext/**/*.ts",
+        "types/other/web-set-timeout.d.ts"
+    ],
     "exclude": [
         "node_modules",
-        "**/node_modules/*"
+        "ext/lib"
     ]
 }

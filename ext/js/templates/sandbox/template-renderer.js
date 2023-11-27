@@ -20,47 +20,74 @@ import {Handlebars} from '../../../lib/handlebars.js';
 
 export class TemplateRenderer {
     constructor() {
+        /** @type {Map<string, HandlebarsTemplateDelegate<import('anki-templates').NoteData>>} */
         this._cache = new Map();
+        /** @type {number} */
         this._cacheMaxSize = 5;
+        /** @type {Map<import('anki-templates').RenderMode, import('template-renderer').DataType>} */
         this._dataTypes = new Map();
+        /** @type {?((noteData: import('anki-templates').NoteData) => import('template-renderer').SetupCallbackResult)} */
         this._renderSetup = null;
+        /** @type {?((noteData: import('anki-templates').NoteData) => import('template-renderer').CleanupCallbackResult)} */
         this._renderCleanup = null;
     }
 
+    /**
+     * @param {import('template-renderer').HelperFunctionsDescriptor} helpers
+     */
     registerHelpers(helpers) {
         for (const [name, helper] of helpers) {
             this._registerHelper(name, helper);
         }
     }
 
-    registerDataType(name, {modifier=null, composeData=null}) {
+    /**
+     * @param {import('anki-templates').RenderMode} name
+     * @param {import('template-renderer').DataType} details
+     */
+    registerDataType(name, {modifier, composeData}) {
         this._dataTypes.set(name, {modifier, composeData});
     }
 
+    /**
+     * @param {?((noteData: import('anki-templates').NoteData) => import('template-renderer').SetupCallbackResult)} setup
+     * @param {?((noteData: import('anki-templates').NoteData) => import('template-renderer').CleanupCallbackResult)} cleanup
+     */
     setRenderCallbacks(setup, cleanup) {
         this._renderSetup = setup;
         this._renderCleanup = cleanup;
     }
 
+    /**
+     * @param {string} template
+     * @param {import('template-renderer').PartialOrCompositeRenderData} data
+     * @param {import('anki-templates').RenderMode} type
+     * @returns {import('template-renderer').RenderResult}
+     */
     render(template, data, type) {
         const instance = this._getTemplateInstance(template);
-        data = this._getModifiedData(data, void 0, type);
-        return this._renderTemplate(instance, data);
+        const modifiedData = this._getModifiedData(data, void 0, type);
+        return this._renderTemplate(instance, modifiedData);
     }
 
+    /**
+     * @param {import('template-renderer').RenderMultiItem[]} items
+     * @returns {import('core').Response<import('template-renderer').RenderResult>[]}
+     */
     renderMulti(items) {
+        /** @type {import('core').Response<import('template-renderer').RenderResult>[]} */
         const results = [];
         for (const {template, templateItems} of items) {
             const instance = this._getTemplateInstance(template);
             for (const {type, commonData, datas} of templateItems) {
-                for (let data of datas) {
+                for (const data of datas) {
                     let result;
                     try {
-                        data = this._getModifiedData(data, commonData, type);
-                        result = this._renderTemplate(instance, data);
-                        result = {result};
+                        const data2 = this._getModifiedData(data, commonData, type);
+                        const renderResult = this._renderTemplate(instance, data2);
+                        result = {result: renderResult};
                     } catch (error) {
-                        result = {error};
+                        result = {error: ExtensionError.serialize(error)};
                     }
                     results.push(result);
                 }
@@ -69,29 +96,46 @@ export class TemplateRenderer {
         return results;
     }
 
+    /**
+     * @param {import('template-renderer').CompositeRenderData} data
+     * @param {import('anki-templates').RenderMode} type
+     * @returns {import('anki-templates').NoteData}
+     */
     getModifiedData(data, type) {
         return this._getModifiedData(data, void 0, type);
     }
 
     // Private
 
+    /**
+     * @param {string} template
+     * @returns {HandlebarsTemplateDelegate<import('anki-templates').NoteData>}
+     */
     _getTemplateInstance(template) {
         const cache = this._cache;
         let instance = cache.get(template);
         if (typeof instance === 'undefined') {
             this._updateCacheSize(this._cacheMaxSize - 1);
-            instance = Handlebars.compileAST(template);
+            instance = /** @type {HandlebarsTemplateDelegate<import('anki-templates').NoteData>} */ (Handlebars.compileAST(template));
             cache.set(template, instance);
         }
 
         return instance;
     }
 
+    /**
+     * @param {HandlebarsTemplateDelegate<import('anki-templates').NoteData>} instance
+     * @param {import('anki-templates').NoteData} data
+     * @returns {import('template-renderer').RenderResult}
+     */
     _renderTemplate(instance, data) {
         const renderSetup = this._renderSetup;
         const renderCleanup = this._renderCleanup;
+        /** @type {string} */
         let result;
+        /** @type {?import('template-renderer').SetupCallbackResult} */
         let additions1;
+        /** @type {?import('template-renderer').CleanupCallbackResult} */
         let additions2;
         try {
             additions1 = (typeof renderSetup === 'function' ? renderSetup(data) : null);
@@ -99,28 +143,36 @@ export class TemplateRenderer {
         } finally {
             additions2 = (typeof renderCleanup === 'function' ? renderCleanup(data) : null);
         }
-        return Object.assign({result}, additions1, additions2);
+        return /** @type {import('template-renderer').RenderResult} */ (Object.assign({result}, additions1, additions2));
     }
 
+    /**
+     * @param {import('template-renderer').PartialOrCompositeRenderData} data
+     * @param {import('anki-note-builder').CommonData|undefined} commonData
+     * @param {import('anki-templates').RenderMode} type
+     * @returns {import('anki-templates').NoteData}
+     * @throws {Error}
+     */
     _getModifiedData(data, commonData, type) {
         if (typeof type === 'string') {
             const typeInfo = this._dataTypes.get(type);
             if (typeof typeInfo !== 'undefined') {
                 if (typeof commonData !== 'undefined') {
                     const {composeData} = typeInfo;
-                    if (typeof composeData === 'function') {
-                        data = composeData(data, commonData);
-                    }
+                    data = composeData(data, commonData);
+                } else if (typeof data.commonData === 'undefined') {
+                    throw new Error('Incomplete data');
                 }
                 const {modifier} = typeInfo;
-                if (typeof modifier === 'function') {
-                    data = modifier(data);
-                }
+                return modifier(/** @type {import('template-renderer').CompositeRenderData} */ (data));
             }
         }
-        return data;
+        throw new Error(`Invalid type: ${type}`);
     }
 
+    /**
+     * @param {number} maxSize
+     */
     _updateCacheSize(maxSize) {
         const cache = this._cache;
         let removeCount = cache.size - maxSize;
@@ -132,9 +184,21 @@ export class TemplateRenderer {
         }
     }
 
+    /**
+     * @param {string} name
+     * @param {import('template-renderer').HelperFunction} helper
+     */
     _registerHelper(name, helper) {
+        /**
+         * @this {unknown}
+         * @param {unknown[]} args
+         * @returns {unknown}
+         */
         function wrapper(...args) {
-            return helper(this, ...args);
+            const argCountM1 = Math.max(0, args.length - 1);
+            const options = /** @type {Handlebars.HelperOptions} */ (args[argCountM1]);
+            args.length = argCountM1;
+            return helper(args, this, options);
         }
         Handlebars.registerHelper(name, wrapper);
     }

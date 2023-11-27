@@ -28,21 +28,15 @@ export class AnkiNoteDataCreator {
      * @param {JapaneseUtil} japaneseUtil An instance of `JapaneseUtil`.
      */
     constructor(japaneseUtil) {
+        /** @type {JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
     }
 
     /**
      * Creates a compatibility representation of the specified data.
      * @param {string} marker The marker that is being used for template rendering.
-     * @param {object} details Information which is used to generate the data.
-     * @param {Translation.DictionaryEntry} details.dictionaryEntry The dictionary entry.
-     * @param {string} details.resultOutputMode The result output mode.
-     * @param {string} details.mode The mode being used to generate the Anki data.
-     * @param {string} details.glossaryLayoutMode The glossary layout mode.
-     * @param {boolean} details.compactTags Whether or not compact tags mode is enabled.
-     * @param {{documentTitle: string, query: string, fullQuery: string}} details.context Contextual information about the source of the dictionary entry.
-     * @param {object} details.media Media data.
-     * @returns {object} An object used for rendering Anki templates.
+     * @param {import('anki-templates-internal').CreateDetails} details Information which is used to generate the data.
+     * @returns {import('anki-templates').NoteData} An object used for rendering Anki templates.
      */
     create(marker, {
         dictionaryEntry,
@@ -53,6 +47,7 @@ export class AnkiNoteDataCreator {
         context,
         media
     }) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         const definition = this.createCachedValue(this._getDefinition.bind(this, dictionaryEntry, context, resultOutputMode));
         const uniqueExpressions = this.createCachedValue(this._getUniqueExpressions.bind(this, dictionaryEntry));
@@ -60,7 +55,18 @@ export class AnkiNoteDataCreator {
         const context2 = this.createCachedValue(this._getPublicContext.bind(this, context));
         const pitches = this.createCachedValue(this._getPitches.bind(this, dictionaryEntry));
         const pitchCount = this.createCachedValue(this._getPitchCount.bind(this, pitches));
-        if (typeof media !== 'object' || media === null || Array.isArray(media)) { media = {}; }
+        if (typeof media !== 'object' || media === null || Array.isArray(media)) {
+            media = {
+                audio: void 0,
+                screenshot: void 0,
+                clipboardImage: void 0,
+                clipboardText: void 0,
+                selectionText: void 0,
+                textFurigana: [],
+                dictionaryMedia: {}
+            };
+        }
+        /** @type {import('anki-templates').NoteData} */
         const result = {
             marker,
             get definition() { return self.getCachedValue(definition); },
@@ -77,7 +83,8 @@ export class AnkiNoteDataCreator {
             get pitches() { return self.getCachedValue(pitches); },
             get pitchCount() { return self.getCachedValue(pitchCount); },
             get context() { return self.getCachedValue(context2); },
-            media
+            media,
+            dictionaryEntry
         };
         Object.defineProperty(result, 'dictionaryEntry', {
             configurable: false,
@@ -90,8 +97,9 @@ export class AnkiNoteDataCreator {
 
     /**
      * Creates a deferred-evaluation value.
-     * @param {Function} getter The function to invoke to get the return value.
-     * @returns {{getter: Function, hasValue: false, value: undefined}} An object which can be passed into `getCachedValue`.
+     * @template [T=unknown]
+     * @param {() => T} getter The function to invoke to get the return value.
+     * @returns {import('anki-templates-internal').CachedValue<T>} An object which can be passed into `getCachedValue`.
      */
     createCachedValue(getter) {
         return {getter, hasValue: false, value: void 0};
@@ -99,11 +107,12 @@ export class AnkiNoteDataCreator {
 
     /**
      * Gets the value of a cached object.
-     * @param {{getter: Function, hasValue: boolean, value: *}} item An object that was returned from `createCachedValue`.
-     * @returns {*} The result of evaluating the getter, which is cached after the first invocation.
+     * @template [T=unknown]
+     * @param {import('anki-templates-internal').CachedValue<T>} item An object that was returned from `createCachedValue`.
+     * @returns {T} The result of evaluating the getter, which is cached after the first invocation.
      */
     getCachedValue(item) {
-        if (item.hasValue) { return item.value; }
+        if (item.hasValue) { return /** @type {T} */ (item.value); }
         const value = item.getter();
         item.value = value;
         item.hasValue = true;
@@ -112,10 +121,10 @@ export class AnkiNoteDataCreator {
 
     // Private
 
-    _asObject(value) {
-        return (typeof value === 'object' && value !== null ? value : {});
-    }
-
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @returns {?import('dictionary').TermSource}
+     */
     _getPrimarySource(dictionaryEntry) {
         for (const headword of dictionaryEntry.headwords) {
             for (const source of headword.sources) {
@@ -125,6 +134,10 @@ export class AnkiNoteDataCreator {
         return null;
     }
 
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @returns {string[]}
+     */
     _getUniqueExpressions(dictionaryEntry) {
         if (dictionaryEntry.type === 'term') {
             const results = new Set();
@@ -137,6 +150,10 @@ export class AnkiNoteDataCreator {
         }
     }
 
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @returns {string[]}
+     */
     _getUniqueReadings(dictionaryEntry) {
         if (dictionaryEntry.type === 'term') {
             const results = new Set();
@@ -149,8 +166,12 @@ export class AnkiNoteDataCreator {
         }
     }
 
+    /**
+     * @param {import('anki-templates-internal').Context} context
+     * @returns {import('anki-templates').Context}
+     */
     _getPublicContext(context) {
-        let {documentTitle, query, fullQuery} = this._asObject(context);
+        let {documentTitle, query, fullQuery} = context;
         if (typeof documentTitle !== 'string') { documentTitle = ''; }
         return {
             query,
@@ -161,10 +182,16 @@ export class AnkiNoteDataCreator {
         };
     }
 
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @returns {import('anki-templates').PitchGroup[]}
+     */
     _getPitches(dictionaryEntry) {
+        /** @type {import('anki-templates').PitchGroup[]} */
         const results = [];
         if (dictionaryEntry.type === 'term') {
             for (const {dictionary, pronunciations} of DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry)) {
+                /** @type {import('anki-templates').Pitch[]} */
                 const pitches = [];
                 for (const {terms, reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} of pronunciations) {
                     pitches.push({
@@ -173,7 +200,7 @@ export class AnkiNoteDataCreator {
                         position,
                         nasalPositions,
                         devoicePositions,
-                        tags,
+                        tags: this._convertPitchTags(tags),
                         exclusiveExpressions: exclusiveTerms,
                         exclusiveReadings
                     });
@@ -184,11 +211,21 @@ export class AnkiNoteDataCreator {
         return results;
     }
 
+    /**
+     * @param {import('anki-templates-internal').CachedValue<import('anki-templates').PitchGroup[]>} cachedPitches
+     * @returns {number}
+     */
     _getPitchCount(cachedPitches) {
         const pitches = this.getCachedValue(cachedPitches);
         return pitches.reduce((i, v) => i + v.pitches.length, 0);
     }
 
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @param {import('anki-templates-internal').Context} context
+     * @param {import('settings').ResultOutputMode} resultOutputMode
+     * @returns {import('anki-templates').DictionaryEntry}
+     */
     _getDefinition(dictionaryEntry, context, resultOutputMode) {
         switch (dictionaryEntry.type) {
             case 'term':
@@ -196,16 +233,22 @@ export class AnkiNoteDataCreator {
             case 'kanji':
                 return this._getKanjiDefinition(dictionaryEntry, context);
             default:
-                return {};
+                return /** @type {import('anki-templates').UnknownDictionaryEntry} */ ({});
         }
     }
 
+    /**
+     * @param {import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+     * @param {import('anki-templates-internal').Context} context
+     * @returns {import('anki-templates').KanjiDictionaryEntry}
+     */
     _getKanjiDefinition(dictionaryEntry, context) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
 
         const {character, dictionary, onyomi, kunyomi, definitions} = dictionaryEntry;
 
-        let {url} = this._asObject(context);
+        let {url} = context;
         if (typeof url !== 'string') { url = ''; }
 
         const stats = this.createCachedValue(this._getKanjiStats.bind(this, dictionaryEntry));
@@ -228,14 +271,24 @@ export class AnkiNoteDataCreator {
         };
     }
 
+    /**
+     * @param {import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+     * @returns {import('anki-templates').KanjiStatGroups}
+     */
     _getKanjiStats(dictionaryEntry) {
+        /** @type {import('anki-templates').KanjiStatGroups} */
         const results = {};
+        const convertKanjiStatBind = this._convertKanjiStat.bind(this);
         for (const [key, value] of Object.entries(dictionaryEntry.stats)) {
-            results[key] = value.map(this._convertKanjiStat.bind(this));
+            results[key] = value.map(convertKanjiStatBind);
         }
         return results;
     }
 
+    /**
+     * @param {import('dictionary').KanjiStat} kanjiStat
+     * @returns {import('anki-templates').KanjiStat}
+     */
     _convertKanjiStat({name, category, content, order, score, dictionary, value}) {
         return {
             name,
@@ -248,7 +301,12 @@ export class AnkiNoteDataCreator {
         };
     }
 
+    /**
+     * @param {import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+     * @returns {import('anki-templates').KanjiFrequency[]}
+     */
     _getKanjiFrequencies(dictionaryEntry) {
+        /** @type {import('anki-templates').KanjiFrequency[]} */
         const results = [];
         for (const {index, dictionary, dictionaryIndex, dictionaryPriority, character, frequency, displayValue} of dictionaryEntry.frequencies) {
             results.push({
@@ -265,9 +323,17 @@ export class AnkiNoteDataCreator {
         return results;
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {import('anki-templates-internal').Context} context
+     * @param {import('settings').ResultOutputMode} resultOutputMode
+     * @returns {import('anki-templates').TermDictionaryEntry}
+     */
     _getTermDefinition(dictionaryEntry, context, resultOutputMode) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
 
+        /** @type {import('anki-templates').TermDictionaryEntryType} */
         let type = 'term';
         switch (resultOutputMode) {
             case 'group': type = 'termGrouped'; break;
@@ -276,7 +342,7 @@ export class AnkiNoteDataCreator {
 
         const {inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, definitions} = dictionaryEntry;
 
-        let {url} = this._asObject(context);
+        let {url} = context;
         if (typeof url !== 'string') { url = ''; }
 
         const primarySource = this._getPrimarySource(dictionaryEntry);
@@ -330,6 +396,10 @@ export class AnkiNoteDataCreator {
         };
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @returns {string[]}
+     */
     _getTermDictionaryNames(dictionaryEntry) {
         const dictionaryNames = new Set();
         for (const {dictionary} of dictionaryEntry.definitions) {
@@ -338,11 +408,18 @@ export class AnkiNoteDataCreator {
         return [...dictionaryNames];
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {import('anki-templates').TermDictionaryEntryType} type
+     * @returns {import('anki-templates').TermDictionaryEntryCommonInfo}
+     */
     _getTermDictionaryEntryCommonInfo(dictionaryEntry, type) {
         const merged = (type === 'termMerged');
         const hasDefinitions = (type !== 'term');
 
+        /** @type {Set<string>} */
         const allTermsSet = new Set();
+        /** @type {Set<string>} */
         const allReadingsSet = new Set();
         for (const {term, reading} of dictionaryEntry.headwords) {
             allTermsSet.add(term);
@@ -351,7 +428,9 @@ export class AnkiNoteDataCreator {
         const uniqueTerms = [...allTermsSet];
         const uniqueReadings = [...allReadingsSet];
 
+        /** @type {import('anki-templates').TermDefinition[]} */
         const definitions = [];
+        /** @type {import('anki-templates').Tag[]} */
         const definitionTags = [];
         for (const {tags, headwordIndices, entries, dictionary, sequences} of dictionaryEntry.definitions) {
             const definitionTags2 = [];
@@ -378,6 +457,10 @@ export class AnkiNoteDataCreator {
         };
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @returns {import('anki-templates').TermFrequency[]}
+     */
     _getTermFrequencies(dictionaryEntry) {
         const results = [];
         const {headwords} = dictionaryEntry;
@@ -400,7 +483,12 @@ export class AnkiNoteDataCreator {
         return results;
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @returns {import('anki-templates').TermPronunciation[]}
+     */
     _getTermPitches(dictionaryEntry) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         const results = [];
         const {headwords} = dictionaryEntry;
@@ -423,7 +511,12 @@ export class AnkiNoteDataCreator {
         return results;
     }
 
+    /**
+     * @param {import('dictionary').TermPitch[]} pitches
+     * @returns {import('anki-templates').TermPitch[]}
+     */
     _getTermPitchesInner(pitches) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         const results = [];
         for (const {position, tags} of pitches) {
@@ -436,7 +529,12 @@ export class AnkiNoteDataCreator {
         return results;
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @returns {import('anki-templates').TermHeadword[]}
+     */
     _getTermExpressions(dictionaryEntry) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         const results = [];
         const {headwords} = dictionaryEntry;
@@ -463,6 +561,11 @@ export class AnkiNoteDataCreator {
         return results;
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {number} i
+     * @returns {import('anki-templates').TermFrequency[]}
+     */
     _getTermExpressionFrequencies(dictionaryEntry, i) {
         const results = [];
         const {headwords, frequencies} = dictionaryEntry;
@@ -486,7 +589,13 @@ export class AnkiNoteDataCreator {
         return results;
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {number} i
+     * @returns {import('anki-templates').TermPronunciation[]}
+     */
     _getTermExpressionPitches(dictionaryEntry, i) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         const results = [];
         const {headwords, pronunciations} = dictionaryEntry;
@@ -510,11 +619,20 @@ export class AnkiNoteDataCreator {
         return results;
     }
 
+    /**
+     * @param {import('anki-templates-internal').CachedValue<import('anki-templates').Tag[]>} cachedTermTags
+     * @returns {import('anki-templates').TermFrequencyType}
+     */
     _getTermExpressionTermFrequency(cachedTermTags) {
         const termTags = this.getCachedValue(cachedTermTags);
         return DictionaryDataUtil.getTermFrequency(termTags);
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {import('anki-templates').TermDictionaryEntryType} type
+     * @returns {import('dictionary-data').TermGlossary[]|undefined}
+     */
     _getTermGlossaryArray(dictionaryEntry, type) {
         if (type === 'term') {
             const results = [];
@@ -526,6 +644,11 @@ export class AnkiNoteDataCreator {
         return void 0;
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {import('anki-templates').TermDictionaryEntryType} type
+     * @returns {import('anki-templates').Tag[]|undefined}
+     */
     _getTermTags(dictionaryEntry, type) {
         if (type !== 'termMerged') {
             const results = [];
@@ -537,6 +660,10 @@ export class AnkiNoteDataCreator {
         return void 0;
     }
 
+    /**
+     * @param {import('dictionary').Tag[]} tags
+     * @returns {import('anki-templates').Tag[]}
+     */
     _convertTags(tags) {
         const results = [];
         for (const tag of tags) {
@@ -545,6 +672,10 @@ export class AnkiNoteDataCreator {
         return results;
     }
 
+    /**
+     * @param {import('dictionary').Tag} tag
+     * @returns {import('anki-templates').Tag}
+     */
     _convertTag({name, category, content, order, score, dictionaries, redundant}) {
         return {
             name,
@@ -557,6 +688,39 @@ export class AnkiNoteDataCreator {
         };
     }
 
+    /**
+     * @param {import('dictionary').Tag[]} tags
+     * @returns {import('anki-templates').PitchTag[]}
+     */
+    _convertPitchTags(tags) {
+        const results = [];
+        for (const tag of tags) {
+            results.push(this._convertPitchTag(tag));
+        }
+        return results;
+    }
+
+    /**
+     * @param {import('dictionary').Tag} tag
+     * @returns {import('anki-templates').PitchTag}
+     */
+    _convertPitchTag({name, category, content, order, score, dictionaries, redundant}) {
+        return {
+            name,
+            category,
+            order,
+            score,
+            content: [...content],
+            dictionaries: [...dictionaries],
+            redundant
+        };
+    }
+
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @param {import('anki-templates-internal').Context} context
+     * @returns {import('anki-templates').Cloze}
+     */
     _getCloze(dictionaryEntry, context) {
         let originalText = '';
         switch (dictionaryEntry.type) {
@@ -571,8 +735,12 @@ export class AnkiNoteDataCreator {
                 break;
         }
 
-        const {sentence} = this._asObject(context);
-        let {text, offset} = this._asObject(sentence);
+        const {sentence} = context;
+        let text;
+        let offset;
+        if (typeof sentence === 'object' && sentence !== null) {
+            ({text, offset} = sentence);
+        }
         if (typeof text !== 'string') { text = ''; }
         if (typeof offset !== 'number') { offset = 0; }
 
@@ -584,6 +752,11 @@ export class AnkiNoteDataCreator {
         };
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {import('anki-templates').TermDictionaryEntryType} type
+     * @returns {import('anki-templates').FuriganaSegment[]|undefined}
+     */
     _getTermFuriganaSegments(dictionaryEntry, type) {
         if (type === 'term') {
             for (const {term, reading} of dictionaryEntry.headwords) {
@@ -593,7 +766,13 @@ export class AnkiNoteDataCreator {
         return void 0;
     }
 
+    /**
+     * @param {string} term
+     * @param {string} reading
+     * @returns {import('anki-templates').FuriganaSegment[]}
+     */
     _getTermHeadwordFuriganaSegments(term, reading) {
+        /** @type {import('anki-templates').FuriganaSegment[]} */
         const result = [];
         for (const {text, reading: reading2} of this._japaneseUtil.distributeFurigana(term, reading)) {
             result.push({text, furigana: reading2});
@@ -601,11 +780,15 @@ export class AnkiNoteDataCreator {
         return result;
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @returns {number}
+     */
     _getTermDictionaryEntrySequence(dictionaryEntry) {
         let hasSequence = false;
         let mainSequence = -1;
-        for (const {sequences, isPrimary} of dictionaryEntry.definitions) {
-            if (!isPrimary) { continue; }
+        if (!dictionaryEntry.isPrimary) { return mainSequence; }
+        for (const {sequences} of dictionaryEntry.definitions) {
             const sequence = sequences[0];
             if (!hasSequence) {
                 mainSequence = sequence;

@@ -31,11 +31,17 @@ export class FrameAncestryHandler {
      * @param {number} frameId The frame ID of the current frame the instance is instantiated in.
      */
     constructor(frameId) {
+        /** @type {number} */
         this._frameId = frameId;
+        /** @type {boolean} */
         this._isPrepared = false;
+        /** @type {string} */
         this._requestMessageId = 'FrameAncestryHandler.requestFrameInfo';
+        /** @type {string} */
         this._responseMessageIdBase = `${this._requestMessageId}.response.`;
+        /** @type {?Promise<number[]>} */
         this._getFrameAncestryInfoPromise = null;
+        /** @type {Map<number, {window: Window, frameElement: ?(undefined|Element)}>} */
         this._childFrameMap = new Map();
     }
 
@@ -68,7 +74,7 @@ export class FrameAncestryHandler {
      * Gets the frame ancestry information for the current frame. If the frame is the
      * root frame, an empty array is returned. Otherwise, an array of frame IDs is returned,
      * starting from the nearest ancestor.
-     * @returns {number[]} An array of frame IDs corresponding to the ancestors of the current frame.
+     * @returns {Promise<number[]>} An array of frame IDs corresponding to the ancestors of the current frame.
      */
     async getFrameAncestryInfo() {
         if (this._getFrameAncestryInfoPromise === null) {
@@ -82,7 +88,7 @@ export class FrameAncestryHandler {
      * For this function to work, the `getFrameAncestryInfo` function needs to have
      * been invoked previously.
      * @param {number} frameId The frame ID of the child frame to get.
-     * @returns {HTMLElement} The element corresponding to the frame with ID `frameId`, otherwise `null`.
+     * @returns {?Element} The element corresponding to the frame with ID `frameId`, otherwise `null`.
      */
     getChildFrameElement(frameId) {
         const frameInfo = this._childFrameMap.get(frameId);
@@ -99,6 +105,10 @@ export class FrameAncestryHandler {
 
     // Private
 
+    /**
+     * @param {number} [timeout]
+     * @returns {Promise<number[]>}
+     */
     _getFrameAncestryInfo(timeout=5000) {
         return new Promise((resolve, reject) => {
             const targetWindow = window.parent;
@@ -110,7 +120,9 @@ export class FrameAncestryHandler {
             const uniqueId = generateId(16);
             let nonce = generateId(16);
             const responseMessageId = `${this._responseMessageIdBase}${uniqueId}`;
+            /** @type {number[]} */
             const results = [];
+            /** @type {?number} */
             let timer = null;
 
             const cleanup = () => {
@@ -120,6 +132,10 @@ export class FrameAncestryHandler {
                 }
                 yomitan.crossFrame.unregisterHandler(responseMessageId);
             };
+            /**
+             * @param {import('frame-ancestry-handler').RequestFrameInfoResponseParams} params
+             * @returns {?import('frame-ancestry-handler').RequestFrameInfoResponseReturn}
+             */
             const onMessage = (params) => {
                 if (params.nonce !== nonce) { return null; }
 
@@ -155,24 +171,35 @@ export class FrameAncestryHandler {
         });
     }
 
+    /**
+     * @param {MessageEvent<unknown>} event
+     */
     _onWindowMessage(event) {
-        const {source} = event;
-        if (source === window || source.parent !== window) { return; }
+        const source = /** @type {?Window} */ (event.source);
+        if (source === null || source === window || source.parent !== window) { return; }
 
         const {data} = event;
-        if (
-            typeof data === 'object' &&
-            data !== null &&
-            data.action === this._requestMessageId
-        ) {
-            this._onRequestFrameInfo(data.params, source);
-        }
+        if (typeof data !== 'object' || data === null) { return; }
+
+        const {action} = /** @type {import('core').SerializableObject} */ (data);
+        if (action !== this._requestMessageId) { return; }
+
+        const {params} = /** @type {import('core').SerializableObject} */ (data);
+        if (typeof params !== 'object' || params === null) { return; }
+
+        this._onRequestFrameInfo(/** @type {import('core').SerializableObject} */ (params), source);
     }
 
+    /**
+     * @param {import('core').SerializableObject} params
+     * @param {Window} source
+     */
     async _onRequestFrameInfo(params, source) {
         try {
             let {originFrameId, childFrameId, uniqueId, nonce} = params;
             if (
+                typeof originFrameId !== 'number' ||
+                typeof childFrameId !== 'number' ||
                 !this._isNonNegativeInteger(originFrameId) ||
                 typeof uniqueId !== 'string' ||
                 typeof nonce !== 'string'
@@ -183,13 +210,17 @@ export class FrameAncestryHandler {
             const frameId = this._frameId;
             const {parent} = window;
             const more = (window !== parent);
+            /** @type {import('frame-ancestry-handler').RequestFrameInfoResponseParams} */
             const responseParams = {frameId, nonce, more};
             const responseMessageId = `${this._responseMessageIdBase}${uniqueId}`;
 
             try {
+                /** @type {?import('frame-ancestry-handler').RequestFrameInfoResponseReturn} */
                 const response = await yomitan.crossFrame.invoke(originFrameId, responseMessageId, responseParams);
                 if (response === null) { return; }
-                nonce = response.nonce;
+                const nonce2 = response.nonce;
+                if (typeof nonce2 !== 'string') { return; }
+                nonce = nonce2;
             } catch (e) {
                 return;
             }
@@ -199,13 +230,20 @@ export class FrameAncestryHandler {
             }
 
             if (more) {
-                this._requestFrameInfo(parent, originFrameId, frameId, uniqueId, nonce);
+                this._requestFrameInfo(parent, originFrameId, frameId, uniqueId, /** @type {string} */ (nonce));
             }
         } catch (e) {
             // NOP
         }
     }
 
+    /**
+     * @param {Window} targetWindow
+     * @param {number} originFrameId
+     * @param {number} childFrameId
+     * @param {string} uniqueId
+     * @param {string} nonce
+     */
     _requestFrameInfo(targetWindow, originFrameId, childFrameId, uniqueId, nonce) {
         targetWindow.postMessage({
             action: this._requestMessageId,
@@ -213,15 +251,22 @@ export class FrameAncestryHandler {
         }, '*');
     }
 
+    /**
+     * @param {number} value
+     * @returns {boolean}
+     */
     _isNonNegativeInteger(value) {
         return (
-            typeof value === 'number' &&
             Number.isFinite(value) &&
             value >= 0 &&
             Math.floor(value) === value
         );
     }
 
+    /**
+     * @param {Window} contentWindow
+     * @returns {?Element}
+     */
     _findFrameElementWithContentWindow(contentWindow) {
         // Check frameElement, for non-null same-origin frames
         try {
@@ -232,9 +277,9 @@ export class FrameAncestryHandler {
         }
 
         // Check frames
-        const frameTypes = ['iframe', 'frame', 'embed'];
+        const frameTypes = ['iframe', 'frame', 'object'];
         for (const frameType of frameTypes) {
-            for (const frame of document.getElementsByTagName(frameType)) {
+            for (const frame of /** @type {HTMLCollectionOf<import('extension').HtmlElementWithContentWindow>} */ (document.getElementsByTagName(frameType))) {
                 if (frame.contentWindow === contentWindow) {
                     return frame;
                 }
@@ -242,20 +287,24 @@ export class FrameAncestryHandler {
         }
 
         // Check for shadow roots
+        /** @type {Node[]} */
         const rootElements = [document.documentElement];
         while (rootElements.length > 0) {
-            const rootElement = rootElements.shift();
+            const rootElement = /** @type {Node} */ (rootElements.shift());
             const walker = document.createTreeWalker(rootElement, NodeFilter.SHOW_ELEMENT);
             while (walker.nextNode()) {
-                const element = walker.currentNode;
+                const element = /** @type {Element} */ (walker.currentNode);
 
+                // @ts-ignore - this is more simple to elide any type checks or casting
                 if (element.contentWindow === contentWindow) {
                     return element;
                 }
 
+                /** @type {?ShadowRoot|undefined} */
                 const shadowRoot = (
                     element.shadowRoot ||
-                    element.openOrClosedShadowRoot // Available to Firefox 63+ for WebExtensions
+                    // @ts-ignore - openOrClosedShadowRoot is available to Firefox 63+ for WebExtensions
+                    element.openOrClosedShadowRoot
                 );
                 if (shadowRoot) {
                     rootElements.push(shadowRoot);

@@ -16,25 +16,43 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deserializeError, log} from '../../core.js';
+import {log} from '../../core.js';
 import {DictionaryWorker} from '../../language/dictionary-worker.js';
 import {yomitan} from '../../yomitan.js';
 import {DictionaryController} from './dictionary-controller.js';
 
 export class DictionaryImportController {
+    /**
+     * @param {SettingsController} settingsController
+     * @param {ModalController} modalController
+     * @param {StatusFooter} statusFooter
+     */
     constructor(settingsController, modalController, statusFooter) {
+        /** @type {SettingsController} */
         this._settingsController = settingsController;
+        /** @type {ModalController} */
         this._modalController = modalController;
+        /** @type {StatusFooter} */
         this._statusFooter = statusFooter;
+        /** @type {boolean} */
         this._modifying = false;
+        /** @type {?HTMLButtonElement} */
         this._purgeButton = null;
+        /** @type {?HTMLButtonElement} */
         this._purgeConfirmButton = null;
+        /** @type {?HTMLButtonElement} */
         this._importFileButton = null;
+        /** @type {?HTMLInputElement} */
         this._importFileInput = null;
+        /** @type {?Modal} */
         this._purgeConfirmModal = null;
+        /** @type {?HTMLElement} */
         this._errorContainer = null;
+        /** @type {?HTMLElement} */
         this._spinner = null;
+        /** @type {?HTMLElement} */
         this._purgeNotification = null;
+        /** @type {[originalMessage: string, newMessage: string][]} */
         this._errorToStringOverrides = [
             [
                 'A mutation operation was attempted on a database that did not allow mutations.',
@@ -47,15 +65,16 @@ export class DictionaryImportController {
         ];
     }
 
+    /** */
     async prepare() {
-        this._purgeButton = document.querySelector('#dictionary-delete-all-button');
-        this._purgeConfirmButton = document.querySelector('#dictionary-confirm-delete-all-button');
-        this._importFileButton = document.querySelector('#dictionary-import-file-button');
-        this._importFileInput = document.querySelector('#dictionary-import-file-input');
+        this._purgeButton = /** @type {HTMLButtonElement} */ (document.querySelector('#dictionary-delete-all-button'));
+        this._purgeConfirmButton = /** @type {HTMLButtonElement} */ (document.querySelector('#dictionary-confirm-delete-all-button'));
+        this._importFileButton = /** @type {HTMLButtonElement} */ (document.querySelector('#dictionary-import-file-button'));
+        this._importFileInput = /** @type {HTMLInputElement} */ (document.querySelector('#dictionary-import-file-input'));
         this._purgeConfirmModal = this._modalController.getModal('dictionary-confirm-delete-all');
-        this._errorContainer = document.querySelector('#dictionary-error');
-        this._spinner = document.querySelector('#dictionary-spinner');
-        this._purgeNotification = document.querySelector('#dictionary-delete-all-status');
+        this._errorContainer = /** @type {HTMLElement} */ (document.querySelector('#dictionary-error'));
+        this._spinner = /** @type {HTMLElement} */ (document.querySelector('#dictionary-spinner'));
+        this._purgeNotification = /** @type {HTMLElement} */ (document.querySelector('#dictionary-delete-all-status'));
 
         this._purgeButton.addEventListener('click', this._onPurgeButtonClick.bind(this), false);
         this._purgeConfirmButton.addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
@@ -65,28 +84,41 @@ export class DictionaryImportController {
 
     // Private
 
+    /** */
     _onImportButtonClick() {
-        this._importFileInput.click();
+        /** @type {HTMLInputElement} */ (this._importFileInput).click();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onPurgeButtonClick(e) {
         e.preventDefault();
-        this._purgeConfirmModal.setVisible(true);
+        /** @type {Modal} */ (this._purgeConfirmModal).setVisible(true);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onPurgeConfirmButtonClick(e) {
         e.preventDefault();
-        this._purgeConfirmModal.setVisible(false);
+        /** @type {Modal} */ (this._purgeConfirmModal).setVisible(false);
         this._purgeDatabase();
     }
 
+    /**
+     * @param {Event} e
+     */
     _onImportFileChange(e) {
-        const node = e.currentTarget;
-        const files = [...node.files];
-        node.value = null;
-        this._importDictionaries(files);
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
+        const {files} = node;
+        if (files === null) { return; }
+        const files2 = [...files];
+        node.value = '';
+        this._importDictionaries(files2);
     }
 
+    /** */
     async _purgeDatabase() {
         if (this._modifying) { return; }
 
@@ -106,7 +138,7 @@ export class DictionaryImportController {
                 this._showErrors(errors);
             }
         } catch (error) {
-            this._showErrors([error]);
+            this._showErrors([error instanceof Error ? error : new Error(`${error}`)]);
         } finally {
             prevention.end();
             if (purgeNotification !== null) { purgeNotification.hidden = true; }
@@ -116,16 +148,19 @@ export class DictionaryImportController {
         }
     }
 
+    /**
+     * @param {File[]} files
+     */
     async _importDictionaries(files) {
         if (this._modifying) { return; }
 
         const statusFooter = this._statusFooter;
-        const importInfo = document.querySelector('#dictionary-import-info');
+        const importInfo = /** @type {HTMLElement} */ (document.querySelector('#dictionary-import-info'));
         const progressSelector = '.dictionary-import-progress';
-        const progressContainers = document.querySelectorAll(`#dictionaries-modal ${progressSelector}`);
-        const progressBars = document.querySelectorAll(`${progressSelector} .progress-bar`);
-        const infoLabels = document.querySelectorAll(`${progressSelector} .progress-info`);
-        const statusLabels = document.querySelectorAll(`${progressSelector} .progress-status`);
+        const progressContainers = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`#dictionaries-modal ${progressSelector}`));
+        const progressBars = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`${progressSelector} .progress-bar`));
+        const infoLabels = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`${progressSelector} .progress-info`));
+        const statusLabels = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`${progressSelector} .progress-status`));
 
         const prevention = this._preventPageExit();
 
@@ -143,6 +178,7 @@ export class DictionaryImportController {
 
             let statusPrefix = '';
             let stepIndex = -2;
+            /** @type {import('dictionary-worker').ImportProgressCallback} */
             const onProgress = (data) => {
                 const {stepIndex: stepIndex2, index, count} = data;
                 if (stepIndex !== stepIndex2) {
@@ -184,7 +220,7 @@ export class DictionaryImportController {
                 await this._importDictionary(files[i], importDetails, onProgress);
             }
         } catch (err) {
-            this._showErrors([err]);
+            this._showErrors([err instanceof Error ? err : new Error(`${err}`)]);
         } finally {
             prevention.end();
             for (const progress of progressContainers) { progress.hidden = true; }
@@ -199,6 +235,10 @@ export class DictionaryImportController {
         }
     }
 
+    /**
+     * @param {number} stepIndex
+     * @returns {string}
+     */
     _getImportLabel(stepIndex) {
         switch (stepIndex) {
             case -1:
@@ -212,6 +252,11 @@ export class DictionaryImportController {
         }
     }
 
+    /**
+     * @param {File} file
+     * @param {import('dictionary-importer').ImportDetails} importDetails
+     * @param {import('dictionary-worker').ImportProgressCallback} onProgress
+     */
     async _importDictionary(file, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
         const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
@@ -225,8 +270,14 @@ export class DictionaryImportController {
         }
     }
 
+    /**
+     * @param {boolean} sequenced
+     * @param {string} title
+     * @returns {Promise<Error[]>}
+     */
     async _addDictionarySettings(sequenced, title) {
         const optionsFull = await this._settingsController.getOptionsFull();
+        /** @type {import('settings-modifications').Modification[]} */
         const targets = [];
         const profileCount = optionsFull.profiles.length;
         for (let i = 0; i < profileCount; ++i) {
@@ -243,8 +294,12 @@ export class DictionaryImportController {
         return await this._modifyGlobalSettings(targets);
     }
 
+    /**
+     * @returns {Promise<Error[]>}
+     */
     async _clearDictionarySettings() {
         const optionsFull = await this._settingsController.getOptionsFull();
+        /** @type {import('settings-modifications').Modification[]} */
         const targets = [];
         const profileCount = optionsFull.profiles.length;
         for (let i = 0; i < profileCount; ++i) {
@@ -256,16 +311,25 @@ export class DictionaryImportController {
         return await this._modifyGlobalSettings(targets);
     }
 
+    /**
+     * @param {boolean} visible
+     */
     _setSpinnerVisible(visible) {
         if (this._spinner !== null) {
             this._spinner.hidden = !visible;
         }
     }
 
+    /**
+     * @returns {import('settings-controller').PageExitPrevention}
+     */
     _preventPageExit() {
         return this._settingsController.preventPageExit();
     }
 
+    /**
+     * @param {Error[]} errors
+     */
     _showErrors(errors) {
         const uniqueErrors = new Map();
         for (const error of errors) {
@@ -292,59 +356,81 @@ export class DictionaryImportController {
             fragment.appendChild(div);
         }
 
-        this._errorContainer.appendChild(fragment);
-        this._errorContainer.hidden = false;
+        const errorContainer = /** @type {HTMLElement} */ (this._errorContainer);
+        errorContainer.appendChild(fragment);
+        errorContainer.hidden = false;
     }
 
+    /** */
     _hideErrors() {
-        this._errorContainer.textContent = '';
-        this._errorContainer.hidden = true;
+        const errorContainer = /** @type {HTMLElement} */ (this._errorContainer);
+        errorContainer.textContent = '';
+        errorContainer.hidden = true;
     }
 
+    /**
+     * @param {File} file
+     * @returns {Promise<ArrayBuffer>}
+     */
     _readFile(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
+            reader.onload = () => resolve(/** @type {ArrayBuffer} */ (reader.result));
             reader.onerror = () => reject(reader.error);
             reader.readAsArrayBuffer(file);
         });
     }
 
+    /**
+     * @param {Error} error
+     * @returns {string}
+     */
     _errorToString(error) {
-        error = (typeof error.toString === 'function' ? error.toString() : `${error}`);
+        const errorMessage = error.toString();
 
         for (const [match, newErrorString] of this._errorToStringOverrides) {
-            if (error.includes(match)) {
+            if (errorMessage.includes(match)) {
                 return newErrorString;
             }
         }
 
-        return error;
+        return errorMessage;
     }
 
+    /**
+     * @param {boolean} value
+     */
     _setModifying(value) {
         this._modifying = value;
         this._setButtonsEnabled(!value);
     }
 
+    /**
+     * @param {boolean} value
+     */
     _setButtonsEnabled(value) {
         value = !value;
-        for (const node of document.querySelectorAll('.dictionary-database-mutating-input')) {
+        for (const node of /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('.dictionary-database-mutating-input'))) {
             node.disabled = value;
         }
     }
 
+    /**
+     * @param {import('settings-modifications').Modification[]} targets
+     * @returns {Promise<Error[]>}
+     */
     async _modifyGlobalSettings(targets) {
         const results = await this._settingsController.modifyGlobalSettings(targets);
         const errors = [];
         for (const {error} of results) {
             if (typeof error !== 'undefined') {
-                errors.push(deserializeError(error));
+                errors.push(ExtensionError.deserialize(error));
             }
         }
         return errors;
     }
 
+    /** */
     _triggerStorageChanged() {
         yomitan.trigger('storageChanged');
     }

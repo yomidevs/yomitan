@@ -28,15 +28,19 @@ export class AccessibilityController {
      * @param {ScriptManager} scriptManager An instance of the `ScriptManager` class.
      */
     constructor(scriptManager) {
+        /** @type {ScriptManager} */
         this._scriptManager = scriptManager;
+        /** @type {?import('core').TokenObject} */
         this._updateGoogleDocsAccessibilityToken = null;
+        /** @type {?Promise<void>} */
         this._updateGoogleDocsAccessibilityPromise = null;
+        /** @type {boolean} */
         this._forceGoogleDocsHtmlRenderingAny = false;
     }
 
     /**
      * Updates the accessibility handlers.
-     * @param {object} fullOptions The full options object from the `Backend` instance.
+     * @param {import('settings').Options} fullOptions The full options object from the `Backend` instance.
      *   The value is treated as read-only and is not modified.
      */
     async update(fullOptions) {
@@ -53,8 +57,12 @@ export class AccessibilityController {
 
     // Private
 
+    /**
+     * @param {boolean} forceGoogleDocsHtmlRenderingAny
+     */
     async _updateGoogleDocsAccessibility(forceGoogleDocsHtmlRenderingAny) {
         // Reentrant token
+        /** @type {?import('core').TokenObject} */
         const token = {};
         this._updateGoogleDocsAccessibilityToken = token;
 
@@ -72,6 +80,9 @@ export class AccessibilityController {
         this._updateGoogleDocsAccessibilityPromise = null;
     }
 
+    /**
+     * @param {boolean} forceGoogleDocsHtmlRenderingAny
+     */
     async _updateGoogleDocsAccessibilityInner(forceGoogleDocsHtmlRenderingAny) {
         if (this._forceGoogleDocsHtmlRenderingAny === forceGoogleDocsHtmlRenderingAny) { return; }
 
@@ -81,6 +92,7 @@ export class AccessibilityController {
         try {
             if (forceGoogleDocsHtmlRenderingAny) {
                 if (await this._scriptManager.isContentScriptRegistered(id)) { return; }
+                /** @type {import('script-manager').RegistrationDetails} */
                 const details = {
                     allFrames: true,
                     matchAboutBlank: true,

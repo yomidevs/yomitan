@@ -1,0 +1,39 @@
+{
+    "compilerOptions": {
+        "module": "ES2015",
+        "target": "ES2022",
+        "checkJs": true,
+        "moduleResolution": "node",
+        "strict": true,
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "strictPropertyInitialization": true,
+        "suppressImplicitAnyIndexErrors": false,
+        "skipLibCheck": false,
+        "baseUrl": ".",
+        "paths": {
+            "*": ["../types/ext/*"],
+            "dev/*": ["../types/dev/*"],
+            "test/*": ["../types/test/*"]
+        },
+        "types": [
+            "chrome",
+            "firefox-webext-browser",
+            "handlebars",
+            "jszip",
+            "parse5",
+            "wanakana"
+        ]
+    },
+    "include": [
+        "**/*.js",
+        "../ext/**/*.js",
+        "../types/ext/**/*.ts",
+        "../types/dev/**/*.ts",
+        "../types/other/web-set-timeout.d.ts"
+    ],
+    "exclude": [
+        "../node_modules",
+        "../ext/lib"
+    ]
+}

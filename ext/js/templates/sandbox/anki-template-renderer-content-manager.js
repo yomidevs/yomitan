@@ -17,30 +17,21 @@
  */
 
 /**
- * A callback used when a media file has been loaded.
- * @callback AnkiTemplateRendererContentManager.OnLoadCallback
- * @param {string} url The URL of the media that was loaded.
- */
-
-/**
- * A callback used when a media file should be unloaded.
- * @callback AnkiTemplateRendererContentManager.OnUnloadCallback
- * @param {boolean} fullyLoaded Whether or not the media was fully loaded.
- */
-
-/**
  * The content manager which is used when generating content for Anki.
  */
 export class AnkiTemplateRendererContentManager {
     /**
      * Creates a new instance of the class.
      * @param {TemplateRendererMediaProvider} mediaProvider The media provider for the object.
-     * @param {object} data The data object passed to the Handlebars template renderer.
+     * @param {import('anki-templates').NoteData} data The data object passed to the Handlebars template renderer.
      *   See {@link AnkiNoteDataCreator.create}'s return value for structure information.
      */
     constructor(mediaProvider, data) {
+        /** @type {TemplateRendererMediaProvider} */
         this._mediaProvider = mediaProvider;
+        /** @type {import('anki-templates').NoteData} */
         this._data = data;
+        /** @type {import('anki-template-renderer-content-manager').OnUnloadCallback[]} */
         this._onUnloadCallbacks = [];
     }
 
@@ -48,9 +39,9 @@ export class AnkiTemplateRendererContentManager {
      * Attempts to load the media file from a given dictionary.
      * @param {string} path The path to the media file in the dictionary.
      * @param {string} dictionary The name of the dictionary.
-     * @param {AnkiTemplateRendererContentManager.OnLoadCallback} onLoad The callback that is executed if the media was loaded successfully.
+     * @param {import('anki-template-renderer-content-manager').OnLoadCallback} onLoad The callback that is executed if the media was loaded successfully.
      *   No assumptions should be made about the synchronicity of this callback.
-     * @param {AnkiTemplateRendererContentManager.OnUnloadCallback} onUnload The callback that is executed when the media should be unloaded.
+     * @param {import('anki-template-renderer-content-manager').OnUnloadCallback} onUnload The callback that is executed when the media should be unloaded.
      */
     loadMedia(path, dictionary, onLoad, onUnload) {
         const imageUrl = this._mediaProvider.getMedia(this._data, ['dictionaryMedia', path], {dictionary, format: 'fileName', default: null});
@@ -73,7 +64,7 @@ export class AnkiTemplateRendererContentManager {
 
     /**
      * Sets up attributes and events for a link element.
-     * @param {Element} element The link element.
+     * @param {HTMLAnchorElement} element The link element.
      * @param {string} href The URL.
      * @param {boolean} internal Whether or not the URL is an internal or external link.
      */

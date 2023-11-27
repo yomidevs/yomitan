@@ -16,17 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deserializeError} from '../core.js';
 import {yomitan} from '../yomitan.js';
 
 export class OptionToggleHotkeyHandler {
+    /**
+     * @param {Display} display
+     */
     constructor(display) {
+        /** @type {Display} */
         this._display = display;
+        /** @type {?DisplayNotification} */
         this._notification = null;
+        /** @type {?number} */
         this._notificationHideTimer = null;
+        /** @type {number} */
         this._notificationHideTimeout = 5000;
+        /** @type {string} */
+        this._source = `option-toggle-hotkey-handler-${generateId(16)}`;
     }
 
+    /** @type {number} */
     get notificationHideTimeout() {
         return this._notificationHideTimeout;
     }
@@ -35,6 +44,7 @@ export class OptionToggleHotkeyHandler {
         this._notificationHideTimeout = value;
     }
 
+    /** */
     prepare() {
         this._display.hotkeyHandler.registerActions([
             ['toggleOption', this._onHotkeyActionToggleOption.bind(this)]
@@ -43,10 +53,17 @@ export class OptionToggleHotkeyHandler {
 
     // Private
 
+    /**
+     * @param {unknown} argument
+     */
     _onHotkeyActionToggleOption(argument) {
+        if (typeof argument !== 'string') { return; }
         this._toggleOption(argument);
     }
 
+    /**
+     * @param {string} path
+     */
     async _toggleOption(path) {
         let value;
         try {
@@ -59,7 +76,7 @@ export class OptionToggleHotkeyHandler {
             }]))[0];
             const {error} = result;
             if (typeof error !== 'undefined') {
-                throw deserializeError(error);
+                throw ExtensionError.deserialize(error);
             }
 
             value = result.result;
@@ -69,16 +86,18 @@ export class OptionToggleHotkeyHandler {
 
             value = !value;
 
-            const result2 = (await yomitan.api.modifySettings([{
+            /** @type {import('settings-modifications').ScopedModificationSet} */
+            const modification = {
                 scope: 'profile',
                 action: 'set',
                 path,
                 value,
                 optionsContext
-            }]))[0];
+            };
+            const result2 = (await yomitan.api.modifySettings([modification], this._source))[0];
             const {error: error2} = result2;
             if (typeof error2 !== 'undefined') {
-                throw deserializeError(error2);
+                throw ExtensionError.deserialize(error2);
             }
 
             this._showNotification(this._createSuccessMessage(path, value), true);
@@ -87,12 +106,17 @@ export class OptionToggleHotkeyHandler {
         }
     }
 
+    /**
+     * @param {string} path
+     * @param {unknown} value
+     * @returns {DocumentFragment}
+     */
     _createSuccessMessage(path, value) {
         const fragment = document.createDocumentFragment();
         const n1 = document.createElement('em');
         n1.textContent = path;
         const n2 = document.createElement('strong');
-        n2.textContent = value;
+        n2.textContent = `${value}`;
         fragment.appendChild(document.createTextNode('Option '));
         fragment.appendChild(n1);
         fragment.appendChild(document.createTextNode(' changed to '));
@@ -100,17 +124,13 @@ export class OptionToggleHotkeyHandler {
         return fragment;
     }
 
+    /**
+     * @param {string} path
+     * @param {unknown} error
+     * @returns {DocumentFragment}
+     */
     _createErrorMessage(path, error) {
-        let message;
-        try {
-            ({message} = error);
-        } catch (e) {
-            // NOP
-        }
-        if (typeof message !== 'string') {
-            message = `${error}`;
-        }
-
+        const message = error instanceof Error ? error.message : `${error}`;
         const fragment = document.createDocumentFragment();
         const n1 = document.createElement('em');
         n1.textContent = path;
@@ -124,6 +144,10 @@ export class OptionToggleHotkeyHandler {
         return fragment;
     }
 
+    /**
+     * @param {DocumentFragment} message
+     * @param {boolean} autoClose
+     */
     _showNotification(message, autoClose) {
         if (this._notification === null) {
             this._notification = this._display.createNotification(false);
@@ -139,12 +163,16 @@ export class OptionToggleHotkeyHandler {
         }
     }
 
+    /**
+     * @param {boolean} animate
+     */
     _hideNotification(animate) {
         if (this._notification === null) { return; }
         this._notification.close(animate);
         this._stopHideNotificationTimer();
     }
 
+    /** */
     _stopHideNotificationTimer() {
         if (this._notificationHideTimer !== null) {
             clearTimeout(this._notificationHideTimer);
@@ -152,11 +180,13 @@ export class OptionToggleHotkeyHandler {
         }
     }
 
+    /** */
     _onNotificationHideTimeout() {
         this._notificationHideTimer = null;
         this._hideNotification(true);
     }
 
+    /** */
     _onNotificationClick() {
         this._stopHideNotificationTimer();
     }

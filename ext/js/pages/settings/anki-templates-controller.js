@@ -16,39 +16,56 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../../core.js';
 import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
 import {JapaneseUtil} from '../../language/sandbox/japanese-util.js';
 import {yomitan} from '../../yomitan.js';
 
 export class AnkiTemplatesController {
+    /**
+     * @param {SettingsController} settingsController
+     * @param {ModalController} modalController
+     * @param {AnkiController} ankiController
+     */
     constructor(settingsController, modalController, ankiController) {
+        /** @type {SettingsController} */
         this._settingsController = settingsController;
+        /** @type {ModalController} */
         this._modalController = modalController;
+        /** @type {AnkiController} */
         this._ankiController = ankiController;
+        /** @type {?import('dictionary').TermDictionaryEntry} */
         this._cachedDictionaryEntryValue = null;
+        /** @type {?string} */
         this._cachedDictionaryEntryText = null;
+        /** @type {?string} */
         this._defaultFieldTemplates = null;
+        /** @type {?HTMLTextAreaElement} */
         this._fieldTemplatesTextarea = null;
+        /** @type {?HTMLElement} */
         this._compileResultInfo = null;
+        /** @type {?HTMLInputElement} */
         this._renderFieldInput = null;
+        /** @type {?HTMLElement} */
         this._renderResult = null;
+        /** @type {?Modal} */
         this._fieldTemplateResetModal = null;
+        /** @type {AnkiNoteBuilder} */
         this._ankiNoteBuilder = new AnkiNoteBuilder({japaneseUtil: new JapaneseUtil(null)});
     }
 
+    /** */
     async prepare() {
         this._defaultFieldTemplates = await yomitan.api.getDefaultAnkiFieldTemplates();
 
-        this._fieldTemplatesTextarea = document.querySelector('#anki-card-templates-textarea');
-        this._compileResultInfo = document.querySelector('#anki-card-templates-compile-result');
-        this._renderFieldInput = document.querySelector('#anki-card-templates-test-field-input');
-        this._renderTextInput = document.querySelector('#anki-card-templates-test-text-input');
-        this._renderResult = document.querySelector('#anki-card-templates-render-result');
-        const menuButton = document.querySelector('#anki-card-templates-test-field-menu-button');
-        const testRenderButton = document.querySelector('#anki-card-templates-test-render-button');
-        const resetButton = document.querySelector('#anki-card-templates-reset-button');
-        const resetConfirmButton = document.querySelector('#anki-card-templates-reset-button-confirm');
+        this._fieldTemplatesTextarea = /** @type {HTMLTextAreaElement} */ (document.querySelector('#anki-card-templates-textarea'));
+        this._compileResultInfo = /** @type {HTMLElement} */ (document.querySelector('#anki-card-templates-compile-result'));
+        this._renderFieldInput = /** @type {HTMLInputElement} */ (document.querySelector('#anki-card-templates-test-field-input'));
+        this._renderTextInput = /** @type {HTMLInputElement} */ (document.querySelector('#anki-card-templates-test-text-input'));
+        this._renderResult = /** @type {HTMLElement} */ (document.querySelector('#anki-card-templates-render-result'));
+        const menuButton = /** @type {HTMLButtonElement} */ (document.querySelector('#anki-card-templates-test-field-menu-button'));
+        const testRenderButton = /** @type {HTMLButtonElement} */ (document.querySelector('#anki-card-templates-test-render-button'));
+        const resetButton = /** @type {HTMLButtonElement} */ (document.querySelector('#anki-card-templates-reset-button'));
+        const resetConfirmButton = /** @type {HTMLButtonElement} */ (document.querySelector('#anki-card-templates-reset-button-confirm'));
         this._fieldTemplateResetModal = this._modalController.getModal('anki-card-templates-reset');
 
         this._fieldTemplatesTextarea.addEventListener('change', this._onChanged.bind(this), false);
@@ -56,44 +73,71 @@ export class AnkiTemplatesController {
         resetButton.addEventListener('click', this._onReset.bind(this), false);
         resetConfirmButton.addEventListener('click', this._onResetConfirm.bind(this), false);
         if (menuButton !== null) {
-            menuButton.addEventListener('menuClose', this._onFieldMenuClose.bind(this), false);
+            menuButton.addEventListener(
+                /** @type {string} */ ('menuClose'),
+                /** @type {EventListener} */ (this._onFieldMenuClose.bind(this)),
+                false
+            );
         }
 
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
         const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        const optionsContext = this._settingsController.getOptionsContext();
+        this._onOptionsChanged({options, optionsContext});
     }
 
     // Private
 
+    /**
+     * @param {import('settings-controller').OptionsChangedEvent} details
+     */
     _onOptionsChanged({options}) {
         let templates = options.anki.fieldTemplates;
-        if (typeof templates !== 'string') { templates = this._defaultFieldTemplates; }
-        this._fieldTemplatesTextarea.value = templates;
+        if (typeof templates !== 'string') {
+            templates = this._defaultFieldTemplates;
+            if (typeof templates !== 'string') { templates = ''; }
+        }
+        /** @type {HTMLTextAreaElement} */ (this._fieldTemplatesTextarea).value = templates;
 
         this._onValidateCompile();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onReset(e) {
         e.preventDefault();
-        this._fieldTemplateResetModal.setVisible(true);
+        if (this._fieldTemplateResetModal !== null) {
+            this._fieldTemplateResetModal.setVisible(true);
+        }
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onResetConfirm(e) {
         e.preventDefault();
 
-        this._fieldTemplateResetModal.setVisible(false);
+        if (this._fieldTemplateResetModal !== null) {
+            this._fieldTemplateResetModal.setVisible(false);
+        }
 
         const value = this._defaultFieldTemplates;
 
-        this._fieldTemplatesTextarea.value = value;
-        this._fieldTemplatesTextarea.dispatchEvent(new Event('change'));
+        const textarea = /** @type {HTMLTextAreaElement} */ (this._fieldTemplatesTextarea);
+        textarea.value = typeof value === 'string' ? value : '';
+        textarea.dispatchEvent(new Event('change'));
     }
 
+    /**
+     * @param {Event} e
+     */
     async _onChanged(e) {
         // Get value
-        let templates = e.currentTarget.value;
+        const element = /** @type {HTMLInputElement} */ (e.currentTarget);
+        /** @type {?string} */
+        let templates = element.value;
         if (templates === this._defaultFieldTemplates) {
             // Default
             templates = null;
@@ -106,34 +150,55 @@ export class AnkiTemplatesController {
         this._onValidateCompile();
     }
 
+    /** */
     _onValidateCompile() {
+        if (this._compileResultInfo === null) { return; }
         this._validate(this._compileResultInfo, '{expression}', 'term-kanji', false, true);
     }
 
+    /**
+     * @param {Event} e
+     */
     _onRender(e) {
         e.preventDefault();
 
-        const field = this._renderFieldInput.value;
-        const infoNode = this._renderResult;
+        const field = /** @type {HTMLInputElement} */ (this._renderFieldInput).value;
+        const infoNode = /** @type {HTMLElement} */ (this._renderResult);
         infoNode.hidden = true;
         this._cachedDictionaryEntryText = null;
         this._validate(infoNode, field, 'term-kanji', true, false);
     }
 
-    _onFieldMenuClose({currentTarget: button, detail: {action, item}}) {
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} event
+     */
+    _onFieldMenuClose({detail: {action, item}}) {
         switch (action) {
             case 'setFieldMarker':
-                this._setFieldMarker(button, item.dataset.marker);
+                {
+                    const {marker} = /** @type {HTMLElement} */ (item).dataset;
+                    if (typeof marker === 'string') {
+                        this._setFieldMarker(marker);
+                    }
+                }
                 break;
         }
     }
 
-    _setFieldMarker(element, marker) {
-        const input = this._renderFieldInput;
+    /**
+     * @param {string} marker
+     */
+    _setFieldMarker(marker) {
+        const input = /** @type {HTMLInputElement} */ (this._renderFieldInput);
         input.value = `{${marker}}`;
         input.dispatchEvent(new Event('change'));
     }
 
+    /**
+     * @param {string} text
+     * @param {import('settings').OptionsContext} optionsContext
+     * @returns {Promise<?{dictionaryEntry: import('dictionary').TermDictionaryEntry, text: string}>}
+     */
     async _getDictionaryEntry(text, optionsContext) {
         if (this._cachedDictionaryEntryText !== text) {
             const {dictionaryEntries} = await yomitan.api.termsFind(text, {}, optionsContext);
@@ -143,19 +208,28 @@ export class AnkiTemplatesController {
             this._cachedDictionaryEntryText = text;
         }
         return {
-            dictionaryEntry: this._cachedDictionaryEntryValue,
+            dictionaryEntry: /** @type {import('dictionary').TermDictionaryEntry} */ (this._cachedDictionaryEntryValue),
             text: this._cachedDictionaryEntryText
         };
     }
 
+    /**
+     * @param {HTMLElement} infoNode
+     * @param {string} field
+     * @param {import('anki-templates-internal').CreateModeNoTest} mode
+     * @param {boolean} showSuccessResult
+     * @param {boolean} invalidateInput
+     */
     async _validate(infoNode, field, mode, showSuccessResult, invalidateInput) {
+        /** @type {Error[]} */
         const allErrors = [];
-        const text = this._renderTextInput.value || '';
+        const text = /** @type {HTMLInputElement} */ (this._renderTextInput).value;
         let result = `No definition found for ${text}`;
         try {
             const optionsContext = this._settingsController.getOptionsContext();
-            const {dictionaryEntry, text: sentenceText} = await this._getDictionaryEntry(text, optionsContext);
-            if (dictionaryEntry !== null) {
+            const data = await this._getDictionaryEntry(text, optionsContext);
+            if (data !== null) {
+                const {dictionaryEntry, text: sentenceText} = data;
                 const options = await this._settingsController.getOptions();
                 const context = {
                     url: window.location.href,
@@ -170,7 +244,7 @@ export class AnkiTemplatesController {
                 let template = options.anki.fieldTemplates;
                 if (typeof template !== 'string') { template = this._defaultFieldTemplates; }
                 const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
-                const {note, errors} = await this._ankiNoteBuilder.createNote({
+                const {note, errors} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
                     dictionaryEntry,
                     mode,
                     context,
@@ -183,28 +257,29 @@ export class AnkiTemplatesController {
                     resultOutputMode,
                     glossaryLayoutMode,
                     compactTags
-                });
+                }));
                 result = note.fields.field;
                 allErrors.push(...errors);
             }
         } catch (e) {
-            allErrors.push(e);
+            allErrors.push(e instanceof Error ? e : new Error(`${e}`));
         }
 
+        /**
+         * @param {Error} e
+         * @returns {string}
+         */
         const errorToMessageString = (e) => {
-            if (isObject(e)) {
-                let v = e.data;
-                if (isObject(v)) {
-                    v = v.error;
-                    if (isObject(v)) {
-                        e = v;
+            if (e instanceof ExtensionError) {
+                const v = e.data;
+                if (typeof v === 'object' && v !== null) {
+                    const v2 = /** @type {import('core').UnknownObject} */ (v).error;
+                    if (v2 instanceof Error) {
+                        return v2.message;
                     }
                 }
-
-                v = e.message;
-                if (typeof v === 'string') { return v; }
             }
-            return `${e}`;
+            return e.message;
         };
 
         const hasError = allErrors.length > 0;
@@ -212,7 +287,7 @@ export class AnkiTemplatesController {
         infoNode.textContent = hasError ? allErrors.map(errorToMessageString).join('\n') : (showSuccessResult ? result : '');
         infoNode.classList.toggle('text-danger', hasError);
         if (invalidateInput) {
-            this._fieldTemplatesTextarea.dataset.invalid = `${hasError}`;
+            /** @type {HTMLTextAreaElement} */ (this._fieldTemplatesTextarea).dataset.invalid = `${hasError}`;
         }
     }
 }

@@ -21,50 +21,77 @@ import {yomitan} from '../../yomitan.js';
 import {ProfileConditionsUI} from './profile-conditions-ui.js';
 
 export class ProfileController {
+    /**
+     * @param {SettingsController} settingsController
+     * @param {ModalController} modalController
+     */
     constructor(settingsController, modalController) {
+        /** @type {SettingsController} */
         this._settingsController = settingsController;
+        /** @type {ModalController} */
         this._modalController = modalController;
+        /** @type {ProfileConditionsUI} */
         this._profileConditionsUI = new ProfileConditionsUI(settingsController);
+        /** @type {?number} */
         this._profileConditionsIndex = null;
+        /** @type {?HTMLSelectElement} */
         this._profileActiveSelect = null;
+        /** @type {?HTMLSelectElement} */
         this._profileTargetSelect = null;
+        /** @type {?HTMLSelectElement} */
         this._profileCopySourceSelect = null;
+        /** @type {?HTMLElement} */
         this._removeProfileNameElement = null;
+        /** @type {?HTMLButtonElement} */
         this._profileAddButton = null;
+        /** @type {?HTMLButtonElement} */
         this._profileRemoveConfirmButton = null;
+        /** @type {?HTMLButtonElement} */
         this._profileCopyConfirmButton = null;
+        /** @type {?HTMLElement} */
         this._profileEntryListContainer = null;
+        /** @type {?HTMLElement} */
         this._profileConditionsProfileName = null;
+        /** @type {?Modal} */
         this._profileRemoveModal = null;
+        /** @type {?Modal} */
         this._profileCopyModal = null;
+        /** @type {?Modal} */
         this._profileConditionsModal = null;
+        /** @type {boolean} */
         this._profileEntriesSupported = false;
+        /** @type {ProfileEntry[]} */
         this._profileEntryList = [];
+        /** @type {import('settings').Profile[]} */
         this._profiles = [];
+        /** @type {number} */
         this._profileCurrent = 0;
     }
 
+    /** @type {number} */
     get profileCount() {
         return this._profiles.length;
     }
 
+    /** @type {number} */
     get profileCurrentIndex() {
         return this._profileCurrent;
     }
 
+    /** */
     async prepare() {
         const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._profileConditionsUI.os = os;
 
-        this._profileActiveSelect = document.querySelector('#profile-active-select');
-        this._profileTargetSelect = document.querySelector('#profile-target-select');
-        this._profileCopySourceSelect = document.querySelector('#profile-copy-source-select');
-        this._removeProfileNameElement = document.querySelector('#profile-remove-name');
-        this._profileAddButton = document.querySelector('#profile-add-button');
-        this._profileRemoveConfirmButton = document.querySelector('#profile-remove-confirm-button');
-        this._profileCopyConfirmButton = document.querySelector('#profile-copy-confirm-button');
-        this._profileEntryListContainer = document.querySelector('#profile-entry-list');
-        this._profileConditionsProfileName = document.querySelector('#profile-conditions-profile-name');
+        this._profileActiveSelect = /** @type {HTMLSelectElement} */ (document.querySelector('#profile-active-select'));
+        this._profileTargetSelect = /** @type {HTMLSelectElement} */ (document.querySelector('#profile-target-select'));
+        this._profileCopySourceSelect = /** @type {HTMLSelectElement} */ (document.querySelector('#profile-copy-source-select'));
+        this._removeProfileNameElement = /** @type {HTMLElement} */ (document.querySelector('#profile-remove-name'));
+        this._profileAddButton = /** @type {HTMLButtonElement} */ (document.querySelector('#profile-add-button'));
+        this._profileRemoveConfirmButton = /** @type {HTMLButtonElement} */ (document.querySelector('#profile-remove-confirm-button'));
+        this._profileCopyConfirmButton = /** @type {HTMLButtonElement} */ (document.querySelector('#profile-copy-confirm-button'));
+        this._profileEntryListContainer = /** @type {HTMLElement} */ (document.querySelector('#profile-entry-list'));
+        this._profileConditionsProfileName = /** @type {HTMLElement} */ (document.querySelector('#profile-conditions-profile-name'));
         this._profileRemoveModal = this._modalController.getModal('profile-remove');
         this._profileCopyModal = this._modalController.getModal('profile-copy');
         this._profileConditionsModal = this._modalController.getModal('profile-conditions');
@@ -82,6 +109,10 @@ export class ProfileController {
         this._onOptionsChanged();
     }
 
+    /**
+     * @param {number} profileIndex
+     * @param {number} offset
+     */
     async moveProfile(profileIndex, offset) {
         if (this._getProfile(profileIndex) === null) { return; }
 
@@ -91,6 +122,10 @@ export class ProfileController {
         await this.swapProfiles(profileIndex, profileIndexNew);
     }
 
+    /**
+     * @param {number} profileIndex
+     * @param {string} value
+     */
     async setProfileName(profileIndex, value) {
         const profile = this._getProfile(profileIndex);
         if (profile === null) { return; }
@@ -104,11 +139,14 @@ export class ProfileController {
         await this._settingsController.setGlobalSetting(`profiles[${profileIndex}].name`, value);
     }
 
+    /**
+     * @param {number} profileIndex
+     */
     async setDefaultProfile(profileIndex) {
         const profile = this._getProfile(profileIndex);
         if (profile === null) { return; }
 
-        this._profileActiveSelect.value = `${profileIndex}`;
+        /** @type {HTMLSelectElement} */ (this._profileActiveSelect).value = `${profileIndex}`;
         this._profileCurrent = profileIndex;
 
         const profileEntry = this._getProfileEntry(profileIndex);
@@ -117,6 +155,10 @@ export class ProfileController {
         await this._settingsController.setGlobalSetting('profileCurrent', profileIndex);
     }
 
+    /**
+     * @param {number} sourceProfileIndex
+     * @param {number} destinationProfileIndex
+     */
     async copyProfile(sourceProfileIndex, destinationProfileIndex) {
         const sourceProfile = this._getProfile(sourceProfileIndex);
         if (sourceProfile === null || !this._getProfile(destinationProfileIndex)) { return; }
@@ -140,9 +182,12 @@ export class ProfileController {
         await this._settingsController.refresh();
     }
 
+    /**
+     * @param {number} profileIndex
+     */
     async duplicateProfile(profileIndex) {
         const profile = this._getProfile(profileIndex);
-        if (this.profile === null) { return; }
+        if (profile === null) { return; }
 
         // Create new profile
         const newProfile = clone(profile);
@@ -169,6 +214,9 @@ export class ProfileController {
         this._settingsController.profileIndex = index;
     }
 
+    /**
+     * @param {number} profileIndex
+     */
     async deleteProfile(profileIndex) {
         const profile = this._getProfile(profileIndex);
         if (profile === null || this.profileCount <= 1) { return; }
@@ -178,6 +226,7 @@ export class ProfileController {
         const settingsProfileIndex = this._settingsController.profileIndex;
 
         // Construct settings modifications
+        /** @type {import('settings-modifications').Modification[]} */
         const modifications = [{
             action: 'splice',
             path: 'profiles',
@@ -225,6 +274,10 @@ export class ProfileController {
         await this._settingsController.modifyGlobalSettings(modifications);
     }
 
+    /**
+     * @param {number} index1
+     * @param {number} index2
+     */
     async swapProfiles(index1, index2) {
         const profile1 = this._getProfile(index1);
         const profile2 = this._getProfile(index2);
@@ -238,6 +291,7 @@ export class ProfileController {
         const settingsProfileIndexNew = this._getSwappedValue(settingsProfileIndex, index1, index2);
 
         // Construct settings modifications
+        /** @type {import('settings-modifications').Modification[]} */
         const modifications = [{
             action: 'swap',
             path1: `profiles[${index1}]`,
@@ -278,15 +332,21 @@ export class ProfileController {
         }
     }
 
+    /**
+     * @param {number} profileIndex
+     */
     openDeleteProfileModal(profileIndex) {
         const profile = this._getProfile(profileIndex);
         if (profile === null || this.profileCount <= 1) { return; }
 
-        this._removeProfileNameElement.textContent = profile.name;
-        this._profileRemoveModal.node.dataset.profileIndex = `${profileIndex}`;
-        this._profileRemoveModal.setVisible(true);
+        /** @type {HTMLElement} */ (this._removeProfileNameElement).textContent = profile.name;
+        /** @type {Modal} */ (this._profileRemoveModal).node.dataset.profileIndex = `${profileIndex}`;
+        /** @type {Modal} */ (this._profileRemoveModal).setVisible(true);
     }
 
+    /**
+     * @param {number} profileIndex
+     */
     openCopyProfileModal(profileIndex) {
         const profile = this._getProfile(profileIndex);
         if (profile === null || this.profileCount <= 1) { return; }
@@ -301,16 +361,20 @@ export class ProfileController {
         }
 
         const profileIndexString = `${profileIndex}`;
-        for (const option of this._profileCopySourceSelect.querySelectorAll('option')) {
+        const select = /** @type {HTMLSelectElement} */ (this._profileCopySourceSelect);
+        for (const option of select.querySelectorAll('option')) {
             const {value} = option;
             option.disabled = (value === profileIndexString);
         }
-        this._profileCopySourceSelect.value = `${copyFromIndex}`;
+        select.value = `${copyFromIndex}`;
 
-        this._profileCopyModal.node.dataset.profileIndex = `${profileIndex}`;
-        this._profileCopyModal.setVisible(true);
+        /** @type {Modal} */ (this._profileCopyModal).node.dataset.profileIndex = `${profileIndex}`;
+        /** @type {Modal} */ (this._profileCopyModal).setVisible(true);
     }
 
+    /**
+     * @param {number} profileIndex
+     */
     openProfileConditionsModal(profileIndex) {
         const profile = this._getProfile(profileIndex);
         if (profile === null) { return; }
@@ -328,6 +392,7 @@ export class ProfileController {
 
     // Private
 
+    /** */
     async _onOptionsChanged() {
         // Update state
         const {profiles, profileCurrent} = await this._settingsController.getOptionsFull();
@@ -339,8 +404,8 @@ export class ProfileController {
         // Udpate UI
         this._updateProfileSelectOptions();
 
-        this._profileActiveSelect.value = `${profileCurrent}`;
-        this._profileTargetSelect.value = `${settingsProfileIndex}`;
+        /** @type {HTMLSelectElement} */ (this._profileActiveSelect).value = `${profileCurrent}`;
+        /** @type {HTMLSelectElement} */ (this._profileTargetSelect).value = `${settingsProfileIndex}`;
 
         // Update profile conditions
         this._profileConditionsUI.cleanup();
@@ -361,51 +426,65 @@ export class ProfileController {
         }
     }
 
+    /**
+     * @param {Event} e
+     */
     _onProfileActiveChange(e) {
-        const value = this._tryGetValidProfileIndex(e.currentTarget.value);
+        const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        const value = this._tryGetValidProfileIndex(element.value);
         if (value === null) { return; }
         this.setDefaultProfile(value);
     }
 
+    /**
+     * @param {Event} e
+     */
     _onProfileTargetChange(e) {
-        const value = this._tryGetValidProfileIndex(e.currentTarget.value);
+        const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        const value = this._tryGetValidProfileIndex(element.value);
         if (value === null) { return; }
         this._settingsController.profileIndex = value;
     }
 
+    /** */
     _onAdd() {
         this.duplicateProfile(this._settingsController.profileIndex);
     }
 
+    /** */
     _onDeleteConfirm() {
-        const modal = this._profileRemoveModal;
+        const modal = /** @type {Modal} */ (this._profileRemoveModal);
         modal.setVisible(false);
         const {node} = modal;
-        let profileIndex = node.dataset.profileIndex;
+        const profileIndex = node.dataset.profileIndex;
         delete node.dataset.profileIndex;
 
-        profileIndex = this._tryGetValidProfileIndex(profileIndex);
-        if (profileIndex === null) { return; }
+        const validProfileIndex = this._tryGetValidProfileIndex(profileIndex);
+        if (validProfileIndex === null) { return; }
 
-        this.deleteProfile(profileIndex);
+        this.deleteProfile(validProfileIndex);
     }
 
+    /** */
     _onCopyConfirm() {
-        const modal = this._profileCopyModal;
+        const modal = /** @type {Modal} */ (this._profileCopyModal);
         modal.setVisible(false);
         const {node} = modal;
-        let destinationProfileIndex = node.dataset.profileIndex;
+        const destinationProfileIndex = node.dataset.profileIndex;
         delete node.dataset.profileIndex;
 
-        destinationProfileIndex = this._tryGetValidProfileIndex(destinationProfileIndex);
-        if (destinationProfileIndex === null) { return; }
+        const validDestinationProfileIndex = this._tryGetValidProfileIndex(destinationProfileIndex);
+        if (validDestinationProfileIndex === null) { return; }
 
-        const sourceProfileIndex = this._tryGetValidProfileIndex(this._profileCopySourceSelect.value);
+        const sourceProfileIndex = this._tryGetValidProfileIndex(/** @type {HTMLSelectElement} */ (this._profileCopySourceSelect).value);
         if (sourceProfileIndex === null) { return; }
 
-        this.copyProfile(sourceProfileIndex, destinationProfileIndex);
+        this.copyProfile(sourceProfileIndex, validDestinationProfileIndex);
     }
 
+    /**
+     * @param {import('profile-conditions-ui').ConditionGroupCountChangedEvent} details
+     */
     _onConditionGroupCountChanged({count, profileIndex}) {
         if (profileIndex >= 0 && profileIndex < this._profileEntryList.length) {
             const profileEntry = this._profileEntryList[profileIndex];
@@ -413,15 +492,19 @@ export class ProfileController {
         }
     }
 
+    /**
+     * @param {number} profileIndex
+     */
     _addProfileEntry(profileIndex) {
         const profile = this._profiles[profileIndex];
-        const node = this._settingsController.instantiateTemplate('profile-entry');
-        const entry = new ProfileEntry(this, node);
+        const node = /** @type {HTMLElement} */ (this._settingsController.instantiateTemplate('profile-entry'));
+        const entry = new ProfileEntry(this, node, profile, profileIndex);
         this._profileEntryList.push(entry);
-        entry.prepare(profile, profileIndex);
-        this._profileEntryListContainer.appendChild(node);
+        entry.prepare();
+        /** @type {HTMLElement} */ (this._profileEntryListContainer).appendChild(node);
     }
 
+    /** */
     _updateProfileSelectOptions() {
         for (const select of this._getAllProfileSelects()) {
             const fragment = document.createDocumentFragment();
@@ -437,6 +520,10 @@ export class ProfileController {
         }
     }
 
+    /**
+     * @param {number} index
+     * @param {string} name
+     */
     _updateSelectName(index, name) {
         const optionValue = `${index}`;
         for (const select of this._getAllProfileSelects()) {
@@ -448,14 +535,21 @@ export class ProfileController {
         }
     }
 
+    /**
+     * @returns {HTMLSelectElement[]}
+     */
     _getAllProfileSelects() {
         return [
-            this._profileActiveSelect,
-            this._profileTargetSelect,
-            this._profileCopySourceSelect
+            /** @type {HTMLSelectElement} */ (this._profileActiveSelect),
+            /** @type {HTMLSelectElement} */ (this._profileTargetSelect),
+            /** @type {HTMLSelectElement} */ (this._profileCopySourceSelect)
         ];
     }
 
+    /**
+     * @param {string|undefined} stringValue
+     * @returns {?number}
+     */
     _tryGetValidProfileIndex(stringValue) {
         if (typeof stringValue !== 'string') { return null; }
         const intValue = parseInt(stringValue, 10);
@@ -467,6 +561,12 @@ export class ProfileController {
         );
     }
 
+    /**
+     * @param {string} name
+     * @param {import('settings').Profile[]} profiles
+     * @param {number} maxUniqueAttempts
+     * @returns {string}
+     */
     _createCopyName(name, profiles, maxUniqueAttempts) {
         let space, index, prefix, suffix;
         const match = /^([\w\W]*\(Copy)((\s+)(\d+))?(\)\s*)$/.exec(name);
@@ -502,44 +602,80 @@ export class ProfileController {
         }
     }
 
+    /**
+     * @template T
+     * @param {T} currentValue
+     * @param {T} value1
+     * @param {T} value2
+     * @returns {T}
+     */
     _getSwappedValue(currentValue, value1, value2) {
         if (currentValue === value1) { return value2; }
         if (currentValue === value2) { return value1; }
         return currentValue;
     }
 
+    /**
+     * @param {number} profileIndex
+     * @returns {?import('settings').Profile}
+     */
     _getProfile(profileIndex) {
         return (profileIndex >= 0 && profileIndex < this._profiles.length ? this._profiles[profileIndex] : null);
     }
 
+    /**
+     * @param {number} profileIndex
+     * @returns {?ProfileEntry}
+     */
     _getProfileEntry(profileIndex) {
         return (profileIndex >= 0 && profileIndex < this._profileEntryList.length ? this._profileEntryList[profileIndex] : null);
     }
 
+    /**
+     * @param {Element} node1
+     * @param {Element} node2
+     */
     _swapDomNodes(node1, node2) {
         const parent1 = node1.parentNode;
         const parent2 = node2.parentNode;
         const next1 = node1.nextSibling;
         const next2 = node2.nextSibling;
-        if (node2 !== next1) { parent1.insertBefore(node2, next1); }
-        if (node1 !== next2) { parent2.insertBefore(node1, next2); }
+        if (node2 !== next1 && parent1 !== null) { parent1.insertBefore(node2, next1); }
+        if (node1 !== next2 && parent2 !== null) { parent2.insertBefore(node1, next2); }
     }
 }
 
 class ProfileEntry {
-    constructor(profileController, node) {
+    /**
+     * @param {ProfileController} profileController
+     * @param {HTMLElement} node
+     * @param {import('settings').Profile} profile
+     * @param {number} index
+     */
+    constructor(profileController, node, profile, index) {
+        /** @type {ProfileController} */
         this._profileController = profileController;
+        /** @type {HTMLElement} */
         this._node = node;
-        this._profile = null;
-        this._index = 0;
-        this._isDefaultRadio = null;
-        this._nameInput = null;
-        this._countLink = null;
-        this._countText = null;
-        this._menuButton = null;
+        /** @type {import('settings').Profile} */
+        this._profile = profile;
+        /** @type {number} */
+        this._index = index;
+        /** @type {HTMLInputElement} */
+        this._isDefaultRadio = /** @type {HTMLInputElement} */ (node.querySelector('.profile-entry-is-default-radio'));
+        /** @type {HTMLInputElement} */
+        this._nameInput = /** @type {HTMLInputElement} */ (node.querySelector('.profile-entry-name-input'));
+        /** @type {HTMLElement} */
+        this._countLink = /** @type {HTMLElement} */ (node.querySelector('.profile-entry-condition-count-link'));
+        /** @type {HTMLElement} */
+        this._countText = /** @type {HTMLElement} */ (node.querySelector('.profile-entry-condition-count'));
+        /** @type {HTMLButtonElement} */
+        this._menuButton = /** @type {HTMLButtonElement} */ (node.querySelector('.profile-entry-menu-button'));
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
     }
 
+    /** @type {number} */
     get index() {
         return this._index;
     }
@@ -548,21 +684,13 @@ class ProfileEntry {
         this._index = value;
     }
 
+    /** @type {HTMLElement} */
     get node() {
         return this._node;
     }
 
-    prepare(profile, index) {
-        this._profile = profile;
-        this._index = index;
-
-        const node = this._node;
-        this._isDefaultRadio = node.querySelector('.profile-entry-is-default-radio');
-        this._nameInput = node.querySelector('.profile-entry-name-input');
-        this._countLink = node.querySelector('.profile-entry-condition-count-link');
-        this._countText = node.querySelector('.profile-entry-condition-count');
-        this._menuButton = node.querySelector('.profile-entry-menu-button');
-
+    /** */
+    prepare() {
         this.updateState();
 
         this._eventListeners.addEventListener(this._isDefaultRadio, 'change', this._onIsDefaultRadioChange.bind(this), false);
@@ -572,6 +700,7 @@ class ProfileEntry {
         this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
     }
 
+    /** */
     cleanup() {
         this._eventListeners.removeAllEventListeners();
         if (this._node.parentNode !== null) {
@@ -579,41 +708,63 @@ class ProfileEntry {
         }
     }
 
+    /**
+     * @param {string} value
+     */
     setName(value) {
         if (this._nameInput.value === value) { return; }
         this._nameInput.value = value;
     }
 
+    /**
+     * @param {boolean} value
+     */
     setIsDefault(value) {
         this._isDefaultRadio.checked = value;
     }
 
+    /** */
     updateState() {
         this._nameInput.value = this._profile.name;
         this._countText.textContent = `${this._profile.conditionGroups.length}`;
         this._isDefaultRadio.checked = (this._index === this._profileController.profileCurrentIndex);
     }
 
+    /**
+     * @param {number} count
+     */
     setConditionGroupsCount(count) {
         this._countText.textContent = `${count}`;
     }
 
     // Private
 
+    /**
+     * @param {Event} e
+     */
     _onIsDefaultRadioChange(e) {
-        if (!e.currentTarget.checked) { return; }
+        const element = /** @type {HTMLInputElement} */ (e.currentTarget);
+        if (!element.checked) { return; }
         this._profileController.setDefaultProfile(this._index);
     }
 
+    /**
+     * @param {Event} e
+     */
     _onNameInputInput(e) {
-        const name = e.currentTarget.value;
+        const element = /** @type {HTMLInputElement} */ (e.currentTarget);
+        const name = element.value;
         this._profileController.setProfileName(this._index, name);
     }
 
+    /** */
     _onConditionsCountLinkClick() {
         this._profileController.openProfileConditionsModal(this._index);
     }
 
+    /**
+     * @param {import('popup-menu').MenuOpenEvent} e
+     */
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
         const count = this._profileController.profileCount;
@@ -623,6 +774,9 @@ class ProfileEntry {
         this._setMenuActionEnabled(bodyNode, 'delete', count > 1);
     }
 
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} e
+     */
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'moveUp':
@@ -646,8 +800,13 @@ class ProfileEntry {
         }
     }
 
+    /**
+     * @param {Element} menu
+     * @param {string} action
+     * @param {boolean} enabled
+     */
     _setMenuActionEnabled(menu, action, enabled) {
-        const element = menu.querySelector(`[data-menu-action="${action}"]`);
+        const element = /** @type {HTMLButtonElement} */ (menu.querySelector(`[data-menu-action="${action}"]`));
         if (element === null) { return; }
         element.disabled = !enabled;
     }

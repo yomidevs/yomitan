@@ -19,16 +19,27 @@
 import {EventListenerCollection} from '../core.js';
 
 export class DisplayResizer {
+    /**
+     * @param {Display} display
+     */
     constructor(display) {
+        /** @type {Display} */
         this._display = display;
+        /** @type {?import('core').TokenObject} */
         this._token = null;
+        /** @type {?HTMLElement} */
         this._handle = null;
+        /** @type {?number} */
         this._touchIdentifier = null;
+        /** @type {?{width: number, height: number}} */
         this._startSize = null;
+        /** @type {?{x: number, y: number}} */
         this._startOffset = null;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
     }
 
+    /** */
     prepare() {
         this._handle = document.querySelector('#frame-resizer-handle');
         if (this._handle === null) { return; }
@@ -39,6 +50,9 @@ export class DisplayResizer {
 
     // Private
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onFrameResizerMouseDown(e) {
         if (e.button !== 0) { return; }
         // Don't do e.preventDefault() here; this allows mousemove events to be processed
@@ -46,19 +60,27 @@ export class DisplayResizer {
         this._startFrameResize(e);
     }
 
+    /**
+     * @param {TouchEvent} e
+     */
     _onFrameResizerTouchStart(e) {
         e.preventDefault();
         this._startFrameResizeTouch(e);
     }
 
+    /** */
     _onFrameResizerMouseUp() {
         this._stopFrameResize();
     }
 
+    /** */
     _onFrameResizerWindowBlur() {
         this._stopFrameResize();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onFrameResizerMouseMove(e) {
         if ((e.buttons & 0x1) === 0x0) {
             this._stopFrameResize();
@@ -69,16 +91,25 @@ export class DisplayResizer {
         }
     }
 
+    /**
+     * @param {TouchEvent} e
+     */
     _onFrameResizerTouchEnd(e) {
         if (this._getTouch(e.changedTouches, this._touchIdentifier) === null) { return; }
         this._stopFrameResize();
     }
 
+    /**
+     * @param {TouchEvent} e
+     */
     _onFrameResizerTouchCancel(e) {
         if (this._getTouch(e.changedTouches, this._touchIdentifier) === null) { return; }
         this._stopFrameResize();
     }
 
+    /**
+     * @param {TouchEvent} e
+     */
     _onFrameResizerTouchMove(e) {
         if (this._startSize === null) { return; }
         const primaryTouch = this._getTouch(e.changedTouches, this._touchIdentifier);
@@ -87,10 +118,14 @@ export class DisplayResizer {
         this._updateFrameSize(x, y);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _startFrameResize(e) {
         if (this._token !== null) { return; }
 
         const {clientX: x, clientY: y} = e;
+        /** @type {?import('core').TokenObject} */
         const token = {};
         this._token = token;
         this._startOffset = {x, y};
@@ -106,10 +141,14 @@ export class DisplayResizer {
         this._initializeFrameResize(token);
     }
 
+    /**
+     * @param {TouchEvent} e
+     */
     _startFrameResizeTouch(e) {
         if (this._token !== null) { return; }
 
         const {clientX: x, clientY: y, identifier} = e.changedTouches[0];
+        /** @type {?import('core').TokenObject} */
         const token = {};
         this._token = token;
         this._startOffset = {x, y};
@@ -127,15 +166,21 @@ export class DisplayResizer {
         this._initializeFrameResize(token);
     }
 
+    /**
+     * @param {import('core').TokenObject} token
+     */
     async _initializeFrameResize(token) {
         const {parentPopupId} = this._display;
         if (parentPopupId === null) { return; }
 
+        /** @type {import('popup').ValidSize} */
         const size = await this._display.invokeParentFrame('PopupFactory.getFrameSize', {id: parentPopupId});
         if (this._token !== token) { return; }
-        this._startSize = size;
+        const {width, height} = size;
+        this._startSize = {width, height};
     }
 
+    /** */
     _stopFrameResize() {
         if (this._token === null) { return; }
 
@@ -151,9 +196,13 @@ export class DisplayResizer {
         }
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     */
     async _updateFrameSize(x, y) {
         const {parentPopupId} = this._display;
-        if (parentPopupId === null) { return; }
+        if (parentPopupId === null || this._handle === null || this._startOffset === null || this._startSize === null) { return; }
 
         const handleSize = this._handle.getBoundingClientRect();
         let {width, height} = this._startSize;
@@ -164,6 +213,11 @@ export class DisplayResizer {
         await this._display.invokeParentFrame('PopupFactory.setFrameSize', {id: parentPopupId, width, height});
     }
 
+    /**
+     * @param {TouchList} touchList
+     * @param {?number} identifier
+     * @returns {?Touch}
+     */
     _getTouch(touchList, identifier) {
         for (const touch of touchList) {
             if (touch.identifier === identifier) {

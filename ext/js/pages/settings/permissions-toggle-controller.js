@@ -19,11 +19,17 @@
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
 
 export class PermissionsToggleController {
+    /**
+     * @param {SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {SettingsController} */
         this._settingsController = settingsController;
+        /** @type {?NodeListOf<HTMLInputElement>} */
         this._toggles = null;
     }
 
+    /** */
     async prepare() {
         this._toggles = document.querySelectorAll('.permissions-toggle');
 
@@ -34,14 +40,18 @@ export class PermissionsToggleController {
         this._settingsController.on('permissionsChanged', this._onPermissionsChanged.bind(this));
 
         const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        const optionsContext = this._settingsController.getOptionsContext();
+        this._onOptionsChanged({options, optionsContext});
     }
 
     // Private
 
+    /**
+     * @param {import('settings-controller').OptionsChangedEvent} details
+     */
     _onOptionsChanged({options}) {
         let accessor = null;
-        for (const toggle of this._toggles) {
+        for (const toggle of /** @type {NodeListOf<HTMLInputElement>} */ (this._toggles)) {
             const {permissionsSetting} = toggle.dataset;
             if (typeof permissionsSetting !== 'string') { continue; }
 
@@ -61,8 +71,11 @@ export class PermissionsToggleController {
         this._updateValidity();
     }
 
+    /**
+     * @param {Event} e
+     */
     async _onPermissionsToggleChange(e) {
-        const toggle = e.currentTarget;
+        const toggle = /** @type {HTMLInputElement} */ (e.currentTarget);
         let value = toggle.checked;
         const valuePre = !value;
         const {permissionsSetting} = toggle.dataset;
@@ -90,9 +103,13 @@ export class PermissionsToggleController {
         }
     }
 
-    _onPermissionsChanged({permissions: {permissions}}) {
-        const permissionsSet = new Set(permissions);
-        for (const toggle of this._toggles) {
+    /**
+     * @param {import('settings-controller').PermissionsChangedEvent} details
+     */
+    _onPermissionsChanged({permissions}) {
+        const permissions2 = permissions.permissions;
+        const permissionsSet = new Set(typeof permissions2 !== 'undefined' ? permissions2 : []);
+        for (const toggle of /** @type {NodeListOf<HTMLInputElement>} */ (this._toggles)) {
             const {permissionsSetting} = toggle.dataset;
             const hasPermissions = this._hasAll(permissionsSet, this._getRequiredPermissions(toggle));
 
@@ -105,17 +122,27 @@ export class PermissionsToggleController {
         }
     }
 
+    /**
+     * @param {HTMLInputElement} toggle
+     * @param {boolean} valid
+     */
     _setToggleValid(toggle, valid) {
-        const relative = toggle.closest('.settings-item');
+        const relative = /** @type {?HTMLElement} */ (toggle.closest('.settings-item'));
         if (relative === null) { return; }
         relative.dataset.invalid = `${!valid}`;
     }
 
+    /** */
     async _updateValidity() {
         const permissions = await this._settingsController.permissionsUtil.getAllPermissions();
         this._onPermissionsChanged({permissions});
     }
 
+    /**
+     * @param {Set<string>} set
+     * @param {string[]} values
+     * @returns {boolean}
+     */
     _hasAll(set, values) {
         for (const value of values) {
             if (!set.has(value)) { return false; }
@@ -123,6 +150,10 @@ export class PermissionsToggleController {
         return true;
     }
 
+    /**
+     * @param {HTMLInputElement} toggle
+     * @returns {string[]}
+     */
     _getRequiredPermissions(toggle) {
         const requiredPermissions = toggle.dataset.requiredPermissions;
         return (typeof requiredPermissions === 'string' && requiredPermissions.length > 0 ? requiredPermissions.split(' ') : []);

@@ -61,7 +61,7 @@ export class RegexUtil {
      * Applies the replacement string for a given regular expression match.
      * @param {string} replacement The replacement string that follows the format of the standard
      *   JavaScript regular expression replacement string.
-     * @param {object} match A match object returned from RegExp.match.
+     * @param {RegExpMatchArray} match A match object returned from RegExp.match.
      * @returns {string} A new string with the pattern replacement applied.
      */
     static applyMatchReplacement(replacement, match) {
@@ -79,11 +79,13 @@ export class RegexUtil {
                     return groups[g2];
                 }
             } else {
+                let {index} = match;
+                if (typeof index !== 'number') { index = 0; }
                 switch (g0) {
                     case '$': return '$';
                     case '&': return match[0];
-                    case '`': return replacement.substring(0, match.index);
-                    case '\'': return replacement.substring(match.index + g0.length);
+                    case '`': return replacement.substring(0, index);
+                    case '\'': return replacement.substring(index + g0.length);
                 }
             }
             return g0;

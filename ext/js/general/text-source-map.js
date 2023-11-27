@@ -17,15 +17,26 @@
  */
 
 export class TextSourceMap {
+    /**
+     * @param {string} source
+     * @param {number[]|null} [mapping=null]
+     */
     constructor(source, mapping=null) {
+        /** @type {string} */
         this._source = source;
+        /** @type {?number[]} */
         this._mapping = (mapping !== null ? TextSourceMap.normalizeMapping(mapping) : null);
     }
 
+    /** @type {string} */
     get source() {
         return this._source;
     }
 
+    /**
+     * @param {unknown} other
+     * @returns {boolean}
+     */
     equals(other) {
         if (this === other) {
             return true;
@@ -61,6 +72,10 @@ export class TextSourceMap {
         return true;
     }
 
+    /**
+     * @param {number} finalLength
+     * @returns {number}
+     */
     getSourceLength(finalLength) {
         const mapping = this._mapping;
         if (mapping === null) {
@@ -74,6 +89,10 @@ export class TextSourceMap {
         return sourceLength;
     }
 
+    /**
+     * @param {number} index
+     * @param {number} count
+     */
     combine(index, count) {
         if (count <= 0) { return; }
 
@@ -89,6 +108,10 @@ export class TextSourceMap {
         this._mapping[index] = sum;
     }
 
+    /**
+     * @param {number} index
+     * @param {number[]} items
+     */
     insert(index, ...items) {
         if (this._mapping === null) {
             this._mapping = TextSourceMap.createMapping(this._source);
@@ -97,14 +120,25 @@ export class TextSourceMap {
         this._mapping.splice(index, 0, ...items);
     }
 
+    /**
+     * @returns {?number[]}
+     */
     getMappingCopy() {
         return this._mapping !== null ? [...this._mapping] : null;
     }
 
+    /**
+     * @param {string} text
+     * @returns {number[]}
+     */
     static createMapping(text) {
         return new Array(text.length).fill(1);
     }
 
+    /**
+     * @param {number[]} mapping
+     * @returns {number[]}
+     */
     static normalizeMapping(mapping) {
         const result = [];
         for (const value of mapping) {

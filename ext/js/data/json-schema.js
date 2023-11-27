@@ -19,31 +19,70 @@
 import {clone} from '../core.js';
 import {CacheMap} from '../general/cache-map.js';
 
-export class JsonSchema {
-    constructor(schema, rootSchema) {
-        this._schema = null;
-        this._startSchema = schema;
-        this._rootSchema = typeof rootSchema !== 'undefined' ? rootSchema : schema;
-        this._regexCache = null;
-        this._refCache = null;
-        this._valueStack = [];
-        this._schemaStack = [];
-        this._progress = null;
-        this._progressCounter = 0;
-        this._progressInterval = 1;
-
-        this._schemaPush(null, null);
-        this._valuePush(null, null);
+export class JsonSchemaError extends Error {
+    /**
+     * @param {string} message
+     * @param {import('json-schema').ValueStackItem[]} valueStack
+     * @param {import('json-schema').SchemaStackItem[]} schemaStack
+     */
+    constructor(message, valueStack, schemaStack) {
+        super(message);
+        /** @type {import('json-schema').ValueStackItem[]} */
+        this._valueStack = valueStack;
+        /** @type {import('json-schema').SchemaStackItem[]} */
+        this._schemaStack = schemaStack;
     }
 
+    /** @type {unknown|undefined} */
+    get value() { return this._valueStack.length > 0 ? this._valueStack[this._valueStack.length - 1].value : void 0; }
+
+    /** @type {import('json-schema').Schema|import('json-schema').Schema[]|undefined} */
+    get schema() { return this._schemaStack.length > 0 ? this._schemaStack[this._schemaStack.length - 1].schema : void 0; }
+
+    /** @type {import('json-schema').ValueStackItem[]} */
+    get valueStack() { return this._valueStack; }
+
+    /** @type {import('json-schema').SchemaStackItem[]} */
+    get schemaStack() { return this._schemaStack; }
+}
+
+export class JsonSchema {
+    /**
+     * @param {import('json-schema').Schema} schema
+     * @param {import('json-schema').Schema} [rootSchema]
+     */
+    constructor(schema, rootSchema) {
+        /** @type {import('json-schema').Schema} */
+        this._startSchema = schema;
+        /** @type {import('json-schema').Schema} */
+        this._rootSchema = typeof rootSchema !== 'undefined' ? rootSchema : schema;
+        /** @type {?CacheMap<string, RegExp>} */
+        this._regexCache = null;
+        /** @type {?Map<string, {schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}>} */
+        this._refCache = null;
+        /** @type {import('json-schema').ValueStackItem[]} */
+        this._valueStack = [];
+        /** @type {import('json-schema').SchemaStackItem[]} */
+        this._schemaStack = [];
+        /** @type {?(jsonSchema: JsonSchema) => void} */
+        this._progress = null;
+        /** @type {number} */
+        this._progressCounter = 0;
+        /** @type {number} */
+        this._progressInterval = 1;
+    }
+
+    /** @type {import('json-schema').Schema} */
     get schema() {
         return this._startSchema;
     }
 
+    /** @type {import('json-schema').Schema} */
     get rootSchema() {
         return this._rootSchema;
     }
 
+    /** @type {?(jsonSchema: JsonSchema) => void} */
     get progress() {
         return this._progress;
     }
@@ -52,6 +91,7 @@ export class JsonSchema {
         this._progress = value;
     }
 
+    /** @type {number} */
     get progressInterval() {
         return this._progressInterval;
     }
@@ -60,6 +100,10 @@ export class JsonSchema {
         this._progressInterval = value;
     }
 
+    /**
+     * @param {import('json-schema').Value} value
+     * @returns {import('json-schema').Value}
+     */
     createProxy(value) {
         return (
             typeof value === 'object' && value !== null ?
@@ -68,6 +112,10 @@ export class JsonSchema {
         );
     }
 
+    /**
+     * @param {unknown} value
+     * @returns {boolean}
+     */
     isValid(value) {
         try {
             this.validate(value);
@@ -77,123 +125,203 @@ export class JsonSchema {
         }
     }
 
+    /**
+     * @param {unknown} value
+     */
     validate(value) {
-        this._schemaPush(this._startSchema, null);
+        const schema = this._startSchema;
+        this._schemaPush(schema, null);
         this._valuePush(value, null);
         try {
-            this._validate(value);
+            this._validate(schema, value);
         } finally {
             this._valuePop();
             this._schemaPop();
         }
     }
 
+    /**
+     * @param {unknown} [value]
+     * @returns {import('json-schema').Value}
+     */
     getValidValueOrDefault(value) {
-        return this._getValidValueOrDefault(null, value, {schema: this._startSchema, path: null});
+        const schema = this._startSchema;
+        return this._getValidValueOrDefault(schema, null, value, [{schema, path: null}]);
     }
 
+    /**
+     * @param {string} property
+     * @returns {?JsonSchema}
+     */
     getObjectPropertySchema(property) {
-        const startSchemaInfo = this._getResolveSchemaInfo({schema: this._startSchema, path: null});
-        this._schemaPush(startSchemaInfo.schema, startSchemaInfo.path);
+        const schema = this._startSchema;
+        const {schema: schema2, stack} = this._getResolvedSchemaInfo(schema, [{schema, path: null}]);
+        this._schemaPushMultiple(stack);
         try {
-            const schemaInfo = this._getObjectPropertySchemaInfo(property);
-            return schemaInfo !== null ? new JsonSchema(schemaInfo.schema, this._rootSchema) : null;
+            const {schema: propertySchema} = this._getObjectPropertySchemaInfo(schema2, property);
+            return propertySchema !== false ? new JsonSchema(propertySchema, this._rootSchema) : null;
         } finally {
-            this._schemaPop();
+            this._schemaPopMultiple(stack.length);
         }
     }
 
+    /**
+     * @param {number} index
+     * @returns {?JsonSchema}
+     */
     getArrayItemSchema(index) {
-        const startSchemaInfo = this._getResolveSchemaInfo({schema: this._startSchema, path: null});
-        this._schemaPush(startSchemaInfo.schema, startSchemaInfo.path);
+        const schema = this._startSchema;
+        const {schema: schema2, stack} = this._getResolvedSchemaInfo(schema, [{schema, path: null}]);
+        this._schemaPushMultiple(stack);
         try {
-            const schemaInfo = this._getArrayItemSchemaInfo(index);
-            return schemaInfo !== null ? new JsonSchema(schemaInfo.schema, this._rootSchema) : null;
+            const {schema: itemSchema} = this._getArrayItemSchemaInfo(schema2, index);
+            return itemSchema !== false ? new JsonSchema(itemSchema, this._rootSchema) : null;
         } finally {
-            this._schemaPop();
+            this._schemaPopMultiple(stack.length);
         }
     }
 
+    /**
+     * @param {string} property
+     * @returns {boolean}
+     */
     isObjectPropertyRequired(property) {
-        const {required} = this._startSchema;
+        const schema = this._startSchema;
+        if (typeof schema === 'boolean') { return false; }
+        const {required} = schema;
         return Array.isArray(required) && required.includes(property);
     }
 
     // Internal state functions for error construction and progress callback
 
+    /**
+     * @returns {import('json-schema').ValueStackItem[]}
+     */
     getValueStack() {
-        const valueStack = [];
-        for (let i = 1, ii = this._valueStack.length; i < ii; ++i) {
-            const {value, path} = this._valueStack[i];
-            valueStack.push({value, path});
+        const result = [];
+        for (const {value, path} of this._valueStack) {
+            result.push({value, path});
         }
-        return valueStack;
+        return result;
     }
 
+    /**
+     * @returns {import('json-schema').SchemaStackItem[]}
+     */
     getSchemaStack() {
-        const schemaStack = [];
-        for (let i = 1, ii = this._schemaStack.length; i < ii; ++i) {
-            const {schema, path} = this._schemaStack[i];
-            schemaStack.push({schema, path});
+        const result = [];
+        for (const {schema, path} of this._schemaStack) {
+            result.push({schema, path});
         }
-        return schemaStack;
+        return result;
     }
 
+    /**
+     * @returns {number}
+     */
     getValueStackLength() {
         return this._valueStack.length - 1;
     }
 
+    /**
+     * @param {number} index
+     * @returns {import('json-schema').ValueStackItem}
+     */
     getValueStackItem(index) {
         const {value, path} = this._valueStack[index + 1];
         return {value, path};
     }
 
+    /**
+     * @returns {number}
+     */
     getSchemaStackLength() {
         return this._schemaStack.length - 1;
     }
 
+    /**
+     * @param {number} index
+     * @returns {import('json-schema').SchemaStackItem}
+     */
     getSchemaStackItem(index) {
         const {schema, path} = this._schemaStack[index + 1];
         return {schema, path};
     }
 
+    /**
+     * @template T
+     * @param {T} value
+     * @returns {T}
+     */
+    static clone(value) {
+        return clone(value);
+    }
+
     // Stack
 
+    /**
+     * @param {unknown} value
+     * @param {string|number|null} path
+     */
     _valuePush(value, path) {
         this._valueStack.push({value, path});
     }
 
+    /**
+     * @returns {void}
+     */
     _valuePop() {
         this._valueStack.pop();
     }
 
+    /**
+     * @param {import('json-schema').Schema|import('json-schema').Schema[]} schema
+     * @param {string|number|null} path
+     */
     _schemaPush(schema, path) {
         this._schemaStack.push({schema, path});
-        this._schema = schema;
     }
 
+    /**
+     * @param {import('json-schema').SchemaStackItem[]} items
+     */
+    _schemaPushMultiple(items) {
+        this._schemaStack.push(...items);
+    }
+
+    /**
+     * @returns {void}
+     */
     _schemaPop() {
         this._schemaStack.pop();
-        this._schema = this._schemaStack[this._schemaStack.length - 1].schema;
+    }
+
+    /**
+     * @param {number} count
+     */
+    _schemaPopMultiple(count) {
+        for (let i = 0; i < count; ++i) {
+            this._schemaStack.pop();
+        }
     }
 
     // Private
 
+    /**
+     * @param {string} message
+     * @returns {JsonSchemaError}
+     */
     _createError(message) {
         const valueStack = this.getValueStack();
         const schemaStack = this.getSchemaStack();
-        const error = new Error(message);
-        error.value = valueStack[valueStack.length - 1].value;
-        error.schema = schemaStack[schemaStack.length - 1].schema;
-        error.valueStack = valueStack;
-        error.schemaStack = schemaStack;
-        return error;
+        return new JsonSchemaError(message, valueStack, schemaStack);
     }
 
-    _isObject(value) {
-        return typeof value === 'object' && value !== null && !Array.isArray(value);
-    }
-
+    /**
+     * @param {string} pattern
+     * @param {string} flags
+     * @returns {RegExp}
+     */
     _getRegex(pattern, flags) {
         if (this._regexCache === null) {
             this._regexCache = new CacheMap(100);
@@ -208,81 +336,125 @@ export class JsonSchema {
         return regex;
     }
 
-    _getUnconstrainedSchema() {
-        return {};
-    }
-
-    _getObjectPropertySchemaInfo(property) {
-        const {properties} = this._schema;
-        if (this._isObject(properties)) {
+    /**
+     * @param {import('json-schema').Schema} schema
+     * @param {string} property
+     * @returns {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}}
+     */
+    _getObjectPropertySchemaInfo(schema, property) {
+        if (typeof schema === 'boolean') {
+            return {schema, stack: [{schema, path: null}]};
+        }
+        const {properties} = schema;
+        if (typeof properties !== 'undefined' && Object.prototype.hasOwnProperty.call(properties, property)) {
             const propertySchema = properties[property];
-            if (this._isObject(propertySchema)) {
-                return {schema: propertySchema, path: ['properties', property]};
+            if (typeof propertySchema !== 'undefined') {
+                return {
+                    schema: propertySchema,
+                    stack: [
+                        {schema: properties, path: 'properties'},
+                        {schema: propertySchema, path: property}
+                    ]
+                };
             }
         }
-
-        const {additionalProperties} = this._schema;
-        if (additionalProperties === false) {
-            return null;
-        } else if (this._isObject(additionalProperties)) {
-            return {schema: additionalProperties, path: 'additionalProperties'};
-        } else {
-            const result = this._getUnconstrainedSchema();
-            return {schema: result, path: null};
-        }
+        return this._getOptionalSchemaInfo(schema.additionalProperties, 'additionalProperties');
     }
 
-    _getArrayItemSchemaInfo(index) {
-        const {items} = this._schema;
-        if (this._isObject(items)) {
-            return {schema: items, path: 'items'};
+    /**
+     * @param {import('json-schema').Schema} schema
+     * @param {number} index
+     * @returns {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}}
+     */
+    _getArrayItemSchemaInfo(schema, index) {
+        if (typeof schema === 'boolean') {
+            return {schema, stack: [{schema, path: null}]};
         }
-        if (Array.isArray(items)) {
-            if (index >= 0 && index < items.length) {
-                const propertySchema = items[index];
-                if (this._isObject(propertySchema)) {
-                    return {schema: propertySchema, path: ['items', index]};
+        const {prefixItems} = schema;
+        if (typeof prefixItems !== 'undefined') {
+            if (index >= 0 && index < prefixItems.length) {
+                const itemSchema = prefixItems[index];
+                if (typeof itemSchema !== 'undefined') {
+                    return {
+                        schema: itemSchema,
+                        stack: [
+                            {schema: prefixItems, path: 'prefixItems'},
+                            {schema: itemSchema, path: index}
+                        ]
+                    };
                 }
             }
         }
-
-        const {additionalItems} = this._schema;
-        if (additionalItems === false) {
-            return null;
-        } else if (this._isObject(additionalItems)) {
-            return {schema: additionalItems, path: 'additionalItems'};
-        } else {
-            const result = this._getUnconstrainedSchema();
-            return {schema: result, path: null};
-        }
-    }
-
-    _getSchemaOrValueType(value) {
-        const {type} = this._schema;
-
-        if (Array.isArray(type)) {
-            if (typeof value !== 'undefined') {
-                const valueType = this._getValueType(value);
-                if (type.indexOf(valueType) >= 0) {
-                    return valueType;
+        const {items} = schema;
+        if (typeof items !== 'undefined') {
+            if (Array.isArray(items)) { // Legacy schema format
+                if (index >= 0 && index < items.length) {
+                    const itemSchema = items[index];
+                    if (typeof itemSchema !== 'undefined') {
+                        return {
+                            schema: itemSchema,
+                            stack: [
+                                {schema: items, path: 'items'},
+                                {schema: itemSchema, path: index}
+                            ]
+                        };
+                    }
                 }
+            } else {
+                return {
+                    schema: items,
+                    stack: [{schema: items, path: 'items'}]
+                };
             }
-            return null;
         }
-
-        if (typeof type !== 'undefined') { return type; }
-        return (typeof value !== 'undefined') ? this._getValueType(value) : null;
+        return this._getOptionalSchemaInfo(schema.additionalItems, 'additionalItems');
     }
 
+    /**
+     * @param {import('json-schema').Schema|undefined} schema
+     * @param {string|number|null} path
+     * @returns {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}}
+     */
+    _getOptionalSchemaInfo(schema, path) {
+        switch (typeof schema) {
+            case 'boolean':
+            case 'object':
+                break;
+            default:
+                schema = true;
+                path = null;
+                break;
+        }
+        return {schema, stack: [{schema, path}]};
+    }
+
+    /**
+     * @param {unknown} value
+     * @returns {?import('json-schema').Type}
+     * @throws {Error}
+     */
     _getValueType(value) {
         const type = typeof value;
-        if (type === 'object') {
-            if (value === null) { return 'null'; }
-            if (Array.isArray(value)) { return 'array'; }
+        switch (type) {
+            case 'object':
+                if (value === null) { return 'null'; }
+                if (Array.isArray(value)) { return 'array'; }
+                return 'object';
+            case 'string':
+            case 'number':
+            case 'boolean':
+                return type;
+            default:
+                return null;
         }
-        return type;
     }
 
+    /**
+     * @param {unknown} value
+     * @param {?import('json-schema').Type} type
+     * @param {import('json-schema').Type|import('json-schema').Type[]|undefined} schemaTypes
+     * @returns {boolean}
+     */
     _isValueTypeAny(value, type, schemaTypes) {
         if (typeof schemaTypes === 'string') {
             return this._isValueType(value, type, schemaTypes);
@@ -297,13 +469,24 @@ export class JsonSchema {
         return true;
     }
 
+    /**
+     * @param {unknown} value
+     * @param {?import('json-schema').Type} type
+     * @param {import('json-schema').Type} schemaType
+     * @returns {boolean}
+     */
     _isValueType(value, type, schemaType) {
         return (
             type === schemaType ||
-            (schemaType === 'integer' && Math.floor(value) === value)
+            (schemaType === 'integer' && typeof value === 'number' && Math.floor(value) === value)
         );
     }
 
+    /**
+     * @param {unknown} value1
+     * @param {import('json-schema').Value[]} valueList
+     * @returns {boolean}
+     */
     _valuesAreEqualAny(value1, valueList) {
         for (const value2 of valueList) {
             if (this._valuesAreEqual(value1, value2)) {
@@ -313,29 +496,45 @@ export class JsonSchema {
         return false;
     }
 
+    /**
+     * @param {unknown} value1
+     * @param {import('json-schema').Value} value2
+     * @returns {boolean}
+     */
     _valuesAreEqual(value1, value2) {
         return value1 === value2;
     }
 
-    _getResolveSchemaInfo(schemaInfo) {
-        const ref = schemaInfo.schema.$ref;
-        if (typeof ref !== 'string') { return schemaInfo; }
-
-        const {path: basePath} = schemaInfo;
-        const {schema, path} = this._getReference(ref);
-        if (Array.isArray(basePath)) {
-            path.unshift(...basePath);
-        } else {
-            path.unshift(basePath);
+    /**
+     * @param {import('json-schema').Schema} schema
+     * @param {import('json-schema').SchemaStackItem[]} stack
+     * @returns {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}}
+     */
+    _getResolvedSchemaInfo(schema, stack) {
+        if (typeof schema !== 'boolean') {
+            const ref = schema.$ref;
+            if (typeof ref === 'string') {
+                const {schema: schema2, stack: stack2} = this._getReference(ref);
+                return {
+                    schema: schema2,
+                    stack: [...stack, ...stack2]
+                };
+            }
         }
-        return {schema, path};
+        return {schema, stack};
     }
 
+    /**
+     * @param {string} ref
+     * @returns {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}}
+     * @throws {Error}
+     */
     _getReference(ref) {
         if (!ref.startsWith('#/')) {
             throw this._createError(`Unsupported reference path: ${ref}`);
         }
 
+        /** @type {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}|undefined} */
         let info;
         if (this._refCache !== null) {
             info = this._refCache.get(ref);
@@ -348,12 +547,20 @@ export class JsonSchema {
             this._refCache.set(ref, info);
         }
 
-        return {schema: info.schema, path: [...info.path]};
+        info.stack = this._copySchemaStack(info.stack);
+        return info;
     }
 
+    /**
+     * @param {string} ref
+     * @returns {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}}
+     * @throws {Error}
+     */
     _getReferenceUncached(ref) {
+        /** @type {Set<string>} */
         const visited = new Set();
-        const path = [];
+        /** @type {import('json-schema').SchemaStackItem[]} */
+        const stack = [];
         while (true) {
             if (visited.has(ref)) {
                 throw this._createError(`Recursive reference: ${ref}`);
@@ -362,106 +569,139 @@ export class JsonSchema {
 
             const pathParts = ref.substring(2).split('/');
             let schema = this._rootSchema;
-            try {
-                for (const pathPart of pathParts) {
-                    schema = schema[pathPart];
+            stack.push({schema, path: null});
+            for (const pathPart of pathParts) {
+                if (!(typeof schema === 'object' && schema !== null && Object.prototype.hasOwnProperty.call(schema, pathPart))) {
+                    throw this._createError(`Invalid reference: ${ref}`);
                 }
-            } catch (e) {
-                throw this._createError(`Invalid reference: ${ref}`);
+                const schemaNext = /** @type {import('core').UnknownObject} */ (schema)[pathPart];
+                if (!(typeof schemaNext === 'boolean' || (typeof schemaNext === 'object' && schemaNext !== null))) {
+                    throw this._createError(`Invalid reference: ${ref}`);
+                }
+                schema = schemaNext;
+                stack.push({schema, path: pathPart});
             }
-            if (!this._isObject(schema)) {
+            if (Array.isArray(schema)) {
                 throw this._createError(`Invalid reference: ${ref}`);
             }
 
-            path.push(null, ...pathParts);
-
-            ref = schema.$ref;
-            if (typeof ref !== 'string') {
-                return {schema, path};
+            const refNext = typeof schema === 'object' && schema !== null ? schema.$ref : void 0;
+            if (typeof refNext !== 'string') {
+                return {schema, stack};
             }
+            ref = refNext;
         }
+    }
+
+    /**
+     * @param {import('json-schema').SchemaStackItem[]} schemaStack
+     * @returns {import('json-schema').SchemaStackItem[]}
+     */
+    _copySchemaStack(schemaStack) {
+        /** @type {import('json-schema').SchemaStackItem[]} */
+        const results = [];
+        for (const {schema, path} of schemaStack) {
+            results.push({schema, path});
+        }
+        return results;
     }
 
     // Validation
 
-    _isValidCurrent(value) {
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {unknown} value
+     * @returns {boolean}
+     */
+    _isValidCurrent(schema, value) {
         try {
-            this._validate(value);
+            this._validate(schema, value);
             return true;
         } catch (e) {
             return false;
         }
     }
 
-    _validate(value) {
+    /**
+     * @param {import('json-schema').Schema} schema
+     * @param {unknown} value
+     */
+    _validate(schema, value) {
         if (this._progress !== null) {
             const counter = (this._progressCounter + 1) % this._progressInterval;
             this._progressCounter = counter;
             if (counter === 0) { this._progress(this); }
         }
 
-        const ref = this._schema.$ref;
-        const schemaInfo = (typeof ref === 'string') ? this._getReference(ref) : null;
-
-        if (schemaInfo === null) {
-            this._validateInner(value);
-        } else {
-            this._schemaPush(schemaInfo.schema, schemaInfo.path);
-            try {
-                this._validateInner(value);
-            } finally {
-                this._schemaPop();
-            }
+        const {schema: schema2, stack} = this._getResolvedSchemaInfo(schema, []);
+        this._schemaPushMultiple(stack);
+        try {
+            this._validateInner(schema2, value);
+        } finally {
+            this._schemaPopMultiple(stack.length);
         }
     }
 
-    _validateInner(value) {
-        this._validateSingleSchema(value);
-        this._validateConditional(value);
-        this._validateAllOf(value);
-        this._validateAnyOf(value);
-        this._validateOneOf(value);
-        this._validateNoneOf(value);
+    /**
+     * @param {import('json-schema').Schema} schema
+     * @param {unknown} value
+     * @throws {Error}
+     */
+    _validateInner(schema, value) {
+        if (schema === true) { return; }
+        if (schema === false) { throw this._createError('False schema'); }
+        this._validateSingleSchema(schema, value);
+        this._validateConditional(schema, value);
+        this._validateAllOf(schema, value);
+        this._validateAnyOf(schema, value);
+        this._validateOneOf(schema, value);
+        this._validateNot(schema, value);
     }
 
-    _validateConditional(value) {
-        const ifSchema = this._schema.if;
-        if (!this._isObject(ifSchema)) { return; }
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {unknown} value
+     */
+    _validateConditional(schema, value) {
+        const ifSchema = schema.if;
+        if (typeof ifSchema === 'undefined') { return; }
 
         let okay = true;
         this._schemaPush(ifSchema, 'if');
         try {
-            this._validate(value);
+            this._validate(ifSchema, value);
         } catch (e) {
             okay = false;
         } finally {
             this._schemaPop();
         }
 
-        const nextSchema = okay ? this._schema.then : this._schema.else;
-        if (this._isObject(nextSchema)) { return; }
+        const nextSchema = okay ? schema.then : schema.else;
+        if (typeof nextSchema === 'undefined') { return; }
 
         this._schemaPush(nextSchema, okay ? 'then' : 'else');
         try {
-            this._validate(value);
+            this._validate(nextSchema, value);
         } finally {
             this._schemaPop();
         }
     }
 
-    _validateAllOf(value) {
-        const subSchemas = this._schema.allOf;
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {unknown} value
+     */
+    _validateAllOf(schema, value) {
+        const subSchemas = schema.allOf;
         if (!Array.isArray(subSchemas)) { return; }
 
         this._schemaPush(subSchemas, 'allOf');
         try {
             for (let i = 0, ii = subSchemas.length; i < ii; ++i) {
                 const subSchema = subSchemas[i];
-                if (!this._isObject(subSchema)) { continue; }
-
                 this._schemaPush(subSchema, i);
                 try {
-                    this._validate(value);
+                    this._validate(subSchema, value);
                 } finally {
                     this._schemaPop();
                 }
@@ -471,19 +711,21 @@ export class JsonSchema {
         }
     }
 
-    _validateAnyOf(value) {
-        const subSchemas = this._schema.anyOf;
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {unknown} value
+     */
+    _validateAnyOf(schema, value) {
+        const subSchemas = schema.anyOf;
         if (!Array.isArray(subSchemas)) { return; }
 
         this._schemaPush(subSchemas, 'anyOf');
         try {
             for (let i = 0, ii = subSchemas.length; i < ii; ++i) {
                 const subSchema = subSchemas[i];
-                if (!this._isObject(subSchema)) { continue; }
-
                 this._schemaPush(subSchema, i);
                 try {
-                    this._validate(value);
+                    this._validate(subSchema, value);
                     return;
                 } catch (e) {
                     // NOP
@@ -498,8 +740,12 @@ export class JsonSchema {
         }
     }
 
-    _validateOneOf(value) {
-        const subSchemas = this._schema.oneOf;
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {unknown} value
+     */
+    _validateOneOf(schema, value) {
+        const subSchemas = schema.oneOf;
         if (!Array.isArray(subSchemas)) { return; }
 
         this._schemaPush(subSchemas, 'oneOf');
@@ -507,11 +753,9 @@ export class JsonSchema {
             let count = 0;
             for (let i = 0, ii = subSchemas.length; i < ii; ++i) {
                 const subSchema = subSchemas[i];
-                if (!this._isObject(subSchema)) { continue; }
-
                 this._schemaPush(subSchema, i);
                 try {
-                    this._validate(value);
+                    this._validate(subSchema, value);
                     ++count;
                 } catch (e) {
                     // NOP
@@ -528,33 +772,37 @@ export class JsonSchema {
         }
     }
 
-    _validateNoneOf(value) {
-        const subSchemas = this._schema.not;
-        if (!Array.isArray(subSchemas)) { return; }
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {unknown} value
+     * @throws {Error}
+     */
+    _validateNot(schema, value) {
+        const notSchema = schema.not;
+        if (typeof notSchema === 'undefined') { return; }
 
-        this._schemaPush(subSchemas, 'not');
+        if (Array.isArray(notSchema)) {
+            throw this._createError('not schema is an array');
+        }
+
+        this._schemaPush(notSchema, 'not');
         try {
-            for (let i = 0, ii = subSchemas.length; i < ii; ++i) {
-                const subSchema = subSchemas[i];
-                if (!this._isObject(subSchema)) { continue; }
-
-                this._schemaPush(subSchema, i);
-                try {
-                    this._validate(value);
-                } catch (e) {
-                    continue;
-                } finally {
-                    this._schemaPop();
-                }
-                throw this._createError(`not[${i}] schema matched`);
-            }
+            this._validate(notSchema, value);
+        } catch (e) {
+            return;
         } finally {
             this._schemaPop();
         }
+        throw this._createError('not schema matched');
     }
 
-    _validateSingleSchema(value) {
-        const {type: schemaType, const: schemaConst, enum: schemaEnum} = this._schema;
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {unknown} value
+     * @throws {Error}
+     */
+    _validateSingleSchema(schema, value) {
+        const {type: schemaType, const: schemaConst, enum: schemaEnum} = schema;
         const type = this._getValueType(value);
         if (!this._isValueTypeAny(value, type, schemaType)) {
             throw this._createError(`Value type ${type} does not match schema type ${schemaType}`);
@@ -570,22 +818,27 @@ export class JsonSchema {
 
         switch (type) {
             case 'number':
-                this._validateNumber(value);
+                this._validateNumber(schema, /** @type {number} */ (value));
                 break;
             case 'string':
-                this._validateString(value);
+                this._validateString(schema, /** @type {string} */ (value));
                 break;
             case 'array':
-                this._validateArray(value);
+                this._validateArray(schema, /** @type {import('json-schema').Value[]} */ (value));
                 break;
             case 'object':
-                this._validateObject(value);
+                this._validateObject(schema, /** @type {import('json-schema').ValueObject} */ (value));
                 break;
         }
     }
 
-    _validateNumber(value) {
-        const {multipleOf, minimum, exclusiveMinimum, maximum, exclusiveMaximum} = this._schema;
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {number} value
+     * @throws {Error}
+     */
+    _validateNumber(schema, value) {
+        const {multipleOf, minimum, exclusiveMinimum, maximum, exclusiveMaximum} = schema;
         if (typeof multipleOf === 'number' && Math.floor(value / multipleOf) * multipleOf !== value) {
             throw this._createError(`Number is not a multiple of ${multipleOf}`);
         }
@@ -607,8 +860,13 @@ export class JsonSchema {
         }
     }
 
-    _validateString(value) {
-        const {minLength, maxLength, pattern} = this._schema;
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {string} value
+     * @throws {Error}
+     */
+    _validateString(schema, value) {
+        const {minLength, maxLength, pattern} = schema;
         if (typeof minLength === 'number' && value.length < minLength) {
             throw this._createError('String length too short');
         }
@@ -618,14 +876,14 @@ export class JsonSchema {
         }
 
         if (typeof pattern === 'string') {
-            let {patternFlags} = this._schema;
+            let {patternFlags} = schema;
             if (typeof patternFlags !== 'string') { patternFlags = ''; }
 
             let regex;
             try {
                 regex = this._getRegex(pattern, patternFlags);
             } catch (e) {
-                throw this._createError(`Pattern is invalid (${e.message})`);
+                throw this._createError(`Pattern is invalid (${e instanceof Error ? e.message : `${e}`})`);
             }
 
             if (!regex.test(value)) {
@@ -634,8 +892,13 @@ export class JsonSchema {
         }
     }
 
-    _validateArray(value) {
-        const {minItems, maxItems} = this._schema;
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {unknown[]} value
+     * @throws {Error}
+     */
+    _validateArray(schema, value) {
+        const {minItems, maxItems} = schema;
         const {length} = value;
 
         if (typeof minItems === 'number' && length < minItems) {
@@ -646,30 +909,35 @@ export class JsonSchema {
             throw this._createError('Array length too long');
         }
 
-        this._validateArrayContains(value);
+        this._validateArrayContains(schema, value);
 
         for (let i = 0; i < length; ++i) {
-            const schemaInfo = this._getArrayItemSchemaInfo(i);
-            if (schemaInfo === null) {
+            const {schema: itemSchema, stack} = this._getArrayItemSchemaInfo(schema, i);
+            if (itemSchema === false) {
                 throw this._createError(`No schema found for array[${i}]`);
             }
 
             const propertyValue = value[i];
 
-            this._schemaPush(schemaInfo.schema, schemaInfo.path);
+            this._schemaPushMultiple(stack);
             this._valuePush(propertyValue, i);
             try {
-                this._validate(propertyValue);
+                this._validate(itemSchema, propertyValue);
             } finally {
                 this._valuePop();
-                this._schemaPop();
+                this._schemaPopMultiple(stack.length);
             }
         }
     }
 
-    _validateArrayContains(value) {
-        const containsSchema = this._schema.contains;
-        if (!this._isObject(containsSchema)) { return; }
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {unknown[]} value
+     * @throws {Error}
+     */
+    _validateArrayContains(schema, value) {
+        const containsSchema = schema.contains;
+        if (typeof containsSchema === 'undefined') { return; }
 
         this._schemaPush(containsSchema, 'contains');
         try {
@@ -677,7 +945,7 @@ export class JsonSchema {
                 const propertyValue = value[i];
                 this._valuePush(propertyValue, i);
                 try {
-                    this._validate(propertyValue);
+                    this._validate(containsSchema, propertyValue);
                     return;
                 } catch (e) {
                     // NOP
@@ -691,8 +959,13 @@ export class JsonSchema {
         }
     }
 
-    _validateObject(value) {
-        const {required, minProperties, maxProperties} = this._schema;
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('json-schema').ValueObject} value
+     * @throws {Error}
+     */
+    _validateObject(schema, value) {
+        const {required, minProperties, maxProperties} = schema;
         const properties = Object.getOwnPropertyNames(value);
         const {length} = properties;
 
@@ -714,27 +987,32 @@ export class JsonSchema {
 
         for (let i = 0; i < length; ++i) {
             const property = properties[i];
-            const schemaInfo = this._getObjectPropertySchemaInfo(property);
-            if (schemaInfo === null) {
+            const {schema: propertySchema, stack} = this._getObjectPropertySchemaInfo(schema, property);
+            if (propertySchema === false) {
                 throw this._createError(`No schema found for ${property}`);
             }
 
             const propertyValue = value[property];
 
-            this._schemaPush(schemaInfo.schema, schemaInfo.path);
+            this._schemaPushMultiple(stack);
             this._valuePush(propertyValue, property);
             try {
-                this._validate(propertyValue);
+                this._validate(propertySchema, propertyValue);
             } finally {
                 this._valuePop();
-                this._schemaPop();
+                this._schemaPopMultiple(stack.length);
             }
         }
     }
 
     // Creation
 
+    /**
+     * @param {import('json-schema').Type|import('json-schema').Type[]|undefined} type
+     * @returns {import('json-schema').Value}
+     */
     _getDefaultTypeValue(type) {
+        if (Array.isArray(type)) { type = type[0]; }
         if (typeof type === 'string') {
             switch (type) {
                 case 'null':
@@ -755,95 +1033,122 @@ export class JsonSchema {
         return null;
     }
 
-    _getDefaultSchemaValue() {
-        const {type: schemaType, default: schemaDefault} = this._schema;
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @returns {import('json-schema').Value}
+     */
+    _getDefaultSchemaValue(schema) {
+        const {type: schemaType, default: schemaDefault} = schema;
         return (
             typeof schemaDefault !== 'undefined' &&
             this._isValueTypeAny(schemaDefault, this._getValueType(schemaDefault), schemaType) ?
-            clone(schemaDefault) :
+            JsonSchema.clone(schemaDefault) :
             this._getDefaultTypeValue(schemaType)
         );
     }
 
-    _getValidValueOrDefault(path, value, schemaInfo) {
-        schemaInfo = this._getResolveSchemaInfo(schemaInfo);
-        this._schemaPush(schemaInfo.schema, schemaInfo.path);
+    /**
+     * @param {import('json-schema').Schema} schema
+     * @param {string|number|null} path
+     * @param {unknown} value
+     * @param {import('json-schema').SchemaStackItem[]} stack
+     * @returns {import('json-schema').Value}
+     */
+    _getValidValueOrDefault(schema, path, value, stack) {
+        ({schema, stack} = this._getResolvedSchemaInfo(schema, stack));
+        this._schemaPushMultiple(stack);
         this._valuePush(value, path);
         try {
-            return this._getValidValueOrDefaultInner(value);
+            return this._getValidValueOrDefaultInner(schema, value);
         } finally {
             this._valuePop();
-            this._schemaPop();
+            this._schemaPopMultiple(stack.length);
         }
     }
 
-    _getValidValueOrDefaultInner(value) {
+    /**
+     * @param {import('json-schema').Schema} schema
+     * @param {unknown} value
+     * @returns {import('json-schema').Value}
+     */
+    _getValidValueOrDefaultInner(schema, value) {
         let type = this._getValueType(value);
-        if (typeof value === 'undefined' || !this._isValueTypeAny(value, type, this._schema.type)) {
-            value = this._getDefaultSchemaValue();
+        if (typeof schema === 'boolean') {
+            return type !== null ? /** @type {import('json-schema').ValueObject} */ (value) : null;
+        }
+        if (typeof value === 'undefined' || !this._isValueTypeAny(value, type, schema.type)) {
+            value = this._getDefaultSchemaValue(schema);
             type = this._getValueType(value);
         }
 
         switch (type) {
             case 'object':
-                value = this._populateObjectDefaults(value);
-                break;
+                return this._populateObjectDefaults(schema, /** @type {import('json-schema').ValueObject} */ (value));
             case 'array':
-                value = this._populateArrayDefaults(value);
-                break;
+                return this._populateArrayDefaults(schema, /** @type {import('json-schema').Value[]} */ (value));
             default:
-                if (!this._isValidCurrent(value)) {
-                    const schemaDefault = this._getDefaultSchemaValue();
-                    if (this._isValidCurrent(schemaDefault)) {
-                        value = schemaDefault;
+                if (!this._isValidCurrent(schema, value)) {
+                    const schemaDefault = this._getDefaultSchemaValue(schema);
+                    if (this._isValidCurrent(schema, schemaDefault)) {
+                        return schemaDefault;
                     }
                 }
                 break;
         }
 
-        return value;
+        return /** @type {import('json-schema').ValueObject} */ (value);
     }
 
-    _populateObjectDefaults(value) {
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('json-schema').ValueObject} value
+     * @returns {import('json-schema').ValueObject}
+     */
+    _populateObjectDefaults(schema, value) {
         const properties = new Set(Object.getOwnPropertyNames(value));
 
-        const {required} = this._schema;
+        const {required} = schema;
         if (Array.isArray(required)) {
             for (const property of required) {
                 properties.delete(property);
-                const schemaInfo = this._getObjectPropertySchemaInfo(property);
-                if (schemaInfo === null) { continue; }
+                const {schema: propertySchema, stack} = this._getObjectPropertySchemaInfo(schema, property);
+                if (propertySchema === false) { continue; }
                 const propertyValue = Object.prototype.hasOwnProperty.call(value, property) ? value[property] : void 0;
-                value[property] = this._getValidValueOrDefault(property, propertyValue, schemaInfo);
+                value[property] = this._getValidValueOrDefault(propertySchema, property, propertyValue, stack);
             }
         }
 
         for (const property of properties) {
-            const schemaInfo = this._getObjectPropertySchemaInfo(property);
-            if (schemaInfo === null) {
+            const {schema: propertySchema, stack} = this._getObjectPropertySchemaInfo(schema, property);
+            if (propertySchema === false) {
                 Reflect.deleteProperty(value, property);
             } else {
-                value[property] = this._getValidValueOrDefault(property, value[property], schemaInfo);
+                value[property] = this._getValidValueOrDefault(propertySchema, property, value[property], stack);
             }
         }
 
         return value;
     }
 
-    _populateArrayDefaults(value) {
+    /**
+     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('json-schema').Value[]} value
+     * @returns {import('json-schema').Value[]}
+     */
+    _populateArrayDefaults(schema, value) {
         for (let i = 0, ii = value.length; i < ii; ++i) {
-            const schemaInfo = this._getArrayItemSchemaInfo(i);
-            if (schemaInfo === null) { continue; }
+            const {schema: itemSchema, stack} = this._getArrayItemSchemaInfo(schema, i);
+            if (itemSchema === false) { continue; }
             const propertyValue = value[i];
-            value[i] = this._getValidValueOrDefault(i, propertyValue, schemaInfo);
+            value[i] = this._getValidValueOrDefault(itemSchema, i, propertyValue, stack);
         }
 
-        const {minItems, maxItems} = this._schema;
+        const {minItems, maxItems} = schema;
         if (typeof minItems === 'number' && value.length < minItems) {
             for (let i = value.length; i < minItems; ++i) {
-                const schemaInfo = this._getArrayItemSchemaInfo(i);
-                if (schemaInfo === null) { break; }
-                const item = this._getValidValueOrDefault(i, void 0, schemaInfo);
+                const {schema: itemSchema, stack} = this._getArrayItemSchemaInfo(schema, i);
+                if (itemSchema === false) { break; }
+                const item = this._getValidValueOrDefault(itemSchema, i, void 0, stack);
                 value.push(item);
             }
         }
@@ -856,115 +1161,187 @@ export class JsonSchema {
     }
 }
 
+/**
+ * @implements {ProxyHandler<import('json-schema').ValueObjectOrArray>}
+ */
 class JsonSchemaProxyHandler {
-    constructor(schema) {
-        this._schema = schema;
+    /**
+     * @param {JsonSchema} schemaValidator
+     */
+    constructor(schemaValidator) {
+        /** @type {JsonSchema} */
+        this._schemaValidator = schemaValidator;
+        /** @type {RegExp} */
         this._numberPattern = /^(?:0|[1-9]\d*)$/;
     }
 
+    /**
+     * @param {import('json-schema').ValueObjectOrArray} target
+     * @returns {?import('core').UnknownObject}
+     */
     getPrototypeOf(target) {
         return Object.getPrototypeOf(target);
     }
 
+    /**
+     * @type {(target: import('json-schema').ValueObjectOrArray, newPrototype: ?unknown) => boolean}
+     */
     setPrototypeOf() {
         throw new Error('setPrototypeOf not supported');
     }
 
+    /**
+     * @param {import('json-schema').ValueObjectOrArray} target
+     * @returns {boolean}
+     */
     isExtensible(target) {
         return Object.isExtensible(target);
     }
 
+    /**
+     * @param {import('json-schema').ValueObjectOrArray} target
+     * @returns {boolean}
+     */
     preventExtensions(target) {
         Object.preventExtensions(target);
         return true;
     }
 
+    /**
+     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {string|symbol} property
+     * @returns {PropertyDescriptor|undefined}
+     */
     getOwnPropertyDescriptor(target, property) {
         return Object.getOwnPropertyDescriptor(target, property);
     }
 
+    /**
+     * @type {(target: import('json-schema').ValueObjectOrArray, property: string|symbol, attributes: PropertyDescriptor) => boolean}
+     */
     defineProperty() {
         throw new Error('defineProperty not supported');
     }
 
+    /**
+     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {string|symbol} property
+     * @returns {boolean}
+     */
     has(target, property) {
         return property in target;
     }
 
-    get(target, property) {
-        if (typeof property === 'symbol') { return target[property]; }
+    /**
+     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {string|symbol} property
+     * @param {import('core').SafeAny} _receiver
+     * @returns {import('core').SafeAny}
+     */
+    get(target, property, _receiver) {
+        if (typeof property === 'symbol') { return /** @type {import('core').UnknownObject} */ (target)[property]; }
 
         let propertySchema;
         if (Array.isArray(target)) {
             const index = this._getArrayIndex(property);
             if (index === null) {
                 // Note: this does not currently wrap mutating functions like push, pop, shift, unshift, splice
-                return target[property];
+                return /** @type {import('core').SafeAny} */ (target)[property];
             }
-            property = index;
-            propertySchema = this._schema.getArrayItemSchema(property);
+            property = `${index}`;
+            propertySchema = this._schemaValidator.getArrayItemSchema(index);
         } else {
-            propertySchema = this._schema.getObjectPropertySchema(property);
+            propertySchema = this._schemaValidator.getObjectPropertySchema(property);
         }
 
         if (propertySchema === null) { return void 0; }
 
-        const value = target[property];
-        return value !== null && typeof value === 'object' ? propertySchema.createProxy(value) : value;
+        const value = /** @type {import('core').UnknownObject} */ (target)[property];
+        return value !== null && typeof value === 'object' ? propertySchema.createProxy(/** @type {import('json-schema').Value} */ (value)) : value;
     }
 
+    /**
+     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {string|number|symbol} property
+     * @param {import('core').SafeAny} value
+     * @returns {boolean}
+     * @throws {Error}
+     */
     set(target, property, value) {
-        if (typeof property === 'symbol') { throw new Error(`Cannot assign symbol property ${property}`); }
+        if (typeof property === 'symbol') { throw new Error(`Cannot assign symbol property ${typeof property === 'symbol' ? '<symbol>' : property}`); }
 
         let propertySchema;
         if (Array.isArray(target)) {
             const index = this._getArrayIndex(property);
             if (index === null) {
-                target[property] = value;
+                /** @type {import('core').SafeAny} */ (target)[property] = value;
                 return true;
             }
             if (index > target.length) { throw new Error('Array index out of range'); }
             property = index;
-            propertySchema = this._schema.getArrayItemSchema(property);
+            propertySchema = this._schemaValidator.getArrayItemSchema(property);
         } else {
-            propertySchema = this._schema.getObjectPropertySchema(property);
+            if (typeof property !== 'string') {
+                property = `${property}`;
+            }
+            propertySchema = this._schemaValidator.getObjectPropertySchema(property);
         }
 
         if (propertySchema === null) { throw new Error(`Property ${property} not supported`); }
 
-        value = clone(value);
+        value = JsonSchema.clone(value);
         propertySchema.validate(value);
 
-        target[property] = value;
+        /** @type {import('core').UnknownObject} */ (target)[property] = value;
         return true;
     }
 
+    /**
+     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {string|symbol} property
+     * @returns {boolean}
+     * @throws {Error}
+     */
     deleteProperty(target, property) {
         const required = (
             (typeof target === 'object' && target !== null) ?
-            (!Array.isArray(target) && this._schema.isObjectPropertyRequired(property)) :
+            (!Array.isArray(target) && typeof property === 'string' && this._schemaValidator.isObjectPropertyRequired(property)) :
             true
         );
         if (required) {
-            throw new Error(`${property} cannot be deleted`);
+            throw new Error(`${typeof property === 'symbol' ? '<symbol>' : property} cannot be deleted`);
         }
         return Reflect.deleteProperty(target, property);
     }
 
+    /**
+     * @param {import('json-schema').ValueObjectOrArray} target
+     * @returns {ArrayLike<string|symbol>}
+     */
     ownKeys(target) {
         return Reflect.ownKeys(target);
     }
 
+    /**
+     * @type {(target: import('json-schema').ValueObjectOrArray, thisArg: import('core').SafeAny, argArray: import('core').SafeAny[]) => import('core').SafeAny}
+     */
     apply() {
         throw new Error('apply not supported');
     }
 
+    /**
+     * @type {(target: import('json-schema').ValueObjectOrArray, argArray: import('core').SafeAny[], newTarget: import('core').SafeFunction) => import('json-schema').ValueObjectOrArray}
+     */
     construct() {
         throw new Error('construct not supported');
     }
 
     // Private
 
+    /**
+     * @param {string|symbol|number} property
+     * @returns {?number}
+     */
     _getArrayIndex(property) {
         if (typeof property === 'string' && this._numberPattern.test(property)) {
             return Number.parseInt(property, 10);

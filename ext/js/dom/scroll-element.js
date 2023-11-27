@@ -17,39 +17,68 @@
  */
 
 export class ScrollElement {
+    /**
+     * @param {Element} node
+     */
     constructor(node) {
+        /** @type {Element} */
         this._node = node;
+        /** @type {?number} */
         this._animationRequestId = null;
+        /** @type {number} */
         this._animationStartTime = 0;
+        /** @type {number} */
         this._animationStartX = 0;
+        /** @type {number} */
         this._animationStartY = 0;
+        /** @type {number} */
         this._animationEndTime = 0;
+        /** @type {number} */
         this._animationEndX = 0;
+        /** @type {number} */
         this._animationEndY = 0;
+        /** @type {(time: number) => void} */
         this._requestAnimationFrameCallback = this._onAnimationFrame.bind(this);
     }
 
+    /** @type {number} */
     get x() {
         return this._node !== null ? this._node.scrollLeft : window.scrollX || window.pageXOffset;
     }
 
+    /** @type {number} */
     get y() {
         return this._node !== null ? this._node.scrollTop : window.scrollY || window.pageYOffset;
     }
 
+    /**
+     * @param {number} y
+     */
     toY(y) {
         this.to(this.x, y);
     }
 
+    /**
+     * @param {number} x
+     */
     toX(x) {
         this.to(x, this.y);
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     */
     to(x, y) {
         this.stop();
         this._scroll(x, y);
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} time
+     */
     animate(x, y, time) {
         this._animationStartX = this.x;
         this._animationStartY = this.y;
@@ -60,6 +89,7 @@ export class ScrollElement {
         this._animationRequestId = window.requestAnimationFrame(this._requestAnimationFrameCallback);
     }
 
+    /** */
     stop() {
         if (this._animationRequestId === null) {
             return;
@@ -69,12 +99,18 @@ export class ScrollElement {
         this._animationRequestId = null;
     }
 
+    /**
+     * @returns {DOMRect}
+     */
     getRect() {
         return this._node.getBoundingClientRect();
     }
 
     // Private
 
+    /**
+     * @param {number} time
+     */
     _onAnimationFrame(time) {
         if (time >= this._animationEndTime) {
             this._scroll(this._animationEndX, this._animationEndY);
@@ -91,6 +127,10 @@ export class ScrollElement {
         this._animationRequestId = window.requestAnimationFrame(this._requestAnimationFrameCallback);
     }
 
+    /**
+     * @param {number} t
+     * @returns {number}
+     */
     _easeInOutCubic(t) {
         if (t < 0.5) {
             return (4.0 * t * t * t);
@@ -100,10 +140,20 @@ export class ScrollElement {
         }
     }
 
+    /**
+     * @param {number} start
+     * @param {number} end
+     * @param {number} percent
+     * @returns {number}
+     */
     _lerp(start, end, percent) {
         return (end - start) * percent + start;
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     */
     _scroll(x, y) {
         if (this._node !== null) {
             this._node.scrollLeft = x;

@@ -19,12 +19,19 @@
 import {EventDispatcher} from '../core.js';
 import {TextToSpeechAudio} from './text-to-speech-audio.js';
 
+/**
+ * @augments EventDispatcher<import('audio-system').EventType>
+ */
 export class AudioSystem extends EventDispatcher {
     constructor() {
         super();
+        /** @type {?HTMLAudioElement} */
         this._fallbackAudio = null;
     }
 
+    /**
+     * @returns {void}
+     */
     prepare() {
         // speechSynthesis.getVoices() will not be populated unless some API call is made.
         if (
@@ -35,6 +42,9 @@ export class AudioSystem extends EventDispatcher {
         }
     }
 
+    /**
+     * @returns {HTMLAudioElement}
+     */
     getFallbackAudio() {
         if (this._fallbackAudio === null) {
             this._fallbackAudio = new Audio('/data/audio/button.mp3');
@@ -42,6 +52,11 @@ export class AudioSystem extends EventDispatcher {
         return this._fallbackAudio;
     }
 
+    /**
+     * @param {string} url
+     * @param {import('settings').AudioSourceType} sourceType
+     * @returns {Promise<HTMLAudioElement>}
+     */
     async createAudio(url, sourceType) {
         const audio = new Audio(url);
         await this._waitForData(audio);
@@ -51,6 +66,12 @@ export class AudioSystem extends EventDispatcher {
         return audio;
     }
 
+    /**
+     * @param {string} text
+     * @param {string} voiceUri
+     * @returns {TextToSpeechAudio}
+     * @throws {Error}
+     */
     createTextToSpeechAudio(text, voiceUri) {
         const voice = this._getTextToSpeechVoiceFromVoiceUri(voiceUri);
         if (voice === null) {
@@ -61,10 +82,17 @@ export class AudioSystem extends EventDispatcher {
 
     // Private
 
-    _onVoicesChanged(e) {
-        this.trigger('voiceschanged', e);
+    /**
+     * @param {Event} event
+     */
+    _onVoicesChanged(event) {
+        this.trigger('voiceschanged', event);
     }
 
+    /**
+     * @param {HTMLAudioElement} audio
+     * @returns {Promise<void>}
+     */
     _waitForData(audio) {
         return new Promise((resolve, reject) => {
             audio.addEventListener('loadeddata', () => resolve());
@@ -72,6 +100,11 @@ export class AudioSystem extends EventDispatcher {
         });
     }
 
+    /**
+     * @param {HTMLAudioElement} audio
+     * @param {import('settings').AudioSourceType} sourceType
+     * @returns {boolean}
+     */
     _isAudioValid(audio, sourceType) {
         switch (sourceType) {
             case 'jpod101':
@@ -87,6 +120,10 @@ export class AudioSystem extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {string} voiceUri
+     * @returns {?SpeechSynthesisVoice}
+     */
     _getTextToSpeechVoiceFromVoiceUri(voiceUri) {
         try {
             for (const voice of speechSynthesis.getVoices()) {

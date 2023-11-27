@@ -44,7 +44,9 @@ import {SearchPersistentStateController} from './search-persistent-state-control
 
         const {tabId, frameId} = await yomitan.api.frameInformationGet();
 
-        const japaneseUtil = new JapaneseUtil(wanakana);
+        /** @type {import('wanakana')} */
+        const wanakanaLib = wanakana;
+        const japaneseUtil = new JapaneseUtil(wanakanaLib);
 
         const hotkeyHandler = new HotkeyHandler();
         hotkeyHandler.prepare();

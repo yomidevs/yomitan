@@ -48,10 +48,16 @@ test('visual', async ({page, extensionId}) => {
     // take a screenshot of the settings page with jmdict loaded
     await expect.soft(page).toHaveScreenshot('settings-jmdict-loaded.png', {mask: [storage_locator]});
 
+    /**
+     * @param {number} doc_number
+     * @param {number} test_number
+     * @param {import('@playwright/test').ElementHandle<Node>} el
+     * @param {{x: number, y: number}} offset
+     */
     const screenshot = async (doc_number, test_number, el, offset) => {
         const test_name = 'doc' + doc_number + '-test' + test_number;
 
-        const box = await el.boundingBox();
+        const box = (await el.boundingBox()) || {x: 0, y: 0, width: 0, height: 0};
 
         // find the popup frame if it exists
         let popup_frame = page.frames().find((f) => f.url().includes('popup.html'));
@@ -66,7 +72,7 @@ test('visual', async ({page, extensionId}) => {
             popup_frame = await frame_attached; // wait for popup to be attached
         }
         try {
-            await (await popup_frame.frameElement()).waitForElementState('visible', {timeout: 500});  // some tests don't have a popup, so don't fail if it's not there; TODO: check if the popup is expected to be there
+            await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement()).waitForElementState('visible', {timeout: 500});  // some tests don't have a popup, so don't fail if it's not there; TODO: check if the popup is expected to be there
         } catch (error) {
             console.log(test_name + ' has no popup');
         }
@@ -75,7 +81,7 @@ test('visual', async ({page, extensionId}) => {
         await expect.soft(page).toHaveScreenshot(test_name + '.png');
 
         await page.mouse.click(0, 0); // click away so popup disappears
-        await (await popup_frame.frameElement()).waitForElementState('hidden'); // wait for popup to disappear
+        await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement()).waitForElementState('hidden'); // wait for popup to disappear
     };
 
     // Load test-document1.html

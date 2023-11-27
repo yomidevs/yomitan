@@ -20,16 +20,27 @@ import {EventListenerCollection} from '../core.js';
 
 export class ElementOverflowController {
     constructor() {
+        /** @type {Element[]} */
         this._elements = [];
+        /** @type {?number} */
         this._checkTimer = null;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {EventListenerCollection} */
         this._windowEventListeners = new EventListenerCollection();
+        /** @type {Map<string, {collapsed: boolean, force: boolean}>} */
         this._dictionaries = new Map();
+        /** @type {() => void} */
         this._updateBind = this._update.bind(this);
+        /** @type {() => void} */
         this._onWindowResizeBind = this._onWindowResize.bind(this);
+        /** @type {(event: MouseEvent) => void} */
         this._onToggleButtonClickBind = this._onToggleButtonClick.bind(this);
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
     setOptions(options) {
         this._dictionaries.clear();
         for (const {name, definitionsCollapsible} of options.dictionaries) {
@@ -59,12 +70,18 @@ export class ElementOverflowController {
         }
     }
 
+    /**
+     * @param {Element} entry
+     */
     addElements(entry) {
         if (this._dictionaries.size === 0) { return; }
 
         const elements = entry.querySelectorAll('.definition-item-inner');
         for (const element of elements) {
-            const {dictionary} = element.parentNode.dataset;
+            const {parentNode} = element;
+            if (parentNode === null) { continue; }
+            const {dictionary} = /** @type {HTMLElement} */ (parentNode).dataset;
+            if (typeof dictionary === 'undefined') { continue; }
             const dictionaryInfo = this._dictionaries.get(dictionary);
             if (typeof dictionaryInfo === 'undefined') { continue; }
 
@@ -90,6 +107,7 @@ export class ElementOverflowController {
         }
     }
 
+    /** */
     clearElements() {
         this._elements.length = 0;
         this._windowEventListeners.removeAllEventListeners();
@@ -97,6 +115,7 @@ export class ElementOverflowController {
 
     // Private
 
+    /** */
     _onWindowResize() {
         if (this._checkTimer !== null) {
             this._cancelIdleCallback(this._checkTimer);
@@ -104,18 +123,26 @@ export class ElementOverflowController {
         this._checkTimer = this._requestIdleCallback(this._updateBind, 100);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onToggleButtonClick(e) {
-        const container = e.currentTarget.closest('.definition-item-inner');
+        const element = /** @type {Element} */ (e.currentTarget);
+        const container = element.closest('.definition-item-inner');
         if (container === null) { return; }
         container.classList.toggle('collapsed');
     }
 
+    /** */
     _update() {
         for (const element of this._elements) {
             this._updateElement(element);
         }
     }
 
+    /**
+     * @param {Element} element
+     */
     _updateElement(element) {
         const {classList} = element;
         classList.add('collapse-test');
@@ -124,6 +151,11 @@ export class ElementOverflowController {
         classList.remove('collapse-test');
     }
 
+    /**
+     * @param {() => void} callback
+     * @param {number} timeout
+     * @returns {number}
+     */
     _requestIdleCallback(callback, timeout) {
         if (typeof requestIdleCallback === 'function') {
             return requestIdleCallback(callback, {timeout});
@@ -132,6 +164,9 @@ export class ElementOverflowController {
         }
     }
 
+    /**
+     * @param {number} handle
+     */
     _cancelIdleCallback(handle) {
         if (typeof cancelIdleCallback === 'function') {
             cancelIdleCallback(handle);

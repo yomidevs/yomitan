@@ -46,7 +46,9 @@ import {PopupFactory} from './popup-factory.js';
             parentFrameId: null,
             useProxyPopup: false,
             pageType: 'web',
+            canUseWindowPopup: true,
             allowRootFramePopupProxy: true,
+            childrenSupported: true,
             hotkeyHandler
         });
         await frontend.prepare();

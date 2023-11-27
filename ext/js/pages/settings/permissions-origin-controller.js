@@ -19,24 +19,36 @@
 import {EventListenerCollection} from '../../core.js';
 
 export class PermissionsOriginController {
+    /**
+     * @param {SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {SettingsController} */
         this._settingsController = settingsController;
+        /** @type {?HTMLElement} */
         this._originContainer = null;
+        /** @type {?HTMLElement} */
         this._originEmpty = null;
+        /** @type {?NodeListOf<HTMLInputElement>} */
         this._originToggleNodes = null;
+        /** @type {?HTMLInputElement} */
         this._addOriginInput = null;
+        /** @type {?HTMLElement} */
         this._errorContainer = null;
+        /** @type {ChildNode[]} */
         this._originContainerChildren = [];
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
     }
 
+    /** */
     async prepare() {
-        this._originContainer = document.querySelector('#permissions-origin-list');
-        this._originEmpty = document.querySelector('#permissions-origin-list-empty');
-        this._originToggleNodes = document.querySelectorAll('.permissions-origin-toggle');
-        this._addOriginInput = document.querySelector('#permissions-origin-new-input');
-        this._errorContainer = document.querySelector('#permissions-origin-list-error');
-        const addButton = document.querySelector('#permissions-origin-add');
+        this._originContainer = /** @type {HTMLElement} */ (document.querySelector('#permissions-origin-list'));
+        this._originEmpty = /** @type {HTMLElement} */ (document.querySelector('#permissions-origin-list-empty'));
+        this._originToggleNodes = /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('.permissions-origin-toggle'));
+        this._addOriginInput = /** @type {HTMLInputElement} */ (document.querySelector('#permissions-origin-new-input'));
+        this._errorContainer = /** @type {HTMLElement} */ (document.querySelector('#permissions-origin-list-error'));
+        const addButton = /** @type {HTMLButtonElement} */ (document.querySelector('#permissions-origin-add'));
 
         for (const node of this._originToggleNodes) {
             node.addEventListener('change', this._onOriginToggleChange.bind(this), false);
@@ -49,6 +61,9 @@ export class PermissionsOriginController {
 
     // Private
 
+    /**
+     * @param {import('settings-controller').PermissionsChangedEvent} details
+     */
     _onPermissionsChanged({permissions}) {
         this._eventListeners.removeAllEventListeners();
         for (const node of this._originContainerChildren) {
@@ -57,9 +72,11 @@ export class PermissionsOriginController {
         }
         this._originContainerChildren = [];
 
+        /** @type {Set<string>} */
         const originsSet = new Set(permissions.origins);
-        for (const node of this._originToggleNodes) {
-            node.checked = originsSet.has(node.dataset.origin);
+        for (const node of /** @type {NodeListOf<HTMLInputElement>} */ (this._originToggleNodes)) {
+            const {origin} = node.dataset;
+            node.checked = typeof origin === 'string' && originsSet.has(origin);
         }
 
         let any = false;
@@ -67,60 +84,78 @@ export class PermissionsOriginController {
             '<all_urls>'
         ]);
         const fragment = document.createDocumentFragment();
-        for (const origin of permissions.origins) {
+        for (const origin of originsSet) {
             if (excludeOrigins.has(origin)) { continue; }
             const node = this._settingsController.instantiateTemplateFragment('permissions-origin');
-            const input = node.querySelector('.permissions-origin-input');
-            const menuButton = node.querySelector('.permissions-origin-button');
+            const input = /** @type {HTMLInputElement} */ (node.querySelector('.permissions-origin-input'));
+            const menuButton = /** @type {HTMLElement} */ (node.querySelector('.permissions-origin-button'));
             input.value = origin;
             this._eventListeners.addEventListener(menuButton, 'menuClose', this._onOriginMenuClose.bind(this, origin), false);
             this._originContainerChildren.push(...node.childNodes);
             fragment.appendChild(node);
             any = true;
         }
-        this._originContainer.insertBefore(fragment, this._originContainer.firstChild);
-        this._originEmpty.hidden = any;
+        const container = /** @type {HTMLElement} */ (this._originContainer);
+        container.insertBefore(fragment, container.firstChild);
+        /** @type {HTMLElement} */ (this._originEmpty).hidden = any;
 
-        this._errorContainer.hidden = true;
+        /** @type {HTMLElement} */ (this._errorContainer).hidden = true;
     }
 
+    /**
+     * @param {Event} e
+     */
     _onOriginToggleChange(e) {
-        const node = e.currentTarget;
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const value = node.checked;
         node.checked = !value;
 
         const {origin} = node.dataset;
+        if (typeof origin !== 'string') { return; }
         this._setOriginPermissionEnabled(origin, value);
     }
 
+    /**
+     * @param {string} origin
+     */
     _onOriginMenuClose(origin) {
         this._setOriginPermissionEnabled(origin, false);
     }
 
+    /** */
     _onAddButtonClick() {
         this._addOrigin();
     }
 
+    /** */
     async _addOrigin() {
-        const origin = this._addOriginInput.value;
+        const input = /** @type {HTMLInputElement} */ (this._addOriginInput);
+        const origin = input.value;
         const added = await this._setOriginPermissionEnabled(origin, true);
         if (added) {
-            this._addOriginInput.value = '';
+            input.value = '';
         }
     }
 
+    /** */
     async _updatePermissions() {
         const permissions = await this._settingsController.permissionsUtil.getAllPermissions();
         this._onPermissionsChanged({permissions});
     }
 
+    /**
+     * @param {string} origin
+     * @param {boolean} enabled
+     * @returns {Promise<boolean>}
+     */
     async _setOriginPermissionEnabled(origin, enabled) {
         let added = false;
         try {
             added = await this._settingsController.permissionsUtil.setPermissionsGranted({origins: [origin]}, enabled);
         } catch (e) {
-            this._errorContainer.hidden = false;
-            this._errorContainer.textContent = e.message;
+            const errorContainer = /** @type {HTMLElement} */ (this._errorContainer);
+            errorContainer.hidden = false;
+            errorContainer.textContent = e instanceof Error ? e.message : `${e}`;
         }
         if (!added) { return false; }
         await this._updatePermissions();

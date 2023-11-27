@@ -22,21 +22,31 @@ import {HotkeyUtil} from './hotkey-util.js';
 
 export class HotkeyHelpController {
     constructor() {
+        /** @type {HotkeyUtil} */
         this._hotkeyUtil = new HotkeyUtil();
-        this._localActionHotseys = new Map();
+        /** @type {Map<string, string>} */
+        this._localActionHotkeys = new Map();
+        /** @type {Map<string, string>} */
         this._globalActionHotkeys = new Map();
+        /** @type {RegExp} */
         this._replacementPattern = /\{0\}/g;
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async prepare() {
         const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._hotkeyUtil.os = os;
         await this._setupGlobalCommands(this._globalActionHotkeys);
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
     setOptions(options) {
         const hotkeys = options.inputs.hotkeys;
-        const hotkeyMap = this._localActionHotseys;
+        const hotkeyMap = this._localActionHotkeys;
         hotkeyMap.clear();
         for (const {enabled, action, key, modifiers} of hotkeys) {
             if (!enabled || key === null || action === '' || hotkeyMap.has(action)) { continue; }
@@ -44,28 +54,25 @@ export class HotkeyHelpController {
         }
     }
 
+    /**
+     * @param {ParentNode} node
+     */
     setupNode(node) {
-        const globalPrexix = 'global:';
         const replacementPattern = this._replacementPattern;
-        for (const node2 of node.querySelectorAll('[data-hotkey]')) {
-            const data = JSON.parse(node2.dataset.hotkey);
-            let [action, attributes, values] = data;
-            if (!Array.isArray(attributes)) { attributes = [attributes]; }
+        for (const node2 of /** @type {NodeListOf<HTMLElement>} */ (node.querySelectorAll('[data-hotkey]'))) {
+            const info = this._getNodeInfo(node2);
+            if (info === null) { continue; }
+            const {action, global, attributes, values, defaultAttributeValues} = info;
             const multipleValues = Array.isArray(values);
-
-            const actionIsGlobal = action.startsWith(globalPrexix);
-            if (actionIsGlobal) { action = action.substring(globalPrexix.length); }
-
-            const defaultAttributeValues = this._getDefaultAttributeValues(node2, data, attributes);
-
-            const hotkey = (actionIsGlobal ? this._globalActionHotkeys : this._localActionHotseys).get(action);
-
+            const hotkey = (global ? this._globalActionHotkeys : this._localActionHotkeys).get(action);
             for (let i = 0, ii = attributes.length; i < ii; ++i) {
                 const attribute = attributes[i];
-                let value = null;
+                let value;
                 if (typeof hotkey !== 'undefined') {
-                    value = (multipleValues ? values[i] : values);
-                    value = value.replace(replacementPattern, hotkey);
+                    value = /** @type {unknown} */ (multipleValues ? values[i] : values);
+                    if (typeof value === 'string') {
+                        value = value.replace(replacementPattern, hotkey);
+                    }
                 } else {
                     value = defaultAttributeValues[i];
                 }
@@ -81,6 +88,9 @@ export class HotkeyHelpController {
 
     // Private
 
+    /**
+     * @param {Map<string, string>} commandMap
+     */
     async _setupGlobalCommands(commandMap) {
         const commands = await new Promise((resolve, reject) => {
             if (!(isObject(chrome.commands) && typeof chrome.commands.getAll === 'function')) {
@@ -104,14 +114,23 @@ export class HotkeyHelpController {
             const {key, modifiers} = this._hotkeyUtil.convertCommandToInput(shortcut);
             commandMap.set(name, this._hotkeyUtil.getInputDisplayValue(key, modifiers));
         }
-        return commandMap;
     }
 
+    /**
+     * @param {HTMLElement} node
+     * @param {unknown[]} data
+     * @param {string[]} attributes
+     * @returns {unknown[]}
+     */
     _getDefaultAttributeValues(node, data, attributes) {
         if (data.length > 3) {
-            return data[3];
+            const result = data[3];
+            if (Array.isArray(result)) {
+                return result;
+            }
         }
 
+        /** @type {(?string)[]} */
         const defaultAttributeValues = [];
         for (let i = 0, ii = attributes.length; i < ii; ++i) {
             const attribute = attributes[i];
@@ -121,5 +140,38 @@ export class HotkeyHelpController {
         data[3] = defaultAttributeValues;
         node.dataset.hotkey = JSON.stringify(data);
         return defaultAttributeValues;
+    }
+
+    /**
+     * @param {HTMLElement} node
+     * @returns {?{action: string, global: boolean, attributes: string[], values: unknown, defaultAttributeValues: unknown[]}}
+     */
+    _getNodeInfo(node) {
+        const {hotkey} = node.dataset;
+        if (typeof hotkey !== 'string') { return null; }
+        const data = /** @type {unknown} */ (JSON.parse(hotkey));
+        if (!Array.isArray(data)) { return null; }
+        const [action, attributes, values] = data;
+        if (typeof action !== 'string') { return null; }
+        /** @type {string[]} */
+        const attributesArray = [];
+        if (Array.isArray(attributes)) {
+            for (const item of attributes) {
+                if (typeof item !== 'string') { continue; }
+                attributesArray.push(item);
+            }
+        } else if (typeof attributes === 'string') {
+            attributesArray.push(attributes);
+        }
+        const defaultAttributeValues = this._getDefaultAttributeValues(node, data, attributesArray);
+        const globalPrexix = 'global:';
+        const global = action.startsWith(globalPrexix);
+        return {
+            action: global ? action.substring(globalPrexix.length) : action,
+            global,
+            attributes,
+            values,
+            defaultAttributeValues
+        };
     }
 }

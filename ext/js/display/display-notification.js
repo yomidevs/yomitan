@@ -19,23 +19,36 @@
 import {EventListenerCollection} from '../core.js';
 
 export class DisplayNotification {
+    /**
+     * @param {HTMLElement} container
+     * @param {HTMLElement} node
+     */
     constructor(container, node) {
+        /** @type {HTMLElement} */
         this._container = container;
+        /** @type {HTMLElement} */
         this._node = node;
-        this._body = node.querySelector('.footer-notification-body');
-        this._closeButton = node.querySelector('.footer-notification-close-button');
+        /** @type {HTMLElement} */
+        this._body = /** @type {HTMLElement} */ (node.querySelector('.footer-notification-body'));
+        /** @type {HTMLElement} */
+        this._closeButton = /** @type {HTMLElement} */ (node.querySelector('.footer-notification-close-button'));
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {?number} */
         this._closeTimer = null;
     }
 
+    /** @type {HTMLElement} */
     get container() {
         return this._container;
     }
 
+    /** @type {HTMLElement} */
     get node() {
         return this._node;
     }
 
+    /** */
     open() {
         if (!this.isClosed()) { return; }
 
@@ -50,6 +63,9 @@ export class DisplayNotification {
         this._eventListeners.addEventListener(this._closeButton, 'click', this._onCloseButtonClick.bind(this), false);
     }
 
+    /**
+     * @param {boolean} [animate]
+     */
     close(animate=false) {
         if (this.isClosed()) { return; }
 
@@ -69,6 +85,9 @@ export class DisplayNotification {
         }
     }
 
+    /**
+     * @param {string|Node} value
+     */
     setContent(value) {
         if (typeof value === 'string') {
             this._body.textContent = value;
@@ -78,25 +97,34 @@ export class DisplayNotification {
         }
     }
 
+    /**
+     * @returns {boolean}
+     */
     isClosing() {
         return this._closeTimer !== null;
     }
 
+    /**
+     * @returns {boolean}
+     */
     isClosed() {
         return this._node.parentNode === null;
     }
 
     // Private
 
+    /** */
     _onCloseButtonClick() {
         this.close(true);
     }
 
+    /** */
     _onDelayClose() {
         this._closeTimer = null;
         this.close(false);
     }
 
+    /** */
     _clearTimer() {
         if (this._closeTimer !== null) {
             clearTimeout(this._closeTimer);

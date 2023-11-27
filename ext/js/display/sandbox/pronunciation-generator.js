@@ -17,10 +17,21 @@
  */
 
 export class PronunciationGenerator {
+    /**
+     * @param {JapaneseUtil} japaneseUtil
+     */
     constructor(japaneseUtil) {
+        /** @type {JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
     }
 
+    /**
+     * @param {string[]} morae
+     * @param {number} downstepPosition
+     * @param {number[]} nasalPositions
+     * @param {number[]} devoicePositions
+     * @returns {HTMLSpanElement}
+     */
     createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions) {
         const jp = this._japaneseUtil;
         const nasalPositionsSet = nasalPositions.length > 0 ? new Set(nasalPositions) : null;
@@ -63,7 +74,7 @@ export class PronunciationGenerator {
                 group.className = 'pronunciation-character-group';
 
                 const n2 = characterNodes[0];
-                const character = n2.textContent;
+                const character = /** @type {string} */ (n2.textContent);
 
                 const characterInfo = jp.getKanaDiacriticInfo(character);
                 if (characterInfo !== null) {
@@ -81,7 +92,7 @@ export class PronunciationGenerator {
                 n3.className = 'pronunciation-nasal-indicator';
                 group.appendChild(n3);
 
-                n2.parentNode.replaceChild(group, n2);
+                /** @type {ParentNode} */ (n2.parentNode).replaceChild(group, n2);
                 group.insertBefore(n2, group.firstChild);
             }
 
@@ -94,6 +105,11 @@ export class PronunciationGenerator {
         return container;
     }
 
+    /**
+     * @param {string[]} morae
+     * @param {number} downstepPosition
+     * @returns {SVGSVGElement}
+     */
     createPronunciationGraph(morae, downstepPosition) {
         const jp = this._japaneseUtil;
         const ii = morae.length;
@@ -145,12 +161,16 @@ export class PronunciationGenerator {
         return svg;
     }
 
+    /**
+     * @param {number} downstepPosition
+     * @returns {HTMLSpanElement}
+     */
     createPronunciationDownstepPosition(downstepPosition) {
-        downstepPosition = `${downstepPosition}`;
+        const downstepPositionString = `${downstepPosition}`;
 
         const n1 = document.createElement('span');
         n1.className = 'pronunciation-downstep-notation';
-        n1.dataset.downstepPosition = downstepPosition;
+        n1.dataset.downstepPosition = downstepPositionString;
 
         let n2 = document.createElement('span');
         n2.className = 'pronunciation-downstep-notation-prefix';
@@ -159,7 +179,7 @@ export class PronunciationGenerator {
 
         n2 = document.createElement('span');
         n2.className = 'pronunciation-downstep-notation-number';
-        n2.textContent = downstepPosition;
+        n2.textContent = downstepPositionString;
         n1.appendChild(n2);
 
         n2 = document.createElement('span');
@@ -172,15 +192,33 @@ export class PronunciationGenerator {
 
     // Private
 
+    /**
+     * @param {Element} container
+     * @param {string} svgns
+     * @param {number} x
+     * @param {number} y
+     */
     _addGraphDot(container, svgns, x, y) {
         container.appendChild(this._createGraphCircle(svgns, 'pronunciation-graph-dot', x, y, '15'));
     }
 
+    /**
+     * @param {Element} container
+     * @param {string} svgns
+     * @param {number} x
+     * @param {number} y
+     */
     _addGraphDotDownstep(container, svgns, x, y) {
         container.appendChild(this._createGraphCircle(svgns, 'pronunciation-graph-dot-downstep1', x, y, '15'));
         container.appendChild(this._createGraphCircle(svgns, 'pronunciation-graph-dot-downstep2', x, y, '5'));
     }
 
+    /**
+     * @param {Element} container
+     * @param {string} svgns
+     * @param {number} x
+     * @param {number} y
+     */
     _addGraphTriangle(container, svgns, x, y) {
         const node = document.createElementNS(svgns, 'path');
         node.setAttribute('class', 'pronunciation-graph-triangle');
@@ -189,6 +227,14 @@ export class PronunciationGenerator {
         container.appendChild(node);
     }
 
+    /**
+     * @param {string} svgns
+     * @param {string} className
+     * @param {number} x
+     * @param {number} y
+     * @param {string} radius
+     * @returns {Element}
+     */
     _createGraphCircle(svgns, className, x, y, radius) {
         const node = document.createElementNS(svgns, 'circle');
         node.setAttribute('class', className);

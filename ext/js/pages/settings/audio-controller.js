@@ -19,48 +19,71 @@
 import {EventDispatcher, EventListenerCollection} from '../../core.js';
 import {AudioSystem} from '../../media/audio-system.js';
 
+/**
+ * @augments EventDispatcher<import('audio-controller').EventType>
+ */
 export class AudioController extends EventDispatcher {
+    /**
+     * @param {SettingsController} settingsController
+     * @param {ModalController} modalController
+     */
     constructor(settingsController, modalController) {
         super();
+        /** @type {SettingsController} */
         this._settingsController = settingsController;
+        /** @type {ModalController} */
         this._modalController = modalController;
+        /** @type {AudioSystem} */
         this._audioSystem = new AudioSystem();
+        /** @type {?HTMLElement} */
         this._audioSourceContainer = null;
+        /** @type {?HTMLButtonElement} */
         this._audioSourceAddButton = null;
+        /** @type {AudioSourceEntry[]} */
         this._audioSourceEntries = [];
+        /** @type {?HTMLInputElement} */
         this._voiceTestTextInput = null;
+        /** @type {import('audio-controller').VoiceInfo[]} */
         this._voices = [];
     }
 
+    /** @type {SettingsController} */
     get settingsController() {
         return this._settingsController;
     }
 
+    /** @type {ModalController} */
     get modalController() {
         return this._modalController;
     }
 
+    /** */
     async prepare() {
         this._audioSystem.prepare();
 
-        this._voiceTestTextInput = document.querySelector('#text-to-speech-voice-test-text');
-        this._audioSourceContainer = document.querySelector('#audio-source-list');
-        this._audioSourceAddButton = document.querySelector('#audio-source-add');
+        this._voiceTestTextInput = /** @type {HTMLInputElement} */ (document.querySelector('#text-to-speech-voice-test-text'));
+        this._audioSourceContainer = /** @type {HTMLElement} */ (document.querySelector('#audio-source-list'));
+        this._audioSourceAddButton = /** @type {HTMLButtonElement} */ (document.querySelector('#audio-source-add'));
         this._audioSourceContainer.textContent = '';
+        const testButton = /** @type {HTMLButtonElement} */ (document.querySelector('#text-to-speech-voice-test'));
 
         this._audioSourceAddButton.addEventListener('click', this._onAddAudioSource.bind(this), false);
 
-        this._audioSystem.on('voiceschanged', this._updateTextToSpeechVoices.bind(this), false);
+        this._audioSystem.on('voiceschanged', this._updateTextToSpeechVoices.bind(this));
         this._updateTextToSpeechVoices();
 
-        document.querySelector('#text-to-speech-voice-test').addEventListener('click', this._onTestTextToSpeech.bind(this), false);
+        testButton.addEventListener('click', this._onTestTextToSpeech.bind(this), false);
 
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
         const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        const optionsContext = this._settingsController.getOptionsContext();
+        this._onOptionsChanged({options, optionsContext});
     }
 
+    /**
+     * @param {AudioSourceEntry} entry
+     */
     async removeSource(entry) {
         const {index} = entry;
         this._audioSourceEntries.splice(index, 1);
@@ -78,16 +101,25 @@ export class AudioController extends EventDispatcher {
         }]);
     }
 
+    /**
+     * @returns {import('audio-controller').VoiceInfo[]}
+     */
     getVoices() {
         return this._voices;
     }
 
+    /**
+     * @param {string} voice
+     */
     setTestVoice(voice) {
-        this._voiceTestTextInput.dataset.voice = voice;
+        /** @type {HTMLInputElement} */ (this._voiceTestTextInput).dataset.voice = voice;
     }
 
     // Private
 
+    /**
+     * @param {import('settings-controller').OptionsChangedEvent} details
+     */
     _onOptionsChanged({options}) {
         for (const entry of this._audioSourceEntries) {
             entry.cleanup();
@@ -100,15 +132,18 @@ export class AudioController extends EventDispatcher {
         }
     }
 
+    /** */
     _onAddAudioSource() {
         this._addAudioSource();
     }
 
+    /** */
     _onTestTextToSpeech() {
         try {
-            const text = this._voiceTestTextInput.value || '';
-            const voiceUri = this._voiceTestTextInput.dataset.voice;
-            const audio = this._audioSystem.createTextToSpeechAudio(text, voiceUri);
+            const input = /** @type {HTMLInputElement} */ (this._voiceTestTextInput);
+            const text = input.value || '';
+            const voiceUri = input.dataset.voice;
+            const audio = this._audioSystem.createTextToSpeechAudio(text, typeof voiceUri === 'string' ? voiceUri : '');
             audio.volume = 1.0;
             audio.play();
         } catch (e) {
@@ -116,6 +151,7 @@ export class AudioController extends EventDispatcher {
         }
     }
 
+    /** */
     _updateTextToSpeechVoices() {
         const voices = (
             typeof speechSynthesis !== 'undefined' ?
@@ -131,6 +167,11 @@ export class AudioController extends EventDispatcher {
         this.trigger('voicesUpdated');
     }
 
+    /**
+     * @param {import('audio-controller').VoiceInfo} a
+     * @param {import('audio-controller').VoiceInfo} b
+     * @returns {number}
+     */
     _textToSpeechVoiceCompare(a, b) {
         if (a.isJapanese) {
             if (!b.isJapanese) { return -1; }
@@ -147,6 +188,10 @@ export class AudioController extends EventDispatcher {
         return a.index - b.index;
     }
 
+    /**
+     * @param {string} languageTag
+     * @returns {boolean}
+     */
     _languageTagIsJapanese(languageTag) {
         return (
             languageTag.startsWith('ja_') ||
@@ -155,15 +200,23 @@ export class AudioController extends EventDispatcher {
         );
     }
 
+    /**
+     * @param {number} index
+     * @param {import('settings').AudioSourceOptions} source
+     */
     _createAudioSourceEntry(index, source) {
-        const node = this._settingsController.instantiateTemplate('audio-source');
+        const node = /** @type {HTMLElement} */ (this._settingsController.instantiateTemplate('audio-source'));
         const entry = new AudioSourceEntry(this, index, source, node);
         this._audioSourceEntries.push(entry);
-        this._audioSourceContainer.appendChild(node);
+        /** @type {HTMLElement} */ (this._audioSourceContainer).appendChild(node);
         entry.prepare();
     }
 
+    /**
+     * @returns {import('settings').AudioSourceType}
+     */
     _getUnusedAudioSourceType() {
+        /** @type {import('settings').AudioSourceType[]} */
         const typesAvailable = [
             'jpod101',
             'jpod101-alternate',
@@ -178,8 +231,10 @@ export class AudioController extends EventDispatcher {
         return typesAvailable[0];
     }
 
+    /** */
     async _addAudioSource() {
         const type = this._getUnusedAudioSourceType();
+        /** @type {import('settings').AudioSourceOptions} */
         const source = {type, url: '', voice: ''};
         const index = this._audioSourceEntries.length;
         this._createAudioSourceEntry(index, source);
@@ -194,19 +249,36 @@ export class AudioController extends EventDispatcher {
 }
 
 class AudioSourceEntry {
+    /**
+     * @param {AudioController} parent
+     * @param {number} index
+     * @param {import('settings').AudioSourceOptions} source
+     * @param {HTMLElement} node
+     */
     constructor(parent, index, source, node) {
+        /** @type {AudioController} */
         this._parent = parent;
+        /** @type {number} */
         this._index = index;
+        /** @type {import('settings').AudioSourceType} */
         this._type = source.type;
+        /** @type {string} */
         this._url = source.url;
+        /** @type {string} */
         this._voice = source.voice;
+        /** @type {HTMLElement} */
         this._node = node;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {?HTMLSelectElement} */
         this._typeSelect = null;
+        /** @type {?HTMLInputElement} */
         this._urlInput = null;
+        /** @type {?HTMLSelectElement} */
         this._voiceSelect = null;
     }
 
+    /** @type {number} */
     get index() {
         return this._index;
     }
@@ -215,17 +287,19 @@ class AudioSourceEntry {
         this._index = value;
     }
 
+    /** @type {import('settings').AudioSourceType} */
     get type() {
         return this._type;
     }
 
+    /** */
     prepare() {
         this._updateTypeParameter();
 
-        const menuButton = this._node.querySelector('.audio-source-menu-button');
-        this._typeSelect = this._node.querySelector('.audio-source-type-select');
-        this._urlInput = this._node.querySelector('.audio-source-parameter-container[data-field=url] .audio-source-parameter');
-        this._voiceSelect = this._node.querySelector('.audio-source-parameter-container[data-field=voice] .audio-source-parameter');
+        const menuButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.audio-source-menu-button'));
+        this._typeSelect = /** @type {HTMLSelectElement} */ (this._node.querySelector('.audio-source-type-select'));
+        this._urlInput = /** @type {HTMLInputElement} */ (this._node.querySelector('.audio-source-parameter-container[data-field=url] .audio-source-parameter'));
+        this._voiceSelect = /** @type {HTMLSelectElement} */ (this._node.querySelector('.audio-source-parameter-container[data-field=voice] .audio-source-parameter'));
 
         this._typeSelect.value = this._type;
         this._urlInput.value = this._url;
@@ -239,6 +313,7 @@ class AudioSourceEntry {
         this._onVoicesUpdated();
     }
 
+    /** */
     cleanup() {
         if (this._node.parentNode !== null) {
             this._node.parentNode.removeChild(this._node);
@@ -248,7 +323,9 @@ class AudioSourceEntry {
 
     // Private
 
+    /** */
     _onVoicesUpdated() {
+        if (this._voiceSelect === null) { return; }
         const voices = this._parent.getVoices();
 
         const fragment = document.createDocumentFragment();
@@ -270,18 +347,35 @@ class AudioSourceEntry {
         this._voiceSelect.value = this._voice;
     }
 
+    /**
+     * @param {Event} e
+     */
     _onTypeSelectChange(e) {
-        this._setType(e.currentTarget.value);
+        const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        const value = this._normalizeAudioSourceType(element.value);
+        if (value === null) { return; }
+        this._setType(value);
     }
 
+    /**
+     * @param {Event} e
+     */
     _onUrlInputChange(e) {
-        this._setUrl(e.currentTarget.value);
+        const element = /** @type {HTMLInputElement} */ (e.currentTarget);
+        this._setUrl(element.value);
     }
 
+    /**
+     * @param {Event} e
+     */
     _onVoiceSelectChange(e) {
-        this._setVoice(e.currentTarget.value);
+        const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        this._setVoice(element.value);
     }
 
+    /**
+     * @param {import('popup-menu').MenuOpenEvent} e
+     */
     _onMenuOpen(e) {
         const {menu} = e.detail;
 
@@ -295,9 +389,15 @@ class AudioSourceEntry {
                 break;
         }
 
-        menu.bodyNode.querySelector('.popup-menu-item[data-menu-action=help]').hidden = !hasHelp;
+        const helpNode = /** @type {?HTMLElement} */ (menu.bodyNode.querySelector('.popup-menu-item[data-menu-action=help]'));
+        if (helpNode !== null) {
+            helpNode.hidden = !hasHelp;
+        }
     }
 
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} e
+     */
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'help':
@@ -309,22 +409,32 @@ class AudioSourceEntry {
         }
     }
 
+    /**
+     * @param {import('settings').AudioSourceType} value
+     */
     async _setType(value) {
         this._type = value;
         this._updateTypeParameter();
         await this._parent.settingsController.setProfileSetting(`audio.sources[${this._index}].type`, value);
     }
 
+    /**
+     * @param {string} value
+     */
     async _setUrl(value) {
         this._url = value;
         await this._parent.settingsController.setProfileSetting(`audio.sources[${this._index}].url`, value);
     }
 
+    /**
+     * @param {string} value
+     */
     async _setVoice(value) {
         this._voice = value;
         await this._parent.settingsController.setProfileSetting(`audio.sources[${this._index}].voice`, value);
     }
 
+    /** */
     _updateTypeParameter() {
         let field = null;
         switch (this._type) {
@@ -337,11 +447,14 @@ class AudioSourceEntry {
                 field = 'voice';
                 break;
         }
-        for (const node of this._node.querySelectorAll('.audio-source-parameter-container')) {
+        for (const node of /** @type {NodeListOf<HTMLElement>} */ (this._node.querySelectorAll('.audio-source-parameter-container'))) {
             node.hidden = (field === null || node.dataset.field !== field);
         }
     }
 
+    /**
+     * @param {import('settings').AudioSourceType} type
+     */
     _showHelp(type) {
         switch (type) {
             case 'custom':
@@ -358,7 +471,31 @@ class AudioSourceEntry {
         }
     }
 
+    /**
+     * @param {string} name
+     */
     _showModal(name) {
-        this._parent.modalController.getModal(name).setVisible(true);
+        const modal = this._parent.modalController.getModal(name);
+        if (modal === null) { return; }
+        modal.setVisible(true);
+    }
+
+    /**
+     * @param {string} value
+     * @returns {?import('settings').AudioSourceType}
+     */
+    _normalizeAudioSourceType(value) {
+        switch (value) {
+            case 'jpod101':
+            case 'jpod101-alternate':
+            case 'jisho':
+            case 'text-to-speech':
+            case 'text-to-speech-reading':
+            case 'custom':
+            case 'custom-json':
+                return value;
+            default:
+                return null;
+        }
     }
 }
