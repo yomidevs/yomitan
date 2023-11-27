@@ -24,12 +24,12 @@ import {AudioSystem} from '../../media/audio-system.js';
  */
 export class AudioController extends EventDispatcher {
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      * @param {ModalController} modalController
      */
     constructor(settingsController, modalController) {
         super();
-        /** @type {SettingsController} */
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {ModalController} */
         this._modalController = modalController;
@@ -47,7 +47,7 @@ export class AudioController extends EventDispatcher {
         this._voices = [];
     }
 
-    /** @type {SettingsController} */
+    /** @type {import('./settings-controller.js').SettingsController} */
     get settingsController() {
         return this._settingsController;
     }

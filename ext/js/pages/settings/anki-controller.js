@@ -26,10 +26,10 @@ import {yomitan} from '../../yomitan.js';
 
 export class AnkiController {
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      */
     constructor(settingsController) {
-        /** @type {SettingsController} */
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {AnkiConnect} */
         this._ankiConnect = new AnkiConnect();
@@ -67,7 +67,7 @@ export class AnkiController {
         this._validateFieldsToken = null;
     }
 
-    /** @type {SettingsController} */
+    /** @type {import('./settings-controller.js').SettingsController} */
     get settingsController() {
         return this._settingsController;
     }
@@ -562,12 +562,12 @@ export class AnkiController {
 
 class AnkiCardController {
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      * @param {AnkiController} ankiController
      * @param {HTMLElement} node
      */
     constructor(settingsController, ankiController, node) {
-        /** @type {SettingsController} */
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {AnkiController} */
         this._ankiController = ankiController;

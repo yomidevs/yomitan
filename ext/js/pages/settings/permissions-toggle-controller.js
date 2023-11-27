@@ -20,10 +20,10 @@ import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js'
 
 export class PermissionsToggleController {
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      */
     constructor(settingsController) {
-        /** @type {SettingsController} */
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {?NodeListOf<HTMLInputElement>} */
         this._toggles = null;

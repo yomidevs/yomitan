@@ -20,10 +20,10 @@ import {DocumentUtil} from '../../dom/document-util.js';
 
 export class NestedPopupsController {
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      */
     constructor(settingsController) {
-        /** @type {SettingsController} */
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {number} */
         this._popupNestingMaxDepth = 0;

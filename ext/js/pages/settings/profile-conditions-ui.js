@@ -29,11 +29,11 @@ import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
  */
 export class ProfileConditionsUI extends EventDispatcher {
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      */
     constructor(settingsController) {
         super();
-        /** @type {SettingsController} */
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {?import('environment').OperatingSystem} */
         this._os = null;
@@ -114,7 +114,7 @@ export class ProfileConditionsUI extends EventDispatcher {
         ]);
     }
 
-    /** @type {SettingsController} */
+    /** @type {import('./settings-controller.js').SettingsController} */
     get settingsController() {
         return this._settingsController;
     }
@@ -473,7 +473,7 @@ class ProfileConditionGroupUI {
         this._eventListeners = new EventListenerCollection();
     }
 
-    /** @type {SettingsController} */
+    /** @type {import('./settings-controller.js').SettingsController} */
     get settingsController() {
         return this._parent.settingsController;
     }
@@ -652,7 +652,7 @@ class ProfileConditionUI {
         this._inputEventListeners = new EventListenerCollection();
     }
 
-    /** @type {SettingsController} */
+    /** @type {import('./settings-controller.js').SettingsController} */
     get settingsController() {
         return this._parent.parent.settingsController;
     }

@@ -22,11 +22,11 @@ import {ProfileConditionsUI} from './profile-conditions-ui.js';
 
 export class ProfileController {
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      * @param {ModalController} modalController
      */
     constructor(settingsController, modalController) {
-        /** @type {SettingsController} */
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {ModalController} */
         this._modalController = modalController;

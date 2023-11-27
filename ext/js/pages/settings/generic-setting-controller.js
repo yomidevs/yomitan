@@ -22,10 +22,10 @@ import {DOMDataBinder} from '../../dom/dom-data-binder.js';
 
 export class GenericSettingController {
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      */
     constructor(settingsController) {
-        /** @type {SettingsController} */
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {import('settings-modifications').OptionsScopeType} */
         this._defaultScope = 'profile';

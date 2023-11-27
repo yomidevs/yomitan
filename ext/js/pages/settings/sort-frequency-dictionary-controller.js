@@ -20,10 +20,10 @@ import {yomitan} from '../../yomitan.js';
 
 export class SortFrequencyDictionaryController {
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      */
     constructor(settingsController) {
-        /** @type {SettingsController} */
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {?HTMLSelectElement} */
         this._sortFrequencyDictionarySelect = null;

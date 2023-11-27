@@ -22,10 +22,10 @@ import {ScanInputsController} from './scan-inputs-controller.js';
 
 export class ScanInputsSimpleController {
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      */
     constructor(settingsController) {
-        /** @type {SettingsController} */
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {?HTMLInputElement} */
         this._middleMouseButtonScan = null;

@@ -27,10 +27,10 @@ import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
 export class ScanInputsController {
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      */
     constructor(settingsController) {
-        /** @type {SettingsController} */
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {?import('environment').OperatingSystem} */
         this._os = null;

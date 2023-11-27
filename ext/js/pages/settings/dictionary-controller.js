@@ -335,12 +335,12 @@ class DictionaryExtraInfo {
 
 export class DictionaryController {
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      * @param {ModalController} modalController
      * @param {StatusFooter} statusFooter
      */
     constructor(settingsController, modalController, statusFooter) {
-        /** @type {SettingsController} */
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {ModalController} */
         this._modalController = modalController;
@@ -494,7 +494,7 @@ export class DictionaryController {
     }
 
     /**
-     * @param {SettingsController} settingsController
+     * @param {import('./settings-controller.js').SettingsController} settingsController
      * @param {import('dictionary-importer').Summary[]|undefined} dictionaries
      * @param {import('settings').Options|undefined} optionsFull
      * @param {boolean} modifyGlobalSettings
