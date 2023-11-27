@@ -20,7 +20,10 @@
             "handlebars",
             "jszip",
             "parse5",
-            "wanakana"
+            "wanakana",
+            "zip.js",
+            "dexie",
+            "ajv"
         ]
     },
     "include": [

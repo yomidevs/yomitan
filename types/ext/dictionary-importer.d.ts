@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type * as Ajv from 'ajv';
+import type * as ZipJS from '@zip.js/zip.js';
 import type * as DictionaryData from './dictionary-data';
 import type * as DictionaryDatabase from './dictionary-database';
 import type * as StructuredContent from './structured-content';
@@ -90,6 +92,29 @@ export type StructuredContentImageImportRequirement = {
 };
 
 export type ImportRequirementContext = {
-    archive: import('jszip');
+    fileMap: ArchiveFileMap;
     media: Map<string, DictionaryDatabase.MediaDataArrayBufferContent>;
 };
+
+export type ArchiveFileMap = Map<string, ZipJS.Entry>;
+
+export type CompiledSchemaNameArray = [
+    termBank: CompiledSchemaName,
+    termMetaBank: CompiledSchemaName,
+    kanjiBank: CompiledSchemaName,
+    kanjiMetaBank: CompiledSchemaName,
+    tagBank: CompiledSchemaName,
+];
+
+export type CompiledSchemaValidators = {
+    dictionaryIndex: Ajv.ValidateFunction<unknown>;
+    dictionaryTermBankV1: Ajv.ValidateFunction<unknown>;
+    dictionaryTermBankV3: Ajv.ValidateFunction<unknown>;
+    dictionaryTermMetaBankV3: Ajv.ValidateFunction<unknown>;
+    dictionaryKanjiBankV1: Ajv.ValidateFunction<unknown>;
+    dictionaryKanjiBankV3: Ajv.ValidateFunction<unknown>;
+    dictionaryKanjiMetaBankV3: Ajv.ValidateFunction<unknown>;
+    dictionaryTagBankV3: Ajv.ValidateFunction<unknown>;
+};
+
+export type CompiledSchemaName = keyof CompiledSchemaValidators;
