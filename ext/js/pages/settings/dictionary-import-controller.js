@@ -17,6 +17,7 @@
  */
 
 import {log} from '../../core.js';
+import {ExtensionError} from '../../core/extension-error.js';
 import {DictionaryWorker} from '../../language/dictionary-worker.js';
 import {yomitan} from '../../yomitan.js';
 import {DictionaryController} from './dictionary-controller.js';

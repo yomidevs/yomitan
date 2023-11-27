@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ExtensionError} from '../../core/extension-error.js';
 import {DocumentUtil} from '../../dom/document-util.js';
 import {DOMDataBinder} from '../../dom/dom-data-binder.js';
 

@@ -17,6 +17,7 @@
  */
 
 import {Handlebars} from '../../../lib/handlebars.js';
+import {ExtensionError} from '../../core/extension-error.js';
 
 export class TemplateRenderer {
     constructor() {

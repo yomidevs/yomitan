@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ExtensionError} from '../core/extension-error.js';
 import {yomitan} from '../yomitan.js';
 
 export class OptionToggleHotkeyHandler {

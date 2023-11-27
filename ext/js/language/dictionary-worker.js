@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ExtensionError} from '../core/extension-error.js';
 import {DictionaryImporterMediaLoader} from './dictionary-importer-media-loader.js';
 
 export class DictionaryWorker {

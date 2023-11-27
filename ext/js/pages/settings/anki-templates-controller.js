@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ExtensionError} from '../../core/extension-error.js';
 import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
 import {JapaneseUtil} from '../../language/sandbox/japanese-util.js';
 import {yomitan} from '../../yomitan.js';

@@ -17,6 +17,7 @@
  */
 
 import {deferPromise} from '../core.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
 import {yomitan} from '../yomitan.js';
 import {AnkiUtil} from './anki-util.js';

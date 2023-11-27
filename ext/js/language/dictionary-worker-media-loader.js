@@ -17,6 +17,7 @@
  */
 
 import {generateId} from '../core.js';
+import {ExtensionError} from '../core/extension-error.js';
 
 /**
  * Class used for loading and validating media from a worker thread

@@ -18,6 +18,7 @@
 
 import {AnkiConnect} from '../../comm/anki-connect.js';
 import {EventListenerCollection, log} from '../../core.js';
+import {ExtensionError} from '../../core/extension-error.js';
 import {AnkiUtil} from '../../data/anki-util.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';

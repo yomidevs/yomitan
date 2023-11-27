@@ -17,6 +17,7 @@
  */
 
 import {RequestBuilder} from '../background/request-builder.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {JsonSchema} from '../data/json-schema.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';

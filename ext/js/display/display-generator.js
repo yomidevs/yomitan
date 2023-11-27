@@ -17,6 +17,7 @@
  */
 
 import {isObject} from '../core.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {DictionaryDataUtil} from '../language/sandbox/dictionary-data-util.js';
 import {yomitan} from '../yomitan.js';
