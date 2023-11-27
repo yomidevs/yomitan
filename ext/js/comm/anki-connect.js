@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core.js';
 import {AnkiUtil} from '../data/anki-util.js';
 
 /**

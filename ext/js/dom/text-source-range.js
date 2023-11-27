@@ -18,7 +18,6 @@
 
 import {DocumentUtil} from './document-util.js';
 import {DOMTextScanner} from './dom-text-scanner.js';
-import {TextSourceElement} from './text-source-element.js';
 
 /**
  * This class represents a text source that comes from text nodes in the document.

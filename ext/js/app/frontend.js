@@ -21,10 +21,8 @@ import {EventListenerCollection, invokeMessageHandler, log, promiseAnimationFram
 import {DocumentUtil} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
-import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {TextScanner} from '../language/text-scanner.js';
 import {yomitan} from '../yomitan.js';
-import {PopupFactory} from './popup-factory.js';
 
 /**
  * This is the main class responsible for scanning and handling webpage content.
@@ -50,7 +48,7 @@ export class Frontend {
     }) {
         /** @type {import('frontend').PageType} */
         this._pageType = pageType;
-        /** @type {PopupFactory} */
+        /** @type {import('./popup-factory.js').PopupFactory} */
         this._popupFactory = popupFactory;
         /** @type {number} */
         this._depth = depth;
@@ -70,7 +68,7 @@ export class Frontend {
         this._allowRootFramePopupProxy = allowRootFramePopupProxy;
         /** @type {boolean} */
         this._childrenSupported = childrenSupported;
-        /** @type {HotkeyHandler} */
+        /** @type {import('../input/hotkey-handler.js').HotkeyHandler} */
         this._hotkeyHandler = hotkeyHandler;
         /** @type {?import('popup').PopupAny} */
         this._popup = null;

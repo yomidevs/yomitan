@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection} from '../core.js';
 import {DOMTextScanner} from './dom-text-scanner.js';
 import {TextSourceElement} from './text-source-element.js';
 import {TextSourceRange} from './text-source-range.js';

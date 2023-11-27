@@ -18,7 +18,6 @@
 
 import {EventDispatcher} from '../core.js';
 import {yomitan} from '../yomitan.js';
-import {Popup} from './popup.js';
 
 /**
  * This class represents a popup that is hosted in a new native window.
@@ -54,7 +53,7 @@ export class PopupWindow extends EventDispatcher {
     }
 
     /**
-     * @type {?Popup}
+     * @type {?import('./popup.js').Popup}
      */
     get parent() {
         return null;
@@ -63,7 +62,7 @@ export class PopupWindow extends EventDispatcher {
     /**
      * The parent of the popup, which is always `null` for `PopupWindow` instances,
      * since any potential parent popups are in a different frame.
-     * @param {Popup} _value The parent to assign.
+     * @param {import('./popup.js').Popup} _value The parent to assign.
      * @throws {Error} Throws an error, since this class doesn't support children.
      */
     set parent(_value) {
@@ -73,7 +72,7 @@ export class PopupWindow extends EventDispatcher {
     /**
      * The popup child popup, which is always null for `PopupWindow` instances,
      * since any potential child popups are in a different frame.
-     * @type {?Popup}
+     * @type {?import('./popup.js').Popup}
      */
     get child() {
         return null;
@@ -81,7 +80,7 @@ export class PopupWindow extends EventDispatcher {
 
     /**
      * Attempts to set the child popup.
-     * @param {Popup} _value The child to assign.
+     * @param {import('./popup.js').Popup} _value The child to assign.
      * @throws Throws an error, since this class doesn't support children.
      */
     set child(_value) {

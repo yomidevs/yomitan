@@ -18,7 +18,6 @@
 
 import {StringUtil} from '../data/sandbox/string-util.js';
 import {DocumentUtil} from './document-util.js';
-import {TextSourceRange} from './text-source-range.js';
 
 /**
  * This class represents a text source that is attached to a HTML element, such as an <img>

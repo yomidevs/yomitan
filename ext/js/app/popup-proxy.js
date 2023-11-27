@@ -16,10 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {FrameOffsetForwarder} from '../comm/frame-offset-forwarder.js';
 import {EventDispatcher, log} from '../core.js';
 import {yomitan} from '../yomitan.js';
-import {Popup} from './popup.js';
 
 /**
  * This class is a proxy for a Popup that is hosted in a different frame.
@@ -44,7 +42,7 @@ export class PopupProxy extends EventDispatcher {
         this._depth = depth;
         /** @type {number} */
         this._frameId = frameId;
-        /** @type {?FrameOffsetForwarder} */
+        /** @type {?import('../comm/frame-offset-forwarder.js').FrameOffsetForwarder} */
         this._frameOffsetForwarder = frameOffsetForwarder;
 
         /** @type {number} */
@@ -70,7 +68,7 @@ export class PopupProxy extends EventDispatcher {
     /**
      * The parent of the popup, which is always `null` for `PopupProxy` instances,
      * since any potential parent popups are in a different frame.
-     * @type {?Popup}
+     * @type {?import('./popup.js').Popup}
      */
     get parent() {
         return null;
@@ -78,7 +76,7 @@ export class PopupProxy extends EventDispatcher {
 
     /**
      * Attempts to set the parent popup.
-     * @param {Popup} _value The parent to assign.
+     * @param {import('./popup.js').Popup} _value The parent to assign.
      * @throws {Error} Throws an error, since this class doesn't support a direct parent.
      */
     set parent(_value) {
@@ -88,7 +86,7 @@ export class PopupProxy extends EventDispatcher {
     /**
      * The popup child popup, which is always null for `PopupProxy` instances,
      * since any potential child popups are in a different frame.
-     * @type {?Popup}
+     * @type {?import('./popup.js').Popup}
      */
     get child() {
         return null;
@@ -96,7 +94,7 @@ export class PopupProxy extends EventDispatcher {
 
     /**
      * Attempts to set the child popup.
-     * @param {Popup} _child The child to assign.
+     * @param {import('./popup.js').Popup} _child The child to assign.
      * @throws {Error} Throws an error, since this class doesn't support children.
      */
     set child(_child) {
@@ -354,7 +352,7 @@ export class PopupProxy extends EventDispatcher {
      * @param {number} now
      */
     async _updateFrameOffsetInner(now) {
-        this._frameOffsetPromise = /** @type {FrameOffsetForwarder} */ (this._frameOffsetForwarder).getOffset();
+        this._frameOffsetPromise = /** @type {import('../comm/frame-offset-forwarder.js').FrameOffsetForwarder} */ (this._frameOffsetForwarder).getOffset();
         try {
             const offset = await this._frameOffsetPromise;
             if (offset !== null) {

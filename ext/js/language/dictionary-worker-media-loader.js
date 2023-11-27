@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deserializeError, generateId} from '../core.js';
+import {generateId} from '../core.js';
 
 /**
  * Class used for loading and validating media from a worker thread

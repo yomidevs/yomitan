@@ -19,7 +19,6 @@
 import {RegexUtil} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {Deinflector} from './deinflector.js';
-import {DictionaryDatabase} from './dictionary-database.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.

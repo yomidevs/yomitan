@@ -17,7 +17,6 @@
  */
 
 import {DocumentUtil} from '../dom/document-util.js';
-import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
 
 /**

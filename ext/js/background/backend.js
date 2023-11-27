@@ -25,7 +25,6 @@ import {Mecab} from '../comm/mecab.js';
 import {clone, deferPromise, generateId, invokeMessageHandler, isObject, log, promiseTimeout} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {AnkiUtil} from '../data/anki-util.js';
-import {JsonSchema} from '../data/json-schema.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {PermissionsUtil} from '../data/permissions-util.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
