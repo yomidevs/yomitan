@@ -3,7 +3,7 @@
     "editor.codeActionsOnSave": {
         "source.addMissingImports": false,
         "source.organizeImports": true,
-        "source.fixAll.eslint": true,
+        "source.fixAll.eslint": false
     },
     "eslint.format.enable": true,
     "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,

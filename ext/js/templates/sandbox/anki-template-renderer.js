@@ -151,8 +151,8 @@ export class AnkiTemplateRenderer {
     }
 
     /**
-     *
-     * @param text
+     * @param {string} text
+     * @returns {string}
      */
     _safeString(text) {
         return new Handlebars.SafeString(text);
@@ -221,8 +221,8 @@ export class AnkiTemplateRenderer {
     }
 
     /**
-     *
-     * @param string
+     * @param {string} string
+     * @returns {string}
      */
     _stringToMultiLineHtml(string) {
         return string.split('\n').join('<br>');

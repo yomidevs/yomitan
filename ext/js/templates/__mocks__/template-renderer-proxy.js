@@ -20,20 +20,35 @@ import {AnkiTemplateRenderer} from '../sandbox/anki-template-renderer.js';
 
 export class TemplateRendererProxy {
     constructor() {
+        /** @type {?Promise<void>} */
         this._preparePromise = null;
+        /** @type {AnkiTemplateRenderer} */
         this._ankiTemplateRenderer = new AnkiTemplateRenderer();
     }
 
+    /**
+     * @param {string} template
+     * @param {import('template-renderer').PartialOrCompositeRenderData} data
+     * @param {import('anki-templates').RenderMode} type
+     * @returns {Promise<import('template-renderer').RenderResult>}
+     */
     async render(template, data, type) {
         await this._prepare();
-        return await this._ankiTemplateRenderer.templateRenderer.render(template, data, type);
+        return this._ankiTemplateRenderer.templateRenderer.render(template, data, type);
     }
 
+    /**
+     * @param {import('template-renderer').RenderMultiItem[]} items
+     * @returns {Promise<import('core').Response<import('template-renderer').RenderResult>[]>}
+     */
     async renderMulti(items) {
         await this._prepare();
-        return await this._serializeMulti(this._ankiTemplateRenderer.templateRenderer.renderMulti(items));
+        return this._ankiTemplateRenderer.templateRenderer.renderMulti(items);
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     _prepare() {
         if (this._preparePromise === null) {
             this._preparePromise = this._prepareInternal();
@@ -41,40 +56,8 @@ export class TemplateRendererProxy {
         return this._preparePromise;
     }
 
+    /** */
     async _prepareInternal() {
         await this._ankiTemplateRenderer.prepare();
-    }
-
-    _serializeError(error) {
-        try {
-            if (typeof error === 'object' && error !== null) {
-                const result = {
-                    name: error.name,
-                    message: error.message,
-                    stack: error.stack
-                };
-                if (Object.prototype.hasOwnProperty.call(error, 'data')) {
-                    result.data = error.data;
-                }
-                return result;
-            }
-        } catch (e) {
-            // NOP
-        }
-        return {
-            value: error,
-            hasValue: true
-        };
-    }
-
-    _serializeMulti(array) {
-        for (let i = 0, ii = array.length; i < ii; ++i) {
-            const value = array[i];
-            const {error} = value;
-            if (typeof error !== 'undefined') {
-                value.error = this._serializeError(error);
-            }
-        }
-        return array;
     }
 }

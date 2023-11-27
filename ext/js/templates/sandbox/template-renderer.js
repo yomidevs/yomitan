@@ -21,7 +21,7 @@ import {ExtensionError} from '../../core/extension-error.js';
 
 export class TemplateRenderer {
     constructor() {
-        /** @type {Map<string, HandlebarsTemplateDelegate<import('anki-templates').NoteData>>} */
+        /** @type {Map<string, import('handlebars').TemplateDelegate<import('anki-templates').NoteData>>} */
         this._cache = new Map();
         /** @type {number} */
         this._cacheMaxSize = 5;
@@ -110,14 +110,14 @@ export class TemplateRenderer {
 
     /**
      * @param {string} template
-     * @returns {HandlebarsTemplateDelegate<import('anki-templates').NoteData>}
+     * @returns {import('handlebars').TemplateDelegate<import('anki-templates').NoteData>}
      */
     _getTemplateInstance(template) {
         const cache = this._cache;
         let instance = cache.get(template);
         if (typeof instance === 'undefined') {
             this._updateCacheSize(this._cacheMaxSize - 1);
-            instance = /** @type {HandlebarsTemplateDelegate<import('anki-templates').NoteData>} */ (Handlebars.compileAST(template));
+            instance = /** @type {import('handlebars').TemplateDelegate<import('anki-templates').NoteData>} */ (Handlebars.compileAST(template));
             cache.set(template, instance);
         }
 
@@ -125,7 +125,7 @@ export class TemplateRenderer {
     }
 
     /**
-     * @param {HandlebarsTemplateDelegate<import('anki-templates').NoteData>} instance
+     * @param {import('handlebars').TemplateDelegate<import('anki-templates').NoteData>} instance
      * @param {import('anki-templates').NoteData} data
      * @returns {import('template-renderer').RenderResult}
      */

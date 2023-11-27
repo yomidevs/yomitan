@@ -20,10 +20,10 @@ import {ExtensionError} from '../../core/extension-error.js';
 
 export class TemplateRendererFrameApi {
     /**
-     * @param {TemplateRenderer} templateRenderer
+     * @param {import('./template-renderer.js').TemplateRenderer} templateRenderer
      */
     constructor(templateRenderer) {
-        /** @type {TemplateRenderer} */
+        /** @type {import('./template-renderer.js').TemplateRenderer} */
         this._templateRenderer = templateRenderer;
         /** @type {import('core').MessageHandlerMap} */
         this._windowMessageHandlers = new Map(/** @type {import('core').MessageHandlerArray} */ ([

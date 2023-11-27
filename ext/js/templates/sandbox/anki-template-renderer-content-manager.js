@@ -22,12 +22,12 @@
 export class AnkiTemplateRendererContentManager {
     /**
      * Creates a new instance of the class.
-     * @param {TemplateRendererMediaProvider} mediaProvider The media provider for the object.
+     * @param {import('./template-renderer-media-provider.js').TemplateRendererMediaProvider} mediaProvider The media provider for the object.
      * @param {import('anki-templates').NoteData} data The data object passed to the Handlebars template renderer.
-     *   See {@link AnkiNoteDataCreator.create}'s return value for structure information.
+     *   See AnkiNoteDataCreator.create's return value for structure information.
      */
     constructor(mediaProvider, data) {
-        /** @type {TemplateRendererMediaProvider} */
+        /** @type {import('./template-renderer-media-provider.js').TemplateRendererMediaProvider} */
         this._mediaProvider = mediaProvider;
         /** @type {import('anki-templates').NoteData} */
         this._data = data;
