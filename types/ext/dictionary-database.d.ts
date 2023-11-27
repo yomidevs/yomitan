@@ -35,7 +35,7 @@ export interface MediaDataBase<TContentType = unknown> {
 export interface MediaDataArrayBufferContent extends MediaDataBase<ArrayBuffer> {}
 export interface MediaDataStringContent extends MediaDataBase<string> {}
 
-export type Media = {index: number} & MediaDataBase<ArrayBuffer>;
+export type Media<T extends (ArrayBuffer | string) = ArrayBuffer> = {index: number} & MediaDataBase<T>;
 
 export type DatabaseTermEntry = {
     expression: string;

@@ -81,3 +81,15 @@ export type SequenceQuery = {
 };
 
 export type FindTermsMode = 'simple' | 'group' | 'merge' | 'split';
+
+export type TermReadingItem = {
+    term: string;
+    reading: string | null;
+};
+
+export type TermReadingList = TermReadingItem[];
+
+export type FindTermsResult = {
+    dictionaryEntries: Dictionary.TermDictionaryEntry[];
+    originalTextLength: number;
+};
