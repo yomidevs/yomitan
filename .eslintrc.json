@@ -61,7 +61,7 @@
         "no-case-declarations": "error",
         "no-const-assign": "error",
         "no-constant-condition": "off",
-        "no-console": "warn",
+        "no-console": "off",
         "no-global-assign": "error",
         "no-param-reassign": "off",
         "no-prototype-builtins": "error",
@@ -263,7 +263,7 @@
         "jsdoc/multiline-blocks": "error",
         "jsdoc/no-bad-blocks": "error",
         "jsdoc/no-multi-asterisks": "error",
-        "jsdoc/no-undefined-types": 1,
+        "jsdoc/no-undefined-types": "error",
         "jsdoc/require-asterisk-prefix": "error",
         "jsdoc/require-hyphen-before-param-description": [
             "error",
@@ -762,6 +762,16 @@
                 "vitest/prefer-to-be": "off"
             },
             "env": {}
+        },
+        {
+            "files": [
+                "dev/**/*.js",
+                "test/**/*.js"
+            ],
+            "rules": {
+                "jsdoc/require-jsdoc": "off",
+                "jsdoc/no-undefined-types": "off"
+            }
         }
     ]
 }

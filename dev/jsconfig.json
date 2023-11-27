@@ -52,6 +52,7 @@
     "include": [
         "**/*.js",
         "../playwright.config.js",
+        "../vitest.config.js",
         "../ext/js/core.js",
         "../ext/js/core/extension-error.js",
         "../ext/js/data/database.js",
