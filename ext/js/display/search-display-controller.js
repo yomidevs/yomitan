@@ -63,7 +63,7 @@ export class SearchDisplayController {
         this._wanakanaBound = false;
         /** @type {boolean} */
         this._introVisible = true;
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         this._introAnimationTimer = null;
         /** @type {boolean} */
         this._clipboardMonitorEnabled = false;

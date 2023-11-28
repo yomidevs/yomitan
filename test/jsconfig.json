@@ -31,7 +31,7 @@
         "../ext/**/*.js",
         "../types/ext/**/*.ts",
         "../types/dev/**/*.ts",
-        "../types/other/web-set-timeout.d.ts"
+        "../types/other/globals.d.ts"
     ],
     "exclude": [
         "../node_modules",

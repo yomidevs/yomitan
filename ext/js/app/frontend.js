@@ -99,7 +99,7 @@ export class Frontend {
         this._popupEventListeners = new EventListenerCollection();
         /** @type {?import('core').TokenObject} */
         this._updatePopupToken = null;
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         this._clearSelectionTimer = null;
         /** @type {boolean} */
         this._isPointerOverPopup = false;
@@ -840,7 +840,7 @@ export class Frontend {
      */
     async _waitForFrontendReady(frameId, timeout) {
         return new Promise((resolve, reject) => {
-            /** @type {?number} */
+            /** @type {?import('core').Timeout} */
             let timeoutId = null;
 
             const cleanup = () => {
@@ -973,6 +973,13 @@ export class Frontend {
         await yomitan.api.loadExtensionScripts([
             '/js/accessibility/google-docs-util.js'
         ]);
+        this._prepareGoogleDocs2();
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _prepareGoogleDocs2() {
         if (typeof GoogleDocsUtil === 'undefined') { return; }
         DocumentUtil.registerGetRangeFromPointHandler(GoogleDocsUtil.getRangeFromPoint.bind(GoogleDocsUtil));
     }

@@ -307,7 +307,7 @@ export function promiseAnimationFrame(timeout) {
             return;
         }
 
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         let timer = null;
         /** @type {?number} */
         let frameRequest = null;

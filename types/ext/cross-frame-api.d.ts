@@ -50,5 +50,5 @@ export type Invocation = {
     responseTimeout: number;
     action: string;
     ack: boolean;
-    timer: number | null;
+    timer: Core.Timeout | null;
 };

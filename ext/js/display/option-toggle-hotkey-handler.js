@@ -29,7 +29,7 @@ export class OptionToggleHotkeyHandler {
         this._display = display;
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._notification = null;
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         this._notificationHideTimer = null;
         /** @type {number} */
         this._notificationHideTimeout = 5000;

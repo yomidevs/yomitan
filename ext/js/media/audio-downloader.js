@@ -316,7 +316,7 @@ export class AudioDownloader {
         let signal;
         /** @type {?import('request-builder.js').ProgressCallback} */
         let onProgress = null;
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         let idleTimer = null;
         if (typeof idleTimeout === 'number') {
             const abortController = new AbortController();

@@ -122,7 +122,7 @@ export class FrameAncestryHandler {
             const responseMessageId = `${this._responseMessageIdBase}${uniqueId}`;
             /** @type {number[]} */
             const results = [];
-            /** @type {?number} */
+            /** @type {?import('core').Timeout} */
             let timer = null;
 
             const cleanup = () => {

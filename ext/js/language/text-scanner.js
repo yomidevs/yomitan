@@ -120,7 +120,7 @@ export class TextScanner extends EventDispatcher {
 
         /** @type {boolean} */
         this._preventNextClickScan = false;
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         this._preventNextClickScanTimer = null;
         /** @type {number} */
         this._preventNextClickScanTimerDuration = 50;
@@ -145,7 +145,7 @@ export class TextScanner extends EventDispatcher {
         /** @type {boolean} */
         this._canClearSelection = true;
 
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         this._textSelectionTimer = null;
         /** @type {boolean} */
         this._yomitanIsChangingTextSelectionNow = false;
@@ -995,7 +995,7 @@ export class TextScanner extends EventDispatcher {
     async _scanTimerWait() {
         const delay = this._delay;
         const promise = /** @type {Promise<boolean>} */ (new Promise((resolve) => {
-            /** @type {?number} */
+            /** @type {?import('core').Timeout} */
             let timeout = setTimeout(() => {
                 timeout = null;
                 resolve(true);

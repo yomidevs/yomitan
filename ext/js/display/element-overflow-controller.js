@@ -22,7 +22,7 @@ export class ElementOverflowController {
     constructor() {
         /** @type {Element[]} */
         this._elements = [];
-        /** @type {?number} */
+        /** @type {?(number|import('core').Timeout)} */
         this._checkTimer = null;
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
@@ -154,7 +154,7 @@ export class ElementOverflowController {
     /**
      * @param {() => void} callback
      * @param {number} timeout
-     * @returns {number}
+     * @returns {number|import('core').Timeout}
      */
     _requestIdleCallback(callback, timeout) {
         if (typeof requestIdleCallback === 'function') {
@@ -165,11 +165,11 @@ export class ElementOverflowController {
     }
 
     /**
-     * @param {number} handle
+     * @param {number|import('core').Timeout} handle
      */
     _cancelIdleCallback(handle) {
         if (typeof cancelIdleCallback === 'function') {
-            cancelIdleCallback(handle);
+            cancelIdleCallback(/** @type {number} */ (handle));
         } else {
             clearTimeout(handle);
         }

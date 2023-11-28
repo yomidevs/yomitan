@@ -100,3 +100,5 @@ export type MessageHandlerDetails = {
 export type MessageHandlerMap = Map<string, MessageHandlerDetails>;
 
 export type MessageHandlerArray = [key: string, handlerDetails: MessageHandlerDetails][];
+
+export type Timeout = number | NodeJS.Timeout;

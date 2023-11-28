@@ -43,7 +43,7 @@ export class PopupPreviewFrame {
         this._apiOptionsGetOld = null;
         /** @type {boolean} */
         this._popupShown = false;
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         this._themeChangeTimeout = null;
         /** @type {?import('text-source').TextSource} */
         this._textSource = null;

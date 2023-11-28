@@ -431,7 +431,7 @@ export class API {
      */
     _createActionPort(timeout) {
         return new Promise((resolve, reject) => {
-            /** @type {?number} */
+            /** @type {?import('core').Timeout} */
             let timer = null;
             const portDetails = deferPromise();
 

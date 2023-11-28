@@ -37,7 +37,7 @@ export class PanelElement extends EventDispatcher {
         this._mutationObserver = null;
         /** @type {boolean} */
         this._visible = false;
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         this._closeTimer = null;
     }
 

@@ -36,7 +36,7 @@ export class DisplayAudio {
         this._playbackVolume = 1.0;
         /** @type {boolean} */
         this._autoPlay = false;
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         this._autoPlayAudioTimer = null;
         /** @type {number} */
         this._autoPlayAudioDelay = 400;

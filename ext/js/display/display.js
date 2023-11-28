@@ -117,7 +117,7 @@ export class Display extends EventDispatcher {
         this._queryOffset = 0;
         /** @type {HTMLElement} */
         this._progressIndicator = /** @type {HTMLElement} */ (document.querySelector('#progress-indicator'));
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         this._progressIndicatorTimer = null;
         /** @type {DynamicProperty<boolean>} */
         this._progressIndicatorVisible = new DynamicProperty(false);

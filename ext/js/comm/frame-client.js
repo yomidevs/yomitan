@@ -83,7 +83,7 @@ export class FrameClient {
     _connectInternal(frame, targetOrigin, hostFrameId, setupFrame, timeout) {
         return new Promise((resolve, reject) => {
             const tokenMap = new Map();
-            /** @type {?number} */
+            /** @type {?import('core').Timeout} */
             let timer = null;
             const deferPromiseDetails = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
             const frameLoadedPromise = deferPromiseDetails.promise;

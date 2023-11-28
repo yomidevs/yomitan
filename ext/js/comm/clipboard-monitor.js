@@ -31,7 +31,7 @@ export class ClipboardMonitor extends EventDispatcher {
         this._japaneseUtil = japaneseUtil;
         /** @type {import('clipboard-monitor').ClipboardReaderLike} */
         this._clipboardReader = clipboardReader;
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         this._timerId = null;
         /** @type {?import('core').TokenObject} */
         this._timerToken = null;

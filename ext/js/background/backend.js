@@ -138,7 +138,7 @@ export class Backend {
 
         /** @type {?string} */
         this._defaultBrowserActionTitle = null;
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         this._badgePrepareDelayTimer = null;
         /** @type {?import('log').LogLevel} */
         this._logErrorLevel = null;
@@ -1981,7 +1981,7 @@ export class Backend {
      */
     _waitUntilTabFrameIsReady(tabId, frameId, timeout=null) {
         return new Promise((resolve, reject) => {
-            /** @type {?number} */
+            /** @type {?import('core').Timeout} */
             let timer = null;
             /** @type {?import('extension').ChromeRuntimeOnMessageCallback} */
             let onMessage = (message, sender) => {

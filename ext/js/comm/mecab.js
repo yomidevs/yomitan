@@ -31,7 +31,7 @@ export class Mecab {
         this._port = null;
         /** @type {number} */
         this._sequence = 0;
-        /** @type {Map<number, {resolve: (value: unknown) => void, reject: (reason?: unknown) => void, timer: number}>} */
+        /** @type {Map<number, {resolve: (value: unknown) => void, reject: (reason?: unknown) => void, timer: import('core').Timeout}>} */
         this._invocations = new Map();
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();

@@ -34,7 +34,7 @@ export class DisplayNotification {
         this._closeButton = /** @type {HTMLElement} */ (node.querySelector('.footer-notification-close-button'));
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
-        /** @type {?number} */
+        /** @type {?import('core').Timeout} */
         this._closeTimer = null;
     }
 

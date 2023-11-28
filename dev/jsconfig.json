@@ -71,7 +71,7 @@
         "../ext/js/language/translator.js",
         "../ext/js/media/media-util.js",
         "../types/dev/**/*.ts",
-        "../types/other/web-set-timeout.d.ts"
+        "../types/other/globals.d.ts"
     ],
     "exclude": [
         "../node_modules"

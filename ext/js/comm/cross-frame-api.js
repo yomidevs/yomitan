@@ -25,14 +25,14 @@ import {yomitan} from '../yomitan.js';
  */
 class CrossFrameAPIPort extends EventDispatcher {
     /**
-     * @param {?number} otherTabId
+     * @param {number} otherTabId
      * @param {number} otherFrameId
      * @param {chrome.runtime.Port} port
      * @param {import('core').MessageHandlerMap} messageHandlers
      */
     constructor(otherTabId, otherFrameId, port, messageHandlers) {
         super();
-        /** @type {?number} */
+        /** @type {number} */
         this._otherTabId = otherTabId;
         /** @type {number} */
         this._otherFrameId = otherFrameId;
@@ -48,7 +48,7 @@ class CrossFrameAPIPort extends EventDispatcher {
         this._eventListeners = new EventListenerCollection();
     }
 
-    /** @type {?number} */
+    /** @type {number} */
     get otherTabId() {
         return this._otherTabId;
     }
@@ -299,7 +299,7 @@ export class CrossFrameAPI {
         this._ackTimeout = 3000; // 3 seconds
         /** @type {number} */
         this._responseTimeout = 10000; // 10 seconds
-        /** @type {Map<?number, Map<number, CrossFrameAPIPort>>} */
+        /** @type {Map<number, Map<number, CrossFrameAPIPort>>} */
         this._commPorts = new Map();
         /** @type {import('core').MessageHandlerMap} */
         this._messageHandlers = new Map();
@@ -339,7 +339,12 @@ export class CrossFrameAPI {
      * @returns {Promise<TReturn>}
      */
     async invokeTab(targetTabId, targetFrameId, action, params) {
-        if (typeof targetTabId !== 'number') { targetTabId = this._tabId; }
+        if (typeof targetTabId !== 'number') {
+            targetTabId = this._tabId;
+            if (typeof targetTabId !== 'number') {
+                throw new Error('Unknown target tab id for invocation');
+            }
+        }
         const commPort = await this._getOrCreateCommPort(targetTabId, targetFrameId);
         return await commPort.invoke(action, params, this._ackTimeout, this._responseTimeout);
     }
@@ -405,7 +410,7 @@ export class CrossFrameAPI {
     }
 
     /**
-     * @param {?number} otherTabId
+     * @param {number} otherTabId
      * @param {number} otherFrameId
      * @returns {Promise<CrossFrameAPIPort>}
      */
@@ -420,7 +425,7 @@ export class CrossFrameAPI {
         return await this._createCommPort(otherTabId, otherFrameId);
     }
     /**
-     * @param {?number} otherTabId
+     * @param {number} otherTabId
      * @param {number} otherFrameId
      * @returns {Promise<CrossFrameAPIPort>}
      */
@@ -438,7 +443,7 @@ export class CrossFrameAPI {
     }
 
     /**
-     * @param {?number} otherTabId
+     * @param {number} otherTabId
      * @param {number} otherFrameId
      * @param {chrome.runtime.Port} port
      * @returns {CrossFrameAPIPort}

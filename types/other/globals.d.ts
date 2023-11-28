@@ -15,10 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare module 'web-set-timeout' {
-    global {
-        // These types are used to ensure that setTimeout returns a number
-        function setTimeout<TArgs extends unknown[]>(callback: (...args: TArgs) => void, ms?: number, ...args: TArgs): number;
-        function setTimeout(callback: (args: void) => void, ms?: number): number;
-    }
+declare global {
+    function clearTimeout(timeoutId: NodeJS.Timeout | string | number | undefined): void;
 }
+
+export {};

@@ -51,7 +51,7 @@ export class Offscreen {
         });
 
         /** @type {import('offscreen').MessageHandlerMap} */
-        this._messageHandlers = new Map([
+        const messageHandlers = new Map([
             ['clipboardGetTextOffscreen',    {async: true,  handler: this._getTextHandler.bind(this)}],
             ['clipboardGetImageOffscreen',   {async: true,  handler: this._getImageHandler.bind(this)}],
             ['clipboardSetBrowserOffscreen', {async: false, handler: this._setClipboardBrowser.bind(this)}],
@@ -65,6 +65,8 @@ export class Offscreen {
             ['getTermFrequenciesOffscreen',  {async: true,  handler: this._getTermFrequenciesHandler.bind(this)}],
             ['clearDatabaseCachesOffscreen', {async: false, handler: this._clearDatabaseCachesHandler.bind(this)}]
         ]);
+        /** @type {import('offscreen').MessageHandlerMap<string>} */
+        this._messageHandlers = messageHandlers;
 
         const onMessage = this._onMessage.bind(this);
         chrome.runtime.onMessage.addListener(onMessage);
