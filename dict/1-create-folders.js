@@ -22,7 +22,6 @@ const folders = [
     'kaikki',
     'sentences',
     'tidy',
-    'ipa',
     'language',
     'temp',
     'temp/dict',
