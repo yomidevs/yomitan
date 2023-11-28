@@ -233,11 +233,11 @@ function getProlongedHiragana(previousCharacter) {
 
 export class JapaneseUtil {
     /**
-     * @param {?import('wanakana')} wanakana
+     * @param {?import('wanakana')|import('../../../lib/wanakana.js')} wanakana
      */
     constructor(wanakana=null) {
         /** @type {?import('wanakana')} */
-        this._wanakana = wanakana;
+        this._wanakana = /** @type {import('wanakana')} */ (wanakana);
     }
 
     // Character code testing functions

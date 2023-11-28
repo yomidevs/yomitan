@@ -197,7 +197,7 @@ export class TemplateRenderer {
          */
         function wrapper(...args) {
             const argCountM1 = Math.max(0, args.length - 1);
-            const options = /** @type {Handlebars.HelperOptions} */ (args[argCountM1]);
+            const options = /** @type {import('handlebars').HelperOptions} */ (args[argCountM1]);
             args.length = argCountM1;
             return helper(args, this, options);
         }
