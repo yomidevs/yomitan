@@ -368,12 +368,11 @@ function incrementCounter(key, counter) {
     counter[key] = (counter[key] || 0) + 1;
 }
 
-
 function normalizeOrthography(term) {
     switch (language_short) {
         case 'ar':
             return term
-                // .replace(/[\u064E-\u0650]/g, '');
+                .replace(/[\u064E-\u0650]/g, '');
         case 'la':
             const diacriticMap = {
                 'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u', 'ȳ': 'y',
