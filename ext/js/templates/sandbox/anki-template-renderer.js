@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Handlebars} from '../../../lib/handlebars.js';
+import {Handlebars} from 'handlebars';
 import {AnkiNoteDataCreator} from '../../data/sandbox/anki-note-data-creator.js';
 import {PronunciationGenerator} from '../../display/sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';

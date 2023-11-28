@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../lib/wanakana.js';
+import * as wanakana from 'wanakana';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {EventListenerCollection, invokeMessageHandler} from '../core.js';
 import {yomitan} from '../yomitan.js';

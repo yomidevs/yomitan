@@ -12,6 +12,7 @@
         "skipLibCheck": false,
         "baseUrl": ".",
         "paths": {
+            "zip.js": ["@zip.js/zip.js"],
             "*": ["./types/ext/*"]
         },
         "types": [
@@ -29,7 +30,7 @@
     "include": [
         "ext/**/*.js",
         "types/ext/**/*.ts",
-        "types/other/web-set-timeout.d.ts"
+        "types/other/globals.d.ts"
     ],
     "exclude": [
         "node_modules",

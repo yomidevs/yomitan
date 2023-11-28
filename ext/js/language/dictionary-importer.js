@@ -16,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as ajvSchemas0 from '../../lib/validate-schemas.js';
+import * as ajvSchemas0 from 'validate-schemas';
 import {
     BlobWriter as BlobWriter0,
     TextWriter as TextWriter0,
     Uint8ArrayReader as Uint8ArrayReader0,
     ZipReader as ZipReader0,
     configure
-} from '../../lib/zip.js';
+} from 'zip.js';
 import {stringReverse} from '../core.js';
 import {MediaUtil} from '../media/media-util.js';
 import {ExtensionError} from '../core/extension-error.js';

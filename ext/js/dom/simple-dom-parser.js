@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as parse5 from '../../lib/parse5.js';
+import * as parse5 from 'parse5';
 
 /**
  * @augments import('simple-dom-parser').ISimpleDomParser

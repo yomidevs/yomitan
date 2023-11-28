@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import * as wanakana from 'wanakana';
 import {expect, test} from 'vitest';
 import {TextSourceMap} from '../ext/js/general/text-source-map.js';
 import {JapaneseUtil} from '../ext/js/language/sandbox/japanese-util.js';
-import * as wanakana from '../ext/lib/wanakana.js';
 
 const jp = new JapaneseUtil(wanakana);
 

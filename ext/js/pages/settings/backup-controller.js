@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Dexie} from '../../../lib/dexie.js';
+import {Dexie} from 'dexie';
 import {isObject, log} from '../../core.js';
 import {OptionsUtil} from '../../data/options-util.js';
 import {ArrayBufferUtil} from '../../data/sandbox/array-buffer-util.js';

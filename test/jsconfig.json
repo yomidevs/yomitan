@@ -12,6 +12,7 @@
         "skipLibCheck": false,
         "baseUrl": ".",
         "paths": {
+            "zip.js": ["@zip.js/zip.js"],
             "*": ["../types/ext/*"],
             "dev/*": ["../types/dev/*"],
             "test/*": ["../types/test/*"]
