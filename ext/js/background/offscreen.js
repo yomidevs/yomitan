@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from 'wanakana';
+import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {invokeMessageHandler} from '../core.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';

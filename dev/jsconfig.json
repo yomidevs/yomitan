@@ -12,7 +12,6 @@
         "skipLibCheck": false,
         "baseUrl": ".",
         "paths": {
-            "zip.js": ["@zip.js/zip.js"],
             "anki-templates": ["../types/ext/anki-templates"],
             "anki-templates-internal": ["../types/ext/anki-templates-internal"],
             "cache-map": ["../types/ext/cache-map"],

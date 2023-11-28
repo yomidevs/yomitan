@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from 'wanakana';
+import * as wanakana from '../../../lib/wanakana.js';
 import {Frontend} from '../../app/frontend.js';
 import {TextSourceRange} from '../../dom/text-source-range.js';
 import {yomitan} from '../../yomitan.js';
