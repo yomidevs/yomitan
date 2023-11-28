@@ -154,7 +154,7 @@ ${nineNine.length} words cover 99%.
 
 Frequency list contains ${freqArr.length.toLocaleString()} unique word(s).
 
-${((totalWords - missedWords) / totalWords * 100).toFixed(2)}% of words were able to find a definition.
+${(totalWords / (totalWords + missedWords) * 100).toFixed(2)}% of words were able to find a definition.
 `;
 
 console.log(message);

@@ -84,8 +84,6 @@ lr.on('line', (line) => {
 
       const glosses = raw_glosses || sense.glosses;
 
-      const selectedTags = (tags || []).filter(tag => ['masculine', 'feminine', 'neuter'].includes(tag));
-
       if (glosses && glosses.length > 0) {
         if (form_of) {
           formStuff.push([word, sense, pos]);
@@ -95,7 +93,12 @@ lr.on('line', (line) => {
             lemmaDict[word][pos] ??= {};
 
             lemmaDict[word][pos].ipa ??= ipa;
-            lemmaDict[word][pos].glosses ??= [];
+            lemmaDict[word][pos].senses ??= [];
+
+            const currSense = {
+              'glosses': [],
+              'tags': tags || [],
+            }
 
             if (glosses.length > 1) {
               let nestedObj = nestedGlossObj;
@@ -106,30 +109,25 @@ lr.on('line', (line) => {
 
               if (senseIndex === senses.length - 1) {
                 if (Object.keys(nestedGlossObj).length > 0) {
-                  handleNest(nestedGlossObj, word, pos);
+                  handleNest(nestedGlossObj, currSense);
                   nestedGlossObj = {};
                 }
               }
             } else if (glosses.length === 1) {
               if (Object.keys(nestedGlossObj).length > 0) {
-                handleNest(nestedGlossObj, word, pos);
+                handleNest(nestedGlossObj, currSense);
                 nestedGlossObj = {};
               }
 
               const [gloss] = glosses;
 
-              if (!JSON.stringify(lemmaDict[word][pos].glosses).includes(gloss)) {
-                lemmaDict[word][pos].glosses.push(gloss);
+              if (!JSON.stringify(currSense.glosses).includes(gloss)) {
+                currSense.glosses.push(gloss);
               }
             }
 
-            if (selectedTags.length > 0) {
-              lemmaDict[word][pos].tags ??= [];
-              for (const tag of selectedTags) {
-                if (!lemmaDict[word][pos].tags.includes(tag)) {
-                  lemmaDict[word][pos].tags.push(tag);
-                }
-              }
+            if(currSense.glosses.length > 0){
+              lemmaDict[word][pos].senses.push(currSense);
             }
           }
 
@@ -233,12 +231,12 @@ function handleLevel(nest, level) {
   return nestDefs;
 }
 
-function handleNest(nestedGlossObj, word, pos) {
+function handleNest(nestedGlossObj, sense) {
   const nestedGloss = handleLevel(nestedGlossObj, 1);
 
   if (nestedGloss.length > 0) {
     for (const entry of nestedGloss) {
-      lemmaDict[word][pos].glosses.push({ "type": "structured-content", "content": entry });
+      sense.glosses.push({ "type": "structured-content", "content": entry });
     }
   }
 }

@@ -45,14 +45,14 @@
     "🇩🇪⬇️",
     "",
     0,
-    "Southern German",
+    ["Southern German", "Southern"],
     0
    ],
    [
     "🇩🇪⬆️",
     "",
     0,
-    "Northern Germany",
+    ["Northern Germany", "Northern-Germany"],
     0
    ],
    [
@@ -63,10 +63,17 @@
     0
    ],
    [
+    "🇱🇮",
+    "",
+    0,
+    "Liechtenstein",
+    0
+   ],
+   [
     "🇩🇪⬅️",
     "",
     0,
-    "western Germany",
+    ["western Germany", "Western"],
     0
    ],
    [
@@ -95,6 +102,76 @@
       "",
       0,
       "Rotwelsch",
+      0
+    ],
+    [
+      "c-1",
+      "",
+      0,
+      "class-1",
+      0
+    ],
+    [
+      "c-2",
+      "",
+      0,
+      "class-2",
+      0
+    ],
+    [
+      "c-3",
+      "",
+      0,
+      "class-3",
+      0
+    ],
+    [
+      "c-4",
+      "",
+      0,
+      "class-4",
+      0
+    ],
+    [
+      "c-5",
+      "",
+      0,
+      "class-5",
+      0
+    ],
+    [
+      "c-6",
+      "",
+      0,
+      "class-6",
+      0
+    ],
+    [
+      "c-7",
+      "",
+      0,
+      "class-7",
+      0
+    ],
+    [
+      "strong",
+      "",
+      0,
+      "strong",
+      0
+    ],
+    [
+      "weak",
+      "",
+      0,
+      "weak",
+      0
+    ],
+    [
+      "mix",
+      "",
+      0,
+      "mixed",
       0
     ]
  ]

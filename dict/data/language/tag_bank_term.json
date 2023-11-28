@@ -49,10 +49,17 @@
 		1
 	],
 	[
+		"prop-n",
+		"partOfSpeech",
+		-1,
+		["proper noun", "proper-noun"],
+		1
+	],
+	[
 		"adj",
 		"partOfSpeech",
 		-1,
-		"adj",
+		["adjective", "adj"],
 		1
 	],
 	[
@@ -70,10 +77,17 @@
 		1
 	],
 	[
+		"surn",
+		"",
+		0,
+		"surname",
+		0
+	],
+	[
 		"adv",
 		"partOfSpeech",
 		-1,
-		"adv",
+		["adverb", "adv"],
 		1
 	],
 	[
@@ -87,14 +101,14 @@
         "intj",
         "partOfSpeech",
         -1,
-        "intj",
+        ["interjection", "intj"],
         1
     ],
 	[
 		"det",
 		"partOfSpeech",
 		-1,
-		"det",
+		["determiner", "det"],
 		1
 	],
 	[
@@ -108,14 +122,14 @@
         "prep",
         "partOfSpeech",
         -1,
-        "prep",
+        ["preposition", "prep"],
         1
     ],
 	[
 		"postp",
 		"partOfSpeech",
 		-1,
-		"postp",
+		["postposition", "postp"],
 		1
 	],
     [
@@ -136,7 +150,7 @@
         "pron",
         "partOfSpeech",
         -1,
-        "pron",
+        ["pronoun", "pron"],
         1
     ],
     [
@@ -150,21 +164,21 @@
         "num",
         "partOfSpeech",
         -1,
-        "num",
+        ["numeral", "num"],
         1
     ],
 	[
 		"conj",
 		"partOfSpeech",
 		-1,
-		"conj",
+		["conjunction", "conj"],
 		1
 	],
 	[
 		"prep-phrase",
 		"partOfSpeech",
 		-1,
-		"prep_phrase",
+		["prepositional phrase", "prep_phrase"],
 		1
 	],
 	[
@@ -185,28 +199,28 @@
         "vt",
         "partOfSpeech",
         -1,
-        "transitive",
+        ["transitive verb", "transitive"],
         1
     ],
     [
         "vi",
         "partOfSpeech",
         -1,
-        "intransitive",
+        ["intransitive verb", "intransitive"],
         1
     ],
     [
         "vr",
         "partOfSpeech",
         -1,
-        "reflexive",
+        ["reflexive verb", "reflexive"],
         1
     ],
 	[
 		"vdt",
 		"partOfSpeech",
 		-1,
-		"ditransitive",
+		["ditransitive verb", "ditransitive"],
 		1
 	],
 	[
@@ -220,7 +234,7 @@
 		"pl-only",
 		"",
 		0,
-		"plural only",
+		["plural only", "plural-only"],
 		0
 	],
 	[
@@ -231,10 +245,31 @@
 		0
 	],
 	[
+		"no-pl",
+		"",
+		0,
+		"no-plural",
+		0
+	],
+	[
+		"in-pl",
+		"",
+		0,
+		"in the plural",
+		0
+	],
+	[
+		"in-sg",
+		"",
+		0,
+		"in the singular",
+		0
+	],
+	[
 		"sg-only",
 		"",
 		0,
-		"singular only",
+		["singular only", "singular-only"],
 		0
 	],
 	[
@@ -476,7 +511,7 @@
         0
     ],
     [
-        "rel",
+        "reltnl",
         "",
         0,
         "relational",
@@ -1565,6 +1600,55 @@
 		"",
 		0,
 		"trigonometry",
+		0
+	],
+	[
+		"bank",
+		"",
+		0,
+		"banking",
+		0
+	],
+	[
+		"reltv",
+		"",
+		0,
+		"relative",
+		0
+	],
+	[
+		"abbv",
+		"",
+		0,
+		"abbreviation",
+		0
+	],
+	[
+		"irreg",
+		"",
+		0,
+		"irregular",
+		0
+	],
+	[
+		"indecl",
+		"",
+		0,
+		"indeclinable",
+		0
+	],
+	[
+		"not-comp",
+		"",
+		0,
+		["not comparable", "not-comparable"],
+		0
+	],
+	[
+		"init",
+		"",
+		0,
+		"initialism",
 		0
 	]
 ]
