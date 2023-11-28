@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type {PopupMenu} from '../../ext/js/dom/popup-menu';
+
 export type EventType = 'close';
 
 export type CloseReason = 'close' | 'outside' | 'item' | 'resize';

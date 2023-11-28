@@ -15,4 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type {TextSourceElement} from '../../ext/js/dom/text-source-element';
+import type {TextSourceRange} from '../../ext/js/dom/text-source-range';
+
 export type TextSource = TextSourceRange | TextSourceElement;

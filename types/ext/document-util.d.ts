@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type * as TextSource from './text-source';
+
 export type NormalizedWritingMode = 'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | 'sideways-lr';
 
 /**
@@ -44,7 +46,7 @@ export type GetRangeFromPointHandler = (
     y: number,
     /** Options to configure how element detection is performed. */
     options: GetRangeFromPointOptions,
-) => (TextSourceRange | TextSourceElement | null);
+) => (TextSource.TextSource | null);
 
 export type ToNumberConstraints = {
     min?: string | number;

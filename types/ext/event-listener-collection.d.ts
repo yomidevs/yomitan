@@ -16,6 +16,7 @@
  */
 
 import type * as Core from './core';
+import type {EventDispatcher} from '../../ext/js/core';
 
 export type EventListenerFunction = (...args: Core.SafeAny[]) => unknown;
 

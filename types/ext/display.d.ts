@@ -19,8 +19,12 @@ import type * as Core from './core';
 import type * as Dictionary from './dictionary';
 import type * as Extension from './extension';
 import type * as Settings from './settings';
-import type * as TextScanner from './text-scanner';
+import type * as TextScannerTypes from './text-scanner';
 import type * as TextSource from './text-source';
+import type {DisplayContentManager} from '../../ext/js/display/display-content-manager';
+import type {HotkeyHelpController} from '../../ext/js/input/hotkey-help-controller';
+import type {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util';
+import type {TextScanner} from '../../ext/js/language/text-scanner';
 
 export type HistoryMode = 'clear' | 'overwrite' | 'new';
 
@@ -114,7 +118,7 @@ export type SearchPersistentStateControllerEventType = 'modeChange';
 
 export type SearchMode = null | 'popup' | 'action-popup';
 
-export type GetSearchContextCallback = TextScanner.GetSearchContextCallbackSync;
+export type GetSearchContextCallback = TextScannerTypes.GetSearchContextCallbackSync;
 
 export type QueryParserConstructorDetails = {
     getSearchContext: GetSearchContextCallback;
@@ -127,7 +131,7 @@ export type QueryParserOptions = {
     readingMode: Settings.ParsingReadingMode;
     useInternalParser: boolean;
     useMecabParser: boolean;
-    scanning: TextScanner.Options;
+    scanning: TextScannerTypes.Options;
 };
 
 export type QueryParserEventType = 'searched';
@@ -137,7 +141,7 @@ export type QueryParserSearchedEvent = {
     type: PageType;
     dictionaryEntries: Dictionary.DictionaryEntry[];
     sentence: HistoryStateSentence;
-    inputInfo: TextScanner.InputInfo;
+    inputInfo: TextScannerTypes.InputInfo;
     textSource: TextSource.TextSource;
     optionsContext: Settings.OptionsContext;
     sentenceOffset: number | null;

@@ -18,6 +18,7 @@
 import type * as Audio from './audio';
 import type * as Settings from './settings';
 import type * as AudioDownloader from './audio-downloader';
+import type {TextToSpeechAudio} from '../../ext/js/media/text-to-speech-audio';
 
 export type CacheItem = {
     sourceMap: Map<number, CachedInfoList>;

@@ -16,7 +16,9 @@
  */
 
 import type * as Dictionary from './dictionary';
-import type * as DictionaryDatabase from './dictionary-database';
+import type * as DictionaryDatabaseTypes from './dictionary-database';
+import type {DictionaryDatabase} from '../../ext/js/language/dictionary-database';
+import type {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util';
 
 export type ConstructorDetails = {
     /** An instance of JapaneseUtil. */
@@ -57,7 +59,7 @@ export type TagExpansionTarget = {
 
 export type DictionaryTagCache = Map<string, TagCache>;
 
-export type TagCache = Map<string, DictionaryDatabase.Tag | null>;
+export type TagCache = Map<string, DictionaryDatabaseTypes.Tag | null>;
 
 export type TagTargetMap = Map<string, Map<string, TagTargetItem>>;
 
@@ -66,7 +68,7 @@ export type TagTargetItem = {
     dictionary: string;
     tagName: string;
     cache: TagCache | null;
-    databaseTag: DictionaryDatabase.Tag | null;
+    databaseTag: DictionaryDatabaseTypes.Tag | null;
     targets: Dictionary.Tag[][];
 };
 

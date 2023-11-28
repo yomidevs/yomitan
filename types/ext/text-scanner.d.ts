@@ -20,6 +20,7 @@ import type * as Display from './display';
 import type * as Input from './input';
 import type * as Settings from './settings';
 import type * as TextSource from './text-source';
+import type {TextScanner} from '../../ext/js/language/text-scanner';
 
 export type SearchResultDetail = {
     documentTitle: string;

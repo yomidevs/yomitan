@@ -15,6 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type {PopupFactory} from '../../ext/js/app/popup-factory';
+import type {HotkeyHandler} from '../../ext/js/input/hotkey-handler';
+
 /** Details about how to set up the instance. */
 export type ConstructorDetails = {
     /** The type of page, one of 'web', 'popup', or 'search'. */
