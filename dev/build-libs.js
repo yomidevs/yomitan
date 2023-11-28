@@ -35,7 +35,10 @@ async function buildLib(p) {
         target: 'es2020',
         format: 'esm',
         outfile: path.join(extDir, 'lib', path.basename(p)),
-        external: ['fs']
+        external: ['fs'],
+        banner: {
+            js: '// @ts-nocheck'
+        }
     });
 }
 
@@ -57,7 +60,7 @@ export async function buildLibs() {
     const moduleCode = standaloneCode(ajv);
 
     // https://github.com/ajv-validator/ajv/issues/2209
-    const patchedModuleCode = "import {ucs2length} from './ucs2length.js';" + moduleCode.replaceAll('require("ajv/dist/runtime/ucs2length").default', 'ucs2length');
+    const patchedModuleCode = "// @ts-nocheck\nimport {ucs2length} from './ucs2length.js';" + moduleCode.replaceAll('require("ajv/dist/runtime/ucs2length").default', 'ucs2length');
 
     fs.writeFileSync(path.join(extDir, 'lib/validate-schemas.js'), patchedModuleCode);
 }
