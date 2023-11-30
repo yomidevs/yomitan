@@ -3,7 +3,7 @@
         "module": "ES2022",
         "target": "ES2022",
         "checkJs": true,
-        "moduleResolution": "bundler",
+        "moduleResolution": "node",
         "strict": true,
         "strictNullChecks": true,
         "noImplicitAny": true,
@@ -14,7 +14,8 @@
         "paths": {
             "*": ["../types/ext/*"],
             "dev/*": ["../types/dev/*"],
-            "test/*": ["../types/test/*"]
+            "test/*": ["../types/test/*"],
+            "rollup/parseAst": ["../types/other/rollup-parse-ast"]
         },
         "types": [
             "chrome",

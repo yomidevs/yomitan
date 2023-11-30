@@ -3,7 +3,7 @@
         "module": "ES2022",
         "target": "ES2022",
         "checkJs": true,
-        "moduleResolution": "bundler",
+        "moduleResolution": "node",
         "strict": true,
         "strictNullChecks": true,
         "noImplicitAny": true,
@@ -36,7 +36,8 @@
             "translator": ["../types/ext/translator"],
             "translation": ["../types/ext/translation"],
             "translation-internal": ["../types/ext/translation-internal"],
-            "dev/*": ["../types/dev/*"]
+            "dev/*": ["../types/dev/*"],
+            "rollup/parseAst": ["../types/other/rollup-parse-ast"]
         },
         "types": [
             "node",
