@@ -18,6 +18,7 @@
 
 import {testDictionaryFiles} from '../dictionary-validate.js';
 
+/** */
 async function main() {
     const dictionaryFileNames = process.argv.slice(2);
     if (dictionaryFileNames.length === 0) {

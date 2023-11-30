@@ -254,7 +254,7 @@ export async function main(argv) {
         await build(buildDir, extDir, manifestUtil, variantNames, manifestPath, dryRun, dryRunBuildZip, yomitanVersion);
     } finally {
         // Restore manifest
-        const manifestName = (!args.get('default') && args.get('manifest') !== null) ? args.get('manifest') : null;
+        const manifestName = /** @type {?string} */ ((!args.get('default') && args.get('manifest') !== null) ? args.get('manifest') : null);
         const restoreManifest = manifestUtil.getManifest(manifestName);
         process.stdout.write('Restoring manifest...\n');
         if (!dryRun) {

@@ -771,6 +771,14 @@
                 "jsdoc/require-jsdoc": "off",
                 "jsdoc/no-undefined-types": "off"
             }
+        },
+        {
+            "files": [
+                "dev/lib/**/*.js"
+            ],
+            "extends": [
+                "plugin:@typescript-eslint/disable-type-checked"
+            ]
         }
     ]
 }

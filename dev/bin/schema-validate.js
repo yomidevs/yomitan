@@ -20,6 +20,7 @@ import fs from 'fs';
 import {performance} from 'perf_hooks';
 import {createJsonSchema} from '../schema-validate.js';
 
+/** */
 function main() {
     const args = process.argv.slice(2);
     if (args.length < 2) {
