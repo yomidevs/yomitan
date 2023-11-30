@@ -668,9 +668,8 @@ export class AnkiTemplateRenderer {
      * @type {import('template-renderer').HelperFunction<string>}
      */
     _formatGlossary(args, context, options) {
-        const [dictionary] = /** @type {[dictionary: string]} */ (args);
+        const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossary]} */ (args);
         const data = options.data.root;
-        const content = /** @type {import('dictionary-data').TermGlossary} */ (args[0]);
         if (typeof content === 'string') { return this._stringToMultiLineHtml(this._escape(content)); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }
         switch (content.type) {
