@@ -30,24 +30,48 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // DOMRect class definition
 class DOMRect {
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} width
+     * @param {number} height
+     */
     constructor(x, y, width, height) {
+        /** @type {number} */
         this._x = x;
+        /** @type {number} */
         this._y = y;
+        /** @type {number} */
         this._width = width;
+        /** @type {number} */
         this._height = height;
     }
 
+    /** @type {number} */
     get x() { return this._x; }
+    /** @type {number} */
     get y() { return this._y; }
+    /** @type {number} */
     get width() { return this._width; }
+    /** @type {number} */
     get height() { return this._height; }
+    /** @type {number} */
     get left() { return this._x + Math.min(0, this._width); }
+    /** @type {number} */
     get right() { return this._x + Math.max(0, this._width); }
+    /** @type {number} */
     get top() { return this._y + Math.min(0, this._height); }
+    /** @type {number} */
     get bottom() { return this._y + Math.max(0, this._height); }
+    /** @returns {string} */
+    toJSON() { return '<not implemented>'; }
 }
 
 
+/**
+ * @param {string} fileName
+ * @returns {JSDOM}
+ */
 function createJSDOM(fileName) {
     const domSource = fs.readFileSync(fileName, {encoding: 'utf8'});
     const dom = new JSDOM(domSource);
@@ -65,10 +89,20 @@ function createJSDOM(fileName) {
     return dom;
 }
 
+/**
+ * @param {Element} element
+ * @param {string|undefined} selector
+ * @returns {?Element}
+ */
 function querySelectorChildOrSelf(element, selector) {
     return selector ? element.querySelector(selector) : element;
 }
 
+/**
+ * @param {JSDOM} dom
+ * @param {?Node} node
+ * @returns {?Text|Node}
+ */
 function getChildTextNodeOrSelf(dom, node) {
     if (node === null) { return null; }
     const Node = dom.window.Node;
@@ -76,6 +110,10 @@ function getChildTextNodeOrSelf(dom, node) {
     return (childNode !== null && childNode.nodeType === Node.TEXT_NODE ? childNode : node);
 }
 
+/**
+ * @param {unknown} value
+ * @returns {unknown}
+ */
 function getPrototypeOfOrNull(value) {
     try {
         return Object.getPrototypeOf(value);
@@ -84,12 +122,17 @@ function getPrototypeOfOrNull(value) {
     }
 }
 
+/**
+ * @param {Document} document
+ * @returns {?Element}
+ */
 function findImposterElement(document) {
     // Finds the imposter element based on it's z-index style
     return document.querySelector('div[style*="2147483646"]>*');
 }
 
 
+/** */
 async function testDocument1() {
     const dom = createJSDOM(path.join(dirname, 'data', 'html', 'test-document1.html'));
     const window = dom.window;
@@ -102,13 +145,16 @@ async function testDocument1() {
     }
 }
 
+/**
+ * @param {JSDOM} dom
+ */
 async function testDocumentTextScanningFunctions(dom) {
     const document = dom.window.document;
 
     test('DocumentTextScanningFunctions', () => {
-        for (const testElement of document.querySelectorAll('.test[data-test-type=scan]')) {
-        // Get test parameters
-            let {
+        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.test[data-test-type=scan]'))) {
+            // Get test parameters
+            const {
                 elementFromPointSelector,
                 caretRangeFromPointSelector,
                 startNodeSelector,
@@ -127,10 +173,10 @@ async function testDocumentTextScanningFunctions(dom) {
             const startNode = getChildTextNodeOrSelf(dom, querySelectorChildOrSelf(testElement, startNodeSelector));
             const endNode = getChildTextNodeOrSelf(dom, querySelectorChildOrSelf(testElement, endNodeSelector));
 
-            startOffset = parseInt(startOffset, 10);
-            endOffset = parseInt(endOffset, 10);
-            sentenceScanExtent = parseInt(sentenceScanExtent, 10);
-            terminateAtNewlines = (terminateAtNewlines !== 'false');
+            const startOffset2 = parseInt(/** @type {string} */ (startOffset), 10);
+            const endOffset2 = parseInt(/** @type {string} */ (endOffset), 10);
+            const sentenceScanExtent2 = parseInt(/** @type {string} */ (sentenceScanExtent), 10);
+            const terminateAtNewlines2 = (terminateAtNewlines !== 'false');
 
             expect(elementFromPointValue).not.toStrictEqual(null);
             expect(caretRangeFromPointValue).not.toStrictEqual(null);
@@ -145,11 +191,25 @@ async function testDocumentTextScanningFunctions(dom) {
                 expect(!!imposter).toStrictEqual(hasImposter === 'true');
 
                 const range = document.createRange();
-                range.setStart(imposter ? imposter : startNode, startOffset);
-                range.setEnd(imposter ? imposter : startNode, endOffset);
+                range.setStart(/** @type {Node} */ (imposter ? imposter : startNode), startOffset2);
+                range.setEnd(/** @type {Node} */ (imposter ? imposter : startNode), endOffset2);
 
                 // Override getClientRects to return a rect guaranteed to contain (x, y)
-                range.getClientRects = () => [new DOMRect(x - 1, y - 1, 2, 2)];
+                range.getClientRects = () => {
+                    /** @type {import('test/document-types').PseudoDOMRectList} */
+                    const domRectList = Object.assign(
+                        [new DOMRect(x - 1, y - 1, 2, 2)],
+                        {
+                            /**
+                             * @this {DOMRect[]}
+                             * @param {number} index
+                             * @returns {DOMRect}
+                             */
+                            item: function item(index) { return this[index]; }
+                        }
+                    );
+                    return domRectList;
+                };
                 return range;
             };
 
@@ -192,8 +252,8 @@ async function testDocumentTextScanningFunctions(dom) {
             const sentenceActual = DocumentUtil.extractSentence(
                 source,
                 false,
-                sentenceScanExtent,
-                terminateAtNewlines,
+                sentenceScanExtent2,
+                terminateAtNewlines2,
                 terminatorMap,
                 forwardQuoteMap,
                 backwardQuoteMap
@@ -206,13 +266,16 @@ async function testDocumentTextScanningFunctions(dom) {
     });
 }
 
+/**
+ * @param {JSDOM} dom
+ */
 async function testTextSourceRangeSeekFunctions(dom) {
     const document = dom.window.document;
 
     test('TextSourceRangeSeekFunctions', async () => {
-        for (const testElement of document.querySelectorAll('.test[data-test-type=text-source-range-seek]')) {
-        // Get test parameters
-            let {
+        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.test[data-test-type=text-source-range-seek]'))) {
+            // Get test parameters
+            const {
                 seekNodeSelector,
                 seekNodeIsText,
                 seekOffset,
@@ -224,34 +287,37 @@ async function testTextSourceRangeSeekFunctions(dom) {
                 expectedResultContent
             } = testElement.dataset;
 
-            seekOffset = parseInt(seekOffset, 10);
-            seekLength = parseInt(seekLength, 10);
-            expectedResultOffset = parseInt(expectedResultOffset, 10);
+            const seekOffset2 = parseInt(/** @type {string} */ (seekOffset), 10);
+            const seekLength2 = parseInt(/** @type {string} */ (seekLength), 10);
+            const expectedResultOffset2 = parseInt(/** @type {string} */ (expectedResultOffset), 10);
 
-            let seekNode = testElement.querySelector(seekNodeSelector);
-            if (seekNodeIsText === 'true') {
+            /** @type {?Node} */
+            let seekNode = testElement.querySelector(/** @type {string} */ (seekNodeSelector));
+            if (seekNodeIsText === 'true' && seekNode !== null) {
                 seekNode = seekNode.firstChild;
             }
 
-            let expectedResultNode = testElement.querySelector(expectedResultNodeSelector);
-            if (expectedResultNodeIsText === 'true') {
+            /** @type {?Node} */
+            let expectedResultNode = testElement.querySelector(/** @type {string} */ (expectedResultNodeSelector));
+            if (expectedResultNodeIsText === 'true' && expectedResultNode !== null) {
                 expectedResultNode = expectedResultNode.firstChild;
             }
 
             const {node, offset, content} = (
-            seekDirection === 'forward' ?
-            new DOMTextScanner(seekNode, seekOffset, true, false).seek(seekLength) :
-            new DOMTextScanner(seekNode, seekOffset, true, false).seek(-seekLength)
+                seekDirection === 'forward' ?
+                new DOMTextScanner(/** @type {Node} */ (seekNode), seekOffset2, true, false).seek(seekLength2) :
+                new DOMTextScanner(/** @type {Node} */ (seekNode), seekOffset2, true, false).seek(-seekLength2)
             );
 
             expect(node).toStrictEqual(expectedResultNode);
-            expect(offset).toStrictEqual(expectedResultOffset);
+            expect(offset).toStrictEqual(expectedResultOffset2);
             expect(content).toStrictEqual(expectedResultContent);
         }
     });
 }
 
 
+/** */
 async function main() {
     await testDocument1();
 }

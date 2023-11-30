@@ -21,8 +21,16 @@ import path from 'path';
 import {describe, expect, test} from 'vitest';
 import {Deinflector} from '../ext/js/language/deinflector.js';
 
+/**
+ * @param {Deinflector} deinflector
+ * @param {string} source
+ * @param {string} expectedTerm
+ * @param {string} expectedRule
+ * @param {string[]|undefined} expectedReasons
+ * @returns {{has: false, reasons: null, rules: null}|{has: true, reasons: string[], rules: number}}
+ */
 function hasTermReasons(deinflector, source, expectedTerm, expectedRule, expectedReasons) {
-    for (const {term, reasons, rules} of deinflector.deinflect(source, source)) {
+    for (const {term, reasons, rules} of deinflector.deinflect(source)) {
         if (term !== expectedTerm) { continue; }
         if (typeof expectedRule !== 'undefined') {
             const expectedFlags = Deinflector.rulesToRuleFlags([expectedRule]);
@@ -46,6 +54,7 @@ function hasTermReasons(deinflector, source, expectedTerm, expectedRule, expecte
 }
 
 
+/** */
 function testDeinflections() {
     const data = [
         {
@@ -915,7 +924,7 @@ function testDeinflections() {
         }
     ];
 
-    const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect.json')));
+    const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect.json'), {encoding: 'utf8'}));
     const deinflector = new Deinflector(deinflectionReasons);
 
     describe('deinflections', () => {
@@ -939,6 +948,7 @@ function testDeinflections() {
 }
 
 
+/** */
 function main() {
     testDeinflections();
 }
