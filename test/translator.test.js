@@ -28,6 +28,7 @@ vi.stubGlobal('IDBKeyRange', IDBKeyRange);
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/** */
 async function main() {
     const translatorVM = new TranslatorVM();
     const dictionaryDirectory = path.join(dirname, 'data', 'dictionaries', 'valid-dictionary1');
@@ -53,6 +54,7 @@ async function main() {
                 case 'findTerms':
                     {
                         const {name, mode, text} = t;
+                        /** @type {import('translation').FindTermsOptions} */
                         const options = translatorVM.buildOptions(optionsPresets, t.options);
                         const {dictionaryEntries, originalTextLength} = structuredClone(await translatorVM.translator.findTerms(mode, text, options));
                         const noteDataList = mode !== 'simple' ? structuredClone(dictionaryEntries.map((dictionaryEntry) => translatorVM.createTestAnkiNoteData(structuredClone(dictionaryEntry), mode))) : null;
@@ -66,9 +68,10 @@ async function main() {
                 case 'findKanji':
                     {
                         const {name, text} = t;
+                        /** @type {import('translation').FindKanjiOptions} */
                         const options = translatorVM.buildOptions(optionsPresets, t.options);
                         const dictionaryEntries = structuredClone(await translatorVM.translator.findKanji(text, options));
-                        const noteDataList = structuredClone(dictionaryEntries.map((dictionaryEntry) => translatorVM.createTestAnkiNoteData(structuredClone(dictionaryEntry), null)));
+                        const noteDataList = structuredClone(dictionaryEntries.map((dictionaryEntry) => translatorVM.createTestAnkiNoteData(structuredClone(dictionaryEntry), 'split')));
                         actualResults1.push({name, dictionaryEntries});
                         actualResults2.push({name, noteDataList});
                         expect(dictionaryEntries).toStrictEqual(expected1.dictionaryEntries);

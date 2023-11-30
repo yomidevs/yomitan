@@ -26,20 +26,25 @@ import {expect, test} from 'vitest';
  */
 function testJSDOMSelectorBug() {
     test('JSDOMSelectorBug', () => {
-    // nwsapi is used by JSDOM
+        // nwsapi is used by JSDOM
         const dom = new JSDOM();
         const {document} = dom.window;
         const div = document.createElement('div');
         div.innerHTML = '<div class="b"><div class="c"></div></div>';
         const c = div.querySelector('.c');
-        expect(() => c.matches('.a:nth-last-of-type(1) .b .c')).not.toThrow();
+        expect(() => {
+            if (c === null) { throw new Error('Element not found'); }
+            c.matches('.a:nth-last-of-type(1) .b .c');
+        }).not.toThrow();
     });
 }
 
+/** */
 export function testJSDOM() {
     testJSDOMSelectorBug();
 }
 
+/** */
 function main() {
     testJSDOM();
 }
