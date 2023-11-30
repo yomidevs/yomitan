@@ -26,7 +26,11 @@ import {TranslatorVM} from '../dev/translator-vm.js';
 import {AnkiNoteBuilder} from '../ext/js/data/anki-note-builder.js';
 import {JapaneseUtil} from '../ext/js/language/sandbox/japanese-util.js';
 
-vi.stubGlobal('fetch', async (url2) => {
+/**
+ * @param {string} url2
+ * @returns {Promise<import('dev/vm').PseudoFetchResponse>}
+ */
+async function fetch(url2) {
     const extDir = path.join(__dirname, '..', 'ext');
     let filePath;
     try {
@@ -43,11 +47,15 @@ vi.stubGlobal('fetch', async (url2) => {
         text: async () => Promise.resolve(content.toString('utf8')),
         json: async () => Promise.resolve(JSON.parse(content.toString('utf8')))
     };
-});
+}
+vi.stubGlobal('fetch', fetch);
 vi.mock('../ext/js/templates/template-renderer-proxy.js');
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * @returns {Promise<TranslatorVM>}
+ */
 async function createVM() {
     const dictionaryDirectory = path.join(dirname, 'data', 'dictionaries', 'valid-dictionary1');
     const vm = new TranslatorVM();
@@ -57,6 +65,10 @@ async function createVM() {
     return vm;
 }
 
+/**
+ * @param {'terms'|'kanji'} type
+ * @returns {string[]}
+ */
 function getFieldMarkers(type) {
     switch (type) {
         case 'terms':
@@ -117,8 +129,17 @@ function getFieldMarkers(type) {
     }
 }
 
+/**
+ * @param {import('dictionary').DictionaryEntry[]} dictionaryEntries
+ * @param {'terms'|'kanji'} type
+ * @param {import('settings').ResultOutputMode} mode
+ * @param {string} template
+ * @param {import('@vitest/expect').ExpectStatic} expect
+ * @returns {Promise<import('anki').NoteFields[]>}
+ */
 async function getRenderResults(dictionaryEntries, type, mode, template, expect) {
     const markers = getFieldMarkers(type);
+    /** @type {import('anki-note-builder').Field[]} */
     const fields = [];
     for (const marker of markers) {
         fields.push([marker, `{${marker}}`]);
@@ -151,9 +172,10 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
             query: 'query',
             fullQuery: 'fullQuery'
         };
-        const {note: {fields: noteFields}, errors} = await ankiNoteBuilder.createNote({
+        /** @type {import('anki-note-builder').CreateNoteDetails} */
+        const details = {
             dictionaryEntry,
-            mode: null,
+            mode: 'test',
             context,
             template,
             deckName: 'deckName',
@@ -165,8 +187,11 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
             duplicateScopeCheckAllModels: false,
             resultOutputMode: mode,
             glossaryLayoutMode: 'default',
-            compactTags: false
-        });
+            compactTags: false,
+            requirements: [],
+            mediaOptions: null
+        };
+        const {note: {fields: noteFields}, errors} = await ankiNoteBuilder.createNote(details);
         for (const error of errors) {
             console.error(error);
         }
@@ -178,6 +203,7 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
 }
 
 
+/** */
 async function main() {
     const vm = await createVM();
 
@@ -199,6 +225,7 @@ async function main() {
                     case 'findTerms':
                         {
                             const {name, mode, text} = t;
+                            /** @type {import('translation').FindTermsOptions} */
                             const options = vm.buildOptions(optionsPresets, t.options);
                             const {dictionaryEntries} = structuredClone(await vm.translator.findTerms(mode, text, options));
                             const results = mode !== 'simple' ? structuredClone(await getRenderResults(dictionaryEntries, 'terms', mode, template, expect)) : null;
@@ -209,9 +236,10 @@ async function main() {
                     case 'findKanji':
                         {
                             const {name, text} = t;
+                            /** @type {import('translation').FindKanjiOptions} */
                             const options = vm.buildOptions(optionsPresets, t.options);
                             const dictionaryEntries = structuredClone(await vm.translator.findKanji(text, options));
-                            const results = structuredClone(await getRenderResults(dictionaryEntries, 'kanji', null, template, expect));
+                            const results = structuredClone(await getRenderResults(dictionaryEntries, 'kanji', 'split', template, expect));
                             actualResults1.push({name, results});
                             expect(results).toStrictEqual(expected1.results);
                         }
