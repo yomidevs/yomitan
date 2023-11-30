@@ -22,23 +22,34 @@ import path from 'path';
 import {performance} from 'perf_hooks';
 import {createJsonSchema} from './schema-validate.js';
 
+/**
+ * @param {string} relativeFileName
+ * @returns {import('dev/dictionary-validate').Schema}
+ */
 function readSchema(relativeFileName) {
     const fileName = path.join(__dirname, relativeFileName);
     const source = fs.readFileSync(fileName, {encoding: 'utf8'});
     return JSON.parse(source);
 }
 
+/**
+ * @param {import('dev/schema-validate').ValidateMode} mode
+ * @param {import('jszip')} zip
+ * @param {string} fileNameFormat
+ * @param {import('dev/dictionary-validate').Schema} schema
+ */
 async function validateDictionaryBanks(mode, zip, fileNameFormat, schema) {
     let jsonSchema;
     try {
         jsonSchema = createJsonSchema(mode, schema);
     } catch (e) {
-        e.message += `\n(in file ${fileNameFormat})}`;
-        throw e;
+        const e2 = e instanceof Error ? e : new Error(`${e}`);
+        e2.message += `\n(in file ${fileNameFormat})}`;
+        throw e2;
     }
     let index = 1;
     while (true) {
-        const fileName = fileNameFormat.replace(/\?/, index);
+        const fileName = fileNameFormat.replace(/\?/, `${index}`);
 
         const file = zip.files[fileName];
         if (!file) { break; }
@@ -47,14 +58,20 @@ async function validateDictionaryBanks(mode, zip, fileNameFormat, schema) {
         try {
             jsonSchema.validate(data);
         } catch (e) {
-            e.message += `\n(in file ${fileName})}`;
-            throw e;
+            const e2 = e instanceof Error ? e : new Error(`${e}`);
+            e2.message += `\n(in file ${fileName})}`;
+            throw e2;
         }
 
         ++index;
     }
 }
 
+/**
+ * @param {import('dev/schema-validate').ValidateMode} mode
+ * @param {import('jszip')} archive
+ * @param {import('dev/dictionary-validate').Schemas} schemas
+ */
 export async function validateDictionary(mode, archive, schemas) {
     const fileName = 'index.json';
     const indexFile = archive.files[fileName];
@@ -69,8 +86,9 @@ export async function validateDictionary(mode, archive, schemas) {
         const jsonSchema = createJsonSchema(mode, schemas.index);
         jsonSchema.validate(index);
     } catch (e) {
-        e.message += `\n(in file ${fileName})}`;
-        throw e;
+        const e2 = e instanceof Error ? e : new Error(`${e}`);
+        e2.message += `\n(in file ${fileName})}`;
+        throw e2;
     }
 
     await validateDictionaryBanks(mode, archive, 'term_bank_?.json', version === 1 ? schemas.termBankV1 : schemas.termBankV3);
@@ -80,6 +98,9 @@ export async function validateDictionary(mode, archive, schemas) {
     await validateDictionaryBanks(mode, archive, 'tag_bank_?.json', schemas.tagBankV3);
 }
 
+/**
+ * @returns {import('dev/dictionary-validate').Schemas}
+ */
 export function getSchemas() {
     return {
         index: readSchema('../ext/data/schemas/dictionary-index-schema.json'),
@@ -93,6 +114,10 @@ export function getSchemas() {
     };
 }
 
+/**
+ * @param {import('dev/schema-validate').ValidateMode} mode
+ * @param {string[]} dictionaryFileNames
+ */
 export async function testDictionaryFiles(mode, dictionaryFileNames) {
     const schemas = getSchemas();
 

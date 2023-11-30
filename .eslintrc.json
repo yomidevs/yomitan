@@ -765,7 +765,6 @@
         },
         {
             "files": [
-                "dev/**/*.js",
                 "test/**/*.js"
             ],
             "rules": {

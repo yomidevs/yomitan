@@ -26,15 +26,18 @@ import {fileURLToPath} from 'url';
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const extDir = path.join(dirname, '..', 'ext');
 
-async function buildLib(p) {
+/**
+ * @param {string} scriptPath
+ */
+async function buildLib(scriptPath) {
     await esbuild.build({
-        entryPoints: [p],
+        entryPoints: [scriptPath],
         bundle: true,
         minify: false,
         sourcemap: true,
         target: 'es2020',
         format: 'esm',
-        outfile: path.join(extDir, 'lib', path.basename(p)),
+        outfile: path.join(extDir, 'lib', path.basename(scriptPath)),
         external: ['fs'],
         banner: {
             js: '// @ts-nocheck'
@@ -55,7 +58,7 @@ export async function buildLibs() {
 
     const schemaDir = path.join(extDir, 'data/schemas/');
     const schemaFileNames = fs.readdirSync(schemaDir);
-    const schemas = schemaFileNames.map((schemaFileName) => JSON.parse(fs.readFileSync(path.join(schemaDir, schemaFileName))));
+    const schemas = schemaFileNames.map((schemaFileName) => JSON.parse(fs.readFileSync(path.join(schemaDir, schemaFileName), {encoding: 'utf8'})));
     const ajv = new Ajv({schemas: schemas, code: {source: true, esm: true}});
     const moduleCode = standaloneCode(ajv);
 

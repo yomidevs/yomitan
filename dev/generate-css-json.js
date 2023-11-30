@@ -16,9 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import css from 'css';
 import fs from 'fs';
 import path from 'path';
 
+/**
+ * @returns {{cssFile: string, overridesCssFile: string, outputPath: string}[]}
+ */
 export function getTargets() {
     return [
         {
@@ -34,8 +38,11 @@ export function getTargets() {
     ];
 }
 
-import css from 'css';
-
+/**
+ * @param {import('css-style-applier').RawStyleData} rules
+ * @param {string[]} selectors
+ * @returns {number}
+ */
 function indexOfRule(rules, selectors) {
     const jj = selectors.length;
     for (let i = 0, ii = rules.length; i < ii; ++i) {
@@ -53,6 +60,12 @@ function indexOfRule(rules, selectors) {
     return -1;
 }
 
+/**
+ * @param {import('css-style-applier').RawStyleDataStyleArray} styles
+ * @param {string} property
+ * @param {Map<string, number>} removedProperties
+ * @returns {number}
+ */
 function removeProperty(styles, property, removedProperties) {
     let removeCount = removedProperties.get(property);
     if (typeof removeCount !== 'undefined') { return removeCount; }
@@ -69,6 +82,10 @@ function removeProperty(styles, property, removedProperties) {
     return removeCount;
 }
 
+/**
+ * @param {import('css-style-applier').RawStyleData} rules
+ * @returns {string}
+ */
 export function formatRulesJson(rules) {
     // Manually format JSON, for improved compactness
     // return JSON.stringify(rules, null, 4);
@@ -102,27 +119,39 @@ export function formatRulesJson(rules) {
     return result;
 }
 
+/**
+ * @param {string} cssFile
+ * @param {string} overridesCssFile
+ * @returns {import('css-style-applier').RawStyleData}
+ * @throws {Error}
+ */
 export function generateRules(cssFile, overridesCssFile) {
     const content1 = fs.readFileSync(cssFile, {encoding: 'utf8'});
     const content2 = fs.readFileSync(overridesCssFile, {encoding: 'utf8'});
-    const stylesheet1 = css.parse(content1, {}).stylesheet;
-    const stylesheet2 = css.parse(content2, {}).stylesheet;
+    const stylesheet1 = /** @type {css.StyleRules} */ (css.parse(content1, {}).stylesheet);
+    const stylesheet2 = /** @type {css.StyleRules} */ (css.parse(content2, {}).stylesheet);
 
     const removePropertyPattern = /^remove-property\s+([\w\W]+)$/;
     const removeRulePattern = /^remove-rule$/;
     const propertySeparator = /\s+/;
 
+    /** @type {import('css-style-applier').RawStyleData} */
     const rules = [];
 
     // Default stylesheet
     for (const rule of stylesheet1.rules) {
         if (rule.type !== 'rule') { continue; }
-        const {selectors, declarations} = rule;
+        const {selectors, declarations} = /** @type {css.Rule} */ (rule);
+        if (typeof selectors === 'undefined') { continue; }
+        /** @type {import('css-style-applier').RawStyleDataStyleArray} */
         const styles = [];
-        for (const declaration of declarations) {
-            if (declaration.type !== 'declaration') { console.log(declaration); continue; }
-            const {property, value} = declaration;
-            styles.push([property, value]);
+        if (typeof declarations !== 'undefined') {
+            for (const declaration of declarations) {
+                if (declaration.type !== 'declaration') { console.log(declaration); continue; }
+                const {property, value} = /** @type {css.Declaration} */ (declaration);
+                if (typeof property !== 'string' || typeof value !== 'string') { continue; }
+                styles.push([property, value]);
+            }
         }
         if (styles.length > 0) {
             rules.push({selectors, styles});
@@ -132,7 +161,9 @@ export function generateRules(cssFile, overridesCssFile) {
     // Overrides
     for (const rule of stylesheet2.rules) {
         if (rule.type !== 'rule') { continue; }
-        const {selectors, declarations} = rule;
+        const {selectors, declarations} = /** @type {css.Rule} */ (rule);
+        if (typeof selectors === 'undefined' || typeof declarations === 'undefined') { continue; }
+        /** @type {Map<string, number>} */
         const removedProperties = new Map();
         for (const declaration of declarations) {
             switch (declaration.type) {
@@ -146,16 +177,18 @@ export function generateRules(cssFile, overridesCssFile) {
                             entry = {selectors, styles: []};
                             rules.push(entry);
                         }
-                        const {property, value} = declaration;
-                        removeProperty(entry.styles, property, removedProperties);
-                        entry.styles.push([property, value]);
+                        const {property, value} = /** @type {css.Declaration} */ (declaration);
+                        if (typeof property === 'string' && typeof value === 'string') {
+                            removeProperty(entry.styles, property, removedProperties);
+                            entry.styles.push([property, value]);
+                        }
                     }
                     break;
                 case 'comment':
                     {
                         const index = indexOfRule(rules, selectors);
                         if (index < 0) { throw new Error('Could not find rule with matching selectors'); }
-                        const comment = declaration.comment.trim();
+                        const comment = (/** @type {css.Comment} */ (declaration).comment || '').trim();
                         let m;
                         if ((m = removePropertyPattern.exec(comment)) !== null) {
                             for (const property of m[1].split(propertySeparator)) {

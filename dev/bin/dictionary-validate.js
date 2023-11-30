@@ -28,6 +28,7 @@ async function main() {
         return;
     }
 
+    /** @type {import('dev/schema-validate').ValidateMode} */
     let mode = null;
     if (dictionaryFileNames[0] === '--ajv') {
         mode = 'ajv';

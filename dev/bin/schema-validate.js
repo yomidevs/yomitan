@@ -17,8 +17,8 @@
  */
 
 import fs from 'fs';
-import performance from 'perf_hooks';
-import {createJsonSchema} from '../util.js';
+import {performance} from 'perf_hooks';
+import {createJsonSchema} from '../schema-validate.js';
 
 function main() {
     const args = process.argv.slice(2);
@@ -30,6 +30,7 @@ function main() {
         return;
     }
 
+    /** @type {import('dev/schema-validate').ValidateMode} */
     let mode = null;
     if (args[0] === '--ajv') {
         mode = 'ajv';

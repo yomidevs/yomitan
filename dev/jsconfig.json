@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
-        "module": "ES2015",
+        "module": "ES2022",
         "target": "ES2022",
         "checkJs": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "strict": true,
         "strictNullChecks": true,
         "noImplicitAny": true,
@@ -73,6 +73,7 @@
         "../types/other/globals.d.ts"
     ],
     "exclude": [
-        "../node_modules"
+        "../node_modules",
+        "lib"
     ]
 }
