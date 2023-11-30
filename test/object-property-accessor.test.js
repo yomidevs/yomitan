@@ -19,6 +19,9 @@
 import {expect, test} from 'vitest';
 import {ObjectPropertyAccessor} from '../ext/js/general/object-property-accessor.js';
 
+/**
+ * @returns {import('core').UnknownObject}
+ */
 function createTestObject() {
     return {
         0: null,
@@ -36,8 +39,10 @@ function createTestObject() {
 }
 
 
+/** */
 function testGet1() {
     test('Get1', () => {
+        /** @type {[pathArray: (string|number)[], getExpected: (object: import('core').SafeAny) => unknown][]} */
         const data = [
             [[], (object) => object],
             [['0'], (object) => object['0']],
@@ -61,11 +66,13 @@ function testGet1() {
     });
 }
 
+/** */
 function testGet2() {
     test('Get2', () => {
         const object = createTestObject();
         const accessor = new ObjectPropertyAccessor(object);
 
+        /** @type {[pathArray: (string|number)[], message: string][]} */
         const data = [
             [[0], 'Invalid path: [0]'],
             [['0', 'invalid'], 'Invalid path: ["0"].invalid'],
@@ -95,9 +102,11 @@ function testGet2() {
 }
 
 
+/** */
 function testSet1() {
     test('Set1', () => {
         const testValue = {};
+        /** @type {(string|number)[][]} */
         const data = [
             ['0'],
             ['value1', 'value2'],
@@ -120,12 +129,14 @@ function testSet1() {
     });
 }
 
+/** */
 function testSet2() {
     test('Set2', () => {
         const object = createTestObject();
         const accessor = new ObjectPropertyAccessor(object);
 
         const testValue = {};
+        /** @type {[pathArray: (string|number)[], message: string][]} */
         const data = [
             [[], 'Invalid path'],
             [[0], 'Invalid path: [0]'],
@@ -148,10 +159,17 @@ function testSet2() {
 }
 
 
+/** */
 function testDelete1() {
     test('Delete1', () => {
+        /**
+         * @param {unknown} object
+         * @param {string} property
+         * @returns {boolean}
+         */
         const hasOwn = (object, property) => Object.prototype.hasOwnProperty.call(object, property);
 
+        /** @type {[pathArray: (string|number)[], validate: (object: import('core').SafeAny) => boolean][]} */
         const data = [
             [['0'], (object) => !hasOwn(object, '0')],
             [['value1', 'value2'], (object) => !hasOwn(object.value1, 'value2')],
@@ -171,8 +189,10 @@ function testDelete1() {
     });
 }
 
+/** */
 function testDelete2() {
     test('Delete2', () => {
+        /** @type {[pathArray: (string|number)[], message: string][]} */
         const data = [
             [[], 'Invalid path'],
             [[0], 'Invalid path: [0]'],
@@ -201,8 +221,10 @@ function testDelete2() {
 }
 
 
+/** */
 function testSwap1() {
     test('Swap1', () => {
+        /** @type {[pathArray: (string|number)[], compareValues: boolean][]} */
         const data = [
             [['0'], true],
             [['value1', 'value2'], true],
@@ -237,8 +259,10 @@ function testSwap1() {
     });
 }
 
+/** */
 function testSwap2() {
     test('Swap2', () => {
+        /** @type {[pathArray1: (string|number)[], pathArray2: (string|number)[], checkRevert: boolean, message: string][]} */
         const data = [
             [[], [], false, 'Invalid path 1'],
             [['0'], [], false, 'Invalid path 2'],
@@ -276,8 +300,10 @@ function testSwap2() {
 }
 
 
+/** */
 function testGetPathString1() {
     test('GetPathString1', () => {
+        /** @type {[pathArray: (string|number)[], expected: string][]} */
         const data = [
             [[], ''],
             [[0], '[0]'],
@@ -298,22 +324,27 @@ function testGetPathString1() {
     });
 }
 
+/** */
 function testGetPathString2() {
     test('GetPathString2', () => {
+        /** @type {[pathArray: unknown[], message: string][]} */
         const data = [
             [[1.5], 'Invalid index'],
             [[null], 'Invalid type: object']
         ];
 
         for (const [pathArray, message] of data) {
+            // @ts-ignore - Throwing is expected
             expect(() => ObjectPropertyAccessor.getPathString(pathArray)).toThrow(message);
         }
     });
 }
 
 
+/** */
 function testGetPathArray1() {
     test('GetPathArray1', () => {
+        /** @type {[pathString: string, pathArray: (string|number)[]][]} */
         const data = [
             ['', []],
             ['[0]', [0]],
@@ -338,8 +369,10 @@ function testGetPathArray1() {
     });
 }
 
+/** */
 function testGetPathArray2() {
     test('GetPathArray2', () => {
+        /** @type {[pathString: string, message: string][]} */
         const data = [
             ['?', 'Unexpected character: ?'],
             ['.', 'Unexpected character: .'],
@@ -372,8 +405,10 @@ function testGetPathArray2() {
 }
 
 
+/** */
 function testHasProperty() {
     test('HasProperty', () => {
+        /** @type {[object: unknown, property: unknown, expected: boolean][]} */
         const data = [
             [{}, 'invalid', false],
             [{}, 0, false],
@@ -389,13 +424,16 @@ function testHasProperty() {
         ];
 
         for (const [object, property, expected] of data) {
+            // @ts-ignore - Ignore potentially property types
             expect(ObjectPropertyAccessor.hasProperty(object, property)).toStrictEqual(expected);
         }
     });
 }
 
+/** */
 function testIsValidPropertyType() {
     test('IsValidPropertyType', () => {
+        /** @type {[object: unknown, property: unknown, expected: boolean][]} */
         const data = [
             [{}, 'invalid', true],
             [{}, 0, false],
@@ -411,12 +449,14 @@ function testIsValidPropertyType() {
         ];
 
         for (const [object, property, expected] of data) {
+            // @ts-ignore - Ignore potentially property types
             expect(ObjectPropertyAccessor.isValidPropertyType(object, property)).toStrictEqual(expected);
         }
     });
 }
 
 
+/** */
 function main() {
     testGet1();
     testGet2();
