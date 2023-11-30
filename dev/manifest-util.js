@@ -36,8 +36,8 @@ function clone(value) {
 export class ManifestUtil {
     constructor() {
         const fileName = path.join(dirname, 'data', 'manifest-variants.json');
-        const {manifest, variants, defaultVariant} = /** @type {import('dev/manifest').Manifest} */ (JSON.parse(fs.readFileSync(fileName, {encoding: 'utf8'})));
-        /** @type {chrome.runtime.Manifest} */
+        const {manifest, variants, defaultVariant} = /** @type {import('dev/manifest').ManifestConfig} */ (JSON.parse(fs.readFileSync(fileName, {encoding: 'utf8'})));
+        /** @type {import('dev/manifest').Manifest} */
         this._manifest = manifest;
         /** @type {import('dev/manifest').ManifestVariant[]} */
         this._variants = variants;
@@ -52,7 +52,7 @@ export class ManifestUtil {
 
     /**
      * @param {?string} [variantName]
-     * @returns {chrome.runtime.Manifest}
+     * @returns {import('dev/manifest').Manifest}
      */
     getManifest(variantName) {
         if (typeof variantName === 'string') {
@@ -88,7 +88,7 @@ export class ManifestUtil {
     }
 
     /**
-     * @param {chrome.runtime.Manifest} manifest
+     * @param {import('dev/manifest').Manifest} manifest
      * @returns {string}
      */
     static createManifestString(manifest) {
@@ -119,9 +119,9 @@ export class ManifestUtil {
     }
 
     /**
-     * @param {chrome.runtime.Manifest} manifest
+     * @param {import('dev/manifest').Manifest} manifest
      * @param {import('dev/manifest').Modification[]} modifications
-     * @returns {chrome.runtime.Manifest}
+     * @returns {import('dev/manifest').Manifest}
      */
     _applyModifications(manifest, modifications) {
         if (Array.isArray(modifications)) {
@@ -328,9 +328,9 @@ export class ManifestUtil {
     }
 
     /**
-     * @param {chrome.runtime.Manifest} manifest
+     * @param {import('dev/manifest').Manifest} manifest
      * @param {import('dev/manifest').ManifestVariant} variant
-     * @returns {chrome.runtime.Manifest}
+     * @returns {import('dev/manifest').Manifest}
      */
     _createVariantManifest(manifest, variant) {
         let modifiedManifest = clone(manifest);

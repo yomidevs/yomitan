@@ -15,8 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type Manifest = {
-    manifest: chrome.runtime.Manifest;
+export type Manifest = chrome.runtime.Manifest;
+
+export type ManifestConfig = {
+    manifest: Manifest;
     defaultVariant: string;
     variants: ManifestVariant[];
 };
