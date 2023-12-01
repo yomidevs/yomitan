@@ -19,6 +19,9 @@
 import css from 'css';
 import fs from 'fs';
 import path from 'path';
+import {fileURLToPath} from 'url';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * @returns {{cssFile: string, overridesCssFile: string, outputPath: string}[]}
@@ -26,14 +29,14 @@ import path from 'path';
 export function getTargets() {
     return [
         {
-            cssFile: path.join(__dirname, '..', 'ext/css/structured-content.css'),
-            overridesCssFile: path.join(__dirname, 'data/structured-content-overrides.css'),
-            outputPath: path.join(__dirname, '..', 'ext/data/structured-content-style.json')
+            cssFile: path.join(dirname, '..', 'ext/css/structured-content.css'),
+            overridesCssFile: path.join(dirname, 'data/structured-content-overrides.css'),
+            outputPath: path.join(dirname, '..', 'ext/data/structured-content-style.json')
         },
         {
-            cssFile: path.join(__dirname, '..', 'ext/css/display-pronunciation.css'),
-            overridesCssFile: path.join(__dirname, 'data/display-pronunciation-overrides.css'),
-            outputPath: path.join(__dirname, '..', 'ext/data/pronunciation-style.json')
+            cssFile: path.join(dirname, '..', 'ext/css/display-pronunciation.css'),
+            overridesCssFile: path.join(dirname, 'data/display-pronunciation-overrides.css'),
+            outputPath: path.join(dirname, '..', 'ext/data/pronunciation-style.json')
         }
     ];
 }

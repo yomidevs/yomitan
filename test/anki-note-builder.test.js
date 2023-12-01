@@ -26,12 +26,14 @@ import {TranslatorVM} from '../dev/translator-vm.js';
 import {AnkiNoteBuilder} from '../ext/js/data/anki-note-builder.js';
 import {JapaneseUtil} from '../ext/js/language/sandbox/japanese-util.js';
 
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+
 /**
  * @param {string} url2
  * @returns {Promise<import('dev/vm').PseudoFetchResponse>}
  */
 async function fetch(url2) {
-    const extDir = path.join(__dirname, '..', 'ext');
+    const extDir = path.join(dirname, '..', 'ext');
     let filePath;
     try {
         filePath = url.fileURLToPath(url2);
@@ -50,8 +52,6 @@ async function fetch(url2) {
 }
 vi.stubGlobal('fetch', fetch);
 vi.mock('../ext/js/templates/template-renderer-proxy.js');
-
-const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * @returns {Promise<TranslatorVM>}

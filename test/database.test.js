@@ -18,11 +18,14 @@
 
 import {IDBFactory, IDBKeyRange} from 'fake-indexeddb';
 import path from 'path';
+import {fileURLToPath} from 'node:url';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {createDictionaryArchive} from '../dev/util.js';
 import {DictionaryDatabase} from '../ext/js/language/dictionary-database.js';
 import {DictionaryImporterMediaLoader} from '../ext/js/language/dictionary-importer-media-loader.js';
 import {DictionaryImporter} from '../ext/js/language/dictionary-importer.js';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
 
@@ -34,7 +37,7 @@ vi.mock('../ext/js/language/dictionary-importer-media-loader.js');
  * @returns {import('jszip')}
  */
 function createTestDictionaryArchive(dictionary, dictionaryName) {
-    const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', dictionary);
+    const dictionaryDirectory = path.join(dirname, 'data', 'dictionaries', dictionary);
     return createDictionaryArchive(dictionaryDirectory, dictionaryName);
 }
 

@@ -20,14 +20,17 @@ import fs from 'fs';
 import JSZip from 'jszip';
 import path from 'path';
 import {performance} from 'perf_hooks';
+import {fileURLToPath} from 'url';
 import {createJsonSchema} from './schema-validate.js';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * @param {string} relativeFileName
  * @returns {import('dev/dictionary-validate').Schema}
  */
 function readSchema(relativeFileName) {
-    const fileName = path.join(__dirname, relativeFileName);
+    const fileName = path.join(dirname, relativeFileName);
     const source = fs.readFileSync(fileName, {encoding: 'utf8'});
     return JSON.parse(source);
 }
