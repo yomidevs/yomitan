@@ -654,7 +654,7 @@ export class Logger extends EventDispatcher {
     constructor() {
         super();
         /** @type {string} */
-        this._extensionName = 'Yomichan';
+        this._extensionName = 'Yomitan';
         try {
             const {name, version} = chrome.runtime.getManifest();
             this._extensionName = `${name} ${version}`;
