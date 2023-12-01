@@ -115,6 +115,9 @@ window.languages.de.getDeinflectionReasons = async () => {
         ['-able', [
                 suffixInflection('bar', 'en', [], ['verb']),
                 suffixInflection('bar', 'n', [], ['verb']), // lieferbar
+        ]],
+        ['dated spelling', [
+                suffixInflection('ehn', 'ehen', [], ['verb']), // sehn, gehn
         ]]
     ]);
 
