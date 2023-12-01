@@ -22,7 +22,7 @@ window.languages.ar.textTransformations = [
     {
         id: 'removeDiacritics',
         name: 'Remove diacritics',
-        description: 'قَرَأَ ⬅️ قرأ',
+        description: 'وَلَدَ ⬅️ ولد',
         options: {
             false: 'Disabled',
             true: 'Enabled',
