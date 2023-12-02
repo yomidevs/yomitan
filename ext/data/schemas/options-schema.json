@@ -120,7 +120,8 @@
                                     "termDisplayMode",
                                     "sortFrequencyDictionary",
                                     "sortFrequencyDictionaryOrder",
-                                    "language"
+                                    "language",
+                                    "locale"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -139,6 +140,10 @@
                                     "language": {
                                         "type": "string",
                                         "default": "ja"
+                                    },
+                                    "locale": {
+                                        "type": "string",
+                                        "default": "en"
                                     },
                                     "maxResults": {
                                         "type": "integer",

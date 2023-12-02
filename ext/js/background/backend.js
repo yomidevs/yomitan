@@ -147,6 +147,8 @@ export class Backend {
             ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}],
             ['getTextTransformations',       {async: true,  contentScript: true,  handler: this._onApiGetTextTransformations.bind(this)}],
             ['getLanguages',                 {async: true,  contentScript: true,  handler: this._onApiGetLanguages.bind(this)}],
+            ['getLocales',                   {async: true,  contentScript: true,  handler: this._onApiGetLocales.bind(this)}],
+            ['getTranslations',              {async: true,  contentScript: true,  handler: this._onApiGetTranslations.bind(this)}],
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -802,12 +804,20 @@ export class Backend {
         }
     }
 
+    async _onApiGetLanguages() {
+        return await this._languageUtil.getLanguages();
+    }
+
+    async _onApiGetLocales(){
+        return await this._languageUtil.getLocales();
+    }
+
     async _onApiGetTextTransformations({language}){
         return await this._languageUtil.getTextTransformations(language);
     }
-
-    async _onApiGetLanguages() {
-        return await this._languageUtil.getLanguages();
+    
+    async _onApiGetTranslations({language}){
+        return await this._languageUtil.getTranslations(language);
     }
 
     // Command handlers

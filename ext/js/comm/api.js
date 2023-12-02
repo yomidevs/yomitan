@@ -188,6 +188,14 @@ class API {
         return this._invoke('getLanguages');
     }
 
+    getLocales(){
+        return this._invoke('getLocales');
+    }
+
+    getTranslations(language){
+        return this._invoke('getTranslations', {language});
+    }
+
     // Utilities
 
     _createActionPort(timeout=5000) {

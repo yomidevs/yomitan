@@ -40,6 +40,10 @@ export class LanguageUtil {
         return this.languages;
     }
 
+    getLocales(){
+        return this.languages.filter(({i18n}) => i18n);
+    }
+
     async getDeinflectionReasons(language) {
         try {
             if (!window.languages[language].deinflectionReasons) {
@@ -67,6 +71,18 @@ export class LanguageUtil {
         } catch (e){
             console.error(e);
             return [];
+        }
+    }
+
+    async getTranslations(locale) {
+        try {
+            if (!window.languages[locale].translations) {
+                window.languages[locale].translations = JSON.parse(await fetchAsset(`/js/language/languages/${locale}/i18n.json`));
+            }
+            return window.languages[locale].translations;
+        } catch (e){
+            console.error(e);
+            return {};
         }
     }
 }

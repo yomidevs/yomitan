@@ -29,6 +29,7 @@
  * GenericSettingController
  * KeyboardShortcutController
  * LanguagesController
+ * LocalizationController
  * MecabController
  * ModalController
  * NestedPopupsController
@@ -137,6 +138,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const languagesController = new LanguagesController(settingsController);
         languagesController.prepare();
+
+        const localizationController = new LocalizationController(settingsController);
+        localizationController.prepare();
 
         const textTransformationsController = new TextTransformationsController(settingsController);
         textTransformationsController.prepare();
