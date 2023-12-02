@@ -33,6 +33,7 @@ class SearchDisplayController {
         this._introElement = document.querySelector('#intro');
         this._clipboardMonitorEnableCheckbox = document.querySelector('#clipboard-monitor-enable');
         this._wanakanaEnableCheckbox = document.querySelector('#wanakana-enable');
+        this._wanakanaSearchOption = document.querySelector('#search-option-wanakana');
         this._queryInputEvents = new EventListenerCollection();
         this._queryInputEventsSetup = false;
         this._wanakanaEnabled = false;
@@ -131,7 +132,7 @@ class SearchDisplayController {
         }
     }
 
-    async _onOptionsUpdated() {
+    async _onOptionsUpdated(options) {
         await this._display.updateOptions();
         const query = this._queryInput.value;
         if (query) {
@@ -143,9 +144,14 @@ class SearchDisplayController {
         this._clipboardMonitorEnabled = options.clipboard.enableSearchPageMonitor;
         this._updateClipboardMonitorEnabled();
 
-        const enableWanakana = !!this._display.getOptions().general.enableWanakana;
-        this._wanakanaEnableCheckbox.checked = enableWanakana;
-        this._setWanakanaEnabled(enableWanakana);
+        const {language, enableWanakana} = options.general;
+
+        const wanakanaEnabled = (language === 'ja' && enableWanakana);
+        
+        this._wanakanaEnableCheckbox.checked = wanakanaEnabled;
+        this._wanakanaSearchOption.style.display = (language === 'ja' ? '' : 'none');
+
+        this._setWanakanaEnabled(wanakanaEnabled);
     }
 
     _onContentUpdateStart({type, query}) {

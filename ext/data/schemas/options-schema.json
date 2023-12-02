@@ -238,7 +238,7 @@
                                     },
                                     "enableWanakana": {
                                         "type": "boolean",
-                                        "default": true
+                                        "default": false
                                     },
                                     "showPitchAccentDownstepNotation": {
                                         "type": "boolean",
