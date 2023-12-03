@@ -18,8 +18,8 @@
 
 import fs from 'fs';
 import {JSDOM} from 'jsdom';
-import path from 'path';
 import {fileURLToPath} from 'node:url';
+import path from 'path';
 import {expect, test} from 'vitest';
 import {DOMTextScanner} from '../ext/js/dom/dom-text-scanner.js';
 

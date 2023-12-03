@@ -25,8 +25,8 @@ import {
     configure
 } from '../../lib/zip.js';
 import {stringReverse} from '../core.js';
-import {MediaUtil} from '../media/media-util.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {MediaUtil} from '../media/media-util.js';
 
 const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
 const BlobWriter = /** @type {typeof import('@zip.js/zip.js').BlobWriter} */ (/** @type {unknown} */ (BlobWriter0));

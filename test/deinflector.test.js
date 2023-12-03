@@ -17,10 +17,10 @@
  */
 
 import fs from 'fs';
+import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {describe, expect, test} from 'vitest';
 import {Deinflector} from '../ext/js/language/deinflector.js';
-import {fileURLToPath} from 'node:url';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 

@@ -17,8 +17,8 @@
  */
 
 import {isObject} from '../core.js';
-import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 
 export class OffscreenProxy {
     constructor() {

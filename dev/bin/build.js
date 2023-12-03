@@ -19,10 +19,10 @@
 import assert from 'assert';
 import childProcess from 'child_process';
 import fs from 'fs';
-import path from 'path';
-import readline from 'readline';
 import JSZip from 'jszip';
 import {fileURLToPath} from 'node:url';
+import path from 'path';
+import readline from 'readline';
 import {buildLibs} from '../build-libs.js';
 import {ManifestUtil} from '../manifest-util.js';
 import {getAllFiles, getArgs, testMain} from '../util.js';

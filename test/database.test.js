@@ -17,8 +17,8 @@
  */
 
 import {IDBFactory, IDBKeyRange} from 'fake-indexeddb';
-import path from 'path';
 import {fileURLToPath} from 'node:url';
+import path from 'path';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {createDictionaryArchive} from '../dev/util.js';
 import {DictionaryDatabase} from '../ext/js/language/dictionary-database.js';
