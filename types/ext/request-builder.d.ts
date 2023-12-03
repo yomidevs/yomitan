@@ -15,9 +15,4 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-export type FetchEventListeners = {
-    onBeforeSendHeaders: ((details: chrome.webRequest.WebRequestHeadersDetails) => (chrome.webRequest.BlockingResponse | void)) | null;
-    onErrorOccurred: ((details: chrome.webRequest.WebResponseErrorDetails) => void) | null;
-};
-
 export type ProgressCallback = (complete: boolean) => void;

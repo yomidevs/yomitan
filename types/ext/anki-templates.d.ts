@@ -47,12 +47,6 @@ export type MediaSimpleType = (
     'selectionText'
 );
 
-export type MediaType = (
-    MediaSimpleType |
-    'textFurigana' |
-    'dictionaryMedia'
-);
-
 export type TextFuriganaSegment = {
     text: string;
     readingMode: TextFuriganaReadingMode;

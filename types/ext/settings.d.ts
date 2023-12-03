@@ -283,8 +283,6 @@ export type AnkiOptions = {
     downloadTimeout: number;
 };
 
-export type AnkiCardType = 'terms' | 'kanji';
-
 export type AnkiScreenshotOptions = {
     format: AnkiScreenshotFormat;
     quality: number;

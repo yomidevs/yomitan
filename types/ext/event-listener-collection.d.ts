@@ -69,12 +69,6 @@ export type AddEventListenerArgs = [
     options?: AddEventListenerOptions | boolean,
 ];
 
-export type AddListenerArgs<TCallback = EventListenerFunction, TArgs = unknown> = [
-    target: ExtensionEvent<TCallback, TArgs>,
-    callback: TCallback,
-    ...args: TArgs[],
-];
-
 export type OnArgs = [
     target: EventDispatcher<string>,
     eventName: string,

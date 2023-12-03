@@ -24,8 +24,6 @@ import type * as Environment from './environment';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
 
-export type MessageAny2 = Message<keyof MessageDetailsMap>;
-
 export type Message<T extends MessageType> = (
     MessageDetailsMap[T] extends undefined ?
         {action: T} :

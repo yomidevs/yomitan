@@ -17,27 +17,6 @@
 
 import type * as Translation from '../ext/translation';
 
-export type PseudoURL = {
-    hash: string;
-    host: string;
-    hostname: string;
-    href: string;
-    toString(): string;
-    origin: string;
-    password: string;
-    pathname: string;
-    port: string;
-    protocol: string;
-    search: string;
-    searchParams: URLSearchParams;
-    username: string;
-    toJSON(): string;
-};
-
-export type VMAssert = {
-    deepStrictEqual: (actual: unknown, expected: unknown) => void;
-};
-
 export type PseudoChrome = {
     runtime: {
         getURL(path: string): string;

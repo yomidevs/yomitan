@@ -47,39 +47,6 @@ export type TabInfo = {
     url: string | null;
 };
 
-export type SettingModification = SettingModificationSet | SettingModificationDelete | SettingModificationSwap | SettingModificationSplice | SettingModificationPush;
-
-export type SettingModificationSet = {
-    action: 'set';
-    path: string;
-    value: unknown;
-};
-
-export type SettingModificationDelete = {
-    action: 'delete';
-    path: string;
-};
-
-export type SettingModificationSwap = {
-    action: 'swap';
-    path1: string;
-    path2: string;
-};
-
-export type SettingModificationSplice = {
-    action: 'splice';
-    path: string;
-    start: number;
-    deleteCount: number;
-    items: unknown[];
-};
-
-export type SettingModificationPush = {
-    action: 'push';
-    path: string;
-    items: unknown[];
-};
-
 export type FindTabsPredicate = (tabInfo: TabInfo) => boolean | Promise<boolean>;
 
 export type InvokeWithProgressRequestMessage = (
