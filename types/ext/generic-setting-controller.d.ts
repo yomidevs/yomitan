@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as SettingsModifications from './settings-modifications';
 import type * as DocumentUtil from './document-util';
+import type * as SettingsModifications from './settings-modifications';
 
 export type TransformType = TransformData['type'];
 

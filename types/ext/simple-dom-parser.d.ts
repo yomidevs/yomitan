@@ -16,9 +16,8 @@
  */
 
 export type {
-    Document as Parse5Document,
-    Element as Parse5Element,
-    ChildNode as Parse5ChildNode,
+    ChildNode as Parse5ChildNode, Document as Parse5Document,
+    Element as Parse5Element
 } from 'parse5/dist/tree-adapters/default';
 
 /**

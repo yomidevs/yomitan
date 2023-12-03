@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Translation from './translation';
 import type * as DictionaryDatabase from './dictionary-database';
+import type * as Translation from './translation';
 
 export type TextDeinflectionOptions = [
     textReplacements: Translation.FindTermsTextReplacement[] | null,

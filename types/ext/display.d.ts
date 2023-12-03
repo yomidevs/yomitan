@@ -15,16 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type {DisplayContentManager} from '../../ext/js/display/display-content-manager';
+import type {HotkeyHelpController} from '../../ext/js/input/hotkey-help-controller';
+import type {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util';
+import type {TextScanner} from '../../ext/js/language/text-scanner';
 import type * as Core from './core';
 import type * as Dictionary from './dictionary';
 import type * as Extension from './extension';
 import type * as Settings from './settings';
 import type * as TextScannerTypes from './text-scanner';
 import type * as TextSource from './text-source';
-import type {DisplayContentManager} from '../../ext/js/display/display-content-manager';
-import type {HotkeyHelpController} from '../../ext/js/input/hotkey-help-controller';
-import type {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util';
-import type {TextScanner} from '../../ext/js/language/text-scanner';
 
 export type HistoryMode = 'clear' | 'overwrite' | 'new';
 

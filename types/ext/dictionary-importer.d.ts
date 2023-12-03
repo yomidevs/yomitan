@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Ajv from 'ajv';
 import type * as ZipJS from '@zip.js/zip.js';
+import type * as Ajv from 'ajv';
 import type * as DictionaryData from './dictionary-data';
 import type * as DictionaryDatabase from './dictionary-database';
 import type * as StructuredContent from './structured-content';

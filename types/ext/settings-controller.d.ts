@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Core from './core';
-import type * as Settings from './settings';
-import type * as SettingsModifications from './settings-modifications';
 import type {DictionaryController} from '../../ext/js/pages/settings/dictionary-controller';
 import type {ScanInputsController} from '../../ext/js/pages/settings/scan-inputs-controller';
 import type {ScanInputsSimpleController} from '../../ext/js/pages/settings/scan-inputs-simple-controller';
+import type * as Core from './core';
+import type * as Settings from './settings';
+import type * as SettingsModifications from './settings-modifications';
 
 export type PageExitPrevention = {
     end: () => void;

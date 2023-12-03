@@ -16,8 +16,8 @@
  */
 
 import type * as Core from './core';
-import type * as DictionaryImporter from './dictionary-importer';
 import type * as DictionaryDatabase from './dictionary-database';
+import type * as DictionaryImporter from './dictionary-importer';
 
 export type InvokeDetails<TResponseRaw = unknown, TResponse = unknown> = {
     complete: boolean;

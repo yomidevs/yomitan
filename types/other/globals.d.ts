@@ -19,4 +19,4 @@ declare global {
     function clearTimeout(timeoutId: NodeJS.Timeout | string | number | undefined): void;
 }
 
-export {};
+export { };

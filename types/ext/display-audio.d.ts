@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Audio from './audio';
-import type * as Settings from './settings';
-import type * as AudioDownloader from './audio-downloader';
 import type {TextToSpeechAudio} from '../../ext/js/media/text-to-speech-audio';
+import type * as Audio from './audio';
+import type * as AudioDownloader from './audio-downloader';
+import type * as Settings from './settings';
 
 export type CacheItem = {
     sourceMap: Map<number, CachedInfoList>;
