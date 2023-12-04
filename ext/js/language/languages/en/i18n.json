@@ -132,6 +132,7 @@
             }
         },
         "scanning": {
+            "heading": "Scanning",
             "key": {
                 "label": "Scan modifier key",
                 "description": "Hold a key while moving the cursor to scan text."    

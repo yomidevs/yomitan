@@ -132,6 +132,7 @@
             }
         },
         "scanning": {
+            "heading": "Skeniranje",
             "key": {
                 "label": "Tipka za skeniranje",
                 "description": "Držite tipku dok pomjerate kursor kako biste skenirali tekst."    
