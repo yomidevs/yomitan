@@ -24,7 +24,7 @@ export default defineConfig({
             'test/playwright/**'
         ],
         environment: 'jsdom',
-        // @ts-ignore - Appears to not be defined in the type definitions (https://vitest.dev/advanced/pool)
+        // @ts-expect-error - Appears to not be defined in the type definitions (https://vitest.dev/advanced/pool)
         poolOptions: {
             threads: {
                 useAtomics: true

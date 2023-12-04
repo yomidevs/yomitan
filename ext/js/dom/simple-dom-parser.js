@@ -27,7 +27,7 @@ export class SimpleDOMParser {
      */
     constructor(content) {
         /** @type {import('parse5')} */
-        // @ts-ignore - parse5 global is not defined in typescript declaration
+        // @ts-expect-error - parse5 global is not defined in typescript declaration
         this._parse5Lib = /** @type {import('parse5')} */ (parse5);
         /** @type {import('parse5').TreeAdapter<import('parse5').DefaultTreeAdapterMap>} */
         this._treeAdapter = this._parse5Lib.defaultTreeAdapter;
@@ -131,7 +131,6 @@ export class SimpleDOMParser {
      * @returns {boolean}
      */
     static isSupported() {
-        // @ts-ignore - parse5 global is not defined in typescript declaration
         return typeof parse5 !== 'undefined';
     }
 

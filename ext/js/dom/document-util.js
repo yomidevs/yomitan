@@ -210,7 +210,7 @@ export class DocumentUtil {
      */
     static computeZoomScale(node) {
         if (this._cssZoomSupported === null) {
-            // @ts-ignore - zoom is a non-standard property that exists in Chromium-based browsers
+            // @ts-expect-error - zoom is a non-standard property that exists in Chromium-based browsers
             this._cssZoomSupported = (typeof document.createElement('div').style.zoom === 'string');
         }
         if (!this._cssZoomSupported) { return 1; }
@@ -387,11 +387,11 @@ export class DocumentUtil {
     static getFullscreenElement() {
         return (
             document.fullscreenElement ||
-            // @ts-ignore - vendor prefix
+            // @ts-expect-error - vendor prefix
             document.msFullscreenElement ||
-            // @ts-ignore - vendor prefix
+            // @ts-expect-error - vendor prefix
             document.mozFullScreenElement ||
-            // @ts-ignore - vendor prefix
+            // @ts-expect-error - vendor prefix
             document.webkitFullscreenElement ||
             null
         );
@@ -808,7 +808,7 @@ export class DocumentUtil {
             return document.caretRangeFromPoint(x, y);
         }
 
-        // @ts-ignore - caretPositionFromPoint is non-standard
+        // @ts-expect-error - caretPositionFromPoint is non-standard
         if (typeof document.caretPositionFromPoint === 'function') {
             // Firefox
             return this._caretPositionFromPoint(x, y);
@@ -824,7 +824,7 @@ export class DocumentUtil {
      * @returns {?Range}
      */
     static _caretPositionFromPoint(x, y) {
-        // @ts-ignore - caretPositionFromPoint is non-standard
+        // @ts-expect-error - caretPositionFromPoint is non-standard
         const position = /** @type {(x: number, y: number) => ?{offsetNode: Node, offset: number}} */ (document.caretPositionFromPoint)(x, y);
         if (position === null) {
             return null;
@@ -876,7 +876,7 @@ export class DocumentUtil {
                     nextElement.style.setProperty('user-select', 'text', 'important');
                 }
 
-                // @ts-ignore - caretPositionFromPoint is non-standard
+                // @ts-expect-error - caretPositionFromPoint is non-standard
                 const position = /** @type {(x: number, y: number) => ?{offsetNode: Node, offset: number}} */ (document.caretPositionFromPoint)(x, y);
                 if (position === null) {
                     return null;

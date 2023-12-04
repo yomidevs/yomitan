@@ -18,9 +18,9 @@
 
 (async () => {
     // Reentrant check
-    // @ts-ignore : Checking a property to the global object
+    // @ts-expect-error - Checking a property to the global object
     if (self.googleDocsAccessibilitySetup) { return; }
-    // @ts-ignore : Adding a property to the global object
+    // @ts-expect-error - Adding a property to the global object
     self.googleDocsAccessibilitySetup = true;
 
     /**
@@ -57,7 +57,7 @@
 
     // The extension ID below is on an allow-list that is used on the Google Docs webpage.
     /* eslint-disable */
-    // @ts-ignore : Adding a property to the global object
+    // @ts-expect-error : Adding a property to the global object
     const inject = () => { window._docs_annotate_canvas_by_ext = 'ogmnaimimemjmbakcfefmnahgdfhfami'; };
     /* eslint-enable */
 

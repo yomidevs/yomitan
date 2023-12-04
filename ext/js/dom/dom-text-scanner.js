@@ -520,11 +520,10 @@ export class DOMTextScanner {
     static isStyleSelectable(style) {
         return !(
             style.userSelect === 'none' ||
-            // @ts-ignore - vendor prefix
             style.webkitUserSelect === 'none' ||
-            // @ts-ignore - vendor prefix
+            // @ts-expect-error - vendor prefix
             style.MozUserSelect === 'none' ||
-            // @ts-ignore - vendor prefix
+            // @ts-expect-error - vendor prefix
             style.msUserSelect === 'none'
         );
     }

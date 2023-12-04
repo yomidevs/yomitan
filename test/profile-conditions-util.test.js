@@ -637,9 +637,9 @@ function testSchemas() {
                     {expected: true,  context: {depth: 0, url: ''}},
                     {expected: true,  context: {depth: 0, url: '', flags: []}},
                     {expected: false, context: {depth: 0, url: '', flags: ['clipboard']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
@@ -673,9 +673,9 @@ function testSchemas() {
                     {expected: false, context: {depth: 0, url: ''}},
                     {expected: false, context: {depth: 0, url: '', flags: []}},
                     {expected: false, context: {depth: 0, url: '', flags: ['clipboard']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
@@ -711,9 +711,9 @@ function testSchemas() {
                     {expected: false, context: {depth: 0, url: ''}},
                     {expected: false, context: {depth: 0, url: '', flags: []}},
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
@@ -753,9 +753,9 @@ function testSchemas() {
                     {expected: true,  context: {depth: 0, url: ''}},
                     {expected: true,  context: {depth: 0, url: '', flags: []}},
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
@@ -784,9 +784,9 @@ function testSchemas() {
                     {expected: true,  context: {depth: 0, url: ''}},
                     {expected: true,  context: {depth: 0, url: '', flags: []}},
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
@@ -819,9 +819,9 @@ function testSchemas() {
                     {expected: false, context: {depth: 0, url: ''}},
                     {expected: false, context: {depth: 0, url: '', flags: []}},
                     {expected: false, context: {depth: 0, url: '', flags: ['clipboard']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
@@ -849,9 +849,9 @@ function testSchemas() {
                     {expected: true,  context: {depth: 0, url: ''}},
                     {expected: true,  context: {depth: 0, url: '', flags: []}},
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
@@ -885,9 +885,9 @@ function testSchemas() {
                     {expected: true,  context: {depth: 0, url: ''}},
                     {expected: true,  context: {depth: 0, url: '', flags: []}},
                     {expected: false, context: {depth: 0, url: '', flags: ['clipboard']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
-                    // @ts-ignore - Ignore type for string flag for testing purposes
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
                     {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },

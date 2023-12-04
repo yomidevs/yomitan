@@ -334,7 +334,7 @@ function testGetPathString2() {
         ];
 
         for (const [pathArray, message] of data) {
-            // @ts-ignore - Throwing is expected
+            // @ts-expect-error - Throwing is expected
             expect(() => ObjectPropertyAccessor.getPathString(pathArray)).toThrow(message);
         }
     });
@@ -424,7 +424,7 @@ function testHasProperty() {
         ];
 
         for (const [object, property, expected] of data) {
-            // @ts-ignore - Ignore potentially property types
+            // @ts-expect-error - Ignore potentially property types
             expect(ObjectPropertyAccessor.hasProperty(object, property)).toStrictEqual(expected);
         }
     });
@@ -449,7 +449,7 @@ function testIsValidPropertyType() {
         ];
 
         for (const [object, property, expected] of data) {
-            // @ts-ignore - Ignore potentially property types
+            // @ts-expect-error - Ignore potentially property types
             expect(ObjectPropertyAccessor.isValidPropertyType(object, property)).toStrictEqual(expected);
         }
     });

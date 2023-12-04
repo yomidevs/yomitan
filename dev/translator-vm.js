@@ -42,7 +42,7 @@ export class TranslatorVM {
                 }
             }
         };
-        // @ts-ignore - Overwriting a global
+        // @ts-expect-error - Overwriting a global
         global.chrome = chrome;
 
         /** @type {?JapaneseUtil} */

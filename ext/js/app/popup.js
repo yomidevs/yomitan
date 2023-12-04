@@ -745,7 +745,7 @@ export class Popup extends EventDispatcher {
         if (
             fullscreenElement === null ||
             fullscreenElement.shadowRoot ||
-            // @ts-ignore - openOrClosedShadowRoot is available to Firefox 63+ for WebExtensions
+            // @ts-expect-error - openOrClosedShadowRoot is available to Firefox 63+ for WebExtensions
             fullscreenElement.openOrClosedShadowRoot
         ) {
             return defaultParent;

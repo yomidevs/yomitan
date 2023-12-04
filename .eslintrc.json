@@ -350,7 +350,14 @@
                 "allowAllPropertiesOnSameLine": true
             }
         ],
-        "@typescript-eslint/ban-ts-comment": "off",
+        "@typescript-eslint/ban-ts-comment": [
+            "error",
+            {
+                "ts-expect-error": {
+                    "descriptionFormat": "^ - .+$"
+                }
+            }
+        ],
         "@typescript-eslint/ban-types": [
             "error",
             {

@@ -37,7 +37,7 @@ if ((() => {
     }
     return (hasBrowser && !hasChrome);
 })()) {
-    // @ts-ignore - objects should have roughly the same interface
+    // @ts-expect-error - objects should have roughly the same interface
     chrome = browser;
 }
 
@@ -182,7 +182,7 @@ export class Yomitan extends EventDispatcher {
      */
     sendMessage(...args) {
         try {
-            // @ts-ignore - issue with type conversion, somewhat difficult to resolve in pure JS
+            // @ts-expect-error - issue with type conversion, somewhat difficult to resolve in pure JS
             chrome.runtime.sendMessage(...args);
         } catch (e) {
             this.triggerExtensionUnloaded();

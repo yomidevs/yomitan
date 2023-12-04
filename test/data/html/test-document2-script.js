@@ -22,17 +22,17 @@
 function requestFullscreen(element) {
     if (element.requestFullscreen) {
         element.requestFullscreen();
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
     } else if (element.mozRequestFullScreen) {
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
         element.mozRequestFullScreen();
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
     } else if (element.webkitRequestFullscreen) {
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
         element.webkitRequestFullscreen();
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
     } else if (element.msRequestFullscreen) {
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
         element.msRequestFullscreen();
     }
 }
@@ -41,17 +41,17 @@ function requestFullscreen(element) {
 function exitFullscreen() {
     if (document.exitFullscreen) {
         document.exitFullscreen();
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
     } else if (document.mozCancelFullScreen) {
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
         document.mozCancelFullScreen();
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
     } else if (document.webkitExitFullscreen) {
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
         document.webkitExitFullscreen();
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
     } else if (document.msExitFullscreen) {
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
         document.msExitFullscreen();
     }
 }
@@ -62,11 +62,11 @@ function exitFullscreen() {
 function getFullscreenElement() {
     return (
         document.fullscreenElement ||
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
         document.msFullscreenElement ||
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
         document.mozFullScreenElement ||
-        // @ts-ignore - Browser compatibility
+        // @ts-expect-error - Browser compatibility
         document.webkitFullscreenElement ||
         null
     );

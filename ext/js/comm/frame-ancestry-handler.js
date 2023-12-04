@@ -295,7 +295,7 @@ export class FrameAncestryHandler {
             while (walker.nextNode()) {
                 const element = /** @type {Element} */ (walker.currentNode);
 
-                // @ts-ignore - this is more simple to elide any type checks or casting
+                // @ts-expect-error - this is more simple to elide any type checks or casting
                 if (element.contentWindow === contentWindow) {
                     return element;
                 }
@@ -303,7 +303,7 @@ export class FrameAncestryHandler {
                 /** @type {?ShadowRoot|undefined} */
                 const shadowRoot = (
                     element.shadowRoot ||
-                    // @ts-ignore - openOrClosedShadowRoot is available to Firefox 63+ for WebExtensions
+                    // @ts-expect-error - openOrClosedShadowRoot is available to Firefox 63+ for WebExtensions
                     element.openOrClosedShadowRoot
                 );
                 if (shadowRoot) {

@@ -165,9 +165,9 @@ export class BackupController {
     _saveBlob(blob, fileName) {
         if (
             typeof navigator === 'object' && navigator !== null &&
-            // @ts-ignore - call for legacy Edge
+            // @ts-expect-error - call for legacy Edge
             typeof navigator.msSaveBlob === 'function' &&
-            // @ts-ignore - call for legacy Edge
+            // @ts-expect-error - call for legacy Edge
             navigator.msSaveBlob(blob)
         ) {
             return;
