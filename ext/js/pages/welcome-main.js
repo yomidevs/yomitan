@@ -25,6 +25,7 @@
  * ScanInputsSimpleController
  * SettingsController
  * SettingsDisplayController
+ * LocalizationController
  * StatusFooter
  */
 
@@ -63,6 +64,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const settingsController = new SettingsController();
         await settingsController.prepare();
+
+        const localizationController = new LocalizationController(settingsController);
+        preparePromises.push(localizationController.prepare());
 
         const dictionaryController = new DictionaryController(settingsController, modalController, statusFooter);
         dictionaryController.prepare();

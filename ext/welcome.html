@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Welcome to Yezichak!</title>
+    <title i18n="welcome.title">
+        Welcome to Yezichak!
+    </title>
     <link rel="tongue.png" sizes="16x16">
     <link rel="tongue.png" sizes="19x19">
     <link rel="tongue.png" sizes="32x32">
@@ -23,41 +25,69 @@
 
     <span tabindex="-1" id="content-scroll-focus"></span>
 
-    <h1>Welcome to Yezichak!</h1>
-
-    <h2>Here are some basics to get started</h2>
+    <h1 i18n="welcome.title">
+        Welcome to Yezichak!
+    </h1>
+    <h2 i18n="welcome.subtitle">
+        Here are some basics to get started
+    </h2>
     <div class="settings-group">
         <div class="settings-item">
             <div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
-                Clicking the <img src="/images/yezichak-icon.svg" class="inline-icon" alt=""> <em>Yezichak</em> button in the browser bar will open the quick-actions popup.
+                <span i18n="welcome.actionPopup.1">Clicking the </span><img src="/images/yezichak-icon.svg" class="inline-icon" alt="">
+                <em> <span i18n="Yezichak">Yezichak</span></em>
+                <span i18n="welcome.actionPopup.2"> button in the browser bar will open the quick-actions popup.</span>
             </div></div></div>
             <div class="settings-item-children settings-item-children-group">
                 <div class="settings-item"><div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
-                    The <img src="/images/cog.svg" class="inline-icon" alt=""> <em>cog</em> button will open the <a href="/settings.html" target="_blank" rel="noopener">Settings</a> page.
+                    <span i18n="welcome.cog.1">The </span>
+                    <img src="/images/cog.svg" class="inline-icon" alt="">
+                    <em> <span i18n="welcome.cog.cog">cog</span></em>
+                    <span i18n="welcome.cog.2"> button will open the </span>
+                    <a href="/settings.html" target="_blank" rel="noopener" i18n="pages.Settings">Settings</a>
+                    <span i18n="welcome.cog.3"> page.</span>
                 </div></div></div></div>
                 <div class="settings-item"><div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
-                    The <img src="/images/magnifying-glass.svg" class="inline-icon" alt=""> <em>magnifying glass</em> button will open the <a href="/search.html" target="_blank" rel="noopener">Search</a> page,
-                    enabling text and terms to be looked up using the installed dictionaries.
-                    This can even be used in offline mode!
+                    <span i18n="welcome.glass.1">The </span>
+                    <img src="/images/magnifying-glass.svg" class="inline-icon" alt="">
+                    <em> <span i18n="welcome.glass.magnifyingGlass">magnifying glass</span></em>
+                    <span i18n="welcome.glass.2"> button will open the </span>
+                    <a href="/search.html" target="_blank" rel="noopener" i18n="pages.Search">Search</a>
+                    <span i18n="welcome.glass.3"> page, enabling text and terms to be looked up using the installed dictionaries. This can even be used in offline mode!</span>
                 </div></div></div></div>
                 <div class="settings-item"><div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
-                    The <img src="/images/question-mark-circle.svg" class="inline-icon" alt=""> <em>question mark</em> button will open the <a href="/info.html" target="_blank" rel="noopener">Information</a> page,
-                    which has some helpful information and links about Yezichak.
+                    <span i18n="welcome.question.1">The </span>
+                    <img src="/images/question-mark-circle.svg" class="inline-icon" alt="">
+                    <em> <span i18n="welcome.question.questionMark">question mark</span></em>
+                    <span i18n="welcome.question.2"> button will open the </span>
+                    <a href="/info.html" target="_blank" rel="noopener" i18n="pages.Information">Information</a>
+                    <span i18n="welcome.question.3"> page, which has some helpful information and links about Yezichak.</span>
                 </div></div></div></div>
             </div>
         </div>
         <div class="settings-item">
             <div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
-                Yezichak requires one or more dictionaries to be installed in order to look up terms, kanji, and other information.
-                Several downloadable dictionaries can be found on the <a href="https://discord.gg/WuqdTDQWd" target="_blank" rel="noopener noreferrer">Yezichak Discord server</a>,
-                allowing you to choose the dictionaries most relevant for you.
-                Dictionaries can be configured using the button below,
-                or later from the the <a href="/settings.html" rel="noopener">Settings</a> page.
+                <span i18n="welcome.dictionaries.1">
+                    Yezichak requires one or more dictionaries to be installed in order to look up terms, kanji, and other information.
+                    Several downloadable dictionaries can be found on the
+                </span>
+                <a href="https://discord.gg/WuqdTDQWd" target="_blank" rel="noopener noreferrer" i18n="welcome.dictionaries.discordServer">
+                    Yezichak Discord server
+                </a>
+                <span i18n="welcome.dictionaries.2">
+                    , allowing you to choose the dictionaries most relevant for you.
+                    Dictionaries can be configured using the button below,
+                    or later from the the
+                </span>
+                <a href="/settings.html" rel="noopener" i18n="Settings">Settings</a>
+                <span i18n="welcome.dictionaries.3"> page.</span>
             </div></div></div>
             <div class="settings-item-children settings-item-children-group">
                 <div class="settings-item settings-item-button" data-modal-action="show,dictionaries"><div class="settings-item-inner">
                     <div class="settings-item-left">
-                        <div class="settings-item-label">Install or remove dictionaries&hellip;</div>
+                        <div class="settings-item-label" i18n="welcome.dictionaries.button">
+                            Install or remove dictionaries&hellip;
+                        </div>
                     </div>
                     <div class="settings-item-right open-panel-button-container">
                         <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
@@ -67,19 +97,30 @@
         </div>
         <div class="settings-item">
             <div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
-                After dictionaries have been installed, webpage text can be scanned by moving the cursor while holding a modifier key.
-                The default key is <kbd>Shift</kbd>, which can be disabled or configured below.
+                <span i18n="welcome.shortcuts.1">
+                    After dictionaries have been installed, webpage text can be scanned by moving the cursor while holding a modifier key.
+                    The default key is
+                </span>
+                <kbd>Shift</kbd>
+                <span i18n="welcome.shortcuts.2">, which can be disabled or configured below.</span>
             </div></div></div>
             <div class="settings-item-children settings-item-children-group">
                 <div class="settings-item"><div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
-                    Clicking the <img src="/images/play-audio.svg" class="inline-icon" alt=""> <em>speaker</em> button of an entry in the search results
-                    will play an audio clip of a term's pronunciation using an online dictionary, if available.
+                    <span i18n="welcome.audio.1">Clicking the </span>
+                    <img src="/images/play-audio.svg" class="inline-icon" alt="">
+                    <em> <span i18n="speaker">speaker</span></em>
+                    <span i18n="welcome.audio.2">
+                         button of an entry in the search results
+                        will play an audio clip of a term's pronunciation using an online dictionary, if available.
+                    </span>
                 </div></div></div></div>
             </div>
         </div>
         <div class="settings-item">
             <div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
-                This startup notification can be turned off using the options below, or later from the <a href="/settings.html" rel="noopener">Settings</a> page.
+                <span i18n="welcome.disable.1">This startup notification can be turned off using the options below, or later from the </span>
+                <a href="/settings.html" rel="noopener" i18n="pages.Settings">Settings</a>
+                <span i18n="welcome.disable.2"> page.</span>
             </div></div></div>
         </div>
     </div>
@@ -88,7 +129,7 @@
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Show this welcome guide on browser startup</div>
+                <div class="settings-item-label" i18n="welcome.showOnStartup">Show this welcome guide on browser startup</div>
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" data-setting="general.showGuide"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -97,8 +138,8 @@
         <div class="settings-item">
             <div class="settings-item-inner settings-item-inner-wrappable">
                 <div class="settings-item-left">
-                    <div class="settings-item-label">Scan modifier key</div>
-                    <div class="settings-item-description">Hold a key while moving the cursor to scan text.</div>
+                    <div class="settings-item-label" i18n="settings.scanning.key.label">Scan modifier key</div>
+                    <div class="settings-item-description" i18n="settings.scanning.key.description">Hold a key while moving the cursor to scan text.</div>
                 </div>
                 <div class="settings-item-right">
                     <select id="main-scan-modifier-key"></select>
@@ -107,8 +148,8 @@
         </div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Scan using middle mouse button</div>
-                <div class="settings-item-description">Hold the middle mouse button while moving the cursor to scan text.</div>
+                <div class="settings-item-label" i18n="settings.scanning.middleMouse.label">Scan using middle mouse button</div>
+                <div class="settings-item-description" i18n="settings.scanning.middleMouse.description">Hold the middle mouse button while moving the cursor to scan text.</div>
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" id="middle-mouse-button-scan"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -117,8 +158,8 @@
         <div class="settings-item">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
-                    <div class="settings-item-label">Auto-hide search popup</div>
-                    <div class="settings-item-description">When no definitions are found after scanning text, the popup will be hidden.</div>
+                    <div class="settings-item-label" i18n="settings.scanning.autoHide.label">Auto-hide search popup</div>
+                    <div class="settings-item-description" i18n="settings.scanning.autoHide.description">When no definitions are found after scanning text, the popup will be hidden.</div>
                 </div>
                 <div class="settings-item-right">
                     <label class="toggle"><input type="checkbox" data-setting="scanning.autoHideResults"
@@ -133,7 +174,10 @@
             <div class="settings-item-children settings-item-children-group" id="auto-hide-search-popup-options" hidden>
                 <div class="settings-item"><div class="settings-item-inner">
                     <div class="settings-item-left">
-                        <div class="settings-item-label">Delay <span class="light">(in milliseconds)</span></div>
+                        <div class="settings-item-label">
+                            <span i18n="settings.scanning.autoHide.delay.label">Delay</span> 
+                            <span class="light" i18n="settings.scanning.autoHide.delay.unit">(in milliseconds)</span>
+                        </div>                 
                     </div>
                     <div class="settings-item-right">
                         <input type="number" data-setting="scanning.hideDelay" min="0">
@@ -143,8 +187,11 @@
         </div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Scan delay <span class="light">(in milliseconds)</span></div>
-                <div class="settings-item-description">Change the delay before scanning occurs when no modifier key is required.</div>
+                <div class="settings-item-label">
+                    <span i18n="settings.scanDelay.label">Scan delay</span> 
+                    <span class="light" i18n="settings.scanDelay.unit">(in milliseconds)</span>
+                </div>
+                <div class="settings-item-description" i18n="settings.scanDelay.description">Change the delay before scanning occurs when no modifier key is required.</div>
             </div>
             <div class="settings-item-right">
                 <input type="number" data-setting="scanning.delay" min="0">
@@ -152,19 +199,19 @@
         </div></div>
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
-                <div class="settings-item-label">Theme</div>
-                <div class="settings-item-description">Adjust the style of the popup.</div>
+                <div class="settings-item-label" i18n="settings.theme.label">Theme</div>
+                <div class="settings-item-description" i18n="settings.theme.description">Adjust the style of the popup.</div>
             </div>
             <div class="settings-item-right">
                 <select data-setting="general.popupTheme" class="short-width">
-                    <option value="default">Light</option>
-                    <option value="dark">Dark</option>
+                    <option value="default" i18n="settings.theme.light">Light</option>
+                    <option value="dark" i18n="settings.theme.dark">Dark</option>
                 </select>
             </div>
         </div></div>
         <a href="/settings.html" rel="noopener" class="settings-item settings-item-button"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">More customization options are available on the Settings page</div>
+                <div class="settings-item-label" i18n="welcome.moreCustomization">More customization options are available on the Settings page</div>
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
@@ -414,6 +461,7 @@
 <script src="/js/pages/settings/settings-controller.js"></script>
 <script src="/js/pages/settings/settings-display-controller.js"></script>
 <script src="/js/pages/settings/status-footer.js"></script>
+<script src="/js/language/localization.js"></script>
 
 <script src="/js/pages/welcome-main.js"></script>
 

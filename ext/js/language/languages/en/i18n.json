@@ -1,117 +1,332 @@
 {
-    "About Yezichak": "About Yezichak",
-    "Advanced": "Advanced",
-    "Yezichak Settings": "Yezichak Settings",
-    "Profile": "Profile",
-    "Default profile": "Default profile",
-    "Language": "Language",
-    "Editing profile": "Editing profile",
-    "defaultProfileDescription": "Switch the primary profile that is used for scanning.",
-    "editingProfileDescription": "Change which profile is being modified on this page.",
-    "Configure profiles": "Configure profiles\u2026",
-    "languageDescription": "The language you are reading with this profile",
-    "Locale": "Locale",
-    "localeDescription": "The language the interface will be displayed in",
-    "Deinflection source": "Deinflection source",
-    "deinflectionSourceDescription": "Deinflect via algorithm or dictionary lookup.",
-    "algorithm": "Algorithm 🧩",
-    "both": "Both 📖 🧩",
-    "dictionary": "Dictionary 📖",
-    "Part of speech filtering": "Part of speech filtering",
-    "posFilteringDescription": "Filter algorithm deinflections using part of speech tags.",
-    "Dictionaries": "Dictionaries",
-    "installed": "installed",
-    "enabled": "enabled",
-    "Configure dictionaries": "Configure installed and enabled dictionaries\u2026",
-    "Storage": "Storage",
-    "storageUseInvalid": "Yezichak is using an indeterminate amount of storage.",
-    "storageUseFinite1": "Yezichak is using approximately ",
-    "storageUseFinite2": " of ",
-    "storageUseInfinite": "Yezichak is permitted unlimited storage.",
-    "Refresh": "Refresh",
-    "Persistent storage": "Persistent storage",
-    "persistentStorageDescription": "Enable to help prevent the browser from unexpectedly clearing the database.",
-    "persistentStorageDescriptionMore": "Web browsers will sometimes clear stored data if the device is running low on storage space. This can result in the imported dictionaries being deleted unexpectedly, causing Yezichak to stop functioning. Enabling persistent storage tells the browser that the data should not be deleted in those circumstances.",
-    "invalidStorageFirefoxNote1": "On Firefox and Firefox for Android, the storage information feature may be hidden behind a browser flag. To enable this flag, open",
-    "invalidStorageFirefoxNote2": " and search for ",
-    "invalidStorageFirefoxNote3": " Setting its value to ",
-    "invalidStorageFirefoxNote4": "should allow storage information to be calculated.",
-    "storageFirefoxMobileNote": "It may not be possible to enable Persistent Storage on Firefox for Android.",
-    "storageChromiumNote1": "Chromium-based browsers should not need to enable this setting since the Yezichak extension has the ",
-    "storageChromiumNot2": " permission, which should prevent data deletion.",
-    "General": "General",
-    "Enable content scanning": "Enable content scanning",
-    "showWelcome1": "Show the ",
-    "showWelcome2": "welcome guide",
-    "showWelcome3": " on browser startup",
-    "Frequency sorting dictionary": "Frequency sorting dictionary",
-    "freqSortDescription": "Sort results using a frequency dictionary.",
-    "freqSortDescriptionMore": "Enabling this option will sort search results using a specific dictionary. This can be beneficial when using multiple dictionaries which may not have consistent sorting information.",
-    "Less...": "Less\u2026",
-    "Frequency sorting mode": "Frequency sorting mode",
-    "freqSortDescending": "Occurrence-based",
-    "freqSortAscending": "Rank-based",
-    "Scanning": "Scanning",
-    "Scan modifier key": "Scan modifier key",
-    "scanKeyDescription": "Hold a key while moving the cursor to scan text.",
-    "Hide popup on cursor exit": "Hide popup on cursor exit",
-    "hidePopupOnCursorExitDescription": "When the cursor exits the popup, the popup will be hidden.",
-    "Select matched text": "Select matched text",
-    "Popup Appearance": "Popup Appearance",
-    "Appearance": "Appearance",
-    "Theme": "Theme",
-    "themeDescription": "Adjust the style of the popup.",
-    "Popup Body": "Popup Body",
-    "Shadow": "Shadow",
-    "Light": "Light",
-    "Dark": "Dark",
-    "Browser": "Browser",
-    "Auto": "Auto",
-    "Action bar appearance": "Action bar appearance",
-    "actionBarAppearanceDescription": "Control when and where the action bar is visible.",
-    "Visibility": "Visibility",
-    "Always": "Always",
-    "Location": "Location",
-    "Left": "Left",
-    "Right": "Right",
-    "Top": "Top",
-    "Bottom": "Bottom",
-    "Popup Position and Size": "Popup Position \u0026 Size",
-    "Position and Size": "Position \u0026 Size",
-    "Display mode": "Display mode",
-    "changePopupLayout": "Change the layout of the popup.",
-    "More...": "More\u2026",
-    "Default": "Default",
-    "Full width": "Full width",
-    "Scale": "Scale",
-    "scaleDescription": "Control the scaling factor of the popup.",
-    "Size": "Size",
-    "sizeDescription": "Control the size of the window, in pixels.",
-    "Width": "Width",
-    "Height": "Height",
-    "Audio": "Audio",
-    "enableAudio": "Enable audio playback for terms",
-    "enableAudioDescription": "Show a clickable speaker icon next to search results.",
-    "configureAudioSources": "Configure audio playback sources\u2026",
-    "Translation": "Translation",
-    "Info...": "Info\u2026",
-    "enableAnki": "Enable Anki integration",
-    "Connection status": "Connection status",
-    "Details...": "Details\u2026",
-    "configureAnkiCards": "Configure Anki card format\u2026",
-    "Clipboard": "Clipboard",
-    "clipboard.enableBackgroundMonitor": "Enable background clipboard text monitoring",
-    "clipboard.enableBackgroundMonitorDescription": "Open the search page in a new window when the clipboard contains text.",
-    "clipboard.enableSearchPageMonitor": "Enable search page clipboard text monitoring",
-    "clipboard.enableSearchPageMonitorDescription": "The query on the search page will be automatically updated with text in the clipboard.",
-    "Backup": "Backup",
-    "settingsBackupExplanation": "Yezichak can import and export settings files which can be used to restore settings, share settings across devices, and to help to debug problems. These files will only contain settings and will not contain dictionaries. Dictionaries must be imported separately. However, you can also import a previously exported collection of dictionaries. See the next section about that.",
-    "Import Settings": "Import Settings",
-    "Export Settings": "Export Settings",
-    "Reset Settings": "Reset Settings",
-    "dictionaryExportExplanation    ": "You can try to export the entire collection of your dictionaries into a single large file that you can try to import from other browsers or devices. Importing the collection like that is a destructive operation and will replace your current database of dictionaries so please proceed with caution. These operations can take a lot of time depending on the size of your collection, especially at the start and at the end, so have patience.",
-    "yomichanExport1": "See ",
-    "yomichanExport2": " for instructions to export your data from older Yomichan installations.",
-    "Import Dictionary Collection": "Import Dictionary Collection",
-    "Export Dictionary Collection": "Export Dictionary Collection"
+    "pages": {
+        "Settings": "Settings",
+        "Search": "Search",
+        "Information": "Information",
+        "Permissions": "Permissions",
+        "Licenses": "Licenses",
+        "Issues": "Issues"
+    },
+    "settings": {
+        "title": "Yezichak Settings",
+        "outline": {
+            "profile": "Profile",
+            "language": "Language",
+            "dictionaries": "Dictionaries",
+            "general": "General",
+            "scanning": "Scanning",
+            "popup": "Popup",
+            "appearance": "Appearance",
+            "positionSize": "Position & Size",
+            "window": "Window",
+            "audio": "Audio",
+            "textParsing": "Text Parsing",
+            "translation": "Translation",
+            "anki": "Anki",
+            "clipboard": "Clipboard",
+            "shortcuts": "Shortcuts",
+            "backup": "Backup",
+            "accessibility": "Accessibility",
+            "security": "Security"
+        },
+        "profile":{
+            "heading": "Profile",
+            "default": {
+                "label": "Default profile",
+                "description": "Switch the primary profile that is used for scanning."
+            },
+            "editing": {
+                "label": "Editing profile",
+                "description": "Change which profile is being modified on this page."
+            },
+            "configure": "Configure profiles\u2026"
+        },
+        "language":{
+            "heading": "Language",
+            "language":{
+                "label": "Language",
+                "description": "The language you are reading with this profile"
+            },
+            "locale":{
+                "label": "Locale",
+                "description": "The language the interface will be displayed in"
+            },
+            "deinflection":{
+                "label": "Deinflection source",
+                "description": "Deinflect via algorithm or dictionary lookup.",
+                "algorithm": "Algorithm 🧩",
+                "both": "Both 📖 🧩",
+                "dictionary": "Dictionary 📖"
+            },
+            "posFilter":{
+                "label": "Part of speech filtering",
+                "description": "Filter algorithm deinflections using part of speech tags."
+            },
+            "languages": {
+                "Albanian": "Albanian",
+                "Arabic": "Arabic",
+                "Ancient Greek": "Ancient Greek",
+                "English": "English",
+                "French": "French",
+                "German": "German",
+                "Greek": "Greek",
+                "Indonesian": "Indonesian",
+                "Italian": "Italian",
+                "Japanese": "Japanese",
+                "Latin": "Latin",
+                "Persian": "Persian",
+                "Portuguese": "Portuguese",
+                "Russian": "Russian",
+                "Serbo-Croatian": "Serbo-Croatian",
+                "Spanish": "Spanish"
+            }
+        },
+        "dictionaries": {
+            "heading": "Dictionaries",
+            "installed": "installed",
+            "enabled" : "enabled",
+            "configure": "Configure installed and enabled dictionaries\u2026"
+        },
+        "storage": {
+            "label": "Storage",
+            "invalid": "Yezichak is using an indeterminate amount of storage.",
+            "finite":{
+                "1": "Yezichak is using approximately ",
+                "2": " of "
+            },
+            "infinite": "Yezichak is permitted unlimited storage.",
+            "refresh": "Refresh",
+            "persistent":{
+                "label": "Persistent storage",
+                "description": "Enable to help prevent the browser from unexpectedly clearing the database.",
+                "descriptionMore": "Web browsers will sometimes clear stored data if the device is running low on storage space. This can result in the imported dictionaries being deleted unexpectedly, causing Yezichak to stop functioning. Enabling persistent storage tells the browser that the data should not be deleted in those circumstances.",
+                "firefoxInvalid":{
+                    "1": "On Firefox and Firefox for Android, the storage information feature may be hidden behind a browser flag. To enable this flag, open",
+                    "2": " and search for ",
+                    "3": " Setting its value to ",
+                    "4": "should allow storage information to be calculated."
+                },
+                "firefoxMobile": "It may not be possible to enable Persistent Storage on Firefox for Android.",
+                "chromium":{
+                    "1": "Chromium-based browsers should not need to enable this setting since the Yezichak extension has the ",
+                    "2": " permission, which should prevent data deletion."
+                }
+            }
+        },
+        "general":{
+            "heading": "General",
+            "enableScanning": "Enable content scanning",
+            "showWelcome":{
+                "1": "Show the ",
+                "welcomeGuide": "welcome guide",
+                "2": " on browser startup"
+            },
+            "freqSort":{
+                "label": "Frequency sorting dictionary",
+                "description": "Sort results using a frequency dictionary.",
+                "descriptionMore": "Enabling this option will sort search results using a specific dictionary. This can be beneficial when using multiple dictionaries which may not have consistent sorting information.",
+                "mode": "Frequency sorting mode",
+                "auto": "Auto",
+                "desc": "Occurrence-based",
+                "asc": "Rank-based"
+            }
+        },
+        "scanning": {
+            "key": {
+                "label": "Scan modifier key",
+                "description": "Hold a key while moving the cursor to scan text."    
+            },
+            "middleMouse": {
+                "label": "Scan using middle mouse button",
+                "description": "Hold the middle mouse button while moving the cursor to scan text."
+            },
+            "autoHide":{
+                "label": "Auto-hide search popup",
+                "description": "When no definitions are found after scanning text, the popup will be hidden.",
+                "delay": {
+                    "label": "Delay",
+                    "unit": "(in milliseconds)"
+                }
+            },
+            "cursorHide": {
+                "label": "Hide search popup on cursor exit",
+                "description": "When the cursor exits the popup, the popup will be hidden.",
+                "delay": {
+                    "label": "Delay",
+                    "unit": "(in milliseconds)"
+                }
+            },
+            "scanDelay": {
+                "label": "Scan delay",
+                "unit": "(in milliseconds)",
+                "description": "Change the delay before scanning occurs when no modifier key is required."
+            },
+            "selectMatched": "Select matched text"
+        },
+        "appearance":{
+            "heading": "Appearance",
+            "theme": {
+                "label": "Theme",
+                "description": "Adjust the style of the popup.",
+                "body":{
+                    "body": "Body",
+                    "light": "Light",
+                    "dark": "Dark",
+                    "browser": "Browser"
+                },
+                "shadow":{
+                    "shadow": "Shadow",
+                    "light": "Light",
+                    "dark": "Dark",
+                    "browser": "Browser"
+                }
+            },
+            "actionBar":{
+                "label": "Action bar appearance",
+                "description": "Control when and where the action bar is visible.",
+                "visibility": "Visibility",
+                "always": "Always",
+                "location": "Location",
+                "left": "Left",
+                "right": "Right",
+                "top": "Top",
+                "bottom": "Bottom"
+            }
+        },
+        "posAndSize":{
+            "heading": "Popup Position \u0026 Size",
+            "displayMode": {
+                "label": "Display mode",
+                "description": "Change the layout of the popup.",
+                "default": "Default",
+                "fullWidth": "Full width"
+            },
+            "scale": {
+                "label": "Scale",
+                "description": "Control the scaling factor of the popup."
+            },
+            "size": {
+                "label": "Size",
+                "description": "Control the size of the window, in pixels.",
+                "width": "Width",
+                "height": "Height"
+            }
+        },
+        "audio":{
+            "heading": "Audio",
+            "enable": {
+                "label": "Enable audio playback for terms",
+                "description": "Show a clickable speaker icon next to search results."
+            },
+            "configureSources": "Configure audio playback sources\u2026"
+        },
+        "translation":{
+            "heading": "Translation"
+        },
+        "anki":{
+            "heading": "Anki",
+            "enable": {
+                "label": "Enable Anki integration",
+                "connectionStatus": "Connection status"
+            },
+            "configure": "Configure Anki card format\u2026"
+        },
+        "clipboard":{
+            "heading": "Clipboard",
+            "background":{
+                "label": "Enable background clipboard text monitoring",
+                "description": "Open the search page in a new window when the clipboard contains text."
+            },
+            "search":{
+                "label": "Enable search page clipboard text monitoring",
+                "description": "The query on the search page will be automatically updated with text in the clipboard."
+            }
+        },
+        "backup":{
+            "heading": "Backup",
+            "settings": {
+                "explanation": "Yezichak can import and export settings files which can be used to restore settings, share settings across devices, and to help to debug problems. These files will only contain settings and will not contain dictionaries. Dictionaries must be imported separately. However, you can also import a previously exported collection of dictionaries. See the next section about that.",
+                "import": "Import settings",
+                "export": "Export settings",
+                "reset": "Reset settings"
+            },
+            "dictionaries": {
+                "explanation": "You can try to export the entire collection of your dictionaries into a single large file that you can try to import from other browsers or devices. Importing the collection like that is a destructive operation and will replace your current database of dictionaries so please proceed with caution. These operations can take a lot of time depending on the size of your collection, especially at the start and at the end, so have patience.",
+                "import": "Import dictionary collection",
+                "export": "Export dictionary collection",
+                "yomichan1": "See ",
+                "yomichan2": " for instructions to export your data from older Yomichan installations."
+            }
+        },
+        "more": "More\u2026",
+        "less": "Less\u2026",
+        "info": "Info\u2026",
+        "details": "Details\u2026",
+        "about": "About Yezichak",
+        "advanced": "Advanced"
+    },
+    "welcome": {
+        "title": "Welcome to Yezichak!",
+        "subtitle": "Here are some basics to get started",
+        "actionPopup": {
+            "1": "Clicking the ",
+            "2": " button in the browser bar will open the quick-actions popup."
+        },
+        "cog": {
+            "cog": "cog",
+            "1": "The ",
+            "2": " button will open the ",
+            "3": " page."
+        },
+        "glass": {
+            "magnifyingGlass": "magnifying glass",
+            "1": "The ",
+            "2": " button will open the ",
+            "3": " page, enabling text and terms to be looked up using the installed dictionaries. This can even be used in offline mode!"
+        },
+        "question": {
+            "questionMark": "question mark",
+            "1": "The ",
+            "2": " button will open the ",
+            "3": " page, which has some helpful information and links about Yezichak."
+        },
+        "dictionaries": {
+            "1": "Yezichak requires one or more dictionaries to be installed in order to look up terms, kanji, and other information. Several downloadable dictionaries can be found on the ",
+            "discordServer": "Yezichak Discord server",
+            "2": ", allowing you to choose the dictionaries most relevant for you. Dictionaries can be configured using the button below, or later from the the ",
+            "3": " page."
+        },
+        "audio": {
+            "1": "Clicking the ",
+            "2": " button of an entry in the search results will play an audio clip of a term's pronunciation using an online dictionary, if available."
+        },
+        "disable": {
+            "1": "This startup notification can be turned off using the options below, or later from the ",
+            "2": " page."
+        },
+        "showOnStartup": "Show this welcome guide on browser startup",
+        "moreCustomization": "More customization options are available on the Settings page"
+    },
+    "info": {
+        "title": "Yomichan Info",
+        "general": "General",
+        "extensionVersion": "Extension version: ",
+        "platform": "Platform: ",
+        "browser": "Browser: ",
+        "language": "Language: ",
+        "userAgent": "User agent: ",
+        "ankiConnectVersion": "AnkiConnect version: ",
+        "ankiConnectVersionUnknown": "(Anki not running or connected)",
+        "installedDictionaries": "Installed dictionaries: ",
+        "exportSettings": "Export settings",
+        "links": "Links",
+        "supportAndDictionaries": "Support and downloadable dictionaries: ",
+        "informationAndSourceCode": "Information and source code: ",
+        "moreExtensionInformation": "More extension information: "
+      },
+      "actionPopup":{
+        "on": "On",
+        "off": "Off",
+        "changeProfile": "Change primary profile"
+      }
 }

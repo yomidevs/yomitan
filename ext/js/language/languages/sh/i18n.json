@@ -1,117 +1,332 @@
 {
-    "About Yezichak": "O aplikaciji",
-    "Advanced": "Napredno",
-    "Yezichak Settings": "Postavke Jezička",
-    "Profile": "Profil",
-    "Default profile": "Aktivni profil",
-    "Language": "Jezik",
-    "Editing profile": "Uređivanje profila",
-    "defaultProfileDescription": "Izaberite primarni profil koji se koristi za skeniranje.",
-    "editingProfileDescription": "Promijenite koji se profil uređuje na ovoj stranici.",
-    "Configure profiles": "Podesite profile\u2026",
-    "languageDescription": "Jezik koji čitate ovim profilom.",
-    "Locale": "Jezik interfejsa",
-    "localeDescription": "Jezik na kojem je prikazana aplikacija",
-    "Deinflection source": "Izvor deinflekcije",
-    "deinflectionSourceDescription": "Deinflekcija na osnovu algoritma ili rječnika.",
-    "algorithm": "Algoritam 🧩",
-    "both": "Oba 📖 🧩",
-    "dictionary": "Rječnik 📖",
-    "Part of speech filtering": "Filtriranje po dijelu govora",
-    "posFilteringDescription": "Filtrirajte deinflekcije algoritma pomoću oznaka za dijelove govora.",
-    "Dictionaries": "Rječnici",
-    "installed": "instalirano",
-    "enabled": "uključeno",
-    "Configure dictionaries": "Podesite instalirane i uključene rječnike\u2026",
-    "Storage": "Memorija",
-    "storageUseInvalid": "Jezičak koristi nepoznatu količinu memorije.",
-    "storageUseFinite1": "Jezičak koristi otprilike ",
-    "storageUseFinite2": " od ",
-    "storageUseInfinite": "Jezičak ima dozvoljenu neograničenu pohranu.",
-    "Refresh": "Osvježi",
-    "Persistent storage": "Trajna pohrana",
-    "persistentStorageDescription": "Omogućite kako biste spriječili neočekivano brisanje baze podataka u pregledniku.",
-    "persistentStorageDescriptionMore": "Web preglednici ponekad brišu pohranjene podatke ako uređaj ima malo slobodnog prostora. To može rezultirati neočekivanim brisanjem uvezenih rječnika, što uzrokuje prestanak rada Jezička. Omogućavanje trajne pohrane obavještava preglednik da podaci ne bi trebali biti izbrisani u tim okolnostima.",
-    "invalidStorageFirefoxNote1": "Na Firefoxu i Firefoxu za Android, značajka informacija o pohrani može biti skrivena iza oznake preglednika. Da biste omogućili tu oznaku, otvorite",
-    "invalidStorageFirefoxNote2": " i potražite ",
-    "invalidStorageFirefoxNote3": " Postavljanje vrijednosti na ",
-    "invalidStorageFirefoxNote4": "trebalo bi omogućiti izračunavanje informacija o pohrani.",
-    "storageFirefoxMobileNote": "Možda nije moguće omogućiti trajnu pohranu na Firefoxu za Android.",
-    "storageChromiumNote1": "Preglednici temeljeni na Chromiumu ne bi trebali trebati omogućiti tu postavku jer Jezičak produženje ima",
-    "storageChromiumNot2": " dozvolu, koja bi trebala spriječiti brisanje podataka.",
-    "General": "Opšte",
-    "Enable content scanning": "Omogući skeniranje sadržaja stranica",
-    "showWelcome1": "Prikaži ",
-    "showWelcome2": "vodič dobrodošlice",
-    "showWelcome3": " pri pokretanju preglednika",
-    "Frequency sorting dictionary": "Sortiranje po rečniku učestalosti",
-    "freqSortDescription": "Sortirajte rezultate pomoću rječnika učestalosti.",
-    "freqSortDescriptionMore": "Omogućavanjem ove opcije rezultati pretraživanja sortiraju se pomoću rječnika učestalosti. To može biti korisno kada koristite više rječnika koji možda nemaju dosljedne informacije o sortiranju.",
-    "Less...": "Manje\u2026",
-    "Frequency sorting mode": "Vrsta sortiranja po učestalosti",
-    "freqSortDescending": "Od veće ka manjoj učestalosti",
-    "freqSortAscending": "Od manjeg ka većem rangu",
-    "Scanning": "Skeniranje",
-    "Scan modifier key": "Tipka za mijenjanje skeniranja",
-    "scanKeyDescription": "Držite tipku dok pomjerate kursor kako biste skenirali tekst.",
-    "Hide popup on cursor exit": "Sakrijte iskačući prozor izlaskom kursora",
-    "hidePopupOnCursorExitDescription": "Kada kursor izađe iz iskačućeg prozora, prozor će biti sakriven.",
-    "Select matched text": "Selektuj obuhvaćeni tekst",
-    "Popup Appearance": "Izgled iskačućeg prozora",
-    "Appearance": "Izgled",
-    "Theme": "Tema",
-    "themeDescription": "Prilagodite stil iskačućeg prozora.",
-    "Popup Body": "Tijelo iskačućeg prozora",
-    "Shadow": "Sjenka",
-    "Light": "Svijetlo",
-    "Dark": "Tamno",
-    "Browser": "Preglednik",
-    "Auto": "Automatski",
-    "Action bar appearance": "Izgled trake s radnjama",
-    "actionBarAppearanceDescription": "Kontrolirajte kada i gdje je traka s radnjama vidljiva.",
-    "Visibility": "Vidljivost",
-    "Always": "Uvijek",
-    "Location": "Lokacija",
-    "Left": "Lijevo",
-    "Right": "Desno",
-    "Top": "Vrh",
-    "Bottom": "Dno",
-    "Popup Position and Size": "Položaj i veličina iskačućeg prozora",
-    "Position and Size": "Položaj \u0026 veličina",
-    "Display mode": "Način prikaza",
-    "changePopupLayout": "Promijeni izgled iskačućeg prozora.",
-    "More...": "Više\u2026",
-    "Default": "Zadano",
-    "Full width": "Puna širina",
-    "Scale": "Skala",
-    "scaleDescription": "Kontrolirajte faktor skaliranja iskačućeg prozora.",
-    "Size": "Veličina",
-    "sizeDescription": "Kontrolirajte veličinu prozora, u pikselima.",
-    "Width": "Širina",
-    "Height": "Visina",
-    "Audio": "Audio",
-    "enableAudio": "Omogući reprodukciju zvuka za pojmove",
-    "enableAudioDescription": "Pokažite ikonicu zvučnika pored rezultata pretraživanja.",
-    "configureAudioSources": "Podesite izvore reprodukcije zvuka\u2026",
-    "Translation": "Obrada teksta",
-    "Info...": "Informacije\u2026",
-    "enableAnki": "Omogući integraciju s Anki-jem",
-    "Connection status": "Status veze",
-    "Details...": "Detalji\u2026",
-    "configureAnkiCards": "Podesite format Anki kartica\u2026",
-    "Clipboard": "Međuspremnik",
-    "clipboard.enableBackgroundMonitor": "Omogućite da se u pozadini prati tekst međuspremnika",
-    "clipboard.enableBackgroundMonitorDescription": "Otvori stranicu s pretragom u novom prozoru kada međuspremnik sadrži tekst.",
-    "clipboard.enableSearchPageMonitor": "Omogućite da se na stranici pretraživanja prati tekst međuspremnika",
-    "clipboard.enableSearchPageMonitorDescription": "Upit na stranici pretraživanja automatski će se ažurirati s tekstom u međuspremniku.",
-    "Backup": "Sigurnosna kopija",
-    "settingsBackupExplanation": "Jezičak može uvoziti i izvoziti datoteke postavki koje se mogu koristiti za vraćanje postavki, dijeljenje postavki između uređaja i pomoći u rješavanju problema. Ove datoteke sadržavat će samo postavke i neće sadržavati rječnike. Rječnici se moraju uvoziti zasebno. Međutim, možete također uvesti prethodno izvezeni skup rječnika. Pogledajte sljedeći odjeljak o tome.",
-    "Import Settings": "Uvezi postavke",
-    "Export Settings": "Izvezi postavke",
-    "Reset Settings": "Vrati na početne postavke",
-    "dictionaryExportExplanation": "Možete pokušati izvesti cijelu zbirku svojih rječnika u jednu veliku datoteku koju možete pokušati uvesti iz drugih preglednika ili uređaja. Uvoz cijele zbirke poput te destruktivna je operacija i zamijenit će trenutnu bazu podataka rječnika, pa budite oprezni. Ove operacije mogu trajati puno vremena, ovisno o veličini vaše zbirke, posebno na početku i na kraju, pa budite strpljivi.",
-    "yomichanExport1": "Pogledajte ",
-    "yomichanExport2": " za upute o izvozu podataka s starijih instalacija Yomichan-a.",
-    "Import Dictionary Collection": "Uvezi zbirku rječnika",
-    "Export Dictionary Collection": "Izvezi zbirku rječnika"
+    "pages": {
+        "Settings": "Postavke",
+        "Search": "Pretraga",
+        "Information": "Informacije",
+        "Permissions": "Dozvole",
+        "Licenses": "Licence",
+        "Issues": "Problemi"
+    },
+    "settings": {
+        "title": "Postavke Jezička",
+        "outline": {
+            "profile": "Profil",
+            "language": "Jezik",
+            "dictionaries": "Rječnici",
+            "general": "Opšte",
+            "scanning": "Skeniranje",
+            "popup": "Popup",
+            "appearance": "Izgled",
+            "positionSize": "Položaj \u0026 veličina",
+            "window": "Prozor",
+            "audio": "Audio",
+            "textParsing": "Razlaganje teksta",
+            "translation": "Obrada teksta",
+            "anki": "Anki",
+            "clipboard": "Međuspremnik",
+            "shortcuts": "Prečice",
+            "backup": "Sigurnosna kopija",
+            "accessibility": "Pristupačnost",
+            "security": "Sigurnost"
+        },
+        "profile":{
+            "heading": "Profil",
+            "default": {
+                "label": "Glavni profil",
+                "description": "Izaberite glavni profil koji se koristi za skeniranje."
+            },
+            "editing": {
+                "label": "Uređivanje profila",
+                "description": "Promijenite koji se profil uređuje na ovoj stranici."
+            },
+            "configure": "Podesite profile\u2026"
+        },
+        "language":{
+            "heading": "Jezik",
+            "language":{
+                "label": "Jezik",
+                "description": "Jezik koji čitate ovim profilom."
+            },
+            "locale":{
+                "label": "Jezik interfejsa",
+                "description": "Jezik na kojem je prikazana aplikacija"
+            },
+            "deinflection":{
+                "label": "Izvor deinflekcije",
+                "description": "Deinflekcija na osnovu algoritma ili rječnika.",
+                "algorithm": "Algoritam 🧩",
+                "both": "Oba 📖 🧩",
+                "dictionary": "Rječnik 📖"
+            },
+            "posFilter":{
+                "label": "Filtriranje po dijelu govora",
+                "description": "Filtrirajte deinflekcije algoritma pomoću oznaka za dijelove govora."
+            },
+            "languages": {
+                "Albanian": "Albanski",
+                "Arabic": "Arapski",
+                "Ancient Greek": "Starogrčki",
+                "English": "Engleski",
+                "French": "Francuski",
+                "German": "Njemački",
+                "Greek": "Grčki",
+                "Indonesian": "Indonezijski",
+                "Italian": "Italijanski",
+                "Japanese": "Japanski",
+                "Latin": "Latinski",
+                "Persian": "Perzijski",
+                "Portuguese": "Portugalski",
+                "Russian": "Ruski",
+                "Serbo-Croatian": "Srpskohrvatski",
+                "Spanish": "Španski"
+            }
+        },
+        "dictionaries": {
+            "heading": "Rječnici",
+            "installed": "instalirano",
+            "enabled" : "uključeno",
+            "configure": "Podesite instalirane i uključene rječnike\u2026"
+        },
+        "storage": {
+            "label": "Memorija",
+            "invalid": "Jezičak koristi nepoznatu količinu memorije.",
+            "finite":{
+                "1": "Jezičak koristi otprilike ",
+                "2": " od "
+            },
+            "infinite": "Jezičak ima dozvoljenu neograničenu pohranu.",
+            "refresh": "Osvježi",
+            "persistent":{
+                "label": "Trajna pohrana",
+                "description": "Omogućite kako biste spriječili neočekivano brisanje baze podataka u pregledniku.",
+                "descriptionMore": "Web preglednici ponekad brišu pohranjene podatke ako uređaj ima malo slobodnog prostora. To može rezultirati neočekivanim brisanjem uvezenih rječnika, što uzrokuje prestanak rada Jezička. Omogućavanje trajne pohrane obavještava preglednik da podaci ne bi trebali biti izbrisani u tim okolnostima.",
+                "firefoxInvalid":{
+                    "1": "Na Firefoxu i Firefoxu za Android, informacije o memoriji mogu biti skrivene. Da biste ih omogućili, otvorite",
+                    "2": " i potražite ",
+                    "3": " Postavljanje vrijednosti na ",
+                    "4": "trebalo bi omogućiti izračunavanje informacija o pohrani."
+                },
+                "firefoxMobile": "Možda nije moguće omogućiti trajnu pohranu na Firefoxu za Android.",
+                "chromium":{
+                    "1": "Preglednici temeljeni na Chromiumu ne bi trebali trebati omogućiti tu postavku jer Jezičak produženje ima ",
+                    "2": " dozvolu, koja bi trebala spriječiti brisanje podataka."
+                }
+            }
+        },
+        "general":{
+            "heading": "Opšte",
+            "enableScanning": "Omogući skeniranje sadržaja stranica",
+            "showWelcome":{
+                "1": "Prikaži ",
+                "welcomeGuide": "vodič dobrodošlice",
+                "2": " pri pokretanju preglednika"  
+            },
+            "freqSort":{
+                "label": "Sortiranje po rječniku učestalosti",
+                "description": "Određivanje redosleda prikaza rezultata pomoću rječnika učestalosti.",
+                "descriptionMore": "Omogućavanjem ove opcije rezultati pretraživanja sortiraju se pomoću rječnika učestalosti. To može biti korisno kada koristite više rječnika koji možda nemaju dosljedne informacije o sortiranju.",
+                "mode": "Vrsta sortiranja po učestalosti",
+                "auto": "Automatski",
+                "desc": "Od veće ka manjoj učestalosti",
+                "asc": "Od manjeg ka većem rangu"
+            }
+        },
+        "scanning": {
+            "key": {
+                "label": "Tipka za skeniranje",
+                "description": "Držite tipku dok pomjerate kursor kako biste skenirali tekst."    
+            },
+            "middleMouse": {
+                "label": "Skeniranje pritiskom srednjeg tastera miša",
+                "description": "Držite srednji taster miša dok pomjerate kursor kako biste skenirali tekst."
+            },
+            "autoHide":{
+                "label": "Automatsko sakrivanje prozora pretrage",
+                "description": "Kada se ne pronađu definicije nakon skeniranja teksta, prozor pretrage će biti sakriven.",
+                "delay": {
+                    "label": "Čekanje",
+                    "unit": "(u milisekundama)"
+                }
+            },
+            "cursorHide": {
+                "label": "Sakrij prozor pretrage kada ga kursor napusti",
+                "description": "Kada se kursor pomjeri izvan prozora pretrage, prozor će biti sakriven.",
+                "delay": {
+                    "label": "Čekanje",
+                    "unit": "(u milisekundama)"
+                }
+            },
+            "scanDelay": {
+                "label": "Kašnjenje skeniranja",
+                "unit": "(u milisekundama)",
+                "description": "Vreme pre skeniranja kada se koristi skeniranje bez tipke."
+            },
+            "selectMatched": "Selektuj obuhvaćeni tekst"
+        },
+        "appearance":{
+            "heading": "Izgled prozora",
+            "theme": {
+                "label": "Tema",
+                "description": "Prilagodite stil prozora.",
+                "body":{
+                    "body": "Tijelo",
+                    "light": "Svijetlo",
+                    "dark": "Tamno",
+                    "browser": "Prema pregledniku"
+                },
+                "shadow":{
+                    "shadow": "Sjenka",
+                    "light": "Svijetla",
+                    "dark": "Tamna",
+                    "browser": "Prema pregledniku"
+                }
+            },
+            "actionBar":{
+                "label": "Izgled trake s radnjama",
+                "description": "Kontrolirajte kada i gdje je traka s radnjama vidljiva.",
+                "visibility": "Vidljivost", 
+                "always": "Uvijek",
+                "location": "Položaj",
+                "left": "Lijevo",
+                "right": "Desno",
+                "top": "Vrh",
+                "bottom": "Dno"
+            }
+        },
+        "posAndSize":{
+            "heading": "Položaj i veličina prozora",
+            "displayMode": {
+                "label": "Način prikaza",
+                "description": "Promijeni izgled iskačućeg prozora.",
+                "default": "Običan",
+                "fullWidth": "Puna širina"
+            },
+            "scale": {
+                "label": "Skaliranje",
+                "description": "Kontrolirajte faktor skaliranja iskačućeg prozora."
+            },
+            "size": {
+                "label": "Veličina",
+                "description": "Kontrolirajte veličinu prozora, u pikselima.",
+                "width": "Širina",
+                "height": "Visina"
+            }
+        },
+        "audio":{
+            "heading": "Audio",
+            "enable": {
+                "label": "Omogući reprodukciju zvuka za pojmove",
+                "description": "Pokažite ikonicu zvučnika pored rezultata pretraživanja."
+            },
+            "configureSources": "Podesite izvore reprodukcije zvuka\u2026"
+        },
+        "translation":{
+            "heading": "Obrada teksta"
+        },
+        "anki":{
+            "heading": "Anki",
+            "enable": {
+                "label": "Omogući integraciju s Anki-jem",
+                "connectionStatus": "Stanje veze"
+            },
+            "configure": "Podesite format Anki kartica\u2026"
+        },
+        "clipboard":{
+            "heading": "Međuspremnik",
+            "background":{
+                "label": "Omogućite da se u pozadini prati tekst međuspremnika",
+                "description": "Otvori stranicu s pretragom u novom prozoru kada međuspremnik sadrži tekst."
+            },
+            "search":{
+                "label": "Praćenje međuspremnika na stranici pretraživanja",
+                "description": "Upit na stranici pretraživanja automatski će se ažurirati s tekstom u međuspremniku."
+            }
+        },
+        "backup":{
+            "heading": "Sigurnosna kopija",
+            "settings": {
+                "explanation": "Jezičak može uvoziti i izvoziti datoteke postavki koje se mogu koristiti za vraćanje postavki, dijeljenje postavki između uređaja i pomoći u rješavanju problema. Ove datoteke sadržavat će samo postavke i neće sadržavati rječnike. Rječnici se moraju uvoziti zasebno. Međutim, možete također uvesti prethodno izvezeni skup rječnika. Pogledajte sljedeći odjeljak o tome.",
+                "import": "Uvezi postavke",
+                "export": "Izvezi postavke",
+                "reset": "Vrati na početne postavke"
+            },
+            "dictionaries": {
+                "explanation": "Možete pokušati izvesti cijelu zbirku svojih rječnika u jednu veliku datoteku koju možete pokušati uvesti iz drugih preglednika ili uređaja. Uvoz cijele zbirke poput te destruktivna je operacija i zamijenit će trenutnu bazu podataka rječnika, pa budite oprezni. Ove operacije mogu trajati puno vremena, ovisno o veličini vaše zbirke, posebno na početku i na kraju, pa budite strpljivi.",
+                "import": "Uvezi zbirku rječnika",
+                "export": "Izvezi zbirku rječnika",
+                "yomichan1": "Pogledajte ",
+                "yomichan2": " za upute o izvozu podataka s starijih instalacija Yomichan-a."
+            }
+        },
+        "more": "Više\u2026",
+        "less": "Manje\u2026",
+        "info": "Info\u2026",
+        "details": "Detalji\u2026",
+        "about": "O aplikaciji",
+        "advanced": "Napredno"
+    },
+    "welcome": {
+        "title": "Dobrodošli u Jezičak!",
+        "subtitle": "Za početak, evo nekoliko osnovnih stvari",
+        "actionPopup": {
+            "1": "Klikom na ",
+            "2": " dugme u traci preglednika otvoriće se meni sa radnjama."
+        },
+        "cog": {
+            "cog": "točak",
+            "1": "Dugme ",
+            "2": " otvara stranicu",
+            "3": "."
+        },
+        "glass": {
+            "magnifyingGlass": "povećalo",
+            "1": "Dugme ",
+            "2": " otvara stranicu ",
+            "3": ", omogućavajući pretragu teksta i pojmova pomoću instaliranih rječnika. Ovo radi i offline!"
+        },
+        "question": {
+            "questionMark": "upitnik",
+            "1": "Dugme ",
+            "2": " otvara stranicu ",
+            "3": ", koja sadrži korisne informacije i linkove o Jezičku."
+        },
+        "dictionaries": {
+            "1": "Za korištenje Jezička potrebno je instalirati jedan ili više rječnika kako bi se mogli pretraživati pojmovi, kanji i druge informacije. Nekoliko rječnika može se preuzeti na ",
+            "discordServer": "Yezichak Discord serveru",
+            "2": ". Rječnici se mogu konfigurisati pomoću dugmeta ispod ili kasnije s ",
+            "3": " stranice."
+        },
+        "audio": {
+            "1": "Klikom na dugme ",
+            "2": " za određeni unos u rezultatima pretrage, možete reprodukovati audio zapis izgovora pojma pomoću online rječnika, ako je dostupno."
+        },
+        "disable": {
+            "1": "Ovu obaveštenje pri pokretanju možete isključiti koristeći opcije u nastavku ili kasnije s ",
+            "2": " stranice."
+        },
+        "showOnStartup": "Prikaži ovaj vodič pri pokretanju preglednika",
+        "moreCustomization": "Više opcija prilagođavanja dostupno je na stranici Postavki"
+    },
+    "info": {
+        "title": "Jezičak - informacije",
+        "general": "Opšte",
+        "extensionVersion": "Verzija ekstenzije: ",
+        "platform": "Platforma: ",
+        "browser": "Preglednik: ",
+        "language": "Jezik: ",
+        "userAgent": "Korisnički agent: ",
+        "ankiConnectVersion": "AnkiConnect verzija: ",
+        "ankiConnectVersionUnknown": "(Anki nije pokrenut ili povezan)",
+        "installedDictionaries": "Instalirani rečnici: ",
+        "exportSettings": "Izvezi postavke",
+        "links": "Linkovi",
+        "supportAndDictionaries": "Podrška i preuzimanje rečnika: ",
+        "informationAndSourceCode": "Informacije i izvorni kod: ",
+        "moreExtensionInformation": "Više informacija o ektensziji: "
+      },
+      "actionPopup":{
+        "on": "Uklj.",
+        "off": "Isklj.",
+        "changeProfile": "Promijeni glavni profil"
+      }
 }

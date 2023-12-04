@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Yomichan Info</title>
+    <title i18n="info.title">Yomichan Info</title>
     <link rel="tongue.png" sizes="16x16">
     <link rel="tongue.png" sizes="19x19">
     <link rel="tongue.png" sizes="32x32">
@@ -23,32 +23,48 @@
 
     <span tabindex="-1" id="content-scroll-focus"></span>
 
-    <h1>Yomichan Info</h1>
+    <h1 i18n="info.title">Yomichan Info</h1>
 
-    <h2 id="general">General</h2>
+    <h2 id="general" i18n="info.general">General</h2>
     <div class="settings-group">
-        <div class="settings-item"><div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
-            <ul>
-                <li>Extension version: <span id="version"></span></li>
-                <li>Platform: <span id="platform"></span></li>
-                <li>Browser: <span id="browser"></span></li>
-                <li>Language: <span id="language"></span></li>
-                <li>User agent: <span id="user-agent"></span></li>
-                <li>AnkiConnect version: <span id="anki-connect-version-container"><span id="anki-connect-version">&hellip;</span><em class="light" id="anki-connect-version-unknown-message" hidden> (Anki not running or connected)</em></span></li>
-                <li>Installed dictionaries: <span id="installed-dictionaries">&hellip;</span><em id="installed-dictionaries-none" hidden>None installed</em></li>
-                <li><a tabindex="0" id="settings-export-button">Export settings</a></li>
-            </ul>
-        </div></div></div></div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        <ul>
+                            <li><span i18n="info.extensionVersion">Extension version: </span><span id="version"></span></li>
+                            <li><span i18n="info.platform">Platform: </span><span id="platform"></span></li>
+                            <li><span i18n="info.browser">Browser: </span><span id="browser"></span></li>
+                            <li><span i18n="info.language">Language: </span><span id="language"></span></li>
+                            <li><span i18n="info.userAgent">User agent: </span><span id="user-agent"></span></li>
+                            <li>
+                                <span i18n="info.ankiConnectVersion">AnkiConnect version: </span>
+                                <span id="anki-connect-version-container">
+                                    <span id="anki-connect-version">&hellip;</span>
+                                    <em class="light" id="anki-connect-version-unknown-message" hidden i18n="info.ankiConnectVersionUnknown">
+                                        (Anki not running or connected)
+                                    </em>
+                                </span>
+                            </li>
+                            <li><span i18n="info.installedDictionaries">Installed dictionaries: </span><span id="installed-dictionaries">&hellip;</span><em id="installed-dictionaries-none" hidden>None installed</em></li>
+                            <li><a tabindex="0" id="settings-export-button" i18n="info.exportSettings">Export settings</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <h2 id="links">Links</h2>
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
             <ul>
-                <li>Support and downloadable dictionaries: <a href="https://discord.gg/WuqdTDQWd" rel="noreferrer noopener">Discord</a></li>
-                <li>Information and source code: <a href="https://github.com/StefanVukovic99/yezichak" rel="noreferrer noopener">Github</a></li>
-                <!-- <li>Release notes: <a href="https://github.com/FooSoft/yomichan/releases" rel="noreferrer noopener" data-href-format="https://github.com/FooSoft/yomichan/releases/tag/{version}" id="release-notes-this-version-link">This version</a> | <a href="https://github.com/FooSoft/yomichan/releases" rel="noreferrer noopener">All versions</a></li> -->
-                <li>More extension information: <a href="/permissions.html">Permissions</a> | <a href="/legal.html">Licenses</a> | <a href="/issues.html">Issues</a></li>
+                <li><span i18n="info.supportAndDictionaries">Support and downloadable dictionaries: </span><a href="https://discord.gg/WuqdTDQWd" rel="noreferrer noopener">Discord</a></li>
+                <li><span i18n="info.informationAndSourceCode">Information and source code: </span><a href="https://github.com/StefanVukovic99/yezichak" rel="noreferrer noopener">Github</a></li>
+                <li>
+                    <span i18n="info.moreExtensionInformation">More extension information: </span>
+                    <a href="/permissions.html" i18n="pages.Permissions">Permissions</a> | <a href="/legal.html" i18n="pages.Licences">Licenses</a> | <a href="/issues.html" i18n="pages.Issues">Issues</a>
+                </li>            
             </ul>
         </div></div></div></div>
     </div>
@@ -73,6 +89,7 @@
 <script src="/js/dom/html-template-collection.js"></script>
 <script src="/js/pages/settings/backup-controller.js"></script>
 <script src="/js/pages/settings/settings-controller.js"></script>
+<script src="/js/language/localization.js"></script>
 
 <script src="/js/pages/info-main.js"></script>
 

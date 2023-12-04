@@ -18,6 +18,7 @@
 /* global
  * HotkeyHelpController
  * PermissionsUtil
+ * LocalizationController
  */
 
 class DisplayController {
@@ -50,6 +51,9 @@ class DisplayController {
         }
 
         document.querySelector('.action-select-profile').hidden = (profiles.length <= 1);
+
+        this._localizationController = new LocalizationController();
+        await this._localizationController.prepare(primaryProfile.options);
 
         this._updateProfileSelect(profiles, profileCurrent);
 
@@ -185,6 +189,7 @@ class DisplayController {
     }
 
     _onProfileSelectChange(e) {
+        console.log('onProfileSelectChange')
         const value = parseInt(e.currentTarget.value, 10);
         if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= this._optionsFull.profiles.length) {
             this._setPrimaryProfileIndex(value);

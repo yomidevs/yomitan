@@ -21,7 +21,7 @@ class LanguagesController {
         this._languages.forEach((lang) => {
             const option = document.createElement('option');
             option.value = lang.iso;
-            option.textContent = `${lang.language} ${lang.flag}`;
+            option.innerHTML = `<span i18n="settings.language.languages.${lang.language}">${lang.language}</span> ${lang.flag}`;
             this._selectElement.appendChild(option);
         });
     }

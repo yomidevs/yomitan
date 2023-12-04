@@ -19,6 +19,7 @@
  * BackupController
  * DocumentFocusController
  * SettingsController
+ * LocalizationController
  */
 
 function getBrowserDisplayName(browser) {
@@ -115,6 +116,9 @@ function getOperatingSystemDisplayName(os) {
 
         const backupController = new BackupController(settingsController, null);
         await backupController.prepare();
+
+        const localizationController = new LocalizationController(settingsController);
+        await localizationController.prepare();
 
         await promiseTimeout(100);
 
