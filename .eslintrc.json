@@ -61,7 +61,7 @@
         "no-case-declarations": "error",
         "no-const-assign": "error",
         "no-constant-condition": "off",
-        "no-console": "off",
+        "no-console": "warn",
         "no-global-assign": "error",
         "no-param-reassign": "off",
         "no-prototype-builtins": "error",
