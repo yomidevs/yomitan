@@ -18,15 +18,27 @@
 
 import fs from 'fs';
 import {JSDOM} from 'jsdom';
+import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {expect, test} from 'vitest';
 import {DOMTextScanner} from '../ext/js/dom/dom-text-scanner.js';
 
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * @param {string} fileName
+ * @returns {JSDOM}
+ */
 function createJSDOM(fileName) {
     const domSource = fs.readFileSync(fileName, {encoding: 'utf8'});
     return new JSDOM(domSource);
 }
 
+/**
+ * @param {Element} element
+ * @param {string} selector
+ * @returns {?Node}
+ */
 function querySelectorTextNode(element, selector) {
     let textIndex = -1;
     const match = /::text$|::nth-text\((\d+)\)$/.exec(selector);
@@ -35,13 +47,16 @@ function querySelectorTextNode(element, selector) {
         selector = selector.substring(0, selector.length - match[0].length);
     }
     const result = element.querySelector(selector);
+    if (result === null) {
+        return null;
+    }
     if (textIndex < 0) {
         return result;
     }
     for (let n = result.firstChild; n !== null; n = n.nextSibling) {
-        if (n.nodeType === n.constructor.TEXT_NODE) {
+        if (n.nodeType === /** @type {typeof Node} */ (n.constructor).TEXT_NODE) {
             if (textIndex === 0) {
-                return n;
+                return /** @type {Text} */ (n);
             }
             --textIndex;
         }
@@ -50,10 +65,16 @@ function querySelectorTextNode(element, selector) {
 }
 
 
+/**
+ * @param {import('jsdom').DOMWindow} window
+ * @param {(element: Element) => CSSStyleDeclaration} getComputedStyle
+ * @param {?Node} element
+ * @returns {number}
+ */
 function getComputedFontSizeInPixels(window, getComputedStyle, element) {
     for (; element !== null; element = element.parentNode) {
         if (element.nodeType === window.Node.ELEMENT_NODE) {
-            const fontSize = getComputedStyle(element).fontSize;
+            const fontSize = getComputedStyle(/** @type {Element} */ (element)).fontSize;
             if (fontSize.endsWith('px')) {
                 const value = parseFloat(fontSize.substring(0, fontSize.length - 2));
                 return value;
@@ -64,14 +85,19 @@ function getComputedFontSizeInPixels(window, getComputedStyle, element) {
     return defaultFontSize;
 }
 
+/**
+ * @param {import('jsdom').DOMWindow} window
+ * @returns {(element: Element, pseudoElement?: ?string) => CSSStyleDeclaration}
+ */
 function createAbsoluteGetComputedStyle(window) {
     // Wrapper to convert em units to px units
     const getComputedStyleOld = window.getComputedStyle.bind(window);
+    /** @type {(element: Element, pseudoElement?: ?string) => CSSStyleDeclaration} */
     return (element, ...args) => {
         const style = getComputedStyleOld(element, ...args);
         return new Proxy(style, {
             get: (target, property) => {
-                let result = target[property];
+                let result = /** @type {import('core').SafeAny} */ (target)[property];
                 if (typeof result === 'string') {
                     result = result.replace(/([-+]?\d(?:\.\d)?(?:[eE][-+]?\d+)?)em/g, (g0, g1) => {
                         const fontSize = getComputedFontSizeInPixels(window, getComputedStyleOld, element);
@@ -85,12 +111,15 @@ function createAbsoluteGetComputedStyle(window) {
 }
 
 
+/**
+ * @param {JSDOM} dom
+ */
 async function testDomTextScanner(dom) {
     const document = dom.window.document;
 
     test('DomTextScanner', () => {
-        for (const testElement of document.querySelectorAll('y-test')) {
-            let testData = JSON.parse(testElement.dataset.testData);
+        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('y-test'))) {
+            let testData = JSON.parse(/** @type {string} */ (testElement.dataset.testData));
             if (!Array.isArray(testData)) {
                 testData = [testData];
             }
@@ -159,19 +188,21 @@ async function testDomTextScanner(dom) {
 }
 
 
+/** */
 async function testDocument1() {
-    const dom = createJSDOM(path.join(__dirname, 'data', 'html', 'test-dom-text-scanner.html'));
+    const dom = createJSDOM(path.join(dirname, 'data', 'html', 'test-dom-text-scanner.html'));
     const window = dom.window;
     try {
         window.getComputedStyle = createAbsoluteGetComputedStyle(window);
 
-        await testDomTextScanner(dom, {DOMTextScanner});
+        await testDomTextScanner(dom);
     } finally {
         window.close();
     }
 }
 
 
+/** */
 async function main() {
     await testDocument1();
 }

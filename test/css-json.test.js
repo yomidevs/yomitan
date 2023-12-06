@@ -20,6 +20,7 @@ import fs from 'fs';
 import {expect, test} from 'vitest';
 import {formatRulesJson, generateRules, getTargets} from '../dev/generate-css-json';
 
+/** */
 function main() {
     test('css-json', () => {
         for (const {cssFile, overridesCssFile, outputPath} of getTargets()) {

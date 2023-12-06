@@ -30,6 +30,7 @@ import {SettingsController} from './settings/settings-controller.js';
 import {SettingsDisplayController} from './settings/settings-display-controller.js';
 import {StatusFooter} from './settings/status-footer.js';
 
+/** */
 async function setupEnvironmentInfo() {
     const {manifest_version: manifestVersion} = chrome.runtime.getManifest();
     const {browser, platform} = await yomitan.api.getEnvironmentInfo();
@@ -38,6 +39,9 @@ async function setupEnvironmentInfo() {
     document.documentElement.dataset.manifestVersion = `${manifestVersion}`;
 }
 
+/**
+ * @param {GenericSettingController} genericSettingController
+ */
 async function setupGenericSettingsController(genericSettingController) {
     await genericSettingController.prepare();
     await genericSettingController.refresh();
@@ -51,7 +55,7 @@ async function setupGenericSettingsController(genericSettingController) {
         const extensionContentController = new ExtensionContentController();
         extensionContentController.prepare();
 
-        const statusFooter = new StatusFooter(document.querySelector('.status-footer-container'));
+        const statusFooter = new StatusFooter(/** @type {HTMLElement} */ (document.querySelector('.status-footer-container')));
         statusFooter.prepare();
 
         await yomitan.prepare();

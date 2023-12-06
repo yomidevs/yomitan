@@ -19,18 +19,23 @@
 import {yomitan} from '../../yomitan.js';
 
 export class PopupWindowController {
+    /** */
     prepare() {
-        const testLink = document.querySelector('#test-window-open-link');
+        const testLink = /** @type {HTMLElement} */ (document.querySelector('#test-window-open-link'));
         testLink.addEventListener('click', this._onTestWindowOpenLinkClick.bind(this), false);
     }
 
     // Private
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onTestWindowOpenLinkClick(e) {
         e.preventDefault();
         this._testWindowOpen();
     }
 
+    /** */
     async _testWindowOpen() {
         await yomitan.api.getOrCreateSearchPopup({focus: true});
     }

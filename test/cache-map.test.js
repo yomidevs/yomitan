@@ -19,6 +19,7 @@
 import {expect, test} from 'vitest';
 import {CacheMap} from '../ext/js/general/cache-map.js';
 
+/** */
 function testConstructor() {
     test('constructor', () => {
         const data = [
@@ -29,6 +30,7 @@ function testConstructor() {
             [true,  () => new CacheMap(1.5)],
             [true,  () => new CacheMap(Number.NaN)],
             [true,  () => new CacheMap(Number.POSITIVE_INFINITY)],
+            // @ts-expect-error - Ignore because it should throw an error
             [true,  () => new CacheMap('a')]
         ];
 
@@ -42,6 +44,7 @@ function testConstructor() {
     });
 }
 
+/** */
 function testApi() {
     test('api', () => {
         const data = [
@@ -103,10 +106,10 @@ function testApi() {
                 const {func, args} = call;
                 let returnValue;
                 switch (func) {
-                    case 'get': returnValue = cache.get(...args); break;
-                    case 'set': returnValue = cache.set(...args); break;
-                    case 'has': returnValue = cache.has(...args); break;
-                    case 'clear': returnValue = cache.clear(...args); break;
+                    case 'get': returnValue = cache.get(args[0]); break;
+                    case 'set': returnValue = cache.set(args[0], args[1]); break;
+                    case 'has': returnValue = cache.has(args[0]); break;
+                    case 'clear': returnValue = cache.clear(); break;
                 }
                 if (Object.prototype.hasOwnProperty.call(call, 'returnValue')) {
                     const {returnValue: expectedReturnValue} = call;
@@ -119,6 +122,7 @@ function testApi() {
 }
 
 
+/** */
 function main() {
     testConstructor();
     testApi();

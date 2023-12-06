@@ -16,11 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, EventListenerCollection, clone, isObject, log, promiseTimeout} from '../core.js';
+import {EventDispatcher, EventListenerCollection, clone, log} from '../core.js';
 import {DocumentUtil} from '../dom/document-util.js';
+import {TextSourceElement} from '../dom/text-source-element.js';
 import {yomitan} from '../yomitan.js';
 
+/**
+ * @augments EventDispatcher<import('text-scanner').EventType>
+ */
 export class TextScanner extends EventDispatcher {
+    /**
+     * @param {import('text-scanner').ConstructorDetails} details
+     */
     constructor({
         node,
         getSearchContext,
@@ -32,67 +39,121 @@ export class TextScanner extends EventDispatcher {
         searchOnClickOnly=false
     }) {
         super();
+        /** @type {HTMLElement|Window} */
         this._node = node;
+        /** @type {import('text-scanner').GetSearchContextCallback} */
         this._getSearchContext = getSearchContext;
+        /** @type {?(() => Element[])} */
         this._ignoreElements = ignoreElements;
+        /** @type {?((x: number, y: number) => Promise<boolean>)} */
         this._ignorePoint = ignorePoint;
+        /** @type {boolean} */
         this._searchTerms = searchTerms;
+        /** @type {boolean} */
         this._searchKanji = searchKanji;
+        /** @type {boolean} */
         this._searchOnClick = searchOnClick;
+        /** @type {boolean} */
         this._searchOnClickOnly = searchOnClickOnly;
 
+        /** @type {boolean} */
         this._isPrepared = false;
+        /** @type {?string} */
         this._includeSelector = null;
+        /** @type {?string} */
         this._excludeSelector = null;
 
+        /** @type {?import('text-scanner').InputInfo} */
         this._inputInfoCurrent = null;
+        /** @type {?Promise<boolean>} */
         this._scanTimerPromise = null;
+        /** @type {?(value: boolean) => void} */
+        this._scanTimerPromiseResolve = null;
+        /** @type {?import('text-source').TextSource} */
         this._textSourceCurrent = null;
+        /** @type {boolean} */
         this._textSourceCurrentSelected = false;
+        /** @type {boolean} */
         this._pendingLookup = false;
+        /** @type {?import('text-scanner').SelectionRestoreInfo} */
         this._selectionRestoreInfo = null;
 
+        /** @type {boolean} */
         this._deepContentScan = false;
+        /** @type {boolean} */
         this._normalizeCssZoom = true;
+        /** @type {boolean} */
         this._selectText = false;
+        /** @type {number} */
         this._delay = 0;
+        /** @type {boolean} */
         this._touchInputEnabled = false;
+        /** @type {boolean} */
         this._pointerEventsEnabled = false;
+        /** @type {number} */
         this._scanLength = 1;
+        /** @type {boolean} */
         this._layoutAwareScan = false;
+        /** @type {boolean} */
         this._preventMiddleMouse = false;
+        /** @type {boolean} */
         this._matchTypePrefix = false;
+        /** @type {number} */
         this._sentenceScanExtent = 0;
+        /** @type {boolean} */
         this._sentenceTerminateAtNewlines = true;
+        /** @type {Map<string, [includeCharacterAtStart: boolean, includeCharacterAtEnd: boolean]>} */
         this._sentenceTerminatorMap = new Map();
+        /** @type {Map<string, [character: string, includeCharacterAtStart: boolean]>} */
         this._sentenceForwardQuoteMap = new Map();
+        /** @type {Map<string, [character: string, includeCharacterAtEnd: boolean]>} */
         this._sentenceBackwardQuoteMap = new Map();
+        /** @type {import('text-scanner').InputConfig[]} */
         this._inputs = [];
 
+        /** @type {boolean} */
         this._enabled = false;
+        /** @type {boolean} */
         this._enabledValue = false;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
 
+        /** @type {boolean} */
         this._preventNextClickScan = false;
+        /** @type {?import('core').Timeout} */
         this._preventNextClickScanTimer = null;
+        /** @type {number} */
         this._preventNextClickScanTimerDuration = 50;
+        /** @type {() => void} */
         this._preventNextClickScanTimerCallback = this._onPreventNextClickScanTimeout.bind(this);
 
+        /** @type {?number} */
         this._primaryTouchIdentifier = null;
+        /** @type {boolean} */
         this._preventNextContextMenu = false;
+        /** @type {boolean} */
         this._preventNextMouseDown = false;
+        /** @type {boolean} */
         this._preventNextClick = false;
+        /** @type {boolean} */
         this._preventScroll = false;
+        /** @type {0|1|2|3} */
         this._penPointerState = 0; // 0 = not active; 1 = hovering; 2 = touching; 3 = hovering after touching
+        /** @type {Map<number, string>} */
         this._pointerIdTypeMap = new Map();
 
+        /** @type {boolean} */
         this._canClearSelection = true;
 
+        /** @type {?import('core').Timeout} */
         this._textSelectionTimer = null;
+        /** @type {boolean} */
         this._yomitanIsChangingTextSelectionNow = false;
+        /** @type {boolean} */
         this._userHasNotSelectedAnythingManually = true;
     }
 
+    /** @type {boolean} */
     get canClearSelection() {
         return this._canClearSelection;
     }
@@ -101,6 +162,7 @@ export class TextScanner extends EventDispatcher {
         this._canClearSelection = value;
     }
 
+    /** @type {?string} */
     get includeSelector() {
         return this._includeSelector;
     }
@@ -109,6 +171,7 @@ export class TextScanner extends EventDispatcher {
         this._includeSelector = value;
     }
 
+    /** @type {?string} */
     get excludeSelector() {
         return this._excludeSelector;
     }
@@ -117,15 +180,22 @@ export class TextScanner extends EventDispatcher {
         this._excludeSelector = value;
     }
 
+    /** */
     prepare() {
         this._isPrepared = true;
         this.setEnabled(this._enabled);
     }
 
+    /**
+     * @returns {boolean}
+     */
     isEnabled() {
         return this._enabled;
     }
 
+    /**
+     * @param {boolean} enabled
+     */
     setEnabled(enabled) {
         this._enabled = enabled;
 
@@ -145,11 +215,13 @@ export class TextScanner extends EventDispatcher {
 
         if (value) {
             this._hookEvents();
-            const selection = window.getSelection();
-            this._userHasNotSelectedAnythingManually = (selection === null) ? true : selection.isCollapsed;
+            this._userHasNotSelectedAnythingManually = this._computeUserHasNotSelectedAnythingManually();
         }
     }
 
+    /**
+     * @param {import('text-scanner').Options} options
+     */
     setOptions({
         inputs,
         deepContentScan,
@@ -200,7 +272,7 @@ export class TextScanner extends EventDispatcher {
         if (typeof sentenceParsingOptions === 'object' && sentenceParsingOptions !== null) {
             const {scanExtent, terminationCharacterMode, terminationCharacters} = sentenceParsingOptions;
             if (typeof scanExtent === 'number') {
-                this._sentenceScanExtent = sentenceParsingOptions.scanExtent;
+                this._sentenceScanExtent = scanExtent;
             }
             if (typeof terminationCharacterMode === 'string') {
                 this._sentenceTerminateAtNewlines = (terminationCharacterMode === 'custom' || terminationCharacterMode === 'newlines');
@@ -229,6 +301,12 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {import('text-source').TextSource} textSource
+     * @param {number} length
+     * @param {boolean} layoutAwareScan
+     * @returns {string}
+     */
     getTextSourceContent(textSource, length, layoutAwareScan) {
         const clonedTextSource = textSource.clone();
 
@@ -243,10 +321,14 @@ export class TextScanner extends EventDispatcher {
         return clonedTextSource.text();
     }
 
+    /**
+     * @returns {boolean}
+     */
     hasSelection() {
         return (this._textSourceCurrent !== null);
     }
 
+    /** */
     clearSelection() {
         if (!this._canClearSelection) { return; }
         if (this._textSourceCurrent !== null) {
@@ -263,15 +345,21 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @returns {?import('text-source').TextSource}
+     */
     getCurrentTextSource() {
         return this._textSourceCurrent;
     }
 
+    /**
+     * @param {?import('text-source').TextSource} textSource
+     */
     setCurrentTextSource(textSource) {
         this._textSourceCurrent = textSource;
-        if (this._selectText && this._userHasNotSelectedAnythingManually) {
+        if (this._selectText && this._userHasNotSelectedAnythingManually && textSource !== null) {
             this._yomitanIsChangingTextSelectionNow = true;
-            this._textSourceCurrent.select();
+            textSource.select();
             if (this._textSelectionTimer !== null) { clearTimeout(this._textSelectionTimer); }
             // This timeout uses a 50ms delay to ensure that the selectionchange event has time to occur.
             // If the delay is 0ms, the timeout will sometimes complete before the event.
@@ -285,6 +373,9 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @returns {Promise<boolean>}
+     */
     async searchLast() {
         if (this._textSourceCurrent !== null && this._inputInfoCurrent !== null) {
             await this._search(this._textSourceCurrent, this._searchTerms, this._searchKanji, this._inputInfoCurrent);
@@ -293,6 +384,11 @@ export class TextScanner extends EventDispatcher {
         return false;
     }
 
+    /**
+     * @param {import('text-source').TextSource} textSource
+     * @param {import('text-scanner').InputInfoDetail} [inputDetail]
+     * @returns {Promise<?import('text-scanner').SearchedEventDetails>}
+     */
     async search(textSource, inputDetail) {
         const inputInfo = this._createInputInfo(null, 'script', 'script', true, [], [], inputDetail);
         return await this._search(textSource, this._searchTerms, this._searchKanji, inputInfo);
@@ -300,6 +396,11 @@ export class TextScanner extends EventDispatcher {
 
     // Private
 
+    /**
+     * @param {import('settings').OptionsContext} baseOptionsContext
+     * @param {import('text-scanner').InputInfo} inputInfo
+     * @returns {import('settings').OptionsContext}
+     */
     _createOptionsContextForInput(baseOptionsContext, inputInfo) {
         const optionsContext = clone(baseOptionsContext);
         const {modifiers, modifierKeys} = inputInfo;
@@ -308,20 +409,33 @@ export class TextScanner extends EventDispatcher {
         return optionsContext;
     }
 
+    /**
+     * @param {import('text-source').TextSource} textSource
+     * @param {boolean} searchTerms
+     * @param {boolean} searchKanji
+     * @param {import('text-scanner').InputInfo} inputInfo
+     * @returns {Promise<?import('text-scanner').SearchedEventDetails>}
+     */
     async _search(textSource, searchTerms, searchKanji, inputInfo) {
+        /** @type {?import('dictionary').DictionaryEntry[]} */
         let dictionaryEntries = null;
+        /** @type {?import('display').HistoryStateSentence} */
         let sentence = null;
+        /** @type {?import('display').PageType} */
         let type = null;
+        /** @type {?Error} */
         let error = null;
         let searched = false;
+        /** @type {?import('settings').OptionsContext} */
         let optionsContext = null;
+        /** @type {?import('text-scanner').SearchResultDetail} */
         let detail = null;
 
         try {
             const inputInfoDetail = inputInfo.detail;
             const selectionRestoreInfo = (
-                (isObject(inputInfoDetail) && inputInfoDetail.restoreSelection) ?
-                (this._inputInfoCurrent === null ? this._createSelectionRestoreInfo() : void 0) :
+                (typeof inputInfoDetail === 'object' && inputInfoDetail !== null && inputInfoDetail.restoreSelection) ?
+                (this._inputInfoCurrent === null ? this._createSelectionRestoreInfo() : null) :
                 null
             );
 
@@ -329,8 +443,11 @@ export class TextScanner extends EventDispatcher {
                 return null;
             }
 
-            ({optionsContext, detail} = await this._getSearchContext());
-            optionsContext = this._createOptionsContextForInput(optionsContext, inputInfo);
+            const getSearchContextPromise = this._getSearchContext();
+            const getSearchContextResult = getSearchContextPromise instanceof Promise ? await getSearchContextPromise : getSearchContextPromise;
+            const {detail: detail2} = getSearchContextResult;
+            if (typeof detail2 !== 'undefined') { detail = detail2; }
+            optionsContext = this._createOptionsContextForInput(getSearchContextResult.optionsContext, inputInfo);
 
             searched = true;
 
@@ -339,9 +456,9 @@ export class TextScanner extends EventDispatcher {
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
                 valid = true;
-            } else if (textSource !== null && textSource.type === 'element' && await this._hasJapanese(textSource.fullContent)) {
+            } else if (textSource !== null && textSource instanceof TextSourceElement && await this._hasJapanese(textSource.fullContent)) {
                 dictionaryEntries = [];
-                sentence = {sentence: '', offset: 0};
+                sentence = {text: '', offset: 0};
                 type = 'terms';
                 valid = true;
             }
@@ -354,11 +471,12 @@ export class TextScanner extends EventDispatcher {
                 }
             }
         } catch (e) {
-            error = e;
+            error = e instanceof Error ? e : new Error(`A search error occurred: ${e}`);
         }
 
         if (!searched) { return null; }
 
+        /** @type {import('text-scanner').SearchedEventDetails} */
         const results = {
             textScanner: this,
             type,
@@ -374,41 +492,55 @@ export class TextScanner extends EventDispatcher {
         return results;
     }
 
+    /** */
     _resetPreventNextClickScan() {
         this._preventNextClickScan = false;
         if (this._preventNextClickScanTimer !== null) { clearTimeout(this._preventNextClickScanTimer); }
         this._preventNextClickScanTimer = setTimeout(this._preventNextClickScanTimerCallback, this._preventNextClickScanTimerDuration);
     }
 
+    /** */
     _onPreventNextClickScanTimeout() {
         this._preventNextClickScanTimer = null;
     }
 
+    /** */
     _onSelectionChange() {
         if (this._preventNextClickScanTimer !== null) { return; } // Ignore deselection that occurs at the start of the click
         this._preventNextClickScan = true;
     }
 
+    /** */
     _onSelectionChangeCheckUserSelection() {
         if (this._yomitanIsChangingTextSelectionNow) { return; }
-        this._userHasNotSelectedAnythingManually = window.getSelection().isCollapsed;
+        this._userHasNotSelectedAnythingManually = this._computeUserHasNotSelectedAnythingManually();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onSearchClickMouseDown(e) {
         if (e.button !== 0) { return; }
         this._resetPreventNextClickScan();
     }
 
+    /** */
     _onSearchClickTouchStart() {
         this._resetPreventNextClickScan();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onMouseOver(e) {
-        if (this._ignoreElements !== null && this._ignoreElements().includes(e.target)) {
+        if (this._ignoreElements !== null && this._ignoreElements().includes(/** @type {Element} */ (e.target))) {
             this._scanTimerClear();
         }
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onMouseMove(e) {
         this._scanTimerClear();
 
@@ -418,6 +550,10 @@ export class TextScanner extends EventDispatcher {
         this._searchAtFromMouseMove(e.clientX, e.clientY, inputInfo);
     }
 
+    /**
+     * @param {MouseEvent} e
+     * @returns {boolean|void}
+     */
     _onMouseDown(e) {
         if (this._preventNextMouseDown) {
             this._preventNextMouseDown = false;
@@ -443,10 +579,15 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /** */
     _onMouseOut() {
         this._scanTimerClear();
     }
 
+    /**
+     * @param {MouseEvent} e
+     * @returns {boolean|void}
+     */
     _onClick(e) {
         if (this._preventNextClick) {
             this._preventNextClick = false;
@@ -460,6 +601,9 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onSearchClick(e) {
         const preventNextClickScan = this._preventNextClickScan;
         this._preventNextClickScan = false;
@@ -476,10 +620,15 @@ export class TextScanner extends EventDispatcher {
         this._searchAt(e.clientX, e.clientY, inputInfo);
     }
 
+    /** */
     _onAuxClick() {
         this._preventNextContextMenu = false;
     }
 
+    /**
+     * @param {MouseEvent} e
+     * @returns {boolean|void}
+     */
     _onContextMenu(e) {
         if (this._preventNextContextMenu) {
             this._preventNextContextMenu = false;
@@ -489,6 +638,9 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {TouchEvent} e
+     */
     _onTouchStart(e) {
         if (this._primaryTouchIdentifier !== null || e.changedTouches.length === 0) {
             return;
@@ -498,13 +650,20 @@ export class TextScanner extends EventDispatcher {
         this._onPrimaryTouchStart(e, clientX, clientY, identifier);
     }
 
+    /**
+     * @param {TouchEvent|PointerEvent} e
+     * @param {number} x
+     * @param {number} y
+     * @param {number} identifier
+     */
     _onPrimaryTouchStart(e, x, y, identifier) {
         this._preventScroll = false;
         this._preventNextContextMenu = false;
         this._preventNextMouseDown = false;
         this._preventNextClick = false;
 
-        if (DocumentUtil.isPointInSelection(x, y, window.getSelection())) {
+        const selection = window.getSelection();
+        if (selection !== null && DocumentUtil.isPointInSelection(x, y, selection)) {
             return;
         }
 
@@ -513,11 +672,14 @@ export class TextScanner extends EventDispatcher {
         if (this._pendingLookup) { return; }
 
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchStart', e);
-        if (inputInfo === null || !inputInfo.input.scanOnTouchPress) { return; }
+        if (inputInfo === null || !(inputInfo.input !== null && inputInfo.input.scanOnTouchPress)) { return; }
 
         this._searchAtFromTouchStart(x, y, inputInfo);
     }
 
+    /**
+     * @param {TouchEvent} e
+     */
     _onTouchEnd(e) {
         if (this._primaryTouchIdentifier === null) { return; }
 
@@ -528,6 +690,12 @@ export class TextScanner extends EventDispatcher {
         this._onPrimaryTouchEnd(e, clientX, clientY, true);
     }
 
+    /**
+     * @param {TouchEvent|PointerEvent} e
+     * @param {number} x
+     * @param {number} y
+     * @param {boolean} allowSearch
+     */
     _onPrimaryTouchEnd(e, x, y, allowSearch) {
         this._primaryTouchIdentifier = null;
         this._preventScroll = false;
@@ -538,11 +706,14 @@ export class TextScanner extends EventDispatcher {
         if (!allowSearch) { return; }
 
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchEnd', e);
-        if (inputInfo === null || !inputInfo.input.scanOnTouchRelease) { return; }
+        if (inputInfo === null || !(inputInfo.input !== null && inputInfo.input.scanOnTouchRelease)) { return; }
 
         this._searchAtFromTouchEnd(x, y, inputInfo);
     }
 
+    /**
+     * @param {TouchEvent} e
+     */
     _onTouchCancel(e) {
         if (this._primaryTouchIdentifier === null) { return; }
 
@@ -552,6 +723,9 @@ export class TextScanner extends EventDispatcher {
         this._onPrimaryTouchEnd(e, 0, 0, false);
     }
 
+    /**
+     * @param {TouchEvent} e
+     */
     _onTouchMove(e) {
         if (this._primaryTouchIdentifier === null) { return; }
 
@@ -568,13 +742,18 @@ export class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchMove', e);
         if (inputInfo === null) { return; }
 
-        if (inputInfo.input.scanOnTouchMove) {
+        const {input} = inputInfo;
+        if (input !== null && input.scanOnTouchMove) {
             this._searchAt(primaryTouch.clientX, primaryTouch.clientY, inputInfo);
         }
 
         e.preventDefault(); // Disable scroll
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onPointerOver(e) {
         const {pointerType, pointerId, isPrimary} = e;
         if (pointerType === 'pen') {
@@ -584,11 +763,15 @@ export class TextScanner extends EventDispatcher {
         if (!isPrimary) { return; }
         switch (pointerType) {
             case 'mouse': return this._onMousePointerOver(e);
-            case 'touch': return this._onTouchPointerOver(e);
+            case 'touch': return this._onTouchPointerOver();
             case 'pen': return this._onPenPointerOver(e);
         }
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onPointerDown(e) {
         if (!e.isPrimary) { return; }
         switch (this._getPointerEventType(e)) {
@@ -598,6 +781,10 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onPointerMove(e) {
         if (!e.isPrimary) { return; }
         switch (this._getPointerEventType(e)) {
@@ -607,92 +794,144 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onPointerUp(e) {
         if (!e.isPrimary) { return; }
         switch (this._getPointerEventType(e)) {
-            case 'mouse': return this._onMousePointerUp(e);
+            case 'mouse': return this._onMousePointerUp();
             case 'touch': return this._onTouchPointerUp(e);
             case 'pen': return this._onPenPointerUp(e);
         }
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onPointerCancel(e) {
         this._pointerIdTypeMap.delete(e.pointerId);
         if (!e.isPrimary) { return; }
         switch (e.pointerType) {
-            case 'mouse': return this._onMousePointerCancel(e);
+            case 'mouse': return this._onMousePointerCancel();
             case 'touch': return this._onTouchPointerCancel(e);
-            case 'pen': return this._onPenPointerCancel(e);
+            case 'pen': return this._onPenPointerCancel();
         }
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onPointerOut(e) {
         this._pointerIdTypeMap.delete(e.pointerId);
         if (!e.isPrimary) { return; }
         switch (e.pointerType) {
-            case 'mouse': return this._onMousePointerOut(e);
-            case 'touch': return this._onTouchPointerOut(e);
-            case 'pen': return this._onPenPointerOut(e);
+            case 'mouse': return this._onMousePointerOut();
+            case 'touch': return this._onTouchPointerOut();
+            case 'pen': return this._onPenPointerOut();
         }
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onMousePointerOver(e) {
         return this._onMouseOver(e);
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onMousePointerDown(e) {
         return this._onMouseDown(e);
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onMousePointerMove(e) {
         return this._onMouseMove(e);
     }
 
+    /** */
     _onMousePointerUp() {
         // NOP
     }
 
-    _onMousePointerCancel(e) {
-        return this._onMouseOut(e);
+    /**
+     * @returns {boolean|void}
+     */
+    _onMousePointerCancel() {
+        return this._onMouseOut();
     }
 
-    _onMousePointerOut(e) {
-        return this._onMouseOut(e);
+    /**
+     * @returns {boolean|void}
+     */
+    _onMousePointerOut() {
+        return this._onMouseOut();
     }
 
+    /** */
     _onTouchPointerOver() {
         // NOP
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onTouchPointerDown(e) {
         const {clientX, clientY, pointerId} = e;
         this._onPrimaryTouchStart(e, clientX, clientY, pointerId);
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onTouchPointerMove(e) {
         if (!this._preventScroll || !e.cancelable) {
             return;
         }
 
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchMove', e);
-        if (inputInfo === null || !inputInfo.input.scanOnTouchMove) { return; }
+        if (inputInfo === null || !(inputInfo.input !== null && inputInfo.input.scanOnTouchMove)) { return; }
 
         this._searchAt(e.clientX, e.clientY, inputInfo);
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onTouchPointerUp(e) {
         const {clientX, clientY} = e;
         return this._onPrimaryTouchEnd(e, clientX, clientY, true);
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
     _onTouchPointerCancel(e) {
         return this._onPrimaryTouchEnd(e, 0, 0, false);
     }
 
+    /** */
     _onTouchPointerOut() {
         // NOP
     }
 
+    /**
+     * @param {PointerEvent} e
+     */
     _onTouchMovePreventScroll(e) {
         if (!this._preventScroll) { return; }
 
@@ -703,31 +942,45 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {PointerEvent} e
+     */
     _onPenPointerOver(e) {
         this._penPointerState = 1;
         this._searchAtFromPen(e, 'pointerOver', false);
     }
 
+    /**
+     * @param {PointerEvent} e
+     */
     _onPenPointerDown(e) {
         this._penPointerState = 2;
         this._searchAtFromPen(e, 'pointerDown', true);
     }
 
+    /**
+     * @param {PointerEvent} e
+     */
     _onPenPointerMove(e) {
         if (this._penPointerState === 2 && (!this._preventScroll || !e.cancelable)) { return; }
         this._searchAtFromPen(e, 'pointerMove', true);
     }
 
+    /**
+     * @param {PointerEvent} e
+     */
     _onPenPointerUp(e) {
         this._penPointerState = 3;
         this._preventScroll = false;
         this._searchAtFromPen(e, 'pointerUp', false);
     }
 
-    _onPenPointerCancel(e) {
-        this._onPenPointerOut(e);
+    /** */
+    _onPenPointerCancel() {
+        this._onPenPointerOut();
     }
 
+    /** */
     _onPenPointerOut() {
         this._penPointerState = 0;
         this._preventScroll = false;
@@ -736,32 +989,54 @@ export class TextScanner extends EventDispatcher {
         this._preventNextClick = false;
     }
 
+    /**
+     * @returns {Promise<boolean>}
+     */
     async _scanTimerWait() {
         const delay = this._delay;
-        const promise = promiseTimeout(delay, true);
+        const promise = /** @type {Promise<boolean>} */ (new Promise((resolve) => {
+            /** @type {?import('core').Timeout} */
+            let timeout = setTimeout(() => {
+                timeout = null;
+                resolve(true);
+            }, delay);
+            this._scanTimerPromiseResolve = (value) => {
+                if (timeout === null) { return; }
+                clearTimeout(timeout);
+                timeout = null;
+                resolve(value);
+            };
+        }));
         this._scanTimerPromise = promise;
         try {
             return await promise;
         } finally {
             if (this._scanTimerPromise === promise) {
                 this._scanTimerPromise = null;
+                this._scanTimerPromiseResolve = null;
             }
         }
     }
 
+    /** */
     _scanTimerClear() {
-        if (this._scanTimerPromise !== null) {
-            this._scanTimerPromise.resolve(false);
-            this._scanTimerPromise = null;
-        }
+        if (this._scanTimerPromiseResolve === null) { return; }
+        this._scanTimerPromiseResolve(false);
+        this._scanTimerPromiseResolve = null;
+        this._scanTimerPromise = null;
     }
 
+    /**
+     * @returns {boolean}
+     */
     _arePointerEventsSupported() {
         return (this._pointerEventsEnabled && typeof PointerEvent !== 'undefined');
     }
 
+    /** */
     _hookEvents() {
         const capture = true;
+        /** @type {import('event-listener-collection').AddEventListenerArgs[]} */
         let eventListenerInfos;
         if (this._searchOnClickOnly) {
             eventListenerInfos = this._getMouseClickOnlyEventListeners(capture);
@@ -779,11 +1054,15 @@ export class TextScanner extends EventDispatcher {
 
         eventListenerInfos.push(this._getSelectionChangeCheckUserSelectionListener());
 
-        for (const args of eventListenerInfos) {
+        for (const [...args] of eventListenerInfos) {
             this._eventListeners.addEventListener(...args);
         }
     }
 
+    /**
+     * @param {boolean} capture
+     * @returns {import('event-listener-collection').AddEventListenerArgs[]}
+     */
     _getPointerEventListeners(capture) {
         return [
             [this._node, 'pointerover', this._onPointerOver.bind(this), capture],
@@ -799,6 +1078,10 @@ export class TextScanner extends EventDispatcher {
         ];
     }
 
+    /**
+     * @param {boolean} capture
+     * @returns {import('event-listener-collection').AddEventListenerArgs[]}
+     */
     _getMouseEventListeners(capture) {
         return [
             [this._node, 'mousedown', this._onMouseDown.bind(this), capture],
@@ -809,6 +1092,10 @@ export class TextScanner extends EventDispatcher {
         ];
     }
 
+    /**
+     * @param {boolean} capture
+     * @returns {import('event-listener-collection').AddEventListenerArgs[]}
+     */
     _getTouchEventListeners(capture) {
         return [
             [this._node, 'auxclick', this._onAuxClick.bind(this), capture],
@@ -820,14 +1107,23 @@ export class TextScanner extends EventDispatcher {
         ];
     }
 
+    /**
+     * @param {boolean} capture
+     * @returns {import('event-listener-collection').AddEventListenerArgs[]}
+     */
     _getMouseClickOnlyEventListeners(capture) {
         return [
             [this._node, 'click', this._onClick.bind(this), capture]
         ];
     }
 
+    /**
+     * @param {boolean} capture
+     * @returns {import('event-listener-collection').AddEventListenerArgs[]}
+     */
     _getMouseClickOnlyEventListeners2(capture) {
         const {documentElement} = document;
+        /** @type {import('event-listener-collection').AddEventListenerArgs[]} */
         const entries = [
             [document, 'selectionchange', this._onSelectionChange.bind(this)]
         ];
@@ -840,10 +1136,18 @@ export class TextScanner extends EventDispatcher {
         return entries;
     }
 
+    /**
+     * @returns {import('event-listener-collection').AddEventListenerArgs}
+     */
     _getSelectionChangeCheckUserSelectionListener() {
         return [document, 'selectionchange', this._onSelectionChangeCheckUserSelection.bind(this)];
     }
 
+    /**
+     * @param {TouchList} touchList
+     * @param {number} identifier
+     * @returns {?Touch}
+     */
     _getTouch(touchList, identifier) {
         for (const touch of touchList) {
             if (touch.identifier === identifier) {
@@ -853,6 +1157,13 @@ export class TextScanner extends EventDispatcher {
         return null;
     }
 
+    /**
+     * @param {import('text-source').TextSource} textSource
+     * @param {boolean} searchTerms
+     * @param {boolean} searchKanji
+     * @param {import('settings').OptionsContext} optionsContext
+     * @returns {Promise<?import('text-scanner').SearchResults>}
+     */
     async _findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext) {
         if (textSource === null) {
             return null;
@@ -868,6 +1179,11 @@ export class TextScanner extends EventDispatcher {
         return null;
     }
 
+    /**
+     * @param {import('text-source').TextSource} textSource
+     * @param {import('settings').OptionsContext} optionsContext
+     * @returns {Promise<?import('text-scanner').TermSearchResults>}
+     */
     async _findTermDictionaryEntries(textSource, optionsContext) {
         const scanLength = this._scanLength;
         const sentenceScanExtent = this._sentenceScanExtent;
@@ -879,6 +1195,7 @@ export class TextScanner extends EventDispatcher {
         const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
+        /** @type {import('api').FindTermsDetails} */
         const details = {};
         if (this._matchTypePrefix) { details.matchType = 'prefix'; }
         const {dictionaryEntries, originalTextLength} = await yomitan.api.termsFind(searchText, details, optionsContext);
@@ -898,6 +1215,11 @@ export class TextScanner extends EventDispatcher {
         return {dictionaryEntries, sentence, type: 'terms'};
     }
 
+    /**
+     * @param {import('text-source').TextSource} textSource
+     * @param {import('settings').OptionsContext} optionsContext
+     * @returns {Promise<?import('text-scanner').KanjiSearchResults>}
+     */
     async _findKanjiDictionaryEntries(textSource, optionsContext) {
         const sentenceScanExtent = this._sentenceScanExtent;
         const sentenceTerminateAtNewlines = this._sentenceTerminateAtNewlines;
@@ -925,6 +1247,11 @@ export class TextScanner extends EventDispatcher {
         return {dictionaryEntries, sentence, type: 'kanji'};
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {import('text-scanner').InputInfo} inputInfo
+     */
     async _searchAt(x, y, inputInfo) {
         if (this._pendingLookup) { return; }
 
@@ -948,11 +1275,13 @@ export class TextScanner extends EventDispatcher {
                 deepContentScan: this._deepContentScan,
                 normalizeCssZoom: this._normalizeCssZoom
             });
-            try {
-                await this._search(textSource, searchTerms, searchKanji, inputInfo);
-            } finally {
-                if (textSource !== null) {
-                    textSource.cleanup();
+            if (textSource !== null) {
+                try {
+                    await this._search(textSource, searchTerms, searchKanji, inputInfo);
+                } finally {
+                    if (textSource !== null) {
+                        textSource.cleanup();
+                    }
                 }
             }
         } catch (e) {
@@ -962,6 +1291,11 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {import('text-scanner').InputInfo} inputInfo
+     */
     async _searchAtFromMouseMove(x, y, inputInfo) {
         if (this._pendingLookup) { return; }
 
@@ -975,15 +1309,21 @@ export class TextScanner extends EventDispatcher {
         await this._searchAt(x, y, inputInfo);
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {import('text-scanner').InputInfo} inputInfo
+     */
     async _searchAtFromTouchStart(x, y, inputInfo) {
         const textSourceCurrentPrevious = this._textSourceCurrent !== null ? this._textSourceCurrent.clone() : null;
-        const preventScroll = inputInfo.input.preventTouchScrolling;
+        const {input} = inputInfo;
+        const preventScroll = input !== null && input.preventTouchScrolling;
 
         await this._searchAt(x, y, inputInfo);
 
         if (
             this._textSourceCurrent !== null &&
-            !this._textSourceCurrent.hasSameStart(textSourceCurrentPrevious)
+            !(textSourceCurrentPrevious !== null && this._textSourceCurrent.hasSameStart(textSourceCurrentPrevious))
         ) {
             this._preventScroll = preventScroll;
             this._preventNextContextMenu = true;
@@ -991,10 +1331,20 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {import('text-scanner').InputInfo} inputInfo
+     */
     async _searchAtFromTouchEnd(x, y, inputInfo) {
         await this._searchAt(x, y, inputInfo);
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {boolean} prevent
+     */
     async _searchAtFromPen(e, eventType, prevent) {
         if (this._pendingLookup) { return; }
 
@@ -1002,9 +1352,9 @@ export class TextScanner extends EventDispatcher {
         if (inputInfo === null) { return; }
 
         const {input} = inputInfo;
-        if (!this._isPenEventSupported(eventType, input)) { return; }
+        if (input === null || !this._isPenEventSupported(eventType, input)) { return; }
 
-        const preventScroll = input.preventPenScrolling;
+        const preventScroll = input !== null && input.preventPenScrolling;
 
         await this._searchAt(e.clientX, e.clientY, inputInfo);
 
@@ -1019,6 +1369,11 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {import('text-scanner').InputConfig} input
+     * @returns {boolean}
+     */
     _isPenEventSupported(eventType, input) {
         switch (eventType) {
             case 'pointerDown':
@@ -1038,12 +1393,25 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {import('text-scanner').PointerType} pointerType
+     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {MouseEvent|TouchEvent} event
+     * @returns {?import('text-scanner').InputInfo}
+     */
     _getMatchingInputGroupFromEvent(pointerType, eventType, event) {
         const modifiers = DocumentUtil.getActiveModifiersAndButtons(event);
         const modifierKeys = DocumentUtil.getActiveModifiers(event);
         return this._getMatchingInputGroup(pointerType, eventType, modifiers, modifierKeys);
     }
 
+    /**
+     * @param {import('text-scanner').PointerType} pointerType
+     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {import('input').Modifier[]} modifiers
+     * @param {import('input').ModifierKey[]} modifierKeys
+     * @returns {?import('text-scanner').InputInfo}
+     */
     _getMatchingInputGroup(pointerType, eventType, modifiers, modifierKeys) {
         let fallbackIndex = -1;
         const modifiersSet = new Set(modifiers);
@@ -1067,10 +1435,25 @@ export class TextScanner extends EventDispatcher {
         );
     }
 
+    /**
+     * @param {?import('text-scanner').InputConfig} input
+     * @param {import('text-scanner').PointerType} pointerType
+     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {boolean} passive
+     * @param {import('input').Modifier[]} modifiers
+     * @param {import('input').ModifierKey[]} modifierKeys
+     * @param {import('text-scanner').InputInfoDetail} [detail]
+     * @returns {import('text-scanner').InputInfo}
+     */
     _createInputInfo(input, pointerType, eventType, passive, modifiers, modifierKeys, detail) {
         return {input, pointerType, eventType, passive, modifiers, modifierKeys, detail};
     }
 
+    /**
+     * @param {Set<string>} set
+     * @param {string[]} values
+     * @returns {boolean}
+     */
     _setHasAll(set, values) {
         for (const value of values) {
             if (!set.has(value)) {
@@ -1080,6 +1463,10 @@ export class TextScanner extends EventDispatcher {
         return true;
     }
 
+    /**
+     * @param {import('text-scanner').InputOptionsOuter} input
+     * @returns {import('text-scanner').InputConfig}
+     */
     _convertInput(input) {
         const {options} = input;
         return {
@@ -1101,6 +1488,10 @@ export class TextScanner extends EventDispatcher {
         };
     }
 
+    /**
+     * @param {string} value
+     * @returns {string[]}
+     */
     _getInputArray(value) {
         return (
             typeof value === 'string' ?
@@ -1109,6 +1500,10 @@ export class TextScanner extends EventDispatcher {
         );
     }
 
+    /**
+     * @param {{mouse: boolean, touch: boolean, pen: boolean}} details
+     * @returns {Set<'mouse'|'touch'|'pen'>}
+     */
     _getInputTypeSet({mouse, touch, pen}) {
         const set = new Set();
         if (mouse) { set.add('mouse'); }
@@ -1117,16 +1512,30 @@ export class TextScanner extends EventDispatcher {
         return set;
     }
 
+    /**
+     * @param {unknown} value
+     * @returns {boolean}
+     */
     _getInputBoolean(value) {
         return typeof value === 'boolean' && value;
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {string}
+     */
     _getPointerEventType(e) {
         // Workaround for Firefox bug not detecting certain 'touch' events as 'pen' events.
         const cachedPointerType = this._pointerIdTypeMap.get(e.pointerId);
         return (typeof cachedPointerType !== 'undefined' ? cachedPointerType : e.pointerType);
     }
 
+    /**
+     * @param {import('text-source').TextSource} textSource
+     * @param {?string} includeSelector
+     * @param {?string} excludeSelector
+     * @param {boolean} layoutAwareScan
+     */
     _constrainTextSource(textSource, includeSelector, excludeSelector, layoutAwareScan) {
         let length = textSource.text().length;
         while (length > 0) {
@@ -1143,6 +1552,10 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {string} text
+     * @returns {Promise<boolean>}
+     */
     async _hasJapanese(text) {
         try {
             return await yomitan.api.textHasJapaneseCharacters(text);
@@ -1151,19 +1564,28 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @returns {import('text-scanner').SelectionRestoreInfo}
+     */
     _createSelectionRestoreInfo() {
         const ranges = [];
         const selection = window.getSelection();
-        for (let i = 0, ii = selection.rangeCount; i < ii; ++i) {
-            const range = selection.getRangeAt(i);
-            ranges.push(range.cloneRange());
+        if (selection !== null) {
+            for (let i = 0, ii = selection.rangeCount; i < ii; ++i) {
+                const range = selection.getRangeAt(i);
+                ranges.push(range.cloneRange());
+            }
         }
         return {ranges};
     }
 
+    /**
+     * @param {import('text-scanner').SelectionRestoreInfo} selectionRestoreInfo
+     */
     _restoreSelection(selectionRestoreInfo) {
         const {ranges} = selectionRestoreInfo;
         const selection = window.getSelection();
+        if (selection === null) { return; }
         selection.removeAllRanges();
         for (const range of ranges) {
             try {
@@ -1174,7 +1596,18 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {string} reason
+     */
     _triggerClear(reason) {
         this.trigger('clear', {reason});
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    _computeUserHasNotSelectedAnythingManually() {
+        const selection = window.getSelection();
+        return selection === null || selection.isCollapsed;
     }
 }

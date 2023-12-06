@@ -19,26 +19,38 @@
 import {EventListenerCollection} from '../../core.js';
 
 export class SentenceTerminationCharactersController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {SentenceTerminationCharacterEntry[]} */
         this._entries = [];
+        /** @type {?HTMLButtonElement} */
         this._addButton = null;
+        /** @type {?HTMLButtonElement} */
         this._resetButton = null;
+        /** @type {?HTMLElement} */
         this._listTable = null;
+        /** @type {?HTMLElement} */
         this._listContainer = null;
+        /** @type {?HTMLElement} */
         this._emptyIndicator = null;
     }
 
+    /** @type {import('./settings-controller.js').SettingsController} */
     get settingsController() {
         return this._settingsController;
     }
 
+    /** */
     async prepare() {
-        this._addButton = document.querySelector('#sentence-termination-character-list-add');
-        this._resetButton = document.querySelector('#sentence-termination-character-list-reset');
-        this._listTable = document.querySelector('#sentence-termination-character-list-table');
-        this._listContainer = document.querySelector('#sentence-termination-character-list');
-        this._emptyIndicator = document.querySelector('#sentence-termination-character-list-empty');
+        this._addButton = /** @type {HTMLButtonElement} */ (document.querySelector('#sentence-termination-character-list-add'));
+        this._resetButton = /** @type {HTMLButtonElement} */ (document.querySelector('#sentence-termination-character-list-reset'));
+        this._listTable = /** @type {HTMLElement} */ (document.querySelector('#sentence-termination-character-list-table'));
+        this._listContainer = /** @type {HTMLElement} */ (document.querySelector('#sentence-termination-character-list'));
+        this._emptyIndicator = /** @type {HTMLElement} */ (document.querySelector('#sentence-termination-character-list-empty'));
 
         this._addButton.addEventListener('click', this._onAddClick.bind(this));
         this._resetButton.addEventListener('click', this._onResetClick.bind(this));
@@ -47,6 +59,9 @@ export class SentenceTerminationCharactersController {
         await this._updateOptions();
     }
 
+    /**
+     * @param {import('settings').SentenceParsingTerminationCharacterOption} terminationCharacterEntry
+     */
     async addEntry(terminationCharacterEntry) {
         const options = await this._settingsController.getOptions();
         const {sentenceParsing: {terminationCharacters}} = options;
@@ -62,6 +77,10 @@ export class SentenceTerminationCharactersController {
         await this._updateOptions();
     }
 
+    /**
+     * @param {number} index
+     * @returns {Promise<boolean>}
+     */
     async deleteEntry(index) {
         const options = await this._settingsController.getOptions();
         const {sentenceParsing: {terminationCharacters}} = options;
@@ -80,12 +99,19 @@ export class SentenceTerminationCharactersController {
         return true;
     }
 
+    /**
+     * @param {import('settings-modifications').Modification[]} targets
+     * @returns {Promise<import('settings-controller').ModifyResult[]>}
+     */
     async modifyProfileSettings(targets) {
         return await this._settingsController.modifyProfileSettings(targets);
     }
 
     // Private
 
+    /**
+     * @param {import('settings-controller').OptionsChangedEvent} details
+     */
     _onOptionsChanged({options}) {
         for (const entry of this._entries) {
             entry.cleanup();
@@ -94,29 +120,37 @@ export class SentenceTerminationCharactersController {
         this._entries = [];
         const {sentenceParsing: {terminationCharacters}} = options;
 
+        const listContainer = /** @type {HTMLElement} */ (this._listContainer);
         for (let i = 0, ii = terminationCharacters.length; i < ii; ++i) {
             const terminationCharacterEntry = terminationCharacters[i];
-            const node = this._settingsController.instantiateTemplate('sentence-termination-character-entry');
-            this._listContainer.appendChild(node);
+            const node = /** @type {HTMLElement} */ (this._settingsController.instantiateTemplate('sentence-termination-character-entry'));
+            listContainer.appendChild(node);
             const entry = new SentenceTerminationCharacterEntry(this, terminationCharacterEntry, i, node);
             this._entries.push(entry);
             entry.prepare();
         }
 
-        this._listTable.hidden = (terminationCharacters.length === 0);
-        this._emptyIndicator.hidden = (terminationCharacters.length !== 0);
+        /** @type {HTMLElement} */ (this._listTable).hidden = (terminationCharacters.length === 0);
+        /** @type {HTMLElement} */ (this._emptyIndicator).hidden = (terminationCharacters.length !== 0);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onAddClick(e) {
         e.preventDefault();
         this._addNewEntry();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onResetClick(e) {
         e.preventDefault();
         this._reset();
     }
 
+    /** */
     async _addNewEntry() {
         const newEntry = {
             enabled: true,
@@ -125,14 +159,17 @@ export class SentenceTerminationCharactersController {
             includeCharacterAtStart: false,
             includeCharacterAtEnd: false
         };
-        return await this.addEntry(newEntry);
+        await this.addEntry(newEntry);
     }
 
+    /** */
     async _updateOptions() {
         const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        const optionsContext = this._settingsController.getOptionsContext();
+        this._onOptionsChanged({options, optionsContext});
     }
 
+    /** */
     async _reset() {
         const defaultOptions = await this._settingsController.getDefaultOptions();
         const value = defaultOptions.profiles[0].options.sentenceParsing.terminationCharacters;
@@ -142,28 +179,43 @@ export class SentenceTerminationCharactersController {
 }
 
 class SentenceTerminationCharacterEntry {
+    /**
+     * @param {SentenceTerminationCharactersController} parent
+     * @param {import('settings').SentenceParsingTerminationCharacterOption} data
+     * @param {number} index
+     * @param {HTMLElement} node
+     */
     constructor(parent, data, index, node) {
+        /** @type {SentenceTerminationCharactersController} */
         this._parent = parent;
+        /** @type {import('settings').SentenceParsingTerminationCharacterOption} */
         this._data = data;
+        /** @type {number} */
         this._index = index;
+        /** @type {HTMLElement} */
         this._node = node;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {?HTMLInputElement} */
         this._character1Input = null;
+        /** @type {?HTMLInputElement} */
         this._character2Input = null;
+        /** @type {string} */
         this._basePath = `sentenceParsing.terminationCharacters[${this._index}]`;
     }
 
+    /** */
     prepare() {
         const {enabled, character1, character2, includeCharacterAtStart, includeCharacterAtEnd} = this._data;
         const node = this._node;
 
-        const enabledToggle = node.querySelector('.sentence-termination-character-enabled');
-        const typeSelect = node.querySelector('.sentence-termination-character-type');
-        const character1Input = node.querySelector('.sentence-termination-character-input1');
-        const character2Input = node.querySelector('.sentence-termination-character-input2');
-        const includeAtStartCheckbox = node.querySelector('.sentence-termination-character-include-at-start');
-        const includeAtEndheckbox = node.querySelector('.sentence-termination-character-include-at-end');
-        const menuButton = node.querySelector('.sentence-termination-character-entry-button');
+        const enabledToggle = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-enabled'));
+        const typeSelect = /** @type {HTMLSelectElement} */ (node.querySelector('.sentence-termination-character-type'));
+        const character1Input = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-input1'));
+        const character2Input = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-input2'));
+        const includeAtStartCheckbox = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-include-at-start'));
+        const includeAtEndheckbox = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-include-at-end'));
+        const menuButton = /** @type {HTMLButtonElement} */ (node.querySelector('.sentence-termination-character-entry-button'));
 
         this._character1Input = character1Input;
         this._character2Input = character2Input;
@@ -188,6 +240,7 @@ class SentenceTerminationCharacterEntry {
         this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this), false);
     }
 
+    /** */
     cleanup() {
         this._eventListeners.removeAllEventListeners();
         if (this._node.parentNode !== null) {
@@ -197,12 +250,20 @@ class SentenceTerminationCharacterEntry {
 
     // Private
 
+    /**
+     * @param {Event} e
+     */
     _onTypeSelectChange(e) {
-        this._setHasCharacter2(e.currentTarget.value === 'quote');
+        const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        this._setHasCharacter2(element.value === 'quote');
     }
 
+    /**
+     * @param {1|2} characterNumber
+     * @param {Event} e
+     */
     _onCharacterChange(characterNumber, e) {
-        const node = e.currentTarget;
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         if (characterNumber === 2 && this._data.character2 === null) {
             node.value = '';
         }
@@ -211,6 +272,9 @@ class SentenceTerminationCharacterEntry {
         this._setCharacterValue(node, characterNumber, value);
     }
 
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} e
+     */
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'delete':
@@ -219,11 +283,16 @@ class SentenceTerminationCharacterEntry {
         }
     }
 
+    /** */
     async _delete() {
         this._parent.deleteEntry(this._index);
     }
 
+    /**
+     * @param {boolean} has
+     */
     async _setHasCharacter2(has) {
+        if (this._character2Input === null) { return; }
         const okay = await this._setCharacterValue(this._character2Input, 2, has ? this._data.character1 : null);
         if (okay) {
             const type = (!has ? 'terminator' : 'quote');
@@ -231,14 +300,24 @@ class SentenceTerminationCharacterEntry {
         }
     }
 
+    /**
+     * @param {HTMLInputElement} inputNode
+     * @param {1|2} characterNumber
+     * @param {?string} value
+     * @returns {Promise<boolean>}
+     */
     async _setCharacterValue(inputNode, characterNumber, value) {
-        const pathEnd = `character${characterNumber}`;
-        const r = await this._parent.settingsController.setProfileSetting(`${this._basePath}.${pathEnd}`, value);
+        if (characterNumber === 1 && typeof value !== 'string') { value = ''; }
+        const r = await this._parent.settingsController.setProfileSetting(`${this._basePath}.character${characterNumber}`, value);
         const okay = !r[0].error;
         if (okay) {
-            this._data[pathEnd] = value;
+            if (characterNumber === 1) {
+                this._data.character1 = /** @type {string} */ (value);
+            } else {
+                this._data.character2 = value;
+            }
         } else {
-            value = this._data[pathEnd];
+            value = characterNumber === 1 ? this._data.character1 : this._data.character2;
         }
         inputNode.value = (value !== null ? value : '');
         return okay;

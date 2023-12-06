@@ -155,6 +155,10 @@
                                     "type": "string",
                                     "description": "Hover text for the image."
                                 },
+                                "description": {
+                                    "type": "string",
+                                    "description": "Description of the image."
+                                },
                                 "pixelated": {
                                     "type": "boolean",
                                     "description": "Whether or not the image should appear pixelated at sizes larger than the image's native resolution.",

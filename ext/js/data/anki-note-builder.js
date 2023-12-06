@@ -16,20 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deferPromise, deserializeError} from '../core.js';
+import {deferPromise} from '../core.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
 import {yomitan} from '../yomitan.js';
 import {AnkiUtil} from './anki-util.js';
 
 export class AnkiNoteBuilder {
+    /**
+     * @param {{japaneseUtil: import('../language/sandbox/japanese-util.js').JapaneseUtil}} details
+     */
     constructor({japaneseUtil}) {
+        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
+        /** @type {RegExp} */
         this._markerPattern = AnkiUtil.cloneFieldMarkerPattern(true);
+        /** @type {TemplateRendererProxy} */
         this._templateRenderer = new TemplateRendererProxy();
+        /** @type {import('anki-note-builder').BatchedRequestGroup[]} */
         this._batchedRequests = [];
+        /** @type {boolean} */
         this._batchedRequestsQueued = false;
     }
 
+    /**
+     * @param {import('anki-note-builder').CreateNoteDetails} details
+     * @returns {Promise<import('anki-note-builder').CreateNoteResult>}
+     */
     async createNote({
         dictionaryEntry,
         mode,
@@ -56,16 +69,15 @@ export class AnkiNoteBuilder {
             duplicateScopeCheckChildren = true;
         }
 
+        /** @type {Error[]} */
         const allErrors = [];
         let media;
         if (requirements.length > 0 && mediaOptions !== null) {
             let errors;
             ({media, errors} = await this._injectMedia(dictionaryEntry, requirements, mediaOptions));
             for (const error of errors) {
-                allErrors.push(deserializeError(error));
+                allErrors.push(ExtensionError.deserialize(error));
             }
-        } else {
-            media = {};
         }
 
         const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media);
@@ -77,6 +89,7 @@ export class AnkiNoteBuilder {
 
         const formattedFieldValues = await Promise.all(formattedFieldValuePromises);
         const uniqueRequirements = new Map();
+        /** @type {import('anki').NoteFields} */
         const noteFields = {};
         for (let i = 0, ii = fields.length; i < ii; ++i) {
             const fieldName = fields[i][0];
@@ -90,6 +103,7 @@ export class AnkiNoteBuilder {
             }
         }
 
+        /** @type {import('anki').Note} */
         const note = {
             fields: noteFields,
             tags,
@@ -108,6 +122,10 @@ export class AnkiNoteBuilder {
         return {note, errors: allErrors, requirements: [...uniqueRequirements.values()]};
     }
 
+    /**
+     * @param {import('anki-note-builder').GetRenderingDataDetails} details
+     * @returns {Promise<import('anki-templates').NoteData>}
+     */
     async getRenderingData({
         dictionaryEntry,
         mode,
@@ -115,12 +133,16 @@ export class AnkiNoteBuilder {
         resultOutputMode='split',
         glossaryLayoutMode='default',
         compactTags=false,
-        marker=null
+        marker
     }) {
-        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, {});
+        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0);
         return await this._templateRenderer.getModifiedData({marker, commonData}, 'ankiNote');
     }
 
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @returns {import('api').InjectAnkiNoteMediaDefinitionDetails}
+     */
     getDictionaryEntryDetailsForNote(dictionaryEntry) {
         const {type} = dictionaryEntry;
         if (type === 'kanji') {
@@ -150,6 +172,16 @@ export class AnkiNoteBuilder {
 
     // Private
 
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @param {import('anki-templates-internal').CreateMode} mode
+     * @param {import('anki-templates-internal').Context} context
+     * @param {import('settings').ResultOutputMode} resultOutputMode
+     * @param {import('settings').GlossaryLayoutMode} glossaryLayoutMode
+     * @param {boolean} compactTags
+     * @param {import('anki-templates').Media|undefined} media
+     * @returns {import('anki-note-builder').CommonData}
+     */
     _createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media) {
         return {
             dictionaryEntry,
@@ -162,16 +194,25 @@ export class AnkiNoteBuilder {
         };
     }
 
+    /**
+     * @param {string} field
+     * @param {import('anki-note-builder').CommonData} commonData
+     * @param {string} template
+     * @returns {Promise<{value: string, errors: ExtensionError[], requirements: import('anki-note-builder').Requirement[]}>}
+     */
     async _formatField(field, commonData, template) {
+        /** @type {ExtensionError[]} */
         const errors = [];
+        /** @type {import('anki-note-builder').Requirement[]} */
         const requirements = [];
-        const value = await this._stringReplaceAsync(field, this._markerPattern, async (g0, marker) => {
+        const value = await this._stringReplaceAsync(field, this._markerPattern, async (match) => {
+            const marker = match[1];
             try {
                 const {result, requirements: fieldRequirements} = await this._renderTemplateBatched(template, commonData, marker);
                 requirements.push(...fieldRequirements);
                 return result;
             } catch (e) {
-                const error = new Error(`Template render error for {${marker}}`);
+                const error = new ExtensionError(`Template render error for {${marker}}`);
                 error.data = {error: e};
                 errors.push(error);
                 return `{${marker}-render-error}`;
@@ -180,12 +221,19 @@ export class AnkiNoteBuilder {
         return {value, errors, requirements};
     }
 
+    /**
+     * @param {string} str
+     * @param {RegExp} regex
+     * @param {(match: RegExpExecArray, index: number, str: string) => (string|Promise<string>)} replacer
+     * @returns {Promise<string>}
+     */
     async _stringReplaceAsync(str, regex, replacer) {
         let match;
         let index = 0;
+        /** @type {(Promise<string>|string)[]} */
         const parts = [];
         while ((match = regex.exec(str)) !== null) {
-            parts.push(str.substring(index, match.index), replacer(...match, match.index, str));
+            parts.push(str.substring(index, match.index), replacer(match, match.index, str));
             index = regex.lastIndex;
         }
         if (parts.length === 0) {
@@ -195,6 +243,10 @@ export class AnkiNoteBuilder {
         return (await Promise.all(parts)).join('');
     }
 
+    /**
+     * @param {string} template
+     * @returns {import('anki-note-builder').BatchedRequestGroup}
+     */
     _getBatchedTemplateGroup(template) {
         for (const item of this._batchedRequests) {
             if (item.template === template) {
@@ -207,7 +259,14 @@ export class AnkiNoteBuilder {
         return result;
     }
 
+    /**
+     * @param {string} template
+     * @param {import('anki-note-builder').CommonData} commonData
+     * @param {string} marker
+     * @returns {Promise<import('template-renderer').RenderResult>}
+     */
     _renderTemplateBatched(template, commonData, marker) {
+        /** @type {import('core').DeferredPromiseDetails<import('template-renderer').RenderResult>} */
         const {promise, resolve, reject} = deferPromise();
         const {commonDataRequestsMap} = this._getBatchedTemplateGroup(template);
         let requests = commonDataRequestsMap.get(commonData);
@@ -220,6 +279,9 @@ export class AnkiNoteBuilder {
         return promise;
     }
 
+    /**
+     * @returns {void}
+     */
     _runBatchedRequestsDelayed() {
         if (this._batchedRequestsQueued) { return; }
         this._batchedRequestsQueued = true;
@@ -229,20 +291,30 @@ export class AnkiNoteBuilder {
         });
     }
 
+    /**
+     * @returns {void}
+     */
     _runBatchedRequests() {
         if (this._batchedRequests.length === 0) { return; }
 
         const allRequests = [];
+        /** @type {import('template-renderer').RenderMultiItem[]} */
         const items = [];
         for (const {template, commonDataRequestsMap} of this._batchedRequests) {
+            /** @type {import('template-renderer').RenderMultiTemplateItem[]} */
             const templateItems = [];
             for (const [commonData, requests] of commonDataRequestsMap.entries()) {
+                /** @type {import('template-renderer').PartialOrCompositeRenderData[]} */
                 const datas = [];
                 for (const {marker} of requests) {
-                    datas.push(marker);
+                    datas.push({marker});
                 }
                 allRequests.push(...requests);
-                templateItems.push({type: 'ankiNote', commonData, datas});
+                templateItems.push({
+                    type: /** @type {import('anki-templates').RenderMode} */ ('ankiNote'),
+                    commonData,
+                    datas
+                });
             }
             items.push({template, templateItems});
         }
@@ -252,6 +324,10 @@ export class AnkiNoteBuilder {
         this._resolveBatchedRequests(items, allRequests);
     }
 
+    /**
+     * @param {import('template-renderer').RenderMultiItem[]} items
+     * @param {import('anki-note-builder').BatchedRequestData[]} requests
+     */
     async _resolveBatchedRequests(items, requests) {
         let responses;
         try {
@@ -269,7 +345,7 @@ export class AnkiNoteBuilder {
                 const response = responses[i];
                 const {error} = response;
                 if (typeof error !== 'undefined') {
-                    throw deserializeError(error);
+                    throw ExtensionError.deserialize(error);
                 } else {
                     request.resolve(response.result);
                 }
@@ -279,6 +355,12 @@ export class AnkiNoteBuilder {
         }
     }
 
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @param {import('anki-note-builder').Requirement[]} requirements
+     * @param {import('anki-note-builder').MediaOptions} mediaOptions
+     * @returns {Promise<{media: import('anki-templates').Media, errors: import('core').SerializedError[]}>}
+     */
     async _injectMedia(dictionaryEntry, requirements, mediaOptions) {
         const timestamp = Date.now();
 
@@ -288,7 +370,9 @@ export class AnkiNoteBuilder {
         let injectClipboardImage = false;
         let injectClipboardText = false;
         let injectSelectionText = false;
+        /** @type {import('anki-note-builder').TextFuriganaDetails[]} */
         const textFuriganaDetails = [];
+        /** @type {import('api').InjectAnkiNoteMediaDictionaryMediaDetails[]} */
         const dictionaryMediaDetails = [];
         for (const requirement of requirements) {
             const {type} = requirement;
@@ -315,8 +399,11 @@ export class AnkiNoteBuilder {
 
         // Generate request data
         const dictionaryEntryDetails = this.getDictionaryEntryDetailsForNote(dictionaryEntry);
+        /** @type {?import('api').InjectAnkiNoteMediaAudioDetails} */
         let audioDetails = null;
+        /** @type {?import('api').InjectAnkiNoteMediaScreenshotDetails} */
         let screenshotDetails = null;
+        /** @type {import('api').InjectAnkiNoteMediaClipboardDetails} */
         const clipboardDetails = {image: injectClipboardImage, text: injectClipboardText};
         if (injectAudio && dictionaryEntryDetails.type !== 'kanji') {
             const audioOptions = mediaOptions.audio;
@@ -357,6 +444,7 @@ export class AnkiNoteBuilder {
         const textFurigana = textFuriganaPromise !== null ? await textFuriganaPromise : [];
 
         // Format results
+        /** @type {import('anki-templates').DictionaryMedia} */
         const dictionaryMedia = {};
         for (const {dictionary, path, fileName} of dictionaryMediaArray) {
             if (fileName === null) { continue; }
@@ -368,21 +456,31 @@ export class AnkiNoteBuilder {
             dictionaryMedia2[path] = {value: fileName};
         }
         const media = {
-            audio: (typeof audioFileName === 'string' ? {value: audioFileName} : null),
-            screenshot: (typeof screenshotFileName === 'string' ? {value: screenshotFileName} : null),
-            clipboardImage: (typeof clipboardImageFileName === 'string' ? {value: clipboardImageFileName} : null),
-            clipboardText: (typeof clipboardText === 'string' ? {value: clipboardText} : null),
-            selectionText: (typeof selectionText === 'string' ? {value: selectionText} : null),
+            audio: (typeof audioFileName === 'string' ? {value: audioFileName} : void 0),
+            screenshot: (typeof screenshotFileName === 'string' ? {value: screenshotFileName} : void 0),
+            clipboardImage: (typeof clipboardImageFileName === 'string' ? {value: clipboardImageFileName} : void 0),
+            clipboardText: (typeof clipboardText === 'string' ? {value: clipboardText} : void 0),
+            selectionText: (typeof selectionText === 'string' ? {value: selectionText} : void 0),
             textFurigana,
             dictionaryMedia
         };
         return {media, errors};
     }
 
+    /**
+     * @returns {string}
+     */
     _getSelectionText() {
-        return document.getSelection().toString();
+        const selection = document.getSelection();
+        return selection !== null ? selection.toString() : '';
     }
 
+    /**
+     * @param {import('anki-note-builder').TextFuriganaDetails[]} entries
+     * @param {import('settings').OptionsContext} optionsContext
+     * @param {number} scanLength
+     * @returns {Promise<import('anki-templates').TextFuriganaSegment[]>}
+     */
     async _getTextFurigana(entries, optionsContext, scanLength) {
         const results = [];
         for (const {text, readingMode} of entries) {
@@ -401,6 +499,11 @@ export class AnkiNoteBuilder {
         return results;
     }
 
+    /**
+     * @param {import('api').ParseTextLine[]} data
+     * @param {?import('anki-templates').TextFuriganaReadingMode} readingMode
+     * @returns {string}
+     */
     _createFuriganaHtml(data, readingMode) {
         let result = '';
         for (const term of data) {
@@ -418,6 +521,11 @@ export class AnkiNoteBuilder {
         return result;
     }
 
+    /**
+     * @param {string} reading
+     * @param {?import('anki-templates').TextFuriganaReadingMode} readingMode
+     * @returns {string}
+     */
     _convertReading(reading, readingMode) {
         switch (readingMode) {
             case 'hiragana':

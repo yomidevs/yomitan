@@ -49,6 +49,9 @@ import {StatusFooter} from './status-footer.js';
 import {StorageController} from './storage-controller.js';
 import {TranslationTextReplacementsController} from './translation-text-replacements-controller.js';
 
+/**
+ * @param {GenericSettingController} genericSettingController
+ */
 async function setupGenericSettingsController(genericSettingController) {
     await genericSettingController.prepare();
     await genericSettingController.refresh();
@@ -62,10 +65,11 @@ async function setupGenericSettingsController(genericSettingController) {
         const extensionContentController = new ExtensionContentController();
         extensionContentController.prepare();
 
-        const statusFooter = new StatusFooter(document.querySelector('.status-footer-container'));
+        const statusFooter = new StatusFooter(/** @type {HTMLElement} */ (document.querySelector('.status-footer-container')));
         statusFooter.prepare();
 
-        let prepareTimer = setTimeout(() => {
+        /** @type {?number} */
+        let prepareTimer = window.setTimeout(() => {
             prepareTimer = null;
             document.documentElement.dataset.loadingStalled = 'true';
         }, 1000);

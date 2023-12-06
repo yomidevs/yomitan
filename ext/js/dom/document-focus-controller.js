@@ -29,7 +29,9 @@ export class DocumentFocusController {
      *   should be automatically focused on prepare.
      */
     constructor(autofocusElementSelector=null) {
+        /** @type {?HTMLElement} */
         this._autofocusElement = (autofocusElementSelector !== null ? document.querySelector(autofocusElementSelector) : null);
+        /** @type {?HTMLElement} */
         this._contentScrollFocusElement = document.querySelector('#content-scroll-focus');
     }
 
@@ -46,7 +48,7 @@ export class DocumentFocusController {
 
     /**
      * Removes focus from a given element.
-     * @param {Element} element The element to remove focus from.
+     * @param {HTMLElement} element The element to remove focus from.
      */
     blurElement(element) {
         if (document.activeElement !== element) { return; }
@@ -56,10 +58,14 @@ export class DocumentFocusController {
 
     // Private
 
+    /** */
     _onWindowFocus() {
         this._updateFocusedElement(false);
     }
 
+    /**
+     * @param {boolean} force
+     */
     _updateFocusedElement(force) {
         const target = this._contentScrollFocusElement;
         if (target === null) { return; }
@@ -73,6 +79,7 @@ export class DocumentFocusController {
         ) {
             // Get selection
             const selection = window.getSelection();
+            if (selection === null) { return; }
             const selectionRanges1 = this._getSelectionRanges(selection);
 
             // Note: This function will cause any selected text to be deselected on Firefox.
@@ -86,6 +93,10 @@ export class DocumentFocusController {
         }
     }
 
+    /**
+     * @param {Selection} selection
+     * @returns {Range[]}
+     */
     _getSelectionRanges(selection) {
         const ranges = [];
         for (let i = 0, ii = selection.rangeCount; i < ii; ++i) {
@@ -94,6 +105,10 @@ export class DocumentFocusController {
         return ranges;
     }
 
+    /**
+     * @param {Selection} selection
+     * @param {Range[]} ranges
+     */
     _setSelectionRanges(selection, ranges) {
         selection.removeAllRanges();
         for (const range of ranges) {
@@ -101,6 +116,11 @@ export class DocumentFocusController {
         }
     }
 
+    /**
+     * @param {Range[]} ranges1
+     * @param {Range[]} ranges2
+     * @returns {boolean}
+     */
     _areRangesSame(ranges1, ranges2) {
         const ii = ranges1.length;
         if (ii !== ranges2.length) {

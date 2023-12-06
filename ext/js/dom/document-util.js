@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection} from '../core.js';
 import {DOMTextScanner} from './dom-text-scanner.js';
 import {TextSourceElement} from './text-source-element.js';
 import {TextSourceRange} from './text-source-range.js';
@@ -26,29 +25,11 @@ import {TextSourceRange} from './text-source-range.js';
  */
 export class DocumentUtil {
     /**
-     * Options to configure how element detection is performed.
-     * @typedef {object} GetRangeFromPointOptions
-     * @property {boolean} deepContentScan Whether or deep content scanning should be performed. When deep content scanning is enabled,
-     *   some transparent overlay elements will be ignored when looking for the element at the input position.
-     * @property {boolean} normalizeCssZoom Whether or not zoom coordinates should be normalized.
-     */
-
-    /**
-     * Scans the document for text or elements with text information at the given coordinate.
-     * Coordinates are provided in [client space](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems).
-     * @callback GetRangeFromPointHandler
-     * @param {number} x The x coordinate to search at.
-     * @param {number} y The y coordinate to search at.
-     * @param {GetRangeFromPointOptions} options Options to configure how element detection is performed.
-     * @returns {?TextSourceRange|TextSourceElement} A range for the hovered text or element, or `null` if no applicable content was found.
-     */
-
-    /**
      * Scans the document for text or elements with text information at the given coordinate.
      * Coordinates are provided in [client space](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems).
      * @param {number} x The x coordinate to search at.
      * @param {number} y The y coordinate to search at.
-     * @param {GetRangeFromPointOptions} options Options to configure how element detection is performed.
+     * @param {import('document-util').GetRangeFromPointOptions} options Options to configure how element detection is performed.
      * @returns {?TextSourceRange|TextSourceElement} A range for the hovered text or element, or `null` if no applicable content was found.
      */
     static getRangeFromPoint(x, y, options) {
@@ -60,8 +41,11 @@ export class DocumentUtil {
         const {deepContentScan, normalizeCssZoom} = options;
 
         const elements = this._getElementsFromPoint(x, y, deepContentScan);
+        /** @type {?HTMLDivElement} */
         let imposter = null;
+        /** @type {?HTMLDivElement} */
         let imposterContainer = null;
+        /** @type {?Element} */
         let imposterSourceElement = null;
         if (elements.length > 0) {
             const element = elements[0];
@@ -71,14 +55,14 @@ export class DocumentUtil {
                 case 'SELECT':
                     return TextSourceElement.create(element);
                 case 'INPUT':
-                    if (element.type === 'text') {
+                    if (/** @type {HTMLInputElement} */ (element).type === 'text') {
                         imposterSourceElement = element;
-                        [imposter, imposterContainer] = this._createImposter(element, false);
+                        [imposter, imposterContainer] = this._createImposter(/** @type {HTMLInputElement} */ (element), false);
                     }
                     break;
                 case 'TEXTAREA':
                     imposterSourceElement = element;
-                    [imposter, imposterContainer] = this._createImposter(element, true);
+                    [imposter, imposterContainer] = this._createImposter(/** @type {HTMLTextAreaElement} */ (element), true);
                     break;
             }
         }
@@ -86,14 +70,17 @@ export class DocumentUtil {
         const range = this._caretRangeFromPointExt(x, y, deepContentScan ? elements : [], normalizeCssZoom);
         if (range !== null) {
             if (imposter !== null) {
-                this._setImposterStyle(imposterContainer.style, 'z-index', '-2147483646');
+                this._setImposterStyle(/** @type {HTMLDivElement} */ (imposterContainer).style, 'z-index', '-2147483646');
                 this._setImposterStyle(imposter.style, 'pointer-events', 'none');
-                return TextSourceRange.createFromImposter(range, imposterContainer, imposterSourceElement);
+                return TextSourceRange.createFromImposter(range, /** @type {HTMLDivElement} */ (imposterContainer), /** @type {HTMLElement} */ (imposterSourceElement));
             }
             return TextSourceRange.create(range);
         } else {
             if (imposterContainer !== null) {
-                imposterContainer.parentNode.removeChild(imposterContainer);
+                const {parentNode} = imposterContainer;
+                if (parentNode !== null) {
+                    parentNode.removeChild(imposterContainer);
+                }
             }
             return null;
         }
@@ -101,7 +88,7 @@ export class DocumentUtil {
 
     /**
      * Registers a custom handler for scanning for text or elements at the input position.
-     * @param {GetRangeFromPointHandler} handler The handler callback which will be invoked when calling `getRangeFromPoint`.
+     * @param {import('document-util').GetRangeFromPointHandler} handler The handler callback which will be invoked when calling `getRangeFromPoint`.
      */
     static registerGetRangeFromPointHandler(handler) {
         this._getRangeFromPointHandlers.push(handler);
@@ -129,7 +116,7 @@ export class DocumentUtil {
      *   ```js
      *   new Map([ [character: string, [otherCharacter: string, includeCharacterAtEnd: boolean]], ... ])
      *   ```
-     * @returns {{sentence: string, offset: number}} The sentence and the offset to the original source.
+     * @returns {{text: string, offset: number}} The sentence and the offset to the original source.
      */
     static extractSentence(source, layoutAwareScan, extent, terminateAtNewlines, terminatorMap, forwardQuoteMap, backwardQuoteMap) {
         // Scan text
@@ -218,11 +205,12 @@ export class DocumentUtil {
     /**
      * Computes the scaling adjustment that is necessary for client space coordinates based on the
      * CSS zoom level.
-     * @param {Node} node A node in the document.
+     * @param {?Node} node A node in the document.
      * @returns {number} The scaling factor.
      */
     static computeZoomScale(node) {
         if (this._cssZoomSupported === null) {
+            // @ts-expect-error - zoom is a non-standard property that exists in Chromium-based browsers
             this._cssZoomSupported = (typeof document.createElement('div').style.zoom === 'string');
         }
         if (!this._cssZoomSupported) { return 1; }
@@ -237,7 +225,7 @@ export class DocumentUtil {
         for (; node !== null && node !== documentElement; node = node.parentNode) {
             const {nodeType} = node;
             if (nodeType === DOCUMENT_FRAGMENT_NODE) {
-                const {host} = node;
+                const {host} = /** @type {ShadowRoot} */ (node);
                 if (typeof host !== 'undefined') {
                     node = host;
                 }
@@ -245,9 +233,9 @@ export class DocumentUtil {
             } else if (nodeType !== ELEMENT_NODE) {
                 continue;
             }
-            let {zoom} = getComputedStyle(node);
-            if (typeof zoom !== 'string') { continue; }
-            zoom = Number.parseFloat(zoom);
+            const zoomString = getComputedStyle(/** @type {HTMLElement} */ (node)).getPropertyValue('zoom');
+            if (typeof zoomString !== 'string' || zoomString.length === 0) { continue; }
+            const zoom = Number.parseFloat(zoomString);
             if (!Number.isFinite(zoom) || zoom === 0) { continue; }
             scale *= zoom;
         }
@@ -267,13 +255,13 @@ export class DocumentUtil {
 
     /**
      * Converts multiple rects based on the CSS zoom scaling for a given node.
-     * @param {DOMRect[]} rects The rects to convert.
+     * @param {DOMRect[]|DOMRectList} rects The rects to convert.
      * @param {Node} node The node to compute the zoom from.
      * @returns {DOMRect[]} The updated rects, or the same rects array if no change is needed.
      */
     static convertMultipleRectZoomCoordinates(rects, node) {
         const scale = this.computeZoomScale(node);
-        if (scale === 1) { return rects; }
+        if (scale === 1) { return [...rects]; }
         const results = [];
         for (const rect of rects) {
             results.push(new DOMRect(rect.left * scale, rect.top * scale, rect.width * scale, rect.height * scale));
@@ -299,7 +287,7 @@ export class DocumentUtil {
      * Checks whether a given point is contained within any rect in a list.
      * @param {number} x The horizontal coordinate.
      * @param {number} y The vertical coordinate.
-     * @param {DOMRect[]} rects The rect to check.
+     * @param {DOMRect[]|DOMRectList} rects The rect to check.
      * @returns {boolean} `true` if the point is inside any of the rects, `false` otherwise.
      */
     static isPointInAnyRect(x, y, rects) {
@@ -331,9 +319,10 @@ export class DocumentUtil {
     /**
      * Gets an array of the active modifier keys.
      * @param {KeyboardEvent|MouseEvent|TouchEvent} event The event to check.
-     * @returns {string[]} An array of modifiers.
+     * @returns {import('input').ModifierKey[]} An array of modifiers.
      */
     static getActiveModifiers(event) {
+        /** @type {import('input').ModifierKey[]} */
         const modifiers = [];
         if (event.altKey) { modifiers.push('alt'); }
         if (event.ctrlKey) { modifiers.push('ctrl'); }
@@ -345,20 +334,24 @@ export class DocumentUtil {
     /**
      * Gets an array of the active modifier keys and buttons.
      * @param {KeyboardEvent|MouseEvent|TouchEvent} event The event to check.
-     * @returns {string[]} An array of modifiers and buttons.
+     * @returns {import('input').Modifier[]} An array of modifiers and buttons.
      */
     static getActiveModifiersAndButtons(event) {
+        /** @type {import('input').Modifier[]} */
         const modifiers = this.getActiveModifiers(event);
-        this._getActiveButtons(event, modifiers);
+        if (event instanceof MouseEvent) {
+            this._getActiveButtons(event, modifiers);
+        }
         return modifiers;
     }
 
     /**
      * Gets an array of the active buttons.
-     * @param {KeyboardEvent|MouseEvent|TouchEvent} event The event to check.
-     * @returns {string[]} An array of modifiers and buttons.
+     * @param {MouseEvent} event The event to check.
+     * @returns {import('input').ModifierMouseButton[]} An array of modifiers and buttons.
      */
     static getActiveButtons(event) {
+        /** @type {import('input').ModifierMouseButton[]} */
         const buttons = [];
         this._getActiveButtons(event, buttons);
         return buttons;
@@ -366,8 +359,8 @@ export class DocumentUtil {
 
     /**
      * Adds a fullscreen change event listener. This function handles all of the browser-specific variants.
-     * @param {Function} onFullscreenChanged The event callback.
-     * @param {?EventListenerCollection} eventListenerCollection An optional `EventListenerCollection` to add the registration to.
+     * @param {EventListener} onFullscreenChanged The event callback.
+     * @param {?import('../core.js').EventListenerCollection} eventListenerCollection An optional `EventListenerCollection` to add the registration to.
      */
     static addFullscreenChangeEventListener(onFullscreenChanged, eventListenerCollection=null) {
         const target = document;
@@ -394,8 +387,11 @@ export class DocumentUtil {
     static getFullscreenElement() {
         return (
             document.fullscreenElement ||
+            // @ts-expect-error - vendor prefix
             document.msFullscreenElement ||
+            // @ts-expect-error - vendor prefix
             document.mozFullScreenElement ||
+            // @ts-expect-error - vendor prefix
             document.webkitFullscreenElement ||
             null
         );
@@ -409,7 +405,7 @@ export class DocumentUtil {
     static getNodesInRange(range) {
         const end = range.endContainer;
         const nodes = [];
-        for (let node = range.startContainer; node !== null; node = this.getNextNode(node)) {
+        for (let node = /** @type {?Node} */ (range.startContainer); node !== null; node = this.getNextNode(node)) {
             nodes.push(node);
             if (node === end) { break; }
         }
@@ -422,7 +418,7 @@ export class DocumentUtil {
      * @returns {?Node} The next node, or `null` if there is no next node.
      */
     static getNextNode(node) {
-        let next = node.firstChild;
+        let next = /** @type {?Node} */ (node.firstChild);
         if (next === null) {
             while (true) {
                 next = node.nextSibling;
@@ -445,10 +441,14 @@ export class DocumentUtil {
      */
     static anyNodeMatchesSelector(nodes, selector) {
         const ELEMENT_NODE = Node.ELEMENT_NODE;
-        for (let node of nodes) {
-            for (; node !== null; node = node.parentNode) {
-                if (node.nodeType !== ELEMENT_NODE) { continue; }
-                if (node.matches(selector)) { return true; }
+        // This is a rather ugly way of getting the "node" variable to be a nullable
+        for (let node of /** @type {(?Node)[]} */ (nodes)) {
+            while (node !== null) {
+                if (node.nodeType !== ELEMENT_NODE) {
+                    node = node.parentNode;
+                    continue;
+                }
+                if (/** @type {HTMLElement} */ (node).matches(selector)) { return true; }
                 break;
             }
         }
@@ -463,10 +463,11 @@ export class DocumentUtil {
      */
     static everyNodeMatchesSelector(nodes, selector) {
         const ELEMENT_NODE = Node.ELEMENT_NODE;
-        for (let node of nodes) {
+        // This is a rather ugly way of getting the "node" variable to be a nullable
+        for (let node of /** @type {(?Node)[]} */ (nodes)) {
             while (true) {
                 if (node === null) { return false; }
-                if (node.nodeType === ELEMENT_NODE && node.matches(selector)) { break; }
+                if (node.nodeType === ELEMENT_NODE && /** @type {HTMLElement} */ (node).matches(selector)) { break; }
                 node = node.parentNode;
             }
         }
@@ -497,7 +498,7 @@ export class DocumentUtil {
             case 'SELECT':
                 return true;
             default:
-                return element.isContentEditable;
+                return element instanceof HTMLElement && element.isContentEditable;
         }
     }
 
@@ -506,7 +507,7 @@ export class DocumentUtil {
      * @param {DOMRect[]} rects The DOMRects to offset.
      * @param {number} x The horizontal offset amount.
      * @param {number} y The vertical offset amount.
-     * @returns {DOMRect} The DOMRects with the offset applied.
+     * @returns {DOMRect[]} The DOMRects with the offset applied.
      */
     static offsetDOMRects(rects, x, y) {
         const results = [];
@@ -519,8 +520,8 @@ export class DocumentUtil {
     /**
      * Gets the parent writing mode of an element.
      * See: https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode.
-     * @param {Element} element The HTML element to check.
-     * @returns {string} The writing mode.
+     * @param {?Element} element The HTML element to check.
+     * @returns {import('document-util').NormalizedWritingMode} The writing mode.
      */
     static getElementWritingMode(element) {
         if (element !== null) {
@@ -536,52 +537,95 @@ export class DocumentUtil {
      * Normalizes a CSS writing mode value by converting non-standard and deprecated values
      * into their corresponding standard vaules.
      * @param {string} writingMode The writing mode to normalize.
-     * @returns {string} The normalized writing mode.
+     * @returns {import('document-util').NormalizedWritingMode} The normalized writing mode.
      */
     static normalizeWritingMode(writingMode) {
         switch (writingMode) {
-            case 'lr':
-            case 'lr-tb':
-            case 'rl':
-                return 'horizontal-tb';
             case 'tb':
                 return 'vertical-lr';
             case 'tb-rl':
                 return 'vertical-rl';
-            default:
+            case 'horizontal-tb':
+            case 'vertical-rl':
+            case 'vertical-lr':
+            case 'sideways-rl':
+            case 'sideways-lr':
                 return writingMode;
+            default: // 'lr', 'lr-tb', 'rl'
+                return 'horizontal-tb';
         }
     }
 
     /**
      * Converts a value from an element to a number.
-     * @param {string} value A string representation of a number.
-     * @param {object} constraints An object which might contain `min`, `max`, and `step` fields which are used to constrain the value.
+     * @param {string} valueString A string representation of a number.
+     * @param {import('document-util').ToNumberConstraints} constraints An object which might contain `min`, `max`, and `step` fields which are used to constrain the value.
      * @returns {number} The parsed and constrained number.
      */
-    static convertElementValueToNumber(value, constraints) {
-        value = parseFloat(value);
+    static convertElementValueToNumber(valueString, constraints) {
+        let value = Number.parseFloat(valueString);
         if (!Number.isFinite(value)) { value = 0; }
 
-        let {min, max, step} = constraints;
-        min = this._convertToNumberOrNull(min);
-        max = this._convertToNumberOrNull(max);
-        step = this._convertToNumberOrNull(step);
+        const min = this._convertToNumberOrNull(constraints.min);
+        const max = this._convertToNumberOrNull(constraints.max);
+        const step = this._convertToNumberOrNull(constraints.step);
         if (typeof min === 'number') { value = Math.max(value, min); }
         if (typeof max === 'number') { value = Math.min(value, max); }
         if (typeof step === 'number' && step !== 0) { value = Math.round(value / step) * step; }
         return value;
     }
 
+    /**
+     * @param {string} value
+     * @returns {?import('input').Modifier}
+     */
+    static normalizeModifier(value) {
+        switch (value) {
+            case 'alt':
+            case 'ctrl':
+            case 'meta':
+            case 'shift':
+            case 'mouse0':
+            case 'mouse1':
+            case 'mouse2':
+            case 'mouse3':
+            case 'mouse4':
+            case 'mouse5':
+                return value;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * @param {string} value
+     * @returns {?import('input').ModifierKey}
+     */
+    static normalizeModifierKey(value) {
+        switch (value) {
+            case 'alt':
+            case 'ctrl':
+            case 'meta':
+            case 'shift':
+                return value;
+            default:
+                return null;
+        }
+    }
+
     // Private
 
+    /**
+     * @param {MouseEvent} event The event to check.
+     * @param {import('input').ModifierMouseButton[]|import('input').Modifier[]} array
+     */
     static _getActiveButtons(event, array) {
         let {buttons} = event;
         if (typeof buttons === 'number' && buttons > 0) {
             for (let i = 0; i < 6; ++i) {
                 const buttonFlag = (1 << i);
                 if ((buttons & buttonFlag) !== 0) {
-                    array.push(`mouse${i}`);
+                    array.push(/** @type {import('input').ModifierMouseButton} */ (`mouse${i}`));
                     buttons &= ~buttonFlag;
                     if (buttons === 0) { break; }
                 }
@@ -589,10 +633,20 @@ export class DocumentUtil {
         }
     }
 
+    /**
+     * @param {CSSStyleDeclaration} style
+     * @param {string} propertyName
+     * @param {string} value
+     */
     static _setImposterStyle(style, propertyName, value) {
         style.setProperty(propertyName, value, 'important');
     }
 
+    /**
+     * @param {HTMLInputElement|HTMLTextAreaElement} element
+     * @param {boolean} isTextarea
+     * @returns {[imposter: ?HTMLDivElement, container: ?HTMLDivElement]}
+     */
     static _createImposter(element, isTextarea) {
         const body = document.body;
         if (body === null) { return [null, null]; }
@@ -669,6 +723,12 @@ export class DocumentUtil {
         return [imposter, container];
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {boolean} all
+     * @returns {Element[]}
+     */
     static _getElementsFromPoint(x, y, all) {
         if (all) {
             // document.elementsFromPoint can return duplicates which must be removed.
@@ -680,6 +740,13 @@ export class DocumentUtil {
         return e !== null ? [e] : [];
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {Range} range
+     * @param {boolean} normalizeCssZoom
+     * @returns {boolean}
+     */
     static _isPointInRange(x, y, range, normalizeCssZoom) {
         // Require a text node to start
         const {startContainer} = range;
@@ -722,16 +789,26 @@ export class DocumentUtil {
         return false;
     }
 
+    /**
+     * @param {string} string
+     * @returns {boolean}
+     */
     static _isWhitespace(string) {
         return string.trim().length === 0;
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {?Range}
+     */
     static _caretRangeFromPoint(x, y) {
         if (typeof document.caretRangeFromPoint === 'function') {
             // Chrome, Edge
             return document.caretRangeFromPoint(x, y);
         }
 
+        // @ts-expect-error - caretPositionFromPoint is non-standard
         if (typeof document.caretPositionFromPoint === 'function') {
             // Firefox
             return this._caretPositionFromPoint(x, y);
@@ -741,8 +818,14 @@ export class DocumentUtil {
         return null;
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {?Range}
+     */
     static _caretPositionFromPoint(x, y) {
-        const position = document.caretPositionFromPoint(x, y);
+        // @ts-expect-error - caretPositionFromPoint is non-standard
+        const position = /** @type {(x: number, y: number) => ?{offsetNode: Node, offset: number}} */ (document.caretPositionFromPoint)(x, y);
         if (position === null) {
             return null;
         }
@@ -760,8 +843,8 @@ export class DocumentUtil {
             case Node.ELEMENT_NODE:
                 // Elements with user-select: all will return the element
                 // instead of a text point inside the element.
-                if (this._isElementUserSelectAll(node)) {
-                    return this._caretPositionFromPointNormalizeStyles(x, y, node);
+                if (this._isElementUserSelectAll(/** @type {Element} */ (node))) {
+                    return this._caretPositionFromPointNormalizeStyles(x, y, /** @type {Element} */ (node));
                 }
                 break;
         }
@@ -778,14 +861,23 @@ export class DocumentUtil {
         }
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {Element} nextElement
+     * @returns {?Range}
+     */
     static _caretPositionFromPointNormalizeStyles(x, y, nextElement) {
         const previousStyles = new Map();
         try {
             while (true) {
-                this._recordPreviousStyle(previousStyles, nextElement);
-                nextElement.style.setProperty('user-select', 'text', 'important');
+                if (nextElement instanceof HTMLElement) {
+                    this._recordPreviousStyle(previousStyles, nextElement);
+                    nextElement.style.setProperty('user-select', 'text', 'important');
+                }
 
-                const position = document.caretPositionFromPoint(x, y);
+                // @ts-expect-error - caretPositionFromPoint is non-standard
+                const position = /** @type {(x: number, y: number) => ?{offsetNode: Node, offset: number}} */ (document.caretPositionFromPoint)(x, y);
                 if (position === null) {
                     return null;
                 }
@@ -803,12 +895,12 @@ export class DocumentUtil {
                     case Node.ELEMENT_NODE:
                         // Elements with user-select: all will return the element
                         // instead of a text point inside the element.
-                        if (this._isElementUserSelectAll(node)) {
+                        if (this._isElementUserSelectAll(/** @type {Element} */ (node))) {
                             if (previousStyles.has(node)) {
                                 // Recursive
                                 return null;
                             }
-                            nextElement = node;
+                            nextElement = /** @type {Element} */ (node);
                             continue;
                         }
                         break;
@@ -830,6 +922,13 @@ export class DocumentUtil {
         }
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {Element[]} elements
+     * @param {boolean} normalizeCssZoom
+     * @returns {?Range}
+     */
     static _caretRangeFromPointExt(x, y, elements, normalizeCssZoom) {
         let previousStyles = null;
         try {
@@ -862,6 +961,12 @@ export class DocumentUtil {
         }
     }
 
+    /**
+     * @param {Element[]} elements
+     * @param {number} i
+     * @param {Map<Element, ?string>} previousStyles
+     * @returns {number}
+     */
     static _disableTransparentElement(elements, i, previousStyles) {
         while (true) {
             if (i >= elements.length) {
@@ -870,19 +975,28 @@ export class DocumentUtil {
 
             const element = elements[i++];
             if (this._isElementTransparent(element)) {
-                this._recordPreviousStyle(previousStyles, element);
-                element.style.setProperty('pointer-events', 'none', 'important');
+                if (element instanceof HTMLElement) {
+                    this._recordPreviousStyle(previousStyles, element);
+                    element.style.setProperty('pointer-events', 'none', 'important');
+                }
                 return i;
             }
         }
     }
 
+    /**
+     * @param {Map<Element, ?string>} previousStyles
+     * @param {Element} element
+     */
     static _recordPreviousStyle(previousStyles, element) {
         if (previousStyles.has(element)) { return; }
         const style = element.hasAttribute('style') ? element.getAttribute('style') : null;
         previousStyles.set(element, style);
     }
 
+    /**
+     * @param {Map<Element, ?string>} previousStyles
+     */
     static _revertStyles(previousStyles) {
         for (const [element, style] of previousStyles.entries()) {
             if (style === null) {
@@ -893,6 +1007,10 @@ export class DocumentUtil {
         }
     }
 
+    /**
+     * @param {Element} element
+     * @returns {boolean}
+     */
     static _isElementTransparent(element) {
         if (
             element === document.body ||
@@ -908,14 +1026,26 @@ export class DocumentUtil {
         );
     }
 
+    /**
+     * @param {string} cssColor
+     * @returns {boolean}
+     */
     static _isColorTransparent(cssColor) {
         return this._transparentColorPattern.test(cssColor);
     }
 
+    /**
+     * @param {Element} element
+     * @returns {boolean}
+     */
     static _isElementUserSelectAll(element) {
         return getComputedStyle(element).userSelect === 'all';
     }
 
+    /**
+     * @param {string|number|undefined} value
+     * @returns {?number}
+     */
     static _convertToNumberOrNull(value) {
         if (typeof value !== 'number') {
             if (typeof value !== 'string' || value.length === 0) {
@@ -926,9 +1056,12 @@ export class DocumentUtil {
         return !Number.isNaN(value) ? value : null;
     }
 }
+/** @type {RegExp} */
 // eslint-disable-next-line no-underscore-dangle
 DocumentUtil._transparentColorPattern = /rgba\s*\([^)]*,\s*0(?:\.0+)?\s*\)/;
+/** @type {?boolean} */
 // eslint-disable-next-line no-underscore-dangle
 DocumentUtil._cssZoomSupported = null;
+/** @type {import('document-util').GetRangeFromPointHandler[]} */
 // eslint-disable-next-line no-underscore-dangle
 DocumentUtil._getRangeFromPointHandlers = [];

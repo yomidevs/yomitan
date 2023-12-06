@@ -22,15 +22,7 @@ import {EventListenerCollection} from '../core.js';
  * Class used for loading and validating media during the dictionary import process.
  */
 export class DictionaryImporterMediaLoader {
-    /**
-     * Attempts to load an image using an ArrayBuffer and a media type to return details about it.
-     * @param {ArrayBuffer} content The binary content for the image, encoded as an ArrayBuffer.
-     * @param {string} mediaType The media type for the image content.
-     * @param {Transferable[]} [transfer] An optional array of data that should be transferred in `postMessage` calls.
-     *   When the resulting promise resolves, this array will contain the `content` object.
-     * @returns {Promise<{content: ArrayBuffer, width: number, height: number}>} Details about the requested image content.
-     * @throws {Error} An error can be thrown if the image fails to load.
-     */
+    /** @type {import('dictionary-importer-media-loader').GetImageDetailsFunction} */
     getImageDetails(content, mediaType, transfer) {
         return new Promise((resolve, reject) => {
             const image = new Image();

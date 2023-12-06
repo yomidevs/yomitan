@@ -20,6 +20,11 @@ import fs from 'fs';
 import JSZip from 'jszip';
 import path from 'path';
 
+/**
+ * @param {string[]} args
+ * @param {Map<?string, (boolean|null|number|string|string[])>} argMap
+ * @returns {Map<?string, (boolean|null|number|string|string[])>}
+ */
 export function getArgs(args, argMap) {
     let key = null;
     let canKey = true;
@@ -64,11 +69,16 @@ export function getArgs(args, argMap) {
     return argMap;
 }
 
+/**
+ * @param {string} baseDirectory
+ * @param {?(fileName: string) => boolean} predicate
+ * @returns {string[]}
+ */
 export function getAllFiles(baseDirectory, predicate=null) {
     const results = [];
     const directories = [baseDirectory];
     while (directories.length > 0) {
-        const directory = directories.shift();
+        const directory = /** @type {string} */ (directories.shift());
         const fileNames = fs.readdirSync(directory);
         for (const fileName of fileNames) {
             const fullFileName = path.join(directory, fileName);
@@ -86,6 +96,11 @@ export function getAllFiles(baseDirectory, predicate=null) {
     return results;
 }
 
+/**
+ * @param {string} dictionaryDirectory
+ * @param {string} [dictionaryName]
+ * @returns {import('jszip')}
+ */
 export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
     const fileNames = fs.readdirSync(dictionaryDirectory);
 
@@ -125,6 +140,10 @@ export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
     // return zipFileBlob;
 }
 
+/**
+ * @param {(...args: import('core').SafeAny[]) => (unknown|Promise<unknown>)} func
+ * @param {...import('core').SafeAny} args
+ */
 export async function testMain(func, ...args) {
     try {
         await func(...args);

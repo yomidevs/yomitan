@@ -17,10 +17,18 @@
  */
 
 export class Deinflector {
+    /**
+     * @param {import('deinflector').ReasonsRaw} reasons
+     */
     constructor(reasons) {
+        /** @type {import('deinflector').Reason[]} */
         this.reasons = Deinflector.normalizeReasons(reasons);
     }
 
+    /**
+     * @param {string} source
+     * @returns {import('translation-internal').Deinflection[]}
+     */
     deinflect(source) {
         const results = [this._createDeinflection(source, 0, [])];
         for (let i = 0; i < results.length; ++i) {
@@ -46,13 +54,25 @@ export class Deinflector {
         return results;
     }
 
+    /**
+     * @param {string} term
+     * @param {import('translation-internal').DeinflectionRuleFlags} rules
+     * @param {string[]} reasons
+     * @returns {import('translation-internal').Deinflection}
+     */
     _createDeinflection(term, rules, reasons) {
         return {term, rules, reasons};
     }
 
+    /**
+     * @param {import('deinflector').ReasonsRaw} reasons
+     * @returns {import('deinflector').Reason[]}
+     */
     static normalizeReasons(reasons) {
+        /** @type {import('deinflector').Reason[]} */
         const normalizedReasons = [];
         for (const [reason, reasonInfo] of Object.entries(reasons)) {
+            /** @type {import('deinflector').ReasonVariant[]} */
             const variants = [];
             for (const {kanaIn, kanaOut, rulesIn, rulesOut} of reasonInfo) {
                 variants.push([
@@ -67,6 +87,10 @@ export class Deinflector {
         return normalizedReasons;
     }
 
+    /**
+     * @param {string[]} rules
+     * @returns {import('translation-internal').DeinflectionRuleFlags}
+     */
     static rulesToRuleFlags(rules) {
         const ruleTypes = this._ruleTypes;
         let value = 0;
@@ -79,13 +103,14 @@ export class Deinflector {
     }
 }
 
+/** @type {Map<string, import('translation-internal').DeinflectionRuleFlags>} */
 // eslint-disable-next-line no-underscore-dangle
 Deinflector._ruleTypes = new Map([
-    ['v1',    0b00000001], // Verb ichidan
-    ['v5',    0b00000010], // Verb godan
-    ['vs',    0b00000100], // Verb suru
-    ['vk',    0b00001000], // Verb kuru
-    ['vz',    0b00010000], // Verb zuru
-    ['adj-i', 0b00100000], // Adjective i
-    ['iru',   0b01000000] // Intermediate -iru endings for progressive or perfect tense
+    ['v1',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00000001)], // Verb ichidan
+    ['v5',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00000010)], // Verb godan
+    ['vs',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00000100)], // Verb suru
+    ['vk',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00001000)], // Verb kuru
+    ['vz',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00010000)], // Verb zuru
+    ['adj-i', /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00100000)], // Adjective i
+    ['iru',   /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b01000000)] // Intermediate -iru endings for progressive or perfect tense
 ]);

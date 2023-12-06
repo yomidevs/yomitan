@@ -18,7 +18,6 @@
 
 import {StringUtil} from '../data/sandbox/string-util.js';
 import {DocumentUtil} from './document-util.js';
-import {TextSourceRange} from './text-source-range.js';
 
 /**
  * This class represents a text source that is attached to a HTML element, such as an <img>
@@ -33,16 +32,21 @@ export class TextSourceElement {
      * @param {number} endOffset The text end offset position within the full content.
      */
     constructor(element, fullContent, startOffset, endOffset) {
+        /** @type {Element} */
         this._element = element;
+        /** @type {string} */
         this._fullContent = fullContent;
+        /** @type {number} */
         this._startOffset = startOffset;
+        /** @type {number} */
         this._endOffset = endOffset;
+        /** @type {string} */
         this._content = this._fullContent.substring(this._startOffset, this._endOffset);
     }
 
     /**
      * Gets the type name of this instance.
-     * @type {string}
+     * @type {'element'}
      */
     get type() {
         return 'element';
@@ -147,7 +151,7 @@ export class TextSourceElement {
     /**
      * Gets writing mode that is used for this element.
      * See: https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode.
-     * @returns {string} The rects.
+     * @returns {import('document-util').NormalizedWritingMode} The writing mode.
      */
     getWritingMode() {
         return 'horizontal-tb';
@@ -169,7 +173,7 @@ export class TextSourceElement {
 
     /**
      * Checks whether another text source has the same starting point.
-     * @param {TextSourceElement|TextSourceRange} other The other source to test.
+     * @param {import('text-source').TextSource} other The other source to test.
      * @returns {boolean} `true` if the starting points are equivalent, `false` otherwise.
      */
     hasSameStart(other) {
@@ -206,23 +210,39 @@ export class TextSourceElement {
      * @returns {string} The content string.
      */
     static _getElementContent(element) {
-        let content;
+        let content = '';
         switch (element.nodeName.toUpperCase()) {
             case 'BUTTON':
-                content = element.textContent;
+                {
+                    const {textContent} = /** @type {HTMLButtonElement} */ (element);
+                    if (textContent !== null) {
+                        content = textContent;
+                    }
+                }
                 break;
             case 'IMG':
-                content = element.getAttribute('alt') || '';
+                {
+                    const alt = /** @type {HTMLImageElement} */ (element).getAttribute('alt');
+                    if (typeof alt === 'string') {
+                        content = alt;
+                    }
+                }
                 break;
             case 'SELECT':
                 {
-                    const {selectedIndex, options} = element;
-                    const option = (selectedIndex >= 0 && selectedIndex < options.length ? options[selectedIndex] : null);
-                    content = (option !== null ? option.textContent : '');
+                    const {selectedIndex, options} = /** @type {HTMLSelectElement} */ (element);
+                    if (selectedIndex >= 0 && selectedIndex < options.length) {
+                        const {textContent} = options[selectedIndex];
+                        if (textContent !== null) {
+                            content = textContent;
+                        }
+                    }
                 }
                 break;
-            default:
-                content = `${element.value}`;
+            case 'INPUT':
+                {
+                    content = /** @type {HTMLInputElement} */ (element).value;
+                }
                 break;
         }
 

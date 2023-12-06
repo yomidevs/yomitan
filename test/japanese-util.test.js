@@ -23,8 +23,10 @@ import * as wanakana from '../ext/lib/wanakana.js';
 
 const jp = new JapaneseUtil(wanakana);
 
+/** */
 function testIsCodePointKanji() {
     test('isCodePointKanji', () => {
+        /** @type {[characters: string, expected: boolean][]} */
         const data = [
             ['力方', true],
             ['\u53f1\u{20b9f}', true],
@@ -34,7 +36,7 @@ function testIsCodePointKanji() {
 
         for (const [characters, expected] of data) {
             for (const character of characters) {
-                const codePoint = character.codePointAt(0);
+                const codePoint = /** @type {number} */ (character.codePointAt(0));
                 const actual = jp.isCodePointKanji(codePoint);
                 expect(actual).toStrictEqual(expected); // `isCodePointKanji failed for ${character} (\\u{${codePoint.toString(16)}})`
             }
@@ -42,8 +44,10 @@ function testIsCodePointKanji() {
     });
 }
 
+/** */
 function testIsCodePointKana() {
     test('isCodePointKana', () => {
+        /** @type {[characters: string, expected: boolean][]} */
         const data = [
             ['かたカタ', true],
             ['力方々kata、。？,.?', false],
@@ -52,7 +56,7 @@ function testIsCodePointKana() {
 
         for (const [characters, expected] of data) {
             for (const character of characters) {
-                const codePoint = character.codePointAt(0);
+                const codePoint = /** @type {number} */ (character.codePointAt(0));
                 const actual = jp.isCodePointKana(codePoint);
                 expect(actual).toStrictEqual(expected); // `isCodePointKana failed for ${character} (\\u{${codePoint.toString(16)}})`
             }
@@ -60,8 +64,10 @@ function testIsCodePointKana() {
     });
 }
 
+/** */
 function testIsCodePointJapanese() {
     test('isCodePointJapanese', () => {
+        /** @type {[characters: string, expected: boolean][]} */
         const data = [
             ['かたカタ力方々、。？', true],
             ['\u53f1\u{20b9f}', true],
@@ -71,7 +77,7 @@ function testIsCodePointJapanese() {
 
         for (const [characters, expected] of data) {
             for (const character of characters) {
-                const codePoint = character.codePointAt(0);
+                const codePoint = /** @type {number} */ (character.codePointAt(0));
                 const actual = jp.isCodePointJapanese(codePoint);
                 expect(actual).toStrictEqual(expected); // `isCodePointJapanese failed for ${character} (\\u{${codePoint.toString(16)}})`
             }
@@ -79,8 +85,10 @@ function testIsCodePointJapanese() {
     });
 }
 
+/** */
 function testIsStringEntirelyKana() {
     test('isStringEntirelyKana', () => {
+        /** @type {[string: string, expected: boolean][]} */
         const data = [
             ['かたかな', true],
             ['カタカナ', true],
@@ -101,8 +109,10 @@ function testIsStringEntirelyKana() {
     });
 }
 
+/** */
 function testIsStringPartiallyJapanese() {
     test('isStringPartiallyJapanese', () => {
+        /** @type {[string: string, expected: boolean][]} */
         const data = [
             ['かたかな', true],
             ['カタカナ', true],
@@ -124,8 +134,10 @@ function testIsStringPartiallyJapanese() {
     });
 }
 
+/** */
 function testConvertKatakanaToHiragana() {
     test('convertKatakanaToHiragana', () => {
+        /** @type {[string: string, expected: string, keepProlongedSoundMarks?: boolean][]} */
         const data = [
             ['かたかな', 'かたかな'],
             ['ひらがな', 'ひらがな'],
@@ -146,8 +158,10 @@ function testConvertKatakanaToHiragana() {
     });
 }
 
+/** */
 function testConvertHiraganaToKatakana() {
     test('ConvertHiraganaToKatakana', () => {
+        /** @type {[string: string, expected: string][]} */
         const data = [
             ['かたかな', 'カタカナ'],
             ['ひらがな', 'ヒラガナ'],
@@ -166,8 +180,10 @@ function testConvertHiraganaToKatakana() {
     });
 }
 
+/** */
 function testConvertToRomaji() {
     test('ConvertToRomaji', () => {
+        /** @type {[string: string, expected: string][]} */
         const data = [
             ['かたかな', 'katakana'],
             ['ひらがな', 'hiragana'],
@@ -186,8 +202,10 @@ function testConvertToRomaji() {
     });
 }
 
+/** */
 function testConvertNumericToFullWidth() {
     test('ConvertNumericToFullWidth', () => {
+        /** @type {[string: string, expected: string][]} */
         const data = [
             ['0123456789', '０１２３４５６７８９'],
             ['abcdefghij', 'abcdefghij'],
@@ -201,8 +219,10 @@ function testConvertNumericToFullWidth() {
     });
 }
 
+/** */
 function testConvertHalfWidthKanaToFullWidth() {
     test('ConvertHalfWidthKanaToFullWidth', () => {
+        /** @type {[string: string, expected: string, expectedSourceMapping?: number[]][]} */
         const data = [
             ['0123456789', '0123456789'],
             ['abcdefghij', 'abcdefghij'],
@@ -227,8 +247,10 @@ function testConvertHalfWidthKanaToFullWidth() {
     });
 }
 
+/** */
 function testConvertAlphabeticToKana() {
     test('ConvertAlphabeticToKana', () => {
+        /** @type {[string: string, expected: string, expectedSourceMapping?: number[]][]} */
         const data = [
             ['0123456789', '0123456789'],
             ['abcdefghij', 'あbcでfgひj', [1, 1, 1, 2, 1, 1, 2, 1]],
@@ -252,8 +274,10 @@ function testConvertAlphabeticToKana() {
     });
 }
 
+/** */
 function testDistributeFurigana() {
     test('DistributeFurigana', () => {
+        /** @type {[input: [term: string, reading: string], expected: {text: string, reading: string}[]][]} */
         const data = [
             [
                 ['有り難う', 'ありがとう'],
@@ -719,8 +743,10 @@ function testDistributeFurigana() {
     });
 }
 
+/** */
 function testDistributeFuriganaInflected() {
     test('DistributeFuriganaInflected', () => {
+        /** @type {[input: [term: string, reading: string, source: string], expected: {text: string, reading: string}[]][]} */
         const data = [
             [
                 ['美味しい', 'おいしい', '美味しかた'],
@@ -770,8 +796,10 @@ function testDistributeFuriganaInflected() {
     });
 }
 
+/** */
 function testCollapseEmphaticSequences() {
     test('CollapseEmphaticSequences', () => {
+        /** @type {[input: [text: string, fullCollapse: boolean], output: [expected: string, expectedSourceMapping: number[]]][]} */
         const data = [
             [['かこい', false], ['かこい', [1, 1, 1]]],
             [['かこい', true], ['かこい', [1, 1, 1]]],
@@ -825,8 +853,10 @@ function testCollapseEmphaticSequences() {
     });
 }
 
+/** */
 function testIsMoraPitchHigh() {
     test('IsMoraPitchHigh', () => {
+        /** @type {[input: [moraIndex: number, pitchAccentDownstepPosition: number], expected: boolean][]} */
         const data = [
             [[0, 0], false],
             [[1, 0], true],
@@ -861,8 +891,10 @@ function testIsMoraPitchHigh() {
     });
 }
 
+/** */
 function testGetKanaMorae() {
     test('GetKanaMorae', () => {
+        /** @type {[text: string, expected: string[]][]} */
         const data = [
             ['かこ', ['か', 'こ']],
             ['かっこ', ['か', 'っ', 'こ']],
@@ -883,6 +915,7 @@ function testGetKanaMorae() {
 }
 
 
+/** */
 function main() {
     testIsCodePointKanji();
     testIsCodePointKana();

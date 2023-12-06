@@ -23,6 +23,11 @@ import path from 'path';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * @template T
+ * @param {T} value
+ * @returns {T}
+ */
 function clone(value) {
     return JSON.parse(JSON.stringify(value));
 }
@@ -31,16 +36,24 @@ function clone(value) {
 export class ManifestUtil {
     constructor() {
         const fileName = path.join(dirname, 'data', 'manifest-variants.json');
-        const {manifest, variants, defaultVariant} = JSON.parse(fs.readFileSync(fileName));
+        const {manifest, variants, defaultVariant} = /** @type {import('dev/manifest').ManifestConfig} */ (JSON.parse(fs.readFileSync(fileName, {encoding: 'utf8'})));
+        /** @type {import('dev/manifest').Manifest} */
         this._manifest = manifest;
+        /** @type {import('dev/manifest').ManifestVariant[]} */
         this._variants = variants;
+        /** @type {string} */
         this._defaultVariant = defaultVariant;
+        /** @type {Map<string, import('dev/manifest').ManifestVariant>} */
         this._variantMap = new Map();
         for (const variant of variants) {
             this._variantMap.set(variant.name, variant);
         }
     }
 
+    /**
+     * @param {?string} [variantName]
+     * @returns {import('dev/manifest').Manifest}
+     */
     getManifest(variantName) {
         if (typeof variantName === 'string') {
             const variant = this._variantMap.get(variantName);
@@ -59,20 +72,36 @@ export class ManifestUtil {
         return clone(this._manifest);
     }
 
+    /**
+     * @returns {import('dev/manifest').ManifestVariant[]}
+     */
     getVariants() {
         return [...this._variants];
     }
 
+    /**
+     * @param {string} name
+     * @returns {import('dev/manifest').ManifestVariant|undefined}
+     */
     getVariant(name) {
         return this._variantMap.get(name);
     }
 
+    /**
+     * @param {import('dev/manifest').Manifest} manifest
+     * @returns {string}
+     */
     static createManifestString(manifest) {
         return JSON.stringify(manifest, null, 4) + '\n';
     }
 
     // Private
 
+    /**
+     * @param {import('dev/manifest').Command} data
+     * @returns {string}
+     * @throws {Error}
+     */
     _evaluateModificationCommand(data) {
         const {command, args, trim} = data;
         const {stdout, stderr, status} = childProcess.spawnSync(command, args, {
@@ -89,6 +118,11 @@ export class ManifestUtil {
         return result;
     }
 
+    /**
+     * @param {import('dev/manifest').Manifest} manifest
+     * @param {import('dev/manifest').Modification[]} modifications
+     * @returns {import('dev/manifest').Manifest}
+     */
     _applyModifications(manifest, modifications) {
         if (Array.isArray(modifications)) {
             for (const modification of modifications) {
@@ -97,6 +131,7 @@ export class ManifestUtil {
                     case 'set':
                         {
                             let {value, before, after, command} = modification;
+                            /** @type {import('core').UnknownObject} */
                             const object = this._getObjectProperties(manifest, path2, path2.length - 1);
                             const key = path2[path2.length - 1];
 
@@ -121,6 +156,7 @@ export class ManifestUtil {
                     case 'replace':
                         {
                             const {pattern, patternFlags, replacement} = modification;
+                            /** @type {import('core').UnknownObject} */
                             const value = this._getObjectProperties(manifest, path2, path2.length - 1);
                             const regex = new RegExp(pattern, patternFlags);
                             const last = path2[path2.length - 1];
@@ -131,6 +167,7 @@ export class ManifestUtil {
                         break;
                     case 'delete':
                         {
+                            /** @type {import('core').UnknownObject} */
                             const value = this._getObjectProperties(manifest, path2, path2.length - 1);
                             const last = path2[path2.length - 1];
                             delete value[last];
@@ -139,6 +176,7 @@ export class ManifestUtil {
                     case 'remove':
                         {
                             const {item} = modification;
+                            /** @type {unknown[]} */
                             const value = this._getObjectProperties(manifest, path2, path2.length);
                             const index = value.indexOf(item);
                             if (index >= 0) { value.splice(index, 1); }
@@ -147,6 +185,7 @@ export class ManifestUtil {
                     case 'splice':
                         {
                             const {start, deleteCount, items} = modification;
+                            /** @type {unknown[]} */
                             const value = this._getObjectProperties(manifest, path2, path2.length);
                             const itemsNew = items.map((v) => clone(v));
                             value.splice(start, deleteCount, ...itemsNew);
@@ -158,7 +197,9 @@ export class ManifestUtil {
                             const {newPath, before, after} = modification;
                             const oldKey = path2[path2.length - 1];
                             const newKey = newPath[newPath.length - 1];
+                            /** @type {import('core').UnknownObject} */
                             const oldObject = this._getObjectProperties(manifest, path2, path2.length - 1);
+                            /** @type {import('core').UnknownObject} */
                             const newObject = this._getObjectProperties(manifest, newPath, newPath.length - 1);
                             const oldObjectIsNewObject = this._arraysAreSame(path2, newPath, -1);
                             const value = oldObject[oldKey];
@@ -184,6 +225,7 @@ export class ManifestUtil {
                     case 'add':
                         {
                             const {items} = modification;
+                            /** @type {unknown[]} */
                             const value = this._getObjectProperties(manifest, path2, path2.length);
                             const itemsNew = items.map((v) => clone(v));
                             value.push(...itemsNew);
@@ -196,6 +238,13 @@ export class ManifestUtil {
         return manifest;
     }
 
+    /**
+     * @template T
+     * @param {T[]} array1
+     * @param {T[]} array2
+     * @param {number} lengthOffset
+     * @returns {boolean}
+     */
     _arraysAreSame(array1, array2, lengthOffset) {
         let ii = array1.length;
         if (ii !== array2.length) { return false; }
@@ -206,10 +255,21 @@ export class ManifestUtil {
         return true;
     }
 
+    /**
+     * @param {import('core').UnknownObject} object
+     * @param {string|number} key
+     * @returns {number}
+     */
     _getObjectKeyIndex(object, key) {
-        return Object.keys(object).indexOf(key);
+        return Object.keys(object).indexOf(typeof key === 'string' ? key : `${key}`);
     }
 
+    /**
+     * @param {import('core').UnknownObject} object
+     * @param {string|number} key
+     * @param {unknown} value
+     * @param {number} index
+     */
     _setObjectKeyAtIndex(object, key, value, index) {
         if (index < 0 || typeof key === 'number' || Object.prototype.hasOwnProperty.call(object, key)) {
             object[key] = value;
@@ -229,13 +289,24 @@ export class ManifestUtil {
         }
     }
 
+    /**
+     * @template [TReturn=unknown]
+     * @param {unknown} object
+     * @param {import('dev/manifest').PropertyPath} path2
+     * @param {number} count
+     * @returns {TReturn}
+     */
     _getObjectProperties(object, path2, count) {
         for (let i = 0; i < count; ++i) {
-            object = object[path2[i]];
+            object = /** @type {import('core').UnknownObject} */ (object)[path2[i]];
         }
-        return object;
+        return /** @type {TReturn} */ (object);
     }
 
+    /**
+     * @param {import('dev/manifest').ManifestVariant} variant
+     * @returns {import('dev/manifest').ManifestVariant[]}
+     */
     _getInheritanceChain(variant) {
         const visited = new Set();
         const inheritance = [];
@@ -256,6 +327,11 @@ export class ManifestUtil {
         return inheritance;
     }
 
+    /**
+     * @param {import('dev/manifest').Manifest} manifest
+     * @param {import('dev/manifest').ManifestVariant} variant
+     * @returns {import('dev/manifest').Manifest}
+     */
     _createVariantManifest(manifest, variant) {
         let modifiedManifest = clone(manifest);
         for (const {modifications} of this._getInheritanceChain(variant)) {

@@ -17,23 +17,39 @@
  */
 
 import {EventDispatcher, EventListenerCollection} from '../../core.js';
+import {DocumentUtil} from '../../dom/document-util.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
+/**
+ * @augments EventDispatcher<import('profile-conditions-ui').EventType>
+ */
 export class ProfileConditionsUI extends EventDispatcher {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     */
     constructor(settingsController) {
         super();
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {?import('environment').OperatingSystem} */
         this._os = null;
+        /** @type {?HTMLElement} */
         this._conditionGroupsContainer = null;
+        /** @type {?HTMLElement} */
         this._addConditionGroupButton = null;
+        /** @type {ProfileConditionGroupUI[]} */
         this._children = [];
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {import('profile-conditions-ui').DescriptorType} */
         this._defaultType = 'popupLevel';
+        /** @type {number} */
         this._profileIndex = 0;
         const validateInteger = this._validateInteger.bind(this);
         const normalizeInteger = this._normalizeInteger.bind(this);
         const validateFlags = this._validateFlags.bind(this);
         const normalizeFlags = this._normalizeFlags.bind(this);
+        /** @type {Map<import('profile-conditions-ui').DescriptorType, import('profile-conditions-ui').Descriptor>} */
         this._descriptors = new Map([
             [
                 'popupLevel',
@@ -88,19 +104,23 @@ export class ProfileConditionsUI extends EventDispatcher {
                 }
             ]
         ]);
+        /** @type {Set<string>} */
         this._validFlags = new Set([
             'clipboard'
         ]);
     }
 
+    /** @type {import('./settings-controller.js').SettingsController} */
     get settingsController() {
         return this._settingsController;
     }
 
+    /** @type {number} */
     get profileIndex() {
         return this._profileIndex;
     }
 
+    /** @type {?import('environment').OperatingSystem} */
     get os() {
         return this._os;
     }
@@ -109,6 +129,9 @@ export class ProfileConditionsUI extends EventDispatcher {
         this._os = value;
     }
 
+    /**
+     * @param {number} profileIndex
+     */
     async prepare(profileIndex) {
         const options = await this._settingsController.getOptionsFull();
         const {profiles} = options;
@@ -116,8 +139,8 @@ export class ProfileConditionsUI extends EventDispatcher {
         const {conditionGroups} = profiles[profileIndex];
 
         this._profileIndex = profileIndex;
-        this._conditionGroupsContainer = document.querySelector('#profile-condition-groups');
-        this._addConditionGroupButton = document.querySelector('#profile-add-condition-group');
+        this._conditionGroupsContainer = /** @type {HTMLElement} */ (document.querySelector('#profile-condition-groups'));
+        this._addConditionGroupButton = /** @type {HTMLElement} */ (document.querySelector('#profile-add-condition-group'));
 
         for (let i = 0, ii = conditionGroups.length; i < ii; ++i) {
             this._addConditionGroup(conditionGroups[i], i);
@@ -126,6 +149,7 @@ export class ProfileConditionsUI extends EventDispatcher {
         this._eventListeners.addEventListener(this._addConditionGroupButton, 'click', this._onAddConditionGroupButtonClick.bind(this), false);
     }
 
+    /** */
     cleanup() {
         this._eventListeners.removeAllEventListeners();
 
@@ -138,10 +162,17 @@ export class ProfileConditionsUI extends EventDispatcher {
         this._addConditionGroupButton = null;
     }
 
-    instantiateTemplate(names) {
-        return this._settingsController.instantiateTemplate(names);
+    /**
+     * @param {string} name
+     * @returns {HTMLElement}
+     */
+    instantiateTemplate(name) {
+        return /** @type {HTMLElement} */ (this._settingsController.instantiateTemplate(name));
     }
 
+    /**
+     * @returns {import('profile-conditions-ui').DescriptorInfo[]}
+     */
     getDescriptorTypes() {
         const results = [];
         for (const [name, {displayName}] of this._descriptors.entries()) {
@@ -150,6 +181,10 @@ export class ProfileConditionsUI extends EventDispatcher {
         return results;
     }
 
+    /**
+     * @param {import('profile-conditions-ui').DescriptorType} type
+     * @returns {import('profile-conditions-ui').OperatorInfo[]}
+     */
     getDescriptorOperators(type) {
         const info = this._descriptors.get(type);
         const results = [];
@@ -161,15 +196,27 @@ export class ProfileConditionsUI extends EventDispatcher {
         return results;
     }
 
+    /**
+     * @returns {import('profile-conditions-ui').DescriptorType}
+     */
     getDefaultType() {
         return this._defaultType;
     }
 
+    /**
+     * @param {import('profile-conditions-ui').DescriptorType} type
+     * @returns {string}
+     */
     getDefaultOperator(type) {
         const info = this._descriptors.get(type);
         return (typeof info !== 'undefined' ? info.defaultOperator : '');
     }
 
+    /**
+     * @param {import('profile-conditions-ui').DescriptorType} type
+     * @param {string} operator
+     * @returns {import('profile-conditions-ui').Operator}
+     */
     getOperatorDetails(type, operator) {
         const info = this._getOperatorDetails(type, operator);
 
@@ -192,6 +239,9 @@ export class ProfileConditionsUI extends EventDispatcher {
         };
     }
 
+    /**
+     * @returns {import('settings').ProfileCondition}
+     */
     getDefaultCondition() {
         const type = this.getDefaultType();
         const operator = this.getDefaultOperator(type);
@@ -199,6 +249,10 @@ export class ProfileConditionsUI extends EventDispatcher {
         return {type, operator, value};
     }
 
+    /**
+     * @param {ProfileConditionGroupUI} child
+     * @returns {boolean}
+     */
     removeConditionGroup(child) {
         const index = child.index;
         if (index < 0 || index >= this._children.length) { return false; }
@@ -226,22 +280,53 @@ export class ProfileConditionsUI extends EventDispatcher {
         return true;
     }
 
+    /**
+     * @param {string} value
+     * @returns {string[]}
+     */
     splitValue(value) {
         return value.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0);
     }
 
+    /**
+     * @param {string} property
+     * @returns {string}
+     */
     getPath(property) {
         property = (typeof property === 'string' ? `.${property}` : '');
         return `profiles[${this.profileIndex}]${property}`;
     }
 
+    /**
+     * @param {HTMLInputElement} inputNode
+     * @param {?HTMLButtonElement} mouseButton
+     * @returns {KeyboardMouseInputField}
+     */
     createKeyboardMouseInputField(inputNode, mouseButton) {
         return new KeyboardMouseInputField(inputNode, mouseButton, this._os);
     }
 
+    /**
+     * @param {string} value
+     * @returns {?import('settings').ProfileConditionType}
+     */
+    static normalizeProfileConditionType(value) {
+        switch (value) {
+            case 'popupLevel':
+            case 'url':
+            case 'modifierKeys':
+            case 'flags':
+                return value;
+            default:
+                return null;
+        }
+    }
+
     // Private
 
+    /** */
     _onAddConditionGroupButtonClick() {
+        /** @type {import('settings').ProfileConditionGroup} */
         const conditionGroup = {
             conditions: [this.getDefaultCondition()]
         };
@@ -260,28 +345,50 @@ export class ProfileConditionsUI extends EventDispatcher {
         this._triggerConditionGroupCountChanged(this._children.length);
     }
 
+    /**
+     * @param {import('settings').ProfileConditionGroup} conditionGroup
+     * @param {number} index
+     * @returns {ProfileConditionGroupUI}
+     */
     _addConditionGroup(conditionGroup, index) {
         const child = new ProfileConditionGroupUI(this, index);
         child.prepare(conditionGroup);
         this._children.push(child);
-        this._conditionGroupsContainer.appendChild(child.node);
+        /** @type {HTMLElement} */ (this._conditionGroupsContainer).appendChild(child.node);
         return child;
     }
 
+    /**
+     * @param {import('profile-conditions-ui').DescriptorType} type
+     * @param {string} operator
+     * @returns {import('profile-conditions-ui').OperatorInternal|undefined}
+     */
     _getOperatorDetails(type, operator) {
         const info = this._descriptors.get(type);
         return (typeof info !== 'undefined' ? info.operators.get(operator) : void 0);
     }
 
+    /**
+     * @param {string} value
+     * @returns {boolean}
+     */
     _validateInteger(value) {
         const number = Number.parseFloat(value);
         return Number.isFinite(number) && Math.floor(number) === number;
     }
 
+    /**
+     * @param {string} value
+     * @returns {boolean}
+     */
     _validateDomains(value) {
         return this.splitValue(value).length > 0;
     }
 
+    /**
+     * @param {string} value
+     * @returns {boolean}
+     */
     _validateRegExp(value) {
         try {
             new RegExp(value, 'i');
@@ -291,15 +398,27 @@ export class ProfileConditionsUI extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {string} value
+     * @returns {string}
+     */
     _normalizeInteger(value) {
         const number = Number.parseFloat(value);
         return `${number}`;
     }
 
+    /**
+     * @param {string} value
+     * @returns {string}
+     */
     _normalizeDomains(value) {
         return this.splitValue(value).join(', ');
     }
 
+    /**
+     * @param {string} value
+     * @returns {boolean}
+     */
     _validateFlags(value) {
         const flags = this.splitValue(value);
         for (const flag of flags) {
@@ -310,34 +429,57 @@ export class ProfileConditionsUI extends EventDispatcher {
         return flags.length > 0;
     }
 
+    /**
+     * @param {string} value
+     * @returns {string}
+     */
     _normalizeFlags(value) {
         return [...new Set(this.splitValue(value))].join(', ');
     }
 
+    /**
+     * @param {number} count
+     */
     _triggerConditionGroupCountChanged(count) {
-        this.trigger('conditionGroupCountChanged', {count, profileIndex: this._profileIndex});
+        /** @type {import('profile-conditions-ui').ConditionGroupCountChangedEvent} */
+        const event = {count, profileIndex: this._profileIndex};
+        this.trigger('conditionGroupCountChanged', event);
     }
 }
 
 class ProfileConditionGroupUI {
+    /**
+     * @param {ProfileConditionsUI} parent
+     * @param {number} index
+     */
     constructor(parent, index) {
+        /** @type {ProfileConditionsUI} */
         this._parent = parent;
+        /** @type {number} */
         this._index = index;
-        this._node = null;
-        this._conditionContainer = null;
-        this._addConditionButton = null;
+        /** @type {HTMLElement} */
+        this._node = /** @type {HTMLElement} */ (this._parent.instantiateTemplate('profile-condition-group'));
+        /** @type {HTMLElement} */
+        this._conditionContainer = /** @type {HTMLElement} */ (this._node.querySelector('.profile-condition-list'));
+        /** @type {HTMLElement} */
+        this._addConditionButton = /** @type {HTMLElement} */ (this._node.querySelector('.profile-condition-add-button'));
+        /** @type {ProfileConditionUI[]} */
         this._children = [];
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
     }
 
+    /** @type {import('./settings-controller.js').SettingsController} */
     get settingsController() {
         return this._parent.settingsController;
     }
 
+    /** @type {ProfileConditionsUI} */
     get parent() {
         return this._parent;
     }
 
+    /** @type {number} */
     get index() {
         return this._index;
     }
@@ -346,19 +488,20 @@ class ProfileConditionGroupUI {
         this._index = value;
     }
 
+    /** @type {HTMLElement} */
     get node() {
         return this._node;
     }
 
+    /** @type {number} */
     get childCount() {
         return this._children.length;
     }
 
+    /**
+     * @param {import('settings').ProfileConditionGroup} conditionGroup
+     */
     prepare(conditionGroup) {
-        this._node = this._parent.instantiateTemplate('profile-condition-group');
-        this._conditionContainer = this._node.querySelector('.profile-condition-list');
-        this._addConditionButton = this._node.querySelector('.profile-condition-add-button');
-
         const conditions = conditionGroup.conditions;
         for (let i = 0, ii = conditions.length; i < ii; ++i) {
             this._addCondition(conditions[i], i);
@@ -367,6 +510,7 @@ class ProfileConditionGroupUI {
         this._eventListeners.addEventListener(this._addConditionButton, 'click', this._onAddConditionButtonClick.bind(this), false);
     }
 
+    /** */
     cleanup() {
         this._eventListeners.removeAllEventListeners();
 
@@ -378,15 +522,15 @@ class ProfileConditionGroupUI {
         if (this._node === null) { return; }
 
         const node = this._node;
-        this._node = null;
-        this._conditionContainer = null;
-        this._addConditionButton = null;
-
         if (node.parentNode !== null) {
             node.parentNode.removeChild(node);
         }
     }
 
+    /**
+     * @param {ProfileConditionUI} child
+     * @returns {boolean}
+     */
     removeCondition(child) {
         const index = child.index;
         if (index < 0 || index >= this._children.length) { return false; }
@@ -416,17 +560,23 @@ class ProfileConditionGroupUI {
         return true;
     }
 
+    /**
+     * @param {string} property
+     * @returns {string}
+     */
     getPath(property) {
         property = (typeof property === 'string' ? `.${property}` : '');
         return this._parent.getPath(`conditionGroups[${this._index}]${property}`);
     }
 
+    /** */
     removeSelf() {
         this._parent.removeConditionGroup(this);
     }
 
     // Private
 
+    /** */
     _onAddConditionButtonClick() {
         const condition = this._parent.getDefaultCondition();
         const index = this._children.length;
@@ -442,41 +592,73 @@ class ProfileConditionGroupUI {
         }]);
     }
 
+    /**
+     * @param {import('settings').ProfileCondition} condition
+     * @param {number} index
+     * @returns {ProfileConditionUI}
+     */
     _addCondition(condition, index) {
         const child = new ProfileConditionUI(this, index);
         child.prepare(condition);
         this._children.push(child);
-        this._conditionContainer.appendChild(child.node);
+        if (this._conditionContainer !== null) {
+            this._conditionContainer.appendChild(child.node);
+        }
         return child;
     }
 }
 
 class ProfileConditionUI {
+    /**
+     * @param {ProfileConditionGroupUI} parent
+     * @param {number} index
+     */
     constructor(parent, index) {
+        /** @type {ProfileConditionGroupUI} */
         this._parent = parent;
+        /** @type {number} */
         this._index = index;
-        this._node = null;
-        this._typeInput = null;
-        this._operatorInput = null;
-        this._valueInputContainer = null;
-        this._removeButton = null;
-        this._mouseButton = null;
-        this._mouseButtonContainer = null;
-        this._menuButton = null;
+        /** @type {HTMLElement} */
+        this._node = this._parent.parent.instantiateTemplate('profile-condition');
+        /** @type {HTMLSelectElement} */
+        this._typeInput = /** @type {HTMLSelectElement} */ (this._node.querySelector('.profile-condition-type'));
+        /** @type {HTMLSelectElement} */
+        this._operatorInput = /** @type {HTMLSelectElement} */ (this._node.querySelector('.profile-condition-operator'));
+        /** @type {HTMLButtonElement} */
+        this._removeButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.profile-condition-remove'));
+        /** @type {HTMLButtonElement} */
+        this._mouseButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.mouse-button'));
+        /** @type {HTMLElement} */
+        this._mouseButtonContainer = /** @type {HTMLElement} */ (this._node.querySelector('.mouse-button-container'));
+        /** @type {HTMLButtonElement} */
+        this._menuButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.profile-condition-menu-button'));
+        /** @type {HTMLElement} */
+        this._typeOptionContainer = /** @type {HTMLElement} */ (this._typeInput.querySelector('optgroup'));
+        /** @type {HTMLElement} */
+        this._operatorOptionContainer = /** @type {HTMLElement} */ (this._operatorInput.querySelector('optgroup'));
+        /** @type {HTMLInputElement} */
+        this._valueInput = /** @type {HTMLInputElement} */ (this._node.querySelector('.profile-condition-input'));
+        /** @type {string} */
         this._value = '';
+        /** @type {?KeyboardMouseInputField} */
         this._kbmInputField = null;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {EventListenerCollection} */
         this._inputEventListeners = new EventListenerCollection();
     }
 
+    /** @type {import('./settings-controller.js').SettingsController} */
     get settingsController() {
         return this._parent.parent.settingsController;
     }
 
+    /** @type {ProfileConditionGroupUI} */
     get parent() {
         return this._parent;
     }
 
+    /** @type {number} */
     get index() {
         return this._index;
     }
@@ -485,23 +667,16 @@ class ProfileConditionUI {
         this._index = value;
     }
 
+    /** @type {HTMLElement} */
     get node() {
         return this._node;
     }
 
+    /**
+     * @param {import('settings').ProfileCondition} condition
+     */
     prepare(condition) {
         const {type, operator, value} = condition;
-
-        this._node = this._parent.parent.instantiateTemplate('profile-condition');
-        this._typeInput = this._node.querySelector('.profile-condition-type');
-        this._typeOptionContainer = this._typeInput.querySelector('optgroup');
-        this._operatorInput = this._node.querySelector('.profile-condition-operator');
-        this._operatorOptionContainer = this._operatorInput.querySelector('optgroup');
-        this._valueInput = this._node.querySelector('.profile-condition-input');
-        this._removeButton = this._node.querySelector('.profile-condition-remove');
-        this._mouseButton = this._node.querySelector('.mouse-button');
-        this._mouseButtonContainer = this._node.querySelector('.mouse-button-container');
-        this._menuButton = this._node.querySelector('.profile-condition-menu-button');
 
         const operatorDetails = this._getOperatorDetails(type, operator);
         this._updateTypes(type);
@@ -517,6 +692,7 @@ class ProfileConditionUI {
         }
     }
 
+    /** */
     cleanup() {
         this._eventListeners.removeAllEventListeners();
         this._value = '';
@@ -524,17 +700,15 @@ class ProfileConditionUI {
         if (this._node === null) { return; }
 
         const node = this._node;
-        this._node = null;
-        this._typeInput = null;
-        this._operatorInput = null;
-        this._valueInputContainer = null;
-        this._removeButton = null;
-
         if (node.parentNode !== null) {
             node.parentNode.removeChild(node);
         }
     }
 
+    /**
+     * @param {string} property
+     * @returns {string}
+     */
     getPath(property) {
         property = (typeof property === 'string' ? `.${property}` : '');
         return this._parent.getPath(`conditions[${this._index}]${property}`);
@@ -542,19 +716,33 @@ class ProfileConditionUI {
 
     // Private
 
+    /**
+     * @param {Event} e
+     */
     _onTypeChange(e) {
-        const type = e.currentTarget.value;
+        const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        const type = ProfileConditionsUI.normalizeProfileConditionType(element.value);
+        if (type === null) { return; }
         this._setType(type);
     }
 
+    /**
+     * @param {Event} e
+     */
     _onOperatorChange(e) {
-        const type = this._typeInput.value;
-        const operator = e.currentTarget.value;
+        const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        const type = ProfileConditionsUI.normalizeProfileConditionType(this._typeInput.value);
+        if (type === null) { return; }
+        const operator = element.value;
         this._setOperator(type, operator);
     }
 
+    /**
+     * @param {import('profile-conditions-ui').InputData} details
+     * @param {Event} e
+     */
     _onValueInputChange({validate, normalize}, e) {
-        const node = e.currentTarget;
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const value = node.value;
         const okay = this._validateValue(value, validate);
         this._value = value;
@@ -565,8 +753,12 @@ class ProfileConditionUI {
         }
     }
 
-    _onModifierInputChange({validate, normalize}, {modifiers}) {
-        modifiers = this._joinModifiers(modifiers);
+    /**
+     * @param {import('profile-conditions-ui').InputData} details
+     * @param {import('keyboard-mouse-input-field').ChangeEvent} event
+     */
+    _onModifierInputChange({validate, normalize}, event) {
+        const modifiers = this._joinModifiers(event.modifiers);
         const okay = this._validateValue(modifiers, validate);
         this._value = modifiers;
         if (okay) {
@@ -575,18 +767,25 @@ class ProfileConditionUI {
         }
     }
 
+    /** */
     _onRemoveButtonClick() {
         this._removeSelf();
     }
 
+    /**
+     * @param {import('popup-menu').MenuOpenEvent} e
+     */
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
-        const deleteGroup = bodyNode.querySelector('.popup-menu-item[data-menu-action="deleteGroup"]');
+        const deleteGroup = /** @type {HTMLElement} */ (bodyNode.querySelector('.popup-menu-item[data-menu-action="deleteGroup"]'));
         if (deleteGroup !== null) {
             deleteGroup.hidden = (this._parent.childCount <= 1);
         }
     }
 
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} e
+     */
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'delete':
@@ -601,28 +800,53 @@ class ProfileConditionUI {
         }
     }
 
+    /**
+     * @returns {import('profile-conditions-ui').DescriptorInfo[]}
+     */
     _getDescriptorTypes() {
         return this._parent.parent.getDescriptorTypes();
     }
 
+    /**
+     * @param {import('profile-conditions-ui').DescriptorType} type
+     * @returns {import('profile-conditions-ui').OperatorInfo[]}
+     */
     _getDescriptorOperators(type) {
         return this._parent.parent.getDescriptorOperators(type);
     }
 
+    /**
+     * @param {import('profile-conditions-ui').DescriptorType} type
+     * @param {string} operator
+     * @returns {import('profile-conditions-ui').Operator}
+     */
     _getOperatorDetails(type, operator) {
         return this._parent.parent.getOperatorDetails(type, operator);
     }
 
+    /**
+     * @param {import('profile-conditions-ui').DescriptorType} type
+     */
     _updateTypes(type) {
         const types = this._getDescriptorTypes();
         this._updateSelect(this._typeInput, this._typeOptionContainer, types, type);
     }
 
+    /**
+     * @param {import('profile-conditions-ui').DescriptorType} type
+     * @param {string} operator
+     */
     _updateOperators(type, operator) {
         const operators = this._getDescriptorOperators(type);
         this._updateSelect(this._operatorInput, this._operatorOptionContainer, operators, operator);
     }
 
+    /**
+     * @param {HTMLSelectElement} select
+     * @param {HTMLElement} optionContainer
+     * @param {import('profile-conditions-ui').DescriptorInfo[]|import('profile-conditions-ui').OperatorInfo[]} values
+     * @param {string} value
+     */
     _updateSelect(select, optionContainer, values, value) {
         optionContainer.textContent = '';
         for (const {name, displayName} of values) {
@@ -634,6 +858,11 @@ class ProfileConditionUI {
         select.value = value;
     }
 
+    /**
+     * @param {string} value
+     * @param {import('profile-conditions-ui').Operator} operator
+     * @returns {boolean}
+     */
     _updateValueInput(value, {type, validate, normalize}) {
         this._inputEventListeners.removeAllEventListeners();
         if (this._kbmInputField !== null) {
@@ -642,10 +871,15 @@ class ProfileConditionUI {
         }
 
         let inputType = 'text';
+        /** @type {?string} */
         let inputValue = value;
         let inputStep = null;
         let showMouseButton = false;
-        const events = [];
+        /** @type {import('event-listener-collection').AddEventListenerArgs[]} */
+        const events1 = [];
+        /** @type {import('event-listener-collection').OnArgs[]} */
+        const events2 = [];
+        /** @type {import('profile-conditions-ui').InputData} */
         const inputData = {validate, normalize};
         const node = this._valueInput;
 
@@ -653,7 +887,7 @@ class ProfileConditionUI {
             case 'integer':
                 inputType = 'number';
                 inputStep = '1';
-                events.push(['addEventListener', node, 'change', this._onValueInputChange.bind(this, inputData), false]);
+                events1.push([node, 'change', this._onValueInputChange.bind(this, inputData), false]);
                 break;
             case 'modifierKeys':
             case 'modifierInputs':
@@ -661,10 +895,10 @@ class ProfileConditionUI {
                 showMouseButton = (type === 'modifierInputs');
                 this._kbmInputField = this._parent.parent.createKeyboardMouseInputField(node, this._mouseButton);
                 this._kbmInputField.prepare(null, this._splitModifiers(value), showMouseButton, false);
-                events.push(['on', this._kbmInputField, 'change', this._onModifierInputChange.bind(this, inputData), false]);
+                events2.push([this._kbmInputField, 'change', this._onModifierInputChange.bind(this, inputData)]);
                 break;
             default: // 'string'
-                events.push(['addEventListener', node, 'change', this._onValueInputChange.bind(this, inputData), false]);
+                events1.push([node, 'change', this._onValueInputChange.bind(this, inputData), false]);
                 break;
         }
 
@@ -680,35 +914,67 @@ class ProfileConditionUI {
             node.removeAttribute('step');
         }
         this._mouseButtonContainer.hidden = !showMouseButton;
-        for (const args of events) {
-            this._inputEventListeners.addGeneric(...args);
+        for (const args of events1) {
+            this._inputEventListeners.addEventListener(...args);
+        }
+        for (const args of events2) {
+            this._inputEventListeners.on(...args);
         }
 
-        this._validateValue(value, validate);
+        return this._validateValue(value, validate);
     }
 
+    /**
+     * @param {string} value
+     * @param {?import('profile-conditions-ui').ValidateFunction} validate
+     * @returns {boolean}
+     */
     _validateValue(value, validate) {
         const okay = (validate === null || validate(value));
         this._valueInput.dataset.invalid = `${!okay}`;
         return okay;
     }
 
+    /**
+     * @param {string} value
+     * @param {?import('profile-conditions-ui').NormalizeFunction} normalize
+     * @returns {value}
+     */
     _normalizeValue(value, normalize) {
         return (normalize !== null ? normalize(value) : value);
     }
 
+    /** */
     _removeSelf() {
         this._parent.removeCondition(this);
     }
 
+    /**
+     * @param {string} modifiersString
+     * @returns {import('input').Modifier[]}
+     */
     _splitModifiers(modifiersString) {
-        return modifiersString.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0);
+        /** @type {import('input').Modifier[]} */
+        const results = [];
+        for (const item of modifiersString.split(/[,;\s]+/)) {
+            const modifier = DocumentUtil.normalizeModifier(item.trim().toLowerCase());
+            if (modifier !== null) { results.push(modifier); }
+        }
+        return results;
     }
 
+    /**
+     * @param {import('input').Modifier[]} modifiersArray
+     * @returns {string}
+     */
     _joinModifiers(modifiersArray) {
         return modifiersArray.join(', ');
     }
 
+    /**
+     * @param {import('profile-conditions-ui').DescriptorType} type
+     * @param {string} [operator]
+     */
     async _setType(type, operator) {
         const operators = this._getDescriptorOperators(type);
         if (typeof operator === 'undefined') {
@@ -725,8 +991,13 @@ class ProfileConditionUI {
         ]);
     }
 
+    /**
+     * @param {import('profile-conditions-ui').DescriptorType} type
+     * @param {string} operator
+     */
     async _setOperator(type, operator) {
         const operatorDetails = this._getOperatorDetails(type, operator);
+        /** @type {import('settings-modifications').Modification[]} */
         const settingsModifications = [{action: 'set', path: this.getPath('operator'), value: operator}];
         if (operatorDetails.resetDefaultOnChange) {
             const {defaultValue} = operatorDetails;
@@ -738,8 +1009,10 @@ class ProfileConditionUI {
         await this.settingsController.modifyGlobalSettings(settingsModifications);
     }
 
+    /** */
     async _resetValue() {
-        const type = this._typeInput.value;
+        const type = ProfileConditionsUI.normalizeProfileConditionType(this._typeInput.value);
+        if (type === null) { return; }
         const operator = this._operatorInput.value;
         await this._setType(type, operator);
     }

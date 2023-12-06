@@ -22,20 +22,37 @@ import {AudioSystem} from '../media/audio-system.js';
 import {yomitan} from '../yomitan.js';
 
 export class DisplayAudio {
+    /**
+     * @param {import('./display.js').Display} display
+     */
     constructor(display) {
+        /** @type {import('./display.js').Display} */
         this._display = display;
+        /** @type {?import('display-audio').GenericAudio} */
         this._audioPlaying = null;
+        /** @type {AudioSystem} */
         this._audioSystem = new AudioSystem();
+        /** @type {number} */
         this._playbackVolume = 1.0;
+        /** @type {boolean} */
         this._autoPlay = false;
+        /** @type {?import('core').Timeout} */
         this._autoPlayAudioTimer = null;
+        /** @type {number} */
         this._autoPlayAudioDelay = 400;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {Map<string, import('display-audio').CacheItem>} */
         this._cache = new Map();
-        this._menuContainer = document.querySelector('#popup-menus');
+        /** @type {Element} */
+        this._menuContainer = /** @type {Element} */ (document.querySelector('#popup-menus'));
+        /** @type {import('core').TokenObject} */
         this._entriesToken = {};
+        /** @type {Set<PopupMenu>} */
         this._openMenus = new Set();
+        /** @type {import('display-audio').AudioSource[]} */
         this._audioSources = [];
+        /** @type {Map<import('settings').AudioSourceType, string>} */
         this._audioSourceTypeNames = new Map([
             ['jpod101', 'JapanesePod101'],
             ['jpod101-alternate', 'JapanesePod101 (Alternate)'],
@@ -45,11 +62,15 @@ export class DisplayAudio {
             ['custom', 'Custom URL'],
             ['custom-json', 'Custom URL (JSON)']
         ]);
+        /** @type {(event: MouseEvent) => void} */
         this._onAudioPlayButtonClickBind = this._onAudioPlayButtonClick.bind(this);
+        /** @type {(event: MouseEvent) => void} */
         this._onAudioPlayButtonContextMenuBind = this._onAudioPlayButtonContextMenu.bind(this);
+        /** @type {(event: import('popup-menu').MenuCloseEvent) => void} */
         this._onAudioPlayMenuCloseClickBind = this._onAudioPlayMenuCloseClick.bind(this);
     }
 
+    /** @type {number} */
     get autoPlayAudioDelay() {
         return this._autoPlayAudioDelay;
     }
@@ -58,6 +79,7 @@ export class DisplayAudio {
         this._autoPlayAudioDelay = value;
     }
 
+    /** */
     prepare() {
         this._audioSystem.prepare();
         this._display.hotkeyHandler.registerActions([
@@ -72,21 +94,31 @@ export class DisplayAudio {
         this._display.on('contentUpdateEntry', this._onContentUpdateEntry.bind(this));
         this._display.on('contentUpdateComplete', this._onContentUpdateComplete.bind(this));
         this._display.on('frameVisibilityChange', this._onFrameVisibilityChange.bind(this));
-        this._onOptionsUpdated({options: this._display.getOptions()});
+        const options = this._display.getOptions();
+        if (options !== null) {
+            this._onOptionsUpdated({options});
+        }
     }
 
+    /** */
     clearAutoPlayTimer() {
         if (this._autoPlayAudioTimer === null) { return; }
         clearTimeout(this._autoPlayAudioTimer);
         this._autoPlayAudioTimer = null;
     }
 
+    /** */
     stopAudio() {
         if (this._audioPlaying === null) { return; }
         this._audioPlaying.pause();
         this._audioPlaying = null;
     }
 
+    /**
+     * @param {number} dictionaryEntryIndex
+     * @param {number} headwordIndex
+     * @param {?string} [sourceType]
+     */
     async playAudio(dictionaryEntryIndex, headwordIndex, sourceType=null) {
         let sources = this._audioSources;
         if (sourceType !== null) {
@@ -100,7 +132,13 @@ export class DisplayAudio {
         await this._playAudio(dictionaryEntryIndex, headwordIndex, sources, null);
     }
 
+    /**
+     * @param {string} term
+     * @param {string} reading
+     * @returns {import('display-audio').AudioMediaOptions}
+     */
     getAnkiNoteMediaAudioDetails(term, reading) {
+        /** @type {import('display-audio').AudioSourceShort[]} */
         const sources = [];
         let preferredAudioIndex = null;
         const primaryCardAudio = this._getPrimaryCardAudio(term, reading);
@@ -120,17 +158,21 @@ export class DisplayAudio {
 
     // Private
 
+    /**
+     * @param {import('display').OptionsUpdatedEvent} details
+     */
     _onOptionsUpdated({options}) {
-        if (options === null) { return; }
         const {enabled, autoPlay, volume, sources} = options.audio;
         this._autoPlay = enabled && autoPlay;
         this._playbackVolume = Number.isFinite(volume) ? Math.max(0.0, Math.min(1.0, volume / 100.0)) : 1.0;
 
+        /** @type {Set<import('settings').AudioSourceType>} */
         const requiredAudioSources = new Set([
             'jpod101',
             'jpod101-alternate',
             'jisho'
         ]);
+        /** @type {Map<string, import('display-audio').AudioSource[]>} */
         const nameMap = new Map();
         this._audioSources.length = 0;
         for (const {type, url, voice} of sources) {
@@ -147,6 +189,7 @@ export class DisplayAudio {
         this._cache.clear();
     }
 
+    /** */
     _onContentClear() {
         this._entriesToken = {};
         this._cache.clear();
@@ -154,6 +197,9 @@ export class DisplayAudio {
         this._eventListeners.removeAllEventListeners();
     }
 
+    /**
+     * @param {import('display').ContentUpdateEntryEvent} details
+     */
     _onContentUpdateEntry({element}) {
         const eventListeners = this._eventListeners;
         for (const button of element.querySelectorAll('.action-button[data-action=play-audio]')) {
@@ -163,6 +209,7 @@ export class DisplayAudio {
         }
     }
 
+    /** */
     _onContentUpdateComplete() {
         if (!this._autoPlay || !this._display.frameVisible) { return; }
 
@@ -186,6 +233,9 @@ export class DisplayAudio {
         }
     }
 
+    /**
+     * @param {import('display').FrameVisibilityChangeEvent} details
+     */
     _onFrameVisibilityChange({value}) {
         if (!value) {
             // The auto-play timer is stopped, but any audio that has already started playing
@@ -194,18 +244,31 @@ export class DisplayAudio {
         }
     }
 
+    /** */
     _onHotkeyActionPlayAudio() {
         this.playAudio(this._display.selectedIndex, 0);
     }
 
+    /**
+     * @param {unknown} source
+     */
     _onHotkeyActionPlayAudioFromSource(source) {
+        if (!(typeof source === 'string' || typeof source === 'undefined' || source === null)) { return; }
         this.playAudio(this._display.selectedIndex, 0, source);
     }
 
+    /** */
     _onMessageClearAutoPlayTimer() {
         this.clearAutoPlayTimer();
     }
 
+    /**
+     * @param {import('settings').AudioSourceType} type
+     * @param {string} url
+     * @param {string} voice
+     * @param {boolean} isInOptions
+     * @param {Map<string, import('display-audio').AudioSource[]>} nameMap
+     */
     _addAudioSourceInfo(type, url, voice, isInOptions, nameMap) {
         const index = this._audioSources.length;
         const downloadable = this._sourceIsDownloadable(type);
@@ -222,6 +285,7 @@ export class DisplayAudio {
             entries[0].nameUnique = false;
         }
 
+        /** @type {import('display-audio').AudioSource} */
         const source = {
             index,
             type,
@@ -238,32 +302,41 @@ export class DisplayAudio {
         this._audioSources.push(source);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onAudioPlayButtonClick(e) {
         e.preventDefault();
 
-        const button = e.currentTarget;
+        const button = /** @type {HTMLButtonElement} */ (e.currentTarget);
         const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
         const dictionaryEntryIndex = this._display.getElementDictionaryEntryIndex(button);
 
         if (e.shiftKey) {
-            this._showAudioMenu(e.currentTarget, dictionaryEntryIndex, headwordIndex);
+            this._showAudioMenu(button, dictionaryEntryIndex, headwordIndex);
         } else {
             this.playAudio(dictionaryEntryIndex, headwordIndex);
         }
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onAudioPlayButtonContextMenu(e) {
         e.preventDefault();
 
-        const button = e.currentTarget;
+        const button = /** @type {HTMLButtonElement} */ (e.currentTarget);
         const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
         const dictionaryEntryIndex = this._display.getElementDictionaryEntryIndex(button);
 
-        this._showAudioMenu(e.currentTarget, dictionaryEntryIndex, headwordIndex);
+        this._showAudioMenu(button, dictionaryEntryIndex, headwordIndex);
     }
 
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} e
+     */
     _onAudioPlayMenuCloseClick(e) {
-        const button = e.currentTarget;
+        const button = /** @type {Element} */ (e.currentTarget);
         const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
         const dictionaryEntryIndex = this._display.getElementDictionaryEntryIndex(button);
 
@@ -282,6 +355,12 @@ export class DisplayAudio {
         }
     }
 
+    /**
+     * @param {string} term
+     * @param {string} reading
+     * @param {boolean} create
+     * @returns {import('display-audio').CacheItem|undefined}
+     */
     _getCacheItem(term, reading, create) {
         const key = this._getTermReadingKey(term, reading);
         let cacheEntry = this._cache.get(key);
@@ -295,31 +374,41 @@ export class DisplayAudio {
         return cacheEntry;
     }
 
+    /**
+     * @param {Element} item
+     * @returns {import('display-audio').SourceInfo}
+     */
     _getMenuItemSourceInfo(item) {
-        const group = item.closest('.popup-menu-item-group');
+        const group = /** @type {?HTMLElement} */ (item.closest('.popup-menu-item-group'));
         if (group !== null) {
-            let {index, subIndex} = group.dataset;
-            index = Number.parseInt(index, 10);
-            if (index >= 0 && index < this._audioSources.length) {
-                const source = this._audioSources[index];
-                if (typeof subIndex === 'string') {
-                    subIndex = Number.parseInt(subIndex, 10);
-                } else {
-                    subIndex = null;
+            const {index, subIndex} = group.dataset;
+            if (typeof index === 'string') {
+                const indexNumber = Number.parseInt(index, 10);
+                if (indexNumber >= 0 && indexNumber < this._audioSources.length) {
+                    return {
+                        source: this._audioSources[indexNumber],
+                        subIndex: typeof subIndex === 'string' ? Number.parseInt(subIndex, 10) : null
+                    };
                 }
-                return {source, subIndex};
             }
         }
         return {source: null, subIndex: null};
     }
 
+    /**
+     * @param {number} dictionaryEntryIndex
+     * @param {number} headwordIndex
+     * @param {import('display-audio').AudioSource[]} sources
+     * @param {?number} audioInfoListIndex
+     * @returns {Promise<import('display-audio').PlayAudioResult>}
+     */
     async _playAudio(dictionaryEntryIndex, headwordIndex, sources, audioInfoListIndex) {
         this.stopAudio();
         this.clearAutoPlayTimer();
 
         const headword = this._getHeadword(dictionaryEntryIndex, headwordIndex);
         if (headword === null) {
-            return {audio: null, source: null, valid: false};
+            return {audio: null, source: null, subIndex: 0, valid: false};
         }
 
         const buttons = this._getAudioPlayButtons(dictionaryEntryIndex, headwordIndex);
@@ -377,7 +466,13 @@ export class DisplayAudio {
         }
     }
 
+    /**
+     * @param {number} dictionaryEntryIndex
+     * @param {number} headwordIndex
+     * @param {?HTMLElement} item
+     */
     async _playAudioFromSource(dictionaryEntryIndex, headwordIndex, item) {
+        if (item === null) { return; }
         const {source, subIndex} = this._getMenuItemSourceInfo(item);
         if (source === null) { return; }
 
@@ -392,7 +487,15 @@ export class DisplayAudio {
         }
     }
 
+    /**
+     * @param {number} dictionaryEntryIndex
+     * @param {number} headwordIndex
+     * @param {?HTMLElement} item
+     * @param {?PopupMenu} menu
+     * @param {boolean} canToggleOff
+     */
     _setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, menu, canToggleOff) {
+        if (item === null) { return; }
         const {source, subIndex} = this._getMenuItemSourceInfo(item);
         if (source === null || !source.downloadable) { return; }
 
@@ -402,6 +505,7 @@ export class DisplayAudio {
         const {index} = source;
         const {term, reading} = headword;
         const cacheEntry = this._getCacheItem(term, reading, true);
+        if (typeof cacheEntry === 'undefined') { return; }
 
         let {primaryCardAudio} = cacheEntry;
         primaryCardAudio = (
@@ -417,39 +521,59 @@ export class DisplayAudio {
         }
     }
 
+    /**
+     * @param {Element} button
+     * @returns {number}
+     */
     _getAudioPlayButtonHeadwordIndex(button) {
-        const headwordNode = button.closest('.headword');
+        const headwordNode = /** @type {?HTMLElement} */ (button.closest('.headword'));
         if (headwordNode !== null) {
-            const headwordIndex = parseInt(headwordNode.dataset.index, 10);
-            if (Number.isFinite(headwordIndex)) { return headwordIndex; }
+            const {index} = headwordNode.dataset;
+            if (typeof index === 'string') {
+                const headwordIndex = parseInt(index, 10);
+                if (Number.isFinite(headwordIndex)) { return headwordIndex; }
+            }
         }
         return 0;
     }
 
+    /**
+     * @param {number} dictionaryEntryIndex
+     * @param {number} headwordIndex
+     * @returns {HTMLButtonElement[]}
+     */
     _getAudioPlayButtons(dictionaryEntryIndex, headwordIndex) {
         const results = [];
         const {dictionaryEntryNodes} = this._display;
         if (dictionaryEntryIndex >= 0 && dictionaryEntryIndex < dictionaryEntryNodes.length) {
             const node = dictionaryEntryNodes[dictionaryEntryIndex];
-            const button1 = (headwordIndex === 0 ? node.querySelector('.action-button[data-action=play-audio]') : null);
-            const button2 = node.querySelector(`.headword:nth-of-type(${headwordIndex + 1}) .action-button[data-action=play-audio]`);
+            const button1 = /** @type {?HTMLButtonElement} */ ((headwordIndex === 0 ? node.querySelector('.action-button[data-action=play-audio]') : null));
+            const button2 = /** @type {?HTMLButtonElement} */ (node.querySelector(`.headword:nth-of-type(${headwordIndex + 1}) .action-button[data-action=play-audio]`));
             if (button1 !== null) { results.push(button1); }
             if (button2 !== null) { results.push(button2); }
         }
         return results;
     }
 
+    /**
+     * @param {string} term
+     * @param {string} reading
+     * @param {import('display-audio').AudioSource[]} sources
+     * @param {?number} audioInfoListIndex
+     * @returns {Promise<?import('display-audio').TermAudio>}
+     */
     async _createTermAudio(term, reading, sources, audioInfoListIndex) {
-        const {sourceMap} = this._getCacheItem(term, reading, true);
+        const cacheItem = this._getCacheItem(term, reading, true);
+        if (typeof cacheItem === 'undefined') { return null; }
+        const {sourceMap} = cacheItem;
 
         for (const source of sources) {
             const {index} = source;
 
             let cacheUpdated = false;
-            let infoListPromise;
             let sourceInfo = sourceMap.get(index);
             if (typeof sourceInfo === 'undefined') {
-                infoListPromise = this._getTermAudioInfoList(source, term, reading);
+                const infoListPromise = this._getTermAudioInfoList(source, term, reading);
                 sourceInfo = {infoListPromise, infoList: null};
                 sourceMap.set(index, sourceInfo);
                 cacheUpdated = true;
@@ -457,7 +581,7 @@ export class DisplayAudio {
 
             let {infoList} = sourceInfo;
             if (infoList === null) {
-                infoList = await infoListPromise;
+                infoList = await sourceInfo.infoListPromise;
                 sourceInfo.infoList = infoList;
             }
 
@@ -471,6 +595,12 @@ export class DisplayAudio {
         return null;
     }
 
+    /**
+     * @param {import('display-audio').AudioSource} source
+     * @param {import('display-audio').AudioInfoList} infoList
+     * @param {?number} audioInfoListIndex
+     * @returns {Promise<import('display-audio').CreateAudioResult>}
+     */
     async _createAudioFromInfoList(source, infoList, audioInfoListIndex) {
         let start = 0;
         let end = infoList.length;
@@ -479,6 +609,7 @@ export class DisplayAudio {
             end = Math.max(0, Math.min(end, audioInfoListIndex + 1));
         }
 
+        /** @type {import('display-audio').CreateAudioResult} */
         const result = {
             audio: null,
             index: -1,
@@ -518,6 +649,11 @@ export class DisplayAudio {
         return result;
     }
 
+    /**
+     * @param {import('audio-downloader').Info} info
+     * @param {import('display-audio').AudioSource} source
+     * @returns {Promise<import('display-audio').GenericAudio>}
+     */
     async _createAudioFromInfo(info, source) {
         switch (info.type) {
             case 'url':
@@ -525,16 +661,27 @@ export class DisplayAudio {
             case 'tts':
                 return this._audioSystem.createTextToSpeechAudio(info.text, info.voice);
             default:
-                throw new Error(`Unsupported type: ${info.type}`);
+                throw new Error(`Unsupported type: ${/** @type {import('core').SafeAny} */ (info).type}`);
         }
     }
 
+    /**
+     * @param {import('display-audio').AudioSource} source
+     * @param {string} term
+     * @param {string} reading
+     * @returns {Promise<import('display-audio').AudioInfoList>}
+     */
     async _getTermAudioInfoList(source, term, reading) {
         const sourceData = this._getSourceData(source);
         const infoList = await yomitan.api.getTermAudioInfoList(sourceData, term, reading);
         return infoList.map((info) => ({info, audioPromise: null, audioResolved: false, audio: null}));
     }
 
+    /**
+     * @param {number} dictionaryEntryIndex
+     * @param {number} headwordIndex
+     * @returns {?import('dictionary').TermHeadword}
+     */
     _getHeadword(dictionaryEntryIndex, headwordIndex) {
         const {dictionaryEntries} = this._display;
         if (dictionaryEntryIndex < 0 || dictionaryEntryIndex >= dictionaryEntries.length) { return null; }
@@ -548,10 +695,19 @@ export class DisplayAudio {
         return headwords[headwordIndex];
     }
 
+    /**
+     * @param {string} term
+     * @param {string} reading
+     * @returns {string}
+     */
     _getTermReadingKey(term, reading) {
         return JSON.stringify([term, reading]);
     }
 
+    /**
+     * @param {HTMLButtonElement} button
+     * @param {?number} potentialAvailableAudioCount
+     */
     _updateAudioPlayButtonBadge(button, potentialAvailableAudioCount) {
         if (potentialAvailableAudioCount === null) {
             delete button.dataset.potentialAvailableAudioCount;
@@ -559,27 +715,32 @@ export class DisplayAudio {
             button.dataset.potentialAvailableAudioCount = `${potentialAvailableAudioCount}`;
         }
 
-        const badge = button.querySelector('.action-button-badge');
+        const badge = /** @type {?HTMLElement} */ (button.querySelector('.action-button-badge'));
         if (badge === null) { return; }
 
         const badgeData = badge.dataset;
         switch (potentialAvailableAudioCount) {
             case 0:
                 badgeData.icon = 'cross';
-                badgeData.hidden = false;
+                badge.hidden = false;
                 break;
             case 1:
             case null:
                 delete badgeData.icon;
-                badgeData.hidden = true;
+                badge.hidden = true;
                 break;
             default:
                 badgeData.icon = 'plus-thick';
-                badgeData.hidden = false;
+                badge.hidden = false;
                 break;
         }
     }
 
+    /**
+     * @param {string} term
+     * @param {string} reading
+     * @returns {?number}
+     */
     _getPotentialAvailableAudioCount(term, reading) {
         const cacheEntry = this._getCacheItem(term, reading, false);
         if (typeof cacheEntry === 'undefined') { return null; }
@@ -597,6 +758,11 @@ export class DisplayAudio {
         return count;
     }
 
+    /**
+     * @param {HTMLButtonElement} button
+     * @param {number} dictionaryEntryIndex
+     * @param {number} headwordIndex
+     */
     _showAudioMenu(button, dictionaryEntryIndex, headwordIndex) {
         const headword = this._getHeadword(dictionaryEntryIndex, headwordIndex);
         if (headword === null) { return; }
@@ -608,10 +774,17 @@ export class DisplayAudio {
         popupMenu.on('close', this._onPopupMenuClose.bind(this));
     }
 
+    /**
+     * @param {import('popup-menu').MenuCloseEventDetails} details
+     */
     _onPopupMenuClose({menu}) {
         this._openMenus.delete(menu);
     }
 
+    /**
+     * @param {import('settings').AudioSourceType} source
+     * @returns {boolean}
+     */
     _sourceIsDownloadable(source) {
         switch (source) {
             case 'text-to-speech':
@@ -622,10 +795,16 @@ export class DisplayAudio {
         }
     }
 
+    /**
+     * @param {HTMLButtonElement} sourceButton
+     * @param {string} term
+     * @param {string} reading
+     * @returns {PopupMenu}
+     */
     _createMenu(sourceButton, term, reading) {
         // Create menu
-        const menuContainerNode = this._display.displayGenerator.instantiateTemplate('audio-button-popup-menu');
-        const menuBodyNode = menuContainerNode.querySelector('.popup-menu-body');
+        const menuContainerNode = /** @type {HTMLElement} */ (this._display.displayGenerator.instantiateTemplate('audio-button-popup-menu'));
+        const menuBodyNode = /** @type {HTMLElement} */ (menuContainerNode.querySelector('.popup-menu-body'));
         menuContainerNode.dataset.term = term;
         menuContainerNode.dataset.reading = reading;
 
@@ -640,6 +819,12 @@ export class DisplayAudio {
         return new PopupMenu(sourceButton, menuContainerNode);
     }
 
+    /**
+     * @param {HTMLElement} menuContainerNode
+     * @param {HTMLElement} menuItemContainer
+     * @param {string} term
+     * @param {string} reading
+     */
     _createMenuItems(menuContainerNode, menuItemContainer, term, reading) {
         const {displayGenerator} = this._display;
         let showIcons = false;
@@ -649,12 +834,10 @@ export class DisplayAudio {
             const entries = this._getMenuItemEntries(source, term, reading);
             for (let i = 0, ii = entries.length; i < ii; ++i) {
                 const {valid, index: subIndex, name: subName} = entries[i];
-                let node = this._getOrCreateMenuItem(currentItems, index, subIndex);
-                if (node === null) {
-                    node = displayGenerator.instantiateTemplate('audio-button-popup-menu-item');
-                }
+                const existingNode = this._getOrCreateMenuItem(currentItems, index, subIndex);
+                const node = existingNode !== null ? existingNode : /** @type {HTMLElement} */ (displayGenerator.instantiateTemplate('audio-button-popup-menu-item'));
 
-                const labelNode = node.querySelector('.popup-menu-item-audio-button .popup-menu-item-label');
+                const labelNode = /** @type {HTMLElement} */ (node.querySelector('.popup-menu-item-audio-button .popup-menu-item-label'));
                 let label = name;
                 if (!nameUnique) {
                     label = `${label} ${nameIndex + 1}`;
@@ -664,11 +847,11 @@ export class DisplayAudio {
                 if (typeof subName === 'string' && subName.length > 0) { label += `: ${subName}`; }
                 labelNode.textContent = label;
 
-                const cardButton = node.querySelector('.popup-menu-item-set-primary-audio-button');
+                const cardButton = /** @type {HTMLElement} */ (node.querySelector('.popup-menu-item-set-primary-audio-button'));
                 cardButton.hidden = !downloadable;
 
                 if (valid !== null) {
-                    const icon = node.querySelector('.popup-menu-item-audio-button .popup-menu-item-icon');
+                    const icon = /** @type {HTMLElement} */ (node.querySelector('.popup-menu-item-audio-button .popup-menu-item-icon'));
                     icon.dataset.icon = valid ? 'checkmark' : 'cross';
                     showIcons = true;
                 }
@@ -691,16 +874,22 @@ export class DisplayAudio {
         menuContainerNode.dataset.showIcons = `${showIcons}`;
     }
 
+    /**
+     * @param {Element[]} currentItems
+     * @param {number} index
+     * @param {?number} subIndex
+     * @returns {?HTMLElement}
+     */
     _getOrCreateMenuItem(currentItems, index, subIndex) {
-        index = `${index}`;
-        subIndex = `${subIndex !== null ? subIndex : 0}`;
+        const indexNumber = `${index}`;
+        const subIndexNumber = `${subIndex !== null ? subIndex : 0}`;
         for (let i = 0, ii = currentItems.length; i < ii; ++i) {
             const node = currentItems[i];
-            if (index !== node.dataset.index) { continue; }
+            if (!(node instanceof HTMLElement) || indexNumber !== node.dataset.index) { continue; }
 
             let subIndex2 = node.dataset.subIndex;
             if (typeof subIndex2 === 'undefined') { subIndex2 = '0'; }
-            if (subIndex !== subIndex2) { continue; }
+            if (subIndexNumber !== subIndex2) { continue; }
 
             currentItems.splice(i, 1);
             return node;
@@ -708,6 +897,12 @@ export class DisplayAudio {
         return null;
     }
 
+    /**
+     * @param {import('display-audio').AudioSource} source
+     * @param {string} term
+     * @param {string} reading
+     * @returns {import('display-audio').MenuItemEntry[]}
+     */
     _getMenuItemEntries(source, term, reading) {
         const cacheEntry = this._getCacheItem(term, reading, false);
         if (typeof cacheEntry !== 'undefined') {
@@ -721,11 +916,12 @@ export class DisplayAudio {
                         return [{valid: false, index: null, name: null}];
                     }
 
+                    /** @type {import('display-audio').MenuItemEntry[]} */
                     const results = [];
                     for (let i = 0; i < ii; ++i) {
                         const {audio, audioResolved, info: {name}} = infoList[i];
                         const valid = audioResolved ? (audio !== null) : null;
-                        const entry = {valid, index: i, name};
+                        const entry = {valid, index: i, name: typeof name === 'string' ? name : null};
                         results.push(entry);
                     }
                     return results;
@@ -735,34 +931,52 @@ export class DisplayAudio {
         return [{valid: null, index: null, name: null}];
     }
 
+    /**
+     * @param {string} term
+     * @param {string} reading
+     * @returns {?import('display-audio').PrimaryCardAudio}
+     */
     _getPrimaryCardAudio(term, reading) {
         const cacheEntry = this._getCacheItem(term, reading, false);
         return typeof cacheEntry !== 'undefined' ? cacheEntry.primaryCardAudio : null;
     }
 
+    /**
+     * @param {HTMLElement} menuBodyNode
+     * @param {string} term
+     * @param {string} reading
+     */
     _updateMenuPrimaryCardAudio(menuBodyNode, term, reading) {
         const primaryCardAudio = this._getPrimaryCardAudio(term, reading);
         const primaryCardAudioIndex = (primaryCardAudio !== null ? primaryCardAudio.index : null);
         const primaryCardAudioSubIndex = (primaryCardAudio !== null ? primaryCardAudio.subIndex : null);
-        const itemGroups = menuBodyNode.querySelectorAll('.popup-menu-item-group');
+        const itemGroups = /** @type {NodeListOf<HTMLElement>} */ (menuBodyNode.querySelectorAll('.popup-menu-item-group'));
         for (const node of itemGroups) {
-            let {index, subIndex} = node.dataset;
-            index = Number.parseInt(index, 10);
-            subIndex = typeof subIndex === 'string' ? Number.parseInt(subIndex, 10) : null;
-            const isPrimaryCardAudio = (index === primaryCardAudioIndex && subIndex === primaryCardAudioSubIndex);
+            const {index, subIndex} = node.dataset;
+            if (typeof index !== 'string') { continue; }
+            const indexNumber = Number.parseInt(index, 10);
+            const subIndexNumber = typeof subIndex === 'string' ? Number.parseInt(subIndex, 10) : null;
+            const isPrimaryCardAudio = (indexNumber === primaryCardAudioIndex && subIndexNumber === primaryCardAudioSubIndex);
             node.dataset.isPrimaryCardAudio = `${isPrimaryCardAudio}`;
         }
     }
 
+    /** */
     _updateOpenMenu() {
         for (const menu of this._openMenus) {
             const menuContainerNode = menu.containerNode;
             const {term, reading} = menuContainerNode.dataset;
-            this._createMenuItems(menuContainerNode, menu.bodyNode, term, reading);
+            if (typeof term === 'string' && typeof reading === 'string') {
+                this._createMenuItems(menuContainerNode, menu.bodyNode, term, reading);
+            }
             menu.updatePosition();
         }
     }
 
+    /**
+     * @param {import('display-audio').AudioSource} source
+     * @returns {import('display-audio').AudioSourceShort}
+     */
     _getSourceData(source) {
         const {type, url, voice} = source;
         return {type, url, voice};

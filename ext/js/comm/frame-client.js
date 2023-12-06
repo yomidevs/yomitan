@@ -20,47 +20,81 @@ import {deferPromise, generateId, isObject} from '../core.js';
 
 export class FrameClient {
     constructor() {
+        /** @type {?string} */
         this._secret = null;
+        /** @type {?string} */
         this._token = null;
+        /** @type {?number} */
         this._frameId = null;
     }
 
+    /** @type {number} */
     get frameId() {
+        if (this._frameId === null) { throw new Error('Not connected'); }
         return this._frameId;
     }
 
+    /**
+     * @param {import('extension').HtmlElementWithContentWindow} frame
+     * @param {string} targetOrigin
+     * @param {number} hostFrameId
+     * @param {import('frame-client').SetupFrameFunction} setupFrame
+     * @param {number} [timeout]
+     */
     async connect(frame, targetOrigin, hostFrameId, setupFrame, timeout=10000) {
-        const {secret, token, frameId} = await this._connectIternal(frame, targetOrigin, hostFrameId, setupFrame, timeout);
+        const {secret, token, frameId} = await this._connectInternal(frame, targetOrigin, hostFrameId, setupFrame, timeout);
         this._secret = secret;
         this._token = token;
         this._frameId = frameId;
     }
 
+    /**
+     * @returns {boolean}
+     */
     isConnected() {
         return (this._secret !== null);
     }
 
+    /**
+     * @template T
+     * @param {T} data
+     * @returns {import('frame-client').Message<T>}
+     * @throws {Error}
+     */
     createMessage(data) {
         if (!this.isConnected()) {
             throw new Error('Not connected');
         }
         return {
-            token: this._token,
-            secret: this._secret,
+            token: /** @type {string} */ (this._token),
+            secret: /** @type {string} */ (this._secret),
             data
         };
     }
 
-    _connectIternal(frame, targetOrigin, hostFrameId, setupFrame, timeout) {
+    /**
+     * @param {import('extension').HtmlElementWithContentWindow} frame
+     * @param {string} targetOrigin
+     * @param {number} hostFrameId
+     * @param {(frame: import('extension').HtmlElementWithContentWindow) => void} setupFrame
+     * @param {number} timeout
+     * @returns {Promise<{secret: string, token: string, frameId: number}>}
+     */
+    _connectInternal(frame, targetOrigin, hostFrameId, setupFrame, timeout) {
         return new Promise((resolve, reject) => {
             const tokenMap = new Map();
+            /** @type {?import('core').Timeout} */
             let timer = null;
-            let {
-                promise: frameLoadedPromise,
-                resolve: frameLoadedResolve,
-                reject: frameLoadedReject
-            } = deferPromise();
+            const deferPromiseDetails = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
+            const frameLoadedPromise = deferPromiseDetails.promise;
+            let frameLoadedResolve = /** @type {?() => void} */ (deferPromiseDetails.resolve);
+            let frameLoadedReject = /** @type {?(reason?: import('core').RejectionReason) => void} */ (deferPromiseDetails.reject);
 
+            /**
+             * @param {string} action
+             * @param {import('core').SerializableObject} params
+             * @throws {Error}
+             */
             const postMessage = (action, params) => {
                 const contentWindow = frame.contentWindow;
                 if (contentWindow === null) { throw new Error('Frame missing content window'); }
@@ -76,11 +110,15 @@ export class FrameClient {
                 contentWindow.postMessage({action, params}, targetOrigin);
             };
 
+            /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('extension').ChromeRuntimeMessageWithFrameId>} */
             const onMessage = (message) => {
                 onMessageInner(message);
                 return false;
             };
 
+            /**
+             * @param {import('extension').ChromeRuntimeMessageWithFrameId} message
+             */
             const onMessageInner = async (message) => {
                 try {
                     if (!isObject(message)) { return; }
@@ -92,7 +130,7 @@ export class FrameClient {
                     switch (action) {
                         case 'frameEndpointReady':
                             {
-                                const {secret} = params;
+                                const {secret} = /** @type {import('frame-client').FrameEndpointReadyDetails} */ (params);
                                 const token = generateId(16);
                                 tokenMap.set(secret, token);
                                 postMessage('frameEndpointConnect', {secret, token, hostFrameId});
@@ -100,10 +138,10 @@ export class FrameClient {
                             break;
                         case 'frameEndpointConnected':
                             {
-                                const {secret, token} = params;
+                                const {secret, token} = /** @type {import('frame-client').FrameEndpointConnectedDetails} */ (params);
                                 const frameId = message.frameId;
                                 const token2 = tokenMap.get(secret);
-                                if (typeof token2 !== 'undefined' && token === token2) {
+                                if (typeof token2 !== 'undefined' && token === token2 && typeof frameId === 'number') {
                                     cleanup();
                                     resolve({secret, token, frameId});
                                 }
@@ -168,6 +206,10 @@ export class FrameClient {
         });
     }
 
+    /**
+     * @param {import('extension').HtmlElementWithContentWindow} frame
+     * @returns {boolean}
+     */
     static isFrameAboutBlank(frame) {
         try {
             const contentDocument = frame.contentDocument;

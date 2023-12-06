@@ -18,6 +18,7 @@
 
 
 /**
+ * @template K,V
  * Class which caches a map of values, keeping the most recently accessed values.
  */
 export class CacheMap {
@@ -35,9 +36,13 @@ export class CacheMap {
             throw new Error('Invalid maxCount');
         }
 
+        /** @type {number} */
         this._maxSize = maxSize;
+        /** @type {Map<K, import('cache-map').Node<K, V>>} */
         this._map = new Map();
+        /** @type {import('cache-map').Node<K, V>} */
         this._listFirst = this._createNode(null, null);
+        /** @type {import('cache-map').Node<K, V>} */
         this._listLast = this._createNode(null, null);
         this._resetEndNodes();
     }
@@ -60,7 +65,7 @@ export class CacheMap {
 
     /**
      * Returns whether or not an element exists at the given key.
-     * @param {*} key The key of the element.
+     * @param {K} key The key of the element.
      * @returns {boolean} `true` if an element with the specified key exists, `false` otherwise.
      */
     has(key) {
@@ -69,20 +74,20 @@ export class CacheMap {
 
     /**
      * Gets an element at the given key, if it exists. Otherwise, returns undefined.
-     * @param {*} key The key of the element.
-     * @returns {*} The existing value at the key, if any; `undefined` otherwise.
+     * @param {K} key The key of the element.
+     * @returns {V|undefined} The existing value at the key, if any; `undefined` otherwise.
      */
     get(key) {
         const node = this._map.get(key);
         if (typeof node === 'undefined') { return void 0; }
         this._updateRecency(node);
-        return node.value;
+        return /** @type {V} */ (node.value);
     }
 
     /**
      * Sets a value at a given key.
-     * @param {*} key The key of the element.
-     * @param {*} value The value to store in the cache.
+     * @param {K} key The key of the element.
+     * @param {V} value The value to store in the cache.
      */
     set(key, value) {
         let node = this._map.get(key);
@@ -98,9 +103,9 @@ export class CacheMap {
 
             // Remove
             for (let removeCount = this._map.size - this._maxSize; removeCount > 0; --removeCount) {
-                node = this._listLast.previous;
+                node = /** @type {import('cache-map').Node<K, V>} */ (this._listLast.previous);
                 this._removeNode(node);
-                this._map.delete(node.key);
+                this._map.delete(/** @type {K} */ (node.key));
             }
         }
     }
@@ -115,28 +120,46 @@ export class CacheMap {
 
     // Private
 
+    /**
+     * @param {import('cache-map').Node<K, V>} node
+     */
     _updateRecency(node) {
         this._removeNode(node);
         this._addNode(node, this._listFirst);
     }
 
+    /**
+     * @param {?K} key
+     * @param {?V} value
+     * @returns {import('cache-map').Node<K, V>}
+     */
     _createNode(key, value) {
         return {key, value, previous: null, next: null};
     }
 
+    /**
+     * @param {import('cache-map').Node<K, V>} node
+     * @param {import('cache-map').Node<K, V>} previous
+     */
     _addNode(node, previous) {
         const next = previous.next;
         node.next = next;
         node.previous = previous;
         previous.next = node;
-        next.previous = node;
+        /** @type {import('cache-map').Node<K, V>} */ (next).previous = node;
     }
 
+    /**
+     * @param {import('cache-map').Node<K, V>} node
+     */
     _removeNode(node) {
-        node.next.previous = node.previous;
-        node.previous.next = node.next;
+        /** @type {import('cache-map').Node<K, V>} */ (node.next).previous = node.previous;
+        /** @type {import('cache-map').Node<K, V>} */ (node.previous).next = node.next;
     }
 
+    /**
+     * @returns {void}
+     */
     _resetEndNodes() {
         this._listFirst.next = this._listLast;
         this._listLast.previous = this._listFirst;

@@ -18,6 +18,7 @@
 
 import {FrameClient} from '../comm/frame-client.js';
 import {DynamicProperty, EventDispatcher, EventListenerCollection, deepEqual} from '../core.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {dynamicLoader} from '../script/dynamic-loader.js';
 import {yomitan} from '../yomitan.js';
@@ -25,53 +26,12 @@ import {ThemeController} from './theme-controller.js';
 
 /**
  * This class is the container which hosts the display of search results.
+ * @augments EventDispatcher<import('popup').PopupAnyEventType>
  */
 export class Popup extends EventDispatcher {
     /**
-     * Information about how popup content should be shown, specifically related to the outer popup frame.
-     * @typedef {object} ContentDetails
-     * @property {?object} optionsContext The options context for the content to show.
-     * @property {Rect[]} sourceRects The rectangles of the source content.
-     * @property {'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | 'sideways-lr'} writingMode The normalized CSS writing-mode value of the source content.
-     */
-
-    /**
-     * A rectangle representing a DOM region, similar to DOMRect.
-     * @typedef {object} Rect
-     * @property {number} left The left position of the rectangle.
-     * @property {number} top The top position of the rectangle.
-     * @property {number} right The right position of the rectangle.
-     * @property {number} bottom The bottom position of the rectangle.
-     */
-
-    /**
-     * A rectangle representing a DOM region, similar to DOMRect but with a `valid` property.
-     * @typedef {object} ValidRect
-     * @property {number} left The left position of the rectangle.
-     * @property {number} top The top position of the rectangle.
-     * @property {number} right The right position of the rectangle.
-     * @property {number} bottom The bottom position of the rectangle.
-     * @property {boolean} valid Whether or not the rectangle is valid.
-     */
-
-    /**
-     * A rectangle representing a DOM region for placing the popup frame.
-     * @typedef {object} SizeRect
-     * @property {number} left The left position of the rectangle.
-     * @property {number} top The top position of the rectangle.
-     * @property {number} width The width of the rectangle.
-     * @property {number} height The height of the rectangle.
-     * @property {boolean} after Whether or not the rectangle is positioned to the right of the source rectangle.
-     * @property {boolean} below Whether or not the rectangle is positioned below the source rectangle.
-     */
-
-    /**
      * Creates a new instance.
-     * @param {object} details The details used to construct the new instance.
-     * @param {string} details.id The ID of the popup.
-     * @param {number} details.depth The depth of the popup.
-     * @param {number} details.frameId The ID of the host frame.
-     * @param {boolean} details.childrenSupported Whether or not the popup is able to show child popups.
+     * @param {import('popup').PopupConstructorDetails} details The details used to construct the new instance.
      */
     constructor({
         id,
@@ -80,48 +40,83 @@ export class Popup extends EventDispatcher {
         childrenSupported
     }) {
         super();
+        /** @type {string} */
         this._id = id;
+        /** @type {number} */
         this._depth = depth;
+        /** @type {number} */
         this._frameId = frameId;
+        /** @type {boolean} */
         this._childrenSupported = childrenSupported;
+        /** @type {?Popup} */
         this._parent = null;
+        /** @type {?Popup} */
         this._child = null;
+        /** @type {?Promise<boolean>} */
         this._injectPromise = null;
+        /** @type {boolean} */
         this._injectPromiseComplete = false;
+        /** @type {DynamicProperty<boolean>} */
         this._visible = new DynamicProperty(false);
+        /** @type {boolean} */
         this._visibleValue = false;
+        /** @type {?import('settings').OptionsContext} */
         this._optionsContext = null;
+        /** @type {number} */
         this._contentScale = 1.0;
+        /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
-        this._optionsAssigned = false;
+        /** @type {number} */
         this._initialWidth = 400;
+        /** @type {number} */
         this._initialHeight = 250;
+        /** @type {number} */
         this._horizontalOffset = 0;
+        /** @type {number} */
         this._verticalOffset = 10;
+        /** @type {number} */
         this._horizontalOffset2 = 10;
+        /** @type {number} */
         this._verticalOffset2 = 0;
+        /** @type {import('settings').PopupVerticalTextPosition} */
         this._verticalTextPosition = 'before';
+        /** @type {boolean} */
         this._horizontalTextPositionBelow = true;
+        /** @type {import('settings').PopupDisplayMode} */
         this._displayMode = 'default';
+        /** @type {boolean} */
         this._displayModeIsFullWidth = false;
+        /** @type {boolean} */
         this._scaleRelativeToVisualViewport = true;
+        /** @type {boolean} */
         this._useSecureFrameUrl = true;
+        /** @type {boolean} */
         this._useShadowDom = true;
+        /** @type {string} */
         this._customOuterCss = '';
 
+        /** @type {?number} */
         this._frameSizeContentScale = null;
+        /** @type {?FrameClient} */
         this._frameClient = null;
+        /** @type {HTMLIFrameElement} */
         this._frame = document.createElement('iframe');
         this._frame.className = 'yomitan-popup';
         this._frame.style.width = '0';
         this._frame.style.height = '0';
+        /** @type {boolean} */
+        this._frameConnected = false;
 
+        /** @type {HTMLElement} */
         this._container = this._frame;
+        /** @type {?ShadowRoot} */
         this._shadow = null;
 
+        /** @type {ThemeController} */
         this._themeController = new ThemeController(this._frame);
 
+        /** @type {EventListenerCollection} */
         this._fullscreenEventListeners = new EventListenerCollection();
     }
 
@@ -135,7 +130,7 @@ export class Popup extends EventDispatcher {
 
     /**
      * The parent of the popup.
-     * @type {Popup}
+     * @type {?Popup}
      */
     get parent() {
         return this._parent;
@@ -151,7 +146,7 @@ export class Popup extends EventDispatcher {
 
     /**
      * The child of the popup.
-     * @type {Popup}
+     * @type {?Popup}
      */
     get child() {
         return this._child;
@@ -167,7 +162,7 @@ export class Popup extends EventDispatcher {
 
     /**
      * The depth of the popup.
-     * @type {numer}
+     * @type {number}
      */
     get depth() {
         return this._depth;
@@ -215,11 +210,13 @@ export class Popup extends EventDispatcher {
 
     /**
      * Sets the options context for the popup.
-     * @param {object} optionsContext The options context object.
+     * @param {import('settings').OptionsContext} optionsContext The options context object.
      */
     async setOptionsContext(optionsContext) {
         await this._setOptionsContext(optionsContext);
-        await this._invokeSafe('Display.setOptionsContext', {optionsContext});
+        if (this._frameConnected) {
+            await this._invokeSafe('Display.setOptionsContext', {optionsContext});
+        }
     }
 
     /**
@@ -252,7 +249,7 @@ export class Popup extends EventDispatcher {
      * Force assigns the visibility of the popup.
      * @param {boolean} value Whether or not the popup should be visible.
      * @param {number} priority The priority of the override.
-     * @returns {Promise<string?>} A token used which can be passed to `clearVisibleOverride`,
+     * @returns {Promise<?import('core').TokenString>} A token used which can be passed to `clearVisibleOverride`,
      *   or null if the override wasn't assigned.
      */
     async setVisibleOverride(value, priority) {
@@ -261,7 +258,7 @@ export class Popup extends EventDispatcher {
 
     /**
      * Clears a visibility override that was generated by `setVisibleOverride`.
-     * @param {string} token The token returned from `setVisibleOverride`.
+     * @param {import('core').TokenString} token The token returned from `setVisibleOverride`.
      * @returns {Promise<boolean>} `true` if the override existed and was removed, `false` otherwise.
      */
     async clearVisibleOverride(token) {
@@ -275,7 +272,8 @@ export class Popup extends EventDispatcher {
      * @returns {Promise<boolean>} `true` if the point is contained within the popup's rect, `false` otherwise.
      */
     async containsPoint(x, y) {
-        for (let popup = this; popup !== null && popup.isVisibleSync(); popup = popup.child) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        for (let popup = /** @type {?Popup} */ (this); popup !== null && popup.isVisibleSync(); popup = popup.child) {
             const rect = popup.getFrameRect();
             if (rect.valid && x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
                 return true;
@@ -286,12 +284,12 @@ export class Popup extends EventDispatcher {
 
     /**
      * Shows and updates the positioning and content of the popup.
-     * @param {ContentDetails} details Settings for the outer popup.
-     * @param {Display.ContentDetails} displayDetails The details parameter passed to `Display.setContent`.
+     * @param {import('popup').ContentDetails} details Settings for the outer popup.
+     * @param {?import('display').ContentDetails} displayDetails The details parameter passed to `Display.setContent`.
      * @returns {Promise<void>}
      */
     async showContent(details, displayDetails) {
-        if (!this._optionsAssigned) { throw new Error('Options not assigned'); }
+        if (this._optionsContext === null) { throw new Error('Options not assigned'); }
 
         const {optionsContext, sourceRects, writingMode} = details;
         if (optionsContext !== null) {
@@ -309,25 +307,27 @@ export class Popup extends EventDispatcher {
      * Sets the custom styles for the popup content.
      * @param {string} css The CSS rules.
      */
-    setCustomCss(css) {
-        this._invokeSafe('Display.setCustomCss', {css});
+    async setCustomCss(css) {
+        await this._invokeSafe('Display.setCustomCss', {css});
     }
 
     /**
      * Stops the audio auto-play timer, if one has started.
      */
-    clearAutoPlayTimer() {
-        this._invokeSafe('Display.clearAutoPlayTimer');
+    async clearAutoPlayTimer() {
+        if (this._frameConnected) {
+            await this._invokeSafe('Display.clearAutoPlayTimer', {});
+        }
     }
 
     /**
      * Sets the scaling factor of the popup content.
      * @param {number} scale The scaling factor.
      */
-    setContentScale(scale) {
+    async setContentScale(scale) {
         this._contentScale = scale;
         this._frame.style.fontSize = `${scale}px`;
-        this._invokeSafe('Display.setContentScale', {scale});
+        await this._invokeSafe('Display.setContentScale', {scale});
     }
 
     /**
@@ -360,12 +360,14 @@ export class Popup extends EventDispatcher {
             parentNode = this._shadow;
         }
         const node = await dynamicLoader.loadStyle('yomitan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
-        this.trigger('customOuterCssChanged', {node, useWebExtensionApi, inShadow});
+        /** @type {import('popup').CustomOuterCssChangedEvent} */
+        const event = {node, useWebExtensionApi, inShadow};
+        this.trigger('customOuterCssChanged', event);
     }
 
     /**
      * Gets the rectangle of the DOM frame, synchronously.
-     * @returns {ValidRect} The rect.
+     * @returns {import('popup').ValidRect} The rect.
      *   `valid` is `false` for `PopupProxy`, since the DOM node is hosted in a different frame.
      */
     getFrameRect() {
@@ -375,7 +377,7 @@ export class Popup extends EventDispatcher {
 
     /**
      * Gets the size of the DOM frame.
-     * @returns {Promise<{width: number, height: number, valid: boolean}>} The size and whether or not it is valid.
+     * @returns {Promise<import('popup').ValidSize>} The size and whether or not it is valid.
      */
     async getFrameSize() {
         const {width, height} = this._getFrameBoundingClientRect();
@@ -395,14 +397,23 @@ export class Popup extends EventDispatcher {
 
     // Private functions
 
+    /**
+     * @returns {void}
+     */
     _onFrameMouseOver() {
         this.trigger('framePointerOver', {});
     }
 
+    /**
+     * @returns {void}
+     */
     _onFrameMouseOut() {
         this.trigger('framePointerOut', {});
     }
 
+    /**
+     * @returns {Promise<boolean>}
+     */
     _inject() {
         let injectPromise = this._injectPromise;
         if (injectPromise === null) {
@@ -419,19 +430,25 @@ export class Popup extends EventDispatcher {
         return injectPromise;
     }
 
+    /**
+     * @returns {Promise<boolean>}
+     */
     async _injectInner1() {
         try {
             await this._injectInner2();
             return true;
         } catch (e) {
             this._resetFrame();
-            if (e.source === this) { return false; } // Passive error
+            if (e instanceof PopupError && e.source === this) { return false; } // Passive error
             throw e;
         }
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _injectInner2() {
-        if (!this._optionsAssigned) {
+        if (this._optionsContext === null) {
             throw new Error('Options not initialized');
         }
 
@@ -439,6 +456,7 @@ export class Popup extends EventDispatcher {
 
         await this._setUpContainer(this._useShadowDom);
 
+        /** @type {import('frame-client').SetupFrameFunction} */
         const setupFrame = (frame) => {
             frame.removeAttribute('src');
             frame.removeAttribute('srcdoc');
@@ -447,9 +465,8 @@ export class Popup extends EventDispatcher {
             const {contentDocument} = frame;
             if (contentDocument === null) {
                 // This can occur when running inside a sandboxed frame without "allow-same-origin"
-                const error = new Error('Popup not supoprted in this context');
-                error.source = this; // Used to detect a passive error which should be ignored
-                throw error;
+                // Custom error is used to detect a passive error which should be ignored
+                throw new PopupError('Popup not supported in this context', this);
             }
             const url = chrome.runtime.getURL('/popup.html');
             if (useSecurePopupFrameUrl) {
@@ -462,23 +479,32 @@ export class Popup extends EventDispatcher {
         const frameClient = new FrameClient();
         this._frameClient = frameClient;
         await frameClient.connect(this._frame, this._targetOrigin, this._frameId, setupFrame);
+        this._frameConnected = true;
 
         // Configure
-        await this._invokeSafe('Display.configure', {
+        /** @type {import('display').ConfigureMessageDetails} */
+        const configureParams = {
             depth: this._depth,
             parentPopupId: this._id,
             parentFrameId: this._frameId,
             childrenSupported: this._childrenSupported,
             scale: this._contentScale,
             optionsContext: this._optionsContext
-        });
+        };
+        await this._invokeSafe('Display.configure', configureParams);
     }
 
+    /**
+     * @returns {void}
+     */
     _onFrameLoad() {
         if (!this._injectPromiseComplete) { return; }
         this._resetFrame();
     }
 
+    /**
+     * @returns {void}
+     */
     _resetFrame() {
         const parent = this._container.parentNode;
         if (parent !== null) {
@@ -488,10 +514,14 @@ export class Popup extends EventDispatcher {
         this._frame.removeAttribute('srcdoc');
 
         this._frameClient = null;
+        this._frameConnected = false;
         this._injectPromise = null;
         this._injectPromiseComplete = false;
     }
 
+    /**
+     * @param {boolean} usePopupShadowDom
+     */
     async _setUpContainer(usePopupShadowDom) {
         if (usePopupShadowDom && typeof this._frame.attachShadow === 'function') {
             const container = document.createElement('div');
@@ -514,6 +544,9 @@ export class Popup extends EventDispatcher {
         await this._injectStyles();
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _injectStyles() {
         try {
             await this._injectPopupOuterStylesheet();
@@ -528,7 +561,11 @@ export class Popup extends EventDispatcher {
         }
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _injectPopupOuterStylesheet() {
+        /** @type {'code'|'file'|'file-content'} */
         let fileType = 'file';
         let useWebExtensionApi = true;
         let parentNode = null;
@@ -540,6 +577,9 @@ export class Popup extends EventDispatcher {
         await dynamicLoader.loadStyle('yomitan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
     }
 
+    /**
+     * @param {boolean} observe
+     */
     _observeFullscreen(observe) {
         if (!observe) {
             this._fullscreenEventListeners.removeAllEventListeners();
@@ -554,6 +594,9 @@ export class Popup extends EventDispatcher {
         DocumentUtil.addFullscreenChangeEventListener(this._onFullscreenChanged.bind(this), this._fullscreenEventListeners);
     }
 
+    /**
+     * @returns {void}
+     */
     _onFullscreenChanged() {
         const parent = this._getFrameParentElement();
         if (parent !== null && this._container.parentNode !== parent) {
@@ -561,6 +604,10 @@ export class Popup extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {import('popup').Rect[]} sourceRects
+     * @param {import('document-util').NormalizedWritingMode} writingMode
+     */
     async _show(sourceRects, writingMode) {
         const injected = await this._inject();
         if (!injected) { return; }
@@ -588,16 +635,26 @@ export class Popup extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {number} width
+     * @param {number} height
+     */
     _setFrameSize(width, height) {
         const {style} = this._frame;
         style.width = `${width}px`;
         style.height = `${height}px`;
     }
 
+    /**
+     * @param {boolean} visible
+     */
     _setVisible(visible) {
         this._visible.defaultValue = visible;
     }
 
+    /**
+     * @param {import('dynamic-property').ChangeEventDetails<boolean>} event
+     */
     _onVisibleChange({value}) {
         if (this._visibleValue === value) { return; }
         this._visibleValue = value;
@@ -605,6 +662,9 @@ export class Popup extends EventDispatcher {
         this._invokeSafe('Display.visibilityChanged', {value});
     }
 
+    /**
+     * @returns {void}
+     */
     _focusParent() {
         if (this._parent !== null) {
             // Chrome doesn't like focusing iframe without contentWindow.
@@ -621,23 +681,43 @@ export class Popup extends EventDispatcher {
         }
     }
 
-    async _invoke(action, params={}) {
+    /**
+     * @template {import('core').SerializableObject} TParams
+     * @template [TReturn=unknown]
+     * @param {string} action
+     * @param {TParams} params
+     * @returns {Promise<TReturn>}
+     */
+    async _invoke(action, params) {
         const contentWindow = this._frame.contentWindow;
-        if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
+        if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) {
+            throw new Error(`Failed to invoke action ${action}: frame state invalid`);
+        }
 
         const message = this._frameClient.createMessage({action, params});
         return await yomitan.crossFrame.invoke(this._frameClient.frameId, 'popupMessage', message);
     }
 
-    async _invokeSafe(action, params={}, defaultReturnValue) {
+    /**
+     * @template {import('core').SerializableObject} TParams
+     * @template [TReturn=unknown]
+     * @param {string} action
+     * @param {TParams} params
+     * @returns {Promise<TReturn|undefined>}
+     */
+    async _invokeSafe(action, params) {
         try {
             return await this._invoke(action, params);
         } catch (e) {
             if (!yomitan.isExtensionUnloaded) { throw e; }
-            return defaultReturnValue;
+            return void 0;
         }
     }
 
+    /**
+     * @param {string} action
+     * @param {import('core').SerializableObject} params
+     */
     _invokeWindow(action, params={}) {
         const contentWindow = this._frame.contentWindow;
         if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
@@ -646,10 +726,16 @@ export class Popup extends EventDispatcher {
         contentWindow.postMessage(message, this._targetOrigin);
     }
 
+    /**
+     * @returns {void}
+     */
     _onExtensionUnloaded() {
         this._invokeWindow('Display.extensionUnloaded');
     }
 
+    /**
+     * @returns {Element}
+     */
     _getFrameParentElement() {
         let defaultParent = document.body;
         if (defaultParent !== null && defaultParent.tagName.toLowerCase() === 'frameset') {
@@ -659,7 +745,8 @@ export class Popup extends EventDispatcher {
         if (
             fullscreenElement === null ||
             fullscreenElement.shadowRoot ||
-            fullscreenElement.openOrClosedShadowRoot // Available to Firefox 63+ for WebExtensions
+            // @ts-expect-error - openOrClosedShadowRoot is available to Firefox 63+ for WebExtensions
+            fullscreenElement.openOrClosedShadowRoot
         ) {
             return defaultParent;
         }
@@ -675,10 +762,10 @@ export class Popup extends EventDispatcher {
 
     /**
      * Computes the position where the popup should be placed relative to the source content.
-     * @param {Rect[]} sourceRects The rectangles of the source content.
-     * @param {string} writingMode The CSS writing mode of the source text.
-     * @param {Rect} viewport The viewport that the popup can be placed within.
-     * @returns {SizeRect} The calculated rectangle for where to position the popup.
+     * @param {import('popup').Rect[]} sourceRects The rectangles of the source content.
+     * @param {import('document-util').NormalizedWritingMode} writingMode The CSS writing mode of the source text.
+     * @param {import('popup').Rect} viewport The viewport that the popup can be placed within.
+     * @returns {import('popup').SizeRect} The calculated rectangle for where to position the popup.
      */
     _getPosition(sourceRects, writingMode, viewport) {
         sourceRects = this._convertSourceRectsCoordinateSpace(sourceRects);
@@ -705,6 +792,7 @@ export class Popup extends EventDispatcher {
         horizontalOffset *= contentScale;
         verticalOffset *= contentScale;
 
+        /** @type {?import('popup').SizeRect} */
         let best = null;
         const sourceRectsLength = sourceRects.length;
         for (let i = 0, ii = (sourceRectsLength > 1 ? sourceRectsLength : 0); i <= ii; ++i) {
@@ -720,19 +808,20 @@ export class Popup extends EventDispatcher {
                 if (result.height >= frameHeight) { break; }
             }
         }
-        return best;
+        // Given the loop conditions, this is guaranteed to be non-null
+        return /** @type {import('popup').SizeRect} */ (best);
     }
 
     /**
      * Computes the position where the popup should be placed for horizontal text.
-     * @param {Rect} sourceRect The rectangle of the source content.
+     * @param {import('popup').Rect} sourceRect The rectangle of the source content.
      * @param {number} frameWidth The preferred width of the frame.
      * @param {number} frameHeight The preferred height of the frame.
-     * @param {Rect} viewport The viewport that the frame can be placed within.
+     * @param {import('popup').Rect} viewport The viewport that the frame can be placed within.
      * @param {number} horizontalOffset The horizontal offset from the source rect that the popup will be placed.
      * @param {number} verticalOffset The vertical offset from the source rect that the popup will be placed.
      * @param {boolean} preferBelow Whether or not the popup is preferred to be placed below the source content.
-     * @returns {SizeRect} The calculated rectangle for where to position the popup.
+     * @returns {import('popup').SizeRect} The calculated rectangle for where to position the popup.
      */
     _getPositionForHorizontalText(sourceRect, frameWidth, frameHeight, viewport, horizontalOffset, verticalOffset, preferBelow) {
         const [left, width, after] = this._getConstrainedPosition(
@@ -756,14 +845,14 @@ export class Popup extends EventDispatcher {
 
     /**
      * Computes the position where the popup should be placed for vertical text.
-     * @param {Rect} sourceRect The rectangle of the source content.
+     * @param {import('popup').Rect} sourceRect The rectangle of the source content.
      * @param {number} frameWidth The preferred width of the frame.
      * @param {number} frameHeight The preferred height of the frame.
-     * @param {Rect} viewport The viewport that the frame can be placed within.
+     * @param {import('popup').Rect} viewport The viewport that the frame can be placed within.
      * @param {number} horizontalOffset The horizontal offset from the source rect that the popup will be placed.
      * @param {number} verticalOffset The vertical offset from the source rect that the popup will be placed.
      * @param {boolean} preferRight Whether or not the popup is preferred to be placed to the right of the source content.
-     * @returns {SizeRect} The calculated rectangle for where to position the popup.
+     * @returns {import('popup').SizeRect} The calculated rectangle for where to position the popup.
      */
     _getPositionForVerticalText(sourceRect, frameWidth, frameHeight, viewport, horizontalOffset, verticalOffset, preferRight) {
         const [left, width, after] = this._getConstrainedPositionBinary(
@@ -785,6 +874,11 @@ export class Popup extends EventDispatcher {
         return {left, top, width, height, after, below};
     }
 
+    /**
+     * @param {import('settings').PopupVerticalTextPosition} positionPreference
+     * @param {import('document-util').NormalizedWritingMode} writingMode
+     * @returns {boolean}
+     */
     _isVerticalTextPopupOnRight(positionPreference, writingMode) {
         switch (positionPreference) {
             case 'before':
@@ -799,6 +893,10 @@ export class Popup extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {import('document-util').NormalizedWritingMode} writingMode
+     * @returns {boolean}
+     */
     _isWritingModeLeftToRight(writingMode) {
         switch (writingMode) {
             case 'vertical-lr':
@@ -809,6 +907,15 @@ export class Popup extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {number} positionBefore
+     * @param {number} positionAfter
+     * @param {number} size
+     * @param {number} minLimit
+     * @param {number} maxLimit
+     * @param {boolean} after
+     * @returns {[position: number, size: number, after: boolean]}
+     */
     _getConstrainedPosition(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
         size = Math.min(size, maxLimit - minLimit);
 
@@ -824,6 +931,15 @@ export class Popup extends EventDispatcher {
         return [position, size, after];
     }
 
+    /**
+     * @param {number} positionBefore
+     * @param {number} positionAfter
+     * @param {number} size
+     * @param {number} minLimit
+     * @param {number} maxLimit
+     * @param {boolean} after
+     * @returns {[position: number, size: number, after: boolean]}
+     */
     _getConstrainedPositionBinary(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
         const overflowBefore = minLimit - (positionBefore - size);
         const overflowAfter = (positionAfter + size) - maxLimit;
@@ -847,11 +963,11 @@ export class Popup extends EventDispatcher {
     /**
      * Gets the visual viewport.
      * @param {boolean} useVisualViewport Whether or not the `window.visualViewport` should be used.
-     * @returns {Rect} The rectangle of the visual viewport.
+     * @returns {import('popup').Rect} The rectangle of the visual viewport.
      */
     _getViewport(useVisualViewport) {
-        const visualViewport = window.visualViewport;
-        if (visualViewport !== null && typeof visualViewport === 'object') {
+        const {visualViewport} = window;
+        if (typeof visualViewport !== 'undefined' && visualViewport !== null) {
             const left = visualViewport.offsetLeft;
             const top = visualViewport.offsetTop;
             const width = visualViewport.width;
@@ -882,6 +998,9 @@ export class Popup extends EventDispatcher {
         };
     }
 
+    /**
+     * @param {import('settings').OptionsContext} optionsContext
+     */
     async _setOptionsContext(optionsContext) {
         this._optionsContext = optionsContext;
         const options = await yomitan.api.optionsGet(optionsContext);
@@ -902,10 +1021,12 @@ export class Popup extends EventDispatcher {
         this._useSecureFrameUrl = general.useSecurePopupFrameUrl;
         this._useShadowDom = general.usePopupShadowDom;
         this._customOuterCss = general.customPopupOuterCss;
-        this._optionsAssigned = true;
         this.updateTheme();
     }
 
+    /**
+     * @param {import('settings').OptionsContext} optionsContext
+     */
     async _setOptionsContextIfDifferent(optionsContext) {
         if (deepEqual(this._optionsContext, optionsContext)) { return; }
         await this._setOptionsContext(optionsContext);
@@ -913,8 +1034,8 @@ export class Popup extends EventDispatcher {
 
     /**
      * Computes the bounding rectangle for a set of rectangles.
-     * @param {Rect[]} sourceRects An array of rectangles.
-     * @returns {Rect} The bounding rectangle for all of the source rectangles.
+     * @param {import('popup').Rect[]} sourceRects An array of rectangles.
+     * @returns {import('popup').Rect} The bounding rectangle for all of the source rectangles.
      */
     _getBoundingSourceRect(sourceRects) {
         switch (sourceRects.length) {
@@ -934,8 +1055,8 @@ export class Popup extends EventDispatcher {
 
     /**
      * Checks whether or not a rectangle is overlapping any other rectangles.
-     * @param {SizeRect} sizeRect The rectangles to check for overlaps.
-     * @param {Rect[]} sourceRects The list of rectangles to compare against.
+     * @param {import('popup').SizeRect} sizeRect The rectangles to check for overlaps.
+     * @param {import('popup').Rect[]} sourceRects The list of rectangles to compare against.
      * @param {number} ignoreIndex The index of an item in `sourceRects` to ignore.
      * @returns {boolean} `true` if `sizeRect` overlaps any one of `sourceRects`, excluding `sourceRects[ignoreIndex]`; `false` otherwise.
      */
@@ -968,8 +1089,8 @@ export class Popup extends EventDispatcher {
 
     /**
      * Converts the coordinate space of source rectangles.
-     * @param {Rect[]} sourceRects The list of rectangles to convert.
-     * @returns {Rect[]} Either an updated list of rectangles, or `sourceRects` if no change is required.
+     * @param {import('popup').Rect[]} sourceRects The list of rectangles to convert.
+     * @returns {import('popup').Rect[]} Either an updated list of rectangles, or `sourceRects` if no change is required.
      */
     _convertSourceRectsCoordinateSpace(sourceRects) {
         let scale = DocumentUtil.computeZoomScale(this._container);
@@ -984,9 +1105,9 @@ export class Popup extends EventDispatcher {
 
     /**
      * Creates a scaled rectangle.
-     * @param {Rect} rect The rectangle to scale.
+     * @param {import('popup').Rect} rect The rectangle to scale.
      * @param {number} scale The scale factor.
-     * @returns {Rect} A new rectangle which has been scaled.
+     * @returns {import('popup').Rect} A new rectangle which has been scaled.
      */
     _createScaledRect(rect, scale) {
         return {
@@ -996,4 +1117,19 @@ export class Popup extends EventDispatcher {
             bottom: rect.bottom * scale
         };
     }
+}
+
+class PopupError extends ExtensionError {
+    /**
+     * @param {string} message
+     * @param {Popup} source
+     */
+    constructor(message, source) {
+        super(message);
+        /** @type {Popup} */
+        this._source = source;
+    }
+
+    /** @type {Popup} */
+    get source() { return this._source; }
 }

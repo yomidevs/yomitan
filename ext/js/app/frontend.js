@@ -17,15 +17,12 @@
  */
 
 import {GoogleDocsUtil} from '../accessibility/google-docs-util.js';
-import {EventListenerCollection, invokeMessageHandler, isObject, log, promiseAnimationFrame} from '../core.js';
+import {EventListenerCollection, invokeMessageHandler, log, promiseAnimationFrame} from '../core.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
-import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {TextScanner} from '../language/text-scanner.js';
 import {yomitan} from '../yomitan.js';
-import {PopupFactory} from './popup-factory.js';
-import {Popup} from './popup.js';
 
 /**
  * This is the main class responsible for scanning and handling webpage content.
@@ -33,19 +30,7 @@ import {Popup} from './popup.js';
 export class Frontend {
     /**
      * Creates a new instance.
-     * @param {object} details Details about how to set up the instance.
-     * @param {string} details.pageType The type of page, one of 'web', 'popup', or 'search'.
-     * @param {PopupFactory} details.popupFactory A PopupFactory instance to use for generating popups.
-     * @param {number} details.depth The nesting depth value of the popup.
-     * @param {number} details.tabId The tab ID of the host tab.
-     * @param {number} details.frameId The frame ID of the host frame.
-     * @param {?string} details.parentPopupId The popup ID of the parent popup if one exists, otherwise null.
-     * @param {?number} details.parentFrameId The frame ID of the parent popup if one exists, otherwise null.
-     * @param {boolean} details.useProxyPopup Whether or not proxy popups should be used.
-     * @param {boolean} details.canUseWindowPopup Whether or not window popups can be used.
-     * @param {boolean} details.allowRootFramePopupProxy Whether or not popups can be hosted in the root frame.
-     * @param {boolean} details.childrenSupported Whether popups can create child popups or not.
-     * @param {HotkeyHandler} details.hotkeyHandler A HotkeyHandler instance.
+     * @param {import('frontend').ConstructorDetails} details Details about how to set up the instance.
      */
     constructor({
         pageType,
@@ -61,24 +46,43 @@ export class Frontend {
         childrenSupported=true,
         hotkeyHandler
     }) {
+        /** @type {import('frontend').PageType} */
         this._pageType = pageType;
+        /** @type {import('./popup-factory.js').PopupFactory} */
         this._popupFactory = popupFactory;
+        /** @type {number} */
         this._depth = depth;
+        /** @type {number|undefined} */
         this._tabId = tabId;
+        /** @type {number} */
         this._frameId = frameId;
+        /** @type {?string} */
         this._parentPopupId = parentPopupId;
+        /** @type {?number} */
         this._parentFrameId = parentFrameId;
+        /** @type {boolean} */
         this._useProxyPopup = useProxyPopup;
+        /** @type {boolean} */
         this._canUseWindowPopup = canUseWindowPopup;
+        /** @type {boolean} */
         this._allowRootFramePopupProxy = allowRootFramePopupProxy;
+        /** @type {boolean} */
         this._childrenSupported = childrenSupported;
+        /** @type {import('../input/hotkey-handler.js').HotkeyHandler} */
         this._hotkeyHandler = hotkeyHandler;
+        /** @type {?import('popup').PopupAny} */
         this._popup = null;
+        /** @type {boolean} */
         this._disabledOverride = false;
+        /** @type {?import('settings').ProfileOptions} */
         this._options = null;
+        /** @type {number} */
         this._pageZoomFactor = 1.0;
+        /** @type {number} */
         this._contentScale = 1.0;
+        /** @type {Promise<void>} */
         this._lastShowPromise = Promise.resolve();
+        /** @type {TextScanner} */
         this._textScanner = new TextScanner({
             node: window,
             ignoreElements: this._ignoreElements.bind(this),
@@ -87,19 +91,27 @@ export class Frontend {
             searchTerms: true,
             searchKanji: true
         });
+        /** @type {boolean} */
         this._textScannerHasBeenEnabled = false;
+        /** @type {Map<'default'|'window'|'iframe'|'proxy', Promise<?import('popup').PopupAny>>} */
         this._popupCache = new Map();
+        /** @type {EventListenerCollection} */
         this._popupEventListeners = new EventListenerCollection();
+        /** @type {?import('core').TokenObject} */
         this._updatePopupToken = null;
+        /** @type {?import('core').Timeout} */
         this._clearSelectionTimer = null;
+        /** @type {boolean} */
         this._isPointerOverPopup = false;
+        /** @type {?import('settings').OptionsContext} */
         this._optionsContextOverride = null;
 
-        this._runtimeMessageHandlers = new Map([
+        /** @type {import('core').MessageHandlerMap} */
+        this._runtimeMessageHandlers = new Map(/** @type {import('core').MessageHandlerArray} */ ([
             ['Frontend.requestReadyBroadcast',   {async: false, handler: this._onMessageRequestFrontendReadyBroadcast.bind(this)}],
             ['Frontend.setAllVisibleOverride',   {async: true,  handler: this._onApiSetAllVisibleOverride.bind(this)}],
             ['Frontend.clearAllVisibleOverride', {async: true,  handler: this._onApiClearAllVisibleOverride.bind(this)}]
-        ]);
+        ]));
 
         this._hotkeyHandler.registerActions([
             ['scanSelectedText', this._onActionScanSelectedText.bind(this)],
@@ -125,7 +137,7 @@ export class Frontend {
 
     /**
      * Gets the popup instance.
-     * @type {Popup}
+     * @type {?import('popup').PopupAny}
      */
     get popup() {
         return this._popup;
@@ -148,8 +160,8 @@ export class Frontend {
         window.addEventListener('resize', this._onResize.bind(this), false);
         DocumentUtil.addFullscreenChangeEventListener(this._updatePopup.bind(this));
 
-        const visualViewport = window.visualViewport;
-        if (visualViewport !== null && typeof visualViewport === 'object') {
+        const {visualViewport} = window;
+        if (typeof visualViewport !== 'undefined' && visualViewport !== null) {
             visualViewport.addEventListener('scroll', this._onVisualViewportScroll.bind(this));
             visualViewport.addEventListener('resize', this._onVisualViewportResize.bind(this));
         }
@@ -172,7 +184,7 @@ export class Frontend {
 
         this._prepareSiteSpecific();
         this._updateContentScale();
-        this._signalFrontendReady();
+        this._signalFrontendReady(null);
     }
 
     /**
@@ -186,7 +198,7 @@ export class Frontend {
 
     /**
      * Set or clear an override options context object.
-     * @param {?object} optionsContext An options context object to use as the override, or `null` to clear the override.
+     * @param {?import('settings').OptionsContext} optionsContext An options context object to use as the override, or `null` to clear the override.
      */
     setOptionsContextOverride(optionsContext) {
         this._optionsContextOverride = optionsContext;
@@ -194,7 +206,7 @@ export class Frontend {
 
     /**
      * Performs a new search on a specific source.
-     * @param {TextSourceRange|TextSourceElement} textSource The text source to search.
+     * @param {import('text-source').TextSource} textSource The text source to search.
      */
     async setTextSource(textSource) {
         this._textScanner.setCurrentTextSource(null);
@@ -216,7 +228,7 @@ export class Frontend {
 
     /**
      * Waits for the previous `showContent` call to be completed.
-     * @returns {Promise} A promise which is resolved when the previous `showContent` call has completed.
+     * @returns {Promise<void>} A promise which is resolved when the previous `showContent` call has completed.
      */
     showContentCompleted() {
         return this._lastShowPromise;
@@ -224,45 +236,73 @@ export class Frontend {
 
     // Message handlers
 
+    /**
+     * @param {import('frontend').FrontendRequestReadyBroadcastParams} params
+     */
     _onMessageRequestFrontendReadyBroadcast({frameId}) {
         this._signalFrontendReady(frameId);
     }
 
     // Action handlers
 
+    /**
+     * @returns {void}
+     */
     _onActionScanSelectedText() {
         this._scanSelectedText(false);
     }
 
+    /**
+     * @returns {void}
+     */
     _onActionScanTextAtCaret() {
         this._scanSelectedText(true);
     }
 
     // API message handlers
 
+    /**
+     * @returns {string}
+     */
     _onApiGetUrl() {
         return window.location.href;
     }
 
+    /**
+     * @returns {void}
+     */
     _onApiClosePopup() {
         this._clearSelection(false);
     }
 
+    /**
+     * @returns {void}
+     */
     _onApiCopySelection() {
         // This will not work on Firefox if a popup has focus, which is usually the case when this function is called.
         document.execCommand('copy');
     }
 
+    /**
+     * @returns {string}
+     */
     _onApiGetSelectionText() {
-        return document.getSelection().toString();
+        const selection = document.getSelection();
+        return selection !== null ? selection.toString() : '';
     }
 
+    /**
+     * @returns {import('frontend').GetPopupInfoResult}
+     */
     _onApiGetPopupInfo() {
         return {
             popupId: (this._popup !== null ? this._popup.id : null)
         };
     }
 
+    /**
+     * @returns {{url: string, documentTitle: string}}
+     */
     _onApiGetPageInfo() {
         return {
             url: window.location.href,
@@ -270,6 +310,10 @@ export class Frontend {
         };
     }
 
+    /**
+     * @param {{value: boolean, priority: number, awaitFrame: boolean}} params
+     * @returns {Promise<import('core').TokenString>}
+     */
     async _onApiSetAllVisibleOverride({value, priority, awaitFrame}) {
         const result = await this._popupFactory.setAllVisibleOverride(value, priority);
         if (awaitFrame) {
@@ -278,45 +322,71 @@ export class Frontend {
         return result;
     }
 
+    /**
+     * @param {{token: import('core').TokenString}} params
+     * @returns {Promise<boolean>}
+     */
     async _onApiClearAllVisibleOverride({token}) {
         return await this._popupFactory.clearAllVisibleOverride(token);
     }
 
     // Private
 
+    /**
+     * @returns {void}
+     */
     _onResize() {
         this._updatePopupPosition();
     }
 
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
     _onRuntimeMessage({action, params}, sender, callback) {
         const messageHandler = this._runtimeMessageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return false; }
         return invokeMessageHandler(messageHandler, params, callback, sender);
     }
 
+    /**
+     * @param {{newZoomFactor: number}} params
+     */
     _onZoomChanged({newZoomFactor}) {
         this._pageZoomFactor = newZoomFactor;
         this._updateContentScale();
     }
 
+    /**
+     * @returns {void}
+     */
     _onClosePopups() {
         this._clearSelection(true);
     }
 
+    /**
+     * @returns {void}
+     */
     _onVisualViewportScroll() {
         this._updatePopupPosition();
     }
 
+    /**
+     * @returns {void}
+     */
     _onVisualViewportResize() {
         this._updateContentScale();
     }
 
+    /**
+     * @returns {void}
+     */
     _onTextScannerClear() {
         this._clearSelection(false);
     }
 
-    _onSearched({type, dictionaryEntries, sentence, inputInfo: {eventType, passive, detail}, textSource, optionsContext, detail: {documentTitle}, error}) {
-        const scanningOptions = this._options.scanning;
+    /**
+     * @param {import('text-scanner').SearchedEventDetails} details
+     */
+    _onSearched({type, dictionaryEntries, sentence, inputInfo: {eventType, passive, detail: inputInfoDetail}, textSource, optionsContext, detail, error}) {
+        const scanningOptions = /** @type {import('settings').ProfileOptions} */ (this._options).scanning;
 
         if (error !== null) {
             if (yomitan.isExtensionUnloaded) {
@@ -326,34 +396,43 @@ export class Frontend {
             } else {
                 log.error(error);
             }
-        } if (type !== null) {
+        } if (type !== null && optionsContext !== null) {
             this._stopClearSelectionDelayed();
             let focus = (eventType === 'mouseMove');
-            if (isObject(detail)) {
-                const focus2 = detail.focus;
+            if (typeof inputInfoDetail === 'object' && inputInfoDetail !== null) {
+                const focus2 = inputInfoDetail.focus;
                 if (typeof focus2 === 'boolean') { focus = focus2; }
             }
-            this._showContent(textSource, focus, dictionaryEntries, type, sentence, documentTitle, optionsContext);
+            this._showContent(textSource, focus, dictionaryEntries, type, sentence, detail !== null ? detail.documentTitle : null, optionsContext);
         } else {
             if (scanningOptions.autoHideResults) {
-                this._clearSelectionDelayed(scanningOptions.hideDelay, false);
+                this._clearSelectionDelayed(scanningOptions.hideDelay, false, false);
             }
         }
     }
 
+    /**
+     * @returns {void}
+     */
     _onPopupFramePointerOver() {
         this._isPointerOverPopup = true;
         this._stopClearSelectionDelayed();
     }
 
+    /**
+     * @returns {void}
+     */
     _onPopupFramePointerOut() {
         this._isPointerOverPopup = false;
-        const scanningOptions = this._options.scanning;
+        const scanningOptions = /** @type {import('settings').ProfileOptions} */ (this._options).scanning;
         if (scanningOptions.hidePopupOnCursorExit) {
-            this._clearSelectionDelayed(scanningOptions.hidePopupOnCursorExitDelay, false);
+            this._clearSelectionDelayed(scanningOptions.hidePopupOnCursorExitDelay, false, false);
         }
     }
 
+    /**
+     * @param {boolean} passive
+     */
     _clearSelection(passive) {
         this._stopClearSelectionDelayed();
         if (this._popup !== null) {
@@ -364,6 +443,11 @@ export class Frontend {
         this._textScanner.clearSelection();
     }
 
+    /**
+     * @param {number} delay
+     * @param {boolean} restart
+     * @param {boolean} passive
+     */
     _clearSelectionDelayed(delay, restart, passive) {
         if (!this._textScanner.hasSelection()) { return; }
         if (delay > 0) {
@@ -379,6 +463,9 @@ export class Frontend {
         }
     }
 
+    /**
+     * @returns {void}
+     */
     _stopClearSelectionDelayed() {
         if (this._clearSelectionTimer !== null) {
             clearTimeout(this._clearSelectionTimer);
@@ -386,6 +473,9 @@ export class Frontend {
         }
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _updateOptionsInternal() {
         const optionsContext = await this._getOptionsContext();
         const options = await yomitan.api.optionsGet(optionsContext);
@@ -426,12 +516,16 @@ export class Frontend {
         await this._textScanner.searchLast();
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _updatePopup() {
-        const {usePopupWindow, showIframePopupsInRootFrame} = this._options.general;
+        const {usePopupWindow, showIframePopupsInRootFrame} = /** @type {import('settings').ProfileOptions} */ (this._options).general;
         const isIframe = !this._useProxyPopup && (window !== window.parent);
 
         const currentPopup = this._popup;
 
+        /** @type {Promise<?import('popup').PopupAny>|undefined} */
         let popupPromise;
         if (usePopupWindow && this._canUseWindowPopup) {
             popupPromise = this._popupCache.get('window');
@@ -466,6 +560,7 @@ export class Frontend {
 
         // The token below is used as a unique identifier to ensure that a new _updatePopup call
         // hasn't been started during the await.
+        /** @type {?import('core').TokenObject} */
         const token = {};
         this._updatePopupToken = token;
         const popup = await popupPromise;
@@ -489,6 +584,9 @@ export class Frontend {
         this._isPointerOverPopup = false;
     }
 
+    /**
+     * @returns {Promise<?import('popup').PopupAny>}
+     */
     async _getDefaultPopup() {
         const isXmlDocument = (typeof XMLDocument !== 'undefined' && document instanceof XMLDocument);
         if (isXmlDocument) {
@@ -502,6 +600,9 @@ export class Frontend {
         });
     }
 
+    /**
+     * @returns {Promise<import('popup').PopupAny>}
+     */
     async _getProxyPopup() {
         return await this._popupFactory.getOrCreatePopup({
             frameId: this._parentFrameId,
@@ -511,6 +612,9 @@ export class Frontend {
         });
     }
 
+    /**
+     * @returns {Promise<?import('popup').PopupAny>}
+     */
     async _getIframeProxyPopup() {
         const targetFrameId = 0; // Root frameId
         try {
@@ -520,7 +624,8 @@ export class Frontend {
             return await this._getDefaultPopup();
         }
 
-        const {popupId} = await yomitan.crossFrame.invoke(targetFrameId, 'Frontend.getPopupInfo');
+        /** @type {import('frontend').GetPopupInfoResult} */
+        const {popupId} = await yomitan.crossFrame.invoke(targetFrameId, 'Frontend.getPopupInfo', {});
         if (popupId === null) {
             return null;
         }
@@ -537,6 +642,9 @@ export class Frontend {
         return popup;
     }
 
+    /**
+     * @returns {Promise<import('popup').PopupAny>}
+     */
     async _getPopupWindow() {
         return await this._popupFactory.getOrCreatePopup({
             depth: this._depth,
@@ -545,6 +653,9 @@ export class Frontend {
         });
     }
 
+    /**
+     * @returns {Element[]}
+     */
     _ignoreElements() {
         if (this._popup !== null) {
             const container = this._popup.container;
@@ -555,6 +666,11 @@ export class Frontend {
         return [];
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {Promise<boolean>}
+     */
     async _ignorePoint(x, y) {
         try {
             return this._popup !== null && await this._popup.containsPoint(x, y);
@@ -566,17 +682,44 @@ export class Frontend {
         }
     }
 
+    /**
+     * @param {import('text-source').TextSource} textSource
+     */
     _showExtensionUnloaded(textSource) {
-        if (textSource === null) {
-            textSource = this._textScanner.getCurrentTextSource();
-            if (textSource === null) { return; }
-        }
         this._showPopupContent(textSource, null, null);
     }
 
+    /**
+     * @param {import('text-source').TextSource} textSource
+     * @param {boolean} focus
+     * @param {?import('dictionary').DictionaryEntry[]} dictionaryEntries
+     * @param {import('display').PageType} type
+     * @param {?import('display').HistoryStateSentence} sentence
+     * @param {?string} documentTitle
+     * @param {import('settings').OptionsContext} optionsContext
+     */
     _showContent(textSource, focus, dictionaryEntries, type, sentence, documentTitle, optionsContext) {
         const query = textSource.text();
         const {url} = optionsContext;
+        /** @type {import('display').HistoryState} */
+        const detailsState = {
+            focusEntry: 0,
+            optionsContext,
+            url
+        };
+        if (sentence !== null) { detailsState.sentence = sentence; }
+        if (documentTitle !== null) { detailsState.documentTitle = documentTitle; }
+        /** @type {import('display').HistoryContent} */
+        const detailsContent = {
+            contentOrigin: {
+                tabId: this._tabId,
+                frameId: this._frameId
+            }
+        };
+        if (dictionaryEntries !== null) {
+            detailsContent.dictionaryEntries = dictionaryEntries;
+        }
+        /** @type {import('display').ContentDetails} */
         const details = {
             focus,
             historyMode: 'clear',
@@ -585,28 +728,22 @@ export class Frontend {
                 query,
                 wildcards: 'off'
             },
-            state: {
-                focusEntry: 0,
-                optionsContext,
-                url,
-                sentence,
-                documentTitle
-            },
-            content: {
-                dictionaryEntries,
-                contentOrigin: {
-                    tabId: this._tabId,
-                    frameId: this._frameId
-                }
-            }
+            state: detailsState,
+            content: detailsContent
         };
-        if (textSource.type === 'element' && textSource.fullContent !== query) {
+        if (textSource instanceof TextSourceElement && textSource.fullContent !== query) {
             details.params.full = textSource.fullContent;
             details.params['full-visible'] = 'true';
         }
         this._showPopupContent(textSource, optionsContext, details);
     }
 
+    /**
+     * @param {import('text-source').TextSource} textSource
+     * @param {?import('settings').OptionsContext} optionsContext
+     * @param {?import('display').ContentDetails} details
+     * @returns {Promise<void>}
+     */
     _showPopupContent(textSource, optionsContext, details) {
         const sourceRects = [];
         for (const {left, top, right, bottom} of textSource.getRects()) {
@@ -631,6 +768,9 @@ export class Frontend {
         return this._lastShowPromise;
     }
 
+    /**
+     * @returns {void}
+     */
     _updateTextScannerEnabled() {
         const enabled = (this._options !== null && this._options.general.enable && !this._disabledOverride);
         if (enabled === this._textScanner.isEnabled()) { return; }
@@ -643,15 +783,18 @@ export class Frontend {
         }
     }
 
+    /**
+     * @returns {void}
+     */
     _updateContentScale() {
-        const {popupScalingFactor, popupScaleRelativeToPageZoom, popupScaleRelativeToVisualViewport} = this._options.general;
+        const {popupScalingFactor, popupScaleRelativeToPageZoom, popupScaleRelativeToVisualViewport} = /** @type {import('settings').ProfileOptions} */ (this._options).general;
         let contentScale = popupScalingFactor;
         if (popupScaleRelativeToPageZoom) {
             contentScale /= this._pageZoomFactor;
         }
         if (popupScaleRelativeToVisualViewport) {
-            const visualViewport = window.visualViewport;
-            const visualViewportScale = (visualViewport !== null && typeof visualViewport === 'object' ? visualViewport.scale : 1.0);
+            const {visualViewport} = window;
+            const visualViewportScale = (typeof visualViewport !== 'undefined' && visualViewport !== null ? visualViewport.scale : 1.0);
             contentScale /= visualViewportScale;
         }
         if (contentScale === this._contentScale) { return; }
@@ -663,6 +806,9 @@ export class Frontend {
         this._updatePopupPosition();
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _updatePopupPosition() {
         const textSource = this._textScanner.getCurrentTextSource();
         if (
@@ -674,7 +820,11 @@ export class Frontend {
         }
     }
 
-    _signalFrontendReady(targetFrameId=null) {
+    /**
+     * @param {?number} targetFrameId
+     */
+    _signalFrontendReady(targetFrameId) {
+        /** @type {import('frontend').FrontendReadyDetails} */
         const params = {frameId: this._frameId};
         if (targetFrameId === null) {
             yomitan.api.broadcastTab('frontendReady', params);
@@ -683,8 +833,14 @@ export class Frontend {
         }
     }
 
+    /**
+     * @param {number} frameId
+     * @param {?number} timeout
+     * @returns {Promise<void>}
+     */
     async _waitForFrontendReady(frameId, timeout) {
         return new Promise((resolve, reject) => {
+            /** @type {?import('core').Timeout} */
             let timeoutId = null;
 
             const cleanup = () => {
@@ -694,10 +850,11 @@ export class Frontend {
                 }
                 chrome.runtime.onMessage.removeListener(onMessage);
             };
-            const onMessage = (message, sender, sendResponse) => {
+            /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
+            const onMessage = (message, _sender, sendResponse) => {
                 try {
                     const {action, params} = message;
-                    if (action === 'frontendReady' && params.frameId === frameId) {
+                    if (action === 'frontendReady' && /** @type {import('frontend').FrontendReadyDetails} */ (params).frameId === frameId) {
                         cleanup();
                         resolve();
                         sendResponse();
@@ -720,6 +877,10 @@ export class Frontend {
         });
     }
 
+    /**
+     * @param {import('settings').PreventMiddleMouseOptions} preventMiddleMouseOptions
+     * @returns {boolean}
+     */
     _getPreventMiddleMouseValueForPageType(preventMiddleMouseOptions) {
         switch (this._pageType) {
             case 'web': return preventMiddleMouseOptions.onWebPages;
@@ -729,6 +890,9 @@ export class Frontend {
         }
     }
 
+    /**
+     * @returns {Promise<import('settings').OptionsContext>}
+     */
     async _getOptionsContext() {
         let optionsContext = this._optionsContextOverride;
         if (optionsContext === null) {
@@ -737,10 +901,13 @@ export class Frontend {
         return optionsContext;
     }
 
+    /**
+     * @returns {Promise<{optionsContext: import('settings').OptionsContext, detail?: import('text-scanner').SearchResultDetail}>}
+     */
     async _getSearchContext() {
         let url = window.location.href;
         let documentTitle = document.title;
-        if (this._useProxyPopup) {
+        if (this._useProxyPopup && this._parentFrameId !== null) {
             try {
                 ({url, documentTitle} = await yomitan.crossFrame.invoke(this._parentFrameId, 'Frontend.getPageInfo', {}));
             } catch (e) {
@@ -759,6 +926,10 @@ export class Frontend {
         };
     }
 
+    /**
+     * @param {boolean} allowEmptyRange
+     * @returns {Promise<boolean>}
+     */
     async _scanSelectedText(allowEmptyRange) {
         const range = this._getFirstSelectionRange(allowEmptyRange);
         if (range === null) { return false; }
@@ -767,8 +938,13 @@ export class Frontend {
         return true;
     }
 
+    /**
+     * @param {boolean} allowEmptyRange
+     * @returns {?Range}
+     */
     _getFirstSelectionRange(allowEmptyRange) {
         const selection = window.getSelection();
+        if (selection === null) { return null; }
         for (let i = 0, ii = selection.rangeCount; i < ii; ++i) {
             const range = selection.getRangeAt(i);
             if (range.toString().length > 0 || allowEmptyRange) {
@@ -778,6 +954,9 @@ export class Frontend {
         return null;
     }
 
+    /**
+     * @returns {void}
+     */
     _prepareSiteSpecific() {
         switch (location.hostname.toLowerCase()) {
             case 'docs.google.com':
@@ -786,11 +965,21 @@ export class Frontend {
         }
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _prepareGoogleDocs() {
         if (typeof GoogleDocsUtil !== 'undefined') { return; }
         await yomitan.api.loadExtensionScripts([
             '/js/accessibility/google-docs-util.js'
         ]);
+        this._prepareGoogleDocs2();
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _prepareGoogleDocs2() {
         if (typeof GoogleDocsUtil === 'undefined') { return; }
         DocumentUtil.registerGetRangeFromPointHandler(GoogleDocsUtil.getRangeFromPoint.bind(GoogleDocsUtil));
     }

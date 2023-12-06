@@ -17,8 +17,13 @@
  */
 
 export class Timer {
+    /**
+     * @param {string} name
+     */
     constructor(name) {
+        /** @type {{name: string, time: number, children: Timer[]}[]} */
         this.samples = [];
+        /** @type {?Timer} */
         this.parent = null;
 
         this.sample(name);
@@ -30,6 +35,9 @@ export class Timer {
         Timer.current = this;
     }
 
+    /**
+     * @param {string} name
+     */
     sample(name) {
         const time = performance.now();
         this.samples.push({
@@ -39,6 +47,9 @@ export class Timer {
         });
     }
 
+    /**
+     * @param {boolean} skip
+     */
     complete(skip) {
         this.sample('complete');
 
@@ -55,13 +66,20 @@ export class Timer {
         }
     }
 
+    /**
+     * @param {number} sampleIndex
+     * @returns {number}
+     */
     duration(sampleIndex) {
         const sampleIndexIsValid = (typeof sampleIndex === 'number');
         const startIndex = (sampleIndexIsValid ? sampleIndex : 0);
-        const endIndex = (sampleIndexIsValid ? sampleIndex + 1 : this.times.length - 1);
-        return (this.times[endIndex].time - this.times[startIndex].time);
+        const endIndex = (sampleIndexIsValid ? sampleIndex + 1 : this.samples.length - 1);
+        return (this.samples[endIndex].time - this.samples[startIndex].time);
     }
 
+    /**
+     * @returns {string}
+     */
     toString() {
         const indent = '  ';
         const name = this.samples[0].name;
@@ -70,6 +88,9 @@ export class Timer {
         return `${name} took ${duration.toFixed(8)}ms  [${extensionName}]` + this._indentString(this.getSampleString(), indent);
     }
 
+    /**
+     * @returns {string}
+     */
     getSampleString() {
         const indent = '  ';
         const duration = this.samples[this.samples.length - 1].time - this.samples[0].time;
@@ -87,9 +108,15 @@ export class Timer {
         return message;
     }
 
+    /**
+     * @param {string} message
+     * @param {string} indent
+     * @returns {string}
+     */
     _indentString(message, indent) {
         return message.replace(/\n/g, `\n${indent}`);
     }
 }
 
+/** @type {?Timer} */
 Timer.current = null;

@@ -22,19 +22,25 @@
 export class HotkeyUtil {
     /**
      * Creates a new instance.
-     * @param {?string} os The operating system for this instance.
+     * @param {?import('environment').OperatingSystem} os The operating system for this instance.
      */
     constructor(os=null) {
+        /** @type {?import('environment').OperatingSystem} */
         this._os = os;
+        /** @type {string} */
         this._inputSeparator = ' + ';
+        /** @type {Map<import('input').Modifier, string>} */
         this._modifierKeyNames = new Map();
+        /** @type {RegExp} */
         this._mouseInputNamePattern = /^mouse(\d+)$/;
+        /** @type {Map<import('input').Modifier, number>} */
         this._modifierPriorities = new Map([
             ['meta', -4],
             ['ctrl', -3],
             ['alt', -2],
             ['shift', -1]
         ]);
+        /** @type {Intl.Collator} */
         this._stringComparer = new Intl.Collator('en-US'); // Invariant locale
 
         this._updateModifierKeyNames();
@@ -43,7 +49,7 @@ export class HotkeyUtil {
     /**
      * Gets the operating system for this instance.
      * The operating system is used to display system-localized modifier key names.
-     * @type {?string}
+     * @type {?import('environment').OperatingSystem}
      */
     get os() {
         return this._os;
@@ -51,7 +57,7 @@ export class HotkeyUtil {
 
     /**
      * Sets the operating system for this instance.
-     * @param {?string} value The value to assign.
+     * @param {?import('environment').OperatingSystem} value The value to assign.
      *   Valid values are: win, mac, linux, openbsd, cros, android.
      */
     set os(value) {
@@ -63,7 +69,7 @@ export class HotkeyUtil {
     /**
      * Gets a display string for a key and a set of modifiers.
      * @param {?string} key The key code string, or `null` for no key.
-     * @param {string[]} modifiers An array of modifiers.
+     * @param {import('input').Modifier[]} modifiers An array of modifiers.
      *   Valid values are: ctrl, alt, shift, meta, or mouseN, where N is an integer.
      * @returns {string} A user-friendly string for the combination of key and modifiers.
      */
@@ -88,7 +94,7 @@ export class HotkeyUtil {
 
     /**
      * Gets a display string for a single modifier.
-     * @param {string} modifier A string representing a modifier.
+     * @param {import('input').Modifier} modifier A string representing a modifier.
      *   Valid values are: ctrl, alt, shift, meta, or mouseN, where N is an integer.
      * @returns {string} A user-friendly string for the modifier.
      */
@@ -116,9 +122,9 @@ export class HotkeyUtil {
 
     /**
      * Gets a display string for a single modifier.
-     * @param {string} modifier A string representing a modifier.
+     * @param {import('input').Modifier} modifier A string representing a modifier.
      *   Valid values are: ctrl, alt, shift, meta, or mouseN, where N is an integer.
-     * @returns {'mouse'|'key'} `'mouse'` if the modifier represents a mouse button, `'key'` otherwise.
+     * @returns {import('input').ModifierType} `'mouse'` if the modifier represents a mouse button, `'key'` otherwise.
      */
     getModifierType(modifier) {
         return (this._mouseInputNamePattern.test(modifier) ? 'mouse' : 'key');
@@ -126,18 +132,22 @@ export class HotkeyUtil {
 
     /**
      * Converts an extension command string into a standard input.
-     * @param {string} command An extension command string.
-     * @returns {{key: ?string, modifiers: string[]}} An object `{key, modifiers}`, where key is a string (or `null`) representing the key, and modifiers is an array of modifier keys.
+     * @param {string|undefined} command An extension command string.
+     * @returns {{key: ?string, modifiers: import('input').ModifierKey[]}} An object `{key, modifiers}`, where key is a string (or `null`) representing the key, and modifiers is an array of modifier keys.
      */
     convertCommandToInput(command) {
         let key = null;
+        /** @type {Set<import('input').ModifierKey>} */
         const modifiers = new Set();
         if (typeof command === 'string' && command.length > 0) {
             const parts = command.split('+');
             const ii = parts.length - 1;
             key = this._convertCommandKeyToInputKey(parts[ii]);
             for (let i = 0; i < ii; ++i) {
-                modifiers.add(this._convertCommandModifierToInputModifier(parts[i]));
+                const modifier = this._convertCommandModifierToInputModifier(parts[i]);
+                if (modifier !== null) {
+                    modifiers.add(modifier);
+                }
             }
         }
         return {key, modifiers: this.sortModifiers([...modifiers])};
@@ -146,7 +156,7 @@ export class HotkeyUtil {
     /**
      * Gets a command string for a specified input.
      * @param {?string} key The key code string, or `null` for no key.
-     * @param {string[]} modifiers An array of modifier keys.
+     * @param {import('input').Modifier[]} modifiers An array of modifier keys.
      *   Valid values are: ctrl, alt, shift, meta.
      * @returns {string} An extension command string representing the input.
      */
@@ -170,10 +180,11 @@ export class HotkeyUtil {
     }
 
     /**
+     * @template {import('input').Modifier} TModifier
      * Sorts an array of modifiers.
-     * @param {string[]} modifiers An array of modifiers.
+     * @param {TModifier[]} modifiers An array of modifiers.
      *   Valid values are: ctrl, alt, shift, meta.
-     * @returns {string[]} A sorted array of modifiers. The array instance is the same as the input array.
+     * @returns {TModifier[]} A sorted array of modifiers. The array instance is the same as the input array.
      */
     sortModifiers(modifiers) {
         const pattern = this._mouseInputNamePattern;
@@ -181,10 +192,12 @@ export class HotkeyUtil {
         const stringComparer = this._stringComparer;
 
         const count = modifiers.length;
+        /** @type {[modifier: TModifier, isMouse: 0|1, priority: number, index: number][]} */
         const modifierInfos = [];
         for (let i = 0; i < count; ++i) {
             const modifier = modifiers[i];
             const match = pattern.exec(modifier);
+            /** @type {[modifier: TModifier, isMouse: 0|1, priority: number, index: number]} */
             let info;
             if (match !== null) {
                 info = [modifier, 1, Number.parseInt(match[1], 10), i];
@@ -219,6 +232,10 @@ export class HotkeyUtil {
 
     // Private
 
+    /**
+     * @param {?import('environment').OperatingSystem} os
+     * @returns {[modifier: import('input').ModifierKey, label: string][]}
+     */
     _getModifierKeyNames(os) {
         switch (os) {
             case 'win':
@@ -255,6 +272,9 @@ export class HotkeyUtil {
         }
     }
 
+    /**
+     * @returns {void}
+     */
     _updateModifierKeyNames() {
         const map = this._modifierKeyNames;
         map.clear();
@@ -263,6 +283,10 @@ export class HotkeyUtil {
         }
     }
 
+    /**
+     * @param {string} key
+     * @returns {string}
+     */
     _convertCommandKeyToInputKey(key) {
         if (key.length === 1) {
             key = `Key${key}`;
@@ -270,6 +294,10 @@ export class HotkeyUtil {
         return key;
     }
 
+    /**
+     * @param {string} modifier
+     * @returns {?import('input').ModifierKey}
+     */
     _convertCommandModifierToInputModifier(modifier) {
         switch (modifier) {
             case 'Ctrl': return (this._os === 'mac' ? 'meta' : 'ctrl');
@@ -277,10 +305,14 @@ export class HotkeyUtil {
             case 'Shift': return 'shift';
             case 'MacCtrl': return 'ctrl';
             case 'Command': return 'meta';
-            default: return modifier;
+            default: return null;
         }
     }
 
+    /**
+     * @param {string} key
+     * @returns {string}
+     */
     _convertInputKeyToCommandKey(key) {
         if (key.length === 4 && key.startsWith('Key')) {
             key = key.substring(3);
@@ -288,6 +320,10 @@ export class HotkeyUtil {
         return key;
     }
 
+    /**
+     * @param {import('input').Modifier} modifier
+     * @returns {string}
+     */
     _convertInputModifierToCommandModifier(modifier) {
         switch (modifier) {
             case 'ctrl': return (this._os === 'mac' ? 'MacCtrl' : 'Ctrl');

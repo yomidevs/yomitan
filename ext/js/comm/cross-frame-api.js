@@ -16,34 +16,66 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, EventListenerCollection, deserializeError, invokeMessageHandler, log, serializeError} from '../core.js';
+import {EventDispatcher, EventListenerCollection, invokeMessageHandler, log} from '../core.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {yomitan} from '../yomitan.js';
 
+/**
+ * @augments EventDispatcher<import('cross-frame-api').CrossFrameAPIPortEventType>
+ */
 class CrossFrameAPIPort extends EventDispatcher {
+    /**
+     * @param {number} otherTabId
+     * @param {number} otherFrameId
+     * @param {chrome.runtime.Port} port
+     * @param {import('core').MessageHandlerMap} messageHandlers
+     */
     constructor(otherTabId, otherFrameId, port, messageHandlers) {
         super();
+        /** @type {number} */
         this._otherTabId = otherTabId;
+        /** @type {number} */
         this._otherFrameId = otherFrameId;
+        /** @type {?chrome.runtime.Port} */
         this._port = port;
+        /** @type {import('core').MessageHandlerMap} */
         this._messageHandlers = messageHandlers;
+        /** @type {Map<number, import('cross-frame-api').Invocation>} */
         this._activeInvocations = new Map();
+        /** @type {number} */
         this._invocationId = 0;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
     }
 
+    /** @type {number} */
     get otherTabId() {
         return this._otherTabId;
     }
 
+    /** @type {number} */
     get otherFrameId() {
         return this._otherFrameId;
     }
 
+    /**
+     * @throws {Error}
+     */
     prepare() {
+        if (this._port === null) { throw new Error('Invalid state'); }
         this._eventListeners.addListener(this._port.onDisconnect, this._onDisconnect.bind(this));
         this._eventListeners.addListener(this._port.onMessage, this._onMessage.bind(this));
     }
 
+    /**
+     * @template [TParams=import('core').SerializableObject]
+     * @template [TReturn=unknown]
+     * @param {string} action
+     * @param {TParams} params
+     * @param {number} ackTimeout
+     * @param {number} responseTimeout
+     * @returns {Promise<TReturn>}
+     */
     invoke(action, params, ackTimeout, responseTimeout) {
         return new Promise((resolve, reject) => {
             if (this._port === null) {
@@ -52,6 +84,7 @@ class CrossFrameAPIPort extends EventDispatcher {
             }
 
             const id = this._invocationId++;
+            /** @type {import('cross-frame-api').Invocation} */
             const invocation = {
                 id,
                 resolve,
@@ -73,19 +106,21 @@ class CrossFrameAPIPort extends EventDispatcher {
             }
 
             try {
-                this._port.postMessage({type: 'invoke', id, data: {action, params}});
+                this._port.postMessage(/** @type {import('cross-frame-api').InvokeMessage} */ ({type: 'invoke', id, data: {action, params}}));
             } catch (e) {
                 this._onError(id, e);
             }
         });
     }
 
+    /** */
     disconnect() {
         this._onDisconnect();
     }
 
     // Private
 
+    /** */
     _onDisconnect() {
         if (this._port === null) { return; }
         this._eventListeners.removeAllEventListeners();
@@ -96,22 +131,29 @@ class CrossFrameAPIPort extends EventDispatcher {
         this.trigger('disconnect', this);
     }
 
-    _onMessage({type, id, data}) {
+    /**
+     * @param {import('cross-frame-api').Message} details
+     */
+    _onMessage(details) {
+        const {type, id} = details;
         switch (type) {
             case 'invoke':
-                this._onInvoke(id, data);
+                this._onInvoke(id, details.data);
                 break;
             case 'ack':
                 this._onAck(id);
                 break;
             case 'result':
-                this._onResult(id, data);
+                this._onResult(id, details.data);
                 break;
         }
     }
 
     // Response handlers
 
+    /**
+     * @param {number} id
+     */
     _onAck(id) {
         const invocation = this._activeInvocations.get(id);
         if (typeof invocation === 'undefined') {
@@ -141,6 +183,10 @@ class CrossFrameAPIPort extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {number} id
+     * @param {import('core').Response<unknown>} data
+     */
     _onResult(id, data) {
         const invocation = this._activeInvocations.get(id);
         if (typeof invocation === 'undefined') {
@@ -162,17 +208,21 @@ class CrossFrameAPIPort extends EventDispatcher {
 
         const error = data.error;
         if (typeof error !== 'undefined') {
-            invocation.reject(deserializeError(error));
+            invocation.reject(ExtensionError.deserialize(error));
         } else {
             invocation.resolve(data.result);
         }
     }
 
+    /**
+     * @param {number} id
+     * @param {unknown} error
+     */
     _onError(id, error) {
         const invocation = this._activeInvocations.get(id);
         if (typeof invocation === 'undefined') { return; }
 
-        if (typeof error === 'string') {
+        if (!(error instanceof Error)) {
             error = new Error(`${error} (${invocation.action})`);
         }
 
@@ -186,6 +236,11 @@ class CrossFrameAPIPort extends EventDispatcher {
 
     // Invocation
 
+    /**
+     * @param {number} id
+     * @param {import('cross-frame-api').InvocationData} details
+     * @returns {boolean}
+     */
     _onInvoke(id, {action, params}) {
         const messageHandler = this._messageHandlers.get(action);
         this._sendAck(id);
@@ -194,10 +249,17 @@ class CrossFrameAPIPort extends EventDispatcher {
             return false;
         }
 
+        /**
+         * @param {import('core').Response<unknown>} data
+         * @returns {void}
+         */
         const callback = (data) => this._sendResult(id, data);
         return invokeMessageHandler(messageHandler, params, callback);
     }
 
+    /**
+     * @param {import('cross-frame-api').Message} data
+     */
     _sendResponse(data) {
         if (this._port === null) { return; }
         try {
@@ -207,45 +269,90 @@ class CrossFrameAPIPort extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {number} id
+     */
     _sendAck(id) {
         this._sendResponse({type: 'ack', id});
     }
 
+    /**
+     * @param {number} id
+     * @param {import('core').Response<unknown>} data
+     */
     _sendResult(id, data) {
         this._sendResponse({type: 'result', id, data});
     }
 
+    /**
+     * @param {number} id
+     * @param {Error} error
+     */
     _sendError(id, error) {
-        this._sendResponse({type: 'result', id, data: {error: serializeError(error)}});
+        this._sendResponse({type: 'result', id, data: {error: ExtensionError.serialize(error)}});
     }
 }
 
 export class CrossFrameAPI {
     constructor() {
+        /** @type {number} */
         this._ackTimeout = 3000; // 3 seconds
+        /** @type {number} */
         this._responseTimeout = 10000; // 10 seconds
+        /** @type {Map<number, Map<number, CrossFrameAPIPort>>} */
         this._commPorts = new Map();
+        /** @type {import('core').MessageHandlerMap} */
         this._messageHandlers = new Map();
+        /** @type {(port: CrossFrameAPIPort) => void} */
         this._onDisconnectBind = this._onDisconnect.bind(this);
+        /** @type {?number} */
         this._tabId = null;
+        /** @type {?number} */
         this._frameId = null;
     }
 
+    /** */
     async prepare() {
         chrome.runtime.onConnect.addListener(this._onConnect.bind(this));
-        ({tabId: this._tabId, frameId: this._frameId} = await yomitan.api.frameInformationGet());
+        ({tabId: this._tabId = null, frameId: this._frameId = null} = await yomitan.api.frameInformationGet());
     }
 
-    invoke(targetFrameId, action, params={}) {
+    /**
+     * @template [TParams=import('core').SerializableObject]
+     * @template [TReturn=unknown]
+     * @param {number} targetFrameId
+     * @param {string} action
+     * @param {TParams} params
+     * @returns {Promise<TReturn>}
+     */
+    invoke(targetFrameId, action, params) {
         return this.invokeTab(null, targetFrameId, action, params);
     }
 
-    async invokeTab(targetTabId, targetFrameId, action, params={}) {
-        if (typeof targetTabId !== 'number') { targetTabId = this._tabId; }
+    /**
+     * @template [TParams=import('core').SerializableObject]
+     * @template [TReturn=unknown]
+     * @param {?number} targetTabId
+     * @param {number} targetFrameId
+     * @param {string} action
+     * @param {TParams} params
+     * @returns {Promise<TReturn>}
+     */
+    async invokeTab(targetTabId, targetFrameId, action, params) {
+        if (typeof targetTabId !== 'number') {
+            targetTabId = this._tabId;
+            if (typeof targetTabId !== 'number') {
+                throw new Error('Unknown target tab id for invocation');
+            }
+        }
         const commPort = await this._getOrCreateCommPort(targetTabId, targetFrameId);
         return await commPort.invoke(action, params, this._ackTimeout, this._responseTimeout);
     }
 
+    /**
+     * @param {import('core').MessageHandlerArray} messageHandlers
+     * @throws {Error}
+     */
     registerHandlers(messageHandlers) {
         for (const [key, value] of messageHandlers) {
             if (this._messageHandlers.has(key)) {
@@ -255,12 +362,19 @@ export class CrossFrameAPI {
         }
     }
 
+    /**
+     * @param {string} key
+     * @returns {boolean}
+     */
     unregisterHandler(key) {
         return this._messageHandlers.delete(key);
     }
 
     // Private
 
+    /**
+     * @param {chrome.runtime.Port} port
+     */
     _onConnect(port) {
         try {
             let details;
@@ -280,6 +394,9 @@ export class CrossFrameAPI {
         }
     }
 
+    /**
+     * @param {CrossFrameAPIPort} commPort
+     */
     _onDisconnect(commPort) {
         commPort.off('disconnect', this._onDisconnectBind);
         const {otherTabId, otherFrameId} = commPort;
@@ -292,7 +409,12 @@ export class CrossFrameAPI {
         }
     }
 
-    _getOrCreateCommPort(otherTabId, otherFrameId) {
+    /**
+     * @param {number} otherTabId
+     * @param {number} otherFrameId
+     * @returns {Promise<CrossFrameAPIPort>}
+     */
+    async _getOrCreateCommPort(otherTabId, otherFrameId) {
         const tabPorts = this._commPorts.get(otherTabId);
         if (typeof tabPorts !== 'undefined') {
             const commPort = tabPorts.get(otherFrameId);
@@ -300,9 +422,13 @@ export class CrossFrameAPI {
                 return commPort;
             }
         }
-        return this._createCommPort(otherTabId, otherFrameId);
+        return await this._createCommPort(otherTabId, otherFrameId);
     }
-
+    /**
+     * @param {number} otherTabId
+     * @param {number} otherFrameId
+     * @returns {Promise<CrossFrameAPIPort>}
+     */
     async _createCommPort(otherTabId, otherFrameId) {
         await yomitan.api.openCrossFramePort(otherTabId, otherFrameId);
 
@@ -313,8 +439,15 @@ export class CrossFrameAPI {
                 return commPort;
             }
         }
+        throw new Error('Comm port didn\'t open');
     }
 
+    /**
+     * @param {number} otherTabId
+     * @param {number} otherFrameId
+     * @param {chrome.runtime.Port} port
+     * @returns {CrossFrameAPIPort}
+     */
     _setupCommPort(otherTabId, otherFrameId, port) {
         const commPort = new CrossFrameAPIPort(otherTabId, otherFrameId, port, this._messageHandlers);
         let tabPorts = this._commPorts.get(otherTabId);

@@ -34,34 +34,46 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export class TranslatorVM {
     constructor() {
-        global.chrome = {
+        /** @type {import('dev/vm').PseudoChrome} */
+        const chrome = {
             runtime: {
                 getURL: (path2) => {
                     return url.pathToFileURL(path.join(dirname, '..', 'ext', path2.replace(/^\//, ''))).href;
                 }
             }
         };
+        // @ts-expect-error - Overwriting a global
+        global.chrome = chrome;
 
+        /** @type {?JapaneseUtil} */
         this._japaneseUtil = null;
+        /** @type {?Translator} */
         this._translator = null;
+        /** @type {?AnkiNoteDataCreator} */
         this._ankiNoteDataCreator = null;
+        /** @type {?string} */
         this._dictionaryName = null;
     }
 
+    /** @type {Translator} */
     get translator() {
+        if (this._translator === null) { throw new Error('Not prepared'); }
         return this._translator;
     }
 
+    /**
+     * @param {string} dictionaryDirectory
+     * @param {string} dictionaryName
+     */
     async prepare(dictionaryDirectory, dictionaryName) {
         // Dictionary
         this._dictionaryName = dictionaryName;
         const testDictionary = createDictionaryArchive(dictionaryDirectory, dictionaryName);
-        // const testDictionaryContent = await testDictionary.arrayBuffer();
         const testDictionaryContent = await testDictionary.generateAsync({type: 'arraybuffer'});
 
         // Setup database
         const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
-        const dictionaryImporter = new DictionaryImporter(dictionaryImporterMediaLoader, null);
+        const dictionaryImporter = new DictionaryImporter(dictionaryImporterMediaLoader);
         const dictionaryDatabase = new DictionaryDatabase();
         await dictionaryDatabase.prepare();
 
@@ -73,27 +85,35 @@ export class TranslatorVM {
 
         expect(errors.length).toEqual(0);
 
-        const myDirname = path.dirname(fileURLToPath(import.meta.url));
-
         // Setup translator
         this._japaneseUtil = new JapaneseUtil(null);
         this._translator = new Translator({
             japaneseUtil: this._japaneseUtil,
             database: dictionaryDatabase
         });
-        const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(myDirname, '..', 'ext', 'data/deinflect.json')));
+        const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/deinflect.json'), {encoding: 'utf8'}));
         this._translator.prepare(deinflectionReasons);
 
         // Assign properties
         this._ankiNoteDataCreator = new AnkiNoteDataCreator(this._japaneseUtil);
     }
 
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @param {import('settings').ResultOutputMode} mode
+     * @returns {import('anki-templates').NoteData}
+     * @throws {Error}
+     */
     createTestAnkiNoteData(dictionaryEntry, mode) {
+        if (this._ankiNoteDataCreator === null) {
+            throw new Error('Not prepared');
+        }
         const marker = '{marker}';
+        /** @type {import('anki-templates-internal').CreateDetails} */
         const data = {
             dictionaryEntry,
             resultOutputMode: mode,
-            mode: 'mode',
+            mode: 'test',
             glossaryLayoutMode: 'default',
             compactTags: false,
             context: {
@@ -108,8 +128,16 @@ export class TranslatorVM {
         return this._ankiNoteDataCreator.create(marker, data);
     }
 
+    /**
+     * @template {import('translation').FindTermsOptions|import('translation').FindKanjiOptions} T
+     * @param {import('dev/vm').OptionsPresetObject} optionsPresets
+     * @param {string|import('dev/vm').OptionsPresetObject|(string|import('dev/vm').OptionsPresetObject)[]} optionsArray
+     * @returns {T}
+     * @throws {Error}
+     */
     buildOptions(optionsPresets, optionsArray) {
         const dictionaryName = this._dictionaryName;
+        /** @type {import('core').UnknownObject} */
         const options = {};
         if (!Array.isArray(optionsArray)) { optionsArray = [optionsArray]; }
         for (const entry of optionsArray) {
@@ -160,6 +188,6 @@ export class TranslatorVM {
             null
         );
 
-        return options;
+        return /** @type {T} */ (options);
     }
 }

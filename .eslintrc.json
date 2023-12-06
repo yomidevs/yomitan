@@ -2,15 +2,22 @@
     "root": true,
     "extends": [
         "eslint:recommended",
-        "plugin:jsonc/recommended-with-json"
+        "plugin:jsonc/recommended-with-json",
+        "plugin:@typescript-eslint/recommended"
     ],
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": 2022,
         "sourceType": "module",
         "ecmaFeatures": {
             "globalReturn": false,
             "impliedStrict": true
-        }
+        },
+        "project": [
+            "./jsconfig.json",
+            "./dev/jsconfig.json",
+            "./test/jsconfig.json"
+        ]
     },
     "env": {
         "browser": true,
@@ -21,7 +28,10 @@
         "no-unsanitized",
         "header",
         "jsdoc",
-        "jsonc"
+        "jsonc",
+        "unused-imports",
+        "@typescript-eslint",
+        "@stylistic/ts"
     ],
     "ignorePatterns": [
         "/ext/lib/",
@@ -56,7 +66,7 @@
         "no-param-reassign": "off",
         "no-prototype-builtins": "error",
         "no-shadow": [
-            "error",
+            "off",
             {
                 "builtinGlobals": false
             }
@@ -253,29 +263,47 @@
         "jsdoc/multiline-blocks": "error",
         "jsdoc/no-bad-blocks": "error",
         "jsdoc/no-multi-asterisks": "error",
-        "jsdoc/no-undefined-types": 1,
+        "jsdoc/no-undefined-types": "error",
         "jsdoc/require-asterisk-prefix": "error",
         "jsdoc/require-hyphen-before-param-description": [
             "error",
             "never"
         ],
-        "jsdoc/require-jsdoc": "off",
+        "jsdoc/require-jsdoc": [
+            "error",
+            {
+                "require": {
+                    "ClassDeclaration": false,
+                    "FunctionDeclaration": true,
+                    "MethodDefinition": false
+                },
+                "contexts": [
+                    "MethodDefinition[kind=constructor]>FunctionExpression>BlockStatement>ExpressionStatement>AssignmentExpression[left.object.type=ThisExpression]",
+                    "ClassDeclaration>Classbody>PropertyDefinition",
+                    "MethodDefinition[kind!=constructor][kind!=set]",
+                    "MethodDefinition[kind=constructor][value.params.length>0]"
+                ],
+                "checkGetters": "no-setter",
+                "checkSetters": "no-getter"
+            }
+        ],
+        "jsdoc/require-description": "off",
         "jsdoc/require-param": "error",
-        "jsdoc/require-param-description": "error",
+        "jsdoc/require-param-description": "off",
         "jsdoc/require-param-name": "error",
         "jsdoc/require-param-type": "error",
         "jsdoc/require-property": "error",
-        "jsdoc/require-property-description": "error",
+        "jsdoc/require-property-description": "off",
         "jsdoc/require-property-name": "error",
         "jsdoc/require-property-type": "error",
         "jsdoc/require-returns": "error",
         "jsdoc/require-returns-check": "error",
-        "jsdoc/require-returns-description": "error",
+        "jsdoc/require-returns-description": "off",
         "jsdoc/require-returns-type": "error",
         "jsdoc/require-throws": "error",
         "jsdoc/require-yields": "error",
         "jsdoc/require-yields-check": "error",
-        "jsdoc/tag-lines": "error",
+        "jsdoc/tag-lines": ["error", "never", {"startLines": 0}],
         "jsdoc/valid-types": "error",
         "jsonc/indent": [
             "error",
@@ -321,9 +349,169 @@
             {
                 "allowAllPropertiesOnSameLine": true
             }
-        ]
+        ],
+        "@typescript-eslint/ban-ts-comment": [
+            "error",
+            {
+                "ts-expect-error": {
+                    "descriptionFormat": "^ - .+$"
+                }
+            }
+        ],
+        "@typescript-eslint/ban-types": [
+            "error",
+            {
+                "types": {
+                    "object": true
+                },
+                "extendDefaults": true
+            }
+        ],
+        "@typescript-eslint/consistent-type-exports": "off",
+        "@typescript-eslint/no-explicit-any": "error",
+        "@typescript-eslint/no-shadow": [
+            "error",
+            {
+                "builtinGlobals": false
+            }
+        ],
+        "@typescript-eslint/no-this-alias": "error",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-var-requires": "off"
     },
     "overrides": [
+        {
+            "files": [
+                "*.ts"
+            ],
+            "rules": {
+                "no-undef": "off",
+                "unused-imports/no-unused-imports": "error",
+                "@typescript-eslint/no-unused-vars": [
+                    "error",
+                    {
+                        "vars": "local",
+                        "args": "after-used",
+                        "argsIgnorePattern": "^_",
+                        "caughtErrors": "none"
+                    }
+                ],
+                "comma-dangle": "off",
+                "@typescript-eslint/comma-dangle": [
+                    "error",
+                    {
+                        "arrays": "always-multiline",
+                        "objects": "always-multiline",
+                        "imports": "always-multiline",
+                        "exports": "always-multiline",
+                        "functions": "always-multiline",
+                        "enums": "always-multiline",
+                        "generics": "always-multiline",
+                        "tuples": "always-multiline"
+                    }
+                ],
+                "@stylistic/ts/block-spacing": "off",
+                "@stylistic/ts/brace-style": [
+                    "error",
+                    "1tbs",
+                    {
+                        "allowSingleLine": true
+                    }
+                ],
+                "@stylistic/ts/comma-dangle": [
+                    "error",
+                    {
+                        "arrays": "always-multiline",
+                        "objects": "always-multiline",
+                        "imports": "always-multiline",
+                        "exports": "always-multiline",
+                        "functions": "always-multiline",
+                        "enums": "always-multiline",
+                        "generics": "always-multiline",
+                        "tuples": "always-multiline"
+                    }
+                ],
+                "@stylistic/ts/comma-spacing": [
+                    "error",
+                    {
+                        "before": false,
+                        "after": true
+                    }
+                ],
+                "@stylistic/ts/function-call-spacing": [
+                    "error",
+                    "never"
+                ],
+                "@stylistic/ts/indent": [
+                    "error",
+                    4
+                ],
+                "@stylistic/ts/key-spacing": [
+                    "error",
+                    {
+                        "beforeColon": false,
+                        "afterColon": true,
+                        "mode": "strict"
+                    }
+                ],
+                "@stylistic/ts/keyword-spacing": [
+                    "error",
+                    {
+                        "before": true,
+                        "after": true
+                    }
+                ],
+                "@stylistic/ts/lines-around-comment": "off",
+                "@stylistic/ts/lines-between-class-members": [
+                    "error",
+                    "always"
+                ],
+                "@stylistic/ts/member-delimiter-style": [
+                    "error",
+                    {
+                        "multiline": {
+                            "delimiter": "semi",
+                            "requireLast": true
+                        },
+                        "singleline": {
+                            "delimiter": "comma",
+                            "requireLast": false
+                        },
+                        "multilineDetection": "brackets"
+                    }
+                ],
+                "@stylistic/ts/no-extra-parens": [
+                    "error",
+                    "all"
+                ],
+                "@stylistic/ts/no-extra-semi": "error",
+                "@stylistic/ts/object-curly-spacing": [
+                    "error",
+                    "never"
+                ],
+                "@stylistic/ts/padding-line-between-statements": "off",
+                "@stylistic/ts/quotes": [
+                    "error",
+                    "single",
+                    "avoid-escape"
+                ],
+                "@stylistic/ts/semi": "error",
+                "@stylistic/ts/space-before-blocks": [
+                    "error",
+                    "always"
+                ],
+                "@stylistic/ts/space-before-function-paren": [
+                    "error",
+                    {
+                        "anonymous": "never",
+                        "named": "never",
+                        "asyncArrow": "always"
+                    }
+                ],
+                "@stylistic/ts/space-infix-ops": "error",
+                "@stylistic/ts/type-annotation-spacing": "error"
+            }
+        },
         {
             "files": [
                 "*.json"
@@ -373,10 +561,65 @@
         {
             "files": [
                 "ext/js/core.js",
+                "ext/js/core/extension-error.js",
                 "ext/js/**/sandbox/**/*.js"
             ],
             "env": {
                 "webextensions": false
+            }
+        },
+        {
+            "files": [
+                "ext/**/*.js"
+            ],
+            "excludedFiles": [
+                "ext/js/core/extension-error.js"
+            ],
+            "globals": {
+                "ExtensionError": "readonly"
+            }
+        },
+        {
+            "files": [
+                "ext/**/*.js"
+            ],
+            "excludedFiles": [
+                "ext/js/core.js",
+                "ext/js/core/extension-error.js",
+                "ext/js/accessibility/google-docs.js",
+                "ext/js/**/sandbox/**/*.js"
+            ],
+            "globals": {
+                "isObject": "readonly",
+                "stringReverse": "readonly",
+                "promiseTimeout": "readonly",
+                "escapeRegExp": "readonly",
+                "deferPromise": "readonly",
+                "clone": "readonly",
+                "deepEqual": "readonly",
+                "generateId": "readonly",
+                "promiseAnimationFrame": "readonly",
+                "invokeMessageHandler": "readonly",
+                "log": "readonly",
+                "DynamicProperty": "readonly",
+                "EventDispatcher": "readonly",
+                "EventListenerCollection": "readonly",
+                "Logger": "readonly"
+            }
+        },
+        {
+            "files": [
+                "ext/**/*.js"
+            ],
+            "excludedFiles": [
+                "ext/js/core.js",
+                "ext/js/core/extension-error.js",
+                "ext/js/accessibility/google-docs.js",
+                "ext/js/yomitan.js",
+                "ext/js/**/sandbox/**/*.js"
+            ],
+            "globals": {
+                "yomitan": "readonly"
             }
         },
         {
@@ -417,6 +660,7 @@
         {
             "files": [
                 "ext/js/core.js",
+                "ext/js/core/extension-error.js",
                 "ext/js/yomitan.js",
                 "ext/js/accessibility/accessibility-controller.js",
                 "ext/js/background/backend.js",
@@ -466,6 +710,7 @@
         {
             "files": [
                 "ext/js/core.js",
+                "ext/js/core/extension-error.js",
                 "ext/js/data/database.js",
                 "ext/js/data/json-schema.js",
                 "ext/js/general/cache-map.js",
@@ -524,6 +769,14 @@
                 "vitest/prefer-to-be": "off"
             },
             "env": {}
+        },
+        {
+            "files": [
+                "dev/lib/**/*.js"
+            ],
+            "extends": [
+                "plugin:@typescript-eslint/disable-type-checked"
+            ]
         }
     ]
 }

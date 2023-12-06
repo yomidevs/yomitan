@@ -22,40 +22,20 @@
  */
 export class CssStyleApplier {
     /**
-     * A CSS rule.
-     * @typedef {object} CssRule
-     * @property {string} selectors A CSS selector string representing one or more selectors.
-     * @property {CssDeclaration[]} styles A list of CSS property and value pairs.
-     */
-
-    /**
-     * A single CSS property declaration.
-     * @typedef {object} CssDeclaration
-     * @property {string} property A CSS property's name, using kebab-case.
-     * @property {string} value The property's value.
-     */
-
-    /* eslint-disable jsdoc/check-line-alignment */
-    /**
      * Creates a new instance of the class.
-     * @param {string} styleDataUrl The local URL to the JSON file containing the style rules.
-     *   The style rules should be of the format:
-     *   ```
-     *   [
-     *     {
-     *       selectors: [(selector:string)...],
-     *       styles: [
-     *         [(property:string), (value:string)]...
-     *       ]
-     *     }...
-     *   ]
-     *   ```
+     * @param {string} styleDataUrl The local URL to the JSON file continaing the style rules.
+     *   The style rules should follow the format of `CssStyleApplierRawStyleData`.
      */
     constructor(styleDataUrl) {
+        /** @type {string} */
         this._styleDataUrl = styleDataUrl;
+        /** @type {import('css-style-applier').CssRule[]} */
         this._styleData = [];
+        /** @type {Map<string, import('css-style-applier').CssRule[]>} */
         this._cachedRules = new Map();
+        /** @type {RegExp} */
         this._patternHtmlWhitespace = /[\t\r\n\f ]+/g;
+        /** @type {RegExp} */
         this._patternClassNameCharacter = /[0-9a-zA-Z-_]/;
     }
     /* eslint-enable jsdoc/check-line-alignment */
@@ -64,7 +44,8 @@ export class CssStyleApplier {
      * Loads the data file for use.
      */
     async prepare() {
-        let rawData;
+        /** @type {import('css-style-applier').RawStyleData} */
+        let rawData = [];
         try {
             rawData = await this._fetchJsonAsset(this._styleDataUrl);
         } catch (e) {
@@ -94,7 +75,7 @@ export class CssStyleApplier {
         const elementStyles = [];
         for (const element of elements) {
             const className = element.getAttribute('class');
-            if (className.length === 0) { continue; }
+            if (className === null || className.length === 0) { continue; }
             let cssTextNew = '';
             for (const {selectors, styles} of this._getCandidateCssRulesForClass(className)) {
                 if (!element.matches(selectors)) { continue; }
@@ -139,7 +120,7 @@ export class CssStyleApplier {
     /**
      * Gets an array of candidate CSS rules which might match a specific class.
      * @param {string} className A whitespace-separated list of classes.
-     * @returns {CssRule[]} An array of candidate CSS rules.
+     * @returns {import('css-style-applier').CssRule[]} An array of candidate CSS rules.
      */
     _getCandidateCssRulesForClass(className) {
         let rules = this._cachedRules.get(className);
@@ -159,7 +140,7 @@ export class CssStyleApplier {
 
     /**
      * Converts an array of CSS rules to a CSS string.
-     * @param {CssRule[]} styles An array of CSS rules.
+     * @param {import('css-style-applier').CssDeclaration[]} styles An array of CSS rules.
      * @returns {string} The CSS string.
      */
     _getCssText(styles) {

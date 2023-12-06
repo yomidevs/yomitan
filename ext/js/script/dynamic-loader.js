@@ -19,9 +19,16 @@
 import {yomitan} from '../yomitan.js';
 
 export const dynamicLoader = (() => {
+    /** @type {Map<string, ?HTMLStyleElement|HTMLLinkElement>} */
     const injectedStylesheets = new Map();
+    /** @type {WeakMap<Node, Map<string, ?HTMLStyleElement|HTMLLinkElement>>} */
     const injectedStylesheetsWithParent = new WeakMap();
 
+    /**
+     * @param {string} id
+     * @param {?Node} parentNode
+     * @returns {?HTMLStyleElement|HTMLLinkElement|undefined}
+     */
     function getInjectedStylesheet(id, parentNode) {
         if (parentNode === null) {
             return injectedStylesheets.get(id);
@@ -30,6 +37,11 @@ export const dynamicLoader = (() => {
         return typeof map !== 'undefined' ? map.get(id) : void 0;
     }
 
+    /**
+     * @param {string} id
+     * @param {?Node} parentNode
+     * @param {?HTMLStyleElement|HTMLLinkElement} value
+     */
     function setInjectedStylesheet(id, parentNode, value) {
         if (parentNode === null) {
             injectedStylesheets.set(id, value);
@@ -43,6 +55,15 @@ export const dynamicLoader = (() => {
         map.set(id, value);
     }
 
+    /**
+     * @param {string} id
+     * @param {'code'|'file'|'file-content'} type
+     * @param {string} value
+     * @param {boolean} [useWebExtensionApi]
+     * @param {?Node} [parentNode]
+     * @returns {Promise<?HTMLStyleElement|HTMLLinkElement>}
+     * @throws {Error}
+     */
     async function loadStyle(id, type, value, useWebExtensionApi=false, parentNode=null) {
         if (useWebExtensionApi && yomitan.isExtensionUrl(window.location.href)) {
             // Permissions error will occur if trying to use the WebExtension API to inject into an extension page
@@ -97,8 +118,8 @@ export const dynamicLoader = (() => {
 
         // Update node style
         if (isFile) {
-            styleNode.rel = 'stylesheet';
-            styleNode.href = value;
+            /** @type {HTMLLinkElement} */ (styleNode).rel = 'stylesheet';
+            /** @type {HTMLLinkElement} */ (styleNode).href = value;
         } else {
             styleNode.textContent = value;
         }
@@ -113,6 +134,10 @@ export const dynamicLoader = (() => {
         return styleNode;
     }
 
+    /**
+     * @param {string[]} urls
+     * @returns {Promise<void>}
+     */
     function loadScripts(urls) {
         return new Promise((resolve, reject) => {
             const parent = document.body;
@@ -136,12 +161,20 @@ export const dynamicLoader = (() => {
         });
     }
 
+    /**
+     * @param {HTMLElement} parent
+     * @param {() => void} resolve
+     * @param {(reason?: unknown) => void} reject
+     */
     function loadScriptSentinel(parent, resolve, reject) {
         const script = document.createElement('script');
 
         const sentinelEventName = 'dynamicLoaderSentinel';
+        /**
+         * @param {import('dynamic-loader').DynamicLoaderSentinelDetails} e
+         */
         const sentinelEventCallback = (e) => {
-            if (e.script !== script.src) { return; }
+            if (e.scriptUrl !== script.src) { return; }
             yomitan.off(sentinelEventName, sentinelEventCallback);
             parent.removeChild(script);
             resolve();
@@ -159,6 +192,10 @@ export const dynamicLoader = (() => {
         }
     }
 
+    /**
+     * @param {string} value
+     * @returns {string}
+     */
     function escapeCSSAttribute(value) {
         return value.replace(/['\\]/g, (character) => `\\${character}`);
     }

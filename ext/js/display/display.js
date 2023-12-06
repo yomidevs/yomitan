@@ -20,7 +20,7 @@ import {Frontend} from '../app/frontend.js';
 import {PopupFactory} from '../app/popup-factory.js';
 import {ThemeController} from '../app/theme-controller.js';
 import {FrameEndpoint} from '../comm/frame-endpoint.js';
-import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, isObject, log, promiseTimeout} from '../core.js';
+import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, log, promiseTimeout} from '../core.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {ScrollElement} from '../dom/scroll-element.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
@@ -35,132 +35,164 @@ import {ElementOverflowController} from './element-overflow-controller.js';
 import {OptionToggleHotkeyHandler} from './option-toggle-hotkey-handler.js';
 import {QueryParser} from './query-parser.js';
 
+/**
+ * @augments EventDispatcher<import('display').DisplayEventType>
+ */
 export class Display extends EventDispatcher {
     /**
-     * Information about how popup content should be shown, specifically related to the inner popup content.
-     * @typedef {object} ContentDetails
-     * @property {boolean} focus Whether or not the frame should be `focus()`'d.
-     * @property {HistoryParams} params An object containing key-value pairs representing the URL search params.
-     * @property {?HistoryState} state The semi-persistent state assigned to the navigation entry.
-     * @property {?HistoryContent} content The non-persistent content assigned to the navigation entry.
-     * @property {'clear'|'overwrite'|'new'} historyMode How the navigation history should be modified.
+     * @param {number|undefined} tabId
+     * @param {number|undefined} frameId
+     * @param {import('display').DisplayPageType} pageType
+     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
+     * @param {import('../dom/document-focus-controller.js').DocumentFocusController} documentFocusController
+     * @param {import('../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
-
-    /**
-     * An object containing key-value pairs representing the URL search params.
-     * @typedef {object} HistoryParams
-     * @property {'terms'|'kanji'|'unloaded'|'clear'} [type] The type of content that is being shown.
-     * @property {string} [query] The search query.
-     * @property {'on'|'off'} [wildcards] Whether or not wildcards can be used for the search query.
-     * @property {string} [offset] The start position of the `query` string as an index into the `full` query string.
-     * @property {string} [full] The full search text. If absent, `query` is the full search text.
-     * @property {'true'|'false'} [full-visible] Whether or not the full search query should be forced to be visible.
-     * @property {'true'|'false'} [lookup] Whether or not the query should be looked up. If it is not looked up,
-     *   the content should be provided.
-     */
-
-    /**
-     * The semi-persistent state assigned to the navigation entry.
-     * @typedef {object} HistoryState
-     * @property {'queryParser'} [cause] What was the cause of the navigation.
-     * @property {object} [sentence] The sentence context.
-     * @property {string} sentence.text The full string.
-     * @property {number} sentence.offset The offset from the start of `text` to the full search query.
-     * @property {number} [focusEntry] The index of the dictionary entry to focus.
-     * @property {number} [scrollX] The horizontal scroll position.
-     * @property {number} [scrollY] The vertical scroll position.
-     * @property {object} [optionsContext] The options context which should be used for lookups.
-     * @property {string} [url] The originating URL of the content.
-     * @property {string} [documentTitle] The originating document title of the content.
-     */
-
-    /**
-     * The non-persistent content assigned to the navigation entry.
-     * @typedef {object} HistoryContent
-     * @property {boolean} [animate] Whether or not any CSS animations should occur.
-     * @property {object[]} [dictionaryEntries] An array of dictionary entries to display as content.
-     * @property {object} [contentOrigin] The identifying information for the frame the content originated from.
-     * @property {number} [contentOrigin.tabId] The tab id.
-     * @property {number} [contentOrigin.frameId] The frame id within the tab.
-     */
-
     constructor(tabId, frameId, pageType, japaneseUtil, documentFocusController, hotkeyHandler) {
         super();
+        /** @type {number|undefined} */
         this._tabId = tabId;
+        /** @type {number|undefined} */
         this._frameId = frameId;
+        /** @type {import('display').DisplayPageType} */
         this._pageType = pageType;
+        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
+        /** @type {import('../dom/document-focus-controller.js').DocumentFocusController} */
         this._documentFocusController = documentFocusController;
+        /** @type {import('../input/hotkey-handler.js').HotkeyHandler} */
         this._hotkeyHandler = hotkeyHandler;
-        this._container = document.querySelector('#dictionary-entries');
+        /** @type {HTMLElement} */
+        this._container = /** @type {HTMLElement} */ (document.querySelector('#dictionary-entries'));
+        /** @type {import('dictionary').DictionaryEntry[]} */
         this._dictionaryEntries = [];
+        /** @type {HTMLElement[]} */
         this._dictionaryEntryNodes = [];
+        /** @type {import('settings').OptionsContext} */
         this._optionsContext = {depth: 0, url: window.location.href};
+        /** @type {?import('settings').ProfileOptions} */
         this._options = null;
+        /** @type {number} */
         this._index = 0;
+        /** @type {?HTMLStyleElement} */
         this._styleNode = null;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {?import('core').TokenObject} */
         this._setContentToken = null;
+        /** @type {DisplayContentManager} */
         this._contentManager = new DisplayContentManager(this);
+        /** @type {HotkeyHelpController} */
         this._hotkeyHelpController = new HotkeyHelpController();
+        /** @type {DisplayGenerator} */
         this._displayGenerator = new DisplayGenerator({
             japaneseUtil,
             contentManager: this._contentManager,
             hotkeyHelpController: this._hotkeyHelpController
         });
+        /** @type {import('core').MessageHandlerMap} */
         this._messageHandlers = new Map();
+        /** @type {import('core').MessageHandlerMap} */
         this._directMessageHandlers = new Map();
+        /** @type {import('core').MessageHandlerMap} */
         this._windowMessageHandlers = new Map();
+        /** @type {DisplayHistory} */
         this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
+        /** @type {boolean} */
         this._historyChangeIgnore = false;
+        /** @type {boolean} */
         this._historyHasChanged = false;
+        /** @type {?Element} */
         this._navigationHeader = document.querySelector('#navigation-header');
+        /** @type {import('display').PageType} */
         this._contentType = 'clear';
+        /** @type {string} */
         this._defaultTitle = document.title;
+        /** @type {number} */
         this._titleMaxLength = 1000;
+        /** @type {string} */
         this._query = '';
+        /** @type {string} */
         this._fullQuery = '';
+        /** @type {number} */
         this._queryOffset = 0;
-        this._progressIndicator = document.querySelector('#progress-indicator');
+        /** @type {HTMLElement} */
+        this._progressIndicator = /** @type {HTMLElement} */ (document.querySelector('#progress-indicator'));
+        /** @type {?import('core').Timeout} */
         this._progressIndicatorTimer = null;
+        /** @type {DynamicProperty<boolean>} */
         this._progressIndicatorVisible = new DynamicProperty(false);
+        /** @type {boolean} */
         this._queryParserVisible = false;
+        /** @type {?boolean} */
         this._queryParserVisibleOverride = null;
-        this._queryParserContainer = document.querySelector('#query-parser-container');
+        /** @type {HTMLElement} */
+        this._queryParserContainer = /** @type {HTMLElement} */ (document.querySelector('#query-parser-container'));
+        /** @type {QueryParser} */
         this._queryParser = new QueryParser({
             getSearchContext: this._getSearchContext.bind(this),
             japaneseUtil
         });
-        this._contentScrollElement = document.querySelector('#content-scroll');
-        this._contentScrollBodyElement = document.querySelector('#content-body');
+        /** @type {HTMLElement} */
+        this._contentScrollElement = /** @type {HTMLElement} */ (document.querySelector('#content-scroll'));
+        /** @type {HTMLElement} */
+        this._contentScrollBodyElement = /** @type {HTMLElement} */ (document.querySelector('#content-body'));
+        /** @type {ScrollElement} */
         this._windowScroll = new ScrollElement(this._contentScrollElement);
-        this._closeButton = document.querySelector('#close-button');
-        this._navigationPreviousButton = document.querySelector('#navigate-previous-button');
-        this._navigationNextButton = document.querySelector('#navigate-next-button');
+        /** @type {HTMLButtonElement} */
+        this._closeButton = /** @type {HTMLButtonElement} */ (document.querySelector('#close-button'));
+        /** @type {HTMLButtonElement} */
+        this._navigationPreviousButton = /** @type {HTMLButtonElement} */ (document.querySelector('#navigate-previous-button'));
+        /** @type {HTMLButtonElement} */
+        this._navigationNextButton = /** @type {HTMLButtonElement} */ (document.querySelector('#navigate-next-button'));
+        /** @type {?Frontend} */
         this._frontend = null;
+        /** @type {?Promise<void>} */
         this._frontendSetupPromise = null;
+        /** @type {number} */
         this._depth = 0;
+        /** @type {?string} */
         this._parentPopupId = null;
+        /** @type {?number} */
         this._parentFrameId = null;
+        /** @type {number|undefined} */
         this._contentOriginTabId = tabId;
+        /** @type {number|undefined} */
         this._contentOriginFrameId = frameId;
+        /** @type {boolean} */
         this._childrenSupported = true;
+        /** @type {?FrameEndpoint} */
         this._frameEndpoint = (pageType === 'popup' ? new FrameEndpoint() : null);
+        /** @type {?import('environment').Browser} */
         this._browser = null;
+        /** @type {?HTMLTextAreaElement} */
         this._copyTextarea = null;
+        /** @type {?TextScanner} */
         this._contentTextScanner = null;
+        /** @type {?import('./display-notification.js').DisplayNotification} */
         this._tagNotification = null;
-        this._footerNotificationContainer = document.querySelector('#content-footer');
+        /** @type {HTMLElement} */
+        this._footerNotificationContainer = /** @type {HTMLElement} */ (document.querySelector('#content-footer'));
+        /** @type {OptionToggleHotkeyHandler} */
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
+        /** @type {ElementOverflowController} */
         this._elementOverflowController = new ElementOverflowController();
+        /** @type {boolean} */
         this._frameVisible = (pageType === 'search');
-        this._menuContainer = document.querySelector('#popup-menus');
+        /** @type {HTMLElement} */
+        this._menuContainer = /** @type {HTMLElement} */ (document.querySelector('#popup-menus'));
+        /** @type {(event: MouseEvent) => void} */
         this._onEntryClickBind = this._onEntryClick.bind(this);
+        /** @type {(event: MouseEvent) => void} */
         this._onKanjiLookupBind = this._onKanjiLookup.bind(this);
+        /** @type {(event: MouseEvent) => void} */
         this._onDebugLogClickBind = this._onDebugLogClick.bind(this);
+        /** @type {(event: MouseEvent) => void} */
         this._onTagClickBind = this._onTagClick.bind(this);
+        /** @type {(event: MouseEvent) => void} */
         this._onMenuButtonClickBind = this._onMenuButtonClick.bind(this);
+        /** @type {(event: import('popup-menu').MenuCloseEvent) => void} */
         this._onMenuButtonMenuCloseBind = this._onMenuButtonMenuClose.bind(this);
+        /** @type {ThemeController} */
         this._themeController = new ThemeController(document.documentElement);
 
         this._hotkeyHandler.registerActions([
@@ -188,10 +220,12 @@ export class Display extends EventDispatcher {
         ]);
     }
 
+    /** @type {DisplayGenerator} */
     get displayGenerator() {
         return this._displayGenerator;
     }
 
+    /** @type {boolean} */
     get queryParserVisible() {
         return this._queryParserVisible;
     }
@@ -201,58 +235,72 @@ export class Display extends EventDispatcher {
         this._updateQueryParser();
     }
 
+    /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
     get japaneseUtil() {
         return this._japaneseUtil;
     }
 
+    /** @type {number} */
     get depth() {
         return this._depth;
     }
 
+    /** @type {import('../input/hotkey-handler.js').HotkeyHandler} */
     get hotkeyHandler() {
         return this._hotkeyHandler;
     }
 
+    /** @type {import('dictionary').DictionaryEntry[]} */
     get dictionaryEntries() {
         return this._dictionaryEntries;
     }
 
+    /** @type {HTMLElement[]} */
     get dictionaryEntryNodes() {
         return this._dictionaryEntryNodes;
     }
 
+    /** @type {DynamicProperty<boolean>} */
     get progressIndicatorVisible() {
         return this._progressIndicatorVisible;
     }
 
+    /** @type {?string} */
     get parentPopupId() {
         return this._parentPopupId;
     }
 
+    /** @type {number} */
     get selectedIndex() {
         return this._index;
     }
 
+    /** @type {DisplayHistory} */
     get history() {
         return this._history;
     }
 
+    /** @type {string} */
     get query() {
         return this._query;
     }
 
+    /** @type {string} */
     get fullQuery() {
         return this._fullQuery;
     }
 
+    /** @type {number} */
     get queryOffset() {
         return this._queryOffset;
     }
 
+    /** @type {boolean} */
     get frameVisible() {
         return this._frameVisible;
     }
 
+    /** */
     async prepare() {
         // Theme
         this._themeController.siteTheme = 'light';
@@ -302,6 +350,9 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @returns {import('extension').ContentOrigin}
+     */
     getContentOrigin() {
         return {
             tabId: this._contentOriginTabId,
@@ -309,6 +360,7 @@ export class Display extends EventDispatcher {
         };
     }
 
+    /** */
     initializeState() {
         this._onStateChanged();
         if (this._frameEndpoint !== null) {
@@ -316,6 +368,9 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {{clearable?: boolean, useBrowserHistory?: boolean}} details
+     */
     setHistorySettings({clearable, useBrowserHistory}) {
         if (typeof clearable !== 'undefined') {
             this._history.clearable = clearable;
@@ -325,24 +380,37 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {Error} error
+     */
     onError(error) {
         if (yomitan.isExtensionUnloaded) { return; }
         log.error(error);
     }
 
+    /**
+     * @returns {?import('settings').ProfileOptions}
+     */
     getOptions() {
         return this._options;
     }
 
+    /**
+     * @returns {import('settings').OptionsContext}
+     */
     getOptionsContext() {
         return this._optionsContext;
     }
 
+    /**
+     * @param {import('settings').OptionsContext} optionsContext
+     */
     async setOptionsContext(optionsContext) {
         this._optionsContext = optionsContext;
         await this.updateOptions();
     }
 
+    /** */
     async updateOptions() {
         const options = await yomitan.api.optionsGet(this.getOptionsContext());
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
@@ -381,12 +449,14 @@ export class Display extends EventDispatcher {
         this._updateNestedFrontend(options);
         this._updateContentTextScanner(options);
 
-        this.trigger('optionsUpdated', {options});
+        /** @type {import('display').OptionsUpdatedEvent} */
+        const event = {options};
+        this.trigger('optionsUpdated', event);
     }
 
     /**
      * Updates the content of the display.
-     * @param {ContentDetails} details Information about the content to show.
+     * @param {import('display').ContentDetails} details Information about the content to show.
      */
     setContent(details) {
         const {focus, params, state, content} = details;
@@ -398,6 +468,7 @@ export class Display extends EventDispatcher {
 
         const urlSearchParams = new URLSearchParams();
         for (const [key, value] of Object.entries(params)) {
+            if (typeof value !== 'string') { continue; }
             urlSearchParams.append(key, value);
         }
         const url = `${location.protocol}//${location.host}${location.pathname}?${urlSearchParams.toString()}`;
@@ -417,6 +488,9 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {string} css
+     */
     setCustomCss(css) {
         if (this._styleNode === null) {
             if (css.length === 0) { return; }
@@ -431,18 +505,25 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {import('core').MessageHandlerArray} handlers
+     */
     registerDirectMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {
             this._directMessageHandlers.set(name, handlerInfo);
         }
     }
 
+    /**
+     * @param {import('core').MessageHandlerArray} handlers
+     */
     registerWindowMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {
             this._windowMessageHandlers.set(name, handlerInfo);
         }
     }
 
+    /** */
     close() {
         switch (this._pageType) {
             case 'popup':
@@ -454,49 +535,72 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {HTMLElement} element
+     */
     blurElement(element) {
         this._documentFocusController.blurElement(element);
     }
 
+    /**
+     * @param {boolean} updateOptionsContext
+     */
     searchLast(updateOptionsContext) {
         const type = this._contentType;
         if (type === 'clear') { return; }
         const query = this._query;
-        const hasState = this._historyHasState();
-        const state = (
+        const {state} = this._history;
+        const hasState = typeof state === 'object' && state !== null;
+        /** @type {import('display').HistoryState} */
+        const newState = (
             hasState ?
-            clone(this._history.state) :
+            clone(state) :
             {
                 focusEntry: 0,
-                optionsContext: null,
+                optionsContext: void 0,
                 url: window.location.href,
                 sentence: {text: query, offset: 0},
                 documentTitle: document.title
             }
         );
         if (!hasState || updateOptionsContext) {
-            state.optionsContext = clone(this._optionsContext);
+            newState.optionsContext = clone(this._optionsContext);
         }
+        /** @type {import('display').ContentDetails} */
         const details = {
             focus: false,
             historyMode: 'clear',
             params: this._createSearchParams(type, query, false, this._queryOffset),
-            state,
+            state: newState,
             content: {
-                dictionaryEntries: null,
                 contentOrigin: this.getContentOrigin()
             }
         };
         this.setContent(details);
     }
 
+    /**
+     * @template [TReturn=unknown]
+     * @param {string} action
+     * @param {import('core').SerializableObject} [params]
+     * @returns {Promise<TReturn>}
+     */
     async invokeContentOrigin(action, params={}) {
         if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
             throw new Error('Content origin is same page');
         }
+        if (typeof this._contentOriginTabId !== 'number' || typeof this._contentOriginFrameId !== 'number') {
+            throw new Error('No content origin is assigned');
+        }
         return await yomitan.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
     }
 
+    /**
+     * @template [TReturn=unknown]
+     * @param {string} action
+     * @param {import('core').SerializableObject} [params]
+     * @returns {Promise<TReturn>}
+     */
     async invokeParentFrame(action, params={}) {
         if (this._parentFrameId === null || this._parentFrameId === this._frameId) {
             throw new Error('Invalid parent frame');
@@ -504,11 +608,17 @@ export class Display extends EventDispatcher {
         return await yomitan.crossFrame.invoke(this._parentFrameId, action, params);
     }
 
+    /**
+     * @param {Element} element
+     * @returns {number}
+     */
     getElementDictionaryEntryIndex(element) {
-        const node = element.closest('.entry');
+        const node = /** @type {?HTMLElement} */ (element.closest('.entry'));
         if (node === null) { return -1; }
-        const index = parseInt(node.dataset.index, 10);
-        return Number.isFinite(index) ? index : -1;
+        const {index} = node.dataset;
+        if (typeof index !== 'string') { return -1; }
+        const indexNumber = parseInt(index, 10);
+        return Number.isFinite(indexNumber) ? indexNumber : -1;
     }
 
     /**
@@ -526,9 +636,13 @@ export class Display extends EventDispatcher {
 
     // Message handlers
 
+    /**
+     * @param {import('frame-client').Message<import('display').MessageDetails>} data
+     * @returns {import('core').MessageHandlerAsyncResult}
+     * @throws {Error}
+     */
     _onDirectMessage(data) {
-        data = this._authenticateMessageData(data);
-        const {action, params} = data;
+        const {action, params} = this._authenticateMessageData(data);
         const handlerInfo = this._directMessageHandlers.get(action);
         if (typeof handlerInfo === 'undefined') {
             throw new Error(`Invalid action: ${action}`);
@@ -536,17 +650,24 @@ export class Display extends EventDispatcher {
 
         const {async, handler} = handlerInfo;
         const result = handler(params);
-        return {async, result};
+        return {
+            async: typeof async === 'boolean' && async,
+            result
+        };
     }
 
+    /**
+     * @param {MessageEvent<import('frame-client').Message<import('display').MessageDetails>>} details
+     */
     _onWindowMessage({data}) {
+        let data2;
         try {
-            data = this._authenticateMessageData(data);
+            data2 = this._authenticateMessageData(data);
         } catch (e) {
             return;
         }
 
-        const {action, params} = data;
+        const {action, params} = data2;
         const messageHandler = this._windowMessageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return; }
 
@@ -554,23 +675,38 @@ export class Display extends EventDispatcher {
         invokeMessageHandler(messageHandler, params, callback);
     }
 
+    /**
+     * @param {{optionsContext: import('settings').OptionsContext}} details
+     */
     async _onMessageSetOptionsContext({optionsContext}) {
         await this.setOptionsContext(optionsContext);
         this.searchLast(true);
     }
 
+    /**
+     * @param {{details: import('display').ContentDetails}} details
+     */
     _onMessageSetContent({details}) {
         this.setContent(details);
     }
 
+    /**
+     * @param {{css: string}} details
+     */
     _onMessageSetCustomCss({css}) {
         this.setCustomCss(css);
     }
 
+    /**
+     * @param {{scale: number}} details
+     */
     _onMessageSetContentScale({scale}) {
         this._setContentScale(scale);
     }
 
+    /**
+     * @param {import('display').ConfigureMessageDetails} details
+     */
     async _onMessageConfigure({depth, parentPopupId, parentFrameId, childrenSupported, scale, optionsContext}) {
         this._depth = depth;
         this._parentPopupId = parentPopupId;
@@ -580,11 +716,17 @@ export class Display extends EventDispatcher {
         await this.setOptionsContext(optionsContext);
     }
 
+    /**
+     * @param {{value: boolean}} details
+     */
     _onMessageVisibilityChanged({value}) {
         this._frameVisible = value;
-        this.trigger('frameVisibilityChange', {value});
+        /** @type {import('display').FrameVisibilityChangeEvent} */
+        const event = {value};
+        this.trigger('frameVisibilityChange', event);
     }
 
+    /** */
     _onMessageExtensionUnloaded() {
         if (yomitan.isExtensionUnloaded) { return; }
         yomitan.triggerExtensionUnloaded();
@@ -592,19 +734,27 @@ export class Display extends EventDispatcher {
 
     // Private
 
+    /**
+     * @template [T=unknown]
+     * @param {T|import('frame-client').Message<T>} data
+     * @returns {T}
+     * @throws {Error}
+     */
     _authenticateMessageData(data) {
         if (this._frameEndpoint === null) {
-            return data;
+            return /** @type {T} */ (data);
         }
         if (!this._frameEndpoint.authenticate(data)) {
             throw new Error('Invalid authentication');
         }
-        return data.data;
+        return /** @type {import('frame-client').Message<T>} */ (data).data;
     }
 
+    /** */
     async _onStateChanged() {
         if (this._historyChangeIgnore) { return; }
 
+        /** @type {?import('core').TokenObject} */
         const token = {}; // Unique identifier token
         this._setContentToken = token;
         try {
@@ -628,15 +778,16 @@ export class Display extends EventDispatcher {
             this._queryParserVisibleOverride = (fullVisible === null ? null : (fullVisible !== 'false'));
 
             this._historyHasChanged = true;
-            this._contentType = type;
 
             // Set content
             switch (type) {
                 case 'terms':
                 case 'kanji':
+                    this._contentType = type;
                     await this._setContentTermsOrKanji(type, urlSearchParams, token);
                     break;
                 case 'unloaded':
+                    this._contentType = type;
                     this._setContentExtensionUnloaded();
                     break;
                 default:
@@ -645,18 +796,22 @@ export class Display extends EventDispatcher {
                     break;
             }
         } catch (e) {
-            this.onError(e);
+            this.onError(e instanceof Error ? e : new Error(`${e}`));
         }
     }
 
+    /**
+     * @param {import('display').QueryParserSearchedEvent} details
+     */
     _onQueryParserSearch({type, dictionaryEntries, sentence, inputInfo: {eventType}, textSource, optionsContext, sentenceOffset}) {
         const query = textSource.text();
         const historyState = this._history.state;
         const historyMode = (
             eventType === 'click' ||
-            !isObject(historyState) ||
+            !(typeof historyState === 'object' && historyState !== null) ||
             historyState.cause !== 'queryParser'
         ) ? 'new' : 'overwrite';
+        /** @type {import('display').ContentDetails} */
         const details = {
             focus: false,
             historyMode,
@@ -674,9 +829,11 @@ export class Display extends EventDispatcher {
         this.setContent(details);
     }
 
+    /** */
     _onExtensionUnloaded() {
         const type = 'unloaded';
         if (this._contentType === type) { return; }
+        /** @type {import('display').ContentDetails} */
         const details = {
             focus: false,
             historyMode: 'clear',
@@ -692,21 +849,33 @@ export class Display extends EventDispatcher {
         this.setContent(details);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onCloseButtonClick(e) {
         e.preventDefault();
         this.close();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onSourceTermView(e) {
         e.preventDefault();
         this._sourceTermView();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onNextTermView(e) {
         e.preventDefault();
         this._nextTermView();
     }
 
+    /**
+     * @param {import('dynamic-property').ChangeEventDetails<boolean>} details
+     */
     _onProgressIndicatorVisibleChanged({value}) {
         if (this._progressIndicatorTimer !== null) {
             clearTimeout(this._progressIndicatorTimer);
@@ -726,17 +895,24 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     async _onKanjiLookup(e) {
         try {
             e.preventDefault();
-            if (!this._historyHasState()) { return; }
+            const {state} = this._history;
+            if (!(typeof state === 'object' && state !== null)) { return; }
 
-            let {state: {sentence, url, documentTitle}} = this._history;
+            let {sentence, url, documentTitle} = state;
             if (typeof url !== 'string') { url = window.location.href; }
             if (typeof documentTitle !== 'string') { documentTitle = document.title; }
             const optionsContext = this.getOptionsContext();
-            const query = e.currentTarget.textContent;
+            const element = /** @type {Element} */ (e.currentTarget);
+            let query = element.textContent;
+            if (query === null) { query = ''; }
             const dictionaryEntries = await yomitan.api.kanjiFind(query, optionsContext);
+            /** @type {import('display').ContentDetails} */
             const details = {
                 focus: false,
                 historyMode: 'new',
@@ -755,10 +931,13 @@ export class Display extends EventDispatcher {
             };
             this.setContent(details);
         } catch (error) {
-            this.onError(error);
+            this.onError(error instanceof Error ? error : new Error(`${error}`));
         }
     }
 
+    /**
+     * @param {WheelEvent} e
+     */
     _onWheel(e) {
         if (e.altKey) {
             if (e.deltaY !== 0) {
@@ -770,6 +949,9 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {WheelEvent} e
+     */
     _onHistoryWheel(e) {
         if (e.altKey) { return; }
         const delta = -e.deltaX || e.deltaY;
@@ -784,12 +966,18 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onDebugLogClick(e) {
-        const link = e.currentTarget;
+        const link = /** @type {HTMLElement} */ (e.currentTarget);
         const index = this.getElementDictionaryEntryIndex(link);
         this._logDictionaryEntryData(index);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onDocumentElementMouseUp(e) {
         switch (e.button) {
             case 3: // Back
@@ -805,6 +993,9 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onDocumentElementClick(e) {
         switch (e.button) {
             case 3: // Back
@@ -822,27 +1013,43 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onEntryClick(e) {
         if (e.button !== 0) { return; }
-        const node = e.currentTarget;
-        const index = parseInt(node.dataset.index, 10);
-        if (!Number.isFinite(index)) { return; }
-        this._entrySetCurrent(index);
+        const node = /** @type {HTMLElement} */ (e.currentTarget);
+        const {index} = node.dataset;
+        if (typeof index !== 'string') { return; }
+        const indexNumber = parseInt(index, 10);
+        if (!Number.isFinite(indexNumber)) { return; }
+        this._entrySetCurrent(indexNumber);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onTagClick(e) {
-        this._showTagNotification(e.currentTarget);
+        const node = /** @type {HTMLElement} */ (e.currentTarget);
+        this._showTagNotification(node);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onMenuButtonClick(e) {
-        const node = e.currentTarget;
+        const node = /** @type {HTMLElement} */ (e.currentTarget);
 
-        const menuContainerNode = this._displayGenerator.instantiateTemplate('dictionary-entry-popup-menu');
-        const menuBodyNode = menuContainerNode.querySelector('.popup-menu-body');
+        const menuContainerNode = /** @type {HTMLElement} */ (this._displayGenerator.instantiateTemplate('dictionary-entry-popup-menu'));
+        const menuBodyNode = /** @type {HTMLElement} */ (menuContainerNode.querySelector('.popup-menu-body'));
 
+        /**
+         * @param {string} menuAction
+         * @param {string} label
+         */
         const addItem = (menuAction, label) => {
-            const item = this._displayGenerator.instantiateTemplate('dictionary-entry-popup-menu-item');
-            item.querySelector('.popup-menu-item-label').textContent = label;
+            const item = /** @type {HTMLElement} */ (this._displayGenerator.instantiateTemplate('dictionary-entry-popup-menu-item'));
+            /** @type {HTMLElement} */ (item.querySelector('.popup-menu-item-label')).textContent = label;
             item.dataset.menuAction = menuAction;
             menuBodyNode.appendChild(item);
         };
@@ -854,8 +1061,12 @@ export class Display extends EventDispatcher {
         popupMenu.prepare();
     }
 
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} e
+     */
     _onMenuButtonMenuClose(e) {
-        const {currentTarget: node, detail: {action}} = e;
+        const node = /** @type {HTMLElement} */ (e.currentTarget);
+        const {action} = e.detail;
         switch (action) {
             case 'log-debug-info':
                 this._logDictionaryEntryData(this.getElementDictionaryEntryIndex(node));
@@ -863,27 +1074,36 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {Element} tagNode
+     */
     _showTagNotification(tagNode) {
-        tagNode = tagNode.parentNode;
-        if (tagNode === null) { return; }
+        const parent = tagNode.parentNode;
+        if (parent === null || !(parent instanceof HTMLElement)) { return; }
 
         if (this._tagNotification === null) {
             this._tagNotification = this.createNotification(true);
         }
 
-        const index = this.getElementDictionaryEntryIndex(tagNode);
+        const index = this.getElementDictionaryEntryIndex(parent);
         const dictionaryEntry = (index >= 0 && index < this._dictionaryEntries.length ? this._dictionaryEntries[index] : null);
 
-        const content = this._displayGenerator.createTagFooterNotificationDetails(tagNode, dictionaryEntry);
+        const content = this._displayGenerator.createTagFooterNotificationDetails(parent, dictionaryEntry);
         this._tagNotification.setContent(content);
         this._tagNotification.open();
     }
 
+    /**
+     * @param {boolean} animate
+     */
     _hideTagNotification(animate) {
         if (this._tagNotification === null) { return; }
         this._tagNotification.close(animate);
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
     _updateDocumentOptions(options) {
         const data = document.documentElement.dataset;
         data.ankiEnabled = `${options.anki.enable}`;
@@ -903,6 +1123,9 @@ export class Display extends EventDispatcher {
         data.popupActionBarLocation = `${options.general.popupActionBarLocation}`;
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
     _setTheme(options) {
         const {general} = options;
         const {popupTheme} = general;
@@ -912,11 +1135,19 @@ export class Display extends EventDispatcher {
         this.setCustomCss(general.customPopupCss);
     }
 
+    /**
+     * @param {boolean} isKanji
+     * @param {string} source
+     * @param {boolean} wildcardsEnabled
+     * @param {import('settings').OptionsContext} optionsContext
+     * @returns {Promise<import('dictionary').DictionaryEntry[]>}
+     */
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
         if (isKanji) {
             const dictionaryEntries = await yomitan.api.kanjiFind(source, optionsContext);
             return dictionaryEntries;
         } else {
+            /** @type {import('api').FindTermsDetails} */
             const findDetails = {};
             if (wildcardsEnabled) {
                 const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
@@ -937,6 +1168,11 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {string} type
+     * @param {URLSearchParams} urlSearchParams
+     * @param {import('core').TokenObject} token
+     */
     async _setContentTermsOrKanji(type, urlSearchParams, token) {
         const lookup = (urlSearchParams.get('lookup') !== 'false');
         const wildcardsEnabled = (urlSearchParams.get('wildcards') !== 'off');
@@ -946,20 +1182,21 @@ export class Display extends EventDispatcher {
         if (query === null) { query = ''; }
         let queryFull = urlSearchParams.get('full');
         queryFull = (queryFull !== null ? queryFull : query);
-        let queryOffset = urlSearchParams.get('offset');
-        if (queryOffset !== null) {
-            queryOffset = Number.parseInt(queryOffset, 10);
-            queryOffset = Number.isFinite(queryOffset) ? Math.max(0, Math.min(queryFull.length - query.length, queryOffset)) : null;
+        const queryOffsetString = urlSearchParams.get('offset');
+        let queryOffset = 0;
+        if (queryOffsetString !== null) {
+            queryOffset = Number.parseInt(queryOffsetString, 10);
+            queryOffset = Number.isFinite(queryOffset) ? Math.max(0, Math.min(queryFull.length - query.length, queryOffset)) : 0;
         }
         this._setQuery(query, queryFull, queryOffset);
 
         let {state, content} = this._history;
         let changeHistory = false;
-        if (!isObject(content)) {
+        if (!(typeof content === 'object' && content !== null)) {
             content = {};
             changeHistory = true;
         }
-        if (!isObject(state)) {
+        if (!(typeof state === 'object' && state !== null)) {
             state = {};
             changeHistory = true;
         }
@@ -1052,8 +1289,9 @@ export class Display extends EventDispatcher {
         this._triggerContentUpdateComplete();
     }
 
+    /** */
     _setContentExtensionUnloaded() {
-        const errorExtensionUnloaded = document.querySelector('#error-extension-unloaded');
+        const errorExtensionUnloaded = /** @type {?HTMLElement} */ (document.querySelector('#error-extension-unloaded'));
 
         if (this._container !== null) {
             this._container.hidden = true;
@@ -1071,6 +1309,7 @@ export class Display extends EventDispatcher {
         this._triggerContentUpdateComplete();
     }
 
+    /** */
     _clearContent() {
         this._container.textContent = '';
         this._updateNavigationAuto();
@@ -1080,14 +1319,22 @@ export class Display extends EventDispatcher {
         this._triggerContentUpdateComplete();
     }
 
+    /**
+     * @param {boolean} visible
+     */
     _setNoContentVisible(visible) {
-        const noResults = document.querySelector('#no-results');
+        const noResults = /** @type {?HTMLElement} */ (document.querySelector('#no-results'));
 
         if (noResults !== null) {
             noResults.hidden = !visible;
         }
     }
 
+    /**
+     * @param {string} query
+     * @param {string} fullQuery
+     * @param {number} queryOffset
+     */
     _setQuery(query, fullQuery, queryOffset) {
         this._query = query;
         this._fullQuery = fullQuery;
@@ -1096,6 +1343,7 @@ export class Display extends EventDispatcher {
         this._setTitleText(query);
     }
 
+    /** */
     _updateQueryParser() {
         const text = this._fullQuery;
         const visible = this._isQueryParserVisible();
@@ -1105,6 +1353,9 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {string} text
+     */
     async _setQueryParserText(text) {
         const overrideToken = this._progressIndicatorVisible.setOverride(true);
         try {
@@ -1114,6 +1365,9 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {string} text
+     */
     _setTitleText(text) {
         let title = this._defaultTitle;
         if (text.length > 0) {
@@ -1130,10 +1384,15 @@ export class Display extends EventDispatcher {
         document.title = title;
     }
 
+    /** */
     _updateNavigationAuto() {
         this._updateNavigation(this._history.hasPrevious(), this._history.hasNext());
     }
 
+    /**
+     * @param {boolean} previous
+     * @param {boolean} next
+     */
     _updateNavigation(previous, next) {
         const {documentElement} = document;
         if (documentElement !== null) {
@@ -1148,6 +1407,9 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {number} index
+     */
     _entrySetCurrent(index) {
         const entryPre = this._getEntry(this._index);
         if (entryPre !== null) {
@@ -1162,6 +1424,11 @@ export class Display extends EventDispatcher {
         this._index = index;
     }
 
+    /**
+     * @param {number} index
+     * @param {number} definitionIndex
+     * @param {boolean} smooth
+     */
     _focusEntry(index, definitionIndex, smooth) {
         index = Math.max(Math.min(index, this._dictionaryEntries.length - 1), 0);
 
@@ -1188,6 +1455,11 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {number} offset
+     * @param {boolean} smooth
+     * @returns {boolean}
+     */
     _focusEntryWithDifferentDictionary(offset, smooth) {
         const sign = Math.sign(offset);
         if (sign === 0) { return false; }
@@ -1200,18 +1472,22 @@ export class Display extends EventDispatcher {
         const visibleDefinitionIndex = this._getDictionaryEntryVisibleDefinitionIndex(index, sign);
         if (visibleDefinitionIndex === null) { return false; }
 
-        const {dictionary} = dictionaryEntry.definitions[visibleDefinitionIndex];
         let focusDefinitionIndex = null;
-        for (let i = index; i >= 0 && i < count; i += sign) {
-            const {definitions} = this._dictionaryEntries[i];
-            const jj = definitions.length;
-            let j = (i === index ? visibleDefinitionIndex + sign : (sign > 0 ? 0 : jj - 1));
-            for (; j >= 0 && j < jj; j += sign) {
-                if (definitions[j].dictionary !== dictionary) {
-                    focusDefinitionIndex = j;
-                    index = i;
-                    i = -2; // Terminate outer loop
-                    break;
+        if (dictionaryEntry.type === 'term') {
+            const {dictionary} = dictionaryEntry.definitions[visibleDefinitionIndex];
+            for (let i = index; i >= 0 && i < count; i += sign) {
+                const otherDictionaryEntry = this._dictionaryEntries[i];
+                if (otherDictionaryEntry.type !== 'term') { continue; }
+                const {definitions} = otherDictionaryEntry;
+                const jj = definitions.length;
+                let j = (i === index ? visibleDefinitionIndex + sign : (sign > 0 ? 0 : jj - 1));
+                for (; j >= 0 && j < jj; j += sign) {
+                    if (definitions[j].dictionary !== dictionary) {
+                        focusDefinitionIndex = j;
+                        index = i;
+                        i = -2; // Terminate outer loop
+                        break;
+                    }
                 }
             }
         }
@@ -1222,6 +1498,11 @@ export class Display extends EventDispatcher {
         return true;
     }
 
+    /**
+     * @param {number} index
+     * @param {number} sign
+     * @returns {?number}
+     */
     _getDictionaryEntryVisibleDefinitionIndex(index, sign) {
         const {top: scrollTop, bottom: scrollBottom} = this._windowScroll.getRect();
 
@@ -1247,18 +1528,28 @@ export class Display extends EventDispatcher {
         return visibleIndex !== null ? visibleIndex : (sign > 0 ? definitionCount - 1 : 0);
     }
 
+    /**
+     * @param {number} index
+     * @returns {NodeListOf<HTMLElement>}
+     */
     _getDictionaryEntryDefinitionNodes(index) {
         return this._dictionaryEntryNodes[index].querySelectorAll('.definition-item');
     }
 
+    /** */
     _sourceTermView() {
         this._relativeTermView(false);
     }
 
+    /** */
     _nextTermView() {
         this._relativeTermView(true);
     }
 
+    /**
+     * @param {boolean} next
+     * @returns {boolean}
+     */
     _relativeTermView(next) {
         if (next) {
             return this._history.hasNext() && this._history.forward();
@@ -1267,24 +1558,29 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {number} index
+     * @returns {?HTMLElement}
+     */
     _getEntry(index) {
         const entries = this._dictionaryEntryNodes;
         return index >= 0 && index < entries.length ? entries[index] : null;
     }
 
+    /**
+     * @param {Element} element
+     * @returns {number}
+     */
     _getElementTop(element) {
         const elementRect = element.getBoundingClientRect();
         const documentRect = this._contentScrollBodyElement.getBoundingClientRect();
         return elementRect.top - documentRect.top;
     }
 
-    _historyHasState() {
-        return isObject(this._history.state);
-    }
-
+    /** */
     _updateHistoryState() {
         const {state, content} = this._history;
-        if (!isObject(state)) { return; }
+        if (!(typeof state === 'object' && state !== null)) { return; }
 
         state.focusEntry = this._index;
         state.scrollX = this._windowScroll.x;
@@ -1292,6 +1588,10 @@ export class Display extends EventDispatcher {
         this._replaceHistoryStateNoNavigate(state, content);
     }
 
+    /**
+     * @param {import('display-history').EntryState} state
+     * @param {?import('display-history').EntryContent} content
+     */
     _replaceHistoryStateNoNavigate(state, content) {
         const historyChangeIgnorePre = this._historyChangeIgnore;
         try {
@@ -1302,7 +1602,15 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {import('display').PageType} type
+     * @param {string} query
+     * @param {boolean} wildcards
+     * @param {?number} sentenceOffset
+     * @returns {import('display').HistoryParams}
+     */
     _createSearchParams(type, query, wildcards, sentenceOffset) {
+        /** @type {import('display').HistoryParams} */
         const params = {};
         const fullQuery = this._fullQuery;
         const includeFull = (query.length < fullQuery.length);
@@ -1325,6 +1633,9 @@ export class Display extends EventDispatcher {
         return params;
     }
 
+    /**
+     * @returns {boolean}
+     */
     _isQueryParserVisible() {
         return (
             this._queryParserVisibleOverride !== null ?
@@ -1333,22 +1644,34 @@ export class Display extends EventDispatcher {
         );
     }
 
+    /** */
     _closePopups() {
         yomitan.trigger('closePopups');
     }
 
+    /**
+     * @param {import('settings').OptionsContext} optionsContext
+     */
     async _setOptionsContextIfDifferent(optionsContext) {
         if (deepEqual(this._optionsContext, optionsContext)) { return; }
         await this.setOptionsContext(optionsContext);
     }
 
+    /**
+     * @param {number} scale
+     */
     _setContentScale(scale) {
         const body = document.body;
         if (body === null) { return; }
         body.style.fontSize = `${scale}em`;
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
     async _updateNestedFrontend(options) {
+        if (typeof this._frameId !== 'number') { return; }
+
         const isSearchPage = (this._pageType === 'search');
         const isEnabled = (
             this._childrenSupported &&
@@ -1376,15 +1699,18 @@ export class Display extends EventDispatcher {
             }
         }
 
-        this._frontend.setDisabledOverride(!isEnabled);
+        /** @type {Frontend} */ (this._frontend).setDisabledOverride(!isEnabled);
     }
 
+    /** */
     async _setupNestedFrontend() {
-        const setupNestedPopupsOptions = {
-            useProxyPopup: this._parentFrameId !== null,
-            parentPopupId: this._parentPopupId,
-            parentFrameId: this._parentFrameId
-        };
+        if (typeof this._frameId !== 'number') {
+            throw new Error('No frameId assigned');
+        }
+
+        const useProxyPopup = this._parentFrameId !== null;
+        const parentPopupId = this._parentPopupId;
+        const parentFrameId = this._parentFrameId;
 
         await dynamicLoader.loadScripts([
             '/js/language/text-scanner.js',
@@ -1401,7 +1727,11 @@ export class Display extends EventDispatcher {
         const popupFactory = new PopupFactory(this._frameId);
         popupFactory.prepare();
 
-        Object.assign(setupNestedPopupsOptions, {
+        /** @type {import('frontend').ConstructorDetails} */
+        const setupNestedPopupsOptions = {
+            useProxyPopup,
+            parentPopupId,
+            parentFrameId,
             depth: this._depth + 1,
             tabId: this._tabId,
             frameId: this._frameId,
@@ -1410,19 +1740,25 @@ export class Display extends EventDispatcher {
             allowRootFramePopupProxy: true,
             childrenSupported: this._childrenSupported,
             hotkeyHandler: this._hotkeyHandler
-        });
+        };
 
         const frontend = new Frontend(setupNestedPopupsOptions);
         this._frontend = frontend;
         await frontend.prepare();
     }
 
+    /**
+     * @returns {boolean}
+     */
     _copyHostSelection() {
-        if (this._contentOriginFrameId === null || window.getSelection().toString()) { return false; }
+        if (typeof this._contentOriginFrameId !== 'number') { return false; }
+        const selection = window.getSelection();
+        if (selection !== null && selection.toString().length > 0) { return false; }
         this._copyHostSelectionSafe();
         return true;
     }
 
+    /** */
     async _copyHostSelectionSafe() {
         try {
             await this._copyHostSelectionInner();
@@ -1431,11 +1767,13 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /** */
     async _copyHostSelectionInner() {
         switch (this._browser) {
             case 'firefox':
             case 'firefox-mobile':
                 {
+                    /** @type {string} */
                     let text;
                     try {
                         text = await this.invokeContentOrigin('Frontend.getSelectionText');
@@ -1451,6 +1789,9 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {string} text
+     */
     _copyText(text) {
         const parent = document.body;
         if (parent === null) { return; }
@@ -1468,6 +1809,9 @@ export class Display extends EventDispatcher {
         parent.removeChild(textarea);
     }
 
+    /**
+     * @param {HTMLElement} entry
+     */
     _addEntryEventListeners(entry) {
         const eventListeners = this._eventListeners;
         eventListeners.addEventListener(entry, 'click', this._onEntryClickBind);
@@ -1483,6 +1827,9 @@ export class Display extends EventDispatcher {
         }
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
     _updateContentTextScanner(options) {
         if (!options.scanning.enablePopupSearch) {
             if (this._contentTextScanner !== null) {
@@ -1544,10 +1891,14 @@ export class Display extends EventDispatcher {
         this._contentTextScanner.setEnabled(true);
     }
 
+    /** */
     _onContentTextScannerClear() {
-        this._contentTextScanner.clearSelection();
+        /** @type {TextScanner} */ (this._contentTextScanner).clearSelection();
     }
 
+    /**
+     * @param {import('text-scanner').SearchedEventDetails} details
+     */
     _onContentTextScannerSearched({type, dictionaryEntries, sentence, textSource, optionsContext, error}) {
         if (error !== null && !yomitan.isExtensionUnloaded) {
             log.error(error);
@@ -1558,6 +1909,7 @@ export class Display extends EventDispatcher {
         const query = textSource.text();
         const url = window.location.href;
         const documentTitle = document.title;
+        /** @type {import('display').ContentDetails} */
         const details = {
             focus: false,
             historyMode: 'new',
@@ -1568,28 +1920,35 @@ export class Display extends EventDispatcher {
             },
             state: {
                 focusEntry: 0,
-                optionsContext,
+                optionsContext: optionsContext !== null ? optionsContext : void 0,
                 url,
-                sentence,
+                sentence: sentence !== null ? sentence : void 0,
                 documentTitle
             },
             content: {
-                dictionaryEntries,
+                dictionaryEntries: dictionaryEntries !== null ? dictionaryEntries : void 0,
                 contentOrigin: this.getContentOrigin()
             }
         };
-        this._contentTextScanner.clearSelection();
+        /** @type {TextScanner} */ (this._contentTextScanner).clearSelection();
         this.setContent(details);
     }
 
+    /**
+     * @type {import('display').GetSearchContextCallback}
+     */
     _getSearchContext() {
         return {optionsContext: this.getOptionsContext()};
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
     _updateHotkeys(options) {
         this._hotkeyHandler.setHotkeys(this._pageType, options.inputs.hotkeys);
     }
 
+    /** */
     async _closeTab() {
         const tab = await new Promise((resolve, reject) => {
             chrome.tabs.getCurrent((result) => {
@@ -1602,7 +1961,7 @@ export class Display extends EventDispatcher {
             });
         });
         const tabId = tab.id;
-        await new Promise((resolve, reject) => {
+        await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
             chrome.tabs.remove(tabId, () => {
                 const e = chrome.runtime.lastError;
                 if (e) {
@@ -1611,27 +1970,36 @@ export class Display extends EventDispatcher {
                     resolve();
                 }
             });
-        });
+        }));
     }
 
+    /** */
     _onHotkeyClose() {
         if (this._closeSinglePopupMenu()) { return; }
         this.close();
     }
 
+    /**
+     * @param {number} sign
+     * @param {unknown} argument
+     */
     _onHotkeyActionMoveRelative(sign, argument) {
-        let count = Number.parseInt(argument, 10);
+        let count = typeof argument === 'number' ? argument : (typeof argument === 'string' ? Number.parseInt(argument, 10) : 0);
         if (!Number.isFinite(count)) { count = 1; }
         count = Math.max(0, Math.floor(count));
         this._focusEntry(this._index + count * sign, 0, true);
     }
 
+    /** */
     _closeAllPopupMenus() {
         for (const popupMenu of PopupMenu.openMenus) {
             popupMenu.close();
         }
     }
 
+    /**
+     * @returns {boolean}
+     */
     _closeSinglePopupMenu() {
         for (const popupMenu of PopupMenu.openMenus) {
             popupMenu.close();
@@ -1640,13 +2008,19 @@ export class Display extends EventDispatcher {
         return false;
     }
 
+    /**
+     * @param {number} index
+     */
     async _logDictionaryEntryData(index) {
         if (index < 0 || index >= this._dictionaryEntries.length) { return; }
         const dictionaryEntry = this._dictionaryEntries[index];
         const result = {dictionaryEntry};
 
+        /** @type {Promise<unknown>[]} */
         const promises = [];
-        this.trigger('logDictionaryEntryData', {dictionaryEntry, promises});
+        /** @type {import('display').LogDictionaryEntryDataEvent} */
+        const event = {dictionaryEntry, promises};
+        this.trigger('logDictionaryEntryData', event);
         if (promises.length > 0) {
             for (const result2 of await Promise.all(promises)) {
                 Object.assign(result, result2);
@@ -1656,19 +2030,33 @@ export class Display extends EventDispatcher {
         console.log(result);
     }
 
+    /** */
     _triggerContentClear() {
         this.trigger('contentClear', {});
     }
 
+    /** */
     _triggerContentUpdateStart() {
-        this.trigger('contentUpdateStart', {type: this._contentType, query: this._query});
+        /** @type {import('display').ContentUpdateStartEvent} */
+        const event = {type: this._contentType, query: this._query};
+        this.trigger('contentUpdateStart', event);
     }
 
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @param {Element} element
+     * @param {number} index
+     */
     _triggerContentUpdateEntry(dictionaryEntry, element, index) {
-        this.trigger('contentUpdateEntry', {dictionaryEntry, element, index});
+        /** @type {import('display').ContentUpdateEntryEvent} */
+        const event = {dictionaryEntry, element, index};
+        this.trigger('contentUpdateEntry', event);
     }
 
+    /** */
     _triggerContentUpdateComplete() {
-        this.trigger('contentUpdateComplete', {type: this._contentType});
+        /** @type {import('display').ContentUpdateCompleteEvent} */
+        const event = {type: this._contentType};
+        this.trigger('contentUpdateComplete', event);
     }
 }

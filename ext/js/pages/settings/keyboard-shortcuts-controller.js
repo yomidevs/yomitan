@@ -23,16 +23,29 @@ import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
 export class KeyboardShortcutController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {KeyboardShortcutHotkeyEntry[]} */
         this._entries = [];
+        /** @type {?import('environment').OperatingSystem} */
         this._os = null;
+        /** @type {?HTMLButtonElement} */
         this._addButton = null;
+        /** @type {?HTMLButtonElement} */
         this._resetButton = null;
+        /** @type {?HTMLElement} */
         this._listContainer = null;
+        /** @type {?HTMLElement} */
         this._emptyIndicator = null;
+        /** @type {Intl.Collator} */
         this._stringComparer = new Intl.Collator('en-US'); // Invariant locale
+        /** @type {?HTMLElement} */
         this._scrollContainer = null;
+        /** @type {Map<string, import('keyboard-shortcut-controller').ActionDetails>} */
         this._actionDetails = new Map([
             ['',                                 {scopes: new Set()}],
             ['close',                            {scopes: new Set(['popup', 'search'])}],
@@ -58,19 +71,21 @@ export class KeyboardShortcutController {
         ]);
     }
 
+    /** @type {import('./settings-controller.js').SettingsController} */
     get settingsController() {
         return this._settingsController;
     }
 
+    /** */
     async prepare() {
         const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._os = os;
 
-        this._addButton = document.querySelector('#hotkey-list-add');
-        this._resetButton = document.querySelector('#hotkey-list-reset');
-        this._listContainer = document.querySelector('#hotkey-list');
-        this._emptyIndicator = document.querySelector('#hotkey-list-empty');
-        this._scrollContainer = document.querySelector('#keyboard-shortcuts-modal .modal-body');
+        this._addButton = /** @type {HTMLButtonElement} */ (document.querySelector('#hotkey-list-add'));
+        this._resetButton = /** @type {HTMLButtonElement} */ (document.querySelector('#hotkey-list-reset'));
+        this._listContainer = /** @type {HTMLElement} */ (document.querySelector('#hotkey-list'));
+        this._emptyIndicator = /** @type {HTMLElement} */ (document.querySelector('#hotkey-list-empty'));
+        this._scrollContainer = /** @type {HTMLElement} */ (document.querySelector('#keyboard-shortcuts-modal .modal-body'));
 
         this._addButton.addEventListener('click', this._onAddClick.bind(this));
         this._resetButton.addEventListener('click', this._onResetClick.bind(this));
@@ -79,6 +94,9 @@ export class KeyboardShortcutController {
         await this._updateOptions();
     }
 
+    /**
+     * @param {import('settings').InputsHotkeyOptions} terminationCharacterEntry
+     */
     async addEntry(terminationCharacterEntry) {
         const options = await this._settingsController.getOptions();
         const {inputs: {hotkeys}} = options;
@@ -92,9 +110,14 @@ export class KeyboardShortcutController {
         }]);
 
         await this._updateOptions();
-        this._scrollContainer.scrollTop = this._scrollContainer.scrollHeight;
+        const scrollContainer = /** @type {HTMLElement} */ (this._scrollContainer);
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
     }
 
+    /**
+     * @param {number} index
+     * @returns {Promise<boolean>}
+     */
     async deleteEntry(index) {
         const options = await this._settingsController.getOptions();
         const {inputs: {hotkeys}} = options;
@@ -113,55 +136,79 @@ export class KeyboardShortcutController {
         return true;
     }
 
+    /**
+     * @param {import('settings-modifications').Modification[]} targets
+     * @returns {Promise<import('settings-controller').ModifyResult[]>}
+     */
     async modifyProfileSettings(targets) {
         return await this._settingsController.modifyProfileSettings(targets);
     }
 
+    /**
+     * @returns {Promise<import('settings').InputsHotkeyOptions[]>}
+     */
     async getDefaultHotkeys() {
         const defaultOptions = await this._settingsController.getDefaultOptions();
         return defaultOptions.profiles[0].options.inputs.hotkeys;
     }
 
+    /**
+     * @param {string} action
+     * @returns {import('keyboard-shortcut-controller').ActionDetails|undefined}
+     */
     getActionDetails(action) {
         return this._actionDetails.get(action);
     }
 
     // Private
 
+    /**
+     * @param {import('settings-controller').OptionsChangedEvent} details
+     */
     _onOptionsChanged({options}) {
         for (const entry of this._entries) {
             entry.cleanup();
         }
 
         this._entries = [];
+        const os = /** @type {import('environment').OperatingSystem} */ (this._os);
         const {inputs: {hotkeys}} = options;
         const fragment = document.createDocumentFragment();
 
         for (let i = 0, ii = hotkeys.length; i < ii; ++i) {
             const hotkeyEntry = hotkeys[i];
-            const node = this._settingsController.instantiateTemplate('hotkey-list-item');
+            const node = /** @type {HTMLElement} */ (this._settingsController.instantiateTemplate('hotkey-list-item'));
             fragment.appendChild(node);
-            const entry = new KeyboardShortcutHotkeyEntry(this, hotkeyEntry, i, node, this._os, this._stringComparer);
+            const entry = new KeyboardShortcutHotkeyEntry(this, hotkeyEntry, i, node, os, this._stringComparer);
             this._entries.push(entry);
             entry.prepare();
         }
 
-        this._listContainer.appendChild(fragment);
-        this._listContainer.hidden = (hotkeys.length === 0);
-        this._emptyIndicator.hidden = (hotkeys.length !== 0);
+        const listContainer = /** @type {HTMLElement} */ (this._listContainer);
+        listContainer.appendChild(fragment);
+        listContainer.hidden = (hotkeys.length === 0);
+        /** @type {HTMLElement} */ (this._emptyIndicator).hidden = (hotkeys.length !== 0);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onAddClick(e) {
         e.preventDefault();
         this._addNewEntry();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onResetClick(e) {
         e.preventDefault();
         this._reset();
     }
 
+    /** */
     async _addNewEntry() {
+        /** @type {import('settings').InputsHotkeyOptions} */
         const newEntry = {
             action: '',
             argument: '',
@@ -170,14 +217,17 @@ export class KeyboardShortcutController {
             scopes: ['popup', 'search'],
             enabled: true
         };
-        return await this.addEntry(newEntry);
+        await this.addEntry(newEntry);
     }
 
+    /** */
     async _updateOptions() {
         const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        const optionsContext = this._settingsController.getOptionsContext();
+        this._onOptionsChanged({options, optionsContext});
     }
 
+    /** */
     async _reset() {
         const value = await this.getDefaultHotkeys();
         await this._settingsController.setProfileSetting('inputs.hotkeys', value);
@@ -186,34 +236,59 @@ export class KeyboardShortcutController {
 }
 
 class KeyboardShortcutHotkeyEntry {
+    /**
+     * @param {KeyboardShortcutController} parent
+     * @param {import('settings').InputsHotkeyOptions} data
+     * @param {number} index
+     * @param {HTMLElement} node
+     * @param {import('environment').OperatingSystem} os
+     * @param {Intl.Collator} stringComparer
+     */
     constructor(parent, data, index, node, os, stringComparer) {
+        /** @type {KeyboardShortcutController} */
         this._parent = parent;
+        /** @type {import('settings').InputsHotkeyOptions} */
         this._data = data;
+        /** @type {number} */
         this._index = index;
+        /** @type {HTMLElement} */
         this._node = node;
+        /** @type {import('environment').OperatingSystem} */
         this._os = os;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {?KeyboardMouseInputField} */
         this._inputField = null;
+        /** @type {?HTMLSelectElement} */
         this._actionSelect = null;
+        /** @type {string} */
         this._basePath = `inputs.hotkeys[${this._index}]`;
+        /** @type {Intl.Collator} */
         this._stringComparer = stringComparer;
+        /** @type {?HTMLButtonElement} */
         this._enabledButton = null;
+        /** @type {?import('../../dom/popup-menu.js').PopupMenu} */
         this._scopeMenu = null;
+        /** @type {EventListenerCollection} */
         this._scopeMenuEventListeners = new EventListenerCollection();
+        /** @type {?HTMLElement} */
         this._argumentContainer = null;
+        /** @type {?HTMLInputElement} */
         this._argumentInput = null;
+        /** @type {EventListenerCollection} */
         this._argumentEventListeners = new EventListenerCollection();
     }
 
+    /** */
     prepare() {
         const node = this._node;
 
-        const menuButton = node.querySelector('.hotkey-list-item-button');
-        const input = node.querySelector('.hotkey-list-item-input');
-        const action = node.querySelector('.hotkey-list-item-action');
-        const enabledToggle = node.querySelector('.hotkey-list-item-enabled');
-        const scopesButton = node.querySelector('.hotkey-list-item-scopes-button');
-        const enabledButton = node.querySelector('.hotkey-list-item-enabled-button');
+        const menuButton = /** @type {HTMLButtonElement} */ (node.querySelector('.hotkey-list-item-button'));
+        const input = /** @type {HTMLInputElement} */ (node.querySelector('.hotkey-list-item-input'));
+        const action = /** @type {HTMLSelectElement} */ (node.querySelector('.hotkey-list-item-action'));
+        const enabledToggle = /** @type {HTMLInputElement} */ (node.querySelector('.hotkey-list-item-enabled'));
+        const scopesButton = /** @type {HTMLButtonElement} */ (node.querySelector('.hotkey-list-item-scopes-button'));
+        const enabledButton = /** @type {HTMLButtonElement} */ (node.querySelector('.hotkey-list-item-enabled-button'));
 
         this._actionSelect = action;
         this._enabledButton = enabledButton;
@@ -238,9 +313,10 @@ class KeyboardShortcutHotkeyEntry {
         this._eventListeners.on(this._inputField, 'change', this._onInputFieldChange.bind(this));
     }
 
+    /** */
     cleanup() {
         this._eventListeners.removeAllEventListeners();
-        this._inputField.cleanup();
+        /** @type {KeyboardMouseInputField} */ (this._inputField).cleanup();
         this._clearScopeMenu();
         this._clearArgumentEventListeners();
         if (this._node.parentNode !== null) {
@@ -250,11 +326,14 @@ class KeyboardShortcutHotkeyEntry {
 
     // Private
 
+    /**
+     * @param {import('popup-menu').MenuOpenEvent} e
+     */
     _onMenuOpen(e) {
         const {action} = this._data;
 
         const {menu} = e.detail;
-        const resetArgument = menu.bodyNode.querySelector('.popup-menu-item[data-menu-action="resetArgument"]');
+        const resetArgument = /** @type {HTMLElement} */ (menu.bodyNode.querySelector('.popup-menu-item[data-menu-action="resetArgument"]'));
 
         const details = this._parent.getActionDetails(action);
         const argumentDetails = typeof details !== 'undefined' ? details.argument : void 0;
@@ -262,13 +341,16 @@ class KeyboardShortcutHotkeyEntry {
         resetArgument.hidden = (typeof argumentDetails === 'undefined');
     }
 
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} e
+     */
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'delete':
                 this._delete();
                 break;
             case 'clearInputs':
-                this._inputField.clearInputs();
+                /** @type {KeyboardMouseInputField} */ (this._inputField).clearInputs();
                 break;
             case 'resetInput':
                 this._resetInput();
@@ -279,10 +361,13 @@ class KeyboardShortcutHotkeyEntry {
         }
     }
 
+    /**
+     * @param {import('popup-menu').MenuOpenEvent} e
+     */
     _onScopesMenuOpen(e) {
         const {menu} = e.detail;
         const validScopes = this._getValidScopesForAction(this._data.action);
-        if (validScopes.size === 0) {
+        if (validScopes === null || validScopes.size === 0) {
             menu.close();
             return;
         }
@@ -291,6 +376,9 @@ class KeyboardShortcutHotkeyEntry {
         this._updateDisplay(menu.containerNode); // Fix a animation issue due to changing checkbox values
     }
 
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} e
+     */
     _onScopesMenuClose(e) {
         const {menu, action} = e.detail;
         if (action === 'toggleScope') {
@@ -302,24 +390,45 @@ class KeyboardShortcutHotkeyEntry {
         }
     }
 
+    /**
+     * @param {import('keyboard-mouse-input-field').ChangeEvent} details
+     */
     _onInputFieldChange({key, modifiers}) {
-        this._setKeyAndModifiers(key, modifiers);
+        /** @type {import('input').ModifierKey[]} */
+        const modifiers2 = [];
+        for (const modifier of modifiers) {
+            const modifier2 = DocumentUtil.normalizeModifierKey(modifier);
+            if (modifier2 === null) { continue; }
+            modifiers2.push(modifier2);
+        }
+        this._setKeyAndModifiers(key, modifiers2);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onScopeCheckboxChange(e) {
-        const node = e.currentTarget;
-        const {scope} = node.dataset;
-        if (typeof scope !== 'string') { return; }
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
+        const scope = this._normalizeScope(node.dataset.scope);
+        if (scope === null) { return; }
         this._setScopeEnabled(scope, node.checked);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onActionSelectChange(e) {
-        const value = e.currentTarget.value;
+        const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        const value = node.value;
         this._setAction(value);
     }
 
+    /**
+     * @param {string} template
+     * @param {Event} e
+     */
     _onArgumentValueChange(template, e) {
-        const node = e.currentTarget;
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         let value = this._getArgumentInputValue(node);
         switch (template) {
             case 'hotkey-argument-move-offset':
@@ -329,10 +438,15 @@ class KeyboardShortcutHotkeyEntry {
         this._setArgument(value);
     }
 
+    /** */
     async _delete() {
         this._parent.deleteEntry(this._index);
     }
 
+    /**
+     * @param {?string} key
+     * @param {import('input').ModifierKey[]} modifiers
+     */
     async _setKeyAndModifiers(key, modifiers) {
         this._data.key = key;
         this._data.modifiers = modifiers;
@@ -350,6 +464,10 @@ class KeyboardShortcutHotkeyEntry {
         ]);
     }
 
+    /**
+     * @param {import('settings').InputsHotkeyScope} scope
+     * @param {boolean} enabled
+     */
     async _setScopeEnabled(scope, enabled) {
         const scopes = this._data.scopes;
         const index = scopes.indexOf(scope);
@@ -372,10 +490,15 @@ class KeyboardShortcutHotkeyEntry {
         this._updateScopesButton();
     }
 
+    /**
+     * @param {import('settings-modifications').Modification[]} targets
+     * @returns {Promise<import('settings-controller').ModifyResult[]>}
+     */
     async _modifyProfileSettings(targets) {
         return await this._parent.settingsController.modifyProfileSettings(targets);
     }
 
+    /** */
     async _resetInput() {
         const defaultHotkeys = await this._parent.getDefaultHotkeys();
         const defaultValue = this._getDefaultKeyAndModifiers(defaultHotkeys, this._data.action);
@@ -383,9 +506,10 @@ class KeyboardShortcutHotkeyEntry {
 
         const {key, modifiers} = defaultValue;
         await this._setKeyAndModifiers(key, modifiers);
-        this._inputField.setInput(key, modifiers);
+        /** @type {KeyboardMouseInputField} */ (this._inputField).setInput(key, modifiers);
     }
 
+    /** */
     async _resetArgument() {
         const {action} = this._data;
         const details = this._parent.getActionDetails(action);
@@ -395,6 +519,11 @@ class KeyboardShortcutHotkeyEntry {
         await this._setArgument(argumentDefault);
     }
 
+    /**
+     * @param {import('settings').InputsHotkeyOptions[]} defaultHotkeys
+     * @param {string} action
+     * @returns {?{modifiers: import('settings').InputsHotkeyModifier[], key: ?string}}
+     */
     _getDefaultKeyAndModifiers(defaultHotkeys, action) {
         for (const {action: action2, key, modifiers} of defaultHotkeys) {
             if (action2 !== action) { continue; }
@@ -403,16 +532,18 @@ class KeyboardShortcutHotkeyEntry {
         return null;
     }
 
+    /**
+     * @param {string} value
+     */
     async _setAction(value) {
         const validScopesOld = this._getValidScopesForAction(this._data.action);
 
         const scopes = this._data.scopes;
 
         let details = this._parent.getActionDetails(value);
-        if (typeof details === 'undefined') { details = {}; }
+        if (typeof details === 'undefined') { details = {scopes: new Set()}; }
 
-        let validScopes = details.scopes;
-        if (typeof validScopes === 'undefined') { validScopes = new Set(); }
+        const validScopes = details.scopes;
 
         const {argument: argumentDetails} = details;
         let defaultArgument = typeof argumentDetails !== 'undefined' ? argumentDetails.default : '';
@@ -462,6 +593,9 @@ class KeyboardShortcutHotkeyEntry {
         this._updateActionArgument();
     }
 
+    /**
+     * @param {string} value
+     */
     async _setArgument(value) {
         this._data.argument = value;
 
@@ -479,16 +613,24 @@ class KeyboardShortcutHotkeyEntry {
         }]);
     }
 
+    /** */
     _updateScopesMenu() {
         if (this._scopeMenu === null) { return; }
         this._updateScopeMenuItems(this._scopeMenu);
     }
 
+    /**
+     * @param {string} action
+     * @returns {?Set<import('settings').InputsHotkeyScope>}
+     */
     _getValidScopesForAction(action) {
         const details = this._parent.getActionDetails(action);
         return typeof details !== 'undefined' ? details.scopes : null;
     }
 
+    /**
+     * @param {import('../../dom/popup-menu.js').PopupMenu} menu
+     */
     _updateScopeMenuItems(menu) {
         this._scopeMenuEventListeners.removeAllEventListeners();
 
@@ -496,14 +638,15 @@ class KeyboardShortcutHotkeyEntry {
         const validScopes = this._getValidScopesForAction(this._data.action);
 
         const bodyNode = menu.bodyNode;
-        const menuItems = bodyNode.querySelectorAll('.popup-menu-item');
+        const menuItems = /** @type {NodeListOf<HTMLElement>} */ (bodyNode.querySelectorAll('.popup-menu-item'));
         for (const menuItem of menuItems) {
             if (menuItem.dataset.menuAction !== 'toggleScope') { continue; }
 
-            const {scope} = menuItem.dataset;
+            const scope = this._normalizeScope(menuItem.dataset.scope);
+            if (scope === null) { continue; }
             menuItem.hidden = !(validScopes === null || validScopes.has(scope));
 
-            const checkbox = menuItem.querySelector('.hotkey-scope-checkbox');
+            const checkbox = /** @type {HTMLInputElement} */ (menuItem.querySelector('.hotkey-scope-checkbox'));
             if (checkbox !== null) {
                 checkbox.checked = scopes.includes(scope);
                 this._scopeMenuEventListeners.addEventListener(checkbox, 'change', this._onScopeCheckboxChange.bind(this), false);
@@ -511,16 +654,23 @@ class KeyboardShortcutHotkeyEntry {
         }
     }
 
+    /** */
     _clearScopeMenu() {
         this._scopeMenuEventListeners.removeAllEventListeners();
         this._scopeMenu = null;
     }
 
+    /** */
     _updateScopesButton() {
         const {scopes} = this._data;
-        this._enabledButton.dataset.scopeCount = `${scopes.length}`;
+        if (this._enabledButton !== null) {
+            this._enabledButton.dataset.scopeCount = `${scopes.length}`;
+        }
     }
 
+    /**
+     * @param {HTMLElement} node
+     */
     _updateDisplay(node) {
         const {style} = node;
         const {display} = style;
@@ -529,49 +679,64 @@ class KeyboardShortcutHotkeyEntry {
         style.display = display;
     }
 
+    /** */
     _updateActionArgument() {
         this._clearArgumentEventListeners();
 
         const {action, argument} = this._data;
         const details = this._parent.getActionDetails(action);
-        const {argument: argumentDetails} = typeof details !== 'undefined' ? details : {};
+        const argumentDetails = typeof details !== 'undefined' ? details.argument : void 0;
 
-        this._argumentContainer.textContent = '';
+        if (this._argumentContainer !== null) {
+            this._argumentContainer.textContent = '';
+        }
         if (typeof argumentDetails !== 'undefined') {
             const {template} = argumentDetails;
             const node = this._parent.settingsController.instantiateTemplate(template);
             const inputSelector = '.hotkey-argument-input';
-            const inputNode = node.matches(inputSelector) ? node : node.querySelector(inputSelector);
+            const inputNode = /** @type {HTMLInputElement} */ (node.matches(inputSelector) ? node : node.querySelector(inputSelector));
             if (inputNode !== null) {
                 this._setArgumentInputValue(inputNode, argument);
                 this._argumentInput = inputNode;
                 this._updateArgumentInputValidity();
                 this._argumentEventListeners.addEventListener(inputNode, 'change', this._onArgumentValueChange.bind(this, template), false);
             }
-            this._argumentContainer.appendChild(node);
+            if (this._argumentContainer !== null) {
+                this._argumentContainer.appendChild(node);
+            }
         }
     }
 
+    /** */
     _clearArgumentEventListeners() {
         this._argumentEventListeners.removeAllEventListeners();
         this._argumentInput = null;
     }
 
+    /**
+     * @param {HTMLInputElement} node
+     * @returns {string}
+     */
     _getArgumentInputValue(node) {
         return node.value;
     }
 
+    /**
+     * @param {HTMLInputElement} node
+     * @param {string} value
+     */
     _setArgumentInputValue(node, value) {
         node.value = value;
     }
 
+    /** */
     async _updateArgumentInputValidity() {
         if (this._argumentInput === null) { return; }
 
         let okay = true;
         const {action, argument} = this._data;
         const details = this._parent.getActionDetails(action);
-        const {argument: argumentDetails} = typeof details !== 'undefined' ? details : {};
+        const argumentDetails = typeof details !== 'undefined' ? details.argument : void 0;
 
         if (typeof argumentDetails !== 'undefined') {
             const {template} = argumentDetails;
@@ -585,6 +750,10 @@ class KeyboardShortcutHotkeyEntry {
         this._argumentInput.dataset.invalid = `${!okay}`;
     }
 
+    /**
+     * @param {string} path
+     * @returns {Promise<boolean>}
+     */
     async _isHotkeyArgumentSettingPathValid(path) {
         if (path.length === 0) { return true; }
 
@@ -600,5 +769,20 @@ class KeyboardShortcutHotkeyEntry {
             // NOP
         }
         return false;
+    }
+
+    /**
+     * @param {string|undefined} value
+     * @returns {?import('settings').InputsHotkeyScope}
+     */
+    _normalizeScope(value) {
+        switch (value) {
+            case 'popup':
+            case 'search':
+            case 'web':
+                return value;
+            default:
+                return null;
+        }
     }
 }

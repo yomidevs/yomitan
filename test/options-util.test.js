@@ -24,7 +24,12 @@ import {OptionsUtil} from '../ext/js/data/options-util.js';
 import {TemplatePatcher} from '../ext/js/templates/template-patcher.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
-vi.stubGlobal('fetch', async function fetch(url2) {
+
+/**
+ * @param {string} url2
+ * @returns {Promise<import('dev/vm').PseudoFetchResponse>}
+ */
+async function fetch(url2) {
     const filePath = url.fileURLToPath(url2);
     await Promise.resolve();
     const content = fs.readFileSync(filePath, {encoding: null});
@@ -35,15 +40,22 @@ vi.stubGlobal('fetch', async function fetch(url2) {
         text: async () => Promise.resolve(content.toString('utf8')),
         json: async () => Promise.resolve(JSON.parse(content.toString('utf8')))
     };
-});
-vi.stubGlobal('chrome', {
+}
+/** @type {import('dev/vm').PseudoChrome} */
+const chrome = {
     runtime: {
-        getURL: (path2) => {
+        getURL(path2) {
             return url.pathToFileURL(path.join(dirname, '..', 'ext', path2.replace(/^\//, ''))).href;
         }
     }
-});
+};
 
+vi.stubGlobal('fetch', fetch);
+vi.stubGlobal('chrome', chrome);
+
+/**
+ * @returns {unknown}
+ */
 function createProfileOptionsTestData1() {
     return {
         version: 14,
@@ -144,6 +156,9 @@ function createProfileOptionsTestData1() {
     };
 }
 
+/**
+ * @returns {unknown}
+ */
 function createOptionsTestData1() {
     return {
         profiles: [
@@ -243,6 +258,9 @@ function createOptionsTestData1() {
 }
 
 
+/**
+ * @returns {unknown}
+ */
 function createProfileOptionsUpdatedTestData1() {
     return {
         general: {
@@ -519,6 +537,9 @@ function createProfileOptionsUpdatedTestData1() {
     };
 }
 
+/**
+ * @returns {unknown}
+ */
 function createOptionsUpdatedTestData1() {
     return {
         profiles: [
@@ -612,6 +633,7 @@ function createOptionsUpdatedTestData1() {
 }
 
 
+/** */
 async function testUpdate() {
     test('Update', async () => {
         const optionsUtil = new OptionsUtil();
@@ -624,8 +646,10 @@ async function testUpdate() {
     });
 }
 
+/** */
 async function testDefault() {
     test('Default', async () => {
+        /** @type {((options: import('options-util').IntermediateOptions) => void)[]} */
         const data = [
             (options) => options,
             (options) => {
@@ -651,12 +675,17 @@ async function testDefault() {
     });
 }
 
+/** */
 async function testFieldTemplatesUpdate() {
     test('FieldTemplatesUpdate', async () => {
         const optionsUtil = new OptionsUtil();
         await optionsUtil.prepare();
 
         const templatePatcher = new TemplatePatcher();
+        /**
+         * @param {string} fileName
+         * @returns {string}
+         */
         const loadDataFile = (fileName) => {
             const content = fs.readFileSync(path.join(dirname, '..', 'ext', fileName), {encoding: 'utf8'});
             return templatePatcher.parsePatch(content).addition;
@@ -671,6 +700,11 @@ async function testFieldTemplatesUpdate() {
             {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')},
             {version: 21, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v21.handlebars')}
         ];
+        /**
+         * @param {number} startVersion
+         * @param {number} targetVersion
+         * @returns {string}
+         */
         const getUpdateAdditions = (startVersion, targetVersion) => {
             let value = '';
             for (const {version, changes} of updates) {
@@ -682,7 +716,7 @@ async function testFieldTemplatesUpdate() {
         };
 
         const data = [
-        // Standard format
+            // Standard format
             {
                 oldVersion: 0,
                 newVersion: 12,
@@ -1564,7 +1598,7 @@ async function testFieldTemplatesUpdate() {
 
         const updatesPattern = /<<<UPDATE-ADDITIONS>>>/g;
         for (const {old, expected, oldVersion, newVersion} of data) {
-            const options = createOptionsTestData1();
+            const options = /** @type {import('core').SafeAny} */ (createOptionsTestData1());
             options.profiles[0].options.anki.fieldTemplates = old;
             options.version = oldVersion;
 
@@ -1578,6 +1612,7 @@ async function testFieldTemplatesUpdate() {
 }
 
 
+/** */
 async function main() {
     await testUpdate();
     await testDefault();

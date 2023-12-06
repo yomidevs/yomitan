@@ -17,6 +17,7 @@
  */
 
 import {IDBFactory, IDBKeyRange} from 'fake-indexeddb';
+import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {createDictionaryArchive} from '../dev/util.js';
@@ -24,16 +25,27 @@ import {DictionaryDatabase} from '../ext/js/language/dictionary-database.js';
 import {DictionaryImporterMediaLoader} from '../ext/js/language/dictionary-importer-media-loader.js';
 import {DictionaryImporter} from '../ext/js/language/dictionary-importer.js';
 
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
 
 vi.mock('../ext/js/language/dictionary-importer-media-loader.js');
 
+/**
+ * @param {string} dictionary
+ * @param {string} [dictionaryName]
+ * @returns {import('jszip')}
+ */
 function createTestDictionaryArchive(dictionary, dictionaryName) {
-    const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', dictionary);
+    const dictionaryDirectory = path.join(dirname, 'data', 'dictionaries', dictionary);
     return createDictionaryArchive(dictionaryDirectory, dictionaryName);
 }
 
 
+/**
+ * @param {import('dictionary-importer').OnProgressCallback} [onProgress]
+ * @returns {DictionaryImporter}
+ */
 function createDictionaryImporter(onProgress) {
     const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
     return new DictionaryImporter(dictionaryImporterMediaLoader, (...args) => {
@@ -47,24 +59,53 @@ function createDictionaryImporter(onProgress) {
 }
 
 
+/**
+ * @param {import('dictionary-database').TermEntry[]} dictionaryDatabaseEntries
+ * @param {string} term
+ * @returns {number}
+ */
 function countDictionaryDatabaseEntriesWithTerm(dictionaryDatabaseEntries, term) {
     return dictionaryDatabaseEntries.reduce((i, v) => (i + (v.term === term ? 1 : 0)), 0);
 }
 
+/**
+ * @param {import('dictionary-database').TermEntry[]} dictionaryDatabaseEntries
+ * @param {string} reading
+ * @returns {number}
+ */
 function countDictionaryDatabaseEntriesWithReading(dictionaryDatabaseEntries, reading) {
     return dictionaryDatabaseEntries.reduce((i, v) => (i + (v.reading === reading ? 1 : 0)), 0);
 }
 
+/**
+ * @param {import('dictionary-database').TermMeta[]|import('dictionary-database').KanjiMeta[]} metas
+ * @param {import('dictionary-database').TermMetaType|import('dictionary-database').KanjiMetaType} mode
+ * @returns {number}
+ */
 function countMetasWithMode(metas, mode) {
-    return metas.reduce((i, v) => (i + (v.mode === mode ? 1 : 0)), 0);
+    let i = 0;
+    for (const item of metas) {
+        if (item.mode === mode) { ++i; }
+    }
+    return i;
 }
 
+/**
+ * @param {import('dictionary-database').KanjiEntry[]} kanji
+ * @param {string} character
+ * @returns {number}
+ */
 function countKanjiWithCharacter(kanji, character) {
-    return kanji.reduce((i, v) => (i + (v.character === character ? 1 : 0)), 0);
+    let i = 0;
+    for (const item of kanji) {
+        if (item.character === character) { ++i; }
+    }
+    return i;
 }
 
 
 
+/** */
 async function testDatabase1() {
     test('Database1', async () => {    // Load dictionary data
         const testDictionary = createTestDictionaryArchive('valid-dictionary1');
@@ -172,6 +213,9 @@ async function testDatabase1() {
     });
 }
 
+/**
+ * @param {DictionaryDatabase} database
+ */
 async function testDatabaseEmpty1(database) {
     test('DatabaseEmpty1', async () => {
         const info = await database.getDictionaryInfo();
@@ -185,17 +229,22 @@ async function testDatabaseEmpty1(database) {
     });
 }
 
+/**
+ * @param {DictionaryDatabase} database
+ * @param {import('dictionary-database').DictionarySet} titles
+ */
 async function testFindTermsBulkTest1(database, titles) {
     test('FindTermsBulkTest1', async () => {
+        /** @type {{inputs: {matchType: import('dictionary-database').MatchType, termList: string[]}[], expectedResults: {total: number, terms: [key: string, count: number][], readings: [key: string, count: number][]}}[]} */
         const data = [
             {
                 inputs: [
                     {
-                        matchType: null,
+                        matchType: 'exact',
                         termList: ['打', '打つ', '打ち込む']
                     },
                     {
-                        matchType: null,
+                        matchType: 'exact',
                         termList: ['だ', 'ダース', 'うつ', 'ぶつ', 'うちこむ', 'ぶちこむ']
                     },
                     {
@@ -223,7 +272,7 @@ async function testFindTermsBulkTest1(database, titles) {
             {
                 inputs: [
                     {
-                        matchType: null,
+                        matchType: 'exact',
                         termList: ['込む']
                     }
                 ],
@@ -254,7 +303,7 @@ async function testFindTermsBulkTest1(database, titles) {
             {
                 inputs: [
                     {
-                        matchType: null,
+                        matchType: 'exact',
                         termList: []
                     }
                 ],
@@ -281,8 +330,13 @@ async function testFindTermsBulkTest1(database, titles) {
     });
 }
 
+/**
+ * @param {DictionaryDatabase} database
+ * @param {import('dictionary-database').DictionarySet} titles
+ */
 async function testTindTermsExactBulk1(database, titles) {
     test('TindTermsExactBulk1', async () => {
+        /** @type {{inputs: {termList: {term: string, reading: string}[]}[], expectedResults: {total: number, terms: [key: string, count: number][], readings: [key: string, count: number][]}}[]} */
         const data = [
             {
                 inputs: [
@@ -387,8 +441,13 @@ async function testTindTermsExactBulk1(database, titles) {
     });
 }
 
+/**
+ * @param {DictionaryDatabase} database
+ * @param {string} mainDictionary
+ */
 async function testFindTermsBySequenceBulk1(database, mainDictionary) {
     test('FindTermsBySequenceBulk1', async () => {
+        /** @type {{inputs: {sequenceList: number[]}[], expectedResults: {total: number, terms: [key: string, count: number][], readings: [key: string, count: number][]}}[]} */
         const data = [
             {
                 inputs: [
@@ -538,8 +597,13 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
     });
 }
 
+/**
+ * @param {DictionaryDatabase} database
+ * @param {import('dictionary-database').DictionarySet} titles
+ */
 async function testFindTermMetaBulk1(database, titles) {
     test('FindTermMetaBulk1', async () => {
+        /** @type {{inputs: {termList: string[]}[], expectedResults: {total: number, modes: [key: import('dictionary-database').TermMetaType, count: number][]}}[]} */
         const data = [
             {
                 inputs: [
@@ -606,8 +670,13 @@ async function testFindTermMetaBulk1(database, titles) {
     });
 }
 
+/**
+ * @param {DictionaryDatabase} database
+ * @param {import('dictionary-database').DictionarySet} titles
+ */
 async function testFindKanjiBulk1(database, titles) {
     test('FindKanjiBulk1', async () => {
+        /** @type {{inputs: {kanjiList: string[]}[], expectedResults: {total: number, kanji: [key: string, count: number][]}}[]} */
         const data = [
             {
                 inputs: [
@@ -660,8 +729,13 @@ async function testFindKanjiBulk1(database, titles) {
     });
 }
 
+/**
+ * @param {DictionaryDatabase} database
+ * @param {import('dictionary-database').DictionarySet} titles
+ */
 async function testFindKanjiMetaBulk1(database, titles) {
     test('FindKanjiMetaBulk1', async () => {
+        /** @type {{inputs: {kanjiList: string[]}[], expectedResults: {total: number, modes: [key: import('dictionary-database').KanjiMetaType, count: number][]}}[]} */
         const data = [
             {
                 inputs: [
@@ -714,6 +788,10 @@ async function testFindKanjiMetaBulk1(database, titles) {
     });
 }
 
+/**
+ * @param {DictionaryDatabase} database
+ * @param {string} title
+ */
 async function testFindTagForTitle1(database, title) {
     test('FindTagForTitle1', async () => {
         const data = [
@@ -769,6 +847,7 @@ async function testFindTagForTitle1(database, title) {
 }
 
 
+/** */
 async function testDatabase2() {
     test('Database2', async () => {    // Load dictionary data
         const testDictionary = createTestDictionaryArchive('valid-dictionary1');
@@ -782,10 +861,12 @@ async function testDatabase2() {
 
         // Setup database
         const dictionaryDatabase = new DictionaryDatabase();
+        /** @type {import('dictionary-importer').ImportDetails} */
+        const detaultImportDetails = {prefixWildcardsSupported: false};
 
         // Database not open
-        await expect(dictionaryDatabase.deleteDictionary(title, 1000)).rejects.toThrow('Database not open');
-        await expect(dictionaryDatabase.findTermsBulk(['?'], titles, null)).rejects.toThrow('Database not open');
+        await expect(dictionaryDatabase.deleteDictionary(title, 1000, () => {})).rejects.toThrow('Database not open');
+        await expect(dictionaryDatabase.findTermsBulk(['?'], titles, 'exact')).rejects.toThrow('Database not open');
         await expect(dictionaryDatabase.findTermsExactBulk([{term: '?', reading: '?'}], titles)).rejects.toThrow('Database not open');
         await expect(dictionaryDatabase.findTermsBySequenceBulk([{query: 1, dictionary: title}])).rejects.toThrow('Database not open');
         await expect(dictionaryDatabase.findTermMetaBulk(['?'], titles)).rejects.toThrow('Database not open');
@@ -794,24 +875,25 @@ async function testDatabase2() {
         await expect(dictionaryDatabase.findKanjiMetaBulk(['?'], titles)).rejects.toThrow('Database not open');
         await expect(dictionaryDatabase.findTagForTitle('tag', title)).rejects.toThrow('Database not open');
         await expect(dictionaryDatabase.getDictionaryInfo()).rejects.toThrow('Database not open');
-        await expect(dictionaryDatabase.getDictionaryCounts(titles, true)).rejects.toThrow('Database not open');
-        await expect(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, {})).rejects.toThrow('Database is not ready');
+        await expect(dictionaryDatabase.getDictionaryCounts([...titles.keys()], true)).rejects.toThrow('Database not open');
+        await expect(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Database is not ready');
 
         await dictionaryDatabase.prepare();
 
         // already prepared
         await expect(dictionaryDatabase.prepare()).rejects.toThrow('Database already open');
 
-        await createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, {});
+        await createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails);
 
         // dictionary already imported
-        await expect(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, {})).rejects.toThrow('Dictionary is already imported');
+        await expect(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary is already imported');
 
         await dictionaryDatabase.close();
     });
 }
 
 
+/** */
 async function testDatabase3() {
     const invalidDictionaries = [
         'invalid-dictionary1',
@@ -828,12 +910,14 @@ async function testDatabase3() {
             test(`${invalidDictionary}`, async () => {
                 // Setup database
                 const dictionaryDatabase = new DictionaryDatabase();
+                /** @type {import('dictionary-importer').ImportDetails} */
+                const detaultImportDetails = {prefixWildcardsSupported: false};
                 await dictionaryDatabase.prepare();
 
                 const testDictionary = createTestDictionaryArchive(invalidDictionary);
                 const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
 
-                await expect(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, {})).rejects.toThrow('Dictionary has invalid data');
+                await expect(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary has invalid data');
                 await dictionaryDatabase.close();
             });
         }
@@ -841,6 +925,7 @@ async function testDatabase3() {
 }
 
 
+/** */
 async function main() {
     beforeEach(async () => {
         globalThis.indexedDB = new IDBFactory();

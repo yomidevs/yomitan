@@ -22,10 +22,13 @@ import {yomitan} from '../yomitan.js';
 
 export class DisplayController {
     constructor() {
+        /** @type {?import('settings').Options} */
         this._optionsFull = null;
+        /** @type {PermissionsUtil} */
         this._permissionsUtil = new PermissionsUtil();
     }
 
+    /** */
     async prepare() {
         const manifest = chrome.runtime.getManifest();
 
@@ -39,7 +42,12 @@ export class DisplayController {
 
         this._setupHotkeys();
 
-        const optionsPageUrl = manifest.options_ui.page;
+        const optionsPageUrl = (
+            typeof manifest.options_ui === 'object' &&
+            manifest.options_ui !== null &&
+            typeof manifest.options_ui.page === 'string' ?
+            manifest.options_ui.page : ''
+        );
         this._setupButtonEvents('.action-open-settings', 'openSettingsPage', chrome.runtime.getURL(optionsPageUrl));
         this._setupButtonEvents('.action-open-permissions', null, chrome.runtime.getURL('/permissions.html'));
 
@@ -49,7 +57,7 @@ export class DisplayController {
             this._setupOptions(primaryProfile);
         }
 
-        document.querySelector('.action-select-profile').hidden = (profiles.length <= 1);
+        /** @type {HTMLElement} */ (document.querySelector('.action-select-profile')).hidden = (profiles.length <= 1);
 
         this._updateProfileSelect(profiles, profileCurrent);
 
@@ -60,13 +68,18 @@ export class DisplayController {
 
     // Private
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onSearchClick(e) {
         if (!e.shiftKey) { return; }
         e.preventDefault();
         location.href = '/search.html?action-popup=true';
-        return false;
     }
 
+    /**
+     * @param {chrome.runtime.Manifest} manifest
+     */
     _showExtensionInfo(manifest) {
         const node = document.getElementById('extension-info');
         if (node === null) { return; }
@@ -74,11 +87,21 @@ export class DisplayController {
         node.textContent = `${manifest.name} v${manifest.version}`;
     }
 
+    /**
+     * @param {string} selector
+     * @param {?string} command
+     * @param {string} url
+     * @param {(event: MouseEvent) => void} [customHandler]
+     */
     _setupButtonEvents(selector, command, url, customHandler) {
+        /** @type {NodeListOf<HTMLAnchorElement>} */
         const nodes = document.querySelectorAll(selector);
         for (const node of nodes) {
             if (typeof command === 'string') {
-                node.addEventListener('click', (e) => {
+                /**
+                 * @param {MouseEvent} e
+                 */
+                const onClick = (e) => {
                     if (e.button !== 0) { return; }
                     if (typeof customHandler === 'function') {
                         const result = customHandler(e);
@@ -86,12 +109,17 @@ export class DisplayController {
                     }
                     yomitan.api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
                     e.preventDefault();
-                }, false);
-                node.addEventListener('auxclick', (e) => {
+                };
+                /**
+                 * @param {MouseEvent} e
+                 */
+                const onAuxClick = (e) => {
                     if (e.button !== 1) { return; }
                     yomitan.api.commandExec(command, {mode: 'newTab'});
                     e.preventDefault();
-                }, false);
+                };
+                node.addEventListener('click', onClick, false);
+                node.addEventListener('auxclick', onAuxClick, false);
             }
 
             if (typeof url === 'string') {
@@ -102,6 +130,7 @@ export class DisplayController {
         }
     }
 
+    /** */
     async _setupEnvironment() {
         const urlSearchParams = new URLSearchParams(location.search);
         let mode = urlSearchParams.get('mode');
@@ -129,6 +158,9 @@ export class DisplayController {
         document.documentElement.dataset.mode = mode;
     }
 
+    /**
+     * @returns {Promise<chrome.tabs.Tab|undefined>}
+     */
     _getCurrentTab() {
         return new Promise((resolve, reject) => {
             chrome.tabs.getCurrent((result) => {
@@ -142,10 +174,13 @@ export class DisplayController {
         });
     }
 
+    /**
+     * @param {import('settings').Profile} profile
+     */
     _setupOptions({options}) {
         const extensionEnabled = options.general.enable;
         const onToggleChanged = () => yomitan.api.commandExec('toggleTextScanning');
-        for (const toggle of document.querySelectorAll('#enable-search,#enable-search2')) {
+        for (const toggle of /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('#enable-search,#enable-search2'))) {
             toggle.checked = extensionEnabled;
             toggle.addEventListener('change', onToggleChanged, false);
         }
@@ -153,11 +188,12 @@ export class DisplayController {
         this._updatePermissionsWarnings(options);
     }
 
+    /** */
     async _setupHotkeys() {
         const hotkeyHelpController = new HotkeyHelpController();
         await hotkeyHelpController.prepare();
 
-        const {profiles, profileCurrent} = this._optionsFull;
+        const {profiles, profileCurrent} = /** @type {import('settings').Options} */ (this._optionsFull);
         const primaryProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
         if (primaryProfile !== null) {
             hotkeyHelpController.setOptions(primaryProfile.options);
@@ -166,9 +202,13 @@ export class DisplayController {
         hotkeyHelpController.setupNode(document.documentElement);
     }
 
+    /**
+     * @param {import('settings').Profile[]} profiles
+     * @param {number} profileCurrent
+     */
     _updateProfileSelect(profiles, profileCurrent) {
-        const select = document.querySelector('#profile-select');
-        const optionGroup = document.querySelector('#profile-select-option-group');
+        const select = /** @type {HTMLSelectElement} */ (document.querySelector('#profile-select'));
+        const optionGroup = /** @type {HTMLElement} */ (document.querySelector('#profile-select-option-group'));
         const fragment = document.createDocumentFragment();
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
             const {name} = profiles[i];
@@ -184,26 +224,37 @@ export class DisplayController {
         select.addEventListener('change', this._onProfileSelectChange.bind(this), false);
     }
 
-    _onProfileSelectChange(e) {
-        const value = parseInt(e.currentTarget.value, 10);
-        if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= this._optionsFull.profiles.length) {
+    /**
+     * @param {Event} event
+     */
+    _onProfileSelectChange(event) {
+        const node = /** @type {HTMLInputElement} */ (event.currentTarget);
+        const value = parseInt(node.value, 10);
+        if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= /** @type {import('settings').Options} */ (this._optionsFull).profiles.length) {
             this._setPrimaryProfileIndex(value);
         }
     }
 
+    /**
+     * @param {number} value
+     */
     async _setPrimaryProfileIndex(value) {
-        return await yomitan.api.modifySettings(
-            [{
-                action: 'set',
-                path: 'profileCurrent',
-                value,
-                scope: 'global'
-            }]
-        );
+        /** @type {import('settings-modifications').ScopedModificationSet} */
+        const modification = {
+            action: 'set',
+            path: 'profileCurrent',
+            value,
+            scope: 'global',
+            optionsContext: null
+        };
+        await yomitan.api.modifySettings([modification], 'action-popup');
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
     async _updateDictionariesEnabledWarnings(options) {
-        const noDictionariesEnabledWarnings = document.querySelectorAll('.no-dictionaries-enabled-warning');
+        const noDictionariesEnabledWarnings = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.no-dictionaries-enabled-warning'));
         const dictionaries = await yomitan.api.getDictionaryInfo();
 
         const enabledDictionaries = new Set();
@@ -226,16 +277,20 @@ export class DisplayController {
         }
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
     async _updatePermissionsWarnings(options) {
         const permissions = await this._permissionsUtil.getAllPermissions();
         if (this._permissionsUtil.hasRequiredPermissionsForOptions(permissions, options)) { return; }
 
-        const warnings = document.querySelectorAll('.action-open-permissions,.permissions-required-warning');
+        const warnings = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.action-open-permissions,.permissions-required-warning'));
         for (const node of warnings) {
             node.hidden = false;
         }
     }
 
+    /** @returns {Promise<boolean>} */
     async _isSafari() {
         const {browser} = await yomitan.api.getEnvironmentInfo();
         return browser === 'safari';

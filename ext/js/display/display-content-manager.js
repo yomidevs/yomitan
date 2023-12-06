@@ -21,30 +21,23 @@ import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {yomitan} from '../yomitan.js';
 
 /**
- * A callback used when a media file has been loaded.
- * @callback DisplayContentManager.OnLoadCallback
- * @param {string} url The URL of the media that was loaded.
- */
-
-/**
- * A callback used when a media file should be unloaded.
- * @callback DisplayContentManager.OnUnloadCallback
- * @param {boolean} fullyLoaded Whether or not the media was fully loaded.
- */
-
-/**
  * The content manager which is used when generating HTML display content.
  */
 export class DisplayContentManager {
     /**
      * Creates a new instance of the class.
-     * @param {Display} display The display instance that owns this object.
+     * @param {import('./display.js').Display} display The display instance that owns this object.
      */
     constructor(display) {
+        /** @type {import('./display.js').Display} */
         this._display = display;
+        /** @type {import('core').TokenObject} */
         this._token = {};
+        /** @type {Map<string, Map<string, Promise<?import('display-content-manager').CachedMediaDataLoaded>>>} */
         this._mediaCache = new Map();
+        /** @type {import('display-content-manager').LoadMediaDataInfo[]} */
         this._loadMediaData = [];
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
     }
 
@@ -52,9 +45,9 @@ export class DisplayContentManager {
      * Attempts to load the media file from a given dictionary.
      * @param {string} path The path to the media file in the dictionary.
      * @param {string} dictionary The name of the dictionary.
-     * @param {DisplayContentManager.OnLoadCallback} onLoad The callback that is executed if the media was loaded successfully.
+     * @param {import('display-content-manager').OnLoadCallback} onLoad The callback that is executed if the media was loaded successfully.
      *   No assumptions should be made about the synchronicity of this callback.
-     * @param {DisplayContentManager.OnUnloadCallback} onUnload The callback that is executed when the media should be unloaded.
+     * @param {import('display-content-manager').OnUnloadCallback} onUnload The callback that is executed when the media should be unloaded.
      */
     loadMedia(path, dictionary, onLoad, onUnload) {
         this._loadMedia(path, dictionary, onLoad, onUnload);
@@ -72,10 +65,8 @@ export class DisplayContentManager {
         this._loadMediaData = [];
 
         for (const map of this._mediaCache.values()) {
-            for (const {url} of map.values()) {
-                if (url !== null) {
-                    URL.revokeObjectURL(url);
-                }
+            for (const result of map.values()) {
+                this._revokeUrl(result);
             }
         }
         this._mediaCache.clear();
@@ -87,7 +78,7 @@ export class DisplayContentManager {
 
     /**
      * Sets up attributes and events for a link element.
-     * @param {Element} element The link element.
+     * @param {HTMLAnchorElement} element The link element.
      * @param {string} href The URL.
      * @param {boolean} internal Whether or not the URL is an internal or external link.
      */
@@ -100,57 +91,71 @@ export class DisplayContentManager {
         this._eventListeners.addEventListener(element, 'click', this._onLinkClick.bind(this));
     }
 
+    /**
+     * @param {string} path
+     * @param {string} dictionary
+     * @param {import('display-content-manager').OnLoadCallback} onLoad
+     * @param {import('display-content-manager').OnUnloadCallback} onUnload
+     */
     async _loadMedia(path, dictionary, onLoad, onUnload) {
         const token = this._token;
-        const data = {onUnload, loaded: false};
-
-        this._loadMediaData.push(data);
-
         const media = await this._getMedia(path, dictionary);
-        if (token !== this._token) { return; }
+        if (token !== this._token || media === null) { return; }
 
+        /** @type {import('display-content-manager').LoadMediaDataInfo} */
+        const data = {onUnload, loaded: false};
+        this._loadMediaData.push(data);
         onLoad(media.url);
         data.loaded = true;
     }
 
-    async _getMedia(path, dictionary) {
-        let cachedData;
+    /**
+     * @param {string} path
+     * @param {string} dictionary
+     * @returns {Promise<?import('display-content-manager').CachedMediaDataLoaded>}
+     */
+    _getMedia(path, dictionary) {
+        /** @type {Promise<?import('display-content-manager').CachedMediaDataLoaded>|undefined} */
+        let promise;
         let dictionaryCache = this._mediaCache.get(dictionary);
         if (typeof dictionaryCache !== 'undefined') {
-            cachedData = dictionaryCache.get(path);
+            promise = dictionaryCache.get(path);
         } else {
             dictionaryCache = new Map();
             this._mediaCache.set(dictionary, dictionaryCache);
         }
 
-        if (typeof cachedData === 'undefined') {
-            cachedData = {
-                promise: null,
-                data: null,
-                url: null
-            };
-            dictionaryCache.set(path, cachedData);
-            cachedData.promise = this._getMediaData(path, dictionary, cachedData);
+        if (typeof promise === 'undefined') {
+            promise = this._getMediaData(path, dictionary);
+            dictionaryCache.set(path, promise);
         }
 
-        return cachedData.promise;
+        return promise;
     }
 
-    async _getMediaData(path, dictionary, cachedData) {
+    /**
+     * @param {string} path
+     * @param {string} dictionary
+     * @returns {Promise<?import('display-content-manager').CachedMediaDataLoaded>}
+     */
+    async _getMediaData(path, dictionary) {
         const token = this._token;
-        const data = (await yomitan.api.getMedia([{path, dictionary}]))[0];
-        if (token === this._token && data !== null) {
+        const datas = await yomitan.api.getMedia([{path, dictionary}]);
+        if (token === this._token && datas.length > 0) {
+            const data = datas[0];
             const buffer = ArrayBufferUtil.base64ToArrayBuffer(data.content);
             const blob = new Blob([buffer], {type: data.mediaType});
             const url = URL.createObjectURL(blob);
-            cachedData.data = data;
-            cachedData.url = url;
+            return {data, url};
         }
-        return cachedData;
+        return null;
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onLinkClick(e) {
-        const {href} = e.currentTarget;
+        const {href} = /** @type {HTMLAnchorElement} */ (e.currentTarget);
         if (typeof href !== 'string') { return; }
 
         const baseUrl = new URL(location.href);
@@ -160,6 +165,7 @@ export class DisplayContentManager {
 
         e.preventDefault();
 
+        /** @type {import('display').HistoryParams} */
         const params = {};
         for (const [key, value] of url.searchParams.entries()) {
             params[key] = value;
@@ -171,5 +177,14 @@ export class DisplayContentManager {
             state: null,
             content: null
         });
+    }
+
+    /**
+     * @param {Promise<?import('display-content-manager').CachedMediaDataLoaded>} data
+     */
+    async _revokeUrl(data) {
+        const result = await data;
+        if (result === null) { return; }
+        URL.revokeObjectURL(result.url);
     }
 }

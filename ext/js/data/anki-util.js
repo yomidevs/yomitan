@@ -71,7 +71,7 @@ export class AnkiUtil {
 
     /**
      * Checks whether or not a note object is valid.
-     * @param {*} note A note object to check.
+     * @param {import('anki').Note} note A note object to check.
      * @returns {boolean} `true` if the note is valid, `false` otherwise.
      */
     static isNoteDataValid(note) {

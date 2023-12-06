@@ -24,18 +24,37 @@ import {yomitan} from '../../yomitan.js';
 import {DictionaryController} from './dictionary-controller.js';
 
 export class BackupController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     * @param {?import('./modal-controller.js').ModalController} modalController
+     */
     constructor(settingsController, modalController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {?import('./modal-controller.js').ModalController} */
         this._modalController = modalController;
+        /** @type {?import('core').TokenObject} */
         this._settingsExportToken = null;
+        /** @type {?() => void} */
         this._settingsExportRevoke = null;
+        /** @type {number} */
         this._currentVersion = 0;
+        /** @type {?import('./modal.js').Modal} */
         this._settingsResetModal = null;
+        /** @type {?import('./modal.js').Modal} */
         this._settingsImportErrorModal = null;
+        /** @type {?import('./modal.js').Modal} */
         this._settingsImportWarningModal = null;
+        /** @type {?OptionsUtil} */
         this._optionsUtil = null;
 
+        /**
+         *
+         */
         this._dictionariesDatabaseName = 'dict';
+        /**
+         *
+         */
         this._settingsExportDatabaseToken = null;
 
         try {
@@ -45,6 +64,7 @@ export class BackupController {
         }
     }
 
+    /** */
     async prepare() {
         if (this._optionsUtil !== null) {
             await this._optionsUtil.prepare();
@@ -69,13 +89,27 @@ export class BackupController {
 
     // Private
 
-    _addNodeEventListener(selector, ...args) {
+    /**
+     * @param {string} selector
+     * @param {string} eventName
+     * @param {(event: Event) => void} callback
+     * @param {boolean} capture
+     */
+    _addNodeEventListener(selector, eventName, callback, capture) {
         const node = document.querySelector(selector);
         if (node === null) { return; }
 
-        node.addEventListener(...args);
+        node.addEventListener(eventName, callback, capture);
     }
 
+    /**
+     * @param {Date} date
+     * @param {string} dateSeparator
+     * @param {string} dateTimeSeparator
+     * @param {string} timeSeparator
+     * @param {number} resolution
+     * @returns {string}
+     */
     _getSettingsExportDateString(date, dateSeparator, dateTimeSeparator, timeSeparator, resolution) {
         const values = [
             date.getUTCFullYear().toString(),
@@ -93,6 +127,10 @@ export class BackupController {
         return values.slice(0, resolution * 2 - 1).join('');
     }
 
+    /**
+     * @param {Date} date
+     * @returns {Promise<import('backup-controller').BackupData>}
+     */
     async _getSettingsExportData(date) {
         const optionsFull = await this._settingsController.getOptionsFull();
         const environment = await yomitan.api.getEnvironmentInfo();
@@ -120,11 +158,19 @@ export class BackupController {
         return data;
     }
 
+    /**
+     * @param {Blob} blob
+     * @param {string} fileName
+     */
     _saveBlob(blob, fileName) {
-        if (typeof navigator === 'object' && typeof navigator.msSaveBlob === 'function') {
-            if (navigator.msSaveBlob(blob)) {
-                return;
-            }
+        if (
+            typeof navigator === 'object' && navigator !== null &&
+            // @ts-expect-error - call for legacy Edge
+            typeof navigator.msSaveBlob === 'function' &&
+            // @ts-expect-error - call for legacy Edge
+            navigator.msSaveBlob(blob)
+        ) {
+            return;
         }
 
         const blobUrl = URL.createObjectURL(blob);
@@ -146,6 +192,7 @@ export class BackupController {
         setTimeout(revoke, 60000);
     }
 
+    /** */
     async _onSettingsExportClick() {
         if (this._settingsExportRevoke !== null) {
             this._settingsExportRevoke();
@@ -154,6 +201,7 @@ export class BackupController {
 
         const date = new Date(Date.now());
 
+        /** @type {?import('core').TokenObject} */
         const token = {};
         this._settingsExportToken = token;
         const data = await this._getSettingsExportData(date);
@@ -168,10 +216,14 @@ export class BackupController {
         this._saveBlob(blob, fileName);
     }
 
+    /**
+     * @param {File} file
+     * @returns {Promise<ArrayBuffer>}
+     */
     _readFileArrayBuffer(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
+            reader.onload = () => resolve(/** @type {ArrayBuffer} */ (reader.result));
             reader.onerror = () => reject(reader.error);
             reader.readAsArrayBuffer(file);
         });
@@ -179,19 +231,33 @@ export class BackupController {
 
     // Importing
 
+    /**
+     * @param {import('settings').Options} optionsFull
+     */
     async _settingsImportSetOptionsFull(optionsFull) {
         await this._settingsController.setAllSettings(optionsFull);
     }
 
+    /**
+     * @param {Error} error
+     */
     _showSettingsImportError(error) {
         log.error(error);
-        document.querySelector('#settings-import-error-message').textContent = `${error}`;
-        this._settingsImportErrorModal.setVisible(true);
+        const element = /** @type {HTMLElement} */ (document.querySelector('#settings-import-error-message'));
+        element.textContent = `${error}`;
+        if (this._settingsImportErrorModal !== null) {
+            this._settingsImportErrorModal.setVisible(true);
+        }
     }
 
+    /**
+     * @param {Set<string>} warnings
+     * @returns {Promise<import('backup-controller').ShowSettingsImportWarningsResult>}
+     */
     async _showSettingsImportWarnings(warnings) {
         const modal = this._settingsImportWarningModal;
-        const buttons = document.querySelectorAll('.settings-import-warning-import-button');
+        if (modal === null) { return {result: false}; }
+        const buttons = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.settings-import-warning-import-button'));
         const messageContainer = document.querySelector('#settings-import-warning-message');
         if (buttons.length === 0 || messageContainer === null) {
             return {result: false};
@@ -212,20 +278,30 @@ export class BackupController {
 
         // Wait for modal to close
         return new Promise((resolve) => {
+            /**
+             * @param {MouseEvent} e
+             */
             const onButtonClick = (e) => {
+                const element = /** @type {HTMLElement} */ (e.currentTarget);
                 e.preventDefault();
                 complete({
                     result: true,
-                    sanitize: e.currentTarget.dataset.importSanitize === 'true'
+                    sanitize: element.dataset.importSanitize === 'true'
                 });
                 modal.setVisible(false);
             };
+            /**
+             * @param {import('panel-element').VisibilityChangedEvent} details
+             */
             const onModalVisibilityChanged = ({visible}) => {
                 if (visible) { return; }
                 complete({result: false});
             };
 
             let completed = false;
+            /**
+             * @param {import('backup-controller').ShowSettingsImportWarningsResult} result
+             */
             const complete = (result) => {
                 if (completed) { return; }
                 completed = true;
@@ -246,6 +322,10 @@ export class BackupController {
         });
     }
 
+    /**
+     * @param {string} urlString
+     * @returns {boolean}
+     */
     _isLocalhostUrl(urlString) {
         try {
             const url = new URL(urlString);
@@ -266,6 +346,11 @@ export class BackupController {
         return false;
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     * @param {boolean} dryRun
+     * @returns {string[]}
+     */
     _settingsImportSanitizeProfileOptions(options, dryRun) {
         const warnings = [];
 
@@ -308,6 +393,11 @@ export class BackupController {
         return warnings;
     }
 
+    /**
+     * @param {import('settings').Options} optionsFull
+     * @param {boolean} dryRun
+     * @returns {Set<string>}
+     */
     _settingsImportSanitizeOptions(optionsFull, dryRun) {
         const warnings = new Set();
 
@@ -328,7 +418,12 @@ export class BackupController {
         return warnings;
     }
 
+    /**
+     * @param {File} file
+     */
     async _importSettingsFile(file) {
+        if (this._optionsUtil === null) { throw new Error('OptionsUtil invalid'); }
+
         const dataString = ArrayBufferUtil.arrayBufferUtf8Decode(await this._readFileArrayBuffer(file));
         const data = JSON.parse(dataString);
 
@@ -383,31 +478,44 @@ export class BackupController {
         await this._settingsImportSetOptionsFull(optionsFull);
     }
 
+    /** */
     _onSettingsImportClick() {
-        document.querySelector('#settings-import-file').click();
+        const element = /** @type {HTMLElement} */ (document.querySelector('#settings-import-file'));
+        element.click();
     }
 
+    /**
+     * @param {Event} e
+     */
     async _onSettingsImportFileChange(e) {
-        const files = e.target.files;
-        if (files.length === 0) { return; }
+        const element = /** @type {HTMLInputElement} */ (e.currentTarget);
+        const files = element.files;
+        if (files === null || files.length === 0) { return; }
 
         const file = files[0];
-        e.target.value = null;
+        element.value = '';
         try {
             await this._importSettingsFile(file);
         } catch (error) {
-            this._showSettingsImportError(error);
+            this._showSettingsImportError(error instanceof Error ? error : new Error(`${error}`));
         }
     }
 
     // Resetting
 
+    /** */
     _onSettingsResetClick() {
+        if (this._settingsResetModal === null) { return; }
         this._settingsResetModal.setVisible(true);
     }
 
+    /** */
     async _onSettingsResetConfirmClick() {
-        this._settingsResetModal.setVisible(false);
+        if (this._optionsUtil === null) { throw new Error('OptionsUtil invalid'); }
+
+        if (this._settingsResetModal !== null) {
+            this._settingsResetModal.setVisible(false);
+        }
 
         // Get default options
         const optionsFull = this._optionsUtil.getDefault();
@@ -425,8 +533,12 @@ export class BackupController {
 
     // Exporting Dictionaries Database
 
+    /**
+     * @param {string} message
+     * @param {boolean} [isWarning]
+     */
     _databaseExportImportErrorMessage(message, isWarning=false) {
-        const errorMessageContainer = document.querySelector('#db-ops-error-report');
+        const errorMessageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-error-report'));
         errorMessageContainer.style.display = 'block';
         errorMessageContainer.textContent = message;
 
@@ -439,9 +551,12 @@ export class BackupController {
         }
     }
 
+    /**
+     * @param {{totalRows: number, completedRows: number, done: boolean}} details
+     */
     _databaseExportProgressCallback({totalRows, completedRows, done}) {
         console.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
-        const messageContainer = document.querySelector('#db-ops-progress-report');
+        const messageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-progress-report'));
         messageContainer.style.display = 'block';
         messageContainer.textContent = `Export Progress: ${completedRows} of ${totalRows} rows completed`;
 
@@ -451,6 +566,10 @@ export class BackupController {
         }
     }
 
+    /**
+     * @param {string} databaseName
+     * @returns {Promise<Blob>}
+     */
     async _exportDatabase(databaseName) {
         const db = await new Dexie(databaseName).open();
         const blob = await db.export({progressCallback: this._databaseExportProgressCallback});
@@ -458,6 +577,9 @@ export class BackupController {
         return blob;
     }
 
+    /**
+     *
+     */
     async _onSettingsExportDatabaseClick() {
         if (this._settingsExportDatabaseToken !== null) {
             // An existing import or export is in progress.
@@ -465,7 +587,7 @@ export class BackupController {
             return;
         }
 
-        const errorMessageContainer = document.querySelector('#db-ops-error-report');
+        const errorMessageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-error-report'));
         errorMessageContainer.style.display = 'none';
 
         const date = new Date(Date.now());
@@ -488,9 +610,12 @@ export class BackupController {
 
     // Importing Dictionaries Database
 
+    /**
+     * @param {{totalRows: number, completedRows: number, done: boolean}} details
+     */
     _databaseImportProgressCallback({totalRows, completedRows, done}) {
         console.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
-        const messageContainer = document.querySelector('#db-ops-progress-report');
+        const messageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-progress-report'));
         messageContainer.style.display = 'block';
         messageContainer.style.color = '#4169e1';
         messageContainer.textContent = `Import Progress: ${completedRows} of ${totalRows} rows completed`;
@@ -502,6 +627,10 @@ export class BackupController {
         }
     }
 
+    /**
+     * @param {string} databaseName
+     * @param {File} file
+     */
     async _importDatabase(databaseName, file) {
         await yomitan.api.purgeDatabase();
         await Dexie.import(file, {progressCallback: this._databaseImportProgressCallback});
@@ -509,10 +638,14 @@ export class BackupController {
         yomitan.trigger('storageChanged');
     }
 
+    /** */
     _onSettingsImportDatabaseClick() {
-        document.querySelector('#settings-import-db').click();
+        /** @type {HTMLElement} */ (document.querySelector('#settings-import-db')).click();
     }
 
+    /**
+     * @param {Event} e
+     */
     async _onSettingsImportDatabaseChange(e) {
         if (this._settingsExportDatabaseToken !== null) {
             // An existing import or export is in progress.
@@ -520,22 +653,23 @@ export class BackupController {
             return;
         }
 
-        const errorMessageContainer = document.querySelector('#db-ops-error-report');
+        const errorMessageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-error-report'));
         errorMessageContainer.style.display = 'none';
 
-        const files = e.target.files;
-        if (files.length === 0) { return; }
+        const element = /** @type {HTMLInputElement} */ (e.currentTarget);
+        const files = element.files;
+        if (files === null || files.length === 0) { return; }
 
         const pageExitPrevention = this._settingsController.preventPageExit();
         const file = files[0];
-        e.target.value = null;
+        element.value = '';
         try {
             const token = {};
             this._settingsExportDatabaseToken = token;
             await this._importDatabase(this._dictionariesDatabaseName, file);
         } catch (error) {
             console.log(error);
-            const messageContainer = document.querySelector('#db-ops-progress-report');
+            const messageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-progress-report'));
             messageContainer.style.color = 'red';
             this._databaseExportImportErrorMessage('Encountered errors when importing. Please restart the browser and try again. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.');
         } finally {

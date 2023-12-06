@@ -19,6 +19,7 @@
 import fs from 'fs';
 import {formatRulesJson, generateRules, getTargets} from '../generate-css-json.js';
 
+/** */
 function main() {
     for (const {cssFile, overridesCssFile, outputPath} of getTargets()) {
         const json = formatRulesJson(generateRules(cssFile, overridesCssFile));

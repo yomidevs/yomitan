@@ -19,48 +19,61 @@
 import {yomitan} from '../../yomitan.js';
 
 export class MecabController {
-    constructor(settingsController) {
-        this._settingsController = settingsController;
+    constructor() {
+        /** @type {?HTMLButtonElement} */
         this._testButton = null;
+        /** @type {?HTMLElement} */
         this._resultsContainer = null;
+        /** @type {boolean} */
         this._testActive = false;
     }
 
+    /** */
     prepare() {
-        this._testButton = document.querySelector('#test-mecab-button');
-        this._resultsContainer = document.querySelector('#test-mecab-results');
+        this._testButton = /** @type {HTMLButtonElement} */ (document.querySelector('#test-mecab-button'));
+        this._resultsContainer = /** @type {HTMLElement} */ (document.querySelector('#test-mecab-results'));
 
         this._testButton.addEventListener('click', this._onTestButtonClick.bind(this), false);
     }
 
     // Private
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onTestButtonClick(e) {
         e.preventDefault();
         this._testMecab();
     }
 
+    /** */
     async _testMecab() {
         if (this._testActive) { return; }
 
         try {
             this._testActive = true;
-            this._testButton.disabled = true;
-            this._resultsContainer.textContent = '';
-            this._resultsContainer.hidden = true;
+            const resultsContainer = /** @type {HTMLElement} */ (this._resultsContainer);
+            /** @type {HTMLButtonElement} */ (this._testButton).disabled = true;
+            resultsContainer.textContent = '';
+            resultsContainer.hidden = true;
             await yomitan.api.testMecab();
             this._setStatus('Connection was successful', false);
         } catch (e) {
-            this._setStatus(e.message, true);
+            this._setStatus(e instanceof Error ? e.message : `${e}`, true);
         } finally {
             this._testActive = false;
-            this._testButton.disabled = false;
+            /** @type {HTMLButtonElement} */ (this._testButton).disabled = false;
         }
     }
 
+    /**
+     * @param {string} message
+     * @param {boolean} isError
+     */
     _setStatus(message, isError) {
-        this._resultsContainer.textContent = message;
-        this._resultsContainer.hidden = false;
-        this._resultsContainer.classList.toggle('danger-text', isError);
+        const resultsContainer = /** @type {HTMLElement} */ (this._resultsContainer);
+        resultsContainer.textContent = message;
+        resultsContainer.hidden = false;
+        resultsContainer.classList.toggle('danger-text', isError);
     }
 }

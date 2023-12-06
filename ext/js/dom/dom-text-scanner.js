@@ -36,15 +36,25 @@ export class DOMTextScanner {
         const resetOffset = (ruby !== null);
         if (resetOffset) { node = ruby; }
 
+        /** @type {Node} */
         this._node = node;
+        /** @type {number} */
         this._offset = offset;
+        /** @type {string} */
         this._content = '';
+        /** @type {number} */
         this._remainder = 0;
+        /** @type {boolean} */
         this._resetOffset = resetOffset;
+        /** @type {number} */
         this._newlines = 0;
+        /** @type {boolean} */
         this._lineHasWhitespace = false;
+        /** @type {boolean} */
         this._lineHasContent = false;
+        /** @type {boolean} */
         this._forcePreserveWhitespace = forcePreserveWhitespace;
+        /** @type {boolean} */
         this._generateLayoutContent = generateLayoutContent;
     }
 
@@ -99,8 +109,8 @@ export class DOMTextScanner {
         const ELEMENT_NODE = Node.ELEMENT_NODE;
 
         const generateLayoutContent = this._generateLayoutContent;
-        let node = this._node;
-        let lastNode = node;
+        let node = /** @type {?Node} */ (this._node);
+        let lastNode = /** @type {Node} */ (node);
         let resetOffset = this._resetOffset;
         let newlines = 0;
         while (node !== null) {
@@ -111,8 +121,8 @@ export class DOMTextScanner {
                 lastNode = node;
                 if (!(
                     forward ?
-                    this._seekTextNodeForward(node, resetOffset) :
-                    this._seekTextNodeBackward(node, resetOffset)
+                    this._seekTextNodeForward(/** @type {Text} */ (node), resetOffset) :
+                    this._seekTextNodeBackward(/** @type {Text} */ (node), resetOffset)
                 )) {
                     // Length reached
                     break;
@@ -120,18 +130,19 @@ export class DOMTextScanner {
             } else if (nodeType === ELEMENT_NODE) {
                 lastNode = node;
                 this._offset = 0;
-                ({enterable, newlines} = DOMTextScanner.getElementSeekInfo(node));
+                ({enterable, newlines} = DOMTextScanner.getElementSeekInfo(/** @type {Element} */ (node)));
                 if (newlines > this._newlines && generateLayoutContent) {
                     this._newlines = newlines;
                 }
             }
 
+            /** @type {Node[]} */
             const exitedNodes = [];
             node = DOMTextScanner.getNextNode(node, forward, enterable, exitedNodes);
 
             for (const exitedNode of exitedNodes) {
                 if (exitedNode.nodeType !== ELEMENT_NODE) { continue; }
-                ({newlines} = DOMTextScanner.getElementSeekInfo(exitedNode));
+                ({newlines} = DOMTextScanner.getElementSeekInfo(/** @type {Element} */ (exitedNode)));
                 if (newlines > this._newlines && generateLayoutContent) {
                     this._newlines = newlines;
                 }
@@ -155,7 +166,7 @@ export class DOMTextScanner {
      * @returns {boolean} `true` if scanning should continue, or `false` if the scan length has been reached.
      */
     _seekTextNodeForward(textNode, resetOffset) {
-        const nodeValue = textNode.nodeValue;
+        const nodeValue = /** @type {string} */ (textNode.nodeValue);
         const nodeValueLength = nodeValue.length;
         const {preserveNewlines, preserveWhitespace} = this._getWhitespaceSettings(textNode);
 
@@ -241,7 +252,7 @@ export class DOMTextScanner {
      * @returns {boolean} `true` if scanning should continue, or `false` if the scan length has been reached.
      */
     _seekTextNodeBackward(textNode, resetOffset) {
-        const nodeValue = textNode.nodeValue;
+        const nodeValue = /** @type {string} */ (textNode.nodeValue);
         const nodeValueLength = nodeValue.length;
         const {preserveNewlines, preserveWhitespace} = this._getWhitespaceSettings(textNode);
 
@@ -350,6 +361,7 @@ export class DOMTextScanner {
      * @returns {?Node} The next node in the document, or `null` if there is no next node.
      */
     static getNextNode(node, forward, visitChildren, exitedNodes) {
+        /** @type {?Node} */
         let next = visitChildren ? (forward ? node.firstChild : node.lastChild) : null;
         if (next === null) {
             while (true) {
@@ -369,14 +381,17 @@ export class DOMTextScanner {
 
     /**
      * Gets the parent element of a given Node.
-     * @param {Node} node The node to check.
-     * @returns {?Node} The parent element if one exists, otherwise `null`.
+     * @param {?Node} node The node to check.
+     * @returns {?Element} The parent element if one exists, otherwise `null`.
      */
     static getParentElement(node) {
-        while (node !== null && node.nodeType !== Node.ELEMENT_NODE) {
+        while (node !== null) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                return /** @type {Element} */ (node);
+            }
             node = node.parentNode;
         }
-        return node;
+        return null;
     }
 
     /**
@@ -387,11 +402,12 @@ export class DOMTextScanner {
      * @returns {?HTMLElement} A <ruby> node if the input node is contained in one, otherwise `null`.
      */
     static getParentRubyElement(node) {
-        node = DOMTextScanner.getParentElement(node);
-        if (node !== null && node.nodeName.toUpperCase() === 'RT') {
-            node = node.parentNode;
-            if (node !== null && node.nodeName.toUpperCase() === 'RUBY') {
-                return node;
+        /** @type {?Node} */
+        let node2 = DOMTextScanner.getParentElement(node);
+        if (node2 !== null && node2.nodeName.toUpperCase() === 'RT') {
+            node2 = node2.parentNode;
+            if (node2 !== null && node2.nodeName.toUpperCase() === 'RUBY') {
+                return /** @type {HTMLElement} */ (node2);
             }
         }
         return null;
@@ -505,7 +521,9 @@ export class DOMTextScanner {
         return !(
             style.userSelect === 'none' ||
             style.webkitUserSelect === 'none' ||
+            // @ts-expect-error - vendor prefix
             style.MozUserSelect === 'none' ||
+            // @ts-expect-error - vendor prefix
             style.msUserSelect === 'none'
         );
     }
@@ -513,7 +531,7 @@ export class DOMTextScanner {
     /**
      * Checks whether a CSS color is transparent or not.
      * @param {string} cssColor A CSS color string, expected to be encoded in rgb(a) form.
-     * @returns {false} `true` if the color is transparent, otherwise `false`.
+     * @returns {boolean} `true` if the color is transparent, otherwise `false`.
      */
     static isCSSColorTransparent(cssColor) {
         return (

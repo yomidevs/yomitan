@@ -26,19 +26,26 @@ import {fileURLToPath} from 'url';
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const extDir = path.join(dirname, '..', 'ext');
 
-async function buildLib(p) {
+/**
+ * @param {string} scriptPath
+ */
+async function buildLib(scriptPath) {
     await esbuild.build({
-        entryPoints: [p],
+        entryPoints: [scriptPath],
         bundle: true,
         minify: false,
         sourcemap: true,
         target: 'es2020',
         format: 'esm',
-        outfile: path.join(extDir, 'lib', path.basename(p)),
-        external: ['fs']
+        outfile: path.join(extDir, 'lib', path.basename(scriptPath)),
+        external: ['fs'],
+        banner: {
+            js: '// @ts-nocheck'
+        }
     });
 }
 
+/** */
 export async function buildLibs() {
     const devLibPath = path.join(dirname, 'lib');
     const files = await fs.promises.readdir(devLibPath, {
@@ -52,12 +59,12 @@ export async function buildLibs() {
 
     const schemaDir = path.join(extDir, 'data/schemas/');
     const schemaFileNames = fs.readdirSync(schemaDir);
-    const schemas = schemaFileNames.map((schemaFileName) => JSON.parse(fs.readFileSync(path.join(schemaDir, schemaFileName))));
+    const schemas = schemaFileNames.map((schemaFileName) => JSON.parse(fs.readFileSync(path.join(schemaDir, schemaFileName), {encoding: 'utf8'})));
     const ajv = new Ajv({schemas: schemas, code: {source: true, esm: true}});
     const moduleCode = standaloneCode(ajv);
 
     // https://github.com/ajv-validator/ajv/issues/2209
-    const patchedModuleCode = "import {ucs2length} from './ucs2length.js';" + moduleCode.replaceAll('require("ajv/dist/runtime/ucs2length").default', 'ucs2length');
+    const patchedModuleCode = "// @ts-nocheck\nimport {ucs2length} from './ucs2length.js';" + moduleCode.replaceAll('require("ajv/dist/runtime/ucs2length").default', 'ucs2length');
 
     fs.writeFileSync(path.join(extDir, 'lib/validate-schemas.js'), patchedModuleCode);
 }

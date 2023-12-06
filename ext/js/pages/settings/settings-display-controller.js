@@ -21,44 +21,54 @@ import {PopupMenu} from '../../dom/popup-menu.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
 
 export class SettingsDisplayController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     * @param {import('./modal-controller.js').ModalController} modalController
+     */
     constructor(settingsController, modalController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {import('./modal-controller.js').ModalController} */
         this._modalController = modalController;
+        /** @type {?HTMLElement} */
         this._contentNode = null;
+        /** @type {?HTMLElement} */
         this._menuContainer = null;
-        this._onMoreToggleClickBind = null;
-        this._onMenuButtonClickBind = null;
+        /** @type {(event: MouseEvent) => void} */
+        this._onMoreToggleClickBind = this._onMoreToggleClick.bind(this);
+        /** @type {(event: MouseEvent) => void} */
+        this._onMenuButtonClickBind = this._onMenuButtonClick.bind(this);
     }
 
+    /** */
     prepare() {
-        this._contentNode = document.querySelector('.content');
-        this._menuContainer = document.querySelector('#popup-menus');
+        this._contentNode = /** @type {HTMLElement} */ (document.querySelector('.content'));
+        this._menuContainer = /** @type {HTMLElement} */ (document.querySelector('#popup-menus'));
 
         const onFabButtonClick = this._onFabButtonClick.bind(this);
-        for (const fabButton of document.querySelectorAll('.fab-button')) {
+        for (const fabButton of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.fab-button'))) {
             fabButton.addEventListener('click', onFabButtonClick, false);
         }
 
         const onModalAction = this._onModalAction.bind(this);
-        for (const node of document.querySelectorAll('[data-modal-action]')) {
+        for (const node of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('[data-modal-action]'))) {
             node.addEventListener('click', onModalAction, false);
         }
 
         const onSelectOnClickElementClick = this._onSelectOnClickElementClick.bind(this);
-        for (const node of document.querySelectorAll('[data-select-on-click]')) {
+        for (const node of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('[data-select-on-click]'))) {
             node.addEventListener('click', onSelectOnClickElementClick, false);
         }
 
         const onInputTabActionKeyDown = this._onInputTabActionKeyDown.bind(this);
-        for (const node of document.querySelectorAll('[data-tab-action]')) {
+        for (const node of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('[data-tab-action]'))) {
             node.addEventListener('keydown', onInputTabActionKeyDown, false);
         }
 
-        for (const node of document.querySelectorAll('.defer-load-iframe')) {
+        for (const node of /** @type {NodeListOf<HTMLIFrameElement>} */ (document.querySelectorAll('.defer-load-iframe'))) {
             this._setupDeferLoadIframe(node);
         }
 
-        this._onMoreToggleClickBind = this._onMoreToggleClick.bind(this);
         const moreSelectorObserver = new SelectorObserver({
             selector: '.more-toggle',
             onAdded: this._onMoreSetup.bind(this),
@@ -66,7 +76,6 @@ export class SettingsDisplayController {
         });
         moreSelectorObserver.observe(document.documentElement, false);
 
-        this._onMenuButtonClickBind = this._onMenuButtonClick.bind(this);
         const menuSelectorObserver = new SelectorObserver({
             selector: '[data-menu]',
             onAdded: this._onMenuSetup.bind(this),
@@ -81,32 +90,54 @@ export class SettingsDisplayController {
 
     // Private
 
+    /**
+     * @param {Element} element
+     * @returns {null}
+     */
     _onMoreSetup(element) {
-        element.addEventListener('click', this._onMoreToggleClickBind, false);
+        /** @type {HTMLElement} */ (element).addEventListener('click', this._onMoreToggleClickBind, false);
         return null;
     }
 
+    /**
+     * @param {Element} element
+     */
     _onMoreCleanup(element) {
-        element.removeEventListener('click', this._onMoreToggleClickBind, false);
+        /** @type {HTMLElement} */ (element).removeEventListener('click', this._onMoreToggleClickBind, false);
     }
 
+    /**
+     * @param {Element} element
+     * @returns {null}
+     */
     _onMenuSetup(element) {
-        element.addEventListener('click', this._onMenuButtonClickBind, false);
+        /** @type {HTMLElement} */ (element).addEventListener('click', this._onMenuButtonClickBind, false);
         return null;
     }
 
+    /**
+     * @param {Element} element
+     */
     _onMenuCleanup(element) {
-        element.removeEventListener('click', this._onMenuButtonClickBind, false);
+        /** @type {HTMLElement} */ (element).removeEventListener('click', this._onMenuButtonClickBind, false);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onMenuButtonClick(e) {
-        const element = e.currentTarget;
+        const element = /** @type {HTMLElement} */ (e.currentTarget);
         const {menu} = element.dataset;
+        if (typeof menu === 'undefined') { return; }
         this._showMenu(element, menu);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onFabButtonClick(e) {
-        const action = e.currentTarget.dataset.action;
+        const element = /** @type {HTMLElement} */ (e.currentTarget);
+        const action = element.dataset.action;
         switch (action) {
             case 'toggle-sidebar':
                 document.body.classList.toggle('sidebar-visible');
@@ -117,16 +148,20 @@ export class SettingsDisplayController {
         }
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onMoreToggleClick(e) {
-        const container = this._getMoreContainer(e.currentTarget);
+        const node = /** @type {HTMLElement} */ (e.currentTarget);
+        const container = this._getMoreContainer(node);
         if (container === null) { return; }
 
-        const more = container.querySelector('.more');
+        const more = /** @type {?HTMLElement} */ (container.querySelector('.more'));
         if (more === null) { return; }
 
         const moreVisible = more.hidden;
         more.hidden = !moreVisible;
-        for (const moreToggle of container.querySelectorAll('.more-toggle')) {
+        for (const moreToggle of /** @type {NodeListOf<HTMLElement>} */ (container.querySelectorAll('.more-toggle'))) {
             const container2 = this._getMoreContainer(moreToggle);
             if (container2 === null) { continue; }
 
@@ -137,13 +172,16 @@ export class SettingsDisplayController {
         }
 
         e.preventDefault();
-        return false;
     }
 
+    /** */
     _onPopState() {
         this._updateScrollTarget();
     }
 
+    /**
+     * @param {KeyboardEvent} e
+     */
     _onKeyDown(e) {
         switch (e.code) {
             case 'Escape':
@@ -155,12 +193,18 @@ export class SettingsDisplayController {
         }
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onModalAction(e) {
-        const node = e.currentTarget;
+        const node = /** @type {HTMLElement} */ (e.currentTarget);
         const {modalAction} = node.dataset;
         if (typeof modalAction !== 'string') { return; }
 
-        let [action, target] = modalAction.split(',');
+        const modalActionArray = modalAction.split(',');
+        const action = modalActionArray[0];
+        /** @type {string|Element|undefined} */
+        let target = modalActionArray[1];
         if (typeof target === 'undefined') {
             const currentModal = node.closest('.modal');
             if (currentModal === null) { return; }
@@ -185,26 +229,33 @@ export class SettingsDisplayController {
         e.preventDefault();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onSelectOnClickElementClick(e) {
         if (e.button !== 0) { return; }
 
-        const node = e.currentTarget;
+        const node = /** @type {HTMLElement} */ (e.currentTarget);
         const range = document.createRange();
         range.selectNode(node);
 
         const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
+        if (selection !== null) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
 
         e.preventDefault();
         e.stopPropagation();
-        return false;
     }
 
+    /**
+     * @param {KeyboardEvent} e
+     */
     _onInputTabActionKeyDown(e) {
         if (e.key !== 'Tab' || e.ctrlKey) { return; }
 
-        const node = e.currentTarget;
+        const node = /** @type {HTMLElement} */ (e.currentTarget);
         const {tabAction} = node.dataset;
         if (typeof tabAction !== 'string') { return; }
 
@@ -220,6 +271,7 @@ export class SettingsDisplayController {
         }
     }
 
+    /** */
     _updateScrollTarget() {
         const hash = window.location.hash;
         if (!hash.startsWith('#!')) { return; }
@@ -233,18 +285,25 @@ export class SettingsDisplayController {
         content.scrollTop += rect2.top - rect1.top;
     }
 
+    /**
+     * @param {HTMLElement} link
+     * @returns {?Element}
+     */
     _getMoreContainer(link) {
         const v = link.dataset.parentDistance;
         const distance = v ? parseInt(v, 10) : 1;
         if (Number.isNaN(distance)) { return null; }
 
+        /** @type {?Element} */
+        let result = link;
         for (let i = 0; i < distance; ++i) {
-            link = link.parentNode;
-            if (link === null) { break; }
+            if (result === null) { break; }
+            result = /** @type {?Element} */ (result.parentNode);
         }
-        return link;
+        return result;
     }
 
+    /** */
     _closeTopMenuOrModal() {
         for (const popupMenu of PopupMenu.openMenus) {
             popupMenu.close();
@@ -257,17 +316,27 @@ export class SettingsDisplayController {
         }
     }
 
+    /**
+     * @param {HTMLElement} element
+     * @param {string} menuName
+     */
     _showMenu(element, menuName) {
-        const menu = this._settingsController.instantiateTemplate(menuName);
-        if (menu === null) { return; }
+        const menu = /** @type {HTMLElement} */ (this._settingsController.instantiateTemplate(menuName));
 
-        this._menuContainer.appendChild(menu);
+        /** @type {HTMLElement} */ (this._menuContainer).appendChild(menu);
 
         const popupMenu = new PopupMenu(element, menu);
         popupMenu.prepare();
     }
 
+    /**
+     * @param {KeyboardEvent} e
+     * @param {HTMLElement} node
+     * @param {string[]} args
+     */
     _indentInput(e, node, args) {
+        if (!(node instanceof HTMLTextAreaElement)) { return; }
+
         let indent = '\t';
         if (args.length > 1) {
             const count = parseInt(args[1], 10);
@@ -276,7 +345,8 @@ export class SettingsDisplayController {
 
         const {selectionStart: start, selectionEnd: end, value} = node;
         const lineStart = value.substring(0, start).lastIndexOf('\n') + 1;
-        const lineWhitespace = /^[ \t]*/.exec(value.substring(lineStart))[0];
+        const lineWhitespaceMatch = /^[ \t]*/.exec(value.substring(lineStart));
+        const lineWhitespace = lineWhitespaceMatch !== null ? lineWhitespaceMatch[0] : '';
 
         if (e.shiftKey) {
             const whitespaceLength = Math.max(0, Math.floor((lineWhitespace.length - 1) / 4) * 4);
@@ -298,17 +368,23 @@ export class SettingsDisplayController {
         }
     }
 
+    /**
+     * @param {HTMLIFrameElement} element
+     */
     _setupDeferLoadIframe(element) {
         const parent = this._getMoreContainer(element);
         if (parent === null) { return; }
 
+        /** @type {?MutationObserver} */
         let mutationObserver = null;
         const callback = () => {
             if (!this._isElementVisible(element)) { return false; }
 
             const src = element.dataset.src;
             delete element.dataset.src;
-            element.src = src;
+            if (typeof src === 'string') {
+                element.src = src;
+            }
 
             if (mutationObserver === null) { return true; }
 
@@ -323,6 +399,10 @@ export class SettingsDisplayController {
         mutationObserver.observe(parent, {attributes: true});
     }
 
+    /**
+     * @param {HTMLElement} element
+     * @returns {boolean}
+     */
     _isElementVisible(element) {
         return (element.offsetParent !== null);
     }

@@ -1,11 +1,31 @@
 {
     "markdown.extension.toc.levels": "1..3",
-    "editor.codeActionsOnSave": {
-        "source.addMissingImports": true,
-        "source.organizeImports": true,
-        "source.fixAll.eslint": true,
+    "[javascript]": {
+        "editor.codeActionsOnSave": {
+            "source.addMissingImports": true,
+            "source.organizeImports": true,
+            "source.fixAll.eslint": true
+        },
+    },
+    "[typescript]": {
+        "editor.codeActionsOnSave": {
+            "source.addMissingImports": false,
+            "source.organizeImports": false,
+            "source.fixAll.eslint": true
+        },
     },
     "eslint.format.enable": true,
     "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
     "javascript.preferences.importModuleSpecifierEnding": "js",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "eslint.validate": [
+        "javascript",
+        "typescript"
+    ],
+    "files.eol": "\n",
+    "html-validate.validate": [
+        "html"
+    ]
 }
