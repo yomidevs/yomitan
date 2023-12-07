@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {existsSync} from 'fs';
+import {resolve as pathResolve} from 'path';
 import {describe, expect, test} from 'vitest';
 import {Deinflector} from '../ext/js/language/deinflector.js';
 import {LanguageUtil} from '../ext/js/language/language-util.js';
@@ -56,30 +58,37 @@ async function testDeinflections() {
     const languageUtil = new LanguageUtil();
     await languageUtil.prepare();
     const deinflector = new Deinflector(languageUtil);
-    // const languages = languageUtil.getLanguages();
+    const languages = languageUtil.getLanguages();
 
-    // for (const {iso} of languages) {
-    const file = '../ext/js/language/languages/ja/test-deinflections.js';
-    console.log(`Testing ${file}`);
-    // if (!existsSync(file)) { continue; }
-    // eslint-disable-next-line no-unsanitized/method
-    const {deinflectionTests} = await import(file);
+
+    const deinflectionTests = Object.fromEntries(await Promise.all(languages.map(async ({iso}) => {
+        const file = `../ext/js/language/languages/${iso}/test-deinflections.js`;
+        const path = pathResolve(__dirname, file);
+        if (!existsSync(path)) {
+            return [iso, null];
+        }
+        // eslint-disable-next-line no-unsanitized/method
+        const {deinflectionTests: languageTests} = await import(file);
+        return [iso, languageTests];
+    })));
 
     describe('deinflections', () => {
-        for (const {valid, tests} of deinflectionTests) {
-            for (const {source, term, rule, reasons} of tests) {
-                let message = `${source} ${valid ? 'has' : 'does not have'} term candidate ${JSON.stringify(term)}`;
-                if (typeof rule !== 'undefined') {
-                    message += ` with rule ${JSON.stringify(rule)}`;
+        for (const {iso, language} of languages) {
+            for (const {valid, tests} of deinflectionTests[iso] ?? []) {
+                for (const {source, term, rule, reasons} of tests) {
+                    let message = `${source} ${valid ? 'has' : 'does not have'} term candidate ${JSON.stringify(term)}`;
+                    if (typeof rule !== 'undefined') {
+                        message += ` with rule ${JSON.stringify(rule)}`;
+                    }
+                    if (typeof reasons !== 'undefined') {
+                        message += (typeof rule !== 'undefined' ? ' and' : ' with');
+                        message += ` reasons ${JSON.stringify(reasons)}`;
+                    }
+                    test(`${language}: ${message}`, async () => {
+                        const {has} = await hasTermReasons(deinflector, source, term, rule, reasons);
+                        expect(has).toStrictEqual(valid);
+                    });
                 }
-                if (typeof reasons !== 'undefined') {
-                    message += (typeof rule !== 'undefined' ? ' and' : ' with');
-                    message += ` reasons ${JSON.stringify(reasons)}`;
-                }
-                test(`${message}`, async () => {
-                    const {has} = await hasTermReasons(deinflector, source, term, rule, reasons);
-                    expect(has).toStrictEqual(valid);
-                });
             }
         }
     });
