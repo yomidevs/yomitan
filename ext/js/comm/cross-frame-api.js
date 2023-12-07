@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,6 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+import {EventDispatcher, EventListenerCollection, deserializeError, invokeMessageHandler, log, serializeError} from '../core.js';
+import {yomitan} from '../yomitan.js';
 
 class CrossFrameAPIPort extends EventDispatcher {
     constructor(otherTabId, otherFrameId, port, messageHandlers) {
@@ -216,17 +220,20 @@ class CrossFrameAPIPort extends EventDispatcher {
     }
 }
 
-class CrossFrameAPI {
+export class CrossFrameAPI {
     constructor() {
         this._ackTimeout = 3000; // 3 seconds
         this._responseTimeout = 10000; // 10 seconds
         this._commPorts = new Map();
         this._messageHandlers = new Map();
         this._onDisconnectBind = this._onDisconnect.bind(this);
+        this._tabId = null;
+        this._frameId = null;
     }
 
-    prepare() {
+    async prepare() {
         chrome.runtime.onConnect.addListener(this._onConnect.bind(this));
+        ({tabId: this._tabId, frameId: this._frameId} = await yomitan.api.frameInformationGet());
     }
 
     invoke(targetFrameId, action, params={}) {
@@ -234,8 +241,8 @@ class CrossFrameAPI {
     }
 
     async invokeTab(targetTabId, targetFrameId, action, params={}) {
-        if (typeof targetTabId !== 'number') { targetTabId = null; }
-        const commPort = this._getOrCreateCommPort(targetTabId, targetFrameId);
+        if (typeof targetTabId !== 'number') { targetTabId = this._tabId; }
+        const commPort = await this._getOrCreateCommPort(targetTabId, targetFrameId);
         return await commPort.invoke(action, params, this._ackTimeout, this._responseTimeout);
     }
 
@@ -264,8 +271,8 @@ class CrossFrameAPI {
             }
             if (details.name !== 'cross-frame-communication-port') { return; }
 
-            const otherTabId = details.sourceTabId;
-            const otherFrameId = details.sourceFrameId;
+            const otherTabId = details.otherTabId;
+            const otherFrameId = details.otherFrameId;
             this._setupCommPort(otherTabId, otherFrameId, port);
         } catch (e) {
             port.disconnect();
@@ -296,14 +303,16 @@ class CrossFrameAPI {
         return this._createCommPort(otherTabId, otherFrameId);
     }
 
-    _createCommPort(otherTabId, otherFrameId) {
-        const details = {
-            name: 'background-cross-frame-communication-port',
-            targetTabId: otherTabId,
-            targetFrameId: otherFrameId
-        };
-        const port = yomichan.connect(null, {name: JSON.stringify(details)});
-        return this._setupCommPort(otherTabId, otherFrameId, port);
+    async _createCommPort(otherTabId, otherFrameId) {
+        await yomitan.api.openCrossFramePort(otherTabId, otherFrameId);
+
+        const tabPorts = this._commPorts.get(otherTabId);
+        if (typeof tabPorts !== 'undefined') {
+            const commPort = tabPorts.get(otherFrameId);
+            if (typeof commPort !== 'undefined') {
+                return commPort;
+            }
+        }
     }
 
     _setupCommPort(otherTabId, otherFrameId, port) {

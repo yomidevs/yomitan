@@ -1,0 +1,32 @@
+name: publish-firefox
+on:
+  release:
+    types: [released]
+permissions:
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: cd
+    steps:
+      - uses: robinraju/release-downloader@efa4cd07bd0195e6cc65e9e30c251b49ce4d3e51 # pin@v1.8
+        with:
+          tag: ${{ github.ref_name }}
+          fileName: "*"
+
+      - name: Deploy to Firefox Addons
+        id: addonsDeploy
+        uses: cardinalby/webext-buildtools-firefox-addons-action@924ad87df7e4af50a654c164ad9e498dce260ffa # pin@v1.0.9
+        continue-on-error: true
+        with:
+          zipFilePath: yomitan-firefox.zip
+          extensionId: ${{ secrets.FF_EXTENSION_ID }}
+          jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
+          jwtSecret: ${{ secrets.FF_JWT_SECRET }}
+
+      - name: Abort on upload error
+        if: |
+          steps.addonsDeploy.outcome == 'failure' &&
+          steps.addonsDeploy.outputs.sameVersionAlreadyUploadedError != 'true' &&
+          steps.addonsDeploy.outputs.timeoutError != 'true'
+        run: exit 1

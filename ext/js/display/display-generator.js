@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DictionaryDataUtil
- * HtmlTemplateCollection
- * PronunciationGenerator
- * StructuredContentGenerator
- */
+import {isObject} from '../core.js';
+import {DictionaryDataUtil} from '../dictionary/dictionary-data-util.js';
+import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
+import {yomitan} from '../yomitan.js';
+import {PronunciationGenerator} from './sandbox/pronunciation-generator.js';
+import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
 
-class DisplayGenerator {
+export class DisplayGenerator {
     constructor({japaneseUtil, contentManager, hotkeyHelpController=null}) {
         this._japaneseUtil = japaneseUtil;
         this._contentManager = contentManager;
@@ -33,7 +34,7 @@ class DisplayGenerator {
     }
 
     async prepare() {
-        const html = await yomichan.api.getDisplayTemplatesHtml();
+        const html = await yomitan.api.getDisplayTemplatesHtml();
         this._templates = new HtmlTemplateCollection(html);
         this.updateHotkeys();
     }

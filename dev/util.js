@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,24 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import JSZip from 'jszip';
+import path from 'path';
 
-
-let JSZip = null;
-
-
-function getJSZip() {
-    if (JSZip === null) {
-        process.noDeprecation = true; // Suppress a warning about JSZip
-        JSZip = require(path.join(__dirname, '../ext/lib/jszip.min.js'));
-        process.noDeprecation = false;
-    }
-    return JSZip;
-}
-
-
-function getArgs(args, argMap) {
+export function getArgs(args, argMap) {
     let key = null;
     let canKey = true;
     let onKey = false;
@@ -76,7 +64,7 @@ function getArgs(args, argMap) {
     return argMap;
 }
 
-function getAllFiles(baseDirectory, predicate=null) {
+export function getAllFiles(baseDirectory, predicate=null) {
     const results = [];
     const directories = [baseDirectory];
     while (directories.length > 0) {
@@ -98,11 +86,12 @@ function getAllFiles(baseDirectory, predicate=null) {
     return results;
 }
 
-function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
+export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
     const fileNames = fs.readdirSync(dictionaryDirectory);
 
-    const JSZip2 = getJSZip();
-    const archive = new JSZip2();
+    // const zipFileWriter = new BlobWriter();
+    // const zipWriter = new ZipWriter(zipFileWriter);
+    const archive = new JSZip();
 
     for (const fileName of fileNames) {
         if (/\.json$/.test(fileName)) {
@@ -112,17 +101,31 @@ function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
                 json.title = dictionaryName;
             }
             archive.file(fileName, JSON.stringify(json, null, 0));
+
+            // await zipWriter.add(fileName, new TextReader(JSON.stringify(json, null, 0)));
         } else {
             const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: null});
             archive.file(fileName, content);
+
+            // console.log('adding');
+            // const r = new TextReader(content);
+            // console.log(r.readUint8Array(0, 10));
+            // console.log('reader done');
+            // await zipWriter.add(fileName, r);
+            // console.log('??');
         }
     }
+    // await zipWriter.close();
 
+    // Retrieves the Blob object containing the zip content into `zipFileBlob`. It
+    // is also returned by zipWriter.close() for more convenience.
+    // const zipFileBlob = await zipFileWriter.getData();
     return archive;
+
+    // return zipFileBlob;
 }
 
-
-async function testMain(func, ...args) {
+export async function testMain(func, ...args) {
     try {
         await func(...args);
     } catch (e) {
@@ -130,12 +133,3 @@ async function testMain(func, ...args) {
         process.exit(-1);
     }
 }
-
-
-module.exports = {
-    get JSZip() { return getJSZip(); },
-    getArgs,
-    getAllFiles,
-    createDictionaryArchive,
-    testMain
-};

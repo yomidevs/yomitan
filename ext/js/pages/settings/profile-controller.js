@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * ProfileConditionsUI
- */
+import {clone, EventListenerCollection} from '../../core.js';
+import {yomitan} from '../../yomitan.js';
+import {ProfileConditionsUI} from './profile-conditions-ui.js';
 
-class ProfileController {
+export class ProfileController {
     constructor(settingsController, modalController) {
         this._settingsController = settingsController;
         this._modalController = modalController;
@@ -52,7 +53,7 @@ class ProfileController {
     }
 
     async prepare() {
-        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
+        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._profileConditionsUI.os = os;
 
         this._profileActiveSelect = document.querySelector('#profile-active-select');

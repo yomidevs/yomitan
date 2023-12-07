@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,22 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DictionaryWorkerHandler
- */
-
-self.importScripts(
-    '/lib/jszip.min.js',
-    '/js/core.js',
-    '/js/data/database.js',
-    '/js/data/json-schema.js',
-    '/js/general/cache-map.js',
-    '/js/dictionary/dictionary-database.js',
-    '/js/dictionary/dictionary-importer.js',
-    '/js/dictionary/dictionary-worker-handler.js',
-    '/js/dictionary/dictionary-worker-media-loader.js',
-    '/js/media/media-util.js'
-);
+import {log} from '../core.js';
+import {DictionaryWorkerHandler} from './dictionary-worker-handler.js';
 
 (() => {
     try {

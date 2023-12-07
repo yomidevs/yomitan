@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,31 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-async function fetchAsset(url, json=false) {
-    if (typeof window === 'undefined') {
-        const fs = require('fs');
-        const path = require('path');
 
-        return fs.readFileSync(path.resolve(__dirname + '/../ext' + url), 'utf8');
-    } else {
-        url = chrome.runtime.getURL(url);
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.status}`);
-        }
-        return await (json ? response.json() : response.text());
+export async function fetchAsset(url, json=false) {
+    // if (typeof window === 'undefined') {
+    //     const fs = require('fs');
+    //     const path = require('path');
+
+    //     return fs.readFileSync(path.resolve(__dirname + '/../ext' + url), 'utf8');
+    // } else {
+    url = chrome.runtime.getURL(url);
+    const response = await fetch(url, {
+        method: 'GET',
+        mode: 'no-cors',
+        cache: 'default',
+        credentials: 'omit',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+    });
+    if (!response.ok) {
+        throw new Error(`Failed to fetch ${url}: ${response.status}`);
     }
+    return await (json ? response.json() : response.text());
+    // }
 }
 
-function loadScript(filename) {
-    return new Promise((resolve, reject) => {
+export function loadScript(filename) {
+    return new Promise((resolve) => {
         const fileref = document.createElement('script');
         fileref.setAttribute('type', 'text/javascript');
         fileref.setAttribute('src', filename);
@@ -57,8 +59,8 @@ function loadScript(filename) {
     });
 }
 
-function loadModule(filename){
-    return new Promise((resolve, reject) => {
+export function loadModule(filename){
+    return new Promise((resolve) => {
         const fileref = document.createElement('script');
         fileref.setAttribute('type', 'module');
         fileref.setAttribute('src', filename);
@@ -77,7 +79,7 @@ function loadModule(filename){
     });
 }
 
-function removeScript(filename){
+export function removeScript(filename){
     const scriptElement = document.querySelector(`script[src="${filename}"]`);
     if (scriptElement) {
         document.head.removeChild(scriptElement);

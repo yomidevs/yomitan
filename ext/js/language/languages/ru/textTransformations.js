@@ -18,9 +18,9 @@
 /* global
 */
 
-import {decapitalize, capitalizeFirstLetter} from '../../textTransformations.js';
+import {capitalizeFirstLetter, decapitalize} from '../../textTransformations.js';
 
-window.languages.ru.textTransformations = [
+export const textTransformations = [
     {
         id: 'yoToE',
         name: "Convert 'ё' to 'е'",

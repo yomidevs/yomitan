@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const JapaneseUtil = (() => {
+export const JapaneseUtil = (() => {
     const HIRAGANA_SMALL_TSU_CODE_POINT = 0x3063;
     const KATAKANA_SMALL_TSU_CODE_POINT = 0x30c3;
     const KATAKANA_SMALL_KA_CODE_POINT = 0x30f5;

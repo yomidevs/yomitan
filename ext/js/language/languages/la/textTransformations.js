@@ -18,9 +18,9 @@
 /* global
 */
 
-import {decapitalize, capitalizeFirstLetter} from '../../textTransformations.js';
+import {capitalizeFirstLetter, decapitalize} from '../../textTransformations.js';
 
-window.languages.la.textTransformations = [
+export const textTransformations = [
     {
         id: 'removeDiacritics',
         name: 'Remove diacritics',

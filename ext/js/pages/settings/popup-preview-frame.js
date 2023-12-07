@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,13 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Frontend
- * TextSourceRange
- * wanakana
- */
-
-class PopupPreviewFrame {
+import * as wanakana from '../../../lib/wanakana.js';
+import {Frontend} from '../../app/frontend.js';
+import {TextSourceRange} from '../../dom/text-source-range.js';
+import {yomitan} from '../../yomitan.js';
+export class PopupPreviewFrame {
     constructor(tabId, frameId, popupFactory, hotkeyHandler) {
         this._tabId = tabId;
         this._frameId = frameId;
@@ -49,13 +48,13 @@ class PopupPreviewFrame {
 
     async prepare() {
         // Overwrite API functions
-        this._apiOptionsGetOld = yomichan.api.optionsGet.bind(yomichan.api);
-        yomichan.api.optionsGet = this._apiOptionsGet.bind(this);
+        this._apiOptionsGetOld = yomitan.api.optionsGet.bind(yomitan.api);
+        yomitan.api.optionsGet = this._apiOptionsGet.bind(this);
         await this._getOptions();
 
         this._exampleText = document.querySelector('#example-text');
         this._exampleTextInput = document.querySelector('#example-text-input');
-        const languages = await yomichan.api.getLanguages();
+        const languages = await yomitan.api.getLanguages();
         this._exampleTexts = Object.fromEntries(languages.map(({iso, exampleText}) => ([iso, exampleText])));
         this._setExampleText();
 
@@ -230,7 +229,7 @@ class PopupPreviewFrame {
     }
 
     async _getOptions(optionsContext = {current: true}) {
-        this._options = await yomichan.api.optionsGet(optionsContext);
+        this._options = await yomitan.api.optionsGet(optionsContext);
         return this._options;
     }
 

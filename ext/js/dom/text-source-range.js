@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,17 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DOMTextScanner
- * DocumentUtil
- */
+import {DocumentUtil} from './document-util.js';
+import {DOMTextScanner} from './dom-text-scanner.js';
+import {TextSourceElement} from './text-source-element.js';
 
 /**
  * This class represents a text source that comes from text nodes in the document.
  * Sometimes a temporary "imposter" element is created and used to store the text.
  * This element is typically hidden from the page and removed after scanning has completed.
  */
-class TextSourceRange {
+export class TextSourceRange {
     /**
      * Creates a new instance of the class.
      * @param {Range} range The selection range.

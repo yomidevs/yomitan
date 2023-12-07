@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * CacheMap
- */
+import {clone} from '../core.js';
+import {CacheMap} from '../general/cache-map.js';
 
-class JsonSchema {
+export class JsonSchema {
     constructor(schema, rootSchema) {
         this._schema = null;
         this._startSchema = schema;

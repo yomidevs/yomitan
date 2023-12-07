@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * FrameAncestryHandler
- */
+import {yomitan} from '../yomitan.js';
+import {FrameAncestryHandler} from './frame-ancestry-handler.js';
 
-class FrameOffsetForwarder {
+export class FrameOffsetForwarder {
     constructor(frameId) {
         this._frameId = frameId;
         this._frameAncestryHandler = new FrameAncestryHandler(frameId);
@@ -27,7 +27,7 @@ class FrameOffsetForwarder {
 
     prepare() {
         this._frameAncestryHandler.prepare();
-        yomichan.crossFrame.registerHandlers([
+        yomitan.crossFrame.registerHandlers([
             ['FrameOffsetForwarder.getChildFrameRect', {async: false, handler: this._onMessageGetChildFrameRect.bind(this)}]
         ]);
     }
@@ -43,7 +43,7 @@ class FrameOffsetForwarder {
             let childFrameId = this._frameId;
             const promises = [];
             for (const frameId of ancestorFrameIds) {
-                promises.push(yomichan.crossFrame.invoke(frameId, 'FrameOffsetForwarder.getChildFrameRect', {frameId: childFrameId}));
+                promises.push(yomitan.crossFrame.invoke(frameId, 'FrameOffsetForwarder.getChildFrameRect', {frameId: childFrameId}));
                 childFrameId = frameId;
             }
 

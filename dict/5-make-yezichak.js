@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const {readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync, createWriteStream, unlinkSync} = require('fs');
+const {readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync, unlinkSync} = require('fs');
 const date = require('date-and-time');
 const now = new Date();
 
@@ -50,8 +50,8 @@ const tagModifiers = [
     ['sometimes', 'some'],
     ['now', 'now'],
     ['especially', 'esp'],
-    ['slightly', 'sli'],
-]
+    ['slightly', 'sli']
+];
 
 function findTag(tags, tag) {
     const fullTag = tags.find((x) => {
@@ -64,8 +64,8 @@ function findTag(tags, tag) {
     });
 
     const result = fullTag ? [...fullTag] : null;
-    
-    if(result && Array.isArray(result[3])){
+
+    if (result && Array.isArray(result[3])){
         result[3] = result[3][0];
     }
 
@@ -77,7 +77,7 @@ function findModifiedTag(tag){
     tagModifiers.forEach((modifier) => {
         const regex = new RegExp(`^${modifier[0]} `);
         if (regex.test(tag)){
-            fullTag = findTag(termTags, tag.replace(regex, ''));
+            const fullTag = findTag(termTags, tag.replace(regex, ''));
             if (fullTag){
                 modifiedTag = [
                     `${modifier[1]}-${fullTag[0]}`,
@@ -85,10 +85,10 @@ function findModifiedTag(tag){
                     fullTag[2],
                     `${modifier[0]} ${fullTag[3]}`,
                     fullTag[4]
-                ]
+                ];
             }
         }
-    })
+    });
 
     return modifiedTag;
 }
@@ -112,8 +112,8 @@ let ipaCount = 0;
 let termTagCount = 0;
 
 for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
-    normalizedLemma = normalizeOrthography(lemma);
-    
+    const normalizedLemma = normalizeOrthography(lemma);
+
     function debug(word) {
         if (normalizedLemma === DEBUG_WORD) {
             console.log('-------------------');
@@ -131,9 +131,8 @@ for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
         const entries = {};
 
         for (const sense of senses) {
-
             const {glosses, tags} = sense;
-            const senseTags = [...lemmaTags, ...tags]
+            const senseTags = [...lemmaTags, ...tags];
 
             glosses.forEach((gloss) => {
                 debug(gloss);
@@ -156,11 +155,11 @@ for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
                         ];
                     }
                 }
-    
 
-                if (typeof gloss !== 'string') { 
+
+                if (typeof gloss !== 'string') {
                     addGlossToEntries(senseTags.join(' '));
-                    return; 
+                    return;
                 }
 
                 const regex = /^\(([^()]+)\) ?/;
@@ -171,11 +170,11 @@ for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
                     : [];
 
                 const recognizedTags = [];
-                
+
                 const allEntryTags = [...new Set([...lemmaTags, ...senseTags, ...parenthesesTags])];
                 termTagCount += allEntryTags.length;
 
-                unrecognizedTags = allEntryTags
+                const unrecognizedTags = allEntryTags
                     .map((tag) => {
                         const fullTag = findTag(termTags, tag);
 
@@ -189,10 +188,10 @@ for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
                                 recognizedTags.push(modifiedTag[0]);
                                 yzkTags.dict[tag] = modifiedTag;
                             }  else {
-                                if (allEntryTags.some((otherTag) => otherTag !== tag && otherTag.includes(tag))) return null;
-                                incrementCounter(tag, skippedTermTags)
-                                if(tag === pos) incrementCounter("pos-" + tag, skippedTermTags)
-                                if (parenthesesTags.includes(tag)) return tag;
+                                if (allEntryTags.some((otherTag) => otherTag !== tag && otherTag.includes(tag))) { return null; }
+                                incrementCounter(tag, skippedTermTags);
+                                if (tag === pos) { incrementCounter('pos-' + tag, skippedTermTags); }
+                                if (parenthesesTags.includes(tag)) { return tag; }
                             }
                         }
                     })
@@ -203,7 +202,6 @@ for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
 
                 addGlossToEntries(recognizedTags.join(' '));
             });
-            
         }
 
         debug(entries);
@@ -221,7 +219,7 @@ for (const [lemma, infoMap] of Object.entries(lemmaDict)) {
                     yzkTags.ipa[tag] = fullTag;
                     return fullTag[0];
                 } else {
-                    incrementCounter(tag, skippedIpaTags)
+                    incrementCounter(tag, skippedIpaTags);
                 }
             })
             .filter(Boolean);
@@ -253,7 +251,7 @@ const multiwordInflections = [
     'subjunctive II', // de
     'Archaic form', // de
     'archaic form', // de
-    'female equivalent', // de
+    'female equivalent' // de
 ];
 
 for (const [form, allInfo] of Object.entries(formDict)) {
@@ -280,10 +278,10 @@ for (const [form, allInfo] of Object.entries(formDict)) {
                 return hypotheses;
             });
 
-            uniqueHypotheses = [];
+            const uniqueHypotheses = [];
 
             for (const hypothesis of inflectionHypotheses) {
-                const hypothesisStrings = uniqueHypotheses.map((hypothesis) => hypothesis.sort().join(' '));
+                const hypothesisStrings = uniqueHypotheses.map((uniqueHypo) => uniqueHypo.sort().join(' '));
                 const hypothesisString = hypothesis.sort().join(' ');
                 if (!hypothesisStrings.includes(hypothesisString)) {
                     uniqueHypotheses.push(hypothesis);

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class PanelElement extends EventDispatcher {
+import {EventDispatcher} from '../core.js';
+
+export class PanelElement extends EventDispatcher {
     constructor({node, closingAnimationDuration}) {
         super();
         this._node = node;

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,10 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ScriptManager} from '../background/script-manager.js';
+import {log} from '../core.js';
+
 /**
  * This class controls the registration of accessibility handlers.
  */
-class AccessibilityController {
+export class AccessibilityController {
     /**
      * Creates a new instance.
      * @param {ScriptManager} scriptManager An instance of the `ScriptManager` class.
@@ -81,7 +85,7 @@ class AccessibilityController {
                     allFrames: true,
                     matchAboutBlank: true,
                     matches: ['*://docs.google.com/*'],
-                    urlMatches: '^[^:]*://docs.google.com/[\\w\\W]*$',
+                    urlMatches: '^[^:]*://docs\\.google\\.com/[\\w\\W]*$',
                     runAt: 'document_start',
                     js: ['js/accessibility/google-docs.js']
                 };

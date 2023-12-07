@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,16 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DOMTextScanner
- * TextSourceElement
- * TextSourceRange
- */
+import {EventListenerCollection} from '../core.js';
+import {DOMTextScanner} from './dom-text-scanner.js';
+import {TextSourceElement} from './text-source-element.js';
+import {TextSourceRange} from './text-source-range.js';
 
 /**
  * This class contains utility functions related to the HTML document.
  */
-class DocumentUtil {
+export class DocumentUtil {
     /**
      * Options to configure how element detection is performed.
      * @typedef {object} GetRangeFromPointOptions

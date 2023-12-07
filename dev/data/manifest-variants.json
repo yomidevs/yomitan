@@ -1,10 +1,10 @@
 {
     "manifest": {
-        "manifest_version": 2,
-        "name": "Yomichan",
-        "version": "22.10.23.0",
+        "manifest_version": 3,
+        "name": "Yomitan",
+        "version": "$YOMITAN_VERSION",
         "description": "Japanese dictionary with Anki integration",
-        "author": "Alex Yatskov",
+        "author": "TheMoeWay",
         "icons": {
             "16": "images/tongue.png",
             "19": "images/tongue.png",
@@ -14,7 +14,7 @@
             "64": "images/tongue.png",
             "128": "images/tongue.png"
         },
-        "browser_action": {
+        "action": {
             "default_icon": {
                 "16": "images/tongue.png",
                 "19": "images/tongue.png",
@@ -24,12 +24,12 @@
                 "64": "images/tongue.png",
                 "128": "images/tongue.png"
             },
-            "default_title": "Yomichan",
+            "default_title": "Yomitan",
             "default_popup": "action-popup.html"
         },
         "background": {
-            "page": "background.html",
-            "persistent": true
+            "service_worker": "sw.js",
+            "type": "module"
         },
         "content_scripts": [
             {
@@ -42,32 +42,11 @@
                 "match_about_blank": true,
                 "all_frames": true,
                 "js": [
-                    "js/core.js",
-                    "js/yomichan.js",
-                    "js/app/frontend.js",
-                    "js/app/popup.js",
-                    "js/app/popup-factory.js",
-                    "js/app/popup-proxy.js",
-                    "js/app/popup-window.js",
-                    "js/app/theme-controller.js",
-                    "js/comm/api.js",
-                    "js/comm/cross-frame-api.js",
-                    "js/comm/frame-ancestry-handler.js",
-                    "js/comm/frame-client.js",
-                    "js/comm/frame-offset-forwarder.js",
-                    "js/data/sandbox/string-util.js",
-                    "js/dom/dom-text-scanner.js",
-                    "js/dom/document-util.js",
-                    "js/dom/text-source-element.js",
-                    "js/dom/text-source-range.js",
-                    "js/input/hotkey-handler.js",
-                    "js/language/text-scanner.js",
-                    "js/script/dynamic-loader.js",
-                    "js/app/content-script-main.js"
+                    "js/app/content-script-wrapper.js"
                 ]
             }
         ],
-        "minimum_chrome_version": "57.0.0.0",
+        "minimum_chrome_version": "96.0.0.0",
         "options_ui": {
             "page": "settings.html",
             "open_in_tab": true
@@ -75,21 +54,22 @@
         "sandbox": {
             "pages": [
                 "template-renderer.html"
-            ],
-            "content_security_policy": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'unsafe-inline'"
+            ]
         },
         "permissions": [
-            "<all_urls>",
             "storage",
             "clipboardWrite",
             "unlimitedStorage",
-            "webRequest",
-            "webRequestBlocking"
+            "declarativeNetRequest",
+            "scripting",
+            "offscreen"
         ],
         "optional_permissions": [
             "clipboardRead",
-            "nativeMessaging",
-            "webNavigation"
+            "nativeMessaging"
+        ],
+        "host_permissions": [
+            "<all_urls>"
         ],
         "commands": {
             "toggleTextScanning": {
@@ -115,10 +95,21 @@
             }
         },
         "web_accessible_resources": [
-            "popup.html",
-            "template-renderer.html"
+            {
+                "resources": [
+                    "popup.html",
+                    "template-renderer.html",
+                    "js/*"
+                ],
+                "matches": [
+                    "<all_urls>"
+                ]
+            }
         ],
-        "content_security_policy": "default-src 'self'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
+        "content_security_policy": {
+            "extension_pages": "default-src 'self'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *",
+            "sandbox": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'unsafe-inline'"
+        }
     },
     "defaultVariant": "base",
     "variants": [
@@ -129,203 +120,240 @@
         {
             "name": "chrome",
             "inherit": "base",
-            "fileName": "yomichan-chrome.zip",
+            "fileName": "yomitan-chrome.zip",
             "excludeFiles": [
-                "sw.js",
-                "js/dom/simple-dom-parser.js",
-                "lib/parse5.js"
+                "background.html"
             ]
         },
         {
             "name": "chrome-dev",
             "inherit": "chrome",
-            "fileName": "yomichan-chrome-dev.zip",
+            "fileName": "yomitan-chrome-dev.zip",
             "modifications": [
                 {
                     "action": "replace",
-                    "path": ["name"],
+                    "path": [
+                        "name"
+                    ],
                     "pattern": "^.*$",
                     "patternFlags": "",
                     "replacement": "$& (development build)"
                 },
                 {
                     "action": "replace",
-                    "path": ["description"],
+                    "path": [
+                        "description"
+                    ],
                     "pattern": "^(.*)(?:\\.\\s*)?$",
                     "patternFlags": "",
-                    "replacement": "$1. This is a development build; get the stable version here: https://tinyurl.com/yaatdjmp"
+                    "replacement": "$1. This is a development build."
                 }
             ]
         },
         {
-            "name": "chrome-mv3",
-            "inherit": "base",
-            "fileName": "yomichan-chrome-mv3.zip",
+            "name": "chrome-playwright",
+            "inherit": "chrome-dev",
+            "fileName": "yomitan-chrome-playwright.zip",
             "modifications": [
-                {"action": "set",    "path": ["manifest_version"], "value": 3},
-                {"action": "set",    "path": ["minimum_chrome_version"], "value": "96.0.0.0"},
-                {"action": "move",   "path": ["browser_action"], "newPath": ["action"]},
-                {"action": "delete", "path": ["background", "page"]},
-                {"action": "delete", "path": ["background", "persistent"]},
-                {"action": "set",    "path": ["background", "service_worker"], "value": "sw.js"},
-                {"action": "move",   "path": ["content_security_policy"], "newPath": ["content_security_policy_old"]},
-                {"action": "set",    "path": ["content_security_policy"], "value": {}},
-                {"action": "move",   "path": ["content_security_policy_old"], "newPath": ["content_security_policy", "extension_pages"]},
-                {"action": "move",   "path": ["sandbox", "content_security_policy"], "newPath": ["content_security_policy", "sandbox"]},
-                {"action": "remove", "path": ["permissions"], "item": "<all_urls>"},
-                {"action": "remove", "path": ["permissions"], "item": "webRequestBlocking"},
-                {"action": "add",    "path": ["permissions"], "items": ["declarativeNetRequest", "scripting"]},
-                {"action": "set",    "path": ["host_permissions"], "value": ["<all_urls>"], "after": "optional_permissions"},
-                {"action": "remove", "path": ["optional_permissions"], "item": "webNavigation"},
-                {"action": "move",   "path": ["web_accessible_resources"], "newPath": ["web_accessible_resources_old"]},
-                {"action": "set",    "path": ["web_accessible_resources"], "value": [{"resources": [], "matches": ["<all_urls>"]}], "after": "web_accessible_resources_old"},
-                {"action": "move",   "path": ["web_accessible_resources_old"], "newPath": ["web_accessible_resources", 0, "resources"]}
-            ],
-            "excludeFiles": [
-                "background.html",
-                "js/dom/native-simple-dom-parser.js"
+                {
+                    "action": "remove",
+                    "path": [
+                        "optional_permissions"
+                    ],
+                    "item": "clipboardRead"
+                },
+                {
+                    "action": "add",
+                    "path": [
+                        "permissions"
+                    ],
+                    "items": [
+                        "clipboardRead"
+                    ]
+                }
             ]
         },
         {
             "name": "firefox",
             "inherit": "base",
-            "fileName": "yomichan-firefox.xpi",
+            "fileName": "yomitan-firefox.zip",
             "modifications": [
                 {
+                    "action": "delete",
+                    "path": [
+                        "background",
+                        "service_worker"
+                    ]
+                },
+                {
+                    "action": "delete",
+                    "path": [
+                        "background",
+                        "type"
+                    ]
+                },
+                {
+                    "action": "set",
+                    "path": [
+                        "background",
+                        "page"
+                    ],
+                    "value": "background.html"
+                },
+                {
                     "action": "remove",
-                    "path": ["web_accessible_resources"],
+                    "path": [
+                        "web_accessible_resources",
+                        0,
+                        "resources"
+                    ],
                     "item": "template-renderer.html"
                 },
                 {
                     "action": "delete",
-                    "path": ["sandbox"]
+                    "path": [
+                        "sandbox"
+                    ]
+                },
+                {
+                    "action": "delete",
+                    "path": [
+                        "content_security_policy",
+                        "sandbox"
+                    ]
                 },
                 {
                     "action": "set",
-                    "path": ["content_security_policy"],
-                    "value": "default-src 'self'; script-src 'self' 'unsafe-eval'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
+                    "path": [
+                        "content_security_policy",
+                        "extension_pages"
+                    ],
+                    "value": "default-src 'self'; script-src 'self'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
                 },
                 {
                     "action": "set",
-                    "path": ["browser_specific_settings"],
+                    "path": [
+                        "browser_specific_settings"
+                    ],
                     "value": {
                         "gecko": {
-                            "id": "alex@foosoft.net",
-                            "strict_min_version": "57.0"
+                            "id": "{cb7c0bec-7085-4f84-8422-7b55a7c4467c}",
+                            "strict_min_version": "115.0"
+                        },
+                        "gecko_android": {
+                            "strict_min_version": "115.0"
                         }
                     }
                 },
                 {
                     "action": "remove",
-                    "path": ["optional_permissions"],
-                    "item": "nativeMessaging"
-                },
-                {
-                    "action": "add",
-                    "path": ["permissions"],
-                    "items": ["nativeMessaging"]
+                    "path": [
+                        "permissions"
+                    ],
+                    "item": "offscreen"
                 }
             ],
             "excludeFiles": [
                 "sw.js",
-                "js/dom/simple-dom-parser.js",
-                "lib/parse5.js"
+                "offscreen.html",
+                "js/background/offscreen.js",
+                "js/background/offscreen-main.js"
             ]
         },
         {
             "name": "firefox-dev",
             "inherit": "firefox",
-            "fileName": "yomichan-firefox-dev.xpi",
+            "fileName": "yomitan-firefox-dev.zip",
             "modifications": [
                 {
                     "action": "replace",
-                    "path": ["name"],
+                    "path": [
+                        "name"
+                    ],
                     "pattern": "^.*$",
                     "patternFlags": "",
                     "replacement": "$& (development build)"
                 },
                 {
                     "action": "replace",
-                    "path": ["description"],
+                    "path": [
+                        "description"
+                    ],
                     "pattern": "^(.*)(?:\\.\\s*)?$",
                     "patternFlags": "",
-                    "replacement": "$1. This is a development build; get the stable version here: https://tinyurl.com/yaatdjmp"
+                    "replacement": "$1. This is a development build."
                 },
                 {
                     "action": "set",
-                    "path": ["browser_specific_settings", "gecko", "id"],
-                    "value": "alex.testing@foosoft.net"
+                    "path": [
+                        "browser_specific_settings",
+                        "gecko",
+                        "id"
+                    ],
+                    "value": "{2d13e145-294e-4ead-9bce-b4644b203a00}"
                 },
                 {
                     "action": "set",
-                    "path": ["browser_specific_settings", "gecko", "update_url"],
-                    "value": "https://raw.githubusercontent.com/FooSoft/yomichan/metadata/updates.json"
+                    "path": [
+                        "browser_specific_settings",
+                        "gecko",
+                        "update_url"
+                    ],
+                    "value": "https://raw.githubusercontent.com/themoeway/yomitan/metadata/updates.json"
                 }
             ],
             "excludeFiles": [
                 "sw.js",
-                "js/dom/simple-dom-parser.js",
-                "lib/parse5.js"
-            ]
-        },
-        {
-            "name": "firefox-mv3",
-            "inherit": "firefox",
-            "fileName": "yomichan-firefox-mv3.xpi",
-            "modifications": [
-                {"action": "set",    "path": ["manifest_version"], "value": 3},
-                {"action": "set",    "path": ["browser_specific_settings", "gecko", "strict_min_version"], "value": "101.0"},
-                {"action": "move",   "path": ["browser_action"], "newPath": ["action"]},
-                {"action": "delete", "path": ["background", "persistent"]},
-                {"action": "move",   "path": ["content_security_policy"], "newPath": ["content_security_policy_old"]},
-                {"action": "set",    "path": ["content_security_policy"], "value": {}},
-                {"action": "move",   "path": ["content_security_policy_old"], "newPath": ["content_security_policy", "extension_pages"]},
-                {"action": "remove", "path": ["permissions"], "item": "<all_urls>"},
-                {"action": "add",    "path": ["permissions"], "items": ["scripting"]},
-                {"action": "set",    "path": ["host_permissions"], "value": ["<all_urls>"], "after": "optional_permissions"},
-                {"action": "remove", "path": ["optional_permissions"], "item": "webNavigation"},
-                {"action": "move",   "path": ["web_accessible_resources"], "newPath": ["web_accessible_resources_old"]},
-                {
-                    "action": "set",
-                    "path": ["web_accessible_resources"],
-                    "value": [
-                        {
-                            "resources": [],
-                            "matches": [
-                                "http://*/*",
-                                "https://*/*",
-                                "file://*/*"
-                            ]
-                        }
-                    ],
-                    "after": "web_accessible_resources_old"
-                },
-                {"action": "move",   "path": ["web_accessible_resources_old"], "newPath": ["web_accessible_resources", 0, "resources"]}
-            ],
-            "excludeFiles": [
-                "sw.js",
-                "js/dom/simple-dom-parser.js",
-                "lib/parse5.js"
+                "offscreen.html",
+                "js/background/offscreen.js",
+                "js/background/offscreen-main.js"
             ]
         },
         {
             "name": "safari",
             "fileName": null,
             "modifications": [
-                {"action": "remove", "path": ["optional_permissions"], "item": "clipboardRead"},
-                {"action": "remove", "path": ["permissions"], "item": "webRequestBlocking"},
-                {"action": "delete", "path": ["content_scripts", 0, "match_about_blank"]},
-                {"action": "delete", "path": ["sandbox"]},
+                {
+                    "action": "remove",
+                    "path": [
+                        "optional_permissions"
+                    ],
+                    "item": "clipboardRead"
+                },
+                {
+                    "action": "remove",
+                    "path": [
+                        "permissions"
+                    ],
+                    "item": "offscreen"
+                },
+                {
+                    "action": "delete",
+                    "path": [
+                        "content_scripts",
+                        0,
+                        "match_about_blank"
+                    ]
+                },
+                {
+                    "action": "delete",
+                    "path": [
+                        "sandbox"
+                    ]
+                },
                 {
                     "action": "set",
-                    "path": ["content_security_policy"],
+                    "path": [
+                        "content_security_policy"
+                    ],
                     "value": "default-src 'self'; script-src 'self' 'unsafe-eval'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
                 }
             ],
             "excludeFiles": [
                 "sw.js",
-                "js/dom/simple-dom-parser.js",
-                "lib/parse5.js"
+                "offscreen.html",
+                "js/background/offscreen.js",
+                "js/background/offscreen-main.js"
             ]
         }
     ]

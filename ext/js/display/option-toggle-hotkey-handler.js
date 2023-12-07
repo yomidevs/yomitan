@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class OptionToggleHotkeyHandler {
+import {deserializeError} from '../core.js';
+import {yomitan} from '../yomitan.js';
+
+export class OptionToggleHotkeyHandler {
     constructor(display) {
         this._display = display;
         this._notification = null;
@@ -48,7 +52,7 @@ class OptionToggleHotkeyHandler {
         try {
             const optionsContext = this._display.getOptionsContext();
 
-            const result = (await yomichan.api.getSettings([{
+            const result = (await yomitan.api.getSettings([{
                 scope: 'profile',
                 path,
                 optionsContext
@@ -65,7 +69,7 @@ class OptionToggleHotkeyHandler {
 
             value = !value;
 
-            const result2 = (await yomichan.api.modifySettings([{
+            const result2 = (await yomitan.api.modifySettings([{
                 scope: 'profile',
                 action: 'set',
                 path,

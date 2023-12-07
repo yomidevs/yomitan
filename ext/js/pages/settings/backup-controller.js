@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * ArrayBufferUtil
- * Dexie
- * DictionaryController
- * OptionsUtil
- */
+import {Dexie} from '../../../lib/dexie.js';
+import {isObject, log} from '../../core.js';
+import {OptionsUtil} from '../../data/options-util.js';
+import {ArrayBufferUtil} from '../../data/sandbox/array-buffer-util.js';
+import {yomitan} from '../../yomitan.js';
+import {DictionaryController} from './dictionary-controller.js';
 
-class BackupController {
+export class BackupController {
     constructor(settingsController, modalController) {
         this._settingsController = settingsController;
         this._modalController = modalController;
@@ -94,8 +95,8 @@ class BackupController {
 
     async _getSettingsExportData(date) {
         const optionsFull = await this._settingsController.getOptionsFull();
-        const environment = await yomichan.api.getEnvironmentInfo();
-        const fieldTemplatesDefault = await yomichan.api.getDefaultAnkiFieldTemplates();
+        const environment = await yomitan.api.getEnvironmentInfo();
+        const fieldTemplatesDefault = await yomitan.api.getDefaultAnkiFieldTemplates();
         const permissions = await this._settingsController.permissionsUtil.getAllPermissions();
 
         // Format options
@@ -502,10 +503,10 @@ class BackupController {
     }
 
     async _importDatabase(databaseName, file) {
-        await yomichan.api.purgeDatabase();
+        await yomitan.api.purgeDatabase();
         await Dexie.import(file, {progressCallback: this._databaseImportProgressCallback});
-        yomichan.api.triggerDatabaseUpdated('dictionary', 'import');
-        yomichan.trigger('storageChanged');
+        yomitan.api.triggerDatabaseUpdated('dictionary', 'import');
+        yomitan.trigger('storageChanged');
     }
 
     _onSettingsImportDatabaseClick() {

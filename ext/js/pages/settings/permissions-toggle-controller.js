@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * ObjectPropertyAccessor
- */
+import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
 
-class PermissionsToggleController {
+export class PermissionsToggleController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._toggles = null;

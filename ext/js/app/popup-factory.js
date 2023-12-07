@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,17 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * FrameOffsetForwarder
- * Popup
- * PopupProxy
- * PopupWindow
- */
+import {FrameOffsetForwarder} from '../comm/frame-offset-forwarder.js';
+import {generateId} from '../core.js';
+import {yomitan} from '../yomitan.js';
+import {PopupProxy} from './popup-proxy.js';
+import {PopupWindow} from './popup-window.js';
+import {Popup} from './popup.js';
 
 /**
  * A class which is used to generate and manage popups.
  */
-class PopupFactory {
+export class PopupFactory {
     /**
      * Creates a new instance.
      * @param {number} frameId The frame ID of the host frame.
@@ -42,7 +43,7 @@ class PopupFactory {
      */
     prepare() {
         this._frameOffsetForwarder.prepare();
-        yomichan.crossFrame.registerHandlers([
+        yomitan.crossFrame.registerHandlers([
             ['PopupFactory.getOrCreatePopup',     {async: true,  handler: this._onApiGetOrCreatePopup.bind(this)}],
             ['PopupFactory.setOptionsContext',    {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
             ['PopupFactory.hide',                 {async: false, handler: this._onApiHide.bind(this)}],
@@ -70,6 +71,7 @@ class PopupFactory {
      * @param {?number} [details.depth] A specific depth value to assign to the popup.
      * @param {boolean} [details.popupWindow] Whether or not a separate popup window should be used, rather than an iframe.
      * @param {boolean} [details.childrenSupported] Whether or not the popup is able to show child popups.
+     * @returns {Popup|PopupWindow|PopupProxy} The new or existing popup.
      */
     async getOrCreatePopup({
         frameId=null,
@@ -149,7 +151,7 @@ class PopupFactory {
                 throw new Error('Invalid frameId');
             }
             const useFrameOffsetForwarder = (parentPopupId === null);
-            ({id, depth, frameId} = await yomichan.crossFrame.invoke(frameId, 'PopupFactory.getOrCreatePopup', {
+            ({id, depth, frameId} = await yomitan.crossFrame.invoke(frameId, 'PopupFactory.getOrCreatePopup', {
                 id,
                 parentPopupId,
                 frameId,

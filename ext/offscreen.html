@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Offscreen</title>
+    <link rel="icon" type="image/png" href="/images/icon16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/images/icon19.png" sizes="19x19">
+    <link rel="icon" type="image/png" href="/images/icon32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/icon38.png" sizes="38x38">
+    <link rel="icon" type="image/png" href="/images/icon48.png" sizes="48x48">
+    <link rel="icon" type="image/png" href="/images/icon64.png" sizes="64x64">
+    <link rel="icon" type="image/png" href="/images/icon128.png" sizes="128x128">
+    <link rel="stylesheet" type="text/css" href="/css/background.css">
+</head>
+<body>
+
+<textarea id="clipboard-paste-target"></textarea>
+
+<!-- Scripts -->
+<script src="/js/background/offscreen-main.js" type="module"></script>
+
+<!--
+    Due to a Firefox bug, this next element is purposefully terminated incorrectly.
+    This element must appear directly inside the <body> element, and it must not be closed properly.
+    https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
+-->
+<!-- [html-validate-disable close-order] -->
+<div id="clipboard-rich-content-paste-target" contenteditable="true">
+
+</body>
+</html>

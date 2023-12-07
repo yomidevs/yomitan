@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * KeyboardMouseInputField
- */
+import {EventListenerCollection} from '../../core.js';
+import {yomitan} from '../../yomitan.js';
+import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
-class ScanInputsController {
+export class ScanInputsController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._os = null;
@@ -30,7 +31,7 @@ class ScanInputsController {
     }
 
     async prepare() {
-        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
+        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._os = os;
 
         this._container = document.querySelector('#scan-input-list');

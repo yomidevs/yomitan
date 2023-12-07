@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,4 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-yomichan.trigger('dynamicLoaderSentinel', {script: document.currentScript});
+import {yomitan} from '../yomitan.js';
+
+
+yomitan.trigger('dynamicLoaderSentinel', {script: import.meta.url});

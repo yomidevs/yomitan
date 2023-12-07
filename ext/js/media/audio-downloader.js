@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2017-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,15 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * ArrayBufferUtil
- * JsonSchema
- * NativeSimpleDOMParser
- * RequestBuilder
- * SimpleDOMParser
- */
+import {RequestBuilder} from '../background/request-builder.js';
+import {JsonSchema} from '../data/json-schema.js';
+import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';
+import {SimpleDOMParser} from '../dom/simple-dom-parser.js';
 
-class AudioDownloader {
+export class AudioDownloader {
     constructor({japaneseUtil, requestBuilder}) {
         this._japaneseUtil = japaneseUtil;
         this._requestBuilder = requestBuilder;

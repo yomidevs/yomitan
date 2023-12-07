@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AnkiUtil
- * TemplateRendererProxy
- */
+import {deferPromise, deserializeError} from '../core.js';
+import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
+import {yomitan} from '../yomitan.js';
+import {AnkiUtil} from './anki-util.js';
 
-class AnkiNoteBuilder {
+export class AnkiNoteBuilder {
     constructor({japaneseUtil}) {
         this._japaneseUtil = japaneseUtil;
         this._markerPattern = AnkiUtil.cloneFieldMarkerPattern(true);
@@ -345,7 +346,7 @@ class AnkiNoteBuilder {
 
         // Inject media
         const selectionText = injectSelectionText ? this._getSelectionText() : null;
-        const injectedMedia = await yomichan.api.injectAnkiNoteMedia(
+        const injectedMedia = await yomitan.api.injectAnkiNoteMedia(
             timestamp,
             dictionaryEntryDetails,
             audioDetails,
@@ -386,7 +387,7 @@ class AnkiNoteBuilder {
     async _getTextFurigana(entries, optionsContext, scanLength) {
         const results = [];
         for (const {text, readingMode} of entries) {
-            const parseResults = await yomichan.api.parseText(text, optionsContext, scanLength, true, false);
+            const parseResults = await yomitan.api.parseText(text, optionsContext, scanLength, true, false);
             let data = null;
             for (const {source, content} of parseResults) {
                 if (source !== 'scanning-parser') { continue; }

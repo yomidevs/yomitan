@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,16 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- * StringUtil
- */
+import {StringUtil} from '../data/sandbox/string-util.js';
+import {DocumentUtil} from './document-util.js';
+import {TextSourceRange} from './text-source-range.js';
 
 /**
  * This class represents a text source that is attached to a HTML element, such as an <img>
  * with alt text or a <button>.
  */
-class TextSourceElement {
+export class TextSourceElement {
     /**
      * Creates a new instance of the class.
      * @param {Element} element The source element.

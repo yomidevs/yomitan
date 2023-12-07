@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AnkiNoteBuilder
- * JapaneseUtil
- */
+import {isObject} from '../../core.js';
+import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
+import {JapaneseUtil} from '../../language/languages/ja/japanese-util.js';
+import {yomitan} from '../../yomitan.js';
 
-class AnkiTemplatesController {
+export class AnkiTemplatesController {
     constructor(settingsController, modalController, ankiController) {
         this._settingsController = settingsController;
         this._modalController = modalController;
@@ -37,7 +38,7 @@ class AnkiTemplatesController {
     }
 
     async prepare() {
-        this._defaultFieldTemplates = await yomichan.api.getDefaultAnkiFieldTemplates();
+        this._defaultFieldTemplates = await yomitan.api.getDefaultAnkiFieldTemplates();
 
         this._fieldTemplatesTextarea = document.querySelector('#anki-card-templates-textarea');
         this._compileResultInfo = document.querySelector('#anki-card-templates-compile-result');
@@ -135,7 +136,7 @@ class AnkiTemplatesController {
 
     async _getDictionaryEntry(text, optionsContext) {
         if (this._cachedDictionaryEntryText !== text) {
-            const {dictionaryEntries} = await yomichan.api.termsFind(text, {}, optionsContext);
+            const {dictionaryEntries} = await yomitan.api.termsFind(text, {}, optionsContext);
             if (dictionaryEntries.length === 0) { return null; }
 
             this._cachedDictionaryEntryValue = dictionaryEntries[0];

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * ClipboardMonitor
- * wanakana
- */
+import * as wanakana from '../../lib/wanakana.js';
+import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
+import {EventListenerCollection, invokeMessageHandler} from '../core.js';
+import {yomitan} from '../yomitan.js';
 
-class SearchDisplayController {
+export class SearchDisplayController {
     constructor(tabId, frameId, display, displayAudio, japaneseUtil, searchPersistentStateController) {
         this._tabId = tabId;
         this._frameId = frameId;
@@ -44,7 +45,7 @@ class SearchDisplayController {
         this._clipboardMonitor = new ClipboardMonitor({
             japaneseUtil,
             clipboardReader: {
-                getText: async () => (await yomichan.api.clipboardGet())
+                getText: yomitan.api.clipboardGet.bind(yomitan.api)
             }
         });
         this._messageHandlers = new Map();
@@ -56,7 +57,7 @@ class SearchDisplayController {
         this._searchPersistentStateController.on('modeChange', this._onModeChange.bind(this));
 
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-        yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
+        yomitan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
 
         this._display.on('optionsUpdated', this._onDisplayOptionsUpdated.bind(this));
         this._display.on('contentUpdateStart', this._onContentUpdateStart.bind(this));
@@ -132,7 +133,7 @@ class SearchDisplayController {
         }
     }
 
-    async _onOptionsUpdated(options) {
+    async _onOptionsUpdated() {
         await this._display.updateOptions();
         const query = this._queryInput.value;
         if (query) {
@@ -147,7 +148,7 @@ class SearchDisplayController {
         const {language, enableWanakana} = options.general;
 
         const wanakanaEnabled = (language === 'ja' && enableWanakana);
-        
+
         this._wanakanaEnableCheckbox.checked = wanakanaEnabled;
         this._wanakanaSearchOption.style.display = (language === 'ja' ? '' : 'none');
 
@@ -230,7 +231,7 @@ class SearchDisplayController {
     _onWanakanaEnableChange(e) {
         const value = e.target.checked;
         this._setWanakanaEnabled(value);
-        yomichan.api.modifySettings([{
+        yomitan.api.modifySettings([{
             action: 'set',
             path: 'general.enableWanakana',
             value,
@@ -340,7 +341,7 @@ class SearchDisplayController {
 
         if (!modify) { return; }
 
-        await yomichan.api.modifySettings([{
+        await yomitan.api.modifySettings([{
             action: 'set',
             path: 'clipboard.enableSearchPageMonitor',
             value,

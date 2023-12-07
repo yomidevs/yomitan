@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class PermissionsOriginController {
+import {EventListenerCollection} from '../../core.js';
+
+export class PermissionsOriginController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._originContainer = null;

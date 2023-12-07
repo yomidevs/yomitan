@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * HtmlTemplateCollection
- * OptionsUtil
- * PermissionsUtil
- */
+import {EventDispatcher, EventListenerCollection, generateId, isObject} from '../../core.js';
+import {OptionsUtil} from '../../data/options-util.js';
+import {PermissionsUtil} from '../../data/permissions-util.js';
+import {HtmlTemplateCollection} from '../../dom/html-template-collection.js';
+import {yomitan} from '../../yomitan.js';
 
-class SettingsController extends EventDispatcher {
+export class SettingsController extends EventDispatcher {
     constructor() {
         super();
         this._profileIndex = 0;
@@ -50,7 +51,7 @@ class SettingsController extends EventDispatcher {
     }
 
     async prepare() {
-        yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
+        yomitan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         if (this._canObservePermissionsChanges()) {
             chrome.permissions.onAdded.addListener(this._onPermissionsChanged.bind(this));
             chrome.permissions.onRemoved.addListener(this._onPermissionsChanged.bind(this));
@@ -68,16 +69,16 @@ class SettingsController extends EventDispatcher {
 
     async getOptions() {
         const optionsContext = this.getOptionsContext();
-        return await yomichan.api.optionsGet(optionsContext);
+        return await yomitan.api.optionsGet(optionsContext);
     }
 
     async getOptionsFull() {
-        return await yomichan.api.optionsGetFull();
+        return await yomitan.api.optionsGetFull();
     }
 
     async setAllSettings(value) {
         const profileIndex = value.profileCurrent;
-        await yomichan.api.setAllSettings(value, this._source);
+        await yomitan.api.setAllSettings(value, this._source);
         this._setProfileIndex(profileIndex, true);
     }
 
@@ -114,7 +115,7 @@ class SettingsController extends EventDispatcher {
     }
 
     async getDictionaryInfo() {
-        return await yomichan.api.getDictionaryInfo();
+        return await yomitan.api.getDictionaryInfo();
     }
 
     getOptionsContext() {
@@ -185,12 +186,12 @@ class SettingsController extends EventDispatcher {
 
     async _getSettings(targets, extraFields) {
         targets = this._setupTargets(targets, extraFields);
-        return await yomichan.api.getSettings(targets);
+        return await yomitan.api.getSettings(targets);
     }
 
     async _modifySettings(targets, extraFields) {
         targets = this._setupTargets(targets, extraFields);
-        return await yomichan.api.modifySettings(targets, this._source);
+        return await yomitan.api.modifySettings(targets, this._source);
     }
 
     _onBeforeUnload(e) {

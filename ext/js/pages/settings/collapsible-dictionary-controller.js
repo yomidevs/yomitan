@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class CollapsibleDictionaryController {
+import {EventListenerCollection} from '../../core.js';
+import {yomitan} from '../../yomitan.js';
+
+export class CollapsibleDictionaryController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._getDictionaryInfoToken = null;
@@ -31,7 +35,7 @@ class CollapsibleDictionaryController {
 
         await this._onDatabaseUpdated();
 
-        yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+        yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._settingsController.on('dictionarySettingsReordered', this._onDictionarySettingsReordered.bind(this));
     }

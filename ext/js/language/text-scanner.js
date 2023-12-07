@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- */
+import {EventDispatcher, EventListenerCollection, clone, isObject, log, promiseTimeout} from '../core.js';
+import {DocumentUtil} from '../dom/document-util.js';
+import {yomitan} from '../yomitan.js';
 
-class TextScanner extends EventDispatcher {
+export class TextScanner extends EventDispatcher {
     constructor({
         node,
         getSearchContext,
@@ -88,7 +89,7 @@ class TextScanner extends EventDispatcher {
         this._canClearSelection = true;
 
         this._textSelectionTimer = null;
-        this._yomichanIsChangingTextSelectionNow = false;
+        this._yomitanIsChangingTextSelectionNow = false;
         this._userHasNotSelectedAnythingManually = true;
     }
 
@@ -144,7 +145,8 @@ class TextScanner extends EventDispatcher {
 
         if (value) {
             this._hookEvents();
-            this._userHasNotSelectedAnythingManually = window.getSelection().isCollapsed;
+            const selection = window.getSelection();
+            this._userHasNotSelectedAnythingManually = (selection === null) ? true : selection.isCollapsed;
         }
     }
 
@@ -268,13 +270,13 @@ class TextScanner extends EventDispatcher {
     setCurrentTextSource(textSource) {
         this._textSourceCurrent = textSource;
         if (this._selectText && this._userHasNotSelectedAnythingManually) {
-            this._yomichanIsChangingTextSelectionNow = true;
+            this._yomitanIsChangingTextSelectionNow = true;
             this._textSourceCurrent.select();
             if (this._textSelectionTimer !== null) { clearTimeout(this._textSelectionTimer); }
             // This timeout uses a 50ms delay to ensure that the selectionchange event has time to occur.
             // If the delay is 0ms, the timeout will sometimes complete before the event.
             this._textSelectionTimer = setTimeout(() => {
-                this._yomichanIsChangingTextSelectionNow = false;
+                this._yomitanIsChangingTextSelectionNow = false;
                 this._textSelectionTimer = null;
             }, 50);
             this._textSourceCurrentSelected = true;
@@ -388,7 +390,7 @@ class TextScanner extends EventDispatcher {
     }
 
     _onSelectionChangeCheckUserSelection() {
-        if (this._yomichanIsChangingTextSelectionNow) { return; }
+        if (this._yomitanIsChangingTextSelectionNow) { return; }
         this._userHasNotSelectedAnythingManually = window.getSelection().isCollapsed;
     }
 
@@ -879,7 +881,7 @@ class TextScanner extends EventDispatcher {
 
         const details = {};
         if (this._matchTypePrefix) { details.matchType = 'prefix'; }
-        const {dictionaryEntries, originalTextLength} = await yomichan.api.termsFind(searchText, details, optionsContext);
+        const {dictionaryEntries, originalTextLength} = await yomitan.api.termsFind(searchText, details, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(originalTextLength, false, layoutAwareScan);
@@ -906,7 +908,7 @@ class TextScanner extends EventDispatcher {
         const searchText = this.getTextSourceContent(textSource, 1, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
-        const dictionaryEntries = await yomichan.api.kanjiFind(searchText, optionsContext);
+        const dictionaryEntries = await yomitan.api.kanjiFind(searchText, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(1, false, layoutAwareScan);
@@ -1143,7 +1145,7 @@ class TextScanner extends EventDispatcher {
 
     async _hasJapanese(text) {
         try {
-            return await yomichan.api.textHasJapaneseCharacters(text);
+            return await yomitan.api.textHasJapaneseCharacters(text);
         } catch (e) {
             return false;
         }

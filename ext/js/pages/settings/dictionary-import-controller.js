@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DictionaryController
- * DictionaryWorker
- */
+import {deserializeError, log} from '../../core.js';
+import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
+import {yomitan} from '../../yomitan.js';
+import {DictionaryController} from './dictionary-controller.js';
 
-class DictionaryImportController {
+export class DictionaryImportController {
     constructor(settingsController, modalController, statusFooter) {
         this._settingsController = settingsController;
         this._modalController = modalController;
@@ -98,7 +99,7 @@ class DictionaryImportController {
             this._setSpinnerVisible(true);
             if (purgeNotification !== null) { purgeNotification.hidden = false; }
 
-            await yomichan.api.purgeDatabase();
+            await yomitan.api.purgeDatabase();
             const errors = await this._clearDictionarySettings();
 
             if (errors.length > 0) {
@@ -116,7 +117,9 @@ class DictionaryImportController {
     }
 
     async _importDictionaries(files) {
-        if (this._modifying) { return; }
+        if (this._modifying) {
+            return;
+        }
 
         const statusFooter = this._statusFooter;
         const importInfo = document.querySelector('#dictionary-import-info');
@@ -214,7 +217,7 @@ class DictionaryImportController {
     async _importDictionary(file, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
         const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
-        yomichan.api.triggerDatabaseUpdated('dictionary', 'import');
+        yomitan.api.triggerDatabaseUpdated('dictionary', 'import');
         const errors2 = await this._addDictionarySettings(result.sequenced, result.title);
 
         if (errors.length > 0) {
@@ -346,6 +349,6 @@ class DictionaryImportController {
     }
 
     _triggerStorageChanged() {
-        yomichan.trigger('storageChanged');
+        yomitan.trigger('storageChanged');
     }
 }

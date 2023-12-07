@@ -25,7 +25,7 @@
         </div>
     </label>
     <div class="nav-button-container">
-        <button class="nav-button action-select-profile" i18n-title="actionPopup.changeProfile" title="Change primary profile" hidden>
+        <button type="button" class="nav-button action-select-profile" i18n-title="actionPopup.changeProfile" title="Change primary profile" hidden>
             <span class="icon" data-icon="profile"></span>
             <span class="profile-select-container"><select class="profile-select" id="profile-select">
                 <optgroup label="Primary Profile" id="profile-select-option-group"></optgroup>
@@ -82,19 +82,7 @@
 </div>
 
 <!-- Scripts -->
-<script src="/js/core.js"></script>
-
-<script src="/js/yomichan.js"></script>
-
-<script src="/js/comm/api.js"></script>
-<script src="/js/comm/cross-frame-api.js"></script>
-<script src="/js/data/anki-util.js"></script>
-<script src="/js/data/permissions-util.js"></script>
-<script src="/js/input/hotkey-help-controller.js"></script>
-<script src="/js/input/hotkey-util.js"></script>
-<script src="/js/language/localization.js"></script>
-
-<script src="/js/pages/action-popup-main.js"></script>
+<script src="/js/pages/action-popup-main.js" type="module"></script>
 
 </body>
 </html>

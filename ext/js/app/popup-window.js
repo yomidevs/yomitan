@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,10 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {EventDispatcher} from '../core.js';
+import {yomitan} from '../yomitan.js';
+import {Popup} from './popup.js';
+
 /**
  * This class represents a popup that is hosted in a new native window.
  */
-class PopupWindow extends EventDispatcher {
+export class PopupWindow extends EventDispatcher {
     /**
      * Creates a new instance.
      * @param {object} details Details about how to set up the instance.
@@ -133,7 +138,7 @@ class PopupWindow extends EventDispatcher {
      * @returns {Promise<boolean>} `true` if the popup is visible, `false` otherwise.
      */
     async isVisible() {
-        return (this._popupTabId !== null && await yomichan.api.isTabSearchPopup(this._popupTabId));
+        return (this._popupTabId !== null && await yomitan.api.isTabSearchPopup(this._popupTabId));
     }
 
     /**
@@ -258,16 +263,16 @@ class PopupWindow extends EventDispatcher {
     // Private
 
     async _invoke(open, action, params={}, defaultReturnValue) {
-        if (yomichan.isExtensionUnloaded) {
+        if (yomitan.isExtensionUnloaded) {
             return defaultReturnValue;
         }
 
         const frameId = 0;
         if (this._popupTabId !== null) {
             try {
-                return await yomichan.crossFrame.invokeTab(this._popupTabId, frameId, 'popupMessage', {action, params});
+                return await yomitan.crossFrame.invokeTab(this._popupTabId, frameId, 'popupMessage', {action, params});
             } catch (e) {
-                if (yomichan.isExtensionUnloaded) {
+                if (yomitan.isExtensionUnloaded) {
                     open = false;
                 }
             }
@@ -278,9 +283,9 @@ class PopupWindow extends EventDispatcher {
             return defaultReturnValue;
         }
 
-        const {tabId} = await yomichan.api.getOrCreateSearchPopup({focus: 'ifCreated'});
+        const {tabId} = await yomitan.api.getOrCreateSearchPopup({focus: 'ifCreated'});
         this._popupTabId = tabId;
 
-        return await yomichan.crossFrame.invokeTab(this._popupTabId, frameId, 'popupMessage', {action, params});
+        return await yomitan.crossFrame.invokeTab(this._popupTabId, frameId, 'popupMessage', {action, params});
     }
 }

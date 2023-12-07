@@ -1,0 +1,161 @@
+{{<<<<<<<}}
+{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}
+{{=======}}
+{{formatGlossary ../dictionary .}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#furigana}}{{{.}}}{{/furigana~}}
+{{=======}}
+{{~furigana .~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#furigana}}{{{definition}}}{{/furigana}}
+{{=======}}
+{{furigana definition}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#furigana expression reading~}}{{~/furigana~}}
+{{=======}}
+{{~furigana expression reading~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#furigana expression reading}}{{/furigana~}}
+{{=======}}
+{{~furigana expression reading~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}
+{{=======}}
+{{~furiganaPlain .~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
+{{=======}}
+{{furiganaPlain definition}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#furiganaPlain expression reading~}}{{~/furiganaPlain~}}
+{{=======}}
+{{~furiganaPlain expression reading~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#furiganaPlain expression reading}}{{/furiganaPlain~}}
+{{=======}}
+{{~furiganaPlain expression reading~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "audio"}}{{/getMedia}}
+{{=======}}
+{{getMedia "audio"}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "screenshot"}}{{/getMedia}}
+{{=======}}
+{{getMedia "screenshot"}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "clipboardImage"}}{{/getMedia}}
+{{=======}}
+{{getMedia "clipboardImage"}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "clipboardText"}}{{/getMedia}}
+{{=======}}
+{{getMedia "clipboardText"}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "selectionText"}}{{/getMedia}}
+{{=======}}
+{{getMedia "selectionText"}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#getMedia "textFurigana" definition.cloze.sentence escape=false}}{{/getMedia}}
+{{=======}}
+{{getMedia "textFurigana" definition.cloze.sentence escape=false}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}{{~/pronunciation~}}
+{{=======}}
+{{~pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "any" false}}{{/set~}}
+{{=======}}
+{{~set "any" false~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "any" true}}{{/set~}}
+{{=======}}
+{{~set "any" true~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "previousDictionary" dictionary~}}{{~/set~}}
+{{=======}}
+{{~set "previousDictionary" dictionary~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "exclusive" (spread exclusiveExpressions exclusiveReadings)}}{{/set~}}
+{{=======}}
+{{~set "exclusive" (spread exclusiveExpressions exclusiveReadings)~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "separator" ""~}}{{/set~}}
+{{=======}}
+{{~set "separator" ""~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#get "separator"}}{{/get~}}
+{{=======}}
+{{~get "separator"~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "found" false}}{{/set~}}
+{{=======}}
+{{~set "found" false~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "found" true}}{{/set~}}
+{{=======}}
+{{~set "found" true~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "first" true}}{{/set~}}
+{{=======}}
+{{~set "first" true~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set "first" false~}}{{~/set~}}
+{{=======}}
+{{~set "first" false~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#set (concat "used_" .) true~}}{{~/set~}}
+{{=======}}
+{{~set (concat "used_" .) true~}}
+{{>>>>>>>}}

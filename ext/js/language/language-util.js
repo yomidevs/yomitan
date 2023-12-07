@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,46 +16,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * loadScript
- * loadModule
- * removeScript
- * getDeinflectionReasons
- * fetchAsset
- */
+import {fetchAsset} from '../general/helpers.js';
+import {languages} from './languages/index.js';
 
 export class LanguageUtil {
     constructor() {
-        this.languages = [];
     }
 
     async prepare() {
-        this.languages = JSON.parse(await fetchAsset('/js/language/languages.json'));
-        window.languages = window.languages || {};
-        this.languages.forEach(({iso}) => {
-            window.languages[iso] = window.languages[iso] || {};
+        const languagesJSON = JSON.parse(await fetchAsset('/js/language/languages.json')) || {};
+        languagesJSON.forEach(({iso, language, flag, exampleText, i18n}) => {
+            languages[iso] = {...languages[iso], iso, language, flag, exampleText, i18n};
         });
     }
 
     getLanguages() {
-        return this.languages;
+        return Object.values(languages).map(({iso, language, flag, exampleText}) =>
+            ({iso, language, flag, exampleText}));
     }
 
     getLocales(){
-        return this.languages.filter(({i18n}) => i18n);
+        return Object.values(languages).filter(({i18n}) => i18n);
     }
 
     async getDeinflectionReasons(language) {
         try {
-            if (!window.languages[language].deinflectionReasons) {
-                if (!window.languages[language].getDeinflectionReasons) {
-                    await loadModule(`/js/language/languages/${language}/grammar.js`);
-                    window.languages[language].getDeinflectionReasons ??= () => [];
-                }
-                window.languages[language].deinflectionReasons = await window.languages[language].getDeinflectionReasons();
+            if (!languages[language].deinflectionReasons) {
+                languages[language].deinflectionReasons = await languages[language].getDeinflectionReasons();
             }
-            return window.languages[language].deinflectionReasons;
-        } catch (e){
+            return languages[language].deinflectionReasons;
+        } catch (e) {
             console.error(e);
             return [];
         }
@@ -62,12 +53,7 @@ export class LanguageUtil {
 
     async getTextTransformations(language) {
         try {
-            if (!window.languages[language].textTransformations) {
-                await loadModule(`/js/language/languages/${language}/constants.js`);
-                await loadModule(`/js/language/languages/${language}/util.js`);
-                await loadModule(`/js/language/languages/${language}/textTransformations.js`);
-            }
-            return window.languages[language].textTransformations;
+            return languages[language].textTransformations;
         } catch (e){
             console.error(e);
             return [];
@@ -76,10 +62,10 @@ export class LanguageUtil {
 
     async getTranslations(locale) {
         try {
-            if (!window.languages[locale].translations) {
-                window.languages[locale].translations = JSON.parse(await fetchAsset(`/js/language/languages/${locale}/i18n.json`));
+            if (!languages[locale].translations) {
+                languages[locale].translations = JSON.parse(await fetchAsset(`/js/language/languages/${locale}/i18n.json`));
             }
-            return window.languages[locale].translations;
+            return languages[locale].translations;
         } catch (e){
             console.error(e);
             return {};

@@ -15,11 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * suffixInflection
-*/
+import {suffixInflection} from '../../deinflection-ruleset.js';
 
-window.languages.ja.getDeinflectionReasons = async () =>  {
+export async function getDeinflectionReasons(){
     return new Map([
         ['-ba', [
             suffixInflection('ければ', 'い', [], ['adj-i']),
@@ -668,4 +666,4 @@ window.languages.ja.getDeinflectionReasons = async () =>  {
             {'inflected': /.*べえ$/, 'uninflect': (term) =>  term.replace(/べえ$/, 'ばい'), 'rulesIn': [], 'rulesOut': ['adj-i']}
         ]]
     ]);
-};
+}

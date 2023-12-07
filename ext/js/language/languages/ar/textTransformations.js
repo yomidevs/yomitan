@@ -15,10 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
-*/
-
-window.languages.ar.textTransformations = [
+export const textTransformations = [
     {
         id: 'removeDiacritics',
         name: 'Remove diacritics',
@@ -31,5 +28,5 @@ window.languages.ar.textTransformations = [
         transform: (text) => {
             return text.replace(/[\u064E-\u0650]/g, '');
         }
-    },
+    }
 ];

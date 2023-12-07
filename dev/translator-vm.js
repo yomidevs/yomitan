@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,19 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const path = require('path');
-const assert = require('assert');
-const {DatabaseVM, DatabaseVMDictionaryImporterMediaLoader} = require('./database-vm');
-const {createDictionaryArchive} = require('./util');
+import fs from 'fs';
+import url, {fileURLToPath} from 'node:url';
+import path from 'path';
+import {expect, vi} from 'vitest';
+import {AnkiNoteDataCreator} from '../ext/js/data/sandbox/anki-note-data-creator.js';
+import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
+import {DictionaryImporterMediaLoader} from '../ext/js/dictionary/dictionary-importer-media-loader.js';
+import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
+import {JapaneseUtil} from '../ext/js/language/languages/ja/japanese-util.js';
+import {Translator} from '../ext/js/language/translator.js';
+import {createDictionaryArchive} from './util.js';
 
-function clone(value) {
-    return JSON.parse(JSON.stringify(value));
-}
+vi.mock('../ext/js/dictionary/dictionary-importer-media-loader.js');
 
-class TranslatorVM extends DatabaseVM {
-    constructor(globals) {
-        super(globals);
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export class TranslatorVM {
+    constructor() {
+        global.chrome = {
+            runtime: {
+                getURL: (path2) => {
+                    return url.pathToFileURL(path.join(dirname, '..', 'ext', path2.replace(/^\//, ''))).href;
+                }
+            }
+        };
+
         this._japaneseUtil = null;
         this._translator = null;
         this._ankiNoteDataCreator = null;
@@ -39,43 +53,14 @@ class TranslatorVM extends DatabaseVM {
     }
 
     async prepare(dictionaryDirectory, dictionaryName) {
-        this.execute([
-            'js/core.js',
-            'js/data/sandbox/anki-note-data-creator.js',
-            'js/data/database.js',
-            'js/data/json-schema.js',
-            'js/general/cache-map.js',
-            'js/general/regex-util.js',
-            'js/general/text-source-map.js',
-            'js/language/deinflector.js',
-            'js/dictionary/dictionary-data-util.js',
-            'js/dictionary/dictionary-importer.js',
-            'js/dictionary/dictionary-database.js',
-            'js/language/languages/ja/japanese-util.js',
-            'js/language/translator.js',
-            'js/media/media-util.js'
-        ]);
-        const [
-            DictionaryImporter,
-            DictionaryDatabase,
-            JapaneseUtil,
-            Translator,
-            AnkiNoteDataCreator
-        ] = this.get([
-            'DictionaryImporter',
-            'DictionaryDatabase',
-            'JapaneseUtil',
-            'Translator',
-            'AnkiNoteDataCreator'
-        ]);
-
         // Dictionary
         this._dictionaryName = dictionaryName;
         const testDictionary = createDictionaryArchive(dictionaryDirectory, dictionaryName);
+        // const testDictionaryContent = await testDictionary.arrayBuffer();
         const testDictionaryContent = await testDictionary.generateAsync({type: 'arraybuffer'});
 
         // Setup database
-        const dictionaryImporterMediaLoader = new DatabaseVMDictionaryImporterMediaLoader();
+        const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
         const dictionaryImporter = new DictionaryImporter(dictionaryImporterMediaLoader, null);
         const dictionaryDatabase = new DictionaryDatabase();
         await dictionaryDatabase.prepare();
@@ -86,7 +71,9 @@ class TranslatorVM extends DatabaseVM {
             {prefixWildcardsSupported: true}
         );
 
-        assert.deepStrictEqual(errors.length, 0);
+        expect(errors.length).toEqual(0);
+
+        const myDirname = path.dirname(fileURLToPath(import.meta.url));
 
         // Setup translator
         this._japaneseUtil = new JapaneseUtil(null);
@@ -94,9 +81,8 @@ class TranslatorVM extends DatabaseVM {
             japaneseUtil: this._japaneseUtil,
             database: dictionaryDatabase
         });
-
-        // should not work
-        const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'ext', 'data/deinflect_ja.json')));
+        // TODO
+        const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(myDirname, '..', 'ext', 'data/deinflect.json')));
         this._translator.prepare(deinflectionReasons);
 
         // Assign properties
@@ -133,10 +119,10 @@ class TranslatorVM extends DatabaseVM {
                     if (!Object.prototype.hasOwnProperty.call(optionsPresets, entry)) {
                         throw new Error('Invalid options preset');
                     }
-                    Object.assign(options, clone(optionsPresets[entry]));
+                    Object.assign(options, structuredClone(optionsPresets[entry]));
                     break;
                 case 'object':
-                    Object.assign(options, clone(entry));
+                    Object.assign(options, structuredClone(entry));
                     break;
                 default:
                     throw new Error('Invalid options type');
@@ -178,7 +164,3 @@ class TranslatorVM extends DatabaseVM {
         return options;
     }
 }
-
-module.exports = {
-    TranslatorVM
-};

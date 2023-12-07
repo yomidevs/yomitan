@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,7 +34,7 @@ body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, sans-serif;
     font-size: var(--font-size);
-    width: fit-content;
+    width: max-content;
 }
 
 h3 {

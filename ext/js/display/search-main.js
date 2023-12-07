@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,18 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Display
- * DisplayAnki
- * DisplayAudio
- * DocumentFocusController
- * HotkeyHandler
- * JapaneseUtil
- * SearchActionPopupController
- * SearchDisplayController
- * SearchPersistentStateController
- * wanakana
- */
+import * as wanakana from '../../lib/wanakana.js';
+import {log} from '../core.js';
+import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {HotkeyHandler} from '../input/hotkey-handler.js';
+import {JapaneseUtil} from '../language/languages/ja/japanese-util.js';
+import {yomitan} from '../yomitan.js';
+import {DisplayAnki} from './display-anki.js';
+import {DisplayAudio} from './display-audio.js';
+import {Display} from './display.js';
+import {SearchActionPopupController} from './search-action-popup-controller.js';
+import {SearchDisplayController} from './search-display-controller.js';
+import {SearchPersistentStateController} from './search-persistent-state-controller.js';
 
 (async () => {
     try {
@@ -39,9 +40,9 @@
         const searchActionPopupController = new SearchActionPopupController(searchPersistentStateController);
         searchActionPopupController.prepare();
 
-        await yomichan.prepare();
+        await yomitan.prepare();
 
-        const {tabId, frameId} = await yomichan.api.frameInformationGet();
+        const {tabId, frameId} = await yomitan.api.frameInformationGet();
 
         const japaneseUtil = new JapaneseUtil(wanakana);
 
@@ -64,7 +65,7 @@
 
         document.documentElement.dataset.loaded = 'true';
 
-        yomichan.ready();
+        yomitan.ready();
     } catch (e) {
         log.error(e);
     }

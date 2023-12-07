@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Database
- */
+import {log, stringReverse} from '../core.js';
+import {Database} from '../data/database.js';
 
-class DictionaryDatabase {
+export class DictionaryDatabase {
     constructor() {
         this._db = new Database();
         this._dbName = 'dict';

@@ -19,18 +19,18 @@
 */
 
 import {
+    HALFWIDTH_KATAKANA_MAPPING,
     HIRAGANA_CONVERSION_RANGE,
-    KATAKANA_CONVERSION_RANGE,
     KANA_PROLONGED_SOUND_MARK_CODE_POINT,
+    KATAKANA_CONVERSION_RANGE,
     KATAKANA_SMALL_KA_CODE_POINT,
-    KATAKANA_SMALL_KE_CODE_POINT,
-    HALFWIDTH_KATAKANA_MAPPING
+    KATAKANA_SMALL_KE_CODE_POINT
 } from './constants.js';
 
 import {
+    convertAlphabeticPartToKana,
     getProlongedHiragana,
-    isCodePointInRange,
-    convertAlphabeticPartToKana
+    isCodePointInRange
 } from './util.js';
 
 export function convertKatakanaToHiragana(text, keepProlongedSoundMarks=false) {
@@ -164,7 +164,7 @@ export function convertAlphabeticToKana(text, sourceMap=null) {
     return result;
 }
 
-window.languages.ja.textTransformations = [
+export const textTransformations = [
     {
         id: 'convertHalfWidthCharacters',
         name: 'Convert half width characters to full width',

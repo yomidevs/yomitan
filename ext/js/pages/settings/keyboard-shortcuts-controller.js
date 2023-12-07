@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- * KeyboardMouseInputField
- * ObjectPropertyAccessor
- */
+import {EventListenerCollection} from '../../core.js';
+import {DocumentUtil} from '../../dom/document-util.js';
+import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
+import {yomitan} from '../../yomitan.js';
+import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
-class KeyboardShortcutController {
+export class KeyboardShortcutController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._entries = [];
@@ -62,7 +63,7 @@ class KeyboardShortcutController {
     }
 
     async prepare() {
-        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
+        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._os = os;
 
         this._addButton = document.querySelector('#hotkey-list-add');

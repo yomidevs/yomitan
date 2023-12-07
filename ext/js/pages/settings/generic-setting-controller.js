@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,12 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* globals
- * DOMDataBinder
- * DocumentUtil
- */
+import {deserializeError, isObject} from '../../core.js';
+import {DocumentUtil} from '../../dom/document-util.js';
+import {DOMDataBinder} from '../../dom/dom-data-binder.js';
 
-class GenericSettingController {
+export class GenericSettingController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._defaultScope = 'profile';

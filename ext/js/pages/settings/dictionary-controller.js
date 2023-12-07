@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DictionaryWorker
- */
+import {EventListenerCollection, log} from '../../core.js';
+import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
+import {yomitan} from '../../yomitan.js';
 
 class DictionaryEntry {
     constructor(dictionaryController, fragment, index, dictionaryInfo) {
@@ -244,7 +245,7 @@ class DictionaryExtraInfo {
     }
 }
 
-class DictionaryController {
+export class DictionaryController {
     constructor(settingsController, modalController, statusFooter) {
         this._settingsController = settingsController;
         this._modalController = modalController;
@@ -283,7 +284,7 @@ class DictionaryController {
         this._deleteDictionaryModal = this._modalController.getModal('dictionary-confirm-delete');
         this._allCheckbox = document.querySelector('#all-dictionaries-enabled');
 
-        yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+        yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._allCheckbox.addEventListener('change', this._onAllCheckboxChange.bind(this), false);
         document.querySelector('#dictionary-confirm-delete-button').addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
@@ -680,7 +681,7 @@ class DictionaryController {
 
     async _deleteDictionaryInternal(dictionaryTitle, onProgress) {
         await new DictionaryWorker().deleteDictionary(dictionaryTitle, onProgress);
-        yomichan.api.triggerDatabaseUpdated('dictionary', 'delete');
+        yomitan.api.triggerDatabaseUpdated('dictionary', 'delete');
     }
 
     async _deleteDictionarySettings(dictionaryTitle) {
@@ -705,7 +706,7 @@ class DictionaryController {
     }
 
     _triggerStorageChanged() {
-        yomichan.trigger('storageChanged');
+        yomitan.trigger('storageChanged');
     }
 
     _updateDictionaryEntryCount() {

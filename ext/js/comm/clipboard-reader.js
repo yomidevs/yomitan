@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,14 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * MediaUtil
- */
+import {MediaUtil} from '../media/media-util.js';
 
 /**
  * Class which can read text and images from the clipboard.
  */
-class ClipboardReader {
+export class ClipboardReader {
     /**
      * Creates a new instances of a clipboard reader.
      * @param {object} details Details about how to set up the instance.

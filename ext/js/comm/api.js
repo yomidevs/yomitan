@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,9 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class API {
-    constructor(yomichan) {
-        this._yomichan = yomichan;
+import {deferPromise, deserializeError, isObject} from '../core.js';
+
+export class API {
+    constructor(yomitan) {
+        this._yomitan = yomitan;
     }
 
     optionsGet(optionsContext) {
@@ -180,8 +183,13 @@ class API {
         return this._invoke('loadExtensionScripts', {files});
     }
 
+    openCrossFramePort(targetTabId, targetFrameId) {
+        return this._invoke('openCrossFramePort', {targetTabId, targetFrameId});
+    }
+
     getTextTransformations(language){
-        return this._invoke('getTextTransformations', {language});
+        const result = this._invoke('getTextTransformations', {language});
+        return result;
     }
 
     getLanguages(){
@@ -308,7 +316,7 @@ class API {
         const data = {action, params};
         return new Promise((resolve, reject) => {
             try {
-                this._yomichan.sendMessage(data, (response) => {
+                this._yomitan.sendMessage(data, (response) => {
                     this._checkLastError(chrome.runtime.lastError);
                     if (response !== null && typeof response === 'object') {
                         if (typeof response.error !== 'undefined') {

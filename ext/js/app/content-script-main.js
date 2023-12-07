@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,17 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Frontend
- * HotkeyHandler
- * PopupFactory
- */
+import {log} from '../core.js';
+import {HotkeyHandler} from '../input/hotkey-handler.js';
+import {yomitan} from '../yomitan.js';
+import {Frontend} from './frontend.js';
+import {PopupFactory} from './popup-factory.js';
 
 (async () => {
     try {
-        await yomichan.prepare();
+        await yomitan.prepare();
 
-        const {tabId, frameId} = await yomichan.api.frameInformationGet();
+        const {tabId, frameId} = await yomitan.api.frameInformationGet();
         if (typeof frameId !== 'number') {
             throw new Error('Failed to get frameId');
         }
@@ -50,7 +51,7 @@
         });
         await frontend.prepare();
 
-        yomichan.ready();
+        yomitan.ready();
     } catch (e) {
         log.error(e);
     }

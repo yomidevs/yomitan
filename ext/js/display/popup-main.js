@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,25 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Display
- * DisplayAnki
- * DisplayAudio
- * DisplayProfileSelection
- * DisplayResizer
- * DocumentFocusController
- * HotkeyHandler
- * JapaneseUtil
- */
+import {log} from '../core.js';
+import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {HotkeyHandler} from '../input/hotkey-handler.js';
+import {JapaneseUtil} from '../language/languages/ja/japanese-util.js';
+import {yomitan} from '../yomitan.js';
+import {DisplayAnki} from './display-anki.js';
+import {DisplayAudio} from './display-audio.js';
+import {DisplayProfileSelection} from './display-profile-selection.js';
+import {DisplayResizer} from './display-resizer.js';
+import {Display} from './display.js';
 
 (async () => {
     try {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 
-        await yomichan.prepare();
+        await yomitan.prepare();
 
-        const {tabId, frameId} = await yomichan.api.frameInformationGet();
+        const {tabId, frameId} = await yomitan.api.frameInformationGet();
 
         const japaneseUtil = new JapaneseUtil(null);
 
@@ -59,7 +60,7 @@
 
         document.documentElement.dataset.loaded = 'true';
 
-        yomichan.ready();
+        yomitan.ready();
     } catch (e) {
         log.error(e);
     }

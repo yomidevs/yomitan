@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class TemplatePatcher {
+export class TemplatePatcher {
     constructor() {
         this._diffPattern1 = /\n?\{\{<<<<<<<\}\}\n/g;
         this._diffPattern2 = /\n\{\{=======\}\}\n/g;

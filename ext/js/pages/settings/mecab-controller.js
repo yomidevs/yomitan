@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class MecabController {
+import {yomitan} from '../../yomitan.js';
+
+export class MecabController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._testButton = null;
@@ -45,7 +48,7 @@ class MecabController {
             this._testButton.disabled = true;
             this._resultsContainer.textContent = '';
             this._resultsContainer.hidden = true;
-            await yomichan.api.testMecab();
+            await yomitan.api.testMecab();
             this._setStatus('Connection was successful', false);
         } catch (e) {
             this._setStatus(e.message, true);

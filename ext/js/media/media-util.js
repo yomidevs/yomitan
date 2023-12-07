@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +19,7 @@
 /**
  * MediaUtil is a class containing helper methods related to media processing.
  */
-class MediaUtil {
+export class MediaUtil {
     /**
      * Gets the file extension of a file path. URL search queries and hash
      * fragments are not handled.
@@ -107,6 +108,8 @@ class MediaUtil {
      */
     static getFileExtensionFromAudioMediaType(mediaType) {
         switch (mediaType) {
+            case 'audio/aac':
+                return '.aac';
             case 'audio/mpeg':
             case 'audio/mp3':
                 return '.mp3';

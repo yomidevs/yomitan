@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,7 +20,7 @@
  * This class is used to apply CSS styles to elements using a consistent method
  * that is the same across different browsers.
  */
-class CssStyleApplier {
+export class CssStyleApplier {
     /**
      * A CSS rule.
      * @typedef {object} CssRule
@@ -34,9 +35,10 @@ class CssStyleApplier {
      * @property {string} value The property's value.
      */
 
+    /* eslint-disable jsdoc/check-line-alignment */
     /**
      * Creates a new instance of the class.
-     * @param {string} styleDataUrl The local URL to the JSON file continaing the style rules.
+     * @param {string} styleDataUrl The local URL to the JSON file containing the style rules.
      *   The style rules should be of the format:
      *   ```
      *   [
@@ -56,6 +58,7 @@ class CssStyleApplier {
         this._patternHtmlWhitespace = /[\t\r\n\f ]+/g;
         this._patternClassNameCharacter = /[0-9a-zA-Z-_]/;
     }
+    /* eslint-enable jsdoc/check-line-alignment */
 
     /**
      * Loads the data file for use.

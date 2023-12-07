@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,17 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- * GoogleDocsUtil
- * TextScanner
- * TextSourceRange
- */
+import {GoogleDocsUtil} from '../accessibility/google-docs-util.js';
+import {EventListenerCollection, invokeMessageHandler, isObject, log, promiseAnimationFrame} from '../core.js';
+import {DocumentUtil} from '../dom/document-util.js';
+import {TextSourceElement} from '../dom/text-source-element.js';
+import {TextSourceRange} from '../dom/text-source-range.js';
+import {HotkeyHandler} from '../input/hotkey-handler.js';
+import {TextScanner} from '../language/text-scanner.js';
+import {yomitan} from '../yomitan.js';
+import {PopupFactory} from './popup-factory.js';
+import {Popup} from './popup.js';
 
 /**
  * This is the main class responsible for scanning and handling webpage content.
  */
-class Frontend {
+export class Frontend {
     /**
      * Creates a new instance.
      * @param {object} details Details about how to set up the instance.
@@ -132,7 +137,7 @@ class Frontend {
     async prepare() {
         await this.updateOptions();
         try {
-            const {zoomFactor} = await yomichan.api.getZoom();
+            const {zoomFactor} = await yomitan.api.getZoom();
             this._pageZoomFactor = zoomFactor;
         } catch (e) {
             // Ignore exceptions which may occur due to being on an unsupported page (e.g. about:blank)
@@ -149,15 +154,15 @@ class Frontend {
             visualViewport.addEventListener('resize', this._onVisualViewportResize.bind(this));
         }
 
-        yomichan.on('optionsUpdated', this.updateOptions.bind(this));
-        yomichan.on('zoomChanged', this._onZoomChanged.bind(this));
-        yomichan.on('closePopups', this._onClosePopups.bind(this));
+        yomitan.on('optionsUpdated', this.updateOptions.bind(this));
+        yomitan.on('zoomChanged', this._onZoomChanged.bind(this));
+        yomitan.on('closePopups', this._onClosePopups.bind(this));
         chrome.runtime.onMessage.addListener(this._onRuntimeMessage.bind(this));
 
         this._textScanner.on('clear', this._onTextScannerClear.bind(this));
         this._textScanner.on('searched', this._onSearched.bind(this));
 
-        yomichan.crossFrame.registerHandlers([
+        yomitan.crossFrame.registerHandlers([
             ['Frontend.closePopup',       {async: false, handler: this._onApiClosePopup.bind(this)}],
             ['Frontend.copySelection',    {async: false, handler: this._onApiCopySelection.bind(this)}],
             ['Frontend.getSelectionText', {async: false, handler: this._onApiGetSelectionText.bind(this)}],
@@ -203,7 +208,7 @@ class Frontend {
         try {
             await this._updateOptionsInternal();
         } catch (e) {
-            if (!yomichan.isExtensionUnloaded) {
+            if (!yomitan.isExtensionUnloaded) {
                 throw e;
             }
         }
@@ -314,7 +319,7 @@ class Frontend {
         const scanningOptions = this._options.scanning;
 
         if (error !== null) {
-            if (yomichan.isExtensionUnloaded) {
+            if (yomitan.isExtensionUnloaded) {
                 if (textSource !== null && !passive) {
                     this._showExtensionUnloaded(textSource);
                 }
@@ -383,7 +388,7 @@ class Frontend {
 
     async _updateOptionsInternal() {
         const optionsContext = await this._getOptionsContext();
-        const options = await yomichan.api.optionsGet(optionsContext);
+        const options = await yomitan.api.optionsGet(optionsContext);
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
 
@@ -515,7 +520,7 @@ class Frontend {
             return await this._getDefaultPopup();
         }
 
-        const {popupId} = await yomichan.crossFrame.invoke(targetFrameId, 'Frontend.getPopupInfo');
+        const {popupId} = await yomitan.crossFrame.invoke(targetFrameId, 'Frontend.getPopupInfo');
         if (popupId === null) {
             return null;
         }
@@ -554,7 +559,7 @@ class Frontend {
         try {
             return this._popup !== null && await this._popup.containsPoint(x, y);
         } catch (e) {
-            if (!yomichan.isExtensionUnloaded) {
+            if (!yomitan.isExtensionUnloaded) {
                 throw e;
             }
             return false;
@@ -620,7 +625,7 @@ class Frontend {
             Promise.resolve()
         );
         this._lastShowPromise.catch((error) => {
-            if (yomichan.isExtensionUnloaded) { return; }
+            if (yomitan.isExtensionUnloaded) { return; }
             log.error(error);
         });
         return this._lastShowPromise;
@@ -672,9 +677,9 @@ class Frontend {
     _signalFrontendReady(targetFrameId=null) {
         const params = {frameId: this._frameId};
         if (targetFrameId === null) {
-            yomichan.api.broadcastTab('frontendReady', params);
+            yomitan.api.broadcastTab('frontendReady', params);
         } else {
-            yomichan.api.sendMessageToFrame(targetFrameId, 'frontendReady', params);
+            yomitan.api.sendMessageToFrame(targetFrameId, 'frontendReady', params);
         }
     }
 
@@ -711,7 +716,7 @@ class Frontend {
             }
 
             chrome.runtime.onMessage.addListener(onMessage);
-            yomichan.api.broadcastTab('Frontend.requestReadyBroadcast', {frameId: this._frameId});
+            yomitan.api.broadcastTab('Frontend.requestReadyBroadcast', {frameId: this._frameId});
         });
     }
 
@@ -737,7 +742,7 @@ class Frontend {
         let documentTitle = document.title;
         if (this._useProxyPopup) {
             try {
-                ({url, documentTitle} = await yomichan.crossFrame.invoke(this._parentFrameId, 'Frontend.getPageInfo', {}));
+                ({url, documentTitle} = await yomitan.crossFrame.invoke(this._parentFrameId, 'Frontend.getPageInfo', {}));
             } catch (e) {
                 // NOP
             }
@@ -783,7 +788,7 @@ class Frontend {
 
     async _prepareGoogleDocs() {
         if (typeof GoogleDocsUtil !== 'undefined') { return; }
-        await yomichan.api.loadExtensionScripts([
+        await yomitan.api.loadExtensionScripts([
             '/js/accessibility/google-docs-util.js'
         ]);
         if (typeof GoogleDocsUtil === 'undefined') { return; }

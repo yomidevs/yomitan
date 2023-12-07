@@ -15,7 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class TextTransformationsController {
+import {yomitan} from '../../yomitan.js';
+export class TextTransformationsController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._container = null;
@@ -42,7 +43,7 @@ class TextTransformationsController {
                 transformation.remove();
             });
 
-            this._transformations = await yomichan.api.getTextTransformations(this._language);
+            this._transformations = await yomitan.api.getTextTransformations(this._language);
             this._transformations.forEach((transformation) => {
                 const settingsItem = document.createElement('div');
                 settingsItem.classList.add('settings-item');

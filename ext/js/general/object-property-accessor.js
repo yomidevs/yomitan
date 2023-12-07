@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +19,7 @@
 /**
  * Class used to get and mutate generic properties of an object by using path strings.
  */
-class ObjectPropertyAccessor {
+export class ObjectPropertyAccessor {
     /**
      * Create a new accessor for a specific object.
      * @param {object} target The object which the getter and mutation methods are applied to.

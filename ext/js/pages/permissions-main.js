@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,20 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentFocusController
- * ExtensionContentController
- * ModalController
- * PermissionsOriginController
- * PermissionsToggleController
- * PersistentStorageController
- * SettingsController
- * SettingsDisplayController
- */
+import {log, promiseTimeout} from '../core.js';
+import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {yomitan} from '../yomitan.js';
+import {ExtensionContentController} from './common/extension-content-controller.js';
+import {ModalController} from './settings/modal-controller.js';
+import {PermissionsOriginController} from './settings/permissions-origin-controller.js';
+import {PermissionsToggleController} from './settings/permissions-toggle-controller.js';
+import {PersistentStorageController} from './settings/persistent-storage-controller.js';
+import {SettingsController} from './settings/settings-controller.js';
+import {SettingsDisplayController} from './settings/settings-display-controller.js';
 
 async function setupEnvironmentInfo() {
     const {manifest_version: manifestVersion} = chrome.runtime.getManifest();
-    const {browser, platform} = await yomichan.api.getEnvironmentInfo();
+    const {browser, platform} = await yomitan.api.getEnvironmentInfo();
     document.documentElement.dataset.browser = browser;
     document.documentElement.dataset.os = platform.os;
     document.documentElement.dataset.manifestVersion = `${manifestVersion}`;
@@ -72,7 +73,7 @@ function setupPermissionsToggles() {
 
         setupPermissionsToggles();
 
-        await yomichan.prepare();
+        await yomitan.prepare();
 
         setupEnvironmentInfo();
 

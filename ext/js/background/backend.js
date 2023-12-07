@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,32 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AccessibilityController
- * AnkiConnect
- * AnkiUtil
- * ArrayBufferUtil
- * AudioDownloader
- * ClipboardMonitor
- * ClipboardReader
- * DictionaryDatabase
- * Environment
- * LanguageUtil
- * JapaneseUtil
- * Mecab
- * MediaUtil
- * ObjectPropertyAccessor
- * OptionsUtil
- * PermissionsUtil
- * ProfileConditionsUtil
- * RequestBuilder
- * ScriptManager
- * Translator
- * wanakana
- * fetchAsset
- */
-
+import * as wanakana from '../../lib/wanakana.js';
+import {AccessibilityController} from '../accessibility/accessibility-controller.js';
+import {AnkiConnect} from '../comm/anki-connect.js';
+import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
+import {ClipboardReader} from '../comm/clipboard-reader.js';
+import {Mecab} from '../comm/mecab.js';
+import {clone, deferPromise, deserializeError, generateId, invokeMessageHandler, isObject, log, promiseTimeout, serializeError} from '../core.js';
+import {AnkiUtil} from '../data/anki-util.js';
+import {OptionsUtil} from '../data/options-util.js';
+import {PermissionsUtil} from '../data/permissions-util.js';
+import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
+import {Environment} from '../extension/environment.js';
+import {fetchAsset} from '../general/helpers.js';
+import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {LanguageUtil} from '../language/language-util.js';
+import {JapaneseUtil} from '../language/languages/ja/japanese-util.js';
+import {Translator} from '../language/translator.js';
+import {AudioDownloader} from '../media/audio-downloader.js';
+import {MediaUtil} from '../media/media-util.js';
+import {yomitan} from '../yomitan.js';
+import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
+import {ProfileConditionsUtil} from './profile-conditions-util.js';
+import {RequestBuilder} from './request-builder.js';
+import {ScriptManager} from './script-manager.js';
+
+
 
 /**
  * This class controls the core logic of the extension, including API calls
@@ -54,20 +56,29 @@ export class Backend {
         this._languageUtil = new LanguageUtil();
         this._japaneseUtil = new JapaneseUtil(wanakana);
         this._environment = new Environment();
-        this._dictionaryDatabase = new DictionaryDatabase();
-        this._translator = new Translator({
-            languageUtil: this._languageUtil,
-            japaneseUtil: this._japaneseUtil,
-            database: this._dictionaryDatabase
-        });
         this._anki = new AnkiConnect();
         this._mecab = new Mecab();
-        this._clipboardReader = new ClipboardReader({
-            // eslint-disable-next-line no-undef
-            document: (typeof document === 'object' && document !== null ? document : null),
-            pasteTargetSelector: '#clipboard-paste-target',
-            richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
-        });
+
+        if (!chrome.offscreen) {
+            this._dictionaryDatabase = new DictionaryDatabase();
+            this._translator = new Translator({
+                languageUtil: this._languageUtil,
+                japaneseUtil: this._japaneseUtil,
+                database: this._dictionaryDatabase
+            });
+            this._clipboardReader = new ClipboardReader({
+                // eslint-disable-next-line no-undef
+                document: (typeof document === 'object' && document !== null ? document : null),
+                pasteTargetSelector: '#clipboard-paste-target',
+                richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
+            });
+        } else {
+            this._offscreen = new OffscreenProxy();
+            this._dictionaryDatabase = new DictionaryDatabaseProxy(this._offscreen);
+            this._translator = new TranslatorProxy(this._offscreen);
+            this._clipboardReader = new ClipboardReaderProxy(this._offscreen);
+        }
+
         this._clipboardMonitor = new ClipboardMonitor({
             japaneseUtil: this._japaneseUtil,
             clipboardReader: this._clipboardReader
@@ -144,11 +155,12 @@ export class Backend {
             ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
             ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}],
             ['findAnkiNotes',                {async: true,  contentScript: true,  handler: this._onApiFindAnkiNotes.bind(this)}],
+            ['openCrossFramePort',           {async: false, contentScript: true,  handler: this._onApiOpenCrossFramePort.bind(this)}],
             ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}],
             ['getTextTransformations',       {async: true,  contentScript: true,  handler: this._onApiGetTextTransformations.bind(this)}],
             ['getLanguages',                 {async: true,  contentScript: true,  handler: this._onApiGetLanguages.bind(this)}],
             ['getLocales',                   {async: true,  contentScript: true,  handler: this._onApiGetLocales.bind(this)}],
-            ['getTranslations',              {async: true,  contentScript: true,  handler: this._onApiGetTranslations.bind(this)}],
+            ['getTranslations',              {async: true,  contentScript: true,  handler: this._onApiGetTranslations.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
         ]);
@@ -198,9 +210,6 @@ export class Backend {
             chrome.tabs.onZoomChange.addListener(onZoomChange);
         }
 
-        const onConnect = this._onWebExtensionEventWrapper(this._onConnect.bind(this));
-        chrome.runtime.onConnect.addListener(onConnect);
-
         const onMessage = this._onMessageWrapper.bind(this);
         chrome.runtime.onMessage.addListener(onMessage);
 
@@ -225,10 +234,13 @@ export class Backend {
             }, 1000);
             this._updateBadge();
 
-            yomichan.on('log', this._onLog.bind(this));
+            yomitan.on('log', this._onLog.bind(this));
 
             await this._requestBuilder.prepare();
             await this._environment.prepare();
+            if (chrome.offscreen) {
+                await this._offscreen.prepare();
+            }
             this._clipboardReader.browser = this._environment.getInfo().browser;
 
             try {
@@ -248,13 +260,13 @@ export class Backend {
 
             const options = this._getProfileOptions({current: true});
             if (options.general.showGuide) {
-                this._openWelcomeGuidePage();
+                this._openWelcomeGuidePageOnce();
             }
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
 
-            this._sendMessageAllTabsIgnoreResponse('Yomichan.backendReady', {});
-            this._sendMessageIgnoreResponse({action: 'Yomichan.backendReady', params: {}});
+            this._sendMessageAllTabsIgnoreResponse('Yomitan.backendReady', {});
+            this._sendMessageIgnoreResponse({action: 'Yomitan.backendReady', params: {}});
         } catch (e) {
             log.error(e);
             throw e;
@@ -340,60 +352,8 @@ export class Backend {
         return invokeMessageHandler(messageHandler, params, callback, sender);
     }
 
-    _onConnect(port) {
-        try {
-            let details;
-            try {
-                details = JSON.parse(port.name);
-            } catch (e) {
-                return;
-            }
-            if (details.name !== 'background-cross-frame-communication-port') { return; }
-
-            const senderTabId = (port.sender && port.sender.tab ? port.sender.tab.id : null);
-            if (typeof senderTabId !== 'number') {
-                throw new Error('Port does not have an associated tab ID');
-            }
-            const senderFrameId = port.sender.frameId;
-            if (typeof senderFrameId !== 'number') {
-                throw new Error('Port does not have an associated frame ID');
-            }
-            let {targetTabId, targetFrameId} = details;
-            if (typeof targetTabId !== 'number') {
-                targetTabId = senderTabId;
-            }
-
-            const details2 = {
-                name: 'cross-frame-communication-port',
-                sourceTabId: senderTabId,
-                sourceFrameId: senderFrameId
-            };
-            let forwardPort = chrome.tabs.connect(targetTabId, {frameId: targetFrameId, name: JSON.stringify(details2)});
-
-            const cleanup = () => {
-                this._checkLastError(chrome.runtime.lastError);
-                if (forwardPort !== null) {
-                    forwardPort.disconnect();
-                    forwardPort = null;
-                }
-                if (port !== null) {
-                    port.disconnect();
-                    port = null;
-                }
-            };
-
-            port.onMessage.addListener((message) => { forwardPort.postMessage(message); });
-            forwardPort.onMessage.addListener((message) => { port.postMessage(message); });
-            port.onDisconnect.addListener(cleanup);
-            forwardPort.onDisconnect.addListener(cleanup);
-        } catch (e) {
-            port.disconnect();
-            log.error(e);
-        }
-    }
-
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
-        this._sendMessageTabIgnoreResponse(tabId, {action: 'Yomichan.zoomChanged', params: {oldZoomFactor, newZoomFactor}});
+        this._sendMessageTabIgnoreResponse(tabId, {action: 'Yomitan.zoomChanged', params: {oldZoomFactor, newZoomFactor}});
     }
 
     _onPermissionsChanged() {
@@ -409,7 +369,7 @@ export class Backend {
 
     _onApiRequestBackendReadySignal(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
-        const data = {action: 'Yomichan.backendReady', params: {}};
+        const data = {action: 'Yomitan.backendReady', params: {}};
         if (typeof sender.tab === 'undefined') {
             this._sendMessageIgnoreResponse(data);
             return false;
@@ -603,7 +563,7 @@ export class Backend {
     async _onApiInjectStylesheet({type, value}, sender) {
         const {frameId, tab} = sender;
         if (!isObject(tab)) { throw new Error('Invalid tab'); }
-        return await this._scriptManager.injectStylesheet(type, value, tab.id, frameId, false, true, 'document_start');
+        return await this._scriptManager.injectStylesheet(type, value, tab.id, frameId, false);
     }
 
     async _onApiGetStylesheetContent({url}) {
@@ -800,8 +760,51 @@ export class Backend {
         if (typeof tabId !== 'number') { throw new Error('Sender has invalid tab ID'); }
         const {frameId} = sender;
         for (const file of files) {
-            await this._scriptManager.injectScript(file, tabId, frameId, false, true, 'document_start');
+            await this._scriptManager.injectScript(file, tabId, frameId, false);
         }
+    }
+
+    _onApiOpenCrossFramePort({targetTabId, targetFrameId}, sender) {
+        const sourceTabId = (sender && sender.tab ? sender.tab.id : null);
+        if (typeof sourceTabId !== 'number') {
+            throw new Error('Port does not have an associated tab ID');
+        }
+        const sourceFrameId = sender.frameId;
+        if (typeof sourceFrameId !== 'number') {
+            throw new Error('Port does not have an associated frame ID');
+        }
+
+        const sourceDetails = {
+            name: 'cross-frame-communication-port',
+            otherTabId: targetTabId,
+            otherFrameId: targetFrameId
+        };
+        const targetDetails = {
+            name: 'cross-frame-communication-port',
+            otherTabId: sourceTabId,
+            otherFrameId: sourceFrameId
+        };
+        let sourcePort = chrome.tabs.connect(sourceTabId, {frameId: sourceFrameId, name: JSON.stringify(sourceDetails)});
+        let targetPort = chrome.tabs.connect(targetTabId, {frameId: targetFrameId, name: JSON.stringify(targetDetails)});
+
+        const cleanup = () => {
+            this._checkLastError(chrome.runtime.lastError);
+            if (targetPort !== null) {
+                targetPort.disconnect();
+                targetPort = null;
+            }
+            if (sourcePort !== null) {
+                sourcePort.disconnect();
+                sourcePort = null;
+            }
+        };
+
+        sourcePort.onMessage.addListener((message) => { targetPort.postMessage(message); });
+        targetPort.onMessage.addListener((message) => { sourcePort.postMessage(message); });
+        sourcePort.onDisconnect.addListener(cleanup);
+        targetPort.onDisconnect.addListener(cleanup);
+
+        return {targetTabId, targetFrameId};
     }
 
     async _onApiGetLanguages() {
@@ -813,9 +816,10 @@ export class Backend {
     }
 
     async _onApiGetTextTransformations({language}){
-        return await this._languageUtil.getTextTransformations(language);
+        const result = await this._languageUtil.getTextTransformations(language);
+        return result;
     }
-    
+
     async _onApiGetTranslations({language}){
         return await this._languageUtil.getTranslations(language);
     }
@@ -1065,7 +1069,11 @@ export class Backend {
 
         this._onChangedLanguage(options);
 
-        this._sendMessageAllTabsIgnoreResponse('Yomichan.optionsUpdated', {source});
+        this._onChangedLanguage(options);
+
+        this._onChangedLanguage(options);
+
+        this._sendMessageAllTabsIgnoreResponse('Yomitan.optionsUpdated', {source});
     }
 
     _onChangedLanguage(options) {
@@ -1423,27 +1431,27 @@ export class Backend {
 
     _validatePrivilegedMessageSender(sender) {
         let {url} = sender;
-        if (typeof url === 'string' && yomichan.isExtensionUrl(url)) { return; }
+        if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
         const {tab} = url;
         if (typeof tab === 'object' && tab !== null) {
             ({url} = tab);
-            if (typeof url === 'string' && yomichan.isExtensionUrl(url)) { return; }
+            if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
         }
         throw new Error('Invalid message sender');
     }
 
     _getBrowserIconTitle() {
         return (
-            isObject(chrome.browserAction) &&
-            typeof chrome.browserAction.getTitle === 'function' ?
-                new Promise((resolve) => chrome.browserAction.getTitle({}, resolve)) :
+            isObject(chrome.action) &&
+            typeof chrome.action.getTitle === 'function' ?
+                new Promise((resolve) => chrome.action.getTitle({}, resolve)) :
                 Promise.resolve('')
         );
     }
 
     _updateBadge() {
         let title = this._defaultBrowserActionTitle;
-        if (title === null || !isObject(chrome.browserAction)) {
+        if (title === null || !isObject(chrome.action)) {
             // Not ready or invalid
             return;
         }
@@ -1492,17 +1500,17 @@ export class Backend {
             }
         }
 
-        if (color !== null && typeof chrome.browserAction.setBadgeBackgroundColor === 'function') {
-            chrome.browserAction.setBadgeBackgroundColor({color});
+        if (color !== null && typeof chrome.action.setBadgeBackgroundColor === 'function') {
+            chrome.action.setBadgeBackgroundColor({color});
         }
-        if (text !== null && typeof chrome.browserAction.setBadgeText === 'function') {
-            chrome.browserAction.setBadgeText({text});
+        if (text !== null && typeof chrome.action.setBadgeText === 'function') {
+            chrome.action.setBadgeText({text});
         }
-        if (typeof chrome.browserAction.setTitle === 'function') {
+        if (typeof chrome.action.setTitle === 'function') {
             if (status !== null) {
                 title = `${title} - ${status}`;
             }
-            chrome.browserAction.setTitle({title});
+            chrome.action.setTitle({title});
         }
     }
 
@@ -1527,7 +1535,7 @@ export class Backend {
         try {
             const {url} = await this._sendMessageTabPromise(
                 tabId,
-                {action: 'Yomichan.getUrl', params: {}},
+                {action: 'Yomitan.getUrl', params: {}},
                 {frameId: 0}
             );
             if (typeof url === 'string') {
@@ -1663,7 +1671,7 @@ export class Backend {
                     sender.tab.id !== tabId ||
                     sender.frameId !== frameId ||
                     !isObject(message) ||
-                    message.action !== 'yomichanReady'
+                    message.action !== 'yomitanReady'
                 ) {
                     return;
                 }
@@ -1684,7 +1692,7 @@ export class Backend {
 
             chrome.runtime.onMessage.addListener(onMessage);
 
-            this._sendMessageTabPromise(tabId, {action: 'Yomichan.isReady'}, {frameId})
+            this._sendMessageTabPromise(tabId, {action: 'Yomitan.isReady'}, {frameId})
                 .then(
                     (value) => {
                         if (!value) { return; }
@@ -1895,7 +1903,7 @@ export class Backend {
 
         let extension = MediaUtil.getFileExtensionFromAudioMediaType(contentType);
         if (extension === null) { extension = '.mp3'; }
-        let fileName = this._generateAnkiNoteMediaFileName('yomichan_audio', extension, timestamp, definitionDetails);
+        let fileName = this._generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp, definitionDetails);
         fileName = fileName.replace(/\]/g, '');
         fileName = await ankiConnect.storeMediaFile(fileName, data);
 
@@ -1912,7 +1920,7 @@ export class Backend {
             throw new Error('Unknown media type for screenshot image');
         }
 
-        let fileName = this._generateAnkiNoteMediaFileName('yomichan_browser_screenshot', extension, timestamp, definitionDetails);
+        let fileName = this._generateAnkiNoteMediaFileName('yomitan_browser_screenshot', extension, timestamp, definitionDetails);
         fileName = await ankiConnect.storeMediaFile(fileName, data);
 
         return fileName;
@@ -1930,7 +1938,7 @@ export class Backend {
             throw new Error('Unknown media type for clipboard image');
         }
 
-        let fileName = this._generateAnkiNoteMediaFileName('yomichan_clipboard_image', extension, timestamp, definitionDetails);
+        let fileName = this._generateAnkiNoteMediaFileName('yomitan_clipboard_image', extension, timestamp, definitionDetails);
         fileName = await ankiConnect.storeMediaFile(fileName, data);
 
         return fileName;
@@ -1966,7 +1974,7 @@ export class Backend {
             if (media !== null) {
                 const {content, mediaType} = media;
                 const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
-                fileName = this._generateAnkiNoteMediaFileName(`yomichan_dictionary_media_${i + 1}`, extension, timestamp, definitionDetails);
+                fileName = this._generateAnkiNoteMediaFileName(`yomitan_dictionary_media_${i + 1}`, extension, timestamp, definitionDetails);
                 try {
                     fileName = await ankiConnect.storeMediaFile(fileName, content);
                 } catch (e) {
@@ -2084,7 +2092,7 @@ export class Backend {
 
     _triggerDatabaseUpdated(type, cause) {
         this._translator.clearDatabaseCaches();
-        this._sendMessageAllTabsIgnoreResponse('Yomichan.databaseUpdated', {type, cause});
+        this._sendMessageAllTabsIgnoreResponse('Yomitan.databaseUpdated', {type, cause});
     }
 
     async _saveOptions(source) {
@@ -2203,21 +2211,32 @@ export class Backend {
 
     async _getTranslatorTextTransformations(options, language) {
         const textTransformationsOptions = options?.languages?.[language]?.textTransformations || {};
-        const textTransformations = await this._languageUtil.getTextTransformations(language);
+        // const textTransformations = await this._languageUtil.getTextTransformations(language);
 
-        const textTransformationsResult = Object.keys(textTransformationsOptions).reduce((result, key) => {
-            const value = textTransformationsOptions[key];
-            const transformation = textTransformations.find((t) => t.id === key);
-            if (transformation) {
-                result[key] = {
-                    ...transformation,
-                    setting: value
-                };
-            }
-            return result;
-        }, {});
+        // const textTransformationsResult = Object.keys(textTransformationsOptions).reduce((result, key) => {
+        //     const value = textTransformationsOptions[key];
+        //     const transformation = textTransformations.find((t) => t.id === key);
+        //     if (transformation) {
+        //         result[key] = {
+        //             ...transformation,
+        //             setting: value
+        //         };
+        //     }
+        //     return result;
+        // }, {});
+
+        const textTransformationsResult = textTransformationsOptions;
 
         return textTransformationsResult;
+    }
+
+    async _openWelcomeGuidePageOnce() {
+        chrome.storage.session.get(['openedWelcomePage']).then((result) => {
+            if (!result.openedWelcomePage) {
+                this._openWelcomeGuidePage();
+                chrome.storage.session.set({'openedWelcomePage': true});
+            }
+        });
     }
 
     async _openWelcomeGuidePage() {

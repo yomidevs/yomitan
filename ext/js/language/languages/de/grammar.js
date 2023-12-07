@@ -15,12 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * separatedPrefix
- * suffixInflection
-*/
+import {prefixInflection, separatedPrefix, suffixInflection} from '../../deinflection-ruleset.js';
 
-window.languages.de.getDeinflectionReasons = async () => {
+export async function getDeinflectionReasons(){
     const separablePrefixes = [ // https://www.dartmouth.edu/~deutsch/Grammatik/Wortbildung/Separables.html
         'ab',
         'an',
@@ -95,7 +92,7 @@ window.languages.de.getDeinflectionReasons = async () => {
     });
 
     const zuInfinitiveInflections = separablePrefixes.map((prefix) => {
-        return prefixInflection(prefix+'zu', prefix, [], ['verb'])
+        return prefixInflection(prefix+'zu', prefix, [], ['verb']);
     });
 
     return new Map([
@@ -104,22 +101,20 @@ window.languages.de.getDeinflectionReasons = async () => {
         ]],
         ['nominalization', [
             suffixInflection('ung', 'en', [], []),
-            suffixInflection('lung', 'eln', [], []),
+            suffixInflection('lung', 'eln', [], [])
         ]],
         ['zu-infinitive', [
-                ...zuInfinitiveInflections
+            ...zuInfinitiveInflections
         ]],
         ['negative', [
-                prefixInflection('un', '', [], ['adjective']),
+            prefixInflection('un', '', [], ['adjective'])
         ]],
         ['-able', [
-                suffixInflection('bar', 'en', [], ['verb']),
-                suffixInflection('bar', 'n', [], ['verb']), // lieferbar
+            suffixInflection('bar', 'en', [], ['verb']),
+            suffixInflection('bar', 'n', [], ['verb']) // lieferbar
         ]],
         ['dated spelling', [
-                suffixInflection('ehn', 'ehen', [], ['verb']), // sehn, gehn
+            suffixInflection('ehn', 'ehen', [], ['verb']) // sehn, gehn
         ]]
     ]);
-
-
-};
+}

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * TextScanner
- */
+import {EventDispatcher, log} from '../core.js';
+import {TextScanner} from '../language/text-scanner.js';
+import {yomitan} from '../yomitan.js';
 
-class QueryParser extends EventDispatcher {
+export class QueryParser extends EventDispatcher {
     constructor({getSearchContext, japaneseUtil}) {
         super();
         this._getSearchContext = getSearchContext;
@@ -92,7 +93,7 @@ class QueryParser extends EventDispatcher {
 
         const token = {};
         this._setTextToken = token;
-        this._parseResults = await yomichan.api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser);
+        this._parseResults = await yomitan.api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser);
         if (this._setTextToken !== token) { return; }
 
         this._refreshSelectedParser();
@@ -138,7 +139,7 @@ class QueryParser extends EventDispatcher {
 
     _setSelectedParser(value) {
         const optionsContext = this._getOptionsContext();
-        yomichan.api.modifySettings([{
+        yomitan.api.modifySettings([{
             action: 'set',
             path: 'parsing.selectedParser',
             value,

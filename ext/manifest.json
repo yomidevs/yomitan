@@ -1,9 +1,9 @@
 {
-    "manifest_version": 2,
-    "name": "Yezichak",
-    "version": "23.11.10.0",
-    "description": "Dictionary lookup with Anki integration",
-    "author": "Alex Yatskov",
+    "manifest_version": 3,
+    "name": "Yomitan",
+    "version": "0.0.0.0",
+    "description": "Japanese dictionary with Anki integration",
+    "author": "TheMoeWay",
     "icons": {
         "16": "images/tongue.png",
         "19": "images/tongue.png",
@@ -13,7 +13,7 @@
         "64": "images/tongue.png",
         "128": "images/tongue.png"
     },
-    "browser_action": {
+    "action": {
         "default_icon": {
             "16": "images/tongue.png",
             "19": "images/tongue.png",
@@ -23,12 +23,12 @@
             "64": "images/tongue.png",
             "128": "images/tongue.png"
         },
-        "default_title": "Yomichan",
+        "default_title": "Yomitan",
         "default_popup": "action-popup.html"
     },
     "background": {
-        "page": "background.html",
-        "persistent": true
+        "service_worker": "sw.js",
+        "type": "module"
     },
     "content_scripts": [
         {
@@ -41,32 +41,11 @@
             "match_about_blank": true,
             "all_frames": true,
             "js": [
-                "js/core.js",
-                "js/yomichan.js",
-                "js/app/frontend.js",
-                "js/app/popup.js",
-                "js/app/popup-factory.js",
-                "js/app/popup-proxy.js",
-                "js/app/popup-window.js",
-                "js/app/theme-controller.js",
-                "js/comm/api.js",
-                "js/comm/cross-frame-api.js",
-                "js/comm/frame-ancestry-handler.js",
-                "js/comm/frame-client.js",
-                "js/comm/frame-offset-forwarder.js",
-                "js/data/sandbox/string-util.js",
-                "js/dom/dom-text-scanner.js",
-                "js/dom/document-util.js",
-                "js/dom/text-source-element.js",
-                "js/dom/text-source-range.js",
-                "js/input/hotkey-handler.js",
-                "js/language/text-scanner.js",
-                "js/script/dynamic-loader.js",
-                "js/app/content-script-main.js"
+                "js/app/content-script-wrapper.js"
             ]
         }
     ],
-    "minimum_chrome_version": "57.0.0.0",
+    "minimum_chrome_version": "96.0.0.0",
     "options_ui": {
         "page": "settings.html",
         "open_in_tab": true
@@ -74,21 +53,22 @@
     "sandbox": {
         "pages": [
             "template-renderer.html"
-        ],
-        "content_security_policy": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'unsafe-inline'"
+        ]
     },
     "permissions": [
-        "<all_urls>",
         "storage",
         "clipboardWrite",
         "unlimitedStorage",
-        "webRequest",
-        "webRequestBlocking"
+        "declarativeNetRequest",
+        "scripting",
+        "offscreen"
     ],
     "optional_permissions": [
         "clipboardRead",
-        "nativeMessaging",
-        "webNavigation"
+        "nativeMessaging"
+    ],
+    "host_permissions": [
+        "<all_urls>"
     ],
     "commands": {
         "toggleTextScanning": {
@@ -114,8 +94,19 @@
         }
     },
     "web_accessible_resources": [
-        "popup.html",
-        "template-renderer.html"
+        {
+            "resources": [
+                "popup.html",
+                "template-renderer.html",
+                "js/*"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
     ],
-    "content_security_policy": "default-src 'self'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
+    "content_security_policy": {
+        "extension_pages": "default-src 'self'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *",
+        "sandbox": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'unsafe-inline'"
+    }
 }

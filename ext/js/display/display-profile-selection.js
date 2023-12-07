@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * PanelElement
- */
+import {EventListenerCollection, generateId} from '../core.js';
+import {PanelElement} from '../dom/panel-element.js';
+import {yomitan} from '../yomitan.js';
 
-class DisplayProfileSelection {
+export class DisplayProfileSelection {
     constructor(display) {
         this._display = display;
         this._profielList = document.querySelector('#profile-list');
@@ -34,7 +35,7 @@ class DisplayProfileSelection {
     }
 
     async prepare() {
-        yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
+        yomitan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         this._profileButton.addEventListener('click', this._onProfileButtonClick.bind(this), false);
         this._profileListNeedsUpdate = true;
     }
@@ -66,7 +67,7 @@ class DisplayProfileSelection {
 
     async _updateProfileList() {
         this._profileListNeedsUpdate = false;
-        const options = await yomichan.api.optionsGetFull();
+        const options = await yomitan.api.optionsGetFull();
 
         this._eventListeners.removeAllEventListeners();
         const displayGenerator = this._display.displayGenerator;
@@ -94,7 +95,7 @@ class DisplayProfileSelection {
     }
 
     async _setProfileCurrent(index) {
-        await yomichan.api.modifySettings([{
+        await yomitan.api.modifySettings([{
             action: 'set',
             path: 'profileCurrent',
             value: index,

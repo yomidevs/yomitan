@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DocumentUtil
- */
+import {EventDispatcher, EventListenerCollection} from '../core.js';
+import {DocumentUtil} from '../dom/document-util.js';
+import {yomitan} from '../yomitan.js';
 
 /**
  * Class which handles hotkey events and actions.
  */
-class HotkeyHandler extends EventDispatcher {
+export class HotkeyHandler extends EventDispatcher {
     /**
      * Information describing a hotkey.
      * @typedef {object} HotkeyDefinition
@@ -52,7 +53,7 @@ class HotkeyHandler extends EventDispatcher {
     prepare() {
         this._isPrepared = true;
         this._updateEventHandlers();
-        yomichan.crossFrame.registerHandlers([
+        yomitan.crossFrame.registerHandlers([
             ['HotkeyHandler.forwardHotkey', {async: false, handler: this._onMessageForwardHotkey.bind(this)}]
         ]);
     }

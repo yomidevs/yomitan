@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AnkiConnect
- * AnkiUtil
- * ObjectPropertyAccessor
- * SelectorObserver
- */
+import {AnkiConnect} from '../../comm/anki-connect.js';
+import {EventListenerCollection, log} from '../../core.js';
+import {AnkiUtil} from '../../data/anki-util.js';
+import {SelectorObserver} from '../../dom/selector-observer.js';
+import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
+import {yomitan} from '../../yomitan.js';
 
-class AnkiController {
+export class AnkiController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._ankiConnect = new AnkiConnect();
@@ -394,7 +395,7 @@ class AnkiController {
 
         let noteId = null;
         for (const query of queries) {
-            const notes = await yomichan.api.findAnkiNotes(query);
+            const notes = await yomitan.api.findAnkiNotes(query);
             if (notes.length > 0) {
                 noteId = notes[0];
                 break;
@@ -405,7 +406,7 @@ class AnkiController {
             throw new Error('Could not find a note to test with');
         }
 
-        await yomichan.api.noteView(noteId, mode, false);
+        await yomitan.api.noteView(noteId, mode, false);
     }
 
     _setAnkiNoteViewerStatus(visible, error) {

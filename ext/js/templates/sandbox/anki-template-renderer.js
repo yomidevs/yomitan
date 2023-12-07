@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,24 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AnkiNoteDataCreator
- * AnkiTemplateRendererContentManager
- * CssStyleApplier
- * DictionaryDataUtil
- * Handlebars
- * JapaneseUtil
- * PronunciationGenerator
- * StructuredContentGenerator
- * TemplateRenderer
- * TemplateRendererMediaProvider
- */
+import {Handlebars} from '../../../lib/handlebars.js';
+import {AnkiNoteDataCreator} from '../../data/sandbox/anki-note-data-creator.js';
+import {DictionaryDataUtil} from '../../dictionary/dictionary-data-util.js';
+import {PronunciationGenerator} from '../../display/sandbox/pronunciation-generator.js';
+import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';
+import {CssStyleApplier} from '../../dom/sandbox/css-style-applier.js';
+import {JapaneseUtil} from '../../language/languages/ja/japanese-util.js';
+import {AnkiTemplateRendererContentManager} from './anki-template-renderer-content-manager.js';
+import {TemplateRendererMediaProvider} from './template-renderer-media-provider.js';
+import {TemplateRenderer} from './template-renderer.js';
 
 /**
  * This class contains all Anki-specific template rendering functionality. It is built on
  * the generic TemplateRenderer class and various other Anki-related classes.
  */
-class AnkiTemplateRenderer {
+export class AnkiTemplateRenderer {
     /**
      * Creates a new instance of the class.
      */
@@ -67,9 +66,7 @@ class AnkiTemplateRenderer {
             ['dumpObject',       this._dumpObject.bind(this)],
             ['furigana',         this._furigana.bind(this)],
             ['furiganaPlain',    this._furiganaPlain.bind(this)],
-            ['kanjiLinks',       this._kanjiLinks.bind(this)],
             ['multiLine',        this._multiLine.bind(this)],
-            ['sanitizeCssClass', this._sanitizeCssClass.bind(this)],
             ['regexReplace',     this._regexReplace.bind(this)],
             ['regexMatch',       this._regexMatch.bind(this)],
             ['mergeTags',        this._mergeTags.bind(this)],
@@ -131,11 +128,15 @@ class AnkiTemplateRenderer {
         return Handlebars.Utils.escapeExpression(text);
     }
 
+    _safeString(text) {
+        return new Handlebars.SafeString(text);
+    }
+
     // Template helpers
 
-    _dumpObject(context, options) {
-        const dump2 = JSON.stringify(context, null, 4);
-        return this._escape(dump2);
+    _dumpObject(context, object) {
+        const dump = JSON.stringify(object, null, 4);
+        return this._escape(dump);
     }
 
     _furigana(context, ...args) {
@@ -144,14 +145,16 @@ class AnkiTemplateRenderer {
 
         let result = '';
         for (const {text, reading: reading2} of segs) {
-            if (reading2.length > 0) {
-                result += `<ruby>${text}<rt>${reading2}</rt></ruby>`;
+            const safeText = this._escape(text);
+            const safeReading = this._escape(reading2);
+            if (safeReading.length > 0) {
+                result += `<ruby>${safeText}<rt>${safeReading}</rt></ruby>`;
             } else {
-                result += text;
+                result += safeText;
             }
         }
 
-        return result;
+        return this._safeString(result);
     }
 
     _furiganaPlain(context, ...args) {
@@ -172,27 +175,14 @@ class AnkiTemplateRenderer {
     }
 
     _getFuriganaExpressionAndReading(context, ...args) {
-        const options = args[args.length - 1];
         if (args.length >= 3) {
             return {expression: args[0], reading: args[1]};
-        } else {
-            const {expression, reading} = options.fn(context);
+        } else if (args.length === 2) {
+            const {expression, reading} = args[0];
             return {expression, reading};
+        } else {
+            return void 0;
         }
-    }
-
-    _kanjiLinks(context, options) {
-        const jp = this._japaneseUtil;
-        let result = '';
-        for (const c of options.fn(context)) {
-            if (jp.isCodePointKanji(c.codePointAt(0))) {
-                result += `<a href="#" class="kanji-link">${c}</a>`;
-            } else {
-                result += c;
-            }
-        }
-
-        return result;
     }
 
     _stringToMultiLineHtml(string) {
@@ -201,10 +191,6 @@ class AnkiTemplateRenderer {
 
     _multiLine(context, options) {
         return this._stringToMultiLineHtml(options.fn(context));
-    }
-
-    _sanitizeCssClass(context, options) {
-        return options.fn(context).replace(/[^_a-z0-9\u00a0-\uffff]/ig, '_');
     }
 
     _regexReplace(context, ...args) {
@@ -218,7 +204,7 @@ class AnkiTemplateRenderer {
         const options = args[argCount];
         let value = typeof options.fn === 'function' ? options.fn(context) : '';
         if (argCount > 3) {
-            value = `${args.slice(3).join('')}${value}`;
+            value = `${args.slice(3, -1).join('')}${value}`;
         }
         if (argCount > 1) {
             try {
@@ -242,7 +228,7 @@ class AnkiTemplateRenderer {
         const options = args[argCount];
         let value = typeof options.fn === 'function' ? options.fn(context) : '';
         if (argCount > 2) {
-            value = `${args.slice(2).join('')}${value}`;
+            value = `${args.slice(2, -1).join('')}${value}`;
         }
         if (argCount > 0) {
             try {
@@ -489,7 +475,7 @@ class AnkiTemplateRenderer {
         this._normalizeHtml(container, styleApplier, datasetKeyIgnorePattern);
         const result = container.innerHTML;
         container.textContent = '';
-        return result;
+        return this._safeString(result);
     }
 
     _normalizeHtml(root, styleApplier, datasetKeyIgnorePattern) {
@@ -542,9 +528,8 @@ class AnkiTemplateRenderer {
         return instance;
     }
 
-    _formatGlossary(context, dictionary, options) {
+    _formatGlossary(context, dictionary, content, options) {
         const data = options.data.root;
-        const content = options.fn(context);
         if (typeof content === 'string') { return this._stringToMultiLineHtml(this._escape(content)); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }
         switch (content.type) {

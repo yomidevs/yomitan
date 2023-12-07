@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * TextToSpeechAudio
- */
+import {EventDispatcher} from '../core.js';
+import {TextToSpeechAudio} from './text-to-speech-audio.js';
 
-class AudioSystem extends EventDispatcher {
+export class AudioSystem extends EventDispatcher {
     constructor() {
         super();
         this._fallbackAudio = null;

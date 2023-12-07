@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * DictionaryImporterMediaLoader
- */
+import {deserializeError, serializeError} from '../core.js';
+import {DictionaryImporterMediaLoader} from './dictionary-importer-media-loader.js';
 
-class DictionaryWorker {
+export class DictionaryWorker {
     constructor() {
         this._dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
     }
@@ -46,7 +46,7 @@ class DictionaryWorker {
 
     _invoke(action, params, transfer, onProgress, formatResult) {
         return new Promise((resolve, reject) => {
-            const worker = new Worker('/js/dictionary/dictionary-worker-main.js', {});
+            const worker = new Worker('/js/dictionary/dictionary-worker-main.js', {type: 'module'});
             const details = {
                 complete: false,
                 worker,

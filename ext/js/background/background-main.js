@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,14 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Backend
- */
-
+import {yomitan} from '../yomitan.js';
 import {Backend} from './backend.js';
 
 (() => {
-    yomichan.prepare(true);
+    yomitan.prepare(true);
 
     const backend = new Backend();
     backend.prepare();

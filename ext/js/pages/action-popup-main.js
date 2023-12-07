@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2017-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,13 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * HotkeyHelpController
- * PermissionsUtil
- * LocalizationController
- */
+import {PermissionsUtil} from '../data/permissions-util.js';
+import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
+import {LocalizationController} from '../language/localization.js';
+import {yomitan} from '../yomitan.js';
 
-class DisplayController {
+export class DisplayController {
     constructor() {
         this._optionsFull = null;
         this._permissionsUtil = new PermissionsUtil();
@@ -35,7 +35,7 @@ class DisplayController {
         this._setupButtonEvents('.action-open-search', 'openSearchPage', chrome.runtime.getURL('/search.html'), this._onSearchClick.bind(this));
         this._setupButtonEvents('.action-open-info', 'openInfoPage', chrome.runtime.getURL('/info.html'));
 
-        const optionsFull = await yomichan.api.optionsGetFull();
+        const optionsFull = await yomitan.api.optionsGetFull();
         this._optionsFull = optionsFull;
 
         this._setupHotkeys();
@@ -88,12 +88,12 @@ class DisplayController {
                         const result = customHandler(e);
                         if (typeof result !== 'undefined') { return; }
                     }
-                    yomichan.api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
+                    yomitan.api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
                     e.preventDefault();
                 }, false);
                 node.addEventListener('auxclick', (e) => {
                     if (e.button !== 1) { return; }
-                    yomichan.api.commandExec(command, {mode: 'newTab'});
+                    yomitan.api.commandExec(command, {mode: 'newTab'});
                     e.preventDefault();
                 }, false);
             }
@@ -148,7 +148,7 @@ class DisplayController {
 
     _setupOptions({options}) {
         const extensionEnabled = options.general.enable;
-        const onToggleChanged = () => yomichan.api.commandExec('toggleTextScanning');
+        const onToggleChanged = () => yomitan.api.commandExec('toggleTextScanning');
         for (const toggle of document.querySelectorAll('#enable-search,#enable-search2')) {
             toggle.checked = extensionEnabled;
             toggle.addEventListener('change', onToggleChanged, false);
@@ -189,7 +189,6 @@ class DisplayController {
     }
 
     _onProfileSelectChange(e) {
-        console.log('onProfileSelectChange')
         const value = parseInt(e.currentTarget.value, 10);
         if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= this._optionsFull.profiles.length) {
             this._setPrimaryProfileIndex(value);
@@ -197,7 +196,7 @@ class DisplayController {
     }
 
     async _setPrimaryProfileIndex(value) {
-        return await yomichan.api.modifySettings(
+        return await yomitan.api.modifySettings(
             [{
                 action: 'set',
                 path: 'profileCurrent',
@@ -209,7 +208,7 @@ class DisplayController {
 
     async _updateDictionariesEnabledWarnings(options) {
         const noDictionariesEnabledWarnings = document.querySelectorAll('.no-dictionaries-enabled-warning');
-        const dictionaries = await yomichan.api.getDictionaryInfo();
+        const dictionaries = await yomitan.api.getDictionaryInfo();
 
         const enabledDictionaries = new Set();
         for (const {name, enabled} of options.dictionaries) {
@@ -242,18 +241,18 @@ class DisplayController {
     }
 
     async _isSafari() {
-        const {browser} = await yomichan.api.getEnvironmentInfo();
+        const {browser} = await yomitan.api.getEnvironmentInfo();
         return browser === 'safari';
     }
 }
 
 (async () => {
-    await yomichan.prepare();
+    await yomitan.prepare();
 
-    yomichan.api.logIndicatorClear();
+    yomitan.api.logIndicatorClear();
 
     const displayController = new DisplayController();
     displayController.prepare();
 
-    yomichan.ready();
+    yomitan.ready();
 })();

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-function suffixInflection(inflectedSuffix, deinflectedSuffix, rulesIn, rulesOut){
+export function suffixInflection(inflectedSuffix, deinflectedSuffix, rulesIn, rulesOut){
     return {
         inflected: new RegExp('.*' + inflectedSuffix + '$'),
         deinflected: deinflectedSuffix,
@@ -24,7 +24,7 @@ function suffixInflection(inflectedSuffix, deinflectedSuffix, rulesIn, rulesOut)
     };
 }
 
-function prefixInflection(inflectedPrefix, deinflectedPrefix, rulesIn, rulesOut){
+export function prefixInflection(inflectedPrefix, deinflectedPrefix, rulesIn, rulesOut){
     return {
         inflected: new RegExp('^' + inflectedPrefix + '.*'),
         deinflected: deinflectedPrefix,
@@ -34,7 +34,7 @@ function prefixInflection(inflectedPrefix, deinflectedPrefix, rulesIn, rulesOut)
     };
 }
 
-function infixInflection(inflectedInfix, deinflectedInfix, rulesIn, rulesOut){
+export function infixInflection(inflectedInfix, deinflectedInfix, rulesIn, rulesOut){
     return {
         inflected: new RegExp('.*' + inflectedInfix + '.*'),
         deinflected: deinflectedInfix,
@@ -44,7 +44,7 @@ function infixInflection(inflectedInfix, deinflectedInfix, rulesIn, rulesOut){
     };
 }
 
-function separatedPrefix(prefix, rulesIn, rulesOut) {
+export function separatedPrefix(prefix, rulesIn, rulesOut) {
     const de = 'a-zA-ZäöüÄÖÜß';
     const regex = new RegExp(`^([${de}]+) .+ ${prefix}$`);
     return {
@@ -57,7 +57,7 @@ function separatedPrefix(prefix, rulesIn, rulesOut) {
     };
 }
 
-function wholeWordInflection(inflected, deinflected, rulesIn, rulesOut){
+export function wholeWordInflection(inflected, deinflected, rulesIn, rulesOut){
     return {
         inflected: new RegExp('^' + inflected + '$'),
         deinflected,

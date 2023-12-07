@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AudioSystem
- * PopupMenu
- */
+import {EventListenerCollection} from '../core.js';
+import {PopupMenu} from '../dom/popup-menu.js';
+import {AudioSystem} from '../media/audio-system.js';
+import {yomitan} from '../yomitan.js';
 
-class DisplayAudio {
+export class DisplayAudio {
     constructor(display) {
         this._display = display;
         this._audioPlaying = null;
@@ -539,7 +540,7 @@ class DisplayAudio {
 
     async _getTermAudioInfoList(source, term, reading) {
         const sourceData = this._getSourceData(source);
-        const infoList = await yomichan.api.getTermAudioInfoList(sourceData, term, reading);
+        const infoList = await yomitan.api.getTermAudioInfoList(sourceData, term, reading);
         return infoList.map((info) => ({info, audioPromise: null, audioResolved: false, audio: null}));
     }
 

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,13 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * JsonSchema
- * TemplatePatcher
- * fetchAsset
- */
+import {escapeRegExp, isObject} from '../core.js';
+import {fetchAsset} from '../general/helpers.js';
+import {TemplatePatcher} from '../templates/template-patcher.js';
+import {JsonSchema} from './json-schema.js';
 
-class OptionsUtil {
+export class OptionsUtil {
     constructor() {
         this._templatePatcher = null;
         this._optionsSchema = null;
@@ -114,6 +114,7 @@ class OptionsUtil {
 
         if (typeof options !== 'undefined') {
             options = await this.update(options);
+            await this.save(options);
         } else {
             options = this.getDefault();
         }
@@ -325,7 +326,7 @@ class OptionsUtil {
             anki: {
                 enable: false,
                 server: 'http://127.0.0.1:8765',
-                tags: ['yomichan'],
+                tags: ['yomitan'],
                 sentenceExt: 200,
                 screenshot: {format: 'png', quality: 92},
                 terms: {deck: '', model: '', fields: {}},
@@ -450,7 +451,7 @@ class OptionsUtil {
             {async: false, update: this._updateVersion18.bind(this)},
             {async: false, update: this._updateVersion19.bind(this)},
             {async: false, update: this._updateVersion20.bind(this)},
-            {async: false, update: this._updateVersion21.bind(this)}
+            {async: true,  update: this._updateVersion21.bind(this)}
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -978,11 +979,35 @@ class OptionsUtil {
         return options;
     }
 
-    _updateVersion21(options) {
-        // Version 21 changes:
-        //  Added languages
-        console.log('Updating to version 21');
+    async _updateVersion21(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v21.handlebars');
+
+        let customTemplates = false;
+        for (const {options: profileOptions} of options.profiles) {
+            if (profileOptions.anki.fieldTemplates !== null) {
+                customTemplates = true;
+            }
+        }
+
+        if (customTemplates && isObject(chrome.storage)) {
+            chrome.storage.session.set({'needsCustomTemplatesWarning': true});
+            await this._createTab(chrome.runtime.getURL('/welcome.html'));
+            chrome.storage.session.set({'openedWelcomePage': true});
+        }
 
         return options;
+    }
+
+    _createTab(url) {
+        return new Promise((resolve, reject) => {
+            chrome.tabs.create({url}, (tab) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(tab);
+                }
+            });
+        });
     }
 }

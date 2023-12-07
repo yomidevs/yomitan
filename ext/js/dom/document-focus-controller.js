@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +22,7 @@
  * keyboard shortcuts (e.g. arrow keys) not controlling page scroll. Instead, this class will manually
  * focus a dummy element inside the main content, which gives keyboard scroll focus to that element.
  */
-class DocumentFocusController {
+export class DocumentFocusController {
     /**
      * Creates a new instance of the class.
      * @param {?string} autofocusElementSelector A selector string which can be used to specify an element which

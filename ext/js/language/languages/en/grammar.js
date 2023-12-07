@@ -15,14 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * suffixInflection
- * infixInflection
- * prefixInflection
- * wholeWordInflection
- * fetchAsset
-*/
-window.languages.en.getDeinflectionReasons = async () => {
+import {fetchAsset} from '../../../general/helpers.js';
+import {infixInflection, prefixInflection, suffixInflection, wholeWordInflection} from '../../deinflection-ruleset.js';
+
+export async function getDeinflectionReasons(){
     const pastSuffixInflections = [
         suffixInflection('ed', '', [], ['v']), // 'walked'
         suffixInflection('ed', 'e', [], ['v']), // 'hoped'
@@ -291,4 +287,4 @@ window.languages.en.getDeinflectionReasons = async () => {
     ]);
 
     return reasons;
-};
+}

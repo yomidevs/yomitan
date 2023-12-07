@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,12 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * HotkeyUtil
- * ScanInputsController
- */
+import {HotkeyUtil} from '../../input/hotkey-util.js';
+import {yomitan} from '../../yomitan.js';
+import {ScanInputsController} from './scan-inputs-controller.js';
 
-class ScanInputsSimpleController {
+export class ScanInputsSimpleController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._middleMouseButtonScan = null;
@@ -33,7 +33,7 @@ class ScanInputsSimpleController {
         this._middleMouseButtonScan = document.querySelector('#middle-mouse-button-scan');
         this._mainScanModifierKeyInput = document.querySelector('#main-scan-modifier-key');
 
-        const {platform: {os}} = await yomichan.api.getEnvironmentInfo();
+        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._hotkeyUtil.os = os;
 
         this._mainScanModifierKeyInputHasOther = false;

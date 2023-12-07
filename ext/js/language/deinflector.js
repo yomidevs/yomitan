@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +17,7 @@
  */
 
 
-class Deinflector {
+export class Deinflector {
     constructor(languageUtil) {
         this._languageUtil = languageUtil;
     }

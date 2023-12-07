@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,16 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * Deinflector
- * RegexUtil
- * TextSourceMap
- */
+import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
+import {RegexUtil} from '../general/regex-util.js';
+import {TextSourceMap} from '../general/text-source-map.js';
+import {Deinflector} from './deinflector.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.
  */
-class Translator {
+export class Translator {
     /**
      * Information about how popup content should be shown, specifically related to the outer popup frame.
      * @typedef {object} TermFrequency
@@ -93,12 +93,14 @@ class Translator {
         }
 
         if (mode === 'simple') {
-            if (sortFrequencyDictionary == null) {
-                this._clearTermTags(dictionaryEntries);
-            } else {
-                await this._addSortFreqTagOnly(dictionaryEntries, enabledDictionaryMap, sortFrequencyDictionary);
+            if (sortFrequencyDictionary !== null) {
+                const sortDictionaryMap = [sortFrequencyDictionary]
+                    .filter((key) => enabledDictionaryMap.has(key))
+                    .reduce((subMap, key) => subMap.set(key, enabledDictionaryMap.get(key)), new Map());
+                await this._addTermMeta(dictionaryEntries, sortDictionaryMap);
             }
-        } else {    
+            this._clearTermTags(dictionaryEntries);
+        } else {
             await this._addTermMeta(dictionaryEntries, enabledDictionaryMap);
             await this._expandTermTags(dictionaryEntries);
         }
@@ -234,8 +236,7 @@ class Translator {
                             const duplicate = existingHypotheses.find((hypothesis) => this._areInflectionHyphothesesEqual(hypothesis.inflections, inflections));
                             if (!duplicate) {
                                 newHypotheses.push({source, inflections});
-                            } 
-                            else if (duplicate.source != source) {
+                            } else if (duplicate.source !== source) {
                                 duplicate.source = 'both';
                             }
                         });
@@ -312,7 +313,7 @@ class Translator {
         deinflections.forEach((deinflection) => {
             const {originalText, transformedText, inflectionHypotheses: algHypotheses, databaseEntries} = deinflection;
             databaseEntries.forEach((entry) => {
-                const {definitionTags, term, formOf, inflectionHypotheses}  = entry;
+                const {definitionTags, formOf, inflectionHypotheses}  = entry;
                 if (definitionTags.includes('non-lemma')) {
                     const lemma = formOf || '';
                     const hypotheses = (inflectionHypotheses || [])
@@ -320,7 +321,7 @@ class Translator {
                             return {
                                 source: inflections.length === 0 ? 'dictionary' : 'both',
                                 inflections: [...inflections, ...hypothesis]
-                            }
+                            };
                         }));
 
                     const dictionaryDeinflection = this._createDeinflection(originalText, transformedText, lemma, 0, hypotheses, []);
@@ -364,7 +365,9 @@ class Translator {
     // Deinflections and text transformations
 
     async _getAlgorithmDeinflections(text, options) {
-        const textTransformationsVectorSpace = Object.entries(options.textTransformations).reduce((map, [key, value]) => {
+        const textTransformationsOptions = await this._getTextTransformations(options);
+
+        const textTransformationsVectorSpace = Object.entries(textTransformationsOptions).reduce((map, [key, value]) => {
             map[key] = this._getTextOptionEntryVariants(value.setting);
             return map;
         }, {});
@@ -412,8 +415,8 @@ class Translator {
                 if (options.deinflectionSource !== 'dictionary'){
                     for (const {term, rules, reasons} of await this._deinflector.deinflect(source, options)) {
                         const inflectionHypotheses =  {
-                                source: 'algorithm',
-                                inflections: reasons
+                            source: 'algorithm',
+                            inflections: reasons
                         };
                         deinflections.push(this._createDeinflection(rawSource, source, term, rules, [inflectionHypotheses], []));
                     }
@@ -430,6 +433,25 @@ class Translator {
         }
 
         return deinflections;
+    }
+
+    async _getTextTransformations(options){
+        const textTransformationsOptions = options?.textTransformations || {};
+        const textTransformations = await this._languageUtil.getTextTransformations(options.language);
+
+        const textTransformationsResult = Object.keys(textTransformationsOptions).reduce((result, key) => {
+            const value = textTransformationsOptions[key];
+            const transformation = textTransformations.find((t) => t.id === key);
+            if (transformation) {
+                result[key] = {
+                    ...transformation,
+                    setting: value
+                };
+            }
+            return result;
+        }, {});
+
+        return textTransformationsResult;
     }
 
     _applyTextReplacements(text, sourceMap, replacements) {
@@ -737,13 +759,8 @@ class Translator {
     _pickFromMap(sourceMap, keysToPick) {
         // Just a helper to get a subset of the source map with only the picked keys present.
         return keysToPick
-            .filter(key => sourceMap.has(key))
+            .filter((key) => sourceMap.has(key))
             .reduce((subMap, key) => subMap.set(key, sourceMap.get(key)), new Map());
-    }
-
-    async _addSortFreqTagOnly(dictionaryEntries, enabledDictionaryMap, sortFrequencyDictionary) {
-        const dictMapWithOnlySortDict = this._pickFromMap(enabledDictionaryMap, [sortFrequencyDictionary]);
-        await this._addTermMeta(dictionaryEntries, dictMapWithOnlySortDict);
     }
 
     _clearTermTags(dictionaryEntries) {

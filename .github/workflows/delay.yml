@@ -1,0 +1,44 @@
+# This workflow is used to delay the execution of workflows that need to use an environment.
+# The delay occurs thanks to the usage of the 12hoursDelay environment.
+#
+# It is used to delay the execution of the publish-chrome(-development) workflow to avoid the
+# Google Web Store rejecting the upload of a new version because it is still in review.
+#
+# The reason we can't directly do a workflow-dispatch is because the 12hoursDelay
+# environment does not include our secrets, so instead we chain two workflow-dispatch calls.
+
+name: delay
+on:
+  workflow_dispatch:
+    inputs:
+      workflow:
+        description: "Workflow name"
+        required: true
+      attemptNumber:
+        description: "Attempt number"
+        required: false
+        default: "1"
+      maxAttempts:
+        description: "Max attempts"
+        required: false
+        default: "10"
+permissions: {}
+jobs:
+  delay:
+    runs-on: ubuntu-latest
+    environment: 12hoursDelay
+    permissions:
+      actions: write
+    steps:
+      - name: Start the next attempt
+        uses: aurelien-baudet/workflow-dispatch@93e95b157d791ae7f42aef8f8a0d3d723eba1c31 # pin@v2
+        with:
+          workflow: ${{ github.event.inputs.workflow }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: false
+          inputs: |
+            {
+              "attemptNumber": "${{ github.event.inputs.attemptNumber }}",
+              "maxAttempts": "${{ github.event.inputs.maxAttempts }}",
+              "environment": "${{ github.event.inputs.environment }}"
+            }

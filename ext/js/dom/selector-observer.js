@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +19,7 @@
 /**
  * Class which is used to observe elements matching a selector in specific element.
  */
-class SelectorObserver {
+export class SelectorObserver {
     /**
      * @function OnAddedCallback
      * @param {Element} element The element which was added.

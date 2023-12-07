@@ -15,9 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * suffixInflection
-*/
+
+import {suffixInflection} from '../../deinflection-ruleset.js';
 
 function conjugationIISuffixInflection(inflectedSuffix, deinflectedSuffix, rulesIn, rulesOut){
     return {
@@ -26,7 +25,7 @@ function conjugationIISuffixInflection(inflectedSuffix, deinflectedSuffix, rules
     };
 }
 
-window.languages.sq.getDeinflectionReasons = async () => {
+export async function getDeinflectionReasons() {
     return new Map([
         // Nouns
         ['definite', [
@@ -189,4 +188,4 @@ window.languages.sq.getDeinflectionReasons = async () => {
             suffixInflection('je', '', [], ['verb']) // lëvizje
         ]]
     ]);
-};
+}

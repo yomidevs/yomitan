@@ -1,0 +1,16 @@
+body {
+    font: 16px/1.5 monospace;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 3px;
+}
+
+th {
+    background-color: #ffffff;
+}

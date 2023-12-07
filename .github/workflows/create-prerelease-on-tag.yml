@@ -1,0 +1,73 @@
+name: Create prerelease on tag
+on:
+  push:
+    tags:
+      - "*.*.*.*"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Legal
+        run: npm run license-report
+
+      - name: Build
+        run: npm run-script build -- --all --yomitan-version ${{ github.ref_name }}
+        shell: bash
+
+      - name: Generate hashes
+        id: hash
+        run: |
+          cd builds
+          echo "hashes=$(sha256sum * | base64 -w0)" >> "$GITHUB_OUTPUT"
+
+      - name: Release
+        id: release
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v0.1.15
+        with:
+          generate_release_notes: true
+          prerelease: true
+          files: builds/*
+
+      - name: Dispatch publish-chrome-development
+        uses: aurelien-baudet/workflow-dispatch@93e95b157d791ae7f42aef8f8a0d3d723eba1c31 # pin@v2
+        with:
+          workflow: publish-chrome-development
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: false
+
+      - name: Dispatch publish-firefox-development
+        uses: aurelien-baudet/workflow-dispatch@93e95b157d791ae7f42aef8f8a0d3d723eba1c31 # pin@v2
+        with:
+          workflow: publish-firefox-development
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: false
+          inputs: '{ "upload_url": "${{ steps.release.outputs.upload_url }}" }'
+
+  provenance:
+    needs: [build]
+    permissions:
+      actions: read # To read the workflow path.
+      id-token: write # To sign the provenance.
+      contents: write # To add assets to a release.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.9.0
+    with:
+      base64-subjects: "${{ needs.build.outputs.hashes }}"
+      upload-assets: true

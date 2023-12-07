@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,19 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const path = require('path');
-const {performance} = require('perf_hooks');
-const {JSZip} = require('./util');
-const {createJsonSchema} = require('./schema-validate');
-
+import fs from 'fs';
+import JSZip from 'jszip';
+import path from 'path';
+import {performance} from 'perf_hooks';
+import {createJsonSchema} from './schema-validate.js';
 
 function readSchema(relativeFileName) {
     const fileName = path.join(__dirname, relativeFileName);
     const source = fs.readFileSync(fileName, {encoding: 'utf8'});
     return JSON.parse(source);
 }
-
 
 async function validateDictionaryBanks(mode, zip, fileNameFormat, schema) {
     let jsonSchema;
@@ -56,7 +55,7 @@ async function validateDictionaryBanks(mode, zip, fileNameFormat, schema) {
     }
 }
 
-async function validateDictionary(mode, archive, schemas) {
+export async function validateDictionary(mode, archive, schemas) {
     const fileName = 'index.json';
     const indexFile = archive.files[fileName];
     if (!indexFile) {
@@ -81,7 +80,7 @@ async function validateDictionary(mode, archive, schemas) {
     await validateDictionaryBanks(mode, archive, 'tag_bank_?.json', schemas[`tagBankV${version}`]);
 }
 
-function getSchemas() {
+export function getSchemas() {
     return {
         index: readSchema('../ext/data/schemas/dictionary-index-schema.json'),
         kanjiBankV1: readSchema('../ext/data/schemas/dictionary-kanji-bank-v1-schema.json'),
@@ -96,8 +95,7 @@ function getSchemas() {
     };
 }
 
-
-async function testDictionaryFiles(mode, dictionaryFileNames) {
+export async function testDictionaryFiles(mode, dictionaryFileNames) {
     const schemas = getSchemas();
 
     for (const dictionaryFileName of dictionaryFileNames) {
@@ -116,33 +114,3 @@ async function testDictionaryFiles(mode, dictionaryFileNames) {
         }
     }
 }
-
-
-async function main() {
-    const dictionaryFileNames = process.argv.slice(2);
-    if (dictionaryFileNames.length === 0) {
-        console.log([
-            'Usage:',
-            '  node dictionary-validate [--ajv] <dictionary-file-names>...'
-        ].join('\n'));
-        return;
-    }
-
-    let mode = null;
-    if (dictionaryFileNames[0] === '--ajv') {
-        mode = 'ajv';
-        dictionaryFileNames.splice(0, 1);
-    }
-
-    await testDictionaryFiles(mode, dictionaryFileNames);
-}
-
-
-if (require.main === module) { main(); }
-
-
-module.exports = {
-    getSchemas,
-    validateDictionary,
-    testDictionaryFiles
-};

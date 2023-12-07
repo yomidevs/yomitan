@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class StorageController {
+import {yomitan} from '../../yomitan.js';
+
+export class StorageController {
     constructor(persistentStorageController) {
         this._persistentStorageController = persistentStorageController;
         this._mostRecentStorageEstimate = null;
@@ -38,7 +41,7 @@ class StorageController {
         this._storageUseInvalidNodes = document.querySelectorAll('.storage-use-invalid');
 
         document.querySelector('#storage-refresh').addEventListener('click', this._onStorageRefreshButtonClick.bind(this), false);
-        yomichan.on('storageChanged', this._onStorageChanged.bind(this));
+        yomitan.on('storageChanged', this._onStorageChanged.bind(this));
 
         this._updateStats();
     }

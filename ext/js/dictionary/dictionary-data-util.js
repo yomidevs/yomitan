@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class DictionaryDataUtil {
+export class DictionaryDataUtil {
     static groupTermTags(dictionaryEntry) {
         const {headwords} = dictionaryEntry;
         const headwordCount = headwords.length;

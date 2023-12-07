@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,10 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {isObject} from '../core.js';
+
 /**
  * This class has some general utility functions for working with Anki data.
  */
-class AnkiUtil {
+export class AnkiUtil {
     /**
      * Gets the root deck name of a full deck name. If the deck is a root deck,
      * the same name is returned. Nested decks are separated using '::'.

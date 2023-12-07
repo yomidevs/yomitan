@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * KeyboardMouseInputField
- */
+import {EventDispatcher, EventListenerCollection} from '../../core.js';
+import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
-class ProfileConditionsUI extends EventDispatcher {
+export class ProfileConditionsUI extends EventDispatcher {
     constructor(settingsController) {
         super();
         this._settingsController = settingsController;

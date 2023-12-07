@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * ArrayBufferUtil
- */
+import {EventListenerCollection} from '../core.js';
+import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {yomitan} from '../yomitan.js';
 
 /**
  * A callback used when a media file has been loaded.
@@ -34,7 +35,7 @@
 /**
  * The content manager which is used when generating HTML display content.
  */
-class DisplayContentManager {
+export class DisplayContentManager {
     /**
      * Creates a new instance of the class.
      * @param {Display} display The display instance that owns this object.
@@ -137,7 +138,7 @@ class DisplayContentManager {
 
     async _getMediaData(path, dictionary, cachedData) {
         const token = this._token;
-        const data = (await yomichan.api.getMedia([{path, dictionary}]))[0];
+        const data = (await yomitan.api.getMedia([{path, dictionary}]))[0];
         if (token === this._token && data !== null) {
             const buffer = ArrayBufferUtil.base64ToArrayBuffer(data.content);
             const blob = new Blob([buffer], {type: data.mediaType});

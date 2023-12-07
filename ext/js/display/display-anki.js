@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * AnkiNoteBuilder
- * AnkiUtil
- * PopupMenu
- */
+import {EventListenerCollection, deferPromise, isObject} from '../core.js';
+import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
+import {AnkiUtil} from '../data/anki-util.js';
+import {PopupMenu} from '../dom/popup-menu.js';
+import {yomitan} from '../yomitan.js';
 
-class DisplayAnki {
+export class DisplayAnki {
     constructor(display, displayAudio, japaneseUtil) {
         this._display = display;
         this._displayAudio = displayAudio;
@@ -376,7 +377,7 @@ class DisplayAnki {
             let noteId = null;
             let addNoteOkay = false;
             try {
-                noteId = await yomichan.api.addAnkiNote(note);
+                noteId = await yomitan.api.addAnkiNote(note);
                 addNoteOkay = true;
             } catch (e) {
                 allErrors.length = 0;
@@ -389,7 +390,7 @@ class DisplayAnki {
                 } else {
                     if (this._suspendNewCards) {
                         try {
-                            await yomichan.api.suspendAnkiCardsForNote(noteId);
+                            await yomitan.api.suspendAnkiCardsForNote(noteId);
                         } catch (e) {
                             allErrors.push(e);
                         }
@@ -474,7 +475,7 @@ class DisplayAnki {
         templates = this._ankiFieldTemplatesDefault;
         if (typeof templates === 'string') { return templates; }
 
-        templates = await yomichan.api.getDefaultAnkiFieldTemplates();
+        templates = await yomitan.api.getDefaultAnkiFieldTemplates();
         this._ankiFieldTemplatesDefault = templates;
         return templates;
     }
@@ -504,12 +505,12 @@ class DisplayAnki {
         let ankiError = null;
         try {
             if (forceCanAddValue !== null) {
-                if (!await yomichan.api.isAnkiConnected()) {
+                if (!await yomitan.api.isAnkiConnected()) {
                     throw new Error('Anki not connected');
                 }
                 infos = this._getAnkiNoteInfoForceValue(notes, forceCanAddValue);
             } else {
-                infos = await yomichan.api.getAnkiNoteInfo(notes, fetchAdditionalInfo);
+                infos = await yomitan.api.getAnkiNoteInfo(notes, fetchAdditionalInfo);
             }
         } catch (e) {
             infos = this._getAnkiNoteInfoForceValue(notes, false);
@@ -662,7 +663,7 @@ class DisplayAnki {
         const noteIds = this._getNodeNoteIds(node);
         if (noteIds.length === 0) { return; }
         try {
-            await yomichan.api.noteView(noteIds[0], this._noteGuiMode, false);
+            await yomitan.api.noteView(noteIds[0], this._noteGuiMode, false);
         } catch (e) {
             const displayErrors = (
                 e.message === 'Mode not supported' ?

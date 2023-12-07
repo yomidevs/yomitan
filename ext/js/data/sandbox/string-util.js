@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +19,7 @@
 /**
  * Class containing generic string utility functions.
  */
-class StringUtil {
+export class StringUtil {
     /**
      * Reads code points from a string in the forward direction.
      * @param {string} text The text to read the code points from.

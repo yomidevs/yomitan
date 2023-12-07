@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const dynamicLoader = (() => {
+import {yomitan} from '../yomitan.js';
+
+export const dynamicLoader = (() => {
     const injectedStylesheets = new Map();
     const injectedStylesheetsWithParent = new WeakMap();
 
@@ -41,7 +44,7 @@ const dynamicLoader = (() => {
     }
 
     async function loadStyle(id, type, value, useWebExtensionApi=false, parentNode=null) {
-        if (useWebExtensionApi && yomichan.isExtensionUrl(window.location.href)) {
+        if (useWebExtensionApi && yomitan.isExtensionUrl(window.location.href)) {
             // Permissions error will occur if trying to use the WebExtension API to inject into an extension page
             useWebExtensionApi = false;
         }
@@ -57,7 +60,7 @@ const dynamicLoader = (() => {
         }
 
         if (type === 'file-content') {
-            value = await yomichan.api.getStylesheetContent(value);
+            value = await yomitan.api.getStylesheetContent(value);
             type = 'code';
             useWebExtensionApi = false;
         }
@@ -69,7 +72,7 @@ const dynamicLoader = (() => {
             }
 
             setInjectedStylesheet(id, parentNode, null);
-            await yomichan.api.injectStylesheet(type, value);
+            await yomitan.api.injectStylesheet(type, value);
             return null;
         }
 
@@ -123,6 +126,7 @@ const dynamicLoader = (() => {
                 if (node !== null) { continue; }
 
                 const script = document.createElement('script');
+                script.type = 'module';
                 script.async = false;
                 script.src = url;
                 parent.appendChild(script);
@@ -137,19 +141,20 @@ const dynamicLoader = (() => {
 
         const sentinelEventName = 'dynamicLoaderSentinel';
         const sentinelEventCallback = (e) => {
-            if (e.script !== script) { return; }
-            yomichan.off(sentinelEventName, sentinelEventCallback);
+            if (e.script !== script.src) { return; }
+            yomitan.off(sentinelEventName, sentinelEventCallback);
             parent.removeChild(script);
             resolve();
         };
-        yomichan.on(sentinelEventName, sentinelEventCallback);
+        yomitan.on(sentinelEventName, sentinelEventCallback);
 
         try {
+            script.type = 'module';
             script.async = false;
             script.src = '/js/script/dynamic-loader-sentinel.js';
             parent.appendChild(script);
         } catch (e) {
-            yomichan.off(sentinelEventName, sentinelEventCallback);
+            yomitan.off(sentinelEventName, sentinelEventCallback);
             reject(e);
         }
     }
