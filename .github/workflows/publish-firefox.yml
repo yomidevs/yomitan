@@ -1,7 +1,6 @@
 name: publish-firefox
 on:
-  release:
-    types: [released]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:

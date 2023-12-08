@@ -1,0 +1,25 @@
+name: release
+on:
+  release:
+    types: [released]
+permissions: {}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+    steps:
+      - name: Dispatch publish-chrome
+        uses: aurelien-baudet/workflow-dispatch@93e95b157d791ae7f42aef8f8a0d3d723eba1c31 # pin@v2
+        with:
+          workflow: publish-chrome
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: false
+
+      - name: Dispatch publish-firefox
+        uses: aurelien-baudet/workflow-dispatch@93e95b157d791ae7f42aef8f8a0d3d723eba1c31 # pin@v2
+        with:
+          workflow: publish-firefox
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: false
