@@ -1,9 +1,8 @@
 # Yomitan <!-- omit from toc -->
 
-[![Chrome Release (Testing)](<https://img.shields.io/chrome-web-store/v/glnaenfapkkecknnmginabpmgkenenml?label=chrome%20release%20(testing)>)](https://chrome.google.com/webstore/detail/yomitan-development-build/glnaenfapkkecknnmginabpmgkenenml)
-[![Firefox Release (Testing)](<https://img.shields.io/github/v/release/themoeway/yomitan?filter=*&label=firefox%20release%20(testing)>)](https://github.com/themoeway/yomitan/releases)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
-[![Discord Server](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC)
+[![Chrome Release (Stable)](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&logoColor=lightblue&color=lightblue&label=chrome%20release%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn) [![Firefox Release (Stable)](<https://img.shields.io/amo/v/yomitan?logo=Firefox&color=orange&label=firefox%20release%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)  
+[![Chrome Release (Testing)](<https://img.shields.io/chrome-web-store/v/glnaenfapkkecknnmginabpmgkenenml?logo=Google%20Chrome&logoColor=lightblue&color=lightblue&label=chrome%20release%20(testing)>)](https://chrome.google.com/webstore/detail/yomitan-development-build/glnaenfapkkecknnmginabpmgkenenml) [![Firefox Release (Testing)](<https://img.shields.io/github/v/release/themoeway/yomitan?logo=Firefox&color=orange&filter=*&label=firefox%20release%20(testing)>)](https://github.com/themoeway/yomitan/releases)  
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan) [![Discord Server](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC)
 
 ## Project Introduction
 
@@ -78,11 +77,11 @@ submitting issues on GitHub, try the _testing_ version; otherwise, the _stable_ 
 
 - **Google Chrome**
 
-  - stable (not released yet)
+  - [stable](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn)
   - [testing](https://chrome.google.com/webstore/detail/yomitan-development-build/glnaenfapkkecknnmginabpmgkenenml)
 
 - **Mozilla Firefox**
-  - stable (not released yet)
+  - [stable](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
   - [testing](https://github.com/themoeway/yomitan/releases) ※
 
 ※ NOTE: Unlike Chrome, Firefox does not allow extensions meant for testing to be hosted in the marketplace.
