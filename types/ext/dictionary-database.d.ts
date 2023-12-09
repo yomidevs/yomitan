@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Scrub Caffeinated
  * Copyright (C) 2023  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,6 +58,7 @@ export type DatabaseTermEntry = {
 export type DatabaseTermEntryWithId = DatabaseTermEntry & DatabaseId;
 
 export type TermEntry = {
+    skip: boolean;
     index: number;
     matchType: MatchType;
     matchSource: MatchSource;

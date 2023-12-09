@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Scrub Caffeinated
  * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
@@ -1951,4 +1952,143 @@ button.footer-notification-close-button {
 
 :root[data-popup-display-mode=full-width] .frame-resizer-container {
     display: none;
+}
+
+/* https://github.com/seth-js/yomichan-de  */
+/* Seth's Custom CSS */
+.gloss-list {
+    list-style-type: decimal;
+}
+
+.tag[data-category='dictionary'] {
+    display: none;
+}
+
+.tag[data-category='masculine'] {
+    --tag-color: #0070ff;
+}
+
+.tag[data-category='feminine'] {
+    --tag-color: #ec3654;
+}
+
+.tag[data-category='neuter'] {
+    --tag-color: #269100;
+}
+
+.definition-tag-list {
+    display: inline;
+}
+
+.inflection {
+    color: var(--reason-text-color);
+    font-size: 12px;
+    font-style: italic;
+}
+
+.inflection-list {
+    display: none;
+}
+
+.inflection-separator+.inflection::before {
+    content: var(--inflection-separator);
+    padding: 0 0.25em;
+}
+
+div[data-section-type='frequencies'] {
+    display: none;
+}
+
+:root[data-theme='dark'] {
+    --text-color: white;
+}
+
+.headword-term {
+    font-weight: 300;
+}
+
+.entry {
+    padding: 30px 0;
+}
+
+*::-webkit-scrollbar {
+    width: 5px !important;
+}
+
+*::-webkit-scrollbar-thumb {
+    /* background: #777 !important; */
+    border-radius: 20px !important;
+}
+
+* {
+    /* scrollbar-color: #777 #000 !important; */
+    scrollbar-width: thin !important;
+}
+
+.gloss-list {
+    margin-top: 10px;
+}
+
+.gloss-item {
+    margin-bottom: 7px;
+}
+
+.entry-header {
+    margin-bottom: 10px;
+}
+
+.form-info-box {
+    display: none;
+    padding: 20px;
+    width: max-content;
+    box-shadow: 0 1px 12px rgb(0 0 0 / 12%), 0 1px 4px rgb(0 0 0 / 24%);
+    z-index: 1;
+    margin-top: 10px;
+}
+
+:root[data-theme="dark"] .form-info-box {
+    border: 1px solid #333;
+    background-color: #1e1e1e;
+}
+
+.form-info-box ol {
+    padding: 0;
+}
+
+.form-info-box li {
+    list-style-position: inside;
+}
+
+.show-info-btn {
+    width: max-content;
+    user-select: none;
+}
+
+.show-info-btn:hover {
+    cursor: help;
+}
+
+/* ruby {
+    display: inline-flex;
+    flex-direction: column-reverse;
+} */
+
+.pointer-text {
+    margin-bottom: 5px;
+    font-style: italic;
+}
+
+.automated-result-text {
+    font-size: 0.9em;
+    text-align: right;
+    margin-bottom: 5px;
+}
+
+.definition-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+html[data-page-type="popup"] .entry {
+    padding: 30px;
 }

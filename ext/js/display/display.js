@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Scrub Caffeinated
  * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2017-2022  Yomichan Authors
  *
@@ -16,24 +17,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Frontend} from '../app/frontend.js';
-import {PopupFactory} from '../app/popup-factory.js';
-import {ThemeController} from '../app/theme-controller.js';
-import {FrameEndpoint} from '../comm/frame-endpoint.js';
-import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, log, promiseTimeout} from '../core.js';
-import {PopupMenu} from '../dom/popup-menu.js';
-import {ScrollElement} from '../dom/scroll-element.js';
-import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
-import {TextScanner} from '../language/text-scanner.js';
-import {dynamicLoader} from '../script/dynamic-loader.js';
-import {yomitan} from '../yomitan.js';
-import {DisplayContentManager} from './display-content-manager.js';
-import {DisplayGenerator} from './display-generator.js';
-import {DisplayHistory} from './display-history.js';
-import {DisplayNotification} from './display-notification.js';
-import {ElementOverflowController} from './element-overflow-controller.js';
-import {OptionToggleHotkeyHandler} from './option-toggle-hotkey-handler.js';
-import {QueryParser} from './query-parser.js';
+import { Frontend } from '../app/frontend.js';
+import { PopupFactory } from '../app/popup-factory.js';
+import { ThemeController } from '../app/theme-controller.js';
+import { FrameEndpoint } from '../comm/frame-endpoint.js';
+import { DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, log, promiseTimeout } from '../core.js';
+import { PopupMenu } from '../dom/popup-menu.js';
+import { ScrollElement } from '../dom/scroll-element.js';
+import { HotkeyHelpController } from '../input/hotkey-help-controller.js';
+import { TextScanner } from '../language/text-scanner.js';
+import { dynamicLoader } from '../script/dynamic-loader.js';
+import { yomitan } from '../yomitan.js';
+import { DisplayContentManager } from './display-content-manager.js';
+import { DisplayGenerator } from './display-generator.js';
+import { DisplayHistory } from './display-history.js';
+import { DisplayNotification } from './display-notification.js';
+import { ElementOverflowController } from './element-overflow-controller.js';
+import { OptionToggleHotkeyHandler } from './option-toggle-hotkey-handler.js';
+import { QueryParser } from './query-parser.js';
 
 /**
  * @augments EventDispatcher<import('display').DisplayEventType>
@@ -68,7 +69,7 @@ export class Display extends EventDispatcher {
         /** @type {HTMLElement[]} */
         this._dictionaryEntryNodes = [];
         /** @type {import('settings').OptionsContext} */
-        this._optionsContext = {depth: 0, url: window.location.href};
+        this._optionsContext = { depth: 0, url: window.location.href };
         /** @type {?import('settings').ProfileOptions} */
         this._options = null;
         /** @type {number} */
@@ -96,7 +97,7 @@ export class Display extends EventDispatcher {
         /** @type {import('core').MessageHandlerMap} */
         this._windowMessageHandlers = new Map();
         /** @type {DisplayHistory} */
-        this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
+        this._history = new DisplayHistory({ clearable: true, useBrowserHistory: false });
         /** @type {boolean} */
         this._historyChangeIgnore = false;
         /** @type {boolean} */
@@ -196,27 +197,27 @@ export class Display extends EventDispatcher {
         this._themeController = new ThemeController(document.documentElement);
 
         this._hotkeyHandler.registerActions([
-            ['close',             () => { this._onHotkeyClose(); }],
-            ['nextEntry',         this._onHotkeyActionMoveRelative.bind(this, 1)],
-            ['previousEntry',     this._onHotkeyActionMoveRelative.bind(this, -1)],
-            ['lastEntry',         () => { this._focusEntry(this._dictionaryEntries.length - 1, 0, true); }],
-            ['firstEntry',        () => { this._focusEntry(0, 0, true); }],
-            ['historyBackward',   () => { this._sourceTermView(); }],
-            ['historyForward',    () => { this._nextTermView(); }],
+            ['close', () => { this._onHotkeyClose(); }],
+            ['nextEntry', this._onHotkeyActionMoveRelative.bind(this, 1)],
+            ['previousEntry', this._onHotkeyActionMoveRelative.bind(this, -1)],
+            ['lastEntry', () => { this._focusEntry(this._dictionaryEntries.length - 1, 0, true); }],
+            ['firstEntry', () => { this._focusEntry(0, 0, true); }],
+            ['historyBackward', () => { this._sourceTermView(); }],
+            ['historyForward', () => { this._nextTermView(); }],
             ['copyHostSelection', () => this._copyHostSelection()],
-            ['nextEntryDifferentDictionary',     () => { this._focusEntryWithDifferentDictionary(1, true); }],
+            ['nextEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(1, true); }],
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
         ]);
         this.registerDirectMessageHandlers([
-            ['Display.setOptionsContext', {async: true,  handler: this._onMessageSetOptionsContext.bind(this)}],
-            ['Display.setContent',        {async: false, handler: this._onMessageSetContent.bind(this)}],
-            ['Display.setCustomCss',      {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
-            ['Display.setContentScale',   {async: false, handler: this._onMessageSetContentScale.bind(this)}],
-            ['Display.configure',         {async: true,  handler: this._onMessageConfigure.bind(this)}],
-            ['Display.visibilityChanged', {async: false, handler: this._onMessageVisibilityChanged.bind(this)}]
+            ['Display.setOptionsContext', { async: true, handler: this._onMessageSetOptionsContext.bind(this) }],
+            ['Display.setContent', { async: false, handler: this._onMessageSetContent.bind(this) }],
+            ['Display.setCustomCss', { async: false, handler: this._onMessageSetCustomCss.bind(this) }],
+            ['Display.setContentScale', { async: false, handler: this._onMessageSetContentScale.bind(this) }],
+            ['Display.configure', { async: true, handler: this._onMessageConfigure.bind(this) }],
+            ['Display.visibilityChanged', { async: false, handler: this._onMessageVisibilityChanged.bind(this) }]
         ]);
         this.registerWindowMessageHandlers([
-            ['Display.extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
+            ['Display.extensionUnloaded', { async: false, handler: this._onMessageExtensionUnloaded.bind(this) }]
         ]);
     }
 
@@ -307,8 +308,8 @@ export class Display extends EventDispatcher {
         this._themeController.prepare();
 
         // State setup
-        const {documentElement} = document;
-        const {browser} = await yomitan.api.getEnvironmentInfo();
+        const { documentElement } = document;
+        const { browser } = await yomitan.api.getEnvironmentInfo();
         this._browser = browser;
 
         if (documentElement !== null) {
@@ -328,7 +329,7 @@ export class Display extends EventDispatcher {
         this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
         yomitan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         yomitan.crossFrame.registerHandlers([
-            ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
+            ['popupMessage', { async: 'dynamic', handler: this._onDirectMessage.bind(this) }]
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
 
@@ -338,7 +339,7 @@ export class Display extends EventDispatcher {
             documentElement.addEventListener('auxclick', this._onDocumentElementClick.bind(this), false);
         }
 
-        document.addEventListener('wheel', this._onWheel.bind(this), {passive: false});
+        document.addEventListener('wheel', this._onWheel.bind(this), { passive: false });
         if (this._closeButton !== null) {
             this._closeButton.addEventListener('click', this._onCloseButtonClick.bind(this), false);
         }
@@ -371,7 +372,7 @@ export class Display extends EventDispatcher {
     /**
      * @param {{clearable?: boolean, useBrowserHistory?: boolean}} details
      */
-    setHistorySettings({clearable, useBrowserHistory}) {
+    setHistorySettings({ clearable, useBrowserHistory }) {
         if (typeof clearable !== 'undefined') {
             this._history.clearable = clearable;
         }
@@ -413,7 +414,7 @@ export class Display extends EventDispatcher {
     /** */
     async updateOptions() {
         const options = await yomitan.api.optionsGet(this.getOptionsContext());
-        const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
+        const { scanning: scanningOptions, sentenceParsing: sentenceParsingOptions } = options;
         this._options = options;
 
         this._updateHotkeys(options);
@@ -450,7 +451,7 @@ export class Display extends EventDispatcher {
         this._updateContentTextScanner(options);
 
         /** @type {import('display').OptionsUpdatedEvent} */
-        const event = {options};
+        const event = { options };
         this.trigger('optionsUpdated', event);
     }
 
@@ -459,7 +460,7 @@ export class Display extends EventDispatcher {
      * @param {import('display').ContentDetails} details Information about the content to show.
      */
     setContent(details) {
-        const {focus, params, state, content} = details;
+        const { focus, params, state, content } = details;
         const historyMode = this._historyHasChanged ? details.historyMode : 'clear';
 
         if (focus) {
@@ -549,19 +550,19 @@ export class Display extends EventDispatcher {
         const type = this._contentType;
         if (type === 'clear') { return; }
         const query = this._query;
-        const {state} = this._history;
+        const { state } = this._history;
         const hasState = typeof state === 'object' && state !== null;
         /** @type {import('display').HistoryState} */
         const newState = (
             hasState ?
-            clone(state) :
-            {
-                focusEntry: 0,
-                optionsContext: void 0,
-                url: window.location.href,
-                sentence: {text: query, offset: 0},
-                documentTitle: document.title
-            }
+                clone(state) :
+                {
+                    focusEntry: 0,
+                    optionsContext: void 0,
+                    url: window.location.href,
+                    sentence: { text: query, offset: 0 },
+                    documentTitle: document.title
+                }
         );
         if (!hasState || updateOptionsContext) {
             newState.optionsContext = clone(this._optionsContext);
@@ -585,7 +586,7 @@ export class Display extends EventDispatcher {
      * @param {import('core').SerializableObject} [params]
      * @returns {Promise<TReturn>}
      */
-    async invokeContentOrigin(action, params={}) {
+    async invokeContentOrigin(action, params = {}) {
         if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
             throw new Error('Content origin is same page');
         }
@@ -601,7 +602,7 @@ export class Display extends EventDispatcher {
      * @param {import('core').SerializableObject} [params]
      * @returns {Promise<TReturn>}
      */
-    async invokeParentFrame(action, params={}) {
+    async invokeParentFrame(action, params = {}) {
         if (this._parentFrameId === null || this._parentFrameId === this._frameId) {
             throw new Error('Invalid parent frame');
         }
@@ -615,7 +616,7 @@ export class Display extends EventDispatcher {
     getElementDictionaryEntryIndex(element) {
         const node = /** @type {?HTMLElement} */ (element.closest('.entry'));
         if (node === null) { return -1; }
-        const {index} = node.dataset;
+        const { index } = node.dataset;
         if (typeof index !== 'string') { return -1; }
         const indexNumber = parseInt(index, 10);
         return Number.isFinite(indexNumber) ? indexNumber : -1;
@@ -642,13 +643,13 @@ export class Display extends EventDispatcher {
      * @throws {Error}
      */
     _onDirectMessage(data) {
-        const {action, params} = this._authenticateMessageData(data);
+        const { action, params } = this._authenticateMessageData(data);
         const handlerInfo = this._directMessageHandlers.get(action);
         if (typeof handlerInfo === 'undefined') {
             throw new Error(`Invalid action: ${action}`);
         }
 
-        const {async, handler} = handlerInfo;
+        const { async, handler } = handlerInfo;
         const result = handler(params);
         return {
             async: typeof async === 'boolean' && async,
@@ -659,7 +660,7 @@ export class Display extends EventDispatcher {
     /**
      * @param {MessageEvent<import('frame-client').Message<import('display').MessageDetails>>} details
      */
-    _onWindowMessage({data}) {
+    _onWindowMessage({ data }) {
         let data2;
         try {
             data2 = this._authenticateMessageData(data);
@@ -667,18 +668,18 @@ export class Display extends EventDispatcher {
             return;
         }
 
-        const {action, params} = data2;
+        const { action, params } = data2;
         const messageHandler = this._windowMessageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return; }
 
-        const callback = () => {}; // NOP
+        const callback = () => { }; // NOP
         invokeMessageHandler(messageHandler, params, callback);
     }
 
     /**
      * @param {{optionsContext: import('settings').OptionsContext}} details
      */
-    async _onMessageSetOptionsContext({optionsContext}) {
+    async _onMessageSetOptionsContext({ optionsContext }) {
         await this.setOptionsContext(optionsContext);
         this.searchLast(true);
     }
@@ -686,28 +687,28 @@ export class Display extends EventDispatcher {
     /**
      * @param {{details: import('display').ContentDetails}} details
      */
-    _onMessageSetContent({details}) {
+    _onMessageSetContent({ details }) {
         this.setContent(details);
     }
 
     /**
      * @param {{css: string}} details
      */
-    _onMessageSetCustomCss({css}) {
+    _onMessageSetCustomCss({ css }) {
         this.setCustomCss(css);
     }
 
     /**
      * @param {{scale: number}} details
      */
-    _onMessageSetContentScale({scale}) {
+    _onMessageSetContentScale({ scale }) {
         this._setContentScale(scale);
     }
 
     /**
      * @param {import('display').ConfigureMessageDetails} details
      */
-    async _onMessageConfigure({depth, parentPopupId, parentFrameId, childrenSupported, scale, optionsContext}) {
+    async _onMessageConfigure({ depth, parentPopupId, parentFrameId, childrenSupported, scale, optionsContext }) {
         this._depth = depth;
         this._parentPopupId = parentPopupId;
         this._parentFrameId = parentFrameId;
@@ -719,10 +720,10 @@ export class Display extends EventDispatcher {
     /**
      * @param {{value: boolean}} details
      */
-    _onMessageVisibilityChanged({value}) {
+    _onMessageVisibilityChanged({ value }) {
         this._frameVisible = value;
         /** @type {import('display').FrameVisibilityChangeEvent} */
-        const event = {value};
+        const event = { value };
         this.trigger('frameVisibilityChange', event);
     }
 
@@ -803,7 +804,7 @@ export class Display extends EventDispatcher {
     /**
      * @param {import('display').QueryParserSearchedEvent} details
      */
-    _onQueryParserSearch({type, dictionaryEntries, sentence, inputInfo: {eventType}, textSource, optionsContext, sentenceOffset}) {
+    _onQueryParserSearch({ type, dictionaryEntries, sentence, inputInfo: { eventType }, textSource, optionsContext, sentenceOffset }) {
         const query = textSource.text();
         const historyState = this._history.state;
         const historyMode = (
@@ -837,7 +838,7 @@ export class Display extends EventDispatcher {
         const details = {
             focus: false,
             historyMode: 'clear',
-            params: {type},
+            params: { type },
             state: {},
             content: {
                 contentOrigin: {
@@ -876,7 +877,7 @@ export class Display extends EventDispatcher {
     /**
      * @param {import('dynamic-property').ChangeEventDetails<boolean>} details
      */
-    _onProgressIndicatorVisibleChanged({value}) {
+    _onProgressIndicatorVisibleChanged({ value }) {
         if (this._progressIndicatorTimer !== null) {
             clearTimeout(this._progressIndicatorTimer);
             this._progressIndicatorTimer = null;
@@ -901,10 +902,10 @@ export class Display extends EventDispatcher {
     async _onKanjiLookup(e) {
         try {
             e.preventDefault();
-            const {state} = this._history;
+            const { state } = this._history;
             if (!(typeof state === 'object' && state !== null)) { return; }
 
-            let {sentence, url, documentTitle} = state;
+            let { sentence, url, documentTitle } = state;
             if (typeof url !== 'string') { url = window.location.href; }
             if (typeof documentTitle !== 'string') { documentTitle = document.title; }
             const optionsContext = this.getOptionsContext();
@@ -1019,7 +1020,7 @@ export class Display extends EventDispatcher {
     _onEntryClick(e) {
         if (e.button !== 0) { return; }
         const node = /** @type {HTMLElement} */ (e.currentTarget);
-        const {index} = node.dataset;
+        const { index } = node.dataset;
         if (typeof index !== 'string') { return; }
         const indexNumber = parseInt(index, 10);
         if (!Number.isFinite(indexNumber)) { return; }
@@ -1066,7 +1067,7 @@ export class Display extends EventDispatcher {
      */
     _onMenuButtonMenuClose(e) {
         const node = /** @type {HTMLElement} */ (e.currentTarget);
-        const {action} = e.detail;
+        const { action } = e.detail;
         switch (action) {
             case 'log-debug-info':
                 this._logDictionaryEntryData(this.getElementDictionaryEntryIndex(node));
@@ -1127,8 +1128,8 @@ export class Display extends EventDispatcher {
      * @param {import('settings').ProfileOptions} options
      */
     _setTheme(options) {
-        const {general} = options;
-        const {popupTheme} = general;
+        const { general } = options;
+        const { popupTheme } = general;
         this._themeController.theme = popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;
         this._themeController.updateTheme();
@@ -1163,8 +1164,87 @@ export class Display extends EventDispatcher {
                 }
             }
 
-            const {dictionaryEntries} = await yomitan.api.termsFind(source, findDetails, optionsContext);
+            /* https://github.com/seth-js/yomichan-de */
+            /**
+             * @type {string[]}
+             */
+            const matchedDefs = [];
+            /**
+             * @type {any[] | PromiseLike<import("dictionary").DictionaryEntry[]>}
+             */
+            const dictionaryEntries = [];
+
+            /**
+             * 
+             * @param {string} text 
+             * @returns {string}
+             */
+            function firstCharLower(text) {
+                /**
+                 * @type {string[]}
+                 */
+                let chars = [];
+
+                text.split('').forEach((char) => chars.push(char));
+
+                chars[0] = chars[0].toLowerCase();
+
+                return chars.join('');
+            }
+
+            /**
+             * 
+             * @param {string} text 
+             * @returns {string}
+             */
+            function firstCharUpper(text) {
+                /**
+                 * @type {string[]}
+                 */
+                let chars = [];
+
+                text.split('').forEach((char) => chars.push(char));
+
+                chars[0] = chars[0].toUpperCase();
+
+                return chars.join('');
+            }
+
+            const searches = [
+                firstCharLower(source),
+                firstCharUpper(source),
+                source.toLowerCase(),
+                source,
+            ];
+
+            // handle english apostrophe
+            if (/'|´/.test(source) && !/^'|^´/.test(source)) {
+                const noApostrophe = source.replace(/'.+/, '').replace(/´.+/, '');
+                searches.push(...[firstCharLower(noApostrophe), firstCharUpper(noApostrophe), noApostrophe.toLowerCase()]);
+            }
+
+            for (const search of searches) {
+                const result = await yomitan.api.termsFind(
+                    search,
+                    findDetails,
+                    optionsContext,
+                );
+
+                if (result.dictionaryEntries.length > 0) {
+                    result.dictionaryEntries.forEach((entry) => {
+                        const { definitions } = entry;
+
+                        // avoid duplicate results
+                        if (!matchedDefs.includes(JSON.stringify(definitions))) {
+                            matchedDefs.push(JSON.stringify(definitions));
+                            dictionaryEntries.push(entry);
+                        }
+                    });
+                }
+            }
+
             return dictionaryEntries;
+
         }
     }
 
@@ -1190,7 +1270,7 @@ export class Display extends EventDispatcher {
         }
         this._setQuery(query, queryFull, queryOffset);
 
-        let {state, content} = this._history;
+        let { state, content } = this._history;
         let changeHistory = false;
         if (!(typeof content === 'object' && content !== null)) {
             content = {};
@@ -1201,7 +1281,7 @@ export class Display extends EventDispatcher {
             changeHistory = true;
         }
 
-        let {focusEntry, scrollX, scrollY, optionsContext} = state;
+        let { focusEntry, scrollX, scrollY, optionsContext } = state;
         if (typeof focusEntry !== 'number') { focusEntry = 0; }
         if (!(typeof optionsContext === 'object' && optionsContext !== null)) {
             optionsContext = this.getOptionsContext();
@@ -1209,7 +1289,7 @@ export class Display extends EventDispatcher {
             changeHistory = true;
         }
 
-        let {dictionaryEntries} = content;
+        let { dictionaryEntries } = content;
         if (!Array.isArray(dictionaryEntries)) {
             dictionaryEntries = lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, wildcardsEnabled, optionsContext) : [];
             if (this._setContentToken !== token) { return; }
@@ -1218,9 +1298,9 @@ export class Display extends EventDispatcher {
         }
 
         let contentOriginValid = false;
-        const {contentOrigin} = content;
+        const { contentOrigin } = content;
         if (typeof contentOrigin === 'object' && contentOrigin !== null) {
-            const {tabId, frameId} = contentOrigin;
+            const { tabId, frameId } = contentOrigin;
             if (typeof tabId === 'number' && typeof frameId === 'number') {
                 this._contentOriginTabId = tabId;
                 this._contentOriginFrameId = frameId;
@@ -1263,8 +1343,8 @@ export class Display extends EventDispatcher {
             const dictionaryEntry = dictionaryEntries[i];
             const entry = (
                 dictionaryEntry.type === 'term' ?
-                this._displayGenerator.createTermEntry(dictionaryEntry) :
-                this._displayGenerator.createKanjiEntry(dictionaryEntry)
+                    this._displayGenerator.createTermEntry(dictionaryEntry) :
+                    this._displayGenerator.createKanjiEntry(dictionaryEntry)
             );
             entry.dataset.index = `${i}`;
             this._dictionaryEntryNodes.push(entry);
@@ -1279,12 +1359,112 @@ export class Display extends EventDispatcher {
         }
 
         if (typeof scrollX === 'number' || typeof scrollY === 'number') {
-            let {x, y} = this._windowScroll;
+            let { x, y } = this._windowScroll;
             if (typeof scrollX === 'number') { x = scrollX; }
             if (typeof scrollY === 'number') { y = scrollY; }
             this._windowScroll.stop();
             this._windowScroll.to(x, y);
         }
+
+        /* https://github.com/seth-js/yomichan-de */
+        for (const entryElem of Array.from(document.querySelectorAll('#dictionary-entries .entry'))) {
+            const formBoxes = {};
+
+            for (const inflectElem of entryElem.querySelectorAll('.inflection')) {
+                if (inflectElem == undefined) return;
+                if (inflectElem.textContent == undefined) return;
+
+                const [targetPOS] = inflectElem.textContent.split(' ');
+
+                let _inflectText = inflectElem.textContent.split(' ');
+                _inflectText.shift();
+                let inflectText = _inflectText.join(' ');
+
+                if (!formBoxes[targetPOS]) formBoxes[targetPOS] = {};
+                if (!formBoxes[targetPOS]['inflections'])
+                    formBoxes[targetPOS]['inflections'] = [];
+                formBoxes[targetPOS]['isAutomated'] = false;
+
+                if (/-automated-/.test(inflectText)) {
+                    inflectText = inflectText.replace(/^-.+?- /, '');
+                    formBoxes[targetPOS]['isAutomated'] = true;
+                }
+
+                const pointerText = inflectText.replace(/\}.+/, '').replace(/\{/, '');
+                inflectText = inflectText.replace(/\{.+?\} /, '');
+
+                formBoxes[targetPOS]['pointerText'] = pointerText;
+
+                formBoxes[targetPOS]['inflections'].push(inflectText);
+            }
+
+            for (const defElem of Array.from(entryElem.querySelectorAll('.definition-item'))) {
+                for (const tagElem of Array.from(defElem.querySelectorAll('.tag[data-category="partOfSpeech"]'))) {
+                    const pos = tagElem.textContent;
+                    if (pos == null) return;
+                    if (formBoxes[pos]) {
+                        const formInfoBox = document.createElement('div');
+
+                        formInfoBox.classList.add('form-info-box');
+
+                        if (formBoxes[pos].isAutomated) {
+                            const automatedNotice = document.createElement('div');
+                            automatedNotice.classList.add('automated-result-text');
+                            automatedNotice.textContent = '(automated results)';
+                            formInfoBox.appendChild(automatedNotice);
+                        }
+
+                        const pointerElem = document.createElement('div');
+                        pointerElem.classList.add('pointer-text');
+                        pointerElem.textContent = formBoxes[pos].pointerText;
+                        formInfoBox.appendChild(pointerElem);
+
+                        const reasonList = document.createElement('ol');
+
+                        for (const reason of formBoxes[pos].inflections) {
+                            const item = document.createElement('li');
+                            item.textContent = reason;
+                            reasonList.appendChild(item);
+                        }
+
+                        formInfoBox.appendChild(reasonList);
+
+                        const definitionTagList = defElem.querySelector('.definition-tag-list');
+                        if (definitionTagList == undefined) return;
+                        definitionTagList.append(formInfoBox);
+                    }
+                }
+
+                if (defElem.querySelector('.form-info-box')) {
+                    defElem.addEventListener('mouseleave', (e) => {
+                        for (const boxElem of Array.from(defElem.querySelectorAll('.form-info-box'))) {
+                            // Element does not have a 'style' property, but HTMLElement does implement it
+                            // @ts-ignore
+                            boxElem.style.display = 'none';
+                        }
+                    });
+
+                    const showBoxIcon = document.createElement('span');
+                    showBoxIcon.textContent = 'ⓘ';
+                    showBoxIcon.classList.add('show-info-btn');
+
+                    showBoxIcon.addEventListener('mouseenter', (e) => {
+                        for (const boxElem of Array.from(defElem.querySelectorAll('.form-info-box'))) {
+                            // Element does not have a 'style' property, but HTMLElement does implement it
+                            // @ts-ignore
+                            boxElem.style.display = 'block';
+                        }
+                    });
+
+                    let formIntoBox = defElem.querySelector('.form-info-box');
+                    if (formIntoBox == undefined) return;
+                    formIntoBox.before(showBoxIcon);
+                }
+            }
+        }
+
+        // ==============================
+
 
         this._triggerContentUpdateComplete();
     }
@@ -1394,7 +1574,7 @@ export class Display extends EventDispatcher {
      * @param {boolean} next
      */
     _updateNavigation(previous, next) {
-        const {documentElement} = document;
+        const { documentElement } = document;
         if (documentElement !== null) {
             documentElement.dataset.hasNavigationPrevious = `${previous}`;
             documentElement.dataset.hasNavigationNext = `${next}`;
@@ -1474,11 +1654,11 @@ export class Display extends EventDispatcher {
 
         let focusDefinitionIndex = null;
         if (dictionaryEntry.type === 'term') {
-            const {dictionary} = dictionaryEntry.definitions[visibleDefinitionIndex];
+            const { dictionary } = dictionaryEntry.definitions[visibleDefinitionIndex];
             for (let i = index; i >= 0 && i < count; i += sign) {
                 const otherDictionaryEntry = this._dictionaryEntries[i];
                 if (otherDictionaryEntry.type !== 'term') { continue; }
-                const {definitions} = otherDictionaryEntry;
+                const { definitions } = otherDictionaryEntry;
                 const jj = definitions.length;
                 let j = (i === index ? visibleDefinitionIndex + sign : (sign > 0 ? 0 : jj - 1));
                 for (; j >= 0 && j < jj; j += sign) {
@@ -1504,9 +1684,9 @@ export class Display extends EventDispatcher {
      * @returns {?number}
      */
     _getDictionaryEntryVisibleDefinitionIndex(index, sign) {
-        const {top: scrollTop, bottom: scrollBottom} = this._windowScroll.getRect();
+        const { top: scrollTop, bottom: scrollBottom } = this._windowScroll.getRect();
 
-        const {definitions} = this._dictionaryEntries[index];
+        const { definitions } = this._dictionaryEntries[index];
         const nodes = this._getDictionaryEntryDefinitionNodes(index);
         const definitionCount = Math.min(definitions.length, nodes.length);
         if (definitionCount <= 0) { return null; }
@@ -1514,7 +1694,7 @@ export class Display extends EventDispatcher {
         let visibleIndex = null;
         let visibleCoverage = 0;
         for (let i = (sign > 0 ? 0 : definitionCount - 1); i >= 0 && i < definitionCount; i += sign) {
-            const {top, bottom} = nodes[i].getBoundingClientRect();
+            const { top, bottom } = nodes[i].getBoundingClientRect();
             if (bottom <= scrollTop || top >= scrollBottom) { continue; }
             const top2 = Math.max(scrollTop, Math.min(scrollBottom, top));
             const bottom2 = Math.max(scrollTop, Math.min(scrollBottom, bottom));
@@ -1579,7 +1759,7 @@ export class Display extends EventDispatcher {
 
     /** */
     _updateHistoryState() {
-        const {state, content} = this._history;
+        const { state, content } = this._history;
         if (!(typeof state === 'object' && state !== null)) { return; }
 
         state.focusEntry = this._index;
@@ -1639,8 +1819,8 @@ export class Display extends EventDispatcher {
     _isQueryParserVisible() {
         return (
             this._queryParserVisibleOverride !== null ?
-            this._queryParserVisibleOverride :
-            this._queryParserVisible
+                this._queryParserVisibleOverride :
+                this._queryParserVisible
         );
     }
 
@@ -1678,8 +1858,8 @@ export class Display extends EventDispatcher {
             typeof this._tabId === 'number' &&
             (
                 (isSearchPage) ?
-                (options.scanning.enableOnSearchPage) :
-                (this._depth < options.scanning.popupNestingMaxDepth)
+                    (options.scanning.enableOnSearchPage) :
+                    (this._depth < options.scanning.popupNestingMaxDepth)
             )
         );
 
@@ -1855,12 +2035,12 @@ export class Display extends EventDispatcher {
             this._contentTextScanner.on('searched', this._onContentTextScannerSearched.bind(this));
         }
 
-        const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
+        const { scanning: scanningOptions, sentenceParsing: sentenceParsingOptions } = options;
         this._contentTextScanner.setOptions({
             inputs: [{
                 include: 'mouse0',
                 exclude: '',
-                types: {mouse: true, pen: false, touch: false},
+                types: { mouse: true, pen: false, touch: false },
                 options: {
                     searchTerms: true,
                     searchKanji: true,
@@ -1899,7 +2079,7 @@ export class Display extends EventDispatcher {
     /**
      * @param {import('text-scanner').SearchedEventDetails} details
      */
-    _onContentTextScannerSearched({type, dictionaryEntries, sentence, textSource, optionsContext, error}) {
+    _onContentTextScannerSearched({ type, dictionaryEntries, sentence, textSource, optionsContext, error }) {
         if (error !== null && !yomitan.isExtensionUnloaded) {
             log.error(error);
         }
@@ -1938,7 +2118,7 @@ export class Display extends EventDispatcher {
      * @type {import('display').GetSearchContextCallback}
      */
     _getSearchContext() {
-        return {optionsContext: this.getOptionsContext()};
+        return { optionsContext: this.getOptionsContext() };
     }
 
     /**
@@ -2014,12 +2194,12 @@ export class Display extends EventDispatcher {
     async _logDictionaryEntryData(index) {
         if (index < 0 || index >= this._dictionaryEntries.length) { return; }
         const dictionaryEntry = this._dictionaryEntries[index];
-        const result = {dictionaryEntry};
+        const result = { dictionaryEntry };
 
         /** @type {Promise<unknown>[]} */
         const promises = [];
         /** @type {import('display').LogDictionaryEntryDataEvent} */
-        const event = {dictionaryEntry, promises};
+        const event = { dictionaryEntry, promises };
         this.trigger('logDictionaryEntryData', event);
         if (promises.length > 0) {
             for (const result2 of await Promise.all(promises)) {
@@ -2038,7 +2218,7 @@ export class Display extends EventDispatcher {
     /** */
     _triggerContentUpdateStart() {
         /** @type {import('display').ContentUpdateStartEvent} */
-        const event = {type: this._contentType, query: this._query};
+        const event = { type: this._contentType, query: this._query };
         this.trigger('contentUpdateStart', event);
     }
 
@@ -2049,14 +2229,14 @@ export class Display extends EventDispatcher {
      */
     _triggerContentUpdateEntry(dictionaryEntry, element, index) {
         /** @type {import('display').ContentUpdateEntryEvent} */
-        const event = {dictionaryEntry, element, index};
+        const event = { dictionaryEntry, element, index };
         this.trigger('contentUpdateEntry', event);
     }
 
     /** */
     _triggerContentUpdateComplete() {
         /** @type {import('display').ContentUpdateCompleteEvent} */
-        const event = {type: this._contentType};
+        const event = { type: this._contentType };
         this.trigger('contentUpdateComplete', event);
     }
 }
