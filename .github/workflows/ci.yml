@@ -31,7 +31,9 @@ jobs:
           CI: true
 
       - name: Validate JS Types
-        run: npm run test-ts
+        run: |
+          npm run build-libs
+          npm run test-ts
         env:
           CI: true
 
