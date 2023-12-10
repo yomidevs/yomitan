@@ -56,6 +56,7 @@ export class Timer {
         Timer.current = this.parent;
         if (this.parent === null) {
             if (!skip) {
+                // eslint-disable-next-line no-console
                 console.log(this.toString());
             }
         } else {
