@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Scrub Caffeinated
  * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2017-2022  Yomichan Authors
  *
@@ -34,6 +35,42 @@ import {DisplayNotification} from './display-notification.js';
 import {ElementOverflowController} from './element-overflow-controller.js';
 import {OptionToggleHotkeyHandler} from './option-toggle-hotkey-handler.js';
 import {QueryParser} from './query-parser.js';
+
+/**
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+function firstCharLower(text) {
+    /**
+     * @type {string[]}
+     */
+    const chars = [];
+
+    text.split('').forEach((char) => chars.push(char));
+
+    chars[0] = chars[0].toLowerCase();
+
+    return chars.join('');
+}
+
+/**
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+function firstCharUpper(text) {
+    /**
+     * @type {string[]}
+     */
+    const chars = [];
+
+    text.split('').forEach((char) => chars.push(char));
+
+    chars[0] = chars[0].toUpperCase();
+
+    return chars.join('');
+}
 
 /**
  * @augments EventDispatcher<import('display').DisplayEventType>
@@ -196,23 +233,23 @@ export class Display extends EventDispatcher {
         this._themeController = new ThemeController(document.documentElement);
 
         this._hotkeyHandler.registerActions([
-            ['close',             () => { this._onHotkeyClose(); }],
-            ['nextEntry',         this._onHotkeyActionMoveRelative.bind(this, 1)],
-            ['previousEntry',     this._onHotkeyActionMoveRelative.bind(this, -1)],
-            ['lastEntry',         () => { this._focusEntry(this._dictionaryEntries.length - 1, 0, true); }],
-            ['firstEntry',        () => { this._focusEntry(0, 0, true); }],
-            ['historyBackward',   () => { this._sourceTermView(); }],
-            ['historyForward',    () => { this._nextTermView(); }],
+            ['close', () => { this._onHotkeyClose(); }],
+            ['nextEntry', this._onHotkeyActionMoveRelative.bind(this, 1)],
+            ['previousEntry', this._onHotkeyActionMoveRelative.bind(this, -1)],
+            ['lastEntry', () => { this._focusEntry(this._dictionaryEntries.length - 1, 0, true); }],
+            ['firstEntry', () => { this._focusEntry(0, 0, true); }],
+            ['historyBackward', () => { this._sourceTermView(); }],
+            ['historyForward', () => { this._nextTermView(); }],
             ['copyHostSelection', () => this._copyHostSelection()],
-            ['nextEntryDifferentDictionary',     () => { this._focusEntryWithDifferentDictionary(1, true); }],
+            ['nextEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(1, true); }],
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
         ]);
         this.registerDirectMessageHandlers([
-            ['Display.setOptionsContext', {async: true,  handler: this._onMessageSetOptionsContext.bind(this)}],
-            ['Display.setContent',        {async: false, handler: this._onMessageSetContent.bind(this)}],
-            ['Display.setCustomCss',      {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
-            ['Display.setContentScale',   {async: false, handler: this._onMessageSetContentScale.bind(this)}],
-            ['Display.configure',         {async: true,  handler: this._onMessageConfigure.bind(this)}],
+            ['Display.setOptionsContext', {async: true, handler: this._onMessageSetOptionsContext.bind(this)}],
+            ['Display.setContent', {async: false, handler: this._onMessageSetContent.bind(this)}],
+            ['Display.setCustomCss', {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
+            ['Display.setContentScale', {async: false, handler: this._onMessageSetContentScale.bind(this)}],
+            ['Display.configure', {async: true, handler: this._onMessageConfigure.bind(this)}],
             ['Display.visibilityChanged', {async: false, handler: this._onMessageVisibilityChanged.bind(this)}]
         ]);
         this.registerWindowMessageHandlers([
@@ -554,14 +591,14 @@ export class Display extends EventDispatcher {
         /** @type {import('display').HistoryState} */
         const newState = (
             hasState ?
-            clone(state) :
-            {
-                focusEntry: 0,
-                optionsContext: void 0,
-                url: window.location.href,
-                sentence: {text: query, offset: 0},
-                documentTitle: document.title
-            }
+                clone(state) :
+                {
+                    focusEntry: 0,
+                    optionsContext: void 0,
+                    url: window.location.href,
+                    sentence: {text: query, offset: 0},
+                    documentTitle: document.title
+                }
         );
         if (!hasState || updateOptionsContext) {
             newState.optionsContext = clone(this._optionsContext);
@@ -585,7 +622,7 @@ export class Display extends EventDispatcher {
      * @param {import('core').SerializableObject} [params]
      * @returns {Promise<TReturn>}
      */
-    async invokeContentOrigin(action, params={}) {
+    async invokeContentOrigin(action, params = {}) {
         if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
             throw new Error('Content origin is same page');
         }
@@ -601,7 +638,7 @@ export class Display extends EventDispatcher {
      * @param {import('core').SerializableObject} [params]
      * @returns {Promise<TReturn>}
      */
-    async invokeParentFrame(action, params={}) {
+    async invokeParentFrame(action, params = {}) {
         if (this._parentFrameId === null || this._parentFrameId === this._frameId) {
             throw new Error('Invalid parent frame');
         }
@@ -671,7 +708,7 @@ export class Display extends EventDispatcher {
         const messageHandler = this._windowMessageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return; }
 
-        const callback = () => {}; // NOP
+        const callback = () => { }; // NOP
         invokeMessageHandler(messageHandler, params, callback);
     }
 
@@ -1163,7 +1200,49 @@ export class Display extends EventDispatcher {
                 }
             }
 
-            const {dictionaryEntries} = await yomitan.api.termsFind(source, findDetails, optionsContext);
+            /* https://github.com/seth-js/yomichan-de */
+            /**
+             * @type {string[]}
+             */
+            const matchedDefs = [];
+            /**
+             * @type {any[] | PromiseLike<import("dictionary").DictionaryEntry[]>}
+             */
+            const dictionaryEntries = [];
+
+            const searches = [
+                firstCharLower(source),
+                firstCharUpper(source),
+                source.toLowerCase(),
+                source
+            ];
+
+            // handle english apostrophe
+            if (/'|´/.test(source) && !/^'|^´/.test(source)) {
+                const noApostrophe = source.replace(/'.+/, '').replace(/´.+/, '');
+                searches.push(...[firstCharLower(noApostrophe), firstCharUpper(noApostrophe), noApostrophe.toLowerCase()]);
+            }
+
+            for (const search of searches) {
+                const result = await yomitan.api.termsFind(
+                    search,
+                    findDetails,
+                    optionsContext
+                );
+
+                if (result.dictionaryEntries.length > 0) {
+                    result.dictionaryEntries.forEach((entry) => {
+                        const {definitions} = entry;
+
+                        // avoid duplicate results
+                        if (!matchedDefs.includes(JSON.stringify(definitions))) {
+                            matchedDefs.push(JSON.stringify(definitions));
+                            dictionaryEntries.push(entry);
+                        }
+                    });
+                }
+            }
+
             return dictionaryEntries;
         }
     }
@@ -1263,8 +1342,8 @@ export class Display extends EventDispatcher {
             const dictionaryEntry = dictionaryEntries[i];
             const entry = (
                 dictionaryEntry.type === 'term' ?
-                this._displayGenerator.createTermEntry(dictionaryEntry) :
-                this._displayGenerator.createKanjiEntry(dictionaryEntry)
+                    this._displayGenerator.createTermEntry(dictionaryEntry) :
+                    this._displayGenerator.createKanjiEntry(dictionaryEntry)
             );
             entry.dataset.index = `${i}`;
             this._dictionaryEntryNodes.push(entry);
@@ -1285,6 +1364,102 @@ export class Display extends EventDispatcher {
             this._windowScroll.stop();
             this._windowScroll.to(x, y);
         }
+
+        /* https://github.com/seth-js/yomichan-de */
+        for (const entryElem of Array.from(document.querySelectorAll('#dictionary-entries .entry'))) {
+            const formBoxes = new Map();
+
+            for (const inflectElem of entryElem.querySelectorAll('.inflection')) {
+                if (inflectElem.textContent === null) { return; }
+
+                const [targetPOS] = inflectElem.textContent.split(' ');
+
+                const inflectTextArr = inflectElem.textContent.split(' ');
+                inflectTextArr.shift();
+                let inflectText = inflectTextArr.join(' ');
+
+                if (typeof formBoxes.get(targetPOS) === 'undefined') { formBoxes.set(targetPOS, {}); }
+                const targetPOSBox = formBoxes.get(targetPOS);
+
+                if (!targetPOSBox.inflections) { targetPOSBox.inflections = []; }
+                targetPOSBox.isAutomated = false;
+
+                if (/-automated-/.test(inflectText)) {
+                    inflectText = inflectText.replace(/^-.+?- /, '');
+                    targetPOSBox.isAutomated = true;
+                }
+
+                const pointerText = inflectText.replace(/\}.+/, '').replace(/\{/, '');
+                inflectText = inflectText.replace(/\{.+?\} /, '');
+
+                targetPOSBox.pointerText = pointerText;
+
+                targetPOSBox.inflections.push(inflectText);
+            }
+
+            for (const defElem of Array.from(entryElem.querySelectorAll('.definition-item'))) {
+                for (const tagElem of Array.from(defElem.querySelectorAll('.tag[data-category="partOfSpeech"]'))) {
+                    const pos = tagElem.textContent;
+                    if (pos === null) { return; }
+                    if (formBoxes.get(pos)) {
+                        const formInfoBox = document.createElement('div');
+
+                        formInfoBox.classList.add('form-info-box');
+
+                        if (formBoxes.get(pos).isAutomated) {
+                            const automatedNotice = document.createElement('div');
+                            automatedNotice.classList.add('automated-result-text');
+                            automatedNotice.textContent = '(automated results)';
+                            formInfoBox.appendChild(automatedNotice);
+                        }
+
+                        const pointerElem = document.createElement('div');
+                        pointerElem.classList.add('pointer-text');
+                        pointerElem.textContent = formBoxes.get(pos).pointerText;
+                        formInfoBox.appendChild(pointerElem);
+
+                        const reasonList = document.createElement('ol');
+
+                        for (const reason of formBoxes.get(pos).inflections) {
+                            const item = document.createElement('li');
+                            item.textContent = reason;
+                            reasonList.appendChild(item);
+                        }
+
+                        formInfoBox.appendChild(reasonList);
+
+                        const definitionTagList = defElem.querySelector('.definition-tag-list');
+                        if (definitionTagList === null) { return; }
+                        definitionTagList.append(formInfoBox);
+                    }
+                }
+
+                if (defElem.querySelector('.form-info-box')) {
+                    defElem.addEventListener('mouseleave', (e) => {
+                        for (const boxElem of /** @type {NodeListOf<HTMLElement>} */ (defElem.querySelectorAll('.form-info-box'))) {
+                            boxElem.style.display = 'none';
+                        }
+                    });
+
+                    const showBoxIcon = document.createElement('span');
+                    showBoxIcon.textContent = 'ⓘ';
+                    showBoxIcon.classList.add('show-info-btn');
+
+                    showBoxIcon.addEventListener('mouseenter', (e) => {
+                        for (const boxElem of /** @type {NodeListOf<HTMLElement>} */ (defElem.querySelectorAll('.form-info-box'))) {
+                            boxElem.style.display = 'block';
+                        }
+                    });
+
+                    const formIntoBox = defElem.querySelector('.form-info-box');
+                    if (formIntoBox === null) { return; }
+                    formIntoBox.before(showBoxIcon);
+                }
+            }
+        }
+
+        // ==============================
+
 
         this._triggerContentUpdateComplete();
     }
@@ -1639,8 +1814,8 @@ export class Display extends EventDispatcher {
     _isQueryParserVisible() {
         return (
             this._queryParserVisibleOverride !== null ?
-            this._queryParserVisibleOverride :
-            this._queryParserVisible
+                this._queryParserVisibleOverride :
+                this._queryParserVisible
         );
     }
 
@@ -1678,8 +1853,8 @@ export class Display extends EventDispatcher {
             typeof this._tabId === 'number' &&
             (
                 (isSearchPage) ?
-                (options.scanning.enableOnSearchPage) :
-                (this._depth < options.scanning.popupNestingMaxDepth)
+                    (options.scanning.enableOnSearchPage) :
+                    (this._depth < options.scanning.popupNestingMaxDepth)
             )
         );
 

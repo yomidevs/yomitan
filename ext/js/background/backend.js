@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Scrub Caffeinated
  * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
@@ -17,29 +18,29 @@
  */
 
 import * as wanakana from '../../lib/wanakana.js';
-import {AccessibilityController} from '../accessibility/accessibility-controller.js';
-import {AnkiConnect} from '../comm/anki-connect.js';
-import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
-import {ClipboardReader} from '../comm/clipboard-reader.js';
-import {Mecab} from '../comm/mecab.js';
-import {clone, deferPromise, generateId, invokeMessageHandler, isObject, log, promiseTimeout} from '../core.js';
-import {ExtensionError} from '../core/extension-error.js';
-import {AnkiUtil} from '../data/anki-util.js';
-import {OptionsUtil} from '../data/options-util.js';
-import {PermissionsUtil} from '../data/permissions-util.js';
-import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
-import {Environment} from '../extension/environment.js';
-import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
-import {DictionaryDatabase} from '../language/dictionary-database.js';
-import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
-import {Translator} from '../language/translator.js';
-import {AudioDownloader} from '../media/audio-downloader.js';
-import {MediaUtil} from '../media/media-util.js';
-import {yomitan} from '../yomitan.js';
-import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
-import {ProfileConditionsUtil} from './profile-conditions-util.js';
-import {RequestBuilder} from './request-builder.js';
-import {ScriptManager} from './script-manager.js';
+import { AccessibilityController } from '../accessibility/accessibility-controller.js';
+import { AnkiConnect } from '../comm/anki-connect.js';
+import { ClipboardMonitor } from '../comm/clipboard-monitor.js';
+import { ClipboardReader } from '../comm/clipboard-reader.js';
+import { Mecab } from '../comm/mecab.js';
+import { clone, deferPromise, generateId, invokeMessageHandler, isObject, log, promiseTimeout } from '../core.js';
+import { ExtensionError } from '../core/extension-error.js';
+import { AnkiUtil } from '../data/anki-util.js';
+import { OptionsUtil } from '../data/options-util.js';
+import { PermissionsUtil } from '../data/permissions-util.js';
+import { ArrayBufferUtil } from '../data/sandbox/array-buffer-util.js';
+import { Environment } from '../extension/environment.js';
+import { ObjectPropertyAccessor } from '../general/object-property-accessor.js';
+import { DictionaryDatabase } from '../language/dictionary-database.js';
+import { JapaneseUtil } from '../language/sandbox/japanese-util.js';
+import { Translator } from '../language/translator.js';
+import { AudioDownloader } from '../media/audio-downloader.js';
+import { MediaUtil } from '../media/media-util.js';
+import { yomitan } from '../yomitan.js';
+import { ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy } from './offscreen-proxy.js';
+import { ProfileConditionsUtil } from './profile-conditions-util.js';
+import { RequestBuilder } from './request-builder.js';
+import { ScriptManager } from './script-manager.js';
 
 /**
  * This class controls the core logic of the extension, including API calls
@@ -128,7 +129,7 @@ export class Backend {
         /** @type {?Promise<void>} */
         this._preparePromise = null;
         /** @type {import('core').DeferredPromiseDetails<void>} */
-        const {promise, resolve, reject} = deferPromise();
+        const { promise, resolve, reject } = deferPromise();
         /** @type {Promise<void>} */
         this._prepareCompletePromise = promise;
         /** @type {() => void} */
@@ -148,63 +149,63 @@ export class Backend {
         this._permissionsUtil = new PermissionsUtil();
 
         /** @type {import('backend').MessageHandlerMap} */
-        this._messageHandlers = new Map(/** @type {import('backend').MessageHandlerMapInit} */ ([
-            ['requestBackendReadySignal',    {async: false, contentScript: true,  handler: this._onApiRequestBackendReadySignal.bind(this)}],
-            ['optionsGet',                   {async: false, contentScript: true,  handler: this._onApiOptionsGet.bind(this)}],
-            ['optionsGetFull',               {async: false, contentScript: true,  handler: this._onApiOptionsGetFull.bind(this)}],
-            ['kanjiFind',                    {async: true,  contentScript: true,  handler: this._onApiKanjiFind.bind(this)}],
-            ['termsFind',                    {async: true,  contentScript: true,  handler: this._onApiTermsFind.bind(this)}],
-            ['parseText',                    {async: true,  contentScript: true,  handler: this._onApiParseText.bind(this)}],
-            ['getAnkiConnectVersion',        {async: true,  contentScript: true,  handler: this._onApiGetAnkiConnectVersion.bind(this)}],
-            ['isAnkiConnected',              {async: true,  contentScript: true,  handler: this._onApiIsAnkiConnected.bind(this)}],
-            ['addAnkiNote',                  {async: true,  contentScript: true,  handler: this._onApiAddAnkiNote.bind(this)}],
-            ['getAnkiNoteInfo',              {async: true,  contentScript: true,  handler: this._onApiGetAnkiNoteInfo.bind(this)}],
-            ['injectAnkiNoteMedia',          {async: true,  contentScript: true,  handler: this._onApiInjectAnkiNoteMedia.bind(this)}],
-            ['noteView',                     {async: true,  contentScript: true,  handler: this._onApiNoteView.bind(this)}],
-            ['suspendAnkiCardsForNote',      {async: true,  contentScript: true,  handler: this._onApiSuspendAnkiCardsForNote.bind(this)}],
-            ['commandExec',                  {async: false, contentScript: true,  handler: this._onApiCommandExec.bind(this)}],
-            ['getTermAudioInfoList',         {async: true,  contentScript: true,  handler: this._onApiGetTermAudioInfoList.bind(this)}],
-            ['sendMessageToFrame',           {async: false, contentScript: true,  handler: this._onApiSendMessageToFrame.bind(this)}],
-            ['broadcastTab',                 {async: false, contentScript: true,  handler: this._onApiBroadcastTab.bind(this)}],
-            ['frameInformationGet',          {async: true,  contentScript: true,  handler: this._onApiFrameInformationGet.bind(this)}],
-            ['injectStylesheet',             {async: true,  contentScript: true,  handler: this._onApiInjectStylesheet.bind(this)}],
-            ['getStylesheetContent',         {async: true,  contentScript: true,  handler: this._onApiGetStylesheetContent.bind(this)}],
-            ['getEnvironmentInfo',           {async: false, contentScript: true,  handler: this._onApiGetEnvironmentInfo.bind(this)}],
-            ['clipboardGet',                 {async: true,  contentScript: true,  handler: this._onApiClipboardGet.bind(this)}],
-            ['getDisplayTemplatesHtml',      {async: true,  contentScript: true,  handler: this._onApiGetDisplayTemplatesHtml.bind(this)}],
-            ['getZoom',                      {async: true,  contentScript: true,  handler: this._onApiGetZoom.bind(this)}],
-            ['getDefaultAnkiFieldTemplates', {async: false, contentScript: true,  handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this)}],
-            ['getDictionaryInfo',            {async: true,  contentScript: true,  handler: this._onApiGetDictionaryInfo.bind(this)}],
-            ['purgeDatabase',                {async: true,  contentScript: false, handler: this._onApiPurgeDatabase.bind(this)}],
-            ['getMedia',                     {async: true,  contentScript: true,  handler: this._onApiGetMedia.bind(this)}],
-            ['log',                          {async: false, contentScript: true,  handler: this._onApiLog.bind(this)}],
-            ['logIndicatorClear',            {async: false, contentScript: true,  handler: this._onApiLogIndicatorClear.bind(this)}],
-            ['createActionPort',             {async: false, contentScript: true,  handler: this._onApiCreateActionPort.bind(this)}],
-            ['modifySettings',               {async: true,  contentScript: true,  handler: this._onApiModifySettings.bind(this)}],
-            ['getSettings',                  {async: false, contentScript: true,  handler: this._onApiGetSettings.bind(this)}],
-            ['setAllSettings',               {async: true,  contentScript: false, handler: this._onApiSetAllSettings.bind(this)}],
-            ['getOrCreateSearchPopup',       {async: true,  contentScript: true,  handler: this._onApiGetOrCreateSearchPopup.bind(this)}],
-            ['isTabSearchPopup',             {async: true,  contentScript: true,  handler: this._onApiIsTabSearchPopup.bind(this)}],
-            ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}],
-            ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}],
-            ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
-            ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}],
-            ['findAnkiNotes',                {async: true,  contentScript: true,  handler: this._onApiFindAnkiNotes.bind(this)}],
-            ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}],
-            ['openCrossFramePort',           {async: false, contentScript: true,  handler: this._onApiOpenCrossFramePort.bind(this)}]
+        this._messageHandlers = new Map(/** @type {import('backend').MessageHandlerMapInit} */([
+            ['requestBackendReadySignal', { async: false, contentScript: true, handler: this._onApiRequestBackendReadySignal.bind(this) }],
+            ['optionsGet', { async: false, contentScript: true, handler: this._onApiOptionsGet.bind(this) }],
+            ['optionsGetFull', { async: false, contentScript: true, handler: this._onApiOptionsGetFull.bind(this) }],
+            ['kanjiFind', { async: true, contentScript: true, handler: this._onApiKanjiFind.bind(this) }],
+            ['termsFind', { async: true, contentScript: true, handler: this._onApiTermsFind.bind(this) }],
+            ['parseText', { async: true, contentScript: true, handler: this._onApiParseText.bind(this) }],
+            ['getAnkiConnectVersion', { async: true, contentScript: true, handler: this._onApiGetAnkiConnectVersion.bind(this) }],
+            ['isAnkiConnected', { async: true, contentScript: true, handler: this._onApiIsAnkiConnected.bind(this) }],
+            ['addAnkiNote', { async: true, contentScript: true, handler: this._onApiAddAnkiNote.bind(this) }],
+            ['getAnkiNoteInfo', { async: true, contentScript: true, handler: this._onApiGetAnkiNoteInfo.bind(this) }],
+            ['injectAnkiNoteMedia', { async: true, contentScript: true, handler: this._onApiInjectAnkiNoteMedia.bind(this) }],
+            ['noteView', { async: true, contentScript: true, handler: this._onApiNoteView.bind(this) }],
+            ['suspendAnkiCardsForNote', { async: true, contentScript: true, handler: this._onApiSuspendAnkiCardsForNote.bind(this) }],
+            ['commandExec', { async: false, contentScript: true, handler: this._onApiCommandExec.bind(this) }],
+            ['getTermAudioInfoList', { async: true, contentScript: true, handler: this._onApiGetTermAudioInfoList.bind(this) }],
+            ['sendMessageToFrame', { async: false, contentScript: true, handler: this._onApiSendMessageToFrame.bind(this) }],
+            ['broadcastTab', { async: false, contentScript: true, handler: this._onApiBroadcastTab.bind(this) }],
+            ['frameInformationGet', { async: true, contentScript: true, handler: this._onApiFrameInformationGet.bind(this) }],
+            ['injectStylesheet', { async: true, contentScript: true, handler: this._onApiInjectStylesheet.bind(this) }],
+            ['getStylesheetContent', { async: true, contentScript: true, handler: this._onApiGetStylesheetContent.bind(this) }],
+            ['getEnvironmentInfo', { async: false, contentScript: true, handler: this._onApiGetEnvironmentInfo.bind(this) }],
+            ['clipboardGet', { async: true, contentScript: true, handler: this._onApiClipboardGet.bind(this) }],
+            ['getDisplayTemplatesHtml', { async: true, contentScript: true, handler: this._onApiGetDisplayTemplatesHtml.bind(this) }],
+            ['getZoom', { async: true, contentScript: true, handler: this._onApiGetZoom.bind(this) }],
+            ['getDefaultAnkiFieldTemplates', { async: false, contentScript: true, handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this) }],
+            ['getDictionaryInfo', { async: true, contentScript: true, handler: this._onApiGetDictionaryInfo.bind(this) }],
+            ['purgeDatabase', { async: true, contentScript: false, handler: this._onApiPurgeDatabase.bind(this) }],
+            ['getMedia', { async: true, contentScript: true, handler: this._onApiGetMedia.bind(this) }],
+            ['log', { async: false, contentScript: true, handler: this._onApiLog.bind(this) }],
+            ['logIndicatorClear', { async: false, contentScript: true, handler: this._onApiLogIndicatorClear.bind(this) }],
+            ['createActionPort', { async: false, contentScript: true, handler: this._onApiCreateActionPort.bind(this) }],
+            ['modifySettings', { async: true, contentScript: true, handler: this._onApiModifySettings.bind(this) }],
+            ['getSettings', { async: false, contentScript: true, handler: this._onApiGetSettings.bind(this) }],
+            ['setAllSettings', { async: true, contentScript: false, handler: this._onApiSetAllSettings.bind(this) }],
+            ['getOrCreateSearchPopup', { async: true, contentScript: true, handler: this._onApiGetOrCreateSearchPopup.bind(this) }],
+            ['isTabSearchPopup', { async: true, contentScript: true, handler: this._onApiIsTabSearchPopup.bind(this) }],
+            ['triggerDatabaseUpdated', { async: false, contentScript: true, handler: this._onApiTriggerDatabaseUpdated.bind(this) }],
+            ['testMecab', { async: true, contentScript: true, handler: this._onApiTestMecab.bind(this) }],
+            ['textHasJapaneseCharacters', { async: false, contentScript: true, handler: this._onApiTextHasJapaneseCharacters.bind(this) }],
+            ['getTermFrequencies', { async: true, contentScript: true, handler: this._onApiGetTermFrequencies.bind(this) }],
+            ['findAnkiNotes', { async: true, contentScript: true, handler: this._onApiFindAnkiNotes.bind(this) }],
+            ['loadExtensionScripts', { async: true, contentScript: true, handler: this._onApiLoadExtensionScripts.bind(this) }],
+            ['openCrossFramePort', { async: false, contentScript: true, handler: this._onApiOpenCrossFramePort.bind(this) }]
         ]));
         /** @type {import('backend').MessageHandlerWithProgressMap} */
-        this._messageHandlersWithProgress = new Map(/** @type {import('backend').MessageHandlerWithProgressMapInit} */ ([
+        this._messageHandlersWithProgress = new Map(/** @type {import('backend').MessageHandlerWithProgressMapInit} */([
             // Empty
         ]));
 
         /** @type {Map<string, (params?: import('core').SerializableObject) => void>} */
-        this._commandHandlers = new Map(/** @type {[name: string, handler: (params?: import('core').SerializableObject) => void][]} */ ([
+        this._commandHandlers = new Map(/** @type {[name: string, handler: (params?: import('core').SerializableObject) => void][]} */([
             ['toggleTextScanning', this._onCommandToggleTextScanning.bind(this)],
-            ['openInfoPage',       this._onCommandOpenInfoPage.bind(this)],
-            ['openSettingsPage',   this._onCommandOpenSettingsPage.bind(this)],
-            ['openSearchPage',     this._onCommandOpenSearchPage.bind(this)],
-            ['openPopupWindow',    this._onCommandOpenPopupWindow.bind(this)]
+            ['openInfoPage', this._onCommandOpenInfoPage.bind(this)],
+            ['openSettingsPage', this._onCommandOpenSettingsPage.bind(this)],
+            ['openSearchPage', this._onCommandOpenSearchPage.bind(this)],
+            ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)]
         ]));
     }
 
@@ -298,7 +299,7 @@ export class Backend {
 
             this._applyOptions('background');
 
-            const options = this._getProfileOptions({current: true}, false);
+            const options = this._getProfileOptions({ current: true }, false);
             if (options.general.showGuide) {
                 this._openWelcomeGuidePageOnce();
             }
@@ -306,7 +307,7 @@ export class Backend {
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
 
             this._sendMessageAllTabsIgnoreResponse('Yomitan.backendReady', {});
-            this._sendMessageIgnoreResponse({action: 'Yomitan.backendReady', params: {}});
+            this._sendMessageIgnoreResponse({ action: 'Yomitan.backendReady', params: {} });
         } catch (e) {
             log.error(e);
             throw e;
@@ -323,14 +324,14 @@ export class Backend {
     /**
      * @param {{text: string}} params
      */
-    async _onClipboardTextChange({text}) {
-        const {clipboard: {maximumSearchLength}} = this._getProfileOptions({current: true}, false);
+    async _onClipboardTextChange({ text }) {
+        const { clipboard: { maximumSearchLength } } = this._getProfileOptions({ current: true }, false);
         if (text.length > maximumSearchLength) {
             text = text.substring(0, maximumSearchLength);
         }
         try {
-            const {tab, created} = await this._getOrCreateSearchPopup();
-            const {id} = tab;
+            const { tab, created } = await this._getOrCreateSearchPopup();
+            const { id } = tab;
             if (typeof id !== 'number') {
                 throw new Error('Tab does not have an id');
             }
@@ -344,7 +345,7 @@ export class Backend {
     /**
      * @param {{level: import('log').LogLevel}} params
      */
-    _onLog({level}) {
+    _onLog({ level }) {
         const levelValue = this._getErrorLevelValue(level);
         if (levelValue <= this._getErrorLevelValue(this._logErrorLevel)) { return; }
 
@@ -368,7 +369,7 @@ export class Backend {
 
             this._prepareCompletePromise.then(
                 () => { handler(...args); },
-                () => {} // NOP
+                () => { } // NOP
             );
         });
     }
@@ -401,7 +402,7 @@ export class Backend {
      * @param {(response?: unknown) => void} callback
      * @returns {boolean}
      */
-    _onMessage({action, params}, sender, callback) {
+    _onMessage({ action, params }, sender, callback) {
         const messageHandler = this._messageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return false; }
 
@@ -409,7 +410,7 @@ export class Backend {
             try {
                 this._validatePrivilegedMessageSender(sender);
             } catch (error) {
-                callback({error: ExtensionError.serialize(error)});
+                callback({ error: ExtensionError.serialize(error) });
                 return false;
             }
         }
@@ -420,8 +421,8 @@ export class Backend {
     /**
      * @param {chrome.tabs.ZoomChangeInfo} event
      */
-    _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
-        this._sendMessageTabIgnoreResponse(tabId, {action: 'Yomitan.zoomChanged', params: {oldZoomFactor, newZoomFactor}}, {});
+    _onZoomChange({ tabId, oldZoomFactor, newZoomFactor }) {
+        this._sendMessageTabIgnoreResponse(tabId, { action: 'Yomitan.zoomChanged', params: { oldZoomFactor, newZoomFactor } }, {});
     }
 
     /**
@@ -434,7 +435,7 @@ export class Backend {
     /**
      * @param {chrome.runtime.InstalledDetails} event
      */
-    _onInstalled({reason}) {
+    _onInstalled({ reason }) {
         if (reason !== 'install') { return; }
         this._requestPersistentStorage();
     }
@@ -444,12 +445,12 @@ export class Backend {
     /** @type {import('api').Handler<import('api').RequestBackendReadySignalDetails, import('api').RequestBackendReadySignalResult, true>} */
     _onApiRequestBackendReadySignal(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
-        const data = {action: 'Yomitan.backendReady', params: {}};
+        const data = { action: 'Yomitan.backendReady', params: {} };
         if (typeof sender.tab === 'undefined') {
             this._sendMessageIgnoreResponse(data);
             return false;
         } else {
-            const {id} = sender.tab;
+            const { id } = sender.tab;
             if (typeof id === 'number') {
                 this._sendMessageTabIgnoreResponse(id, data, {});
             }
@@ -458,7 +459,7 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').OptionsGetDetails, import('api').OptionsGetResult>} */
-    _onApiOptionsGet({optionsContext}) {
+    _onApiOptionsGet({ optionsContext }) {
         return this._getProfileOptions(optionsContext, false);
     }
 
@@ -468,9 +469,9 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').KanjiFindDetails, import('api').KanjiFindResult>} */
-    async _onApiKanjiFind({text, optionsContext}) {
+    async _onApiKanjiFind({ text, optionsContext }) {
         const options = this._getProfileOptions(optionsContext, false);
-        const {general: {maxResults}} = options;
+        const { general: { maxResults } } = options;
         const findKanjiOptions = this._getTranslatorFindKanjiOptions(options);
         const dictionaryEntries = await this._translator.findKanji(text, findKanjiOptions);
         dictionaryEntries.splice(maxResults);
@@ -478,17 +479,17 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').TermsFindDetails, import('api').TermsFindResult>} */
-    async _onApiTermsFind({text, details, optionsContext}) {
+    async _onApiTermsFind({ text, details, optionsContext }) {
         const options = this._getProfileOptions(optionsContext, false);
-        const {general: {resultOutputMode: mode, maxResults}} = options;
+        const { general: { resultOutputMode: mode, maxResults } } = options;
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
-        const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
+        const { dictionaryEntries, originalTextLength } = await this._translator.findTerms(mode, text, findTermsOptions);
         dictionaryEntries.splice(maxResults);
-        return {dictionaryEntries, originalTextLength};
+        return { dictionaryEntries, originalTextLength };
     }
 
     /** @type {import('api').Handler<import('api').ParseTextDetails, import('api').ParseTextResult>} */
-    async _onApiParseText({text, optionsContext, scanLength, useInternalParser, useMecabParser}) {
+    async _onApiParseText({ text, optionsContext, scanLength, useInternalParser, useMecabParser }) {
         const [internalResults, mecabResults] = await Promise.all([
             (useInternalParser ? this._textParseScanning(text, scanLength, optionsContext) : null),
             (useMecabParser ? this._textParseMecab(text) : null)
@@ -531,12 +532,12 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').AddAnkiNoteDetails, import('api').AddAnkiNoteResult>} */
-    async _onApiAddAnkiNote({note}) {
+    async _onApiAddAnkiNote({ note }) {
         return await this._anki.addNote(note);
     }
 
     /** @type {import('api').Handler<import('api').GetAnkiNoteInfoDetails, import('api').GetAnkiNoteInfoResult>} */
-    async _onApiGetAnkiNoteInfo({notes, fetchAdditionalInfo}) {
+    async _onApiGetAnkiNoteInfo({ notes, fetchAdditionalInfo }) {
         /** @type {import('anki').NoteInfoWrapper[]} */
         const results = [];
         /** @type {{note: import('anki').Note, info: import('anki').NoteInfoWrapper}[]} */
@@ -548,15 +549,15 @@ export class Backend {
             let canAdd = canAddArray[i];
             const valid = AnkiUtil.isNoteDataValid(note);
             if (!valid) { canAdd = false; }
-            const info = {canAdd, valid, noteIds: null};
+            const info = { canAdd, valid, noteIds: null };
             results.push(info);
             if (!canAdd && valid) {
-                cannotAdd.push({note, info});
+                cannotAdd.push({ note, info });
             }
         }
 
         if (cannotAdd.length > 0) {
-            const cannotAddNotes = cannotAdd.map(({note}) => note);
+            const cannotAddNotes = cannotAdd.map(({ note }) => note);
             const noteIdsArray = await this._anki.findNoteIds(cannotAddNotes);
             for (let i = 0, ii = Math.min(cannotAdd.length, noteIdsArray.length); i < ii; ++i) {
                 const noteIds = noteIdsArray[i];
@@ -573,7 +574,7 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').InjectAnkiNoteMediaDetails, import('api').InjectAnkiNoteMediaResult>} */
-    async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails}) {
+    async _onApiInjectAnkiNoteMedia({ timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails }) {
         return await this._injectAnkNoteMedia(
             this._anki,
             timestamp,
@@ -586,7 +587,7 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').NoteViewDetails, import('api').NoteViewResult>} */
-    async _onApiNoteView({noteId, mode, allowFallback}) {
+    async _onApiNoteView({ noteId, mode, allowFallback }) {
         if (mode === 'edit') {
             try {
                 await this._anki.guiEditNote(noteId);
@@ -605,7 +606,7 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').SuspendAnkiCardsForNoteDetails, import('api').SuspendAnkiCardsForNoteResult>} */
-    async _onApiSuspendAnkiCardsForNote({noteId}) {
+    async _onApiSuspendAnkiCardsForNote({ noteId }) {
         const cardIds = await this._anki.findCardsForNote(noteId);
         const count = cardIds.length;
         if (count > 0) {
@@ -616,39 +617,39 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').CommandExecDetails, import('api').CommandExecResult>} */
-    _onApiCommandExec({command, params}) {
+    _onApiCommandExec({ command, params }) {
         return this._runCommand(command, params);
     }
 
     /** @type {import('api').Handler<import('api').GetTermAudioInfoListDetails, import('api').GetTermAudioInfoListResult>} */
-    async _onApiGetTermAudioInfoList({source, term, reading}) {
+    async _onApiGetTermAudioInfoList({ source, term, reading }) {
         return await this._audioDownloader.getTermAudioInfoList(source, term, reading);
     }
 
     /** @type {import('api').Handler<import('api').SendMessageToFrameDetails, import('api').SendMessageToFrameResult, true>} */
-    _onApiSendMessageToFrame({frameId: targetFrameId, action, params}, sender) {
+    _onApiSendMessageToFrame({ frameId: targetFrameId, action, params }, sender) {
         if (!sender) { return false; }
-        const {tab} = sender;
+        const { tab } = sender;
         if (!tab) { return false; }
-        const {id} = tab;
+        const { id } = tab;
         if (typeof id !== 'number') { return false; }
         const frameId = sender.frameId;
         /** @type {import('extension').ChromeRuntimeMessageWithFrameId} */
-        const message = {action, params, frameId};
-        this._sendMessageTabIgnoreResponse(id, message, {frameId: targetFrameId});
+        const message = { action, params, frameId };
+        this._sendMessageTabIgnoreResponse(id, message, { frameId: targetFrameId });
         return true;
     }
 
     /** @type {import('api').Handler<import('api').BroadcastTabDetails, import('api').BroadcastTabResult, true>} */
-    _onApiBroadcastTab({action, params}, sender) {
+    _onApiBroadcastTab({ action, params }, sender) {
         if (!sender) { return false; }
-        const {tab} = sender;
+        const { tab } = sender;
         if (!tab) { return false; }
-        const {id} = tab;
+        const { id } = tab;
         if (typeof id !== 'number') { return false; }
         const frameId = sender.frameId;
         /** @type {import('extension').ChromeRuntimeMessageWithFrameId} */
-        const message = {action, params, frameId};
+        const message = { action, params, frameId };
         this._sendMessageTabIgnoreResponse(id, message, {});
         return true;
     }
@@ -658,18 +659,18 @@ export class Backend {
         const tab = sender.tab;
         const tabId = tab ? tab.id : void 0;
         const frameId = sender.frameId;
-        return Promise.resolve({tabId, frameId});
+        return Promise.resolve({ tabId, frameId });
     }
 
     /** @type {import('api').Handler<import('api').InjectStylesheetDetails, import('api').InjectStylesheetResult, true>} */
-    async _onApiInjectStylesheet({type, value}, sender) {
-        const {frameId, tab} = sender;
+    async _onApiInjectStylesheet({ type, value }, sender) {
+        const { frameId, tab } = sender;
         if (typeof tab !== 'object' || tab === null || typeof tab.id !== 'number') { throw new Error('Invalid tab'); }
         return await this._scriptManager.injectStylesheet(type, value, tab.id, frameId, false);
     }
 
     /** @type {import('api').Handler<import('api').GetStylesheetContentDetails, import('api').GetStylesheetContentResult>} */
-    async _onApiGetStylesheetContent({url}) {
+    async _onApiGetStylesheetContent({ url }) {
         if (!url.startsWith('/') || url.startsWith('//') || !url.endsWith('.css')) {
             throw new Error('Invalid URL');
         }
@@ -707,7 +708,7 @@ export class Backend {
                 typeof chrome.tabs.getZoom === 'function'
             )) {
                 // Not supported
-                resolve({zoomFactor: 1.0});
+                resolve({ zoomFactor: 1.0 });
                 return;
             }
             chrome.tabs.getZoom(tabId, (zoomFactor) => {
@@ -715,7 +716,7 @@ export class Backend {
                 if (e) {
                     reject(new Error(e.message));
                 } else {
-                    resolve({zoomFactor});
+                    resolve({ zoomFactor });
                 }
             });
         });
@@ -738,12 +739,12 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').GetMediaDetails, import('api').GetMediaResult>} */
-    async _onApiGetMedia({targets}) {
+    async _onApiGetMedia({ targets }) {
         return await this._getNormalizedDictionaryDatabaseMedia(targets);
     }
 
     /** @type {import('api').Handler<import('api').LogDetails, import('api').LogResult>} */
-    _onApiLog({error, level, context}) {
+    _onApiLog({ error, level, context }) {
         log.log(ExtensionError.deserialize(error), level, context);
     }
 
@@ -767,7 +768,7 @@ export class Backend {
             id
         };
 
-        const port = chrome.tabs.connect(tabId, {name: JSON.stringify(details), frameId});
+        const port = chrome.tabs.connect(tabId, { name: JSON.stringify(details), frameId });
         try {
             this._createActionListenerPort(port, sender, this._messageHandlersWithProgress);
         } catch (e) {
@@ -779,56 +780,56 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').ModifySettingsDetails, import('api').ModifySettingsResult>} */
-    _onApiModifySettings({targets, source}) {
+    _onApiModifySettings({ targets, source }) {
         return this._modifySettings(targets, source);
     }
 
     /** @type {import('api').Handler<import('api').GetSettingsDetails, import('api').GetSettingsResult>} */
-    _onApiGetSettings({targets}) {
+    _onApiGetSettings({ targets }) {
         const results = [];
         for (const target of targets) {
             try {
                 const result = this._getSetting(target);
-                results.push({result: clone(result)});
+                results.push({ result: clone(result) });
             } catch (e) {
-                results.push({error: ExtensionError.serialize(e)});
+                results.push({ error: ExtensionError.serialize(e) });
             }
         }
         return results;
     }
 
     /** @type {import('api').Handler<import('api').SetAllSettingsDetails, import('api').SetAllSettingsResult>} */
-    async _onApiSetAllSettings({value, source}) {
+    async _onApiSetAllSettings({ value, source }) {
         this._optionsUtil.validate(value);
         this._options = clone(value);
         await this._saveOptions(source);
     }
 
     /** @type {import('api').Handler<import('api').GetOrCreateSearchPopupDetails, import('api').GetOrCreateSearchPopupResult>} */
-    async _onApiGetOrCreateSearchPopup({focus=false, text}) {
-        const {tab, created} = await this._getOrCreateSearchPopup();
+    async _onApiGetOrCreateSearchPopup({ focus = false, text }) {
+        const { tab, created } = await this._getOrCreateSearchPopup();
         if (focus === true || (focus === 'ifCreated' && created)) {
             await this._focusTab(tab);
         }
         if (typeof text === 'string') {
-            const {id} = tab;
+            const { id } = tab;
             if (typeof id === 'number') {
                 await this._updateSearchQuery(id, text, !created);
             }
         }
-        const {id} = tab;
-        return {tabId: typeof id === 'number' ? id : null, windowId: tab.windowId};
+        const { id } = tab;
+        return { tabId: typeof id === 'number' ? id : null, windowId: tab.windowId };
     }
 
     /** @type {import('api').Handler<import('api').IsTabSearchPopupDetails, import('api').IsTabSearchPopupResult>} */
-    async _onApiIsTabSearchPopup({tabId}) {
+    async _onApiIsTabSearchPopup({ tabId }) {
         const baseUrl = chrome.runtime.getURL('/search.html');
         const tab = typeof tabId === 'number' ? await this._checkTabUrl(tabId, (url) => url !== null && url.startsWith(baseUrl)) : null;
         return (tab !== null);
     }
 
     /** @type {import('api').Handler<import('api').TriggerDatabaseUpdatedDetails, import('api').TriggerDatabaseUpdatedResult>} */
-    _onApiTriggerDatabaseUpdated({type, cause}) {
+    _onApiTriggerDatabaseUpdated({ type, cause }) {
         this._triggerDatabaseUpdated(type, cause);
     }
 
@@ -840,7 +841,7 @@ export class Backend {
 
         let permissionsOkay = false;
         try {
-            permissionsOkay = await this._permissionsUtil.hasPermissions({permissions: ['nativeMessaging']});
+            permissionsOkay = await this._permissionsUtil.hasPermissions({ permissions: ['nativeMessaging'] });
         } catch (e) {
             // NOP
         }
@@ -870,33 +871,33 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').TextHasJapaneseCharactersDetails, import('api').TextHasJapaneseCharactersResult>} */
-    _onApiTextHasJapaneseCharacters({text}) {
+    _onApiTextHasJapaneseCharacters({ text }) {
         return this._japaneseUtil.isStringPartiallyJapanese(text);
     }
 
     /** @type {import('api').Handler<import('api').GetTermFrequenciesDetails, import('api').GetTermFrequenciesResult>} */
-    async _onApiGetTermFrequencies({termReadingList, dictionaries}) {
+    async _onApiGetTermFrequencies({ termReadingList, dictionaries }) {
         return await this._translator.getTermFrequencies(termReadingList, dictionaries);
     }
 
     /** @type {import('api').Handler<import('api').FindAnkiNotesDetails, import('api').FindAnkiNotesResult>} */
-    async _onApiFindAnkiNotes({query}) {
+    async _onApiFindAnkiNotes({ query }) {
         return await this._anki.findNotes(query);
     }
 
     /** @type {import('api').Handler<import('api').LoadExtensionScriptsDetails, import('api').LoadExtensionScriptsResult, true>} */
-    async _onApiLoadExtensionScripts({files}, sender) {
+    async _onApiLoadExtensionScripts({ files }, sender) {
         if (!sender || !sender.tab) { throw new Error('Invalid sender'); }
         const tabId = sender.tab.id;
         if (typeof tabId !== 'number') { throw new Error('Sender has invalid tab ID'); }
-        const {frameId} = sender;
+        const { frameId } = sender;
         for (const file of files) {
             await this._scriptManager.injectScript(file, tabId, frameId, false);
         }
     }
 
     /** @type {import('api').Handler<import('api').OpenCrossFramePortDetails, import('api').OpenCrossFramePortResult, true>} */
-    _onApiOpenCrossFramePort({targetTabId, targetFrameId}, sender) {
+    _onApiOpenCrossFramePort({ targetTabId, targetFrameId }, sender) {
         const sourceTabId = (sender && sender.tab ? sender.tab.id : null);
         if (typeof sourceTabId !== 'number') {
             throw new Error('Port does not have an associated tab ID');
@@ -917,9 +918,9 @@ export class Backend {
             otherFrameId: sourceFrameId
         };
         /** @type {?chrome.runtime.Port} */
-        let sourcePort = chrome.tabs.connect(sourceTabId, {frameId: sourceFrameId, name: JSON.stringify(sourceDetails)});
+        let sourcePort = chrome.tabs.connect(sourceTabId, { frameId: sourceFrameId, name: JSON.stringify(sourceDetails) });
         /** @type {?chrome.runtime.Port} */
-        let targetPort = chrome.tabs.connect(targetTabId, {frameId: targetFrameId, name: JSON.stringify(targetDetails)});
+        let targetPort = chrome.tabs.connect(targetTabId, { frameId: targetFrameId, name: JSON.stringify(targetDetails) });
 
         const cleanup = () => {
             this._checkLastError(chrome.runtime.lastError);
@@ -942,7 +943,7 @@ export class Backend {
         sourcePort.onDisconnect.addListener(cleanup);
         targetPort.onDisconnect.addListener(cleanup);
 
-        return {targetTabId, targetFrameId};
+        return { targetTabId, targetFrameId };
     }
 
     // Command handlers
@@ -971,7 +972,7 @@ export class Backend {
         }
 
         /** @type {import('backend').FindTabsPredicate} */
-        const predicate = ({url: url2}) => {
+        const predicate = ({ url: url2 }) => {
             if (url2 === null || !url2.startsWith(baseUrl)) { return false; }
             const parsedUrl = new URL(url2);
             const baseUrl2 = `${parsedUrl.origin}${parsedUrl.pathname}`;
@@ -982,8 +983,8 @@ export class Backend {
         const openInTab = async () => {
             const tabInfo = /** @type {?import('backend').TabInfo} */ (await this._findTabs(1000, false, predicate, false));
             if (tabInfo !== null) {
-                const {tab} = tabInfo;
-                const {id} = tab;
+                const { tab } = tabInfo;
+                const { id } = tab;
                 if (typeof id === 'number') {
                     await this._focusTab(tab);
                     if (queryParams.query) {
@@ -1033,14 +1034,14 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _onCommandToggleTextScanning() {
-        const options = this._getProfileOptions({current: true}, false);
+        const options = this._getProfileOptions({ current: true }, false);
         /** @type {import('settings-modifications').ScopedModificationSet} */
         const modification = {
             action: 'set',
             path: 'general.enable',
             value: !options.general.enable,
             scope: 'profile',
-            optionsContext: {current: true}
+            optionsContext: { current: true }
         };
         await this._modifySettings([modification], 'backend');
     }
@@ -1049,7 +1050,7 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _onCommandOpenPopupWindow() {
-        await this._onApiGetOrCreateSearchPopup({focus: true});
+        await this._onApiGetOrCreateSearchPopup({ focus: true });
     }
 
     // Utilities
@@ -1065,9 +1066,9 @@ export class Backend {
         for (const target of targets) {
             try {
                 const result = this._modifySetting(target);
-                results.push({result: clone(result)});
+                results.push({ result: clone(result) });
             } catch (e) {
-                results.push({error: ExtensionError.serialize(e)});
+                results.push({ error: ExtensionError.serialize(e) });
             }
         }
         await this._saveOptions(source);
@@ -1100,7 +1101,7 @@ export class Backend {
         if (this._searchPopupTabId !== null) {
             const tab = await this._checkTabUrl(this._searchPopupTabId, urlPredicate);
             if (tab !== null) {
-                return {tab, created: false};
+                return { tab, created: false };
             }
             this._searchPopupTabId = null;
         }
@@ -1109,10 +1110,10 @@ export class Backend {
         const existingTabInfo = await this._findSearchPopupTab(urlPredicate);
         if (existingTabInfo !== null) {
             const existingTab = existingTabInfo.tab;
-            const {id} = existingTab;
+            const { id } = existingTab;
             if (typeof id === 'number') {
                 this._searchPopupTabId = id;
-                return {tab: existingTab, created: false};
+                return { tab: existingTab, created: false };
             }
         }
 
@@ -1122,21 +1123,21 @@ export class Backend {
         }
 
         // Create a new window
-        const options = this._getProfileOptions({current: true}, false);
+        const options = this._getProfileOptions({ current: true }, false);
         const createData = this._getSearchPopupWindowCreateData(baseUrl, options);
-        const {popupWindow: {windowState}} = options;
+        const { popupWindow: { windowState } } = options;
         const popupWindow = await this._createWindow(createData);
         if (windowState !== 'normal' && typeof popupWindow.id === 'number') {
-            await this._updateWindow(popupWindow.id, {state: windowState});
+            await this._updateWindow(popupWindow.id, { state: windowState });
         }
 
-        const {tabs} = popupWindow;
+        const { tabs } = popupWindow;
         if (!Array.isArray(tabs) || tabs.length === 0) {
             throw new Error('Created window did not contain a tab');
         }
 
         const tab = tabs[0];
-        const {id} = tab;
+        const { id } = tab;
         if (typeof id !== 'number') {
             throw new Error('Tab does not have an id');
         }
@@ -1144,12 +1145,12 @@ export class Backend {
 
         await this._sendMessageTabPromise(
             id,
-            {action: 'SearchDisplayController.setMode', params: {mode: 'popup'}},
-            {frameId: 0}
+            { action: 'SearchDisplayController.setMode', params: { mode: 'popup' } },
+            { frameId: 0 }
         );
 
         this._searchPopupTabId = id;
-        return {tab, created: true};
+        return { tab, created: true };
     }
 
     /**
@@ -1158,14 +1159,14 @@ export class Backend {
      */
     async _findSearchPopupTab(urlPredicate) {
         /** @type {import('backend').FindTabsPredicate} */
-        const predicate = async ({url, tab}) => {
-            const {id} = tab;
+        const predicate = async ({ url, tab }) => {
+            const { id } = tab;
             if (typeof id === 'undefined' || !urlPredicate(url)) { return false; }
             try {
                 const mode = await this._sendMessageTabPromise(
                     id,
-                    {action: 'SearchDisplayController.getMode', params: {}},
-                    {frameId: 0}
+                    { action: 'SearchDisplayController.getMode', params: {} },
+                    { frameId: 0 }
                 );
                 return mode === 'popup';
             } catch (e) {
@@ -1181,7 +1182,7 @@ export class Backend {
      * @returns {chrome.windows.CreateData}
      */
     _getSearchPopupWindowCreateData(url, options) {
-        const {popupWindow: {width, height, left, top, useLeft, useTop, windowType}} = options;
+        const { popupWindow: { width, height, left, top, useLeft, useTop, windowType } } = options;
         return {
             url,
             width,
@@ -1206,7 +1207,7 @@ export class Backend {
                     if (error) {
                         reject(new Error(error.message));
                     } else {
-                        resolve(/** @type {chrome.windows.Window} */ (result));
+                        resolve(/** @type {chrome.windows.Window} */(result));
                     }
                 }
             );
@@ -1244,8 +1245,8 @@ export class Backend {
     async _updateSearchQuery(tabId, text, animate) {
         await this._sendMessageTabPromise(
             tabId,
-            {action: 'SearchDisplayController.updateSearchQuery', params: {text, animate}},
-            {frameId: 0}
+            { action: 'SearchDisplayController.updateSearchQuery', params: { text, animate } },
+            { frameId: 0 }
         );
     }
 
@@ -1253,7 +1254,7 @@ export class Backend {
      * @param {string} source
      */
     _applyOptions(source) {
-        const options = this._getProfileOptions({current: true}, false);
+        const options = this._getProfileOptions({ current: true }, false);
         this._updateBadge();
 
         const enabled = options.general.enable;
@@ -1275,7 +1276,7 @@ export class Backend {
 
         this._accessibilityController.update(this._getOptionsFull(false));
 
-        this._sendMessageAllTabsIgnoreResponse('Yomitan.optionsUpdated', {source});
+        this._sendMessageAllTabsIgnoreResponse('Yomitan.optionsUpdated', { source });
     }
 
     /**
@@ -1309,7 +1310,7 @@ export class Backend {
         const profiles = options.profiles;
         if (!optionsContext.current) {
             // Specific index
-            const {index} = optionsContext;
+            const { index } = optionsContext;
             if (typeof index === 'number') {
                 if (index < 0 || index >= profiles.length) {
                     throw this._createDataError(`Invalid profile index: ${index}`, optionsContext);
@@ -1323,7 +1324,7 @@ export class Backend {
             }
         }
         // Default
-        const {profileCurrent} = options;
+        const { profileCurrent } = options;
         if (profileCurrent < 0 || profileCurrent >= profiles.length) {
             throw this._createDataError(`Invalid current profile index: ${profileCurrent}`, optionsContext);
         }
@@ -1403,51 +1404,56 @@ export class Backend {
      * @param {import('settings').OptionsContext} optionsContext
      * @returns {Promise<import('api').ParseTextLine[]>}
      */
+
+    /* https://github.com/seth-js/yomichan-de  */
+    // Don't use Japanese text segmentation since it breaks things
     async _textParseScanning(text, scanLength, optionsContext) {
-        const jp = this._japaneseUtil;
-        /** @type {import('translator').FindTermsMode} */
-        const mode = 'simple';
-        const options = this._getProfileOptions(optionsContext, false);
-        const details = {matchType: /** @type {import('translation').FindTermsMatchType} */ ('exact'), deinflect: true};
-        const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
-        /** @type {import('api').ParseTextLine[]} */
-        const results = [];
-        let previousUngroupedSegment = null;
-        let i = 0;
-        const ii = text.length;
-        while (i < ii) {
-            const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
-                mode,
-                text.substring(i, i + scanLength),
-                findTermsOptions
-            );
-            const codePoint = /** @type {number} */ (text.codePointAt(i));
-            const character = String.fromCodePoint(codePoint);
-            if (
-                dictionaryEntries.length > 0 &&
-                originalTextLength > 0 &&
-                (originalTextLength !== character.length || jp.isCodePointJapanese(codePoint))
-            ) {
-                previousUngroupedSegment = null;
-                const {headwords: [{term, reading}]} = dictionaryEntries[0];
-                const source = text.substring(i, i + originalTextLength);
-                const textSegments = [];
-                for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(term, reading, source)) {
-                    textSegments.push({text: text2, reading: reading2});
-                }
-                results.push(textSegments);
-                i += originalTextLength;
-            } else {
-                if (previousUngroupedSegment === null) {
-                    previousUngroupedSegment = {text: character, reading: ''};
-                    results.push([previousUngroupedSegment]);
-                } else {
-                    previousUngroupedSegment.text += character;
-                }
-                i += character.length;
-            }
-        }
-        return results;
+        // const jp = this._japaneseUtil;
+        // /** @type {import('translator').FindTermsMode} */
+        // const mode = 'simple';
+        // const options = this._getProfileOptions(optionsContext, false);
+        // const details = {matchType: /** @type {import('translation').FindTermsMatchType} */ ('exact'), deinflect: true};
+        // const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
+        // /** @type {import('api').ParseTextLine[]} */
+        // const results = [];
+        // let previousUngroupedSegment = null;
+        // let i = 0;
+        // const ii = text.length;
+        // while (i < ii) {
+        //     const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
+        //         mode,
+        //         text.substring(i, i + scanLength),
+        //         findTermsOptions
+        //     );
+        //     const codePoint = /** @type {number} */ (text.codePointAt(i));
+        //     const character = String.fromCodePoint(codePoint);
+        //     if (
+        //         dictionaryEntries.length > 0 &&
+        //         originalTextLength > 0 &&
+        //         (originalTextLength !== character.length || jp.isCodePointJapanese(codePoint))
+        //     ) {
+        //         previousUngroupedSegment = null;
+        //         const {headwords: [{term, reading}]} = dictionaryEntries[0];
+        //         const source = text.substring(i, i + originalTextLength);
+        //         const textSegments = [];
+        //         for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(term, reading, source)) {
+        //             textSegments.push({text: text2, reading: reading2});
+        //         }
+        //         results.push(textSegments);
+        //         i += originalTextLength;
+        //     } else {
+        //         if (previousUngroupedSegment === null) {
+        //             previousUngroupedSegment = {text: character, reading: ''};
+        //             results.push([previousUngroupedSegment]);
+        //         } else {
+        //             previousUngroupedSegment.text += character;
+        //         }
+        //         i += character.length;
+        //     }
+        // }
+        // return results;
+
+        return [[{ "text": text, "reading": "" }]];
     }
 
     /**
@@ -1466,22 +1472,22 @@ export class Backend {
 
         /** @type {import('backend').MecabParseResults} */
         const results = [];
-        for (const {name, lines} of parseTextResults) {
+        for (const { name, lines } of parseTextResults) {
             /** @type {import('api').ParseTextLine[]} */
             const result = [];
             for (const line of lines) {
-                for (const {term, reading, source} of line) {
+                for (const { term, reading, source } of line) {
                     const termParts = [];
-                    for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(
+                    for (const { text: text2, reading: reading2 } of jp.distributeFuriganaInflected(
                         term.length > 0 ? term : source,
                         jp.convertKatakanaToHiragana(reading),
                         source
                     )) {
-                        termParts.push({text: text2, reading: reading2});
+                        termParts.push({ text: text2, reading: reading2 });
                     }
                     result.push(termParts);
                 }
-                result.push([{text: '\n', reading: ''}]);
+                result.push([{ text: '\n', reading: '' }]);
             }
             results.push([name, result]);
         }
@@ -1505,7 +1511,7 @@ export class Backend {
         const onProgress = (...data) => {
             try {
                 if (done) { return; }
-                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseProgressMessage} */ ({type: 'progress', data}));
+                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseProgressMessage} */({ type: 'progress', data }));
             } catch (e) {
                 // NOP
             }
@@ -1518,7 +1524,7 @@ export class Backend {
             if (hasStarted) { return; }
 
             try {
-                const {action} = message;
+                const { action } = message;
                 switch (action) {
                     case 'fragment':
                         messageString += message.data;
@@ -1544,14 +1550,14 @@ export class Backend {
          */
         const onMessageComplete = async (message) => {
             try {
-                const {action, params} = message;
-                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseAcknowledgeMessage} */ ({type: 'ack'}));
+                const { action, params } = message;
+                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseAcknowledgeMessage} */({ type: 'ack' }));
 
                 const messageHandler = handlers.get(action);
                 if (typeof messageHandler === 'undefined') {
                     throw new Error('Invalid action');
                 }
-                const {handler, async, contentScript} = messageHandler;
+                const { handler, async, contentScript } = messageHandler;
 
                 if (!contentScript) {
                     this._validatePrivilegedMessageSender(sender);
@@ -1559,7 +1565,7 @@ export class Backend {
 
                 const promiseOrResult = handler(params, sender, onProgress);
                 const result = async ? await promiseOrResult : promiseOrResult;
-                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseCompleteMessage} */ ({type: 'complete', data: result}));
+                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseCompleteMessage} */({ type: 'complete', data: result }));
             } catch (e) {
                 cleanup(e);
             }
@@ -1575,7 +1581,7 @@ export class Backend {
         const cleanup = (error) => {
             if (done) { return; }
             if (error !== null) {
-                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseErrorMessage} */ ({type: 'error', data: ExtensionError.serialize(error)}));
+                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseErrorMessage} */({ type: 'error', data: ExtensionError.serialize(error) }));
             }
             if (!hasStarted) {
                 port.onMessage.removeListener(onMessage);
@@ -1611,11 +1617,11 @@ export class Backend {
         const scope = target.scope;
         switch (scope) {
             case 'profile':
-            {
-                const {optionsContext} = target;
-                if (typeof optionsContext !== 'object' || optionsContext === null) { throw new Error('Invalid optionsContext'); }
-                return /** @type {import('settings').ProfileOptions} */ (this._getProfileOptions(optionsContext, true));
-            }
+                {
+                    const { optionsContext } = target;
+                    if (typeof optionsContext !== 'object' || optionsContext === null) { throw new Error('Invalid optionsContext'); }
+                    return /** @type {import('settings').ProfileOptions} */ (this._getProfileOptions(optionsContext, true));
+                }
             case 'global':
                 return /** @type {import('settings').Options} */ (this._getOptionsFull(true));
             default:
@@ -1631,7 +1637,7 @@ export class Backend {
     _getSetting(target) {
         const options = this._getModifySettingObject(target);
         const accessor = new ObjectPropertyAccessor(options);
-        const {path} = target;
+        const { path } = target;
         if (typeof path !== 'string') { throw new Error('Invalid path'); }
         return accessor.get(ObjectPropertyAccessor.getPathArray(path));
     }
@@ -1647,50 +1653,50 @@ export class Backend {
         const action = target.action;
         switch (action) {
             case 'set':
-            {
-                const {path, value} = target;
-                if (typeof path !== 'string') { throw new Error('Invalid path'); }
-                const pathArray = ObjectPropertyAccessor.getPathArray(path);
-                accessor.set(pathArray, value);
-                return accessor.get(pathArray);
-            }
+                {
+                    const { path, value } = target;
+                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                    const pathArray = ObjectPropertyAccessor.getPathArray(path);
+                    accessor.set(pathArray, value);
+                    return accessor.get(pathArray);
+                }
             case 'delete':
-            {
-                const {path} = target;
-                if (typeof path !== 'string') { throw new Error('Invalid path'); }
-                accessor.delete(ObjectPropertyAccessor.getPathArray(path));
-                return true;
-            }
+                {
+                    const { path } = target;
+                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                    accessor.delete(ObjectPropertyAccessor.getPathArray(path));
+                    return true;
+                }
             case 'swap':
-            {
-                const {path1, path2} = target;
-                if (typeof path1 !== 'string') { throw new Error('Invalid path1'); }
-                if (typeof path2 !== 'string') { throw new Error('Invalid path2'); }
-                accessor.swap(ObjectPropertyAccessor.getPathArray(path1), ObjectPropertyAccessor.getPathArray(path2));
-                return true;
-            }
+                {
+                    const { path1, path2 } = target;
+                    if (typeof path1 !== 'string') { throw new Error('Invalid path1'); }
+                    if (typeof path2 !== 'string') { throw new Error('Invalid path2'); }
+                    accessor.swap(ObjectPropertyAccessor.getPathArray(path1), ObjectPropertyAccessor.getPathArray(path2));
+                    return true;
+                }
             case 'splice':
-            {
-                const {path, start, deleteCount, items} = target;
-                if (typeof path !== 'string') { throw new Error('Invalid path'); }
-                if (typeof start !== 'number' || Math.floor(start) !== start) { throw new Error('Invalid start'); }
-                if (typeof deleteCount !== 'number' || Math.floor(deleteCount) !== deleteCount) { throw new Error('Invalid deleteCount'); }
-                if (!Array.isArray(items)) { throw new Error('Invalid items'); }
-                const array = accessor.get(ObjectPropertyAccessor.getPathArray(path));
-                if (!Array.isArray(array)) { throw new Error('Invalid target type'); }
-                return array.splice(start, deleteCount, ...items);
-            }
+                {
+                    const { path, start, deleteCount, items } = target;
+                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                    if (typeof start !== 'number' || Math.floor(start) !== start) { throw new Error('Invalid start'); }
+                    if (typeof deleteCount !== 'number' || Math.floor(deleteCount) !== deleteCount) { throw new Error('Invalid deleteCount'); }
+                    if (!Array.isArray(items)) { throw new Error('Invalid items'); }
+                    const array = accessor.get(ObjectPropertyAccessor.getPathArray(path));
+                    if (!Array.isArray(array)) { throw new Error('Invalid target type'); }
+                    return array.splice(start, deleteCount, ...items);
+                }
             case 'push':
-            {
-                const {path, items} = target;
-                if (typeof path !== 'string') { throw new Error('Invalid path'); }
-                if (!Array.isArray(items)) { throw new Error('Invalid items'); }
-                const array = accessor.get(ObjectPropertyAccessor.getPathArray(path));
-                if (!Array.isArray(array)) { throw new Error('Invalid target type'); }
-                const start = array.length;
-                array.push(...items);
-                return start;
-            }
+                {
+                    const { path, items } = target;
+                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                    if (!Array.isArray(items)) { throw new Error('Invalid items'); }
+                    const array = accessor.get(ObjectPropertyAccessor.getPathArray(path));
+                    if (!Array.isArray(array)) { throw new Error('Invalid target type'); }
+                    const start = array.length;
+                    array.push(...items);
+                    return start;
+                }
             default:
                 throw new Error(`Unknown action: ${action}`);
         }
@@ -1701,11 +1707,11 @@ export class Backend {
      * @throws {Error}
      */
     _validatePrivilegedMessageSender(sender) {
-        let {url} = sender;
+        let { url } = sender;
         if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
-        const {tab} = sender;
+        const { tab } = sender;
         if (typeof tab === 'object' && tab !== null) {
-            ({url} = tab);
+            ({ url } = tab);
             if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
         }
         throw new Error('Invalid message sender');
@@ -1717,7 +1723,7 @@ export class Backend {
     _getBrowserIconTitle() {
         return (
             isObject(chrome.action) &&
-            typeof chrome.action.getTitle === 'function' ?
+                typeof chrome.action.getTitle === 'function' ?
                 new Promise((resolve) => chrome.action.getTitle({}, resolve)) :
                 Promise.resolve('')
         );
@@ -1761,7 +1767,7 @@ export class Backend {
                 status = 'Loading';
             }
         } else {
-            const options = this._getProfileOptions({current: true}, false);
+            const options = this._getProfileOptions({ current: true }, false);
             if (!options.general.enable) {
                 text = 'off';
                 color = '#555555';
@@ -1778,16 +1784,16 @@ export class Backend {
         }
 
         if (color !== null && typeof chrome.action.setBadgeBackgroundColor === 'function') {
-            chrome.action.setBadgeBackgroundColor({color});
+            chrome.action.setBadgeBackgroundColor({ color });
         }
         if (text !== null && typeof chrome.action.setBadgeText === 'function') {
-            chrome.action.setBadgeText({text});
+            chrome.action.setBadgeText({ text });
         }
         if (typeof chrome.action.setTitle === 'function') {
             if (status !== null) {
                 title = `${title} - ${status}`;
             }
-            chrome.action.setTitle({title});
+            chrome.action.setTitle({ title });
         }
     }
 
@@ -1796,7 +1802,7 @@ export class Backend {
      * @returns {boolean}
      */
     _isAnyDictionaryEnabled(options) {
-        for (const {enabled} of options.dictionaries) {
+        for (const { enabled } of options.dictionaries) {
             if (enabled) {
                 return true;
             }
@@ -1812,8 +1818,8 @@ export class Backend {
         try {
             const response = await this._sendMessageTabPromise(
                 tabId,
-                {action: 'Yomitan.getUrl', params: {}},
-                {frameId: 0}
+                { action: 'Yomitan.getUrl', params: {} },
+                { frameId: 0 }
             );
             const url = typeof response === 'object' && response !== null ? /** @type {import('core').SerializableObject} */ (response).url : void 0;
             if (typeof url === 'string') {
@@ -1858,13 +1864,13 @@ export class Backend {
          * @param {(tabInfo: import('backend').TabInfo) => boolean} add
          */
         const checkTab = async (tab, add) => {
-            const {id} = tab;
+            const { id } = tab;
             const url = typeof id === 'number' ? await this._getTabUrl(id) : null;
 
             if (done) { return; }
 
             let okay = false;
-            const item = {tab, url};
+            const item = { tab, url };
             try {
                 const okayOrPromise = predicate(item);
                 okay = predicateIsAsync ? await okayOrPromise : /** @type {boolean} */ (okayOrPromise);
@@ -1897,7 +1903,7 @@ export class Backend {
             ]);
             return results;
         } else {
-            const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
+            const { promise, resolve } = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
             /** @type {?import('backend').TabInfo} */
             let result = null;
             /**
@@ -1925,12 +1931,12 @@ export class Backend {
      */
     async _focusTab(tab) {
         await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
-            const {id} = tab;
+            const { id } = tab;
             if (typeof id !== 'number') {
                 reject(new Error('Cannot focus a tab without an id'));
                 return;
             }
-            chrome.tabs.update(id, {active: true}, () => {
+            chrome.tabs.update(id, { active: true }, () => {
                 const e = chrome.runtime.lastError;
                 if (e) {
                     reject(new Error(e.message));
@@ -1958,7 +1964,7 @@ export class Backend {
             });
             if (!tabWindow.focused) {
                 await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
-                    chrome.windows.update(tab.windowId, {focused: true}, () => {
+                    chrome.windows.update(tab.windowId, { focused: true }, () => {
                         const e = chrome.runtime.lastError;
                         if (e) {
                             reject(new Error(e.message));
@@ -1979,7 +1985,7 @@ export class Backend {
      * @param {?number} [timeout=null]
      * @returns {Promise<void>}
      */
-    _waitUntilTabFrameIsReady(tabId, frameId, timeout=null) {
+    _waitUntilTabFrameIsReady(tabId, frameId, timeout = null) {
         return new Promise((resolve, reject) => {
             /** @type {?import('core').Timeout} */
             let timer = null;
@@ -2011,14 +2017,14 @@ export class Backend {
 
             chrome.runtime.onMessage.addListener(onMessage);
 
-            this._sendMessageTabPromise(tabId, {action: 'Yomitan.isReady'}, {frameId})
+            this._sendMessageTabPromise(tabId, { action: 'Yomitan.isReady' }, { frameId })
                 .then(
                     (value) => {
                         if (!value) { return; }
                         cleanup();
                         resolve();
                     },
-                    () => {} // NOP
+                    () => { } // NOP
                 );
 
             if (timeout !== null) {
@@ -2094,9 +2100,9 @@ export class Backend {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, (tabs) => {
             for (const tab of tabs) {
-                const {id} = tab;
+                const { id } = tab;
                 if (typeof id !== 'number') { continue; }
-                chrome.tabs.sendMessage(id, {action, params}, callback);
+                chrome.tabs.sendMessage(id, { action, params }, callback);
             }
         });
     }
@@ -2171,18 +2177,18 @@ export class Backend {
      */
     async _getScreenshot(tabId, frameId, format, quality) {
         const tab = await this._getTabById(tabId);
-        const {windowId} = tab;
+        const { windowId } = tab;
 
         let token = null;
         try {
             if (typeof tabId === 'number' && typeof frameId === 'number') {
                 const action = 'Frontend.setAllVisibleOverride';
-                const params = {value: false, priority: 0, awaitFrame: true};
-                token = await this._sendMessageTabPromise(tabId, {action, params}, {frameId});
+                const params = { value: false, priority: 0, awaitFrame: true };
+                token = await this._sendMessageTabPromise(tabId, { action, params }, { frameId });
             }
 
             return await new Promise((resolve, reject) => {
-                chrome.tabs.captureVisibleTab(windowId, {format, quality}, (result) => {
+                chrome.tabs.captureVisibleTab(windowId, { format, quality }, (result) => {
                     const e = chrome.runtime.lastError;
                     if (e) {
                         reject(new Error(e.message));
@@ -2194,9 +2200,9 @@ export class Backend {
         } finally {
             if (token !== null) {
                 const action = 'Frontend.clearAllVisibleOverride';
-                const params = {token};
+                const params = { token };
                 try {
-                    await this._sendMessageTabPromise(tabId, {action, params}, {frameId});
+                    await this._sendMessageTabPromise(tabId, { action, params }, { frameId });
                 } catch (e) {
                     // NOP
                 }
@@ -2257,7 +2263,7 @@ export class Backend {
         let dictionaryMedia;
         try {
             let errors2;
-            ({results: dictionaryMedia, errors: errors2} = await this._injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, definitionDetails, dictionaryMediaDetails));
+            ({ results: dictionaryMedia, errors: errors2 } = await this._injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, definitionDetails, dictionaryMediaDetails));
             for (const error of errors2) {
                 errors.push(ExtensionError.serialize(error));
             }
@@ -2285,14 +2291,14 @@ export class Backend {
      */
     async _injectAnkiNoteAudio(ankiConnect, timestamp, definitionDetails, details) {
         if (definitionDetails.type !== 'term') { return null; }
-        const {term, reading} = definitionDetails;
+        const { term, reading } = definitionDetails;
         if (term.length === 0 && reading.length === 0) { return null; }
 
-        const {sources, preferredAudioIndex, idleTimeout} = details;
+        const { sources, preferredAudioIndex, idleTimeout } = details;
         let data;
         let contentType;
         try {
-            ({data, contentType} = await this._audioDownloader.downloadTermAudio(
+            ({ data, contentType } = await this._audioDownloader.downloadTermAudio(
                 sources,
                 preferredAudioIndex,
                 term,
@@ -2321,10 +2327,10 @@ export class Backend {
      * @returns {Promise<?string>}
      */
     async _injectAnkiNoteScreenshot(ankiConnect, timestamp, definitionDetails, details) {
-        const {tabId, frameId, format, quality} = details;
+        const { tabId, frameId, format, quality } = details;
         const dataUrl = await this._getScreenshot(tabId, frameId, format, quality);
 
-        const {mediaType, data} = this._getDataUrlInfo(dataUrl);
+        const { mediaType, data } = this._getDataUrlInfo(dataUrl);
         const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
         if (extension === null) {
             throw new Error('Unknown media type for screenshot image');
@@ -2346,7 +2352,7 @@ export class Backend {
             return null;
         }
 
-        const {mediaType, data} = this._getDataUrlInfo(dataUrl);
+        const { mediaType, data } = this._getDataUrlInfo(dataUrl);
         const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
         if (extension === null) {
             throw new Error('Unknown media type for clipboard image');
@@ -2367,9 +2373,9 @@ export class Backend {
         const targets = [];
         const detailsList = [];
         const detailsMap = new Map();
-        for (const {dictionary, path} of dictionaryMediaDetails) {
-            const target = {dictionary, path};
-            const details = {dictionary, path, media: null};
+        for (const { dictionary, path } of dictionaryMediaDetails) {
+            const target = { dictionary, path };
+            const details = { dictionary, path, media: null };
             const key = JSON.stringify(target);
             targets.push(target);
             detailsList.push(details);
@@ -2378,8 +2384,8 @@ export class Backend {
         const mediaList = await this._getNormalizedDictionaryDatabaseMedia(targets);
 
         for (const media of mediaList) {
-            const {dictionary, path} = media;
-            const key = JSON.stringify({dictionary, path});
+            const { dictionary, path } = media;
+            const key = JSON.stringify({ dictionary, path });
             const details = detailsMap.get(key);
             if (typeof details === 'undefined' || details.media !== null) { continue; }
             details.media = media;
@@ -2389,10 +2395,10 @@ export class Backend {
         /** @type {import('api').InjectAnkiNoteDictionaryMediaResult[]} */
         const results = [];
         for (let i = 0, ii = detailsList.length; i < ii; ++i) {
-            const {dictionary, path, media} = detailsList[i];
+            const { dictionary, path, media } = detailsList[i];
             let fileName = null;
             if (media !== null) {
-                const {content, mediaType} = media;
+                const { content, mediaType } = media;
                 const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
                 fileName = this._generateAnkiNoteMediaFileName(
                     `yomitan_dictionary_media_${i + 1}`,
@@ -2407,10 +2413,10 @@ export class Backend {
                     fileName = null;
                 }
             }
-            results.push({dictionary, path, fileName});
+            results.push({ dictionary, path, fileName });
         }
 
-        return {results, errors};
+        return { results, errors };
     }
 
     /**
@@ -2419,7 +2425,7 @@ export class Backend {
      */
     _getAudioDownloadError(error) {
         if (error instanceof ExtensionError && typeof error.data === 'object' && error.data !== null) {
-            const {errors} = /** @type {import('core').SerializableObject} */ (error.data);
+            const { errors } = /** @type {import('core').SerializableObject} */ (error.data);
             if (Array.isArray(errors)) {
                 for (const error2 of errors) {
                     if (!(error2 instanceof Error)) { continue; }
@@ -2427,9 +2433,9 @@ export class Backend {
                         return this._createAudioDownloadError('Audio download was cancelled due to an idle timeout', 'audio-download-idle-timeout', errors);
                     }
                     if (!(error2 instanceof ExtensionError)) { continue; }
-                    const {data} = error2;
+                    const { data } = error2;
                     if (!(typeof data === 'object' && data !== null)) { continue; }
-                    const {details} = /** @type {import('core').SerializableObject} */ (data);
+                    const { details } = /** @type {import('core').SerializableObject} */ (data);
                     if (!(typeof details === 'object' && details !== null)) { continue; }
                     const error3 = /** @type {import('core').SerializableObject} */ (details).error;
                     if (typeof error3 !== 'string') { continue; }
@@ -2488,13 +2494,13 @@ export class Backend {
         switch (definitionDetails.type) {
             case 'kanji':
                 {
-                    const {character} = definitionDetails;
+                    const { character } = definitionDetails;
                     if (character) { fileName += `_${character}`; }
                 }
                 break;
             default:
                 {
-                    const {reading, term} = definitionDetails;
+                    const { reading, term } = definitionDetails;
                     if (reading) { fileName += `_${reading}`; }
                     if (term) { fileName += `_${term}`; }
                 }
@@ -2549,7 +2555,7 @@ export class Backend {
         let data = dataUrl.substring(match[0].length);
         if (typeof match[2] === 'undefined') { data = btoa(data); }
 
-        return {mediaType, data};
+        return { mediaType, data };
     }
 
     /**
@@ -2558,7 +2564,7 @@ export class Backend {
      */
     _triggerDatabaseUpdated(type, cause) {
         this._translator.clearDatabaseCaches();
-        this._sendMessageAllTabsIgnoreResponse('Yomitan.databaseUpdated', {type, cause});
+        this._sendMessageAllTabsIgnoreResponse('Yomitan.databaseUpdated', { type, cause });
     }
 
     /**
@@ -2579,13 +2585,13 @@ export class Backend {
      * @returns {import('translation').FindTermsOptions} An options object.
      */
     _getTranslatorFindTermsOptions(mode, details, options) {
-        let {matchType, deinflect} = details;
+        let { matchType, deinflect } = details;
         if (typeof matchType !== 'string') { matchType = /** @type {import('translation').FindTermsMatchType} */ ('exact'); }
         if (typeof deinflect !== 'boolean') { deinflect = true; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
-            general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder},
-            scanning: {alphanumeric},
+            general: { mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder },
+            scanning: { alphanumeric },
             translation: {
                 convertHalfWidthCharacters,
                 convertNumericCharacters,
@@ -2633,7 +2639,7 @@ export class Backend {
      */
     _getTranslatorFindKanjiOptions(options) {
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
-        return {enabledDictionaryMap};
+        return { enabledDictionaryMap };
     }
 
     /**
@@ -2663,7 +2669,7 @@ export class Backend {
         for (const group of textReplacementsOptions.groups) {
             /** @type {import('translation').FindTermsTextReplacement[]} */
             const textReplacementsEntries = [];
-            for (const {pattern, ignoreCase, replacement} of group) {
+            for (const { pattern, ignoreCase, replacement } of group) {
                 let patternRegExp;
                 try {
                     patternRegExp = new RegExp(pattern, ignoreCase ? 'gi' : 'g');
@@ -2671,7 +2677,7 @@ export class Backend {
                     // Invalid pattern
                     continue;
                 }
-                textReplacementsEntries.push({pattern: patternRegExp, replacement});
+                textReplacementsEntries.push({ pattern: patternRegExp, replacement });
             }
             if (textReplacementsEntries.length > 0) {
                 textReplacements.push(textReplacementsEntries);
@@ -2690,7 +2696,7 @@ export class Backend {
         chrome.storage.session.get(['openedWelcomePage']).then((result) => {
             if (!result.openedWelcomePage) {
                 this._openWelcomeGuidePage();
-                chrome.storage.session.set({'openedWelcomePage': true});
+                chrome.storage.session.set({ 'openedWelcomePage': true });
             }
         });
     }
@@ -2716,7 +2722,7 @@ export class Backend {
         const manifest = chrome.runtime.getManifest();
         const optionsUI = manifest.options_ui;
         if (typeof optionsUI === 'undefined') { throw new Error('Failed to find options_ui'); }
-        const {page} = optionsUI;
+        const { page } = optionsUI;
         if (typeof page === 'undefined') { throw new Error('Failed to find options_ui.page'); }
         const url = chrome.runtime.getURL(page);
         switch (mode) {
@@ -2744,7 +2750,7 @@ export class Backend {
      */
     _createTab(url) {
         return new Promise((resolve, reject) => {
-            chrome.tabs.create({url}, (tab) => {
+            chrome.tabs.create({ url }, (tab) => {
                 const e = chrome.runtime.lastError;
                 if (e) {
                     reject(new Error(e.message));
@@ -2808,7 +2814,7 @@ export class Backend {
 
             // Only request this permission for Firefox versions >= 77.
             // https://bugzilla.mozilla.org/show_bug.cgi?id=1630413
-            const {vendor, version} = await browser.runtime.getBrowserInfo();
+            const { vendor, version } = await browser.runtime.getBrowserInfo();
             if (vendor !== 'Mozilla') { return; }
 
             const match = /^\d+/.exec(version);
@@ -2830,9 +2836,9 @@ export class Backend {
     async _getNormalizedDictionaryDatabaseMedia(targets) {
         const results = [];
         for (const item of await this._dictionaryDatabase.getMedia(targets)) {
-            const {content, dictionary, height, mediaType, path, width} = item;
+            const { content, dictionary, height, mediaType, path, width } = item;
             const content2 = ArrayBufferUtil.arrayBufferToBase64(content);
-            results.push({content: content2, dictionary, height, mediaType, path, width});
+            results.push({ content: content2, dictionary, height, mediaType, path, width });
         }
         return results;
     }

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Scrub Caffeinated
  * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
@@ -196,8 +197,8 @@ export class Translator {
         return results;
     }
 
+    /* https://github.com/seth-js/yomichan-de */
     // Find terms internal implementation
-
     /**
      * @param {string} text
      * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
@@ -213,20 +214,187 @@ export class Translator {
             return {dictionaryEntries: [], originalTextLength: 0};
         }
 
-        const deinflections = await this._findTermsInternal2(text, enabledDictionaryMap, options);
+        // Makes it so that Yomichan doesn't look up parts of a word, only the full word
+        // Ex: находится would give me definitions for на
+        // Also chop the text since words with newlines or spaces after is bugging out
+
+        // const deinflections = await this._findTermsInternal2(text, enabledDictionaryMap, options);
+
+        const choppedText = text.replace(/\n/g, ' ').trim();
+
+        let deinflections = await this._findTermsInternal2(choppedText, enabledDictionaryMap, options);
+
+        /**
+         * @type {import("translation-internal").DatabaseDeinflection[]}
+         */
+        const filteredDeinflections = [];
+
+        let smallestMatch = '';
+
+        deinflections.forEach((flect) => {
+            const {originalText} = flect;
+
+            if (!/\s/.test(originalText)
+                && /\p{L}$/u.test(originalText)
+                && !smallestMatch) { smallestMatch = originalText; }
+        });
+
+        deinflections.forEach((flect) => {
+            const {originalText, databaseEntries} = flect;
+
+            if (databaseEntries && databaseEntries.length > 0) {
+                if (!smallestMatch.includes(originalText) || smallestMatch === originalText) {
+                    filteredDeinflections.push(flect);
+                }
+            }
+        });
+
+        deinflections = [...filteredDeinflections];
+
+        // Automatically handle non-lemma forms by looking up what they point to
+        const requiredSearches = {};
+        let searching = false;
+
+        do {
+            searching = false;
+
+            for (const {databaseEntries} of deinflections) {
+                for (const ent of databaseEntries) {
+                    const {definitionTags, definitions, term} = ent;
+
+                    if (definitionTags.includes('non-lemma')) {
+                        ent.skip = true;
+
+                        for (const definition of definitions) {
+                            const lemma = (typeof definition === 'string') ? definition.replace(/.+?\(->(?=.+?\)$)/, '').replace(/\)$/, '') : '';
+                            const reason = (typeof definition === 'string') ? definition.replace(/\s\(->.+/, '') : '';
+
+                            if (!requiredSearches[lemma]) {
+                                searching = true;
+                                requiredSearches[lemma] = {form: term, reasons: [reason]};
+                            } else if (!requiredSearches[lemma].reasons.includes(reason)) {
+                                searching = true;
+                                requiredSearches[lemma].reasons.push(reason);
+                            }
+                        }
+                    }
+                }
+            }
+
+            const extraDeinflections = [];
+
+            for (const [lemma, {form, reasons}] of Object.entries(requiredSearches)) {
+                const flections = await this._findTermsInternal2(lemma, enabledDictionaryMap, options);
+
+                /**
+                 * @type {import("translation-internal").DatabaseDeinflection[]}
+                 */
+                const filteredFlections = [];
+
+                let innerSmallestMatch = '';
+
+                flections.forEach((flect) => {
+                    const {originalText} = flect;
+
+                    if (!/\s/.test(originalText)
+                        && /\p{L}$/u.test(originalText)
+                        && !innerSmallestMatch) { innerSmallestMatch = originalText; }
+                });
+
+                flections.forEach((flect) => {
+                    const {originalText, deinflectedText, databaseEntries} = flect;
+
+                    if (databaseEntries && databaseEntries.length > 0 && lemma === deinflectedText) {
+                        if (!innerSmallestMatch.includes(originalText) || innerSmallestMatch === originalText) {
+                            filteredFlections.push(flect);
+                        }
+                    }
+                });
+
+                for (const flect of filteredFlections) {
+                    const {databaseEntries} = flect;
+
+                    flect.originalText = form;
+
+                    databaseEntries.forEach((ent) => {
+                        const {definitionTags} = ent;
+
+                        if (definitionTags.includes('non-lemma')) { ent.skip = true; }
+                    });
+
+                    reasons.forEach((/** @type {string} */ reason) => {
+                        flect.reasons.push(reason);
+                    });
+
+                    flect.isExtra = true;
+                    extraDeinflections.push(flect);
+                }
+            }
+
+            if (extraDeinflections.length > 0) { deinflections.push(...extraDeinflections); }
+        } while (searching);
 
         let originalTextLength = 0;
         const dictionaryEntries = [];
         const ids = new Set();
-        for (const {databaseEntries, originalText, transformedText, deinflectedText, reasons} of deinflections) {
+
+        // Added the isExtra variable so it can be checked
+
+        // for (const {databaseEntries, originalText, transformedText, deinflectedText, reasons} of deinflections) {
+
+        const uniqueResultsObj = {};
+        const uniqueResults = [];
+
+        for (const {databaseEntries, originalText, transformedText, deinflectedText, reasons, isExtra} of deinflections) {
+            if (!uniqueResultsObj[deinflectedText]) { uniqueResultsObj[deinflectedText] = {}; }
+            if (!uniqueResultsObj[deinflectedText][originalText]) { uniqueResultsObj[deinflectedText][originalText] = {databaseEntries, originalText, transformedText, deinflectedText, isExtra}; }
+
+            if (reasons.length > 0) {
+                uniqueResultsObj[deinflectedText][originalText].reasons = [...reasons];
+            } else if (!uniqueResultsObj[deinflectedText][originalText].reasons) {
+                uniqueResultsObj[deinflectedText][originalText].reasons = [];
+            }
+        }
+
+        for (const {originalText, deinflectedText} of deinflections) {
+            if (originalText === deinflectedText && Object.entries(uniqueResultsObj[deinflectedText]).length > 1) {
+                delete uniqueResultsObj[deinflectedText][originalText];
+            }
+        }
+
+        for (const [lemma, info] of Object.entries(uniqueResultsObj)) {
+            const [[surface, {databaseEntries, transformedText, reasons, isExtra}]] = Object.entries(info);
+            uniqueResults.push({databaseEntries, originalText: surface, transformedText, deinflectedText: lemma, reasons, isExtra});
+        }
+
+        // console.log(uniqueResults);
+
+        for (const {databaseEntries, originalText, transformedText, deinflectedText, reasons, isExtra} of uniqueResults) {
             if (databaseEntries.length === 0) { continue; }
-            originalTextLength = Math.max(originalTextLength, originalText.length);
+
+            // Makes it so that the character length of lemmas don't affect the non-lemma match
+            // originalTextLength = Math.max(originalTextLength, originalText.length);
+
+            if (!isExtra) {
+                originalTextLength = Math.max(originalTextLength, originalText.length);
+            }
+
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
                 if (ids.has(id)) { continue; }
-                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, true, enabledDictionaryMap, tagAggregator);
-                dictionaryEntries.push(dictionaryEntry);
-                ids.add(id);
+
+                // Makes it so that non-lemma entries aren't added to the dictionary entries
+                // We already have what they point to and the relevant form info
+
+                // const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, true, enabledDictionaryMap);
+                // dictionaryEntries.push(dictionaryEntry);
+                // ids.add(id);
+
+                if (!databaseEntry.skip) {
+                    const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, true, enabledDictionaryMap, tagAggregator);
+                    dictionaryEntries.push(dictionaryEntry);
+                    ids.add(id);
+                }
             }
         }
 
@@ -242,8 +410,8 @@ export class Translator {
     async _findTermsInternal2(text, enabledDictionaryMap, options) {
         const deinflections = (
             options.deinflect ?
-            this._getAllDeinflections(text, options) :
-            [this._createDeinflection(text, text, text, 0, [])]
+                this._getAllDeinflections(text, options) :
+                [this._createDeinflection(text, text, text, 0, [])]
         );
         if (deinflections.length === 0) { return []; }
 
@@ -360,7 +528,7 @@ export class Translator {
         const jp = this._japaneseUtil;
         let length = 0;
         for (const c of text) {
-            if (!jp.isCodePointJapanese(/** @type {number} */ (c.codePointAt(0)))) {
+            if (!jp.isCodePointJapanese(/** @type {number} */(c.codePointAt(0)))) {
                 return text.substring(0, length);
             }
             length += c.length;
@@ -415,7 +583,7 @@ export class Translator {
      * @returns {import('translation-internal').DatabaseDeinflection}
      */
     _createDeinflection(originalText, transformedText, deinflectedText, rules, reasons) {
-        return {originalText, transformedText, deinflectedText, rules, reasons, databaseEntries: []};
+        return {originalText, transformedText, deinflectedText, rules, reasons, databaseEntries: [], isExtra: false};
     }
 
     // Term dictionary entry grouping
@@ -1858,8 +2026,8 @@ export class Translator {
             }
             dictionaryEntry.frequencyOrder = (
                 frequencyMin <= frequencyMax ?
-                (ascending ? frequencyMin : -frequencyMax) :
-                (ascending ? Number.MAX_SAFE_INTEGER : 0)
+                    (ascending ? frequencyMin : -frequencyMax) :
+                    (ascending ? Number.MAX_SAFE_INTEGER : 0)
             );
             for (const definition of definitions) {
                 frequencyMin = Number.MAX_SAFE_INTEGER;
@@ -1873,8 +2041,8 @@ export class Translator {
                 }
                 definition.frequencyOrder = (
                     frequencyMin <= frequencyMax ?
-                    (ascending ? frequencyMin : -frequencyMax) :
-                    (ascending ? Number.MAX_SAFE_INTEGER : 0)
+                        (ascending ? frequencyMin : -frequencyMax) :
+                        (ascending ? Number.MAX_SAFE_INTEGER : 0)
                 );
             }
             frequencyMap.clear();
