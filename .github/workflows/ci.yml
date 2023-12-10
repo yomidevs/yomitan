@@ -30,6 +30,11 @@ jobs:
         env:
           CI: true
 
+      - name: Validate JS Types
+        run: npm run test-ts
+        env:
+          CI: true
+
       - name: Lint CSS
         run: npm run test-lint-css
         env:
