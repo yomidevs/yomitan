@@ -1367,7 +1367,7 @@ export class Display extends EventDispatcher {
 
         /* https://github.com/seth-js/yomichan-de */
         for (const entryElem of Array.from(document.querySelectorAll('#dictionary-entries .entry'))) {
-            const formBoxes = {};
+            const formBoxes = new Map();
 
             for (const inflectElem of entryElem.querySelectorAll('.inflection')) {
                 if (inflectElem.textContent === null) { return; }
@@ -1378,33 +1378,35 @@ export class Display extends EventDispatcher {
                 inflectTextArr.shift();
                 let inflectText = inflectTextArr.join(' ');
 
-                if (!formBoxes[targetPOS]) { formBoxes[targetPOS] = {}; }
-                if (!formBoxes[targetPOS].inflections) { formBoxes[targetPOS].inflections = []; }
-                formBoxes[targetPOS].isAutomated = false;
+                if (typeof formBoxes.get(targetPOS) === 'undefined') { formBoxes.set(targetPOS, {}); }
+                const targetPOSBox = formBoxes.get(targetPOS);
+
+                if (!targetPOSBox.inflections) { targetPOSBox.inflections = []; }
+                targetPOSBox.isAutomated = false;
 
                 if (/-automated-/.test(inflectText)) {
                     inflectText = inflectText.replace(/^-.+?- /, '');
-                    formBoxes[targetPOS].isAutomated = true;
+                    targetPOSBox.isAutomated = true;
                 }
 
                 const pointerText = inflectText.replace(/\}.+/, '').replace(/\{/, '');
                 inflectText = inflectText.replace(/\{.+?\} /, '');
 
-                formBoxes[targetPOS].pointerText = pointerText;
+                targetPOSBox.pointerText = pointerText;
 
-                formBoxes[targetPOS].inflections.push(inflectText);
+                targetPOSBox.inflections.push(inflectText);
             }
 
             for (const defElem of Array.from(entryElem.querySelectorAll('.definition-item'))) {
                 for (const tagElem of Array.from(defElem.querySelectorAll('.tag[data-category="partOfSpeech"]'))) {
                     const pos = tagElem.textContent;
                     if (pos === null) { return; }
-                    if (formBoxes[pos]) {
+                    if (formBoxes.get(pos)) {
                         const formInfoBox = document.createElement('div');
 
                         formInfoBox.classList.add('form-info-box');
 
-                        if (formBoxes[pos].isAutomated) {
+                        if (formBoxes.get(pos).isAutomated) {
                             const automatedNotice = document.createElement('div');
                             automatedNotice.classList.add('automated-result-text');
                             automatedNotice.textContent = '(automated results)';
@@ -1413,12 +1415,12 @@ export class Display extends EventDispatcher {
 
                         const pointerElem = document.createElement('div');
                         pointerElem.classList.add('pointer-text');
-                        pointerElem.textContent = formBoxes[pos].pointerText;
+                        pointerElem.textContent = formBoxes.get(pos).pointerText;
                         formInfoBox.appendChild(pointerElem);
 
                         const reasonList = document.createElement('ol');
 
-                        for (const reason of formBoxes[pos].inflections) {
+                        for (const reason of formBoxes.get(pos).inflections) {
                             const item = document.createElement('li');
                             item.textContent = reason;
                             reasonList.appendChild(item);
