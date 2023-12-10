@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Scrub Caffeinated
  * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
@@ -1403,6 +1404,9 @@ export class Backend {
      * @param {import('settings').OptionsContext} optionsContext
      * @returns {Promise<import('api').ParseTextLine[]>}
      */
+
+    /* https://github.com/seth-js/yomichan-de  */
+    // Don't use Japanese text segmentation since it breaks things
     async _textParseScanning(text, scanLength, optionsContext) {
         // const jp = this._japaneseUtil;
         // /** @type {import('translator').FindTermsMode} */
