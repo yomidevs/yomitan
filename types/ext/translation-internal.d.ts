@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2023  Scrub Caffeinated
  * Copyright (C) 2023  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -63,5 +62,4 @@ export type DatabaseDeinflection = {
     rules: DeinflectionRuleFlags;
     reasons: string[];
     databaseEntries: DictionaryDatabase.TermEntry[];
-    isExtra: boolean;
 };

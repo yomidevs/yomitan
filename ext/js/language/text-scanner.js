@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2023  Scrub Caffeinated
  * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
@@ -17,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { EventDispatcher, EventListenerCollection, clone, log } from '../core.js';
-import { DocumentUtil } from '../dom/document-util.js';
-import { TextSourceElement } from '../dom/text-source-element.js';
-import { yomitan } from '../yomitan.js';
+import {EventDispatcher, EventListenerCollection, clone, log} from '../core.js';
+import {DocumentUtil} from '../dom/document-util.js';
+import {TextSourceElement} from '../dom/text-source-element.js';
+import {yomitan} from '../yomitan.js';
 
 /**
  * @augments EventDispatcher<import('text-scanner').EventType>
@@ -32,12 +31,12 @@ export class TextScanner extends EventDispatcher {
     constructor({
         node,
         getSearchContext,
-        ignoreElements = null,
-        ignorePoint = null,
-        searchTerms = false,
-        searchKanji = false,
-        searchOnClick = false,
-        searchOnClickOnly = false
+        ignoreElements=null,
+        ignorePoint=null,
+        searchTerms=false,
+        searchKanji=false,
+        searchOnClick=false,
+        searchOnClickOnly=false
     }) {
         super();
         /** @type {HTMLElement|Window} */
@@ -271,7 +270,7 @@ export class TextScanner extends EventDispatcher {
             this._matchTypePrefix = matchTypePrefix;
         }
         if (typeof sentenceParsingOptions === 'object' && sentenceParsingOptions !== null) {
-            const { scanExtent, terminationCharacterMode, terminationCharacters } = sentenceParsingOptions;
+            const {scanExtent, terminationCharacterMode, terminationCharacters} = sentenceParsingOptions;
             if (typeof scanExtent === 'number') {
                 this._sentenceScanExtent = scanExtent;
             }
@@ -288,7 +287,7 @@ export class TextScanner extends EventDispatcher {
                     Array.isArray(terminationCharacters) &&
                     (terminationCharacterMode === 'custom' || terminationCharacterMode === 'custom-no-newlines')
                 ) {
-                    for (const { enabled, character1, character2, includeCharacterAtStart, includeCharacterAtEnd } of terminationCharacters) {
+                    for (const {enabled, character1, character2, includeCharacterAtStart, includeCharacterAtEnd} of terminationCharacters) {
                         if (!enabled) { continue; }
                         if (character2 === null) {
                             sentenceTerminatorMap.set(character1, [includeCharacterAtStart, includeCharacterAtEnd]);
@@ -404,7 +403,7 @@ export class TextScanner extends EventDispatcher {
      */
     _createOptionsContextForInput(baseOptionsContext, inputInfo) {
         const optionsContext = clone(baseOptionsContext);
-        const { modifiers, modifierKeys } = inputInfo;
+        const {modifiers, modifierKeys} = inputInfo;
         optionsContext.modifiers = [...modifiers];
         optionsContext.modifierKeys = [...modifierKeys];
         return optionsContext;
@@ -436,8 +435,8 @@ export class TextScanner extends EventDispatcher {
             const inputInfoDetail = inputInfo.detail;
             const selectionRestoreInfo = (
                 (typeof inputInfoDetail === 'object' && inputInfoDetail !== null && inputInfoDetail.restoreSelection) ?
-                    (this._inputInfoCurrent === null ? this._createSelectionRestoreInfo() : null) :
-                    null
+                (this._inputInfoCurrent === null ? this._createSelectionRestoreInfo() : null) :
+                null
             );
 
             if (this._textSourceCurrent !== null && this._textSourceCurrent.hasSameStart(textSource)) {
@@ -446,7 +445,7 @@ export class TextScanner extends EventDispatcher {
 
             const getSearchContextPromise = this._getSearchContext();
             const getSearchContextResult = getSearchContextPromise instanceof Promise ? await getSearchContextPromise : getSearchContextPromise;
-            const { detail: detail2 } = getSearchContextResult;
+            const {detail: detail2} = getSearchContextResult;
             if (typeof detail2 !== 'undefined') { detail = detail2; }
             optionsContext = this._createOptionsContextForInput(getSearchContextResult.optionsContext, inputInfo);
 
@@ -455,11 +454,11 @@ export class TextScanner extends EventDispatcher {
             let valid = false;
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
-                ({ dictionaryEntries, sentence, type } = result);
+                ({dictionaryEntries, sentence, type} = result);
                 valid = true;
             } else if (textSource !== null && textSource instanceof TextSourceElement && await this._hasJapanese(textSource.fullContent)) {
                 dictionaryEntries = [];
-                sentence = { text: '', offset: 0 };
+                sentence = {text: '', offset: 0};
                 type = 'terms';
                 valid = true;
             }
@@ -534,7 +533,7 @@ export class TextScanner extends EventDispatcher {
      * @param {MouseEvent} e
      */
     _onMouseOver(e) {
-        if (this._ignoreElements !== null && this._ignoreElements().includes(/** @type {Element} */(e.target))) {
+        if (this._ignoreElements !== null && this._ignoreElements().includes(/** @type {Element} */ (e.target))) {
             this._scanTimerClear();
         }
     }
@@ -647,7 +646,7 @@ export class TextScanner extends EventDispatcher {
             return;
         }
 
-        const { clientX, clientY, identifier } = e.changedTouches[0];
+        const {clientX, clientY, identifier} = e.changedTouches[0];
         this._onPrimaryTouchStart(e, clientX, clientY, identifier);
     }
 
@@ -687,7 +686,7 @@ export class TextScanner extends EventDispatcher {
         const primaryTouch = this._getTouch(e.changedTouches, this._primaryTouchIdentifier);
         if (primaryTouch === null) { return; }
 
-        const { clientX, clientY } = primaryTouch;
+        const {clientX, clientY} = primaryTouch;
         this._onPrimaryTouchEnd(e, clientX, clientY, true);
     }
 
@@ -743,7 +742,7 @@ export class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchMove', e);
         if (inputInfo === null) { return; }
 
-        const { input } = inputInfo;
+        const {input} = inputInfo;
         if (input !== null && input.scanOnTouchMove) {
             this._searchAt(primaryTouch.clientX, primaryTouch.clientY, inputInfo);
         }
@@ -756,7 +755,7 @@ export class TextScanner extends EventDispatcher {
      * @returns {boolean|void}
      */
     _onPointerOver(e) {
-        const { pointerType, pointerId, isPrimary } = e;
+        const {pointerType, pointerId, isPrimary} = e;
         if (pointerType === 'pen') {
             this._pointerIdTypeMap.set(pointerId, pointerType);
         }
@@ -889,7 +888,7 @@ export class TextScanner extends EventDispatcher {
      * @returns {boolean|void}
      */
     _onTouchPointerDown(e) {
-        const { clientX, clientY, pointerId } = e;
+        const {clientX, clientY, pointerId} = e;
         this._onPrimaryTouchStart(e, clientX, clientY, pointerId);
     }
 
@@ -913,7 +912,7 @@ export class TextScanner extends EventDispatcher {
      * @returns {boolean|void}
      */
     _onTouchPointerUp(e) {
-        const { clientX, clientY } = e;
+        const {clientX, clientY} = e;
         return this._onPrimaryTouchEnd(e, clientX, clientY, true);
     }
 
@@ -1072,7 +1071,7 @@ export class TextScanner extends EventDispatcher {
             [this._node, 'pointerup', this._onPointerUp.bind(this), capture],
             [this._node, 'pointercancel', this._onPointerCancel.bind(this), capture],
             [this._node, 'pointerout', this._onPointerOut.bind(this), capture],
-            [this._node, 'touchmove', this._onTouchMovePreventScroll.bind(this), { passive: false, capture }],
+            [this._node, 'touchmove', this._onTouchMovePreventScroll.bind(this), {passive: false, capture}],
             [this._node, 'mousedown', this._onMouseDown.bind(this), capture],
             [this._node, 'click', this._onClick.bind(this), capture],
             [this._node, 'auxclick', this._onAuxClick.bind(this), capture]
@@ -1103,7 +1102,7 @@ export class TextScanner extends EventDispatcher {
             [this._node, 'touchstart', this._onTouchStart.bind(this), capture],
             [this._node, 'touchend', this._onTouchEnd.bind(this), capture],
             [this._node, 'touchcancel', this._onTouchCancel.bind(this), capture],
-            [this._node, 'touchmove', this._onTouchMove.bind(this), { passive: false, capture }],
+            [this._node, 'touchmove', this._onTouchMove.bind(this), {passive: false, capture}],
             [this._node, 'contextmenu', this._onContextMenu.bind(this), capture]
         ];
     }
@@ -1123,7 +1122,7 @@ export class TextScanner extends EventDispatcher {
      * @returns {import('event-listener-collection').AddEventListenerArgs[]}
      */
     _getMouseClickOnlyEventListeners2(capture) {
-        const { documentElement } = document;
+        const {documentElement} = document;
         /** @type {import('event-listener-collection').AddEventListenerArgs[]} */
         const entries = [
             [document, 'selectionchange', this._onSelectionChange.bind(this)]
@@ -1199,72 +1198,7 @@ export class TextScanner extends EventDispatcher {
         /** @type {import('api').FindTermsDetails} */
         const details = {};
         if (this._matchTypePrefix) { details.matchType = 'prefix'; }
-
-        // const {dictionaryEntries, originalTextLength} = await yomitan.api.termsFind(searchText, details, optionsContext);
-        // if (dictionaryEntries.length === 0) { return null; }
-
-        /* https://github.com/seth-js/yomichan-de */
-        /** @type {string[]} */
-        const matchedDefs = [];
-        /** @type {import('dictionary').TermDictionaryEntry[]} */
-        const dictionaryEntries = [];
-        let originalTextLength = 0;
-
-        /**
-         * @param {string} text
-         * @returns {string}
-         */
-        function firstCharLower(text) {
-            /** @type {string[]} */
-            let chars = [];
-
-            text.split('').forEach((char) => chars.push(char));
-
-            chars[0] = chars[0].toLowerCase();
-
-            return chars.join('');
-        }
-
-        /**
-         * @param {string} text
-         * @returns {string}
-         */
-        function firstCharUpper(text) {
-            /** @type {string[]} */
-            let chars = [];
-
-            text.split('').forEach((char) => chars.push(char));
-
-            chars[0] = chars[0].toUpperCase();
-
-            return chars.join('');
-        }
-
-        const searches = [firstCharLower(searchText), firstCharUpper(searchText), searchText.toLowerCase(), searchText];
-
-        // handle english apostrophe
-        if (/'|´/.test(searchText) && !/^'|^´/.test(searchText)) {
-            const noApostrophe = searchText.replace(/'.+/, '').replace(/´.+/, '');
-            searches.push(...[firstCharLower(noApostrophe), firstCharUpper(noApostrophe), noApostrophe.toLowerCase()]);
-        }
-
-        for (const search of searches) {
-            const result = await yomitan.api.termsFind(search, details, optionsContext);
-
-            if (result.dictionaryEntries.length > 0) {
-                result.dictionaryEntries.forEach((entry) => {
-                    const { definitions } = entry;
-
-                    // avoid duplicate results
-                    if (!matchedDefs.includes(JSON.stringify(definitions))) {
-                        matchedDefs.push(JSON.stringify(definitions));
-                        dictionaryEntries.push(entry);
-                        originalTextLength = result.originalTextLength;
-                    }
-                });
-            }
-        }
-
+        const {dictionaryEntries, originalTextLength} = await yomitan.api.termsFind(searchText, details, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(originalTextLength, false, layoutAwareScan);
@@ -1278,7 +1212,7 @@ export class TextScanner extends EventDispatcher {
             sentenceBackwardQuoteMap
         );
 
-        return { dictionaryEntries, sentence, type: 'terms' };
+        return {dictionaryEntries, sentence, type: 'terms'};
     }
 
     /**
@@ -1310,7 +1244,7 @@ export class TextScanner extends EventDispatcher {
             sentenceBackwardQuoteMap
         );
 
-        return { dictionaryEntries, sentence, type: 'kanji' };
+        return {dictionaryEntries, sentence, type: 'kanji'};
     }
 
     /**
@@ -1382,7 +1316,7 @@ export class TextScanner extends EventDispatcher {
      */
     async _searchAtFromTouchStart(x, y, inputInfo) {
         const textSourceCurrentPrevious = this._textSourceCurrent !== null ? this._textSourceCurrent.clone() : null;
-        const { input } = inputInfo;
+        const {input} = inputInfo;
         const preventScroll = input !== null && input.preventTouchScrolling;
 
         await this._searchAt(x, y, inputInfo);
@@ -1417,7 +1351,7 @@ export class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent('pen', eventType, e);
         if (inputInfo === null) { return; }
 
-        const { input } = inputInfo;
+        const {input} = inputInfo;
         if (input === null || !this._isPenEventSupported(eventType, input)) { return; }
 
         const preventScroll = input !== null && input.preventPenScrolling;
@@ -1483,7 +1417,7 @@ export class TextScanner extends EventDispatcher {
         const modifiersSet = new Set(modifiers);
         for (let i = 0, ii = this._inputs.length; i < ii; ++i) {
             const input = this._inputs[i];
-            const { include, exclude, types } = input;
+            const {include, exclude, types} = input;
             if (!types.has(pointerType)) { continue; }
             if (this._setHasAll(modifiersSet, include) && (exclude.length === 0 || !this._setHasAll(modifiersSet, exclude))) {
                 if (include.length > 0) {
@@ -1496,8 +1430,8 @@ export class TextScanner extends EventDispatcher {
 
         return (
             fallbackIndex >= 0 ?
-                this._createInputInfo(this._inputs[fallbackIndex], pointerType, eventType, true, modifiers, modifierKeys) :
-                null
+            this._createInputInfo(this._inputs[fallbackIndex], pointerType, eventType, true, modifiers, modifierKeys) :
+            null
         );
     }
 
@@ -1512,7 +1446,7 @@ export class TextScanner extends EventDispatcher {
      * @returns {import('text-scanner').InputInfo}
      */
     _createInputInfo(input, pointerType, eventType, passive, modifiers, modifierKeys, detail) {
-        return { input, pointerType, eventType, passive, modifiers, modifierKeys, detail };
+        return {input, pointerType, eventType, passive, modifiers, modifierKeys, detail};
     }
 
     /**
@@ -1534,7 +1468,7 @@ export class TextScanner extends EventDispatcher {
      * @returns {import('text-scanner').InputConfig}
      */
     _convertInput(input) {
-        const { options } = input;
+        const {options} = input;
         return {
             include: this._getInputArray(input.include),
             exclude: this._getInputArray(input.exclude),
@@ -1561,8 +1495,8 @@ export class TextScanner extends EventDispatcher {
     _getInputArray(value) {
         return (
             typeof value === 'string' ?
-                value.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0) :
-                []
+            value.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0) :
+            []
         );
     }
 
@@ -1570,7 +1504,7 @@ export class TextScanner extends EventDispatcher {
      * @param {{mouse: boolean, touch: boolean, pen: boolean}} details
      * @returns {Set<'mouse'|'touch'|'pen'>}
      */
-    _getInputTypeSet({ mouse, touch, pen }) {
+    _getInputTypeSet({mouse, touch, pen}) {
         const set = new Set();
         if (mouse) { set.add('mouse'); }
         if (touch) { set.add('touch'); }
@@ -1642,14 +1576,14 @@ export class TextScanner extends EventDispatcher {
                 ranges.push(range.cloneRange());
             }
         }
-        return { ranges };
+        return {ranges};
     }
 
     /**
      * @param {import('text-scanner').SelectionRestoreInfo} selectionRestoreInfo
      */
     _restoreSelection(selectionRestoreInfo) {
-        const { ranges } = selectionRestoreInfo;
+        const {ranges} = selectionRestoreInfo;
         const selection = window.getSelection();
         if (selection === null) { return; }
         selection.removeAllRanges();
@@ -1666,7 +1600,7 @@ export class TextScanner extends EventDispatcher {
      * @param {string} reason
      */
     _triggerClear(reason) {
-        this.trigger('clear', { reason });
+        this.trigger('clear', {reason});
     }
 
     /**
