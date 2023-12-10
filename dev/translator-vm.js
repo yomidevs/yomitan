@@ -45,7 +45,7 @@ export class TranslatorVM {
                 }
             }
         };
-        // @ts-expect-error - Overwriting a global
+        // @ts-expect-error Overwriting a global
         global.chrome = chrome;
 
         /** @type {?JapaneseUtil} */
@@ -58,9 +58,9 @@ export class TranslatorVM {
         this._dictionaryName = null;
     }
 
-    /** 
+    /**
      * Returns this VM's translator.
-     * @type {Translator} 
+     * @type {Translator}
      */
     get translator() {
         if (this._translator === null) { throw new Error('Not prepared'); }
@@ -69,8 +69,8 @@ export class TranslatorVM {
 
     /**
      * Initialize this translator VM from a dictionary.
-     * @param {string} dictionaryDirectory - Directory of the dictionary files.
-     * @param {string} dictionaryName - Name of the dictionary.
+     * @param {string} dictionaryDirectory Directory of the dictionary files.
+     * @param {string} dictionaryName Name of the dictionary.
      */
     async prepare(dictionaryDirectory, dictionaryName) {
         // Dictionary

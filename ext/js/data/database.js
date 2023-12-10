@@ -97,11 +97,11 @@ export class Database {
 
     /**
      * Add items in bulk to the object store.
-     * *count* items will be added beginning from *start* index of *items* list.
+     * count items will be added beginning from start index of items list.
      * @param {TObjectStoreName} objectStoreName
-     * @param {unknown[]} items - List of items to add.
-     * @param {number} start - Start index. Added items begin at items[start].
-     * @param {number} count - Count of items to add.
+     * @param {unknown[]} items List of items to add.
+     * @param {number} start Start index. Added items begin at items[start].
+     * @param {number} count Count of items to add.
      * @returns {Promise<void>}
      */
     bulkAdd(objectStoreName, items, start, count) {
@@ -301,8 +301,8 @@ export class Database {
     }
 
     /**
-     * Attempts to delete the named database. 
-     * If the database already exists and there are open connections that don't close in response to a versionchange event, the request will be blocked until all they close. 
+     * Attempts to delete the named database.
+     * If the database already exists and there are open connections that don't close in response to a versionchange event, the request will be blocked until all they close.
      * If the request is successful request's result will be null.
      * @param {string} databaseName
      * @returns {Promise<void>}

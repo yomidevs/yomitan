@@ -231,9 +231,9 @@ export class DictionaryDatabase {
 
     /**
      * Find terms in bulk.
-     * @param {string[]} termList - The list of terms to find.
-     * @param {import('dictionary-database').DictionarySet} dictionaries - Dictionaries to find the terms from.
-     * @param {import('dictionary-database').MatchType} matchType - Matching type.
+     * @param {string[]} termList The list of terms to find.
+     * @param {import('dictionary-database').DictionarySet} dictionaries Dictionaries to find the terms from.
+     * @param {import('dictionary-database').MatchType} matchType Matching type.
      * @returns {Promise<import('dictionary-database').TermEntry[]>}
      */
     findTermsBulk(termList, dictionaries, matchType) {
@@ -266,8 +266,8 @@ export class DictionaryDatabase {
 
     /**
      * Find exact terms in bulk.
-     * @param {import('dictionary-database').TermExactRequest[]} termList - The list of terms to find.
-     * @param {import('dictionary-database').DictionarySet} dictionaries - Dictionaries to find the term from.
+     * @param {import('dictionary-database').TermExactRequest[]} termList The list of terms to find.
+     * @param {import('dictionary-database').DictionarySet} dictionaries Dictionaries to find the term from.
      * @returns {Promise<import('dictionary-database').TermEntry[]>}
      */
     findTermsExactBulk(termList, dictionaries) {
@@ -301,8 +301,8 @@ export class DictionaryDatabase {
 
     /**
      * Find kanji in bulk.
-     * @param {string[]} kanjiList - The list of kanji to find.
-     * @param {import('dictionary-database').DictionarySet} dictionaries - Dictionaries to find from.
+     * @param {string[]} kanjiList The list of kanji to find.
+     * @param {import('dictionary-database').DictionarySet} dictionaries Dictionaries to find from.
      * @returns {Promise<import('dictionary-database').KanjiEntry[]>}
      */
     findKanjiBulk(kanjiList, dictionaries) {

@@ -72,9 +72,9 @@ async function validateDictionaryBanks(mode, zip, fileNameFormat, schema) {
 
 /**
  * Validates a dictionary.
- * @param {import('dev/schema-validate').ValidateMode} mode - Mode of validation.
- * @param {import('jszip')} archive - Zip archive of the dictionary.
- * @param {import('dev/dictionary-validate').Schemas} schemas - Schema to use for validation.
+ * @param {import('dev/schema-validate').ValidateMode} mode Mode of validation.
+ * @param {import('jszip')} archive Zip archive of the dictionary.
+ * @param {import('dev/dictionary-validate').Schemas} schemas Schema to use for validation.
  */
 export async function validateDictionary(mode, archive, schemas) {
     const fileName = 'index.json';
@@ -121,8 +121,8 @@ export function getSchemas() {
 
 /**
  * Validates dictionary files and logs the results to the console.
- * @param {import('dev/schema-validate').ValidateMode} mode - Mode of validation.
- * @param {string[]} dictionaryFileNames - Dictionary file names.
+ * @param {import('dev/schema-validate').ValidateMode} mode Mode of validation.
+ * @param {string[]} dictionaryFileNames Dictionary file names.
  */
 export async function testDictionaryFiles(mode, dictionaryFileNames) {
     const schemas = getSchemas();

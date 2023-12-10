@@ -35,7 +35,7 @@ export class Deinflector {
 
     /**
      * Deinflects a Japanese term to all of its possible dictionary forms.
-     * @param {string} source - The source term to deinflect.
+     * @param {string} source The source term to deinflect.
      * @returns {import('translation-internal').Deinflection[]}
      * @example
      * const deinflector = new Deinflector(deinflectionReasons);

@@ -87,7 +87,7 @@ function removeProperty(styles, property, removedProperties) {
 
 /**
  * Manually formats JSON for improved compactness.
- * @param {import('css-style-applier').RawStyleData} rules - CSS ruleset.
+ * @param {import('css-style-applier').RawStyleData} rules CSS ruleset.
  * @returns {string}
  */
 export function formatRulesJson(rules) {
@@ -124,8 +124,8 @@ export function formatRulesJson(rules) {
 
 /**
  * Generates a CSS ruleset.
- * @param {string} cssFile - Path to CSS file.
- * @param {string} overridesCssFile - Path to override CSS file.
+ * @param {string} cssFile Path to CSS file.
+ * @param {string} overridesCssFile Path to override CSS file.
  * @returns {import('css-style-applier').RawStyleData}
  * @throws {Error}
  */
