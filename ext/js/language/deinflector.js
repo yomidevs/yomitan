@@ -34,11 +34,12 @@ export class Deinflector {
     }
 
     /**
-     * Deinflects a Japanese term to its dictionary form.
+     * Deinflects a Japanese term to all of its possible dictionary forms.
      * @param {string} source - The source term to deinflect.
      * @returns {import('translation-internal').Deinflection[]}
      * @example
      * const deinflector = new Deinflector(deinflectionReasons);
+     * // [{ term: '食べた', rules: 0, reasons: [] }, { term: '食べる', rules: 1, reasons: ['past'] }, { term: '食ぶ', rules: 2, reasons: ['potential', 'past'] }]
      * console.log(deinflector.deinflect('食べさせられる'));
      */
     deinflect(source) {
