@@ -52,6 +52,7 @@ class JsonSchemaAjv {
 }
 
 /**
+ * Creates a JSON Schema.
  * @param {import('dev/schema-validate').ValidateMode} mode
  * @param {import('dev/schema-validate').Schema} schema
  * @returns {JsonSchema|JsonSchemaAjv}

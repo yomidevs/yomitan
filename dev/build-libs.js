@@ -45,7 +45,9 @@ async function buildLib(scriptPath) {
     });
 }
 
-/** */
+/** 
+ * Bundles libraries. 
+ */
 export async function buildLibs() {
     const devLibPath = path.join(dirname, 'lib');
     const files = await fs.promises.readdir(devLibPath, {

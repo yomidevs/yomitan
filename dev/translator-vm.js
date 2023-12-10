@@ -32,6 +32,9 @@ vi.mock('../ext/js/language/dictionary-importer-media-loader.js');
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Translator Virtual Machine.
+ */
 export class TranslatorVM {
     constructor() {
         /** @type {import('dev/vm').PseudoChrome} */
@@ -55,15 +58,19 @@ export class TranslatorVM {
         this._dictionaryName = null;
     }
 
-    /** @type {Translator} */
+    /** 
+     * Returns this VM's translator.
+     * @type {Translator} 
+     */
     get translator() {
         if (this._translator === null) { throw new Error('Not prepared'); }
         return this._translator;
     }
 
     /**
-     * @param {string} dictionaryDirectory
-     * @param {string} dictionaryName
+     * Initialize this translator VM from a dictionary.
+     * @param {string} dictionaryDirectory - Directory of the dictionary files.
+     * @param {string} dictionaryName - Name of the dictionary.
      */
     async prepare(dictionaryDirectory, dictionaryName) {
         // Dictionary

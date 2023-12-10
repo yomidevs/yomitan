@@ -97,6 +97,7 @@ export function getAllFiles(baseDirectory, predicate=null) {
 }
 
 /**
+ * Creates a zip archive from the given dictionary directory.
  * @param {string} dictionaryDirectory
  * @param {string} [dictionaryName]
  * @returns {import('jszip')}
