@@ -496,6 +496,7 @@
                                             }
                                         ],
                                         "items": {
+                                            "type": "object",
                                             "required": [
                                                 "include",
                                                 "exclude",
@@ -776,6 +777,7 @@
                                                 "items": {
                                                     "type": "array",
                                                     "items": {
+                                                        "type": "object",
                                                         "required": [
                                                             "pattern",
                                                             "ignoreCase",
