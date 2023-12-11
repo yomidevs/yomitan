@@ -1,58 +1,62 @@
 {
     "extends": "stylelint-config-recommended",
+    "plugins": [
+        "stylelint-stylistic"
+    ],
     "ignoreFiles": [
         "ext/lib/**/*.css"
     ],
     "rules": {
-        "font-family-name-quotes": "always-where-recommended",
-        "string-quotes": "single",
+        "at-rule-empty-line-before": null,
+        "block-no-empty": true,
+        "color-hex-length": null,
         "color-named": "never",
+        "custom-property-empty-line-before": null,
         "declaration-no-important": true,
+        "font-family-name-quotes": "always-where-recommended",
+        "font-weight-notation": "named-where-possible",
         "function-calc-no-unspaced-operator": true,
+        "function-name-case": "lower",
+        "length-zero-no-unit": null,
+        "no-descending-specificity": null,
+        "no-duplicate-selectors": null,
+        "no-invalid-double-slash-comments": true,
+        "rule-empty-line-before": null,
+        "selector-type-no-unknown": null,
+        "selector-pseudo-element-colon-notation": "double",
         "string-no-newline": true,
         "unit-no-unknown": true,
-        "block-no-empty": true,
-        "no-extra-semicolons": true,
-        "no-invalid-double-slash-comments": true,
-        "font-weight-notation": "named-where-possible",
-        "color-hex-case": "lower",
-        "function-comma-space-after": "always",
-        "function-comma-space-before": "never",
-        "function-name-case": "lower",
-        "function-parentheses-space-inside": "never",
-        "function-whitespace-after": "always",
-        "number-leading-zero": "always",
-        "number-no-trailing-zeros": true,
-        "unit-case": "lower",
         "value-keyword-case": [
             "lower",
             {
                 "camelCaseSvgKeywords": true
             }
         ],
-        "property-case": "lower",
-        "indentation": 4,
-        "max-empty-lines": 2,
-        "selector-type-no-unknown": null,
-        "no-descending-specificity": null,
-        "no-duplicate-selectors": null,
-        "selector-combinator-space-before": "never",
-        "selector-combinator-space-after": "never",
-        "selector-list-comma-newline-after": "always-multi-line",
-        "rule-empty-line-before": null,
-        "block-opening-brace-space-before": [
+
+        "stylistic/block-opening-brace-space-after": "always-single-line",
+        "stylistic/block-opening-brace-space-before": [
             "always",
             {
                 "ignoreSelectors": "/^\\.icon/"
             }
         ],
-        "block-opening-brace-space-after": "always-single-line",
-        "color-hex-length": null,
-        "declaration-colon-space-before": "never",
-        "declaration-colon-space-after": "always-single-line",
-        "length-zero-no-unit": null,
-        "selector-pseudo-element-colon-notation": "double",
-        "custom-property-empty-line-before": null,
-        "at-rule-empty-line-before": null
+        "stylistic/color-hex-case": "lower",
+        "stylistic/declaration-colon-space-after": "always-single-line",
+        "stylistic/declaration-colon-space-before": "never",
+        "stylistic/function-comma-space-after": "always",
+        "stylistic/function-comma-space-before": "never",
+        "stylistic/function-parentheses-space-inside": "never",
+        "stylistic/function-whitespace-after": "always",
+        "stylistic/indentation": 4,
+        "stylistic/max-empty-lines": 2,
+        "stylistic/no-extra-semicolons": true,
+        "stylistic/number-leading-zero": "always",
+        "stylistic/number-no-trailing-zeros": true,
+        "stylistic/property-case": "lower",
+        "stylistic/selector-combinator-space-after": "never",
+        "stylistic/selector-combinator-space-before": "never",
+        "stylistic/selector-list-comma-newline-after": "always-multi-line",
+        "stylistic/string-quotes": "single",
+        "stylistic/unit-case": "lower"
     }
 }
