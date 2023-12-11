@@ -564,6 +564,7 @@ export class DisplayAnki {
         const content = this._display.displayGenerator.createAnkiNoteErrorsNotificationContent(displayErrors);
         for (const node of content.querySelectorAll('.anki-note-error-log-link')) {
             /** @type {EventListenerCollection} */ (this._errorNotificationEventListeners).addEventListener(node, 'click', () => {
+                // eslint-disable-next-line no-console
                 console.log({ankiNoteErrors: errors});
             }, false);
         }

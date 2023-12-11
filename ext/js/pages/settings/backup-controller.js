@@ -555,12 +555,14 @@ export class BackupController {
      * @param {{totalRows: number, completedRows: number, done: boolean}} details
      */
     _databaseExportProgressCallback({totalRows, completedRows, done}) {
+        // eslint-disable-next-line no-console
         console.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
         const messageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-progress-report'));
         messageContainer.style.display = 'block';
         messageContainer.textContent = `Export Progress: ${completedRows} of ${totalRows} rows completed`;
 
         if (done) {
+            // eslint-disable-next-line no-console
             console.log('Done exporting.');
             messageContainer.style.display = 'none';
         }
@@ -600,6 +602,7 @@ export class BackupController {
             const blob = new Blob([data], {type: 'application/json'});
             this._saveBlob(blob, fileName);
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.log(error);
             this._databaseExportImportErrorMessage('Errors encountered while exporting. Please try again. Restart the browser if it continues to fail.');
         } finally {
@@ -614,6 +617,7 @@ export class BackupController {
      * @param {{totalRows: number, completedRows: number, done: boolean}} details
      */
     _databaseImportProgressCallback({totalRows, completedRows, done}) {
+        // eslint-disable-next-line no-console
         console.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
         const messageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-progress-report'));
         messageContainer.style.display = 'block';
@@ -621,6 +625,7 @@ export class BackupController {
         messageContainer.textContent = `Import Progress: ${completedRows} of ${totalRows} rows completed`;
 
         if (done) {
+            // eslint-disable-next-line no-console
             console.log('Done importing.');
             messageContainer.style.color = '#006633';
             messageContainer.textContent = 'Done importing. You will need to re-enable the dictionaries and refresh afterward. If you run into issues, please restart the browser. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.';
@@ -668,6 +673,7 @@ export class BackupController {
             this._settingsExportDatabaseToken = token;
             await this._importDatabase(this._dictionariesDatabaseName, file);
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.log(error);
             const messageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-progress-report'));
             messageContainer.style.color = 'red';

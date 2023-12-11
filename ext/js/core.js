@@ -727,6 +727,7 @@ export class Logger extends EventDispatcher {
         }
         message += '\n\nIssues can be reported at https://github.com/themoeway/yomitan/issues';
 
+        /* eslint-disable no-console */
         switch (level) {
             case 'info': console.info(message); break;
             case 'debug': console.debug(message); break;
@@ -734,6 +735,7 @@ export class Logger extends EventDispatcher {
             case 'error': console.error(message); break;
             default: console.log(message); break;
         }
+        /* eslint-enable no-console */
 
         this.trigger('log', {error, level, context});
     }
