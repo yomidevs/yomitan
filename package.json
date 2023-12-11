@@ -74,6 +74,7 @@
         "license-report": "^6.5.0",
         "stylelint": "^15.11.0",
         "stylelint-config-recommended": "^13.0.0",
+        "stylelint-stylistic": "^0.4.3",
         "typescript": "5.3.3",
         "vitest": "^0.34.6"
     },

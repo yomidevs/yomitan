@@ -2027,6 +2027,7 @@ export class Display extends EventDispatcher {
             }
         }
 
+        // eslint-disable-next-line no-console
         console.log(result);
     }
 

@@ -49,6 +49,7 @@ export class CssStyleApplier {
         try {
             rawData = await this._fetchJsonAsset(this._styleDataUrl);
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.error(e);
         }
         const styleData = this._styleData;
