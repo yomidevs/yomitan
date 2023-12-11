@@ -31,6 +31,7 @@
         "type": "array",
         "description": "Metadata about a single kanji character.",
         "minItems": 3,
+        "maxItems": 3,
         "additionalItems": false,
         "items": [
             {

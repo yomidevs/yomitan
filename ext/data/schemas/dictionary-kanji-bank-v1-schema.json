@@ -7,6 +7,7 @@
         "type": "array",
         "description": "Information about a single kanji character.",
         "minItems": 4,
+        "maxItems": 4,
         "items": [
             {
                 "type": "string",

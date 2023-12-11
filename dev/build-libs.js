@@ -60,7 +60,11 @@ export async function buildLibs() {
     const schemaDir = path.join(extDir, 'data/schemas/');
     const schemaFileNames = fs.readdirSync(schemaDir);
     const schemas = schemaFileNames.map((schemaFileName) => JSON.parse(fs.readFileSync(path.join(schemaDir, schemaFileName), {encoding: 'utf8'})));
-    const ajv = new Ajv({schemas: schemas, code: {source: true, esm: true}});
+    const ajv = new Ajv({
+        schemas,
+        code: {source: true, esm: true},
+        allowUnionTypes: true
+    });
     const moduleCode = standaloneCode(ajv);
 
     // https://github.com/ajv-validator/ajv/issues/2209
