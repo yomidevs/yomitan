@@ -546,7 +546,8 @@
         },
         {
             "files": [
-                "*.js"
+                "*.js",
+                "*.ts"
             ],
             "rules": {
                 "header/header": [
