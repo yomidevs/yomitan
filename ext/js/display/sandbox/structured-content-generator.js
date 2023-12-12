@@ -65,6 +65,7 @@ export class StructuredContentGenerator {
             preferredWidth,
             preferredHeight,
             title,
+            description,
             pixelated,
             imageRendering,
             appearance,
@@ -102,7 +103,7 @@ export class StructuredContentGenerator {
         imageContainer.appendChild(imageBackground);
 
         const image = /** @type {HTMLImageElement} */ (this._createElement('img', 'gloss-image'));
-        image.alt = '';
+        image.alt = typeof description === 'string' ? description : '';
         imageContainer.appendChild(image);
 
         const overlay = this._createElement('span', 'gloss-image-container-overlay');
