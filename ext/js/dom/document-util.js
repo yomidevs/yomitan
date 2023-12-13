@@ -132,13 +132,17 @@ export class DocumentUtil {
         // Move backward
         let quoteStack = [];
         for (; pos1 > 0; --pos1) {
-            const c = text[pos1 - 1];
+            let c = text[pos1 - 1];
             if (c === '\n' && terminateAtNewlines) { break; }
 
             if (quoteStack.length === 0) {
-                const terminatorInfo = terminatorMap.get(c);
+                let terminatorInfo = terminatorMap.get(c);
                 if (typeof terminatorInfo !== 'undefined') {
-                    if (terminatorInfo[0]) { --pos1; }
+                    while (typeof terminatorInfo !== 'undefined' && terminatorInfo[0] && pos1 > 0) {
+                        --pos1;
+                        c = text[pos1 - 1];
+                        terminatorInfo = terminatorMap.get(c);
+                    }
                     break;
                 }
             }
@@ -146,7 +150,11 @@ export class DocumentUtil {
             let quoteInfo = forwardQuoteMap.get(c);
             if (typeof quoteInfo !== 'undefined') {
                 if (quoteStack.length === 0) {
-                    if (quoteInfo[1]) { --pos1; }
+                    while (typeof quoteInfo !== 'undefined' && quoteInfo[1] && pos1 > 0) {
+                        --pos1;
+                        c = text[pos1 - 1];
+                        quoteInfo = forwardQuoteMap.get(c);
+                    }
                     break;
                 } else if (quoteStack[0] === c) {
                     quoteStack.pop();
@@ -163,13 +171,17 @@ export class DocumentUtil {
         // Move forward
         quoteStack = [];
         for (; pos2 < textLength; ++pos2) {
-            const c = text[pos2];
+            let c = text[pos2];
             if (c === '\n' && terminateAtNewlines) { break; }
 
             if (quoteStack.length === 0) {
-                const terminatorInfo = terminatorMap.get(c);
+                let terminatorInfo = terminatorMap.get(c);
                 if (typeof terminatorInfo !== 'undefined') {
-                    if (terminatorInfo[1]) { ++pos2; }
+                    while (typeof terminatorInfo !== 'undefined' && terminatorInfo[1] && pos2 < textLength) {
+                        ++pos2;
+                        c = text[pos2];
+                        terminatorInfo = terminatorMap.get(c);
+                    }
                     break;
                 }
             }
@@ -177,7 +189,11 @@ export class DocumentUtil {
             let quoteInfo = backwardQuoteMap.get(c);
             if (typeof quoteInfo !== 'undefined') {
                 if (quoteStack.length === 0) {
-                    if (quoteInfo[1]) { ++pos2; }
+                    while (typeof quoteInfo !== 'undefined' && quoteInfo[1] && pos2 < textLength) {
+                        ++pos2;
+                        c = text[pos2];
+                        quoteInfo = forwardQuoteMap.get(c);
+                    }
                     break;
                 } else if (quoteStack[0] === c) {
                     quoteStack.pop();
