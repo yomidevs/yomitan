@@ -49,6 +49,55 @@
 		1
 	],
 	[
+		"masc-n",
+		"partOfSpeech",
+		-1,
+		"masculine noun",
+		1
+	],
+	[
+		"fem-n",
+		"partOfSpeech",
+		-1,
+		"feminine noun",
+		1
+	],
+	[
+		"neut-n",
+		"partOfSpeech",
+		-1,
+		"neuter noun",
+		1
+	],
+	[
+		"masc/neut-n",
+		"partOfSpeech",
+		-1,
+		["masculine or neuter noun", "neuter or masculine noun"],
+		1
+	],
+	[
+		"fem/neut-n",
+		"partOfSpeech",
+		-1,
+		["feminine or neuter noun", "neuter or feminine noun"],
+		1
+	],
+	[
+		"masc/fem-n",
+		"partOfSpeech",
+		-1,
+		["masculine or feminine noun", "feminine or masculine noun"],
+		1
+	],
+	[
+		"pl-n",
+		"partOfSpeech",
+		-1,
+		"plural noun",
+		1
+	],
+	[
 		"prop-n",
 		"partOfSpeech",
 		-1,
@@ -67,6 +116,20 @@
 		"partOfSpeech",
 		-1,
 		"verb",
+		1
+	],
+	[
+		"mod-v",
+		"partOfSpeech",
+		-1,
+		"modal verb",
+		1
+	],
+	[
+		"aux-v",
+		"partOfSpeech",
+		-1,
+		"auxiliary verb",
 		1
 	],
 	[
@@ -118,6 +181,20 @@
 		"article",
 		1
 	],
+	[
+		"def-artic",
+		"partOfSpeech",
+		-1,
+		"definite article",
+		1
+	],
+	[
+		"indef-artic",
+		"partOfSpeech",
+		-1,
+		"indefinite article",
+		1
+	],
     [
         "prep",
         "partOfSpeech",
@@ -147,12 +224,61 @@
         1
     ],
     [
-        "pron",
+        "pn",
         "partOfSpeech",
         -1,
         ["pronoun", "pron"],
         1
     ],
+	[
+		"pers-pn",
+		"partOfSpeech",
+		-1,
+		"personal pronoun",
+		1
+	],
+	[
+		"indef-pn",
+		"partOfSpeech",
+		-1,
+		"indefinite pronoun",
+		1
+	],
+	[
+		"interr-pn",
+		"partOfSpeech",
+		-1,
+		"interrogative pronoun",
+		1
+	],
+	[
+		"dem-pn",
+		"partOfSpeech",
+		-1,
+		"demonstrative pronoun",
+		1
+	],
+	[
+		"ref-pn",
+		"partOfSpeech",
+		-1,
+		"reflexive pronoun",
+		1
+	],
+	[
+		"rel-pn",
+		"partOfSpeech",
+		-1,
+		"relative pronoun",
+		1
+	],
+	[
+		"poss-pn",
+		"partOfSpeech",
+		-1,
+		"possessive pronoun",
+		1
+	],
     [
         "prov",
         "partOfSpeech",
@@ -195,6 +321,20 @@
 		"particle",
 		1
 	],
+	[
+		"exc",
+		"partOfSpeech",
+		-1,
+		"exclamation",
+		1
+	],
+	[
+		"clsfr",
+		"partOfSpeech",
+		-1,
+		"classifier",
+		1
+	],
     [
         "vt",
         "partOfSpeech",
@@ -209,6 +349,13 @@
         ["intransitive verb", "intransitive"],
         1
     ],
+	[
+		"vt/vi",
+		"partOfSpeech",
+		-1,
+		["transitive or intransitive verb", "intransitive or transitive verb"],
+		1
+	],
     [
         "vr",
         "partOfSpeech",
@@ -248,14 +395,14 @@
 		"no-pl",
 		"",
 		0,
-		"no-plural",
+		["no plural", "no-plural", "no pl", "no-pl"],
 		0
 	],
 	[
 		"in-pl",
 		"",
 		0,
-		"in the plural",
+		["in the plural", "in pl"],
 		0
 	],
 	[
@@ -395,7 +542,7 @@
 		"rail",
 		"",
 		0,
-		"rail transport",
+		["rail transport", "railways"],
 		0
 	],
 	[
@@ -472,14 +619,14 @@
         "music",
         "",
         0,
-        "music",
+        ["music", "Music"],
         0
     ],
     [
-        "sports",
+        "sport",
         "",
         0,
-        "sports",
+        ["sport", "sports"],
         0
     ],
     [
@@ -728,10 +875,10 @@
 		0
 	],
     [
-        "🚢",
+        "🚢naut",
         "",
         0,
-        "nautical",
+        ["nautical", "Nautical"],
         0
     ],
     [
@@ -847,10 +994,10 @@
 		0
 	],
 	[
-		"bible",
+		"📖bbl",
 		"",
 		0,
-		"biblical",
+		["bible", "biblical"],
 		0
 	],
 	[
@@ -945,7 +1092,7 @@
 		0
 	],
 	[
-		"Cath",
+		"✝️RomCath",
 		"",
 		0,
 		"Roman Catholicism",
@@ -977,6 +1124,13 @@
 		"",
 		0,
 		"electronics",
+		0
+	],
+	[
+		"⚡electr",
+		"",
+		0,
+		"electricity",
 		0
 	],
 	[
@@ -1155,7 +1309,7 @@
 		0
 	],
 	[
-		"entom",
+		"🐞ento",
 		"",
 		0,
 		"entomology",
@@ -1183,7 +1337,7 @@
 		0
 	],
 	[
-		"myco",
+		"🍄myco",
 		"",
 		0,
 		"mycology",
@@ -1211,7 +1365,7 @@
 		0
 	],
 	[
-		"game",
+		"🕹️game",
 		"",
 		0,
 		"video games",
@@ -1267,7 +1421,7 @@
 		0
 	],
 	[
-		"golf",
+		"⛳",
 		"",
 		0,
 		"golf",
@@ -1337,7 +1491,7 @@
 		0
 	],
 	[
-		"gen🧬",
+		"🧬gen",
 		"",
 		0,
 		"genetics",
@@ -1358,10 +1512,10 @@
 		0
 	],
 	[
-		"theater",
+		"🎭thtr",
 		"",
 		0,
-		"theater",
+		["theater", "theatre"],
 		0
 	],
 	[
@@ -1372,7 +1526,7 @@
 		0
 	],
 	[
-		"ecc",
+		"eccl",
 		"",
 		0,
 		"ecclesiastical",
@@ -1386,45 +1540,45 @@
 		0
 	],
 	[
-		"Cath✝️",
+		"✝️Cath",
 		"",
 		0,
 		"Catholicism",
 		0
 	],
 	[
-		"Prot✝️",
+		"✝️Prot",
 		"",
 		0,
 		"Protestantism",
 		0
 	],
 	[
-		"Hind🛕",
+		"🛕Hind",
 		"",
 		0,
 		"Hinduism",
 		0
 	],
 	[
-		"journ📰",
+		"📰journ",
 		"",
 		0,
 		"journalism",
 		0
 	],
 	[
-		"bus💼",
+		"💼bus",
 		"",
 		0,
 		"business",
 		0
 	],
 	[
-		"vehic",
+		"🚗veh",
 		"",
 		0,
-		"vehicles",
+		["vehicles", "motor vehicles"],
 		0
 	],
 	[
@@ -1435,7 +1589,7 @@
 		0
 	],
 	[
-		"mine⛏️",
+		"⛏️mine",
 		"",
 		0,
 		"mining",
@@ -1649,6 +1803,48 @@
 		"",
 		0,
 		"initialism",
+		0
+	],
+	[
+		"🎓uni",
+		"",
+		0,
+		"university",
+		0
+	],
+	[
+		"📻rad",
+		"",
+		0,
+		"radio",
+		0
+	],
+	[
+		"📰print",
+		"",
+		0,
+		"printing",
+		0
+	],
+	[
+		"🍿kin",
+		"",
+		0,
+		"cinema",
+		0
+	],
+	[
+		"🚜farm",
+		"",
+		0,
+		"farming",
+		0
+	],
+	[
+		"📡tcom",
+		"",
+		0,
+		"telecommunications",
 		0
 	]
 ]

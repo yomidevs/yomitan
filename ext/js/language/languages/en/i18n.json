@@ -66,6 +66,7 @@
                 "Albanian": "Albanian",
                 "Arabic": "Arabic",
                 "Ancient Greek": "Ancient Greek",
+                "Chinese": "Chinese",
                 "English": "English",
                 "French": "French",
                 "German": "German",
@@ -73,12 +74,14 @@
                 "Indonesian": "Indonesian",
                 "Italian": "Italian",
                 "Japanese": "Japanese",
+                "Korean": "Korean",
                 "Latin": "Latin",
                 "Persian": "Persian",
                 "Portuguese": "Portuguese",
                 "Russian": "Russian",
                 "Serbo-Croatian": "Serbo-Croatian",
-                "Spanish": "Spanish"
+                "Spanish": "Spanish",
+                "Thai": "Thai"
             }
         },
         "dictionaries": {

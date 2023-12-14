@@ -139,9 +139,9 @@ for entry in "${entries[@]}"; do
     echo "Freq file already exists. Skipping freq creation."
   fi
 
-  dict_file="$DICT_NAME-dict-$language_short.zip"
-  ipa_file="$DICT_NAME-ipa-$language_short.zip"
-  freq_file="$DICT_NAME-freq-$language_short.zip"
+  dict_file="${DICT_NAME}W-$language_short-en.zip"
+  ipa_file="${DICT_NAME}W-$language_short-ipa.zip"
+  freq_file="${DICT_NAME}-$language_short-freq.zip"
 
   # Step 7: Create Yezichak files
   if \

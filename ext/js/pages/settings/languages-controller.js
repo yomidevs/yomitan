@@ -27,6 +27,7 @@ export class LanguagesController {
 
     async prepare() {
         this._languages = await yomitan.api.getLanguages();
+        this._languages.sort((a, b) => a.iso.localeCompare(b.iso));
         this._setSelectElement('language-select');
     }
 
@@ -40,7 +41,7 @@ export class LanguagesController {
             const option = document.createElement('option');
             option.value = lang.iso;
             // eslint-disable-next-line no-unsanitized/property
-            option.innerHTML = `<span i18n="settings.language.languages.${lang.language}">${lang.language}</span> ${lang.flag}`;
+            option.innerHTML = `(${lang.iso}) <span i18n="settings.language.languages.${lang.language}">${lang.language}</span> ${lang.flag}`;
             this._selectElement.appendChild(option);
         });
     }

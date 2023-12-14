@@ -2,6 +2,7 @@
     {"iso": "sq",  "i18n":false, "language": "Albanian",       "flag": "🇦🇱",   "exampleText": "ndihmojme"  },
     {"iso": "ar",  "i18n":false, "language": "Arabic",         "flag": "🇪🇬",   "exampleText":"قَرَأَ"         },
     {"iso": "grc", "i18n":false, "language": "Ancient Greek",  "flag": "🏺",   "exampleText": "γράφω"      },
+    {"iso": "zh",  "i18n":false, "language": "Chinese",        "flag": "🇨🇳",   "exampleText": "读"         },
     {"iso": "en",  "i18n":true,  "language": "English",        "flag": "🇺🇸🇬🇧", "exampleText": "don't read" },
     {"iso": "fr",  "i18n":false, "language": "French",         "flag": "🇫🇷",   "exampleText": "lire"       },
     {"iso": "de",  "i18n":false, "language": "German",         "flag": "🇩🇪",   "exampleText": "gelesen"    },
@@ -9,10 +10,13 @@
     {"iso": "id",  "i18n":false, "language": "Indonesian",     "flag": "🇮🇩",   "exampleText": "membaca"    },
     {"iso": "it",  "i18n":false, "language": "Italian",        "flag": "🇮🇹",   "exampleText": "leggere"    },
     {"iso": "ja",  "i18n":false, "language": "Japanese",       "flag": "🇯🇵",   "exampleText": "読め"        },
+    {"iso": "ko",  "i18n":false, "language": "Korean",         "flag": "🇰🇷",   "exampleText": "읽다"        },
     {"iso": "la",  "i18n":false, "language": "Latin",          "flag": "🏛",   "exampleText": "legere"     },
     {"iso": "fa",  "i18n":false, "language": "Persian",        "flag": "🇮🇷",   "exampleText": "خواندن"     },
     {"iso": "pt",  "i18n":false, "language": "Portuguese",     "flag": "🇧🇷🇵🇹", "exampleText": "ler"        },
     {"iso": "ru",  "i18n":false, "language": "Russian",        "flag": "🇷🇺",   "exampleText": "читать"     },
     {"iso": "sh",  "i18n":true,  "language": "Serbo-Croatian", "flag": "🇷🇸🇭🇷", "exampleText": "čitaše"     },
-    {"iso": "es",  "i18n":false, "language": "Spanish",        "flag": "🇪🇸",   "exampleText": "acabar de"  }
+    {"iso": "es",  "i18n":false, "language": "Spanish",        "flag": "🇪🇸",   "exampleText": "acabar de"  },
+    {"iso": "th",  "i18n":false, "language": "Thai",           "flag": "🇹🇭",   "exampleText": "อ่าน"        },
+    {"iso": "vi",  "i18n":false, "language": "Vietnamese",     "flag": "🇻🇳",   "exampleText": "đọc"        }
 ]

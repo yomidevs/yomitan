@@ -1,7 +1,7 @@
 [
     ["🏴󠁧󠁢󠁥󠁮󠁧󠁿", "dialect", 0, "Received-Pronunciation", 0],
-    ["🇬🇧", "dialect", 0, "UK", 0],
-    ["🇺🇸", "dialect", 0, "US", 0],
+    ["🇬🇧", "dialect", 0, ["UK", "BrE"], 0],
+    ["🇺🇸", "dialect", 0, ["US", "AmE"], 0],
     ["🇦🇺", "dialect", 0, "General-Australian", 0],
     ["🇺🇸", "dialect", 0, "General-American", 0],
     ["🇳🇿", "dialect", 0, "New-Zealand", 0],

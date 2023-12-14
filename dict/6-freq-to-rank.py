@@ -47,7 +47,7 @@ print("Converting counts to ranks: 100.00%")
 
 if(len(result)):
     index = {}
-    index['title'] = f"{dict_name}-freq-" + lang_short.lower()
+    index['title'] = f"{dict_name}-" + lang_short.lower() + "-freq"
     index['revision'] = datetime.now().strftime("%Y.%m.%d")
     index['format'] = 4
     index['sequenced'] = True

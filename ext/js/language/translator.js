@@ -399,7 +399,7 @@ export class Translator {
                 text2 = jp.collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
             }
 
-            Object.values(options.textTransformations).forEach((textTransformation) => {
+            Object.values(textTransformationsOptions).forEach((textTransformation) => {
                 if (arrayVariant[textTransformation.id]) {
                     text2 = textTransformation.transform(text2);
                 }

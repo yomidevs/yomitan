@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2023  Yezichak Authors
+ * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +51,9 @@ const tagModifiers = [
     ['sometimes', 'some'],
     ['now', 'now'],
     ['especially', 'esp'],
-    ['slightly', 'sli']
+    ['slightly', 'sli'],
+    ['somewhat', 'smwt'],
+    ['very', 'very']
 ];
 
 function findTag(tags, tag) {
@@ -321,9 +324,10 @@ for (const folder of folders) {
         if (file.includes('term_')) { unlinkSync(`${tempPath}/${folder}/${file}`); }
     }
 
+    const titleSuffix = folder === 'dict' ? 'en' : 'ipa';
     writeFileSync(`${tempPath}/${folder}/index.json`, JSON.stringify({
         ...indexJson,
-        title: `${DICT_NAME}-${folder}-${language_short}`
+        title: `${DICT_NAME}W-${language_short}-${titleSuffix}`
     }));
 
     writeFileSync(`${tempPath}/${folder}/tag_bank_1.json`, JSON.stringify(Object.values(yzkTags[folder])));
@@ -357,6 +361,8 @@ function writeInBatches(inputArray, filenamePrefix, batchSize = 100000) {
 function escapeRegExp(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
+
+writeFileSync(`data/language/${language_short}/skippedTermTags.json`, JSON.stringify(sortBreakdown(skippedTermTags), null, 2));
 
 function sortBreakdown(obj){
     return Object.fromEntries(Object.entries(obj).sort((a, b) => b[1] - a[1]));

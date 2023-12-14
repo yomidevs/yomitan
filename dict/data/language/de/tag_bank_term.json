@@ -10,7 +10,7 @@
      "🇦🇹",
      "",
      0,
-     "Austria",
+     ["Austria", "Austrian"],
      0
    ],
    [
@@ -31,7 +31,7 @@
      "🇩🇪BY",
      "",
      0,
-     "Bavaria",
+     ["Bavaria", "Bavarian"],
      0
    ],
    [
@@ -45,21 +45,21 @@
     "🇩🇪⬇️",
     "",
     0,
-    ["Southern German", "Southern"],
+    ["Southern German", "Southern", "South German"],
     0
    ],
    [
     "🇩🇪⬆️",
     "",
     0,
-    ["Northern Germany", "Northern-Germany"],
+    ["Northern Germany", "Northern-Germany", "North German"],
     0
    ],
    [
     "🇩🇪➡️",
     "",
     0,
-    "East Germany",
+    ["East Germany", "Eastern Germany", "Eastern-Germany", "East-Germany", "East German"],
     0
    ],
    [
@@ -172,6 +172,13 @@
       "",
       0,
       "mixed",
+      0
+    ],
+    [
+      "Akk",
+      "",
+      0,
+      ["accusative", "Akk"],
       0
     ]
  ]

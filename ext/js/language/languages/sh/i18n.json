@@ -66,6 +66,7 @@
                 "Albanian": "Albanski",
                 "Arabic": "Arapski",
                 "Ancient Greek": "Starogrčki",
+                "Chinese": "Kineski",
                 "English": "Engleski",
                 "French": "Francuski",
                 "German": "Njemački",
@@ -73,12 +74,14 @@
                 "Indonesian": "Indonezijski",
                 "Italian": "Italijanski",
                 "Japanese": "Japanski",
+                "Korean": "Korejski",
                 "Latin": "Latinski",
                 "Persian": "Perzijski",
                 "Portuguese": "Portugalski",
                 "Russian": "Ruski",
                 "Serbo-Croatian": "Srpskohrvatski",
-                "Spanish": "Španski"
+                "Spanish": "Španski",
+                "Thai": "Tajlandski"
             }
         },
         "dictionaries": {
