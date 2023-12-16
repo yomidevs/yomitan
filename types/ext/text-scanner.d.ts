@@ -184,3 +184,9 @@ export type PointerEventType = (
     'click' |
     'script'
 );
+
+export type SentenceTerminatorMap = Map<string, [includeCharacterAtStart: boolean, includeCharacterAtEnd: boolean]>;
+
+export type SentenceForwardQuoteMap = Map<string, [character: string, includeCharacterAtStart: boolean]>;
+
+export type SentenceBackwardQuoteMap = Map<string, [character: string, includeCharacterAtEnd: boolean]>;
