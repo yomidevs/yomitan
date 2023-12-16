@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// @vitest-environment jsdom
+
 import 'fake-indexeddb/auto';
 import fs from 'fs';
 import {fileURLToPath} from 'node:url';
