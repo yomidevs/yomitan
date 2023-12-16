@@ -17,6 +17,7 @@
  */
 
 import {PermissionsUtil} from '../data/permissions-util.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {yomitan} from '../yomitan.js';
 
@@ -207,8 +208,10 @@ export class DisplayController {
      * @param {number} profileCurrent
      */
     _updateProfileSelect(profiles, profileCurrent) {
-        const select = /** @type {HTMLSelectElement} */ (document.querySelector('#profile-select'));
-        const optionGroup = /** @type {HTMLElement} */ (document.querySelector('#profile-select-option-group'));
+        /** @type {HTMLSelectElement} */
+        const select = querySelectorNotNull(document, '#profile-select');
+        /** @type {HTMLElement} */
+        const optionGroup = querySelectorNotNull(document, '#profile-select-option-group');
         const fragment = document.createDocumentFragment();
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
             const {name} = profiles[i];

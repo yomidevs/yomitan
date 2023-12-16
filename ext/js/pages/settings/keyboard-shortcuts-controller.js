@@ -18,6 +18,7 @@
 
 import {EventListenerCollection} from '../../core.js';
 import {DocumentUtil} from '../../dom/document-util.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
 import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
@@ -283,12 +284,18 @@ class KeyboardShortcutHotkeyEntry {
     prepare() {
         const node = this._node;
 
-        const menuButton = /** @type {HTMLButtonElement} */ (node.querySelector('.hotkey-list-item-button'));
-        const input = /** @type {HTMLInputElement} */ (node.querySelector('.hotkey-list-item-input'));
-        const action = /** @type {HTMLSelectElement} */ (node.querySelector('.hotkey-list-item-action'));
-        const enabledToggle = /** @type {HTMLInputElement} */ (node.querySelector('.hotkey-list-item-enabled'));
-        const scopesButton = /** @type {HTMLButtonElement} */ (node.querySelector('.hotkey-list-item-scopes-button'));
-        const enabledButton = /** @type {HTMLButtonElement} */ (node.querySelector('.hotkey-list-item-enabled-button'));
+        /** @type {HTMLButtonElement} */
+        const menuButton = querySelectorNotNull(node, '.hotkey-list-item-button');
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(node, '.hotkey-list-item-input');
+        /** @type {HTMLSelectElement} */
+        const action = querySelectorNotNull(node, '.hotkey-list-item-action');
+        /** @type {HTMLInputElement} */
+        const enabledToggle = querySelectorNotNull(node, '.hotkey-list-item-enabled');
+        /** @type {HTMLButtonElement} */
+        const scopesButton = querySelectorNotNull(node, '.hotkey-list-item-scopes-button');
+        /** @type {HTMLButtonElement} */
+        const enabledButton = querySelectorNotNull(node, '.hotkey-list-item-enabled-button');
 
         this._actionSelect = action;
         this._enabledButton = enabledButton;
@@ -333,7 +340,8 @@ class KeyboardShortcutHotkeyEntry {
         const {action} = this._data;
 
         const {menu} = e.detail;
-        const resetArgument = /** @type {HTMLElement} */ (menu.bodyNode.querySelector('.popup-menu-item[data-menu-action="resetArgument"]'));
+        /** @type {HTMLElement} */
+        const resetArgument = querySelectorNotNull(menu.bodyNode, '.popup-menu-item[data-menu-action="resetArgument"]');
 
         const details = this._parent.getActionDetails(action);
         const argumentDetails = typeof details !== 'undefined' ? details.argument : void 0;
@@ -646,7 +654,8 @@ class KeyboardShortcutHotkeyEntry {
             if (scope === null) { continue; }
             menuItem.hidden = !(validScopes === null || validScopes.has(scope));
 
-            const checkbox = /** @type {HTMLInputElement} */ (menuItem.querySelector('.hotkey-scope-checkbox'));
+            /** @type {HTMLInputElement} */
+            const checkbox = querySelectorNotNull(menuItem, '.hotkey-scope-checkbox');
             if (checkbox !== null) {
                 checkbox.checked = scopes.includes(scope);
                 this._scopeMenuEventListeners.addEventListener(checkbox, 'change', this._onScopeCheckboxChange.bind(this), false);

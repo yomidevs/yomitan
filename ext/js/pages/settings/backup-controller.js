@@ -20,6 +20,7 @@ import {Dexie} from '../../../lib/dexie.js';
 import {isObject, log} from '../../core.js';
 import {OptionsUtil} from '../../data/options-util.js';
 import {ArrayBufferUtil} from '../../data/sandbox/array-buffer-util.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 import {DictionaryController} from './dictionary-controller.js';
 
@@ -243,7 +244,8 @@ export class BackupController {
      */
     _showSettingsImportError(error) {
         log.error(error);
-        const element = /** @type {HTMLElement} */ (document.querySelector('#settings-import-error-message'));
+        /** @type {HTMLElement} */
+        const element = querySelectorNotNull(document, '#settings-import-error-message');
         element.textContent = `${error}`;
         if (this._settingsImportErrorModal !== null) {
             this._settingsImportErrorModal.setVisible(true);
@@ -480,7 +482,8 @@ export class BackupController {
 
     /** */
     _onSettingsImportClick() {
-        const element = /** @type {HTMLElement} */ (document.querySelector('#settings-import-file'));
+        /** @type {HTMLElement} */
+        const element = querySelectorNotNull(document, '#settings-import-file');
         element.click();
     }
 
@@ -538,7 +541,8 @@ export class BackupController {
      * @param {boolean} [isWarning]
      */
     _databaseExportImportErrorMessage(message, isWarning=false) {
-        const errorMessageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-error-report'));
+        /** @type {HTMLElement} */
+        const errorMessageContainer = querySelectorNotNull(document, '#db-ops-error-report');
         errorMessageContainer.style.display = 'block';
         errorMessageContainer.textContent = message;
 
@@ -557,7 +561,8 @@ export class BackupController {
     _databaseExportProgressCallback({totalRows, completedRows, done}) {
         // eslint-disable-next-line no-console
         console.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
-        const messageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-progress-report'));
+        /** @type {HTMLElement} */
+        const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
         messageContainer.style.display = 'block';
         messageContainer.textContent = `Export Progress: ${completedRows} of ${totalRows} rows completed`;
 
@@ -589,7 +594,8 @@ export class BackupController {
             return;
         }
 
-        const errorMessageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-error-report'));
+        /** @type {HTMLElement} */
+        const errorMessageContainer = querySelectorNotNull(document, '#db-ops-error-report');
         errorMessageContainer.style.display = 'none';
 
         const date = new Date(Date.now());
@@ -619,7 +625,8 @@ export class BackupController {
     _databaseImportProgressCallback({totalRows, completedRows, done}) {
         // eslint-disable-next-line no-console
         console.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
-        const messageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-progress-report'));
+        /** @type {HTMLElement} */
+        const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
         messageContainer.style.display = 'block';
         messageContainer.style.color = '#4169e1';
         messageContainer.textContent = `Import Progress: ${completedRows} of ${totalRows} rows completed`;
@@ -658,7 +665,8 @@ export class BackupController {
             return;
         }
 
-        const errorMessageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-error-report'));
+        /** @type {HTMLElement} */
+        const errorMessageContainer = querySelectorNotNull(document, '#db-ops-error-report');
         errorMessageContainer.style.display = 'none';
 
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
@@ -675,7 +683,8 @@ export class BackupController {
         } catch (error) {
             // eslint-disable-next-line no-console
             console.log(error);
-            const messageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-progress-report'));
+            /** @type {HTMLElement} */
+            const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
             messageContainer.style.color = 'red';
             this._databaseExportImportErrorMessage('Encountered errors when importing. Please restart the browser and try again. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.');
         } finally {

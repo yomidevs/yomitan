@@ -18,6 +18,7 @@
 
 import {EventListenerCollection} from '../../core.js';
 import {DocumentUtil} from '../../dom/document-util.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
@@ -157,7 +158,8 @@ export class ScanInputsController {
         // Scroll to bottom
         const button = /** @type {HTMLElement} */ (e.currentTarget);
         const modalContainer = /** @type {HTMLElement} */ (button.closest('.modal'));
-        const scrollContainer = /** @type {HTMLElement} */ (modalContainer.querySelector('.modal-body'));
+        /** @type {HTMLElement} */
+        const scrollContainer = querySelectorNotNull(modalContainer, '.modal-body');
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
     }
 
@@ -265,12 +267,18 @@ class ScanInputField {
         const {include, exclude, options: {showAdvanced}} = scanningInput;
 
         const node = /** @type {HTMLElement} */ (this._parent.instantiateTemplate('scan-input'));
-        const includeInputNode = /** @type {HTMLInputElement} */ (node.querySelector('.scan-input-field[data-property=include]'));
-        const includeMouseButton = /** @type {HTMLButtonElement} */ (node.querySelector('.mouse-button[data-property=include]'));
-        const excludeInputNode = /** @type {HTMLInputElement} */ (node.querySelector('.scan-input-field[data-property=exclude]'));
-        const excludeMouseButton = /** @type {HTMLButtonElement} */ (node.querySelector('.mouse-button[data-property=exclude]'));
-        const removeButton = /** @type {HTMLButtonElement} */ (node.querySelector('.scan-input-remove'));
-        const menuButton = /** @type {HTMLButtonElement} */ (node.querySelector('.scanning-input-menu-button'));
+        /** @type {HTMLInputElement} */
+        const includeInputNode = querySelectorNotNull(node, '.scan-input-field[data-property=include]');
+        /** @type {HTMLButtonElement} */
+        const includeMouseButton = querySelectorNotNull(node, '.mouse-button[data-property=include]');
+        /** @type {HTMLInputElement} */
+        const excludeInputNode = querySelectorNotNull(node, '.scan-input-field[data-property=exclude]');
+        /** @type {HTMLButtonElement} */
+        const excludeMouseButton = querySelectorNotNull(node, '.mouse-button[data-property=exclude]');
+        /** @type {HTMLButtonElement} */
+        const removeButton = querySelectorNotNull(node, '.scan-input-remove');
+        /** @type {HTMLButtonElement} */
+        const menuButton = querySelectorNotNull(node, '.scanning-input-menu-button');
 
         node.dataset.showAdvanced = `${showAdvanced}`;
 

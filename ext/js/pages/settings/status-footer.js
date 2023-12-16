@@ -34,7 +34,8 @@ export class StatusFooter extends PanelElement {
 
     /** */
     prepare() {
-        const closeButton = /** @type {HTMLElement} */ (this._body.querySelector('.status-footer-header-close'));
+        /** @type {HTMLElement} */
+        const closeButton = querySelectorNotNull(this._body, '.status-footer-header-close');
         this.on('closeCompleted', this._onCloseCompleted.bind(this));
         closeButton.addEventListener('click', this._onCloseClick.bind(this), false);
     }

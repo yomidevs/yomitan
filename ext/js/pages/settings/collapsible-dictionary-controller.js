@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
 export class CollapsibleDictionaryController {
@@ -150,10 +151,12 @@ export class CollapsibleDictionaryController {
         const node = this._settingsController.instantiateTemplate('collapsible-dictionary-item');
         fragment.appendChild(node);
 
-        const nameNode = /** @type {HTMLElement} */ (node.querySelector('.dictionary-title'));
+        /** @type {HTMLElement} */
+        const nameNode = querySelectorNotNull(node, '.dictionary-title');
         nameNode.textContent = dictionary;
 
-        const versionNode = /** @type {HTMLElement} */ (node.querySelector('.dictionary-version'));
+        /** @type {HTMLElement} */
+        const versionNode = querySelectorNotNull(node, '.dictionary-version');
         versionNode.textContent = version;
 
         return /** @type {HTMLSelectElement} */ (node.querySelector('.definitions-collapsible'));

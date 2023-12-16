@@ -17,6 +17,7 @@
  */
 
 import {EventDispatcher, EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {AudioSystem} from '../../media/audio-system.js';
 
 /**
@@ -65,7 +66,8 @@ export class AudioController extends EventDispatcher {
         this._audioSourceContainer = /** @type {HTMLElement} */ (document.querySelector('#audio-source-list'));
         this._audioSourceAddButton = /** @type {HTMLButtonElement} */ (document.querySelector('#audio-source-add'));
         this._audioSourceContainer.textContent = '';
-        const testButton = /** @type {HTMLButtonElement} */ (document.querySelector('#text-to-speech-voice-test'));
+        /** @type {HTMLButtonElement} */
+        const testButton = querySelectorNotNull(document, '#text-to-speech-voice-test');
 
         this._audioSourceAddButton.addEventListener('click', this._onAddAudioSource.bind(this), false);
 
@@ -296,7 +298,8 @@ class AudioSourceEntry {
     prepare() {
         this._updateTypeParameter();
 
-        const menuButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.audio-source-menu-button'));
+        /** @type {HTMLButtonElement} */
+        const menuButton = querySelectorNotNull(this._node, '.audio-source-menu-button');
         this._typeSelect = /** @type {HTMLSelectElement} */ (this._node.querySelector('.audio-source-type-select'));
         this._urlInput = /** @type {HTMLInputElement} */ (this._node.querySelector('.audio-source-parameter-container[data-field=url] .audio-source-parameter'));
         this._voiceSelect = /** @type {HTMLSelectElement} */ (this._node.querySelector('.audio-source-parameter-container[data-field=voice] .audio-source-parameter'));

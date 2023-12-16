@@ -99,9 +99,11 @@ export class DisplayProfileSelection {
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
             const {name} = profiles[i];
             const entry = displayGenerator.createProfileListItem();
-            const radio = /** @type {HTMLInputElement} */ (entry.querySelector('.profile-entry-is-default-radio'));
+            /** @type {HTMLInputElement} */
+            const radio = querySelectorNotNull(entry, '.profile-entry-is-default-radio');
             radio.checked = (i === profileCurrent);
-            const nameNode = /** @type {Element} */ (entry.querySelector('.profile-list-item-name'));
+            /** @type {Element} */
+            const nameNode = querySelectorNotNull(entry, '.profile-list-item-name');
             nameNode.textContent = name;
             fragment.appendChild(entry);
             this._eventListeners.addEventListener(radio, 'change', this._onProfileRadioChange.bind(this, i), false);

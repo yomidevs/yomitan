@@ -242,8 +242,10 @@ class DictionaryEntry {
         const count = this._dictionaryController.dictionaryOptionCount;
         const modal = this._dictionaryController.modalController.getModal('dictionary-move-location');
         if (modal === null) { return; }
-        const input = /** @type {HTMLInputElement} */ (modal.node.querySelector('#dictionary-move-location'));
-        const titleNode = /** @type {HTMLElement} */ (modal.node.querySelector('.dictionary-title'));
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(modal.node, '#dictionary-move-location');
+        /** @type {HTMLElement} */
+        const titleNode = querySelectorNotNull(modal.node, '.dictionary-title');
 
         modal.node.dataset.index = `${this._index}`;
         titleNode.textContent = title;
@@ -285,7 +287,8 @@ class DictionaryExtraInfo {
             this._nodes.push(node);
         }
 
-        const dictionaryIntegrityButton = /** @type {HTMLButtonElement} */ (fragment.querySelector('.dictionary-integrity-button'));
+        /** @type {HTMLButtonElement} */
+        const dictionaryIntegrityButton = querySelectorNotNull(fragment, '.dictionary-integrity-button');
 
         this._setTitle(fragment.querySelector('.dictionary-total-count'));
         this._eventListeners.addEventListener(dictionaryIntegrityButton, 'click', this._onIntegrityButtonClick.bind(this), false);
@@ -316,7 +319,8 @@ class DictionaryExtraInfo {
         const modal = this._parent.modalController.getModal('dictionary-extra-data');
         if (modal === null) { return; }
 
-        const dictionaryCounts = /** @type {HTMLElement} */ (modal.node.querySelector('.dictionary-counts'));
+        /** @type {HTMLElement} */
+        const dictionaryCounts = querySelectorNotNull(modal.node, '.dictionary-counts');
 
         const info = {counts: this._totalCounts, remainders: this._remainders};
         dictionaryCounts.textContent = JSON.stringify(info, null, 4);
@@ -397,8 +401,10 @@ export class DictionaryController {
         this._noDictionariesEnabledWarnings = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.no-dictionaries-enabled-warning'));
         this._deleteDictionaryModal = this._modalController.getModal('dictionary-confirm-delete');
         this._allCheckbox = /** @type {HTMLInputElement} */ (document.querySelector('#all-dictionaries-enabled'));
-        const dictionaryDeleteButton = /** @type {HTMLButtonElement} */ (document.querySelector('#dictionary-confirm-delete-button'));
-        const dictionaryMoveButton = /** @type {HTMLButtonElement} */ (document.querySelector('#dictionary-move-button'));
+        /** @type {HTMLButtonElement} */
+        const dictionaryDeleteButton = querySelectorNotNull(document, '#dictionary-confirm-delete-button');
+        /** @type {HTMLButtonElement} */
+        const dictionaryMoveButton = querySelectorNotNull(document, '#dictionary-move-button');
 
         yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
@@ -421,7 +427,8 @@ export class DictionaryController {
         if (this._isDeleting) { return; }
         const modal = /** @type {import('./modal.js').Modal} */ (this._deleteDictionaryModal);
         modal.node.dataset.dictionaryTitle = dictionaryTitle;
-        const nameElement = /** @type {Element} */ (modal.node.querySelector('#dictionary-confirm-delete-name'));
+        /** @type {Element} */
+        const nameElement = querySelectorNotNull(modal.node, '#dictionary-confirm-delete-name');
         nameElement.textContent = dictionaryTitle;
         modal.setVisible(true);
     }
@@ -697,7 +704,9 @@ export class DictionaryController {
         if (typeof index !== 'number') { return; }
         const indexNumber = Number.parseInt(index, 10);
 
-        const targetString = /** @type {HTMLInputElement} */ (document.querySelector('#dictionary-move-location')).value;
+        /** @type {HTMLInputElement} */
+        const targetStringInput = querySelectorNotNull(document, '#dictionary-move-location');
+        const targetString = targetStringInput.value;
         const target = Number.parseInt(targetString, 10) - 1;
 
         if (!Number.isFinite(target) || !Number.isFinite(indexNumber) || indexNumber === target) { return; }

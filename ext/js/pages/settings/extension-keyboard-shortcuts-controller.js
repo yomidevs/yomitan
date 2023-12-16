@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection, isObject} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
 import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
@@ -277,11 +278,14 @@ class ExtensionKeyboardShortcutHotkeyEntry {
 
     /** */
     prepare() {
-        const label = /** @type {HTMLElement} */ (this._node.querySelector('.settings-item-label'));
+        /** @type {HTMLElement} */
+        const label = querySelectorNotNull(this._node, '.settings-item-label');
         label.textContent = this._description || this._name;
 
-        const button = /** @type {HTMLButtonElement} */ (this._node.querySelector('.extension-hotkey-list-item-button'));
-        const input = /** @type {HTMLInputElement} */ (this._node.querySelector('input'));
+        /** @type {HTMLButtonElement} */
+        const button = querySelectorNotNull(this._node, '.extension-hotkey-list-item-button');
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(this._node, 'input');
 
         this._input = input;
 

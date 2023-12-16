@@ -20,6 +20,7 @@ import {AnkiConnect} from '../../comm/anki-connect.js';
 import {EventListenerCollection, log} from '../../core.js';
 import {ExtensionError} from '../../core/extension-error.js';
 import {AnkiUtil} from '../../data/anki-util.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
 import {yomitan} from '../../yomitan.js';
@@ -84,9 +85,11 @@ export class AnkiController {
         this._ankiErrorInvalidResponseInfo = /** @type {HTMLElement} */ (document.querySelector('#anki-error-invalid-response-info'));
         this._ankiEnableCheckbox = /** @type {?HTMLInputElement} */ (document.querySelector('[data-setting="anki.enable"]'));
         this._ankiCardPrimary = /** @type {HTMLElement} */ (document.querySelector('#anki-card-primary'));
-        const ankiApiKeyInput = /** @type {HTMLElement} */ (document.querySelector('#anki-api-key-input'));
+        /** @type {HTMLElement} */
+        const ankiApiKeyInput = querySelectorNotNull(document, '#anki-api-key-input');
         const ankiCardPrimaryTypeRadios = /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('input[type=radio][name=anki-card-primary-type]'));
-        const ankiErrorLog = /** @type {HTMLElement} */ (document.querySelector('#anki-error-log'));
+        /** @type {HTMLElement} */
+        const ankiErrorLog = querySelectorNotNull(document, '#anki-error-log');
 
         this._setupFieldMenus();
 
@@ -534,7 +537,8 @@ export class AnkiController {
      * @param {?Error} error
      */
     _setAnkiNoteViewerStatus(visible, error) {
-        const node = /** @type {HTMLElement} */ (document.querySelector('#test-anki-note-viewer-results'));
+        /** @type {HTMLElement} */
+        const node = querySelectorNotNull(document, '#test-anki-note-viewer-results');
         if (visible) {
             const success = (error === null);
             node.textContent = success ? 'Success!' : error.message;
@@ -752,7 +756,8 @@ class AnkiCardController {
     _setFieldMarker(element, marker) {
         const container = element.closest('.anki-card-field-value-container');
         if (container === null) { return; }
-        const input = /** @type {HTMLInputElement} */ (container.querySelector('.anki-card-field-value'));
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(container, '.anki-card-field-value');
         input.value = `{${marker}}`;
         input.dispatchEvent(new Event('change'));
     }
@@ -780,15 +785,19 @@ class AnkiCardController {
         for (const [fieldName, fieldValue] of Object.entries(this._fields)) {
             const content = this._settingsController.instantiateTemplateFragment('anki-card-field');
 
-            const fieldNameContainerNode = /** @type {HTMLElement} */ (content.querySelector('.anki-card-field-name-container'));
+            /** @type {HTMLElement} */
+            const fieldNameContainerNode = querySelectorNotNull(content, '.anki-card-field-name-container');
             fieldNameContainerNode.dataset.index = `${index}`;
-            const fieldNameNode = /** @type {HTMLElement} */ (content.querySelector('.anki-card-field-name'));
+            /** @type {HTMLElement} */
+            const fieldNameNode = querySelectorNotNull(content, '.anki-card-field-name');
             fieldNameNode.textContent = fieldName;
 
-            const valueContainer = /** @type {HTMLElement} */ (content.querySelector('.anki-card-field-value-container'));
+            /** @type {HTMLElement} */
+            const valueContainer = querySelectorNotNull(content, '.anki-card-field-value-container');
             valueContainer.dataset.index = `${index}`;
 
-            const inputField = /** @type {HTMLInputElement} */ (content.querySelector('.anki-card-field-value'));
+            /** @type {HTMLInputElement} */
+            const inputField = querySelectorNotNull(content, '.anki-card-field-value');
             inputField.value = fieldValue;
             inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._cardType, 'fields', fieldName]);
             this._validateFieldPermissions(inputField, index, false);

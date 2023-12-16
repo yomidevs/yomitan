@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class PermissionsOriginController {
     /**
@@ -48,7 +49,8 @@ export class PermissionsOriginController {
         this._originToggleNodes = /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('.permissions-origin-toggle'));
         this._addOriginInput = /** @type {HTMLInputElement} */ (document.querySelector('#permissions-origin-new-input'));
         this._errorContainer = /** @type {HTMLElement} */ (document.querySelector('#permissions-origin-list-error'));
-        const addButton = /** @type {HTMLButtonElement} */ (document.querySelector('#permissions-origin-add'));
+        /** @type {HTMLButtonElement} */
+        const addButton = querySelectorNotNull(document, '#permissions-origin-add');
 
         for (const node of this._originToggleNodes) {
             node.addEventListener('change', this._onOriginToggleChange.bind(this), false);
@@ -87,8 +89,10 @@ export class PermissionsOriginController {
         for (const origin of originsSet) {
             if (excludeOrigins.has(origin)) { continue; }
             const node = this._settingsController.instantiateTemplateFragment('permissions-origin');
-            const input = /** @type {HTMLInputElement} */ (node.querySelector('.permissions-origin-input'));
-            const menuButton = /** @type {HTMLElement} */ (node.querySelector('.permissions-origin-button'));
+            /** @type {HTMLInputElement} */
+            const input = querySelectorNotNull(node, '.permissions-origin-input');
+            /** @type {HTMLElement} */
+            const menuButton = querySelectorNotNull(node, '.permissions-origin-button');
             input.value = origin;
             this._eventListeners.addEventListener(menuButton, 'menuClose', this._onOriginMenuClose.bind(this, origin), false);
             this._originContainerChildren.push(...node.childNodes);

@@ -805,7 +805,8 @@ export class DisplayAudio {
     _createMenu(sourceButton, term, reading) {
         // Create menu
         const menuContainerNode = /** @type {HTMLElement} */ (this._display.displayGenerator.instantiateTemplate('audio-button-popup-menu'));
-        const menuBodyNode = /** @type {HTMLElement} */ (menuContainerNode.querySelector('.popup-menu-body'));
+        /** @type {HTMLElement} */
+        const menuBodyNode = querySelectorNotNull(menuContainerNode, '.popup-menu-body');
         menuContainerNode.dataset.term = term;
         menuContainerNode.dataset.reading = reading;
 
@@ -838,7 +839,8 @@ export class DisplayAudio {
                 const existingNode = this._getOrCreateMenuItem(currentItems, index, subIndex);
                 const node = existingNode !== null ? existingNode : /** @type {HTMLElement} */ (displayGenerator.instantiateTemplate('audio-button-popup-menu-item'));
 
-                const labelNode = /** @type {HTMLElement} */ (node.querySelector('.popup-menu-item-audio-button .popup-menu-item-label'));
+                /** @type {HTMLElement} */
+                const labelNode = querySelectorNotNull(node, '.popup-menu-item-audio-button .popup-menu-item-label');
                 let label = name;
                 if (!nameUnique) {
                     label = `${label} ${nameIndex + 1}`;
@@ -848,11 +850,13 @@ export class DisplayAudio {
                 if (typeof subName === 'string' && subName.length > 0) { label += `: ${subName}`; }
                 labelNode.textContent = label;
 
-                const cardButton = /** @type {HTMLElement} */ (node.querySelector('.popup-menu-item-set-primary-audio-button'));
+                /** @type {HTMLElement} */
+                const cardButton = querySelectorNotNull(node, '.popup-menu-item-set-primary-audio-button');
                 cardButton.hidden = !downloadable;
 
                 if (valid !== null) {
-                    const icon = /** @type {HTMLElement} */ (node.querySelector('.popup-menu-item-audio-button .popup-menu-item-icon'));
+                    /** @type {HTMLElement} */
+                    const icon = querySelectorNotNull(node, '.popup-menu-item-audio-button .popup-menu-item-icon');
                     icon.dataset.icon = valid ? 'checkmark' : 'cross';
                     showIcons = true;
                 }

@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class SentenceTerminationCharactersController {
     /**
@@ -209,13 +210,20 @@ class SentenceTerminationCharacterEntry {
         const {enabled, character1, character2, includeCharacterAtStart, includeCharacterAtEnd} = this._data;
         const node = this._node;
 
-        const enabledToggle = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-enabled'));
-        const typeSelect = /** @type {HTMLSelectElement} */ (node.querySelector('.sentence-termination-character-type'));
-        const character1Input = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-input1'));
-        const character2Input = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-input2'));
-        const includeAtStartCheckbox = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-include-at-start'));
-        const includeAtEndheckbox = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-include-at-end'));
-        const menuButton = /** @type {HTMLButtonElement} */ (node.querySelector('.sentence-termination-character-entry-button'));
+        /** @type {HTMLInputElement} */
+        const enabledToggle = querySelectorNotNull(node, '.sentence-termination-character-enabled');
+        /** @type {HTMLSelectElement} */
+        const typeSelect = querySelectorNotNull(node, '.sentence-termination-character-type');
+        /** @type {HTMLInputElement} */
+        const character1Input = querySelectorNotNull(node, '.sentence-termination-character-input1');
+        /** @type {HTMLInputElement} */
+        const character2Input = querySelectorNotNull(node, '.sentence-termination-character-input2');
+        /** @type {HTMLInputElement} */
+        const includeAtStartCheckbox = querySelectorNotNull(node, '.sentence-termination-character-include-at-start');
+        /** @type {HTMLInputElement} */
+        const includeAtEndheckbox = querySelectorNotNull(node, '.sentence-termination-character-include-at-end');
+        /** @type {HTMLButtonElement} */
+        const menuButton = querySelectorNotNull(node, '.sentence-termination-character-entry-button');
 
         this._character1Input = character1Input;
         this._character2Input = character2Input;

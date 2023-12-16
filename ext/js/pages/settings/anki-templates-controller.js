@@ -18,6 +18,7 @@
 
 import {ExtensionError} from '../../core/extension-error.js';
 import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {JapaneseUtil} from '../../language/sandbox/japanese-util.js';
 import {yomitan} from '../../yomitan.js';
 
@@ -63,10 +64,14 @@ export class AnkiTemplatesController {
         this._renderFieldInput = /** @type {HTMLInputElement} */ (document.querySelector('#anki-card-templates-test-field-input'));
         this._renderTextInput = /** @type {HTMLInputElement} */ (document.querySelector('#anki-card-templates-test-text-input'));
         this._renderResult = /** @type {HTMLElement} */ (document.querySelector('#anki-card-templates-render-result'));
-        const menuButton = /** @type {HTMLButtonElement} */ (document.querySelector('#anki-card-templates-test-field-menu-button'));
-        const testRenderButton = /** @type {HTMLButtonElement} */ (document.querySelector('#anki-card-templates-test-render-button'));
-        const resetButton = /** @type {HTMLButtonElement} */ (document.querySelector('#anki-card-templates-reset-button'));
-        const resetConfirmButton = /** @type {HTMLButtonElement} */ (document.querySelector('#anki-card-templates-reset-button-confirm'));
+        /** @type {HTMLButtonElement} */
+        const menuButton = querySelectorNotNull(document, '#anki-card-templates-test-field-menu-button');
+        /** @type {HTMLButtonElement} */
+        const testRenderButton = querySelectorNotNull(document, '#anki-card-templates-test-render-button');
+        /** @type {HTMLButtonElement} */
+        const resetButton = querySelectorNotNull(document, '#anki-card-templates-reset-button');
+        /** @type {HTMLButtonElement} */
+        const resetConfirmButton = querySelectorNotNull(document, '#anki-card-templates-reset-button-confirm');
         this._fieldTemplateResetModal = this._modalController.getModal('anki-card-templates-reset');
 
         this._fieldTemplatesTextarea.addEventListener('change', this._onChanged.bind(this), false);

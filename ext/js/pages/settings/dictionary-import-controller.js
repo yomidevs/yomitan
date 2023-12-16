@@ -18,6 +18,7 @@
 
 import {log} from '../../core.js';
 import {ExtensionError} from '../../core/extension-error.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {DictionaryWorker} from '../../language/dictionary-worker.js';
 import {yomitan} from '../../yomitan.js';
 import {DictionaryController} from './dictionary-controller.js';
@@ -156,7 +157,8 @@ export class DictionaryImportController {
         if (this._modifying) { return; }
 
         const statusFooter = this._statusFooter;
-        const importInfo = /** @type {HTMLElement} */ (document.querySelector('#dictionary-import-info'));
+        /** @type {HTMLElement} */
+        const importInfo = querySelectorNotNull(document, '#dictionary-import-info');
         const progressSelector = '.dictionary-import-progress';
         const progressContainers = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`#dictionaries-modal ${progressSelector}`));
         const progressBars = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`${progressSelector} .progress-bar`));

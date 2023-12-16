@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
 export class SecondarySearchDictionaryController {
@@ -83,13 +84,16 @@ export class SecondarySearchDictionaryController {
             const node = /** @type {HTMLElement} */ (this._settingsController.instantiateTemplate('secondary-search-dictionary'));
             fragment.appendChild(node);
 
-            const nameNode = /** @type {HTMLElement} */ (node.querySelector('.dictionary-title'));
+            /** @type {HTMLElement} */
+            const nameNode = querySelectorNotNull(node, '.dictionary-title');
             nameNode.textContent = name;
 
-            const versionNode = /** @type {HTMLElement} */ (node.querySelector('.dictionary-version'));
+            /** @type {HTMLElement} */
+            const versionNode = querySelectorNotNull(node, '.dictionary-version');
             versionNode.textContent = `rev.${dictionaryInfo.revision}`;
 
-            const toggle = /** @type {HTMLElement} */ (node.querySelector('.dictionary-allow-secondary-searches'));
+            /** @type {HTMLElement} */
+            const toggle = querySelectorNotNull(node, '.dictionary-allow-secondary-searches');
             toggle.dataset.setting = `dictionaries[${i}].allowSecondarySearches`;
             this._eventListeners.addEventListener(toggle, 'settingChanged', this._onEnabledChanged.bind(this, node), false);
         }

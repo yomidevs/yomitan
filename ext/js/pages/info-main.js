@@ -18,6 +18,7 @@
 
 import {log, promiseTimeout} from '../core.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {yomitan} from '../yomitan.js';
 import {BackupController} from './settings/backup-controller.js';
 import {SettingsController} from './settings/settings-controller.js';
@@ -69,7 +70,8 @@ function getOperatingSystemDisplayName(os) {
         const {name, version} = manifest;
         const {browser, platform: {os}} = await yomitan.api.getEnvironmentInfo();
 
-        const thisVersionLink = /** @type {HTMLLinkElement} */ (document.querySelector('#release-notes-this-version-link'));
+        /** @type {HTMLLinkElement} */
+        const thisVersionLink = querySelectorNotNull(document, '#release-notes-this-version-link');
         const {hrefFormat} = thisVersionLink.dataset;
         thisVersionLink.href = typeof hrefFormat === 'string' ? hrefFormat.replace(/\{version\}/g, version) : '';
 
@@ -116,7 +118,8 @@ function getOperatingSystemDisplayName(os) {
             }
 
             /** @type {HTMLElement} */ (document.querySelector('#installed-dictionaries-none')).hidden = (dictionaryInfos.length !== 0);
-            const container = /** @type {HTMLElement} */ (document.querySelector('#installed-dictionaries'));
+            /** @type {HTMLElement} */
+            const container = querySelectorNotNull(document, '#installed-dictionaries');
             container.textContent = '';
             container.appendChild(fragment);
         })();
