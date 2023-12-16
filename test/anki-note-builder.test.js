@@ -134,7 +134,7 @@ function getFieldMarkers(type) {
  * @param {'terms'|'kanji'} type
  * @param {import('settings').ResultOutputMode} mode
  * @param {string} template
- * @param {import('@vitest/expect').ExpectStatic} expect
+ * @param {import('vitest').ExpectStatic} expect
  * @returns {Promise<import('anki').NoteFields[]>}
  */
 async function getRenderResults(dictionaryEntries, type, mode, template, expect) {
