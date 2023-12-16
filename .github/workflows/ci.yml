@@ -25,8 +25,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build Libs
+        run: npm run build-libs
+
       - name: Lint JS
         run: npm run test-lint-js
+        env:
+          CI: true
+
+      - name: Validate JS Types
+        run: npm run test-ts
         env:
           CI: true
 
@@ -39,9 +47,6 @@ jobs:
         run: npm run test-lint-html
         env:
           CI: true
-
-      - name: Build Libs
-        run: npm run build-libs
 
       - name: Tests
         run: npm run test-code
