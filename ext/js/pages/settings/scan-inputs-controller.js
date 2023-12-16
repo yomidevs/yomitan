@@ -274,8 +274,6 @@ class ScanInputField {
         /** @type {HTMLButtonElement} */
         const excludeMouseButton = querySelectorNotNull(node, '.mouse-button[data-property=exclude]');
         /** @type {HTMLButtonElement} */
-        const removeButton = querySelectorNotNull(node, '.scan-input-remove');
-        /** @type {HTMLButtonElement} */
         const menuButton = querySelectorNotNull(node, '.scanning-input-menu-button');
 
         node.dataset.showAdvanced = `${showAdvanced}`;
@@ -291,13 +289,8 @@ class ScanInputField {
 
         this._eventListeners.on(this._includeInputField, 'change', this._onIncludeValueChange.bind(this));
         this._eventListeners.on(this._excludeInputField, 'change', this._onExcludeValueChange.bind(this));
-        if (removeButton !== null) {
-            this._eventListeners.addEventListener(removeButton, 'click', this._onRemoveClick.bind(this));
-        }
-        if (menuButton !== null) {
-            this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this));
-            this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this));
-        }
+        this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this));
+        this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this));
 
         this._updateDataSettingTargets();
     }

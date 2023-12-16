@@ -47,8 +47,6 @@ export class AnkiController {
         /** @type {?Promise<import('anki-controller').AnkiData>} */
         this._getAnkiDataPromise = null;
         /** @type {HTMLElement} */
-        this._ankiErrorContainer = querySelectorNotNull(document, '#anki-error');
-        /** @type {HTMLElement} */
         this._ankiErrorMessageNode = querySelectorNotNull(document, '#anki-error-message');
         const ankiErrorMessageNodeDefaultContent = this._ankiErrorMessageNode.textContent;
         /** @type {string} */
@@ -434,9 +432,6 @@ export class AnkiController {
     /** */
     _hideAnkiError() {
         const ankiErrorMessageNode = /** @type {HTMLElement} */ (this._ankiErrorMessageNode);
-        if (this._ankiErrorContainer !== null) {
-            this._ankiErrorContainer.hidden = true;
-        }
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsContainer).hidden = true;
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsToggle).hidden = true;
         /** @type {HTMLElement} */ (this._ankiErrorInvalidResponseInfo).hidden = true;
@@ -467,9 +462,6 @@ export class AnkiController {
         details += `${error.stack}`.trimRight();
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsNode).textContent = details;
 
-        if (this._ankiErrorContainer !== null) {
-            this._ankiErrorContainer.hidden = false;
-        }
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsContainer).hidden = true;
         /** @type {HTMLElement} */ (this._ankiErrorInvalidResponseInfo).hidden = (errorString.indexOf('Invalid response') < 0);
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsToggle).hidden = false;

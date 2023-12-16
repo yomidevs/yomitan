@@ -50,10 +50,6 @@ export class DictionaryImportController {
         this._purgeConfirmModal = null;
         /** @type {HTMLElement} */
         this._errorContainer = querySelectorNotNull(document, '#dictionary-error');
-        /** @type {HTMLElement} */
-        this._spinner = querySelectorNotNull(document, '#dictionary-spinner');
-        /** @type {HTMLElement} */
-        this._purgeNotification = querySelectorNotNull(document, '#dictionary-delete-all-status');
         /** @type {[originalMessage: string, newMessage: string][]} */
         this._errorToStringOverrides = [
             [
@@ -117,14 +113,11 @@ export class DictionaryImportController {
     async _purgeDatabase() {
         if (this._modifying) { return; }
 
-        const purgeNotification = this._purgeNotification;
         const prevention = this._preventPageExit();
 
         try {
             this._setModifying(true);
             this._hideErrors();
-            this._setSpinnerVisible(true);
-            if (purgeNotification !== null) { purgeNotification.hidden = false; }
 
             await yomitan.api.purgeDatabase();
             const errors = await this._clearDictionarySettings();
@@ -136,8 +129,6 @@ export class DictionaryImportController {
             this._showErrors([error instanceof Error ? error : new Error(`${error}`)]);
         } finally {
             prevention.end();
-            if (purgeNotification !== null) { purgeNotification.hidden = true; }
-            this._setSpinnerVisible(false);
             this._setModifying(false);
             this._triggerStorageChanged();
         }
@@ -163,7 +154,6 @@ export class DictionaryImportController {
         try {
             this._setModifying(true);
             this._hideErrors();
-            this._setSpinnerVisible(true);
 
             for (const progress of progressContainers) { progress.hidden = false; }
 
@@ -225,7 +215,6 @@ export class DictionaryImportController {
                 importInfo.textContent = '';
                 importInfo.hidden = true;
             }
-            this._setSpinnerVisible(false);
             this._setModifying(false);
             this._triggerStorageChanged();
         }
@@ -305,15 +294,6 @@ export class DictionaryImportController {
             targets.push({action: 'set', path: path2, value: ''});
         }
         return await this._modifyGlobalSettings(targets);
-    }
-
-    /**
-     * @param {boolean} visible
-     */
-    _setSpinnerVisible(visible) {
-        if (this._spinner !== null) {
-            this._spinner.hidden = !visible;
-        }
     }
 
     /**
