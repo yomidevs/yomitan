@@ -32,7 +32,8 @@ export class PersistentStorageController {
 
         if (!this._isPersistentStorageSupported()) { return; }
 
-        const info = /** @type {?HTMLElement} */ (document.querySelector('#storage-persistent-info'));
+        /** @type {?HTMLElement} */
+        const info = document.querySelector('#storage-persistent-info');
         if (info !== null) { info.hidden = false; }
 
         const isStoragePeristent = await this.isStoragePeristent();
@@ -77,7 +78,8 @@ export class PersistentStorageController {
 
         this._updateCheckbox(isStoragePeristent);
 
-        const node = /** @type {?HTMLElement} */ (document.querySelector('#storage-persistent-fail-warning'));
+        /** @type {?HTMLElement} */
+        const node = document.querySelector('#storage-persistent-fail-warning');
         if (node !== null) { node.hidden = isStoragePeristent; }
 
         yomitan.trigger('storageChanged');

@@ -154,7 +154,8 @@ export class SettingsDisplayController {
         const container = this._getMoreContainer(node);
         if (container === null) { return; }
 
-        const more = /** @type {?HTMLElement} */ (container.querySelector('.more'));
+        /** @type {?HTMLElement} */
+        const more = container.querySelector('.more');
         if (more === null) { return; }
 
         const moreVisible = more.hidden;

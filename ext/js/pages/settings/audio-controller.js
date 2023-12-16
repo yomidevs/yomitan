@@ -386,7 +386,8 @@ class AudioSourceEntry {
                 break;
         }
 
-        const helpNode = /** @type {?HTMLElement} */ (menu.bodyNode.querySelector('.popup-menu-item[data-menu-action=help]'));
+        /** @type {?HTMLElement} */
+        const helpNode = menu.bodyNode.querySelector('.popup-menu-item[data-menu-action=help]');
         if (helpNode !== null) {
             helpNode.hidden = !hasHelp;
         }

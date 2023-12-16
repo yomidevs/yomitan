@@ -309,7 +309,8 @@ class DictionaryExtraInfo {
         /** @type {HTMLButtonElement} */
         const dictionaryIntegrityButton = querySelectorNotNull(fragment, '.dictionary-integrity-button');
 
-        this._setTitle(fragment.querySelector('.dictionary-total-count'));
+        const titleNode = fragment.querySelector('.dictionary-total-count');
+        this._setTitle(titleNode);
         this._eventListeners.addEventListener(dictionaryIntegrityButton, 'click', this._onIntegrityButtonClick.bind(this), false);
 
         container.appendChild(fragment);
@@ -343,7 +344,8 @@ class DictionaryExtraInfo {
 
         const info = {counts: this._totalCounts, remainders: this._remainders};
         dictionaryCounts.textContent = JSON.stringify(info, null, 4);
-        this._setTitle(modal.node.querySelector('.dictionary-total-count'));
+        const titleNode = modal.node.querySelector('.dictionary-total-count');
+        this._setTitle(titleNode);
 
         modal.setVisible(true);
     }

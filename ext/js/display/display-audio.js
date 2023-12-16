@@ -716,7 +716,8 @@ export class DisplayAudio {
             button.dataset.potentialAvailableAudioCount = `${potentialAvailableAudioCount}`;
         }
 
-        const badge = /** @type {?HTMLElement} */ (button.querySelector('.action-button-badge'));
+        /** @type {?HTMLElement} */
+        const badge = button.querySelector('.action-button-badge');
         if (badge === null) { return; }
 
         const badgeData = badge.dataset;

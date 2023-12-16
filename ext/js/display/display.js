@@ -1295,7 +1295,8 @@ export class Display extends EventDispatcher {
 
     /** */
     _setContentExtensionUnloaded() {
-        const errorExtensionUnloaded = /** @type {?HTMLElement} */ (document.querySelector('#error-extension-unloaded'));
+        /** @type {?HTMLElement} */
+        const errorExtensionUnloaded = document.querySelector('#error-extension-unloaded');
 
         if (this._container !== null) {
             this._container.hidden = true;
@@ -1327,7 +1328,8 @@ export class Display extends EventDispatcher {
      * @param {boolean} visible
      */
     _setNoContentVisible(visible) {
-        const noResults = /** @type {?HTMLElement} */ (document.querySelector('#no-results'));
+        /** @type {?HTMLElement} */
+        const noResults = document.querySelector('#no-results');
 
         if (noResults !== null) {
             noResults.hidden = !visible;

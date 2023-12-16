@@ -65,6 +65,8 @@ export class AnkiController {
         this._ankiError = null;
         /** @type {?import('core').TokenObject} */
         this._validateFieldsToken = null;
+        /** @type {?HTMLInputElement} */
+        this._ankiEnableCheckbox = document.querySelector('[data-setting="anki.enable"]');
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */
@@ -74,7 +76,6 @@ export class AnkiController {
 
     /** */
     async prepare() {
-        this._ankiEnableCheckbox = /** @type {?HTMLInputElement} */ (document.querySelector('[data-setting="anki.enable"]'));
         /** @type {HTMLElement} */
         const ankiApiKeyInput = querySelectorNotNull(document, '#anki-api-key-input');
         const ankiCardPrimaryTypeRadios = /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('input[type=radio][name=anki-card-primary-type]'));
@@ -795,7 +796,8 @@ class AnkiCardController {
             this._fieldEventListeners.addEventListener(inputField, 'settingChanged', this._onFieldSettingChanged.bind(this, index), false);
             this._validateField(inputField, index);
 
-            const menuButton = /** @type {?HTMLElement} */ (content.querySelector('.anki-card-field-value-menu-button'));
+            /** @type {?HTMLElement} */
+            const menuButton = content.querySelector('.anki-card-field-value-menu-button');
             if (menuButton !== null) {
                 if (typeof this._cardMenu !== 'undefined') {
                     menuButton.dataset.menu = this._cardMenu;
