@@ -141,8 +141,6 @@ export class DictionaryImportController {
         if (this._modifying) { return; }
 
         const statusFooter = this._statusFooter;
-        /** @type {HTMLElement} */
-        const importInfo = querySelectorNotNull(document, '#dictionary-import-info');
         const progressSelector = '.dictionary-import-progress';
         const progressContainers = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`#dictionaries-modal ${progressSelector}`));
         const progressBars = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`${progressSelector} .progress-bar`));
@@ -189,11 +187,6 @@ export class DictionaryImportController {
 
             const fileCount = files.length;
             for (let i = 0; i < fileCount; ++i) {
-                if (importInfo !== null && fileCount > 1) {
-                    importInfo.hidden = false;
-                    importInfo.textContent = `(${i + 1} of ${fileCount})`;
-                }
-
                 statusPrefix = `Importing dictionary${fileCount > 1 ? ` (${i + 1} of ${fileCount})` : ''}`;
                 onProgress({
                     stepIndex: -1,
@@ -211,10 +204,6 @@ export class DictionaryImportController {
             prevention.end();
             for (const progress of progressContainers) { progress.hidden = true; }
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
-            if (importInfo !== null) {
-                importInfo.textContent = '';
-                importInfo.hidden = true;
-            }
             this._setModifying(false);
             this._triggerStorageChanged();
         }
