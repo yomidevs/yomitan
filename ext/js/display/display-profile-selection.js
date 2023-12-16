@@ -18,6 +18,7 @@
 
 import {EventListenerCollection, generateId} from '../core.js';
 import {PanelElement} from '../dom/panel-element.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {yomitan} from '../yomitan.js';
 
 export class DisplayProfileSelection {
@@ -28,9 +29,9 @@ export class DisplayProfileSelection {
         /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {HTMLElement} */
-        this._profielList = /** @type {HTMLElement} */ (document.querySelector('#profile-list'));
+        this._profielList = querySelectorNotNull(document, '#profile-list');
         /** @type {HTMLButtonElement} */
-        this._profileButton = /** @type {HTMLButtonElement} */ (document.querySelector('#profile-button'));
+        this._profileButton = querySelectorNotNull(document, '#profile-button');
         /** @type {PanelElement} */
         this._profilePanel = new PanelElement({
             node: /** @type {HTMLElement} */ (document.querySelector('#profile-panel')),

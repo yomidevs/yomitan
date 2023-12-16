@@ -17,6 +17,7 @@
  */
 
 import {clone, EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 import {ProfileConditionsUI} from './profile-conditions-ui.js';
 
@@ -662,15 +663,15 @@ class ProfileEntry {
         /** @type {number} */
         this._index = index;
         /** @type {HTMLInputElement} */
-        this._isDefaultRadio = /** @type {HTMLInputElement} */ (node.querySelector('.profile-entry-is-default-radio'));
+        this._isDefaultRadio = querySelectorNotNull(node, '.profile-entry-is-default-radio');
         /** @type {HTMLInputElement} */
-        this._nameInput = /** @type {HTMLInputElement} */ (node.querySelector('.profile-entry-name-input'));
+        this._nameInput = querySelectorNotNull(node, '.profile-entry-name-input');
         /** @type {HTMLElement} */
-        this._countLink = /** @type {HTMLElement} */ (node.querySelector('.profile-entry-condition-count-link'));
+        this._countLink = querySelectorNotNull(node, '.profile-entry-condition-count-link');
         /** @type {HTMLElement} */
-        this._countText = /** @type {HTMLElement} */ (node.querySelector('.profile-entry-condition-count'));
+        this._countText = querySelectorNotNull(node, '.profile-entry-condition-count');
         /** @type {HTMLButtonElement} */
-        this._menuButton = /** @type {HTMLButtonElement} */ (node.querySelector('.profile-entry-menu-button'));
+        this._menuButton = querySelectorNotNull(node, '.profile-entry-menu-button');
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
     }

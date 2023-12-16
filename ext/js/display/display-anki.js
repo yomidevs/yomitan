@@ -20,6 +20,7 @@ import {EventListenerCollection, deferPromise} from '../core.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
 import {AnkiUtil} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {yomitan} from '../yomitan.js';
 
 export class DisplayAnki {
@@ -91,7 +92,7 @@ export class DisplayAnki {
             ['term', ['term-kanji', 'term-kana']]
         ]);
         /** @type {HTMLElement} */
-        this._menuContainer = /** @type {HTMLElement} */ (document.querySelector('#popup-menus'));
+        this._menuContainer = querySelectorNotNull(document, '#popup-menus');
         /** @type {(event: MouseEvent) => void} */
         this._onShowTagsBind = this._onShowTags.bind(this);
         /** @type {(event: MouseEvent) => void} */
@@ -827,7 +828,8 @@ export class DisplayAnki {
         button.hidden = disabled;
         button.dataset.noteIds = allNoteIds.join(' ');
 
-        const badge = /** @type {?HTMLElement} */ (button.querySelector('.action-button-badge'));
+        /** @type {?HTMLElement} */
+        const badge = button.querySelector('.action-button-badge');
         if (badge !== null) {
             const badgeData = badge.dataset;
             if (allNoteIds.length > 1) {
@@ -866,13 +868,17 @@ export class DisplayAnki {
         const noteIds = this._getNodeNoteIds(node);
         if (noteIds.length === 0) { return; }
 
-        const menuContainerNode = /** @type {HTMLElement} */ (this._display.displayGenerator.instantiateTemplate('view-note-button-popup-menu'));
-        const menuBodyNode = /** @type {HTMLElement} */ (menuContainerNode.querySelector('.popup-menu-body'));
+        /** @type {HTMLElement} */
+        const menuContainerNode = this._display.displayGenerator.instantiateTemplate('view-note-button-popup-menu');
+        /** @type {HTMLElement} */
+        const menuBodyNode = querySelectorNotNull(menuContainerNode, '.popup-menu-body');
 
         for (let i = 0, ii = noteIds.length; i < ii; ++i) {
             const noteId = noteIds[i];
-            const item = /** @type {HTMLElement} */ (this._display.displayGenerator.instantiateTemplate('view-note-button-popup-menu-item'));
-            const label = /** @type {Element} */ (item.querySelector('.popup-menu-item-label'));
+            /** @type {HTMLElement} */
+            const item = this._display.displayGenerator.instantiateTemplate('view-note-button-popup-menu-item');
+            /** @type {Element} */
+            const label = querySelectorNotNull(item, '.popup-menu-item-label');
             label.textContent = `Note ${i + 1}: ${noteId}`;
             item.dataset.menuAction = 'viewNote';
             item.dataset.noteIds = `${noteId}`;

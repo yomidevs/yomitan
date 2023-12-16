@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection, log} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {DictionaryWorker} from '../../language/dictionary-worker.js';
 import {yomitan} from '../../yomitan.js';
 
@@ -41,21 +42,21 @@ class DictionaryEntry {
         /** @type {ChildNode[]} */
         this._nodes = [...fragment.childNodes];
         /** @type {HTMLInputElement} */
-        this._enabledCheckbox = /** @type {HTMLInputElement} */ (fragment.querySelector('.dictionary-enabled'));
+        this._enabledCheckbox = querySelectorNotNull(fragment, '.dictionary-enabled');
         /** @type {HTMLInputElement} */
-        this._priorityInput = /** @type {HTMLInputElement} */ (fragment.querySelector('.dictionary-priority'));
+        this._priorityInput = querySelectorNotNull(fragment, '.dictionary-priority');
         /** @type {HTMLButtonElement} */
-        this._menuButton = /** @type {HTMLButtonElement} */ (fragment.querySelector('.dictionary-menu-button'));
+        this._menuButton = querySelectorNotNull(fragment, '.dictionary-menu-button');
         /** @type {HTMLButtonElement} */
-        this._outdatedButton = /** @type {HTMLButtonElement} */ (fragment.querySelector('.dictionary-outdated-button'));
+        this._outdatedButton = querySelectorNotNull(fragment, '.dictionary-outdated-button');
         /** @type {HTMLButtonElement} */
-        this._integrityButton = /** @type {HTMLButtonElement} */ (fragment.querySelector('.dictionary-integrity-button'));
+        this._integrityButton = querySelectorNotNull(fragment, '.dictionary-integrity-button');
         /** @type {HTMLElement} */
-        this._titleNode = /** @type {HTMLElement} */ (fragment.querySelector('.dictionary-title'));
+        this._titleNode = querySelectorNotNull(fragment, '.dictionary-title');
         /** @type {HTMLElement} */
-        this._versionNode = /** @type {HTMLElement} */ (fragment.querySelector('.dictionary-version'));
+        this._versionNode = querySelectorNotNull(fragment, '.dictionary-version');
         /** @type {HTMLElement} */
-        this._titleContainer = /** @type {HTMLElement} */ (fragment.querySelector('.dictionary-item-title-container'));
+        this._titleContainer = querySelectorNotNull(fragment, '.dictionary-item-title-container');
     }
 
     /** @type {string} */

@@ -18,6 +18,7 @@
 
 import {EventListenerCollection} from '../core.js';
 import {PopupMenu} from '../dom/popup-menu.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {AudioSystem} from '../media/audio-system.js';
 import {yomitan} from '../yomitan.js';
 
@@ -45,7 +46,7 @@ export class DisplayAudio {
         /** @type {Map<string, import('display-audio').CacheItem>} */
         this._cache = new Map();
         /** @type {Element} */
-        this._menuContainer = /** @type {Element} */ (document.querySelector('#popup-menus'));
+        this._menuContainer = querySelectorNotNull(document, '#popup-menus');
         /** @type {import('core').TokenObject} */
         this._entriesToken = {};
         /** @type {Set<PopupMenu>} */

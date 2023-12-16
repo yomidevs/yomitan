@@ -17,6 +17,7 @@
  */
 
 import {EventDispatcher, log} from '../core.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {TextScanner} from '../language/text-scanner.js';
 import {yomitan} from '../yomitan.js';
 
@@ -50,11 +51,11 @@ export class QueryParser extends EventDispatcher {
         /** @type {import('api').ParseTextResult} */
         this._parseResults = [];
         /** @type {HTMLElement} */
-        this._queryParser = /** @type {HTMLElement} */ (document.querySelector('#query-parser-content'));
+        this._queryParser = querySelectorNotNull(document, '#query-parser-content');
         /** @type {HTMLElement} */
-        this._queryParserModeContainer = /** @type {HTMLElement} */ (document.querySelector('#query-parser-mode-container'));
+        this._queryParserModeContainer = querySelectorNotNull(document, '#query-parser-mode-container');
         /** @type {HTMLSelectElement} */
-        this._queryParserModeSelect = /** @type {HTMLSelectElement} */ (document.querySelector('#query-parser-mode-select'));
+        this._queryParserModeSelect = querySelectorNotNull(document, '#query-parser-mode-select');
         /** @type {TextScanner} */
         this._textScanner = new TextScanner({
             node: this._queryParser,
