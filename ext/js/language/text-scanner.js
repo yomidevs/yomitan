@@ -102,11 +102,11 @@ export class TextScanner extends EventDispatcher {
         this._sentenceScanExtent = 0;
         /** @type {boolean} */
         this._sentenceTerminateAtNewlines = true;
-        /** @type {Map<string, [includeCharacterAtStart: boolean, includeCharacterAtEnd: boolean]>} */
+        /** @type {import('text-scanner').SentenceTerminatorMap} */
         this._sentenceTerminatorMap = new Map();
-        /** @type {Map<string, [character: string, includeCharacterAtStart: boolean]>} */
+        /** @type {import('text-scanner').SentenceForwardQuoteMap} */
         this._sentenceForwardQuoteMap = new Map();
-        /** @type {Map<string, [character: string, includeCharacterAtEnd: boolean]>} */
+        /** @type {import('text-scanner').SentenceBackwardQuoteMap} */
         this._sentenceBackwardQuoteMap = new Map();
         /** @type {import('text-scanner').InputConfig[]} */
         this._inputs = [];
