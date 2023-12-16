@@ -78,9 +78,9 @@
             ]},
             {"type": "structured-content", "content": [
                 "Image alt text tests.\n𬵪 = Unicode character\n",
-                {"tag": "img", "description": "𬵪", "path": "aosaba_mono.png", "height": 1.0, "width": 1.0, "background": false, "sizeUnits": "em", "collapsed": false, "collapsible": false, "appearance": "monochrome"},
+                {"tag": "img", "alt": "𬵪", "path": "aosaba_mono.png", "height": 1.0, "width": 1.0, "background": false, "sizeUnits": "em", "collapsed": false, "collapsible": false, "appearance": "monochrome"},
                 " = monochrome PNG\n",
-                {"tag": "img", "description": "𬵪", "path": "aosaba_auto.png", "height": 1.0, "width": 1.0, "background": false, "sizeUnits": "em", "collapsed": false, "collapsible": false, "appearance": "auto"},
+                {"tag": "img", "alt": "𬵪", "path": "aosaba_auto.png", "height": 1.0, "width": 1.0, "background": false, "sizeUnits": "em", "collapsed": false, "collapsible": false, "appearance": "auto"},
                 " = color PNG"
             ]},
             {"type": "structured-content", "content": [

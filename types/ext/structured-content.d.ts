@@ -134,6 +134,10 @@ export type ImageElementBase = {
      */
     title?: string;
     /**
+     * Alt text for the image.
+     */
+    alt?: string;
+    /**
      * Description of the image.
      */
     description?: string;
