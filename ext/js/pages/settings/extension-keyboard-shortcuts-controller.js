@@ -29,12 +29,12 @@ export class ExtensionKeyboardShortcutController {
     constructor(settingsController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {?HTMLButtonElement} */
-        this._resetButton = null;
-        /** @type {?HTMLButtonElement} */
-        this._clearButton = null;
-        /** @type {?HTMLElement} */
-        this._listContainer = null;
+        /** @type {HTMLButtonElement} */
+        this._resetButton = querySelectorNotNull(document, '#extension-hotkey-list-reset-all');
+        /** @type {HTMLButtonElement} */
+        this._clearButton = querySelectorNotNull(document, '#extension-hotkey-list-clear-all');
+        /** @type {HTMLElement} */
+        this._listContainer = querySelectorNotNull(document, '#extension-hotkey-list');
         /** @type {HotkeyUtil} */
         this._hotkeyUtil = new HotkeyUtil();
         /** @type {?import('environment').OperatingSystem} */
@@ -50,10 +50,6 @@ export class ExtensionKeyboardShortcutController {
 
     /** */
     async prepare() {
-        this._resetButton = /** @type {HTMLButtonElement} */ (document.querySelector('#extension-hotkey-list-reset-all'));
-        this._clearButton = /** @type {HTMLButtonElement} */ (document.querySelector('#extension-hotkey-list-clear-all'));
-        this._listContainer = /** @type {HTMLElement} */ (document.querySelector('#extension-hotkey-list'));
-
         const canResetCommands = this.canResetCommands();
         const canModifyCommands = this.canModifyCommands();
         this._resetButton.hidden = !canResetCommands;

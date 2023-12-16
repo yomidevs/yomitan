@@ -31,10 +31,10 @@ export class ScanInputsController {
         this._settingsController = settingsController;
         /** @type {?import('environment').OperatingSystem} */
         this._os = null;
-        /** @type {?HTMLElement} */
-        this._container = null;
-        /** @type {?HTMLButtonElement} */
-        this._addButton = null;
+        /** @type {HTMLElement} */
+        this._container = querySelectorNotNull(document, '#scan-input-list');
+        /** @type {HTMLButtonElement} */
+        this._addButton = querySelectorNotNull(document, '#scan-input-add');
         /** @type {?NodeListOf<HTMLElement>} */
         this._scanningInputCountNodes = null;
         /** @type {ScanInputField[]} */
@@ -46,8 +46,6 @@ export class ScanInputsController {
         const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._os = os;
 
-        this._container = /** @type {HTMLElement} */ (document.querySelector('#scan-input-list'));
-        this._addButton = /** @type {HTMLButtonElement} */ (document.querySelector('#scan-input-add'));
         this._scanningInputCountNodes = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.scanning-input-count'));
 
         this._addButton.addEventListener('click', this._onAddButtonClick.bind(this), false);

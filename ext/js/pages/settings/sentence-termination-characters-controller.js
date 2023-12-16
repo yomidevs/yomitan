@@ -28,16 +28,16 @@ export class SentenceTerminationCharactersController {
         this._settingsController = settingsController;
         /** @type {SentenceTerminationCharacterEntry[]} */
         this._entries = [];
-        /** @type {?HTMLButtonElement} */
-        this._addButton = null;
-        /** @type {?HTMLButtonElement} */
-        this._resetButton = null;
-        /** @type {?HTMLElement} */
-        this._listTable = null;
-        /** @type {?HTMLElement} */
-        this._listContainer = null;
-        /** @type {?HTMLElement} */
-        this._emptyIndicator = null;
+        /** @type {HTMLButtonElement} */
+        this._addButton = querySelectorNotNull(document, '#sentence-termination-character-list-add');
+        /** @type {HTMLButtonElement} */
+        this._resetButton = querySelectorNotNull(document, '#sentence-termination-character-list-reset');
+        /** @type {HTMLElement} */
+        this._listTable = querySelectorNotNull(document, '#sentence-termination-character-list-table');
+        /** @type {HTMLElement} */
+        this._listContainer = querySelectorNotNull(document, '#sentence-termination-character-list');
+        /** @type {HTMLElement} */
+        this._emptyIndicator = querySelectorNotNull(document, '#sentence-termination-character-list-empty');
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */
@@ -47,12 +47,6 @@ export class SentenceTerminationCharactersController {
 
     /** */
     async prepare() {
-        this._addButton = /** @type {HTMLButtonElement} */ (document.querySelector('#sentence-termination-character-list-add'));
-        this._resetButton = /** @type {HTMLButtonElement} */ (document.querySelector('#sentence-termination-character-list-reset'));
-        this._listTable = /** @type {HTMLElement} */ (document.querySelector('#sentence-termination-character-list-table'));
-        this._listContainer = /** @type {HTMLElement} */ (document.querySelector('#sentence-termination-character-list'));
-        this._emptyIndicator = /** @type {HTMLElement} */ (document.querySelector('#sentence-termination-character-list-empty'));
-
         this._addButton.addEventListener('click', this._onAddClick.bind(this));
         this._resetButton.addEventListener('click', this._onResetClick.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));

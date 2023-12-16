@@ -41,14 +41,16 @@ export class AnkiTemplatesController {
         this._cachedDictionaryEntryText = null;
         /** @type {?string} */
         this._defaultFieldTemplates = null;
-        /** @type {?HTMLTextAreaElement} */
-        this._fieldTemplatesTextarea = null;
-        /** @type {?HTMLElement} */
-        this._compileResultInfo = null;
-        /** @type {?HTMLInputElement} */
-        this._renderFieldInput = null;
-        /** @type {?HTMLElement} */
-        this._renderResult = null;
+        /** @type {HTMLTextAreaElement} */
+        this._fieldTemplatesTextarea = querySelectorNotNull(document, '#anki-card-templates-textarea');
+        /** @type {HTMLElement} */
+        this._compileResultInfo = querySelectorNotNull(document, '#anki-card-templates-compile-result');
+        /** @type {HTMLInputElement} */
+        this._renderFieldInput = querySelectorNotNull(document, '#anki-card-templates-test-field-input');
+        /** @type {HTMLInputElement} */
+        this._renderTextInput = querySelectorNotNull(document, '#anki-card-templates-test-text-input');
+        /** @type {HTMLElement} */
+        this._renderResult = querySelectorNotNull(document, '#anki-card-templates-render-result');
         /** @type {?import('./modal.js').Modal} */
         this._fieldTemplateResetModal = null;
         /** @type {AnkiNoteBuilder} */
@@ -59,11 +61,6 @@ export class AnkiTemplatesController {
     async prepare() {
         this._defaultFieldTemplates = await yomitan.api.getDefaultAnkiFieldTemplates();
 
-        this._fieldTemplatesTextarea = /** @type {HTMLTextAreaElement} */ (document.querySelector('#anki-card-templates-textarea'));
-        this._compileResultInfo = /** @type {HTMLElement} */ (document.querySelector('#anki-card-templates-compile-result'));
-        this._renderFieldInput = /** @type {HTMLInputElement} */ (document.querySelector('#anki-card-templates-test-field-input'));
-        this._renderTextInput = /** @type {HTMLInputElement} */ (document.querySelector('#anki-card-templates-test-text-input'));
-        this._renderResult = /** @type {HTMLElement} */ (document.querySelector('#anki-card-templates-render-result'));
         /** @type {HTMLButtonElement} */
         const menuButton = querySelectorNotNull(document, '#anki-card-templates-test-field-menu-button');
         /** @type {HTMLButtonElement} */

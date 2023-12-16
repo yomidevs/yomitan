@@ -34,10 +34,10 @@ export class ProfileConditionsUI extends EventDispatcher {
         this._settingsController = settingsController;
         /** @type {?import('environment').OperatingSystem} */
         this._os = null;
-        /** @type {?HTMLElement} */
-        this._conditionGroupsContainer = null;
-        /** @type {?HTMLElement} */
-        this._addConditionGroupButton = null;
+        /** @type {HTMLElement} */
+        this._conditionGroupsContainer = querySelectorNotNull(document, '#profile-condition-groups');
+        /** @type {HTMLElement} */
+        this._addConditionGroupButton = querySelectorNotNull(document, '#profile-add-condition-group');
         /** @type {ProfileConditionGroupUI[]} */
         this._children = [];
         /** @type {EventListenerCollection} */
@@ -140,8 +140,6 @@ export class ProfileConditionsUI extends EventDispatcher {
         const {conditionGroups} = profiles[profileIndex];
 
         this._profileIndex = profileIndex;
-        this._conditionGroupsContainer = /** @type {HTMLElement} */ (document.querySelector('#profile-condition-groups'));
-        this._addConditionGroupButton = /** @type {HTMLElement} */ (document.querySelector('#profile-add-condition-group'));
 
         for (let i = 0, ii = conditionGroups.length; i < ii; ++i) {
             this._addConditionGroup(conditionGroups[i], i);
@@ -158,9 +156,6 @@ export class ProfileConditionsUI extends EventDispatcher {
             child.cleanup();
         }
         this._children = [];
-
-        this._conditionGroupsContainer = null;
-        this._addConditionGroupButton = null;
     }
 
     /**
@@ -355,7 +350,7 @@ export class ProfileConditionsUI extends EventDispatcher {
         const child = new ProfileConditionGroupUI(this, index);
         child.prepare(conditionGroup);
         this._children.push(child);
-        /** @type {HTMLElement} */ (this._conditionGroupsContainer).appendChild(child.node);
+        this._conditionGroupsContainer.appendChild(child.node);
         return child;
     }
 

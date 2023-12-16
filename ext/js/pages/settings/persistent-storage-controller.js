@@ -17,17 +17,17 @@
  */
 
 import {isObject} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
 export class PersistentStorageController {
     constructor() {
-        /** @type {?HTMLInputElement} */
-        this._persistentStorageCheckbox = null;
+        /** @type {HTMLInputElement} */
+        this._persistentStorageCheckbox = querySelectorNotNull(document, '#storage-persistent-checkbox');
     }
 
     /** */
     async prepare() {
-        this._persistentStorageCheckbox = /** @type {HTMLInputElement} */ (document.querySelector('#storage-persistent-checkbox'));
         this._persistentStorageCheckbox.addEventListener('change', this._onPersistentStorageCheckboxChange.bind(this), false);
 
         if (!this._isPersistentStorageSupported()) { return; }

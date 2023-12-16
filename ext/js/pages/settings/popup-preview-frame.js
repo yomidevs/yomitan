@@ -18,6 +18,7 @@
 
 import * as wanakana from '../../../lib/wanakana.js';
 import {Frontend} from '../../app/frontend.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {TextSourceRange} from '../../dom/text-source-range.js';
 import {yomitan} from '../../yomitan.js';
 
@@ -49,10 +50,10 @@ export class PopupPreviewFrame {
         this._textSource = null;
         /** @type {?import('settings').OptionsContext} */
         this._optionsContext = null;
-        /** @type {?HTMLElement} */
-        this._exampleText = null;
-        /** @type {?HTMLInputElement} */
-        this._exampleTextInput = null;
+        /** @type {HTMLElement} */
+        this._exampleText = querySelectorNotNull(document, '#example-text');
+        /** @type {HTMLInputElement} */
+        this._exampleTextInput = querySelectorNotNull(document, '#example-text-input');
         /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
@@ -67,9 +68,6 @@ export class PopupPreviewFrame {
 
     /** */
     async prepare() {
-        this._exampleText = /** @type {HTMLElement} */ (document.querySelector('#example-text'));
-        this._exampleTextInput = /** @type {HTMLInputElement} */ (document.querySelector('#example-text-input'));
-
         if (this._exampleTextInput !== null && typeof wanakana !== 'undefined') {
             wanakana.bind(this._exampleTextInput);
         }

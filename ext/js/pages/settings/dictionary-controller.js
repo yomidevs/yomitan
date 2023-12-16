@@ -359,22 +359,22 @@ export class DictionaryController {
         this._databaseStateToken = null;
         /** @type {boolean} */
         this._checkingIntegrity = false;
-        /** @type {?HTMLButtonElement} */
-        this._checkIntegrityButton = null;
-        /** @type {?HTMLElement} */
-        this._dictionaryEntryContainer = null;
-        /** @type {?HTMLElement} */
-        this._dictionaryInstallCountNode = null;
-        /** @type {?HTMLElement} */
-        this._dictionaryEnabledCountNode = null;
+        /** @type {HTMLButtonElement} */
+        this._checkIntegrityButton = querySelectorNotNull(document, '#dictionary-check-integrity');
+        /** @type {HTMLElement} */
+        this._dictionaryEntryContainer = querySelectorNotNull(document, '#dictionary-list');
+        /** @type {HTMLElement} */
+        this._dictionaryInstallCountNode = querySelectorNotNull(document, '#dictionary-install-count');
+        /** @type {HTMLElement} */
+        this._dictionaryEnabledCountNode = querySelectorNotNull(document, '#dictionary-enabled-count');
         /** @type {?NodeListOf<HTMLElement>} */
         this._noDictionariesInstalledWarnings = null;
         /** @type {?NodeListOf<HTMLElement>} */
         this._noDictionariesEnabledWarnings = null;
         /** @type {?import('./modal.js').Modal} */
         this._deleteDictionaryModal = null;
-        /** @type {?HTMLInputElement} */
-        this._allCheckbox = null;
+        /** @type {HTMLInputElement} */
+        this._allCheckbox = querySelectorNotNull(document, '#all-dictionaries-enabled');
         /** @type {?DictionaryExtraInfo} */
         this._extraInfo = null;
         /** @type {boolean} */
@@ -393,14 +393,9 @@ export class DictionaryController {
 
     /** */
     async prepare() {
-        this._checkIntegrityButton = /** @type {HTMLButtonElement} */ (document.querySelector('#dictionary-check-integrity'));
-        this._dictionaryEntryContainer = /** @type {HTMLElement} */ (document.querySelector('#dictionary-list'));
-        this._dictionaryInstallCountNode = /** @type {HTMLElement} */ (document.querySelector('#dictionary-install-count'));
-        this._dictionaryEnabledCountNode = /** @type {HTMLElement} */ (document.querySelector('#dictionary-enabled-count'));
         this._noDictionariesInstalledWarnings = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.no-dictionaries-installed-warning'));
         this._noDictionariesEnabledWarnings = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.no-dictionaries-enabled-warning'));
         this._deleteDictionaryModal = this._modalController.getModal('dictionary-confirm-delete');
-        this._allCheckbox = /** @type {HTMLInputElement} */ (document.querySelector('#all-dictionaries-enabled'));
         /** @type {HTMLButtonElement} */
         const dictionaryDeleteButton = querySelectorNotNull(document, '#dictionary-confirm-delete-button');
         /** @type {HTMLButtonElement} */

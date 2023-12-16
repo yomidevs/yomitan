@@ -26,15 +26,14 @@ export class TranslationTextReplacementsController {
     constructor(settingsController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {?HTMLElement} */
-        this._entryContainer = null;
+        /** @type {HTMLElement} */
+        this._entryContainer = querySelectorNotNull(document, '#translation-text-replacement-list');
         /** @type {TranslationTextReplacementsEntry[]} */
         this._entries = [];
     }
 
     /** */
     async prepare() {
-        this._entryContainer = /** @type {HTMLElement} */ (document.querySelector('#translation-text-replacement-list'));
         /** @type {HTMLButtonElement} */
         const addButton = querySelectorNotNull(document, '#translation-text-replacement-add');
 

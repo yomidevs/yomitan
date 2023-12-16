@@ -38,22 +38,22 @@ export class DictionaryImportController {
         this._statusFooter = statusFooter;
         /** @type {boolean} */
         this._modifying = false;
-        /** @type {?HTMLButtonElement} */
-        this._purgeButton = null;
-        /** @type {?HTMLButtonElement} */
-        this._purgeConfirmButton = null;
-        /** @type {?HTMLButtonElement} */
-        this._importFileButton = null;
-        /** @type {?HTMLInputElement} */
-        this._importFileInput = null;
+        /** @type {HTMLButtonElement} */
+        this._purgeButton = querySelectorNotNull(document, '#dictionary-delete-all-button');
+        /** @type {HTMLButtonElement} */
+        this._purgeConfirmButton = querySelectorNotNull(document, '#dictionary-confirm-delete-all-button');
+        /** @type {HTMLButtonElement} */
+        this._importFileButton = querySelectorNotNull(document, '#dictionary-import-file-button');
+        /** @type {HTMLInputElement} */
+        this._importFileInput = querySelectorNotNull(document, '#dictionary-import-file-input');
         /** @type {?import('./modal.js').Modal} */
         this._purgeConfirmModal = null;
-        /** @type {?HTMLElement} */
-        this._errorContainer = null;
-        /** @type {?HTMLElement} */
-        this._spinner = null;
-        /** @type {?HTMLElement} */
-        this._purgeNotification = null;
+        /** @type {HTMLElement} */
+        this._errorContainer = querySelectorNotNull(document, '#dictionary-error');
+        /** @type {HTMLElement} */
+        this._spinner = querySelectorNotNull(document, '#dictionary-spinner');
+        /** @type {HTMLElement} */
+        this._purgeNotification = querySelectorNotNull(document, '#dictionary-delete-all-status');
         /** @type {[originalMessage: string, newMessage: string][]} */
         this._errorToStringOverrides = [
             [
@@ -69,14 +69,7 @@ export class DictionaryImportController {
 
     /** */
     async prepare() {
-        this._purgeButton = /** @type {HTMLButtonElement} */ (document.querySelector('#dictionary-delete-all-button'));
-        this._purgeConfirmButton = /** @type {HTMLButtonElement} */ (document.querySelector('#dictionary-confirm-delete-all-button'));
-        this._importFileButton = /** @type {HTMLButtonElement} */ (document.querySelector('#dictionary-import-file-button'));
-        this._importFileInput = /** @type {HTMLInputElement} */ (document.querySelector('#dictionary-import-file-input'));
         this._purgeConfirmModal = this._modalController.getModal('dictionary-confirm-delete-all');
-        this._errorContainer = /** @type {HTMLElement} */ (document.querySelector('#dictionary-error'));
-        this._spinner = /** @type {HTMLElement} */ (document.querySelector('#dictionary-spinner'));
-        this._purgeNotification = /** @type {HTMLElement} */ (document.querySelector('#dictionary-delete-all-status'));
 
         this._purgeButton.addEventListener('click', this._onPurgeButtonClick.bind(this), false);
         this._purgeConfirmButton.addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);

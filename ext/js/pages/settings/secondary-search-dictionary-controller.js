@@ -33,14 +33,12 @@ export class SecondarySearchDictionaryController {
         this._dictionaryInfoMap = new Map();
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
-        /** @type {?HTMLElement} */
-        this._container = null;
+        /** @type {HTMLElement} */
+        this._container = querySelectorNotNull(document, '#secondary-search-dictionary-list');
     }
 
     /** */
     async prepare() {
-        this._container = /** @type {HTMLElement} */ (document.querySelector('#secondary-search-dictionary-list'));
-
         await this._onDatabaseUpdated();
 
         yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));

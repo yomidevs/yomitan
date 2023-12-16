@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
 export class SortFrequencyDictionaryController {
@@ -25,25 +26,20 @@ export class SortFrequencyDictionaryController {
     constructor(settingsController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {?HTMLSelectElement} */
-        this._sortFrequencyDictionarySelect = null;
-        /** @type {?HTMLSelectElement} */
-        this._sortFrequencyDictionaryOrderSelect = null;
-        /** @type {?HTMLButtonElement} */
-        this._sortFrequencyDictionaryOrderAutoButton = null;
-        /** @type {?HTMLElement} */
-        this._sortFrequencyDictionaryOrderContainerNode = null;
+        /** @type {HTMLSelectElement} */
+        this._sortFrequencyDictionarySelect = querySelectorNotNull(document, '#sort-frequency-dictionary');
+        /** @type {HTMLSelectElement} */
+        this._sortFrequencyDictionaryOrderSelect = querySelectorNotNull(document, '#sort-frequency-dictionary-order');
+        /** @type {HTMLButtonElement} */
+        this._sortFrequencyDictionaryOrderAutoButton = querySelectorNotNull(document, '#sort-frequency-dictionary-order-auto');
+        /** @type {HTMLElement} */
+        this._sortFrequencyDictionaryOrderContainerNode = querySelectorNotNull(document, '#sort-frequency-dictionary-order-container');
         /** @type {?import('core').TokenObject} */
         this._getDictionaryInfoToken = null;
     }
 
     /** */
     async prepare() {
-        this._sortFrequencyDictionarySelect = /** @type {HTMLSelectElement} */ (document.querySelector('#sort-frequency-dictionary'));
-        this._sortFrequencyDictionaryOrderSelect = /** @type {HTMLSelectElement} */ (document.querySelector('#sort-frequency-dictionary-order'));
-        this._sortFrequencyDictionaryOrderAutoButton = /** @type {HTMLButtonElement} */ (document.querySelector('#sort-frequency-dictionary-order-auto'));
-        this._sortFrequencyDictionaryOrderContainerNode = /** @type {HTMLElement} */ (document.querySelector('#sort-frequency-dictionary-order-container'));
-
         await this._onDatabaseUpdated();
 
         yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));

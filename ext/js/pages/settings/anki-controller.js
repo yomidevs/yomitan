@@ -46,22 +46,23 @@ export class AnkiController {
         this._stringComparer = new Intl.Collator(); // Locale does not matter
         /** @type {?Promise<import('anki-controller').AnkiData>} */
         this._getAnkiDataPromise = null;
-        /** @type {?HTMLElement} */
-        this._ankiErrorContainer = null;
-        /** @type {?HTMLElement} */
-        this._ankiErrorMessageNode = null;
+        /** @type {HTMLElement} */
+        this._ankiErrorContainer = querySelectorNotNull(document, '#anki-error');
+        /** @type {HTMLElement} */
+        this._ankiErrorMessageNode = querySelectorNotNull(document, '#anki-error-message');
+        const ankiErrorMessageNodeDefaultContent = this._ankiErrorMessageNode.textContent;
         /** @type {string} */
-        this._ankiErrorMessageNodeDefaultContent = '';
-        /** @type {?HTMLElement} */
-        this._ankiErrorMessageDetailsNode = null;
-        /** @type {?HTMLElement} */
-        this._ankiErrorMessageDetailsContainer = null;
-        /** @type {?HTMLElement} */
-        this._ankiErrorMessageDetailsToggle = null;
-        /** @type {?HTMLElement} */
-        this._ankiErrorInvalidResponseInfo = null;
-        /** @type {?HTMLElement} */
-        this._ankiCardPrimary = null;
+        this._ankiErrorMessageNodeDefaultContent = typeof ankiErrorMessageNodeDefaultContent === 'string' ? ankiErrorMessageNodeDefaultContent : '';
+        /** @type {HTMLElement} */
+        this._ankiErrorMessageDetailsNode = querySelectorNotNull(document, '#anki-error-message-details');
+        /** @type {HTMLElement} */
+        this._ankiErrorMessageDetailsContainer = querySelectorNotNull(document, '#anki-error-message-details-container');
+        /** @type {HTMLElement} */
+        this._ankiErrorMessageDetailsToggle = querySelectorNotNull(document, '#anki-error-message-details-toggle');
+        /** @type {HTMLElement} */
+        this._ankiErrorInvalidResponseInfo = querySelectorNotNull(document, '#anki-error-invalid-response-info');
+        /** @type {HTMLElement} */
+        this._ankiCardPrimary = querySelectorNotNull(document, '#anki-card-primary');
         /** @type {?Error} */
         this._ankiError = null;
         /** @type {?import('core').TokenObject} */
@@ -75,16 +76,7 @@ export class AnkiController {
 
     /** */
     async prepare() {
-        this._ankiErrorContainer = /** @type {HTMLElement} */ (document.querySelector('#anki-error'));
-        this._ankiErrorMessageNode = /** @type {HTMLElement} */ (document.querySelector('#anki-error-message'));
-        const ankiErrorMessageNodeDefaultContent = this._ankiErrorMessageNode.textContent;
-        this._ankiErrorMessageNodeDefaultContent = typeof ankiErrorMessageNodeDefaultContent === 'string' ? ankiErrorMessageNodeDefaultContent : '';
-        this._ankiErrorMessageDetailsNode = /** @type {HTMLElement} */ (document.querySelector('#anki-error-message-details'));
-        this._ankiErrorMessageDetailsContainer = /** @type {HTMLElement} */ (document.querySelector('#anki-error-message-details-container'));
-        this._ankiErrorMessageDetailsToggle = /** @type {HTMLElement} */ (document.querySelector('#anki-error-message-details-toggle'));
-        this._ankiErrorInvalidResponseInfo = /** @type {HTMLElement} */ (document.querySelector('#anki-error-invalid-response-info'));
         this._ankiEnableCheckbox = /** @type {?HTMLInputElement} */ (document.querySelector('[data-setting="anki.enable"]'));
-        this._ankiCardPrimary = /** @type {HTMLElement} */ (document.querySelector('#anki-card-primary'));
         /** @type {HTMLElement} */
         const ankiApiKeyInput = querySelectorNotNull(document, '#anki-api-key-input');
         const ankiCardPrimaryTypeRadios = /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('input[type=radio][name=anki-card-primary-type]'));

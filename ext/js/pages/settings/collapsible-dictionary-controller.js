@@ -33,8 +33,8 @@ export class CollapsibleDictionaryController {
         this._dictionaryInfoMap = new Map();
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
-        /** @type {?HTMLElement} */
-        this._container = null;
+        /** @type {HTMLElement} */
+        this._container = querySelectorNotNull(document, '#collapsible-dictionary-list');
         /** @type {HTMLSelectElement[]} */
         this._selects = [];
         /** @type {?HTMLSelectElement} */
@@ -43,8 +43,6 @@ export class CollapsibleDictionaryController {
 
     /** */
     async prepare() {
-        this._container = /** @type {HTMLElement} */ (document.querySelector('#collapsible-dictionary-list'));
-
         await this._onDatabaseUpdated();
 
         yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));

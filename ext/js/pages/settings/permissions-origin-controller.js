@@ -26,16 +26,16 @@ export class PermissionsOriginController {
     constructor(settingsController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {?HTMLElement} */
-        this._originContainer = null;
-        /** @type {?HTMLElement} */
-        this._originEmpty = null;
+        /** @type {HTMLElement} */
+        this._originContainer = querySelectorNotNull(document, '#permissions-origin-list');
+        /** @type {HTMLElement} */
+        this._originEmpty = querySelectorNotNull(document, '#permissions-origin-list-empty');
         /** @type {?NodeListOf<HTMLInputElement>} */
         this._originToggleNodes = null;
-        /** @type {?HTMLInputElement} */
-        this._addOriginInput = null;
-        /** @type {?HTMLElement} */
-        this._errorContainer = null;
+        /** @type {HTMLInputElement} */
+        this._addOriginInput = querySelectorNotNull(document, '#permissions-origin-new-input');
+        /** @type {HTMLElement} */
+        this._errorContainer = querySelectorNotNull(document, '#permissions-origin-list-error');
         /** @type {ChildNode[]} */
         this._originContainerChildren = [];
         /** @type {EventListenerCollection} */
@@ -44,11 +44,7 @@ export class PermissionsOriginController {
 
     /** */
     async prepare() {
-        this._originContainer = /** @type {HTMLElement} */ (document.querySelector('#permissions-origin-list'));
-        this._originEmpty = /** @type {HTMLElement} */ (document.querySelector('#permissions-origin-list-empty'));
         this._originToggleNodes = /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('.permissions-origin-toggle'));
-        this._addOriginInput = /** @type {HTMLInputElement} */ (document.querySelector('#permissions-origin-new-input'));
-        this._errorContainer = /** @type {HTMLElement} */ (document.querySelector('#permissions-origin-list-error'));
         /** @type {HTMLButtonElement} */
         const addButton = querySelectorNotNull(document, '#permissions-origin-add');
 
