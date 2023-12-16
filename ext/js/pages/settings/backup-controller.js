@@ -537,7 +537,7 @@ export class BackupController {
      * @param {string} message
      * @param {boolean} [isWarning]
      */
-    _databaseExportImportErrorMessage(message, isWarning=false) {
+    _databaseExportImportErrorMessage(message, isWarning = false) {
         const errorMessageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-error-report'));
         errorMessageContainer.style.display = 'block';
         errorMessageContainer.textContent = message;

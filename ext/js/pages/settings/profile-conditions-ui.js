@@ -221,12 +221,12 @@ export class ProfileConditionsUI extends EventDispatcher {
         const info = this._getOperatorDetails(type, operator);
 
         const {
-            displayName=operator,
-            type: type2='string',
-            defaultValue='',
-            resetDefaultOnChange=false,
-            validate=null,
-            normalize=null
+            displayName = operator,
+            type: type2 = 'string',
+            defaultValue = '',
+            resetDefaultOnChange = false,
+            validate = null,
+            normalize = null
         } = (typeof info === 'undefined' ? {} : info);
 
         return {

@@ -221,6 +221,12 @@
             "error",
             "never"
         ],
+        "space-infix-ops": [
+            "error",
+            {
+                "int32Hint": false
+            }
+        ],
         "space-unary-ops": "error",
         "spaced-comment": [
             "error",

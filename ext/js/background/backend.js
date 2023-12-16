@@ -805,7 +805,7 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').GetOrCreateSearchPopupDetails, import('api').GetOrCreateSearchPopupResult>} */
-    async _onApiGetOrCreateSearchPopup({focus=false, text}) {
+    async _onApiGetOrCreateSearchPopup({focus = false, text}) {
         const {tab, created} = await this._getOrCreateSearchPopup();
         if (focus === true || (focus === 'ifCreated' && created)) {
             await this._focusTab(tab);
@@ -1979,7 +1979,7 @@ export class Backend {
      * @param {?number} [timeout=null]
      * @returns {Promise<void>}
      */
-    _waitUntilTabFrameIsReady(tabId, frameId, timeout=null) {
+    _waitUntilTabFrameIsReady(tabId, frameId, timeout = null) {
         return new Promise((resolve, reject) => {
             /** @type {?import('core').Timeout} */
             let timer = null;

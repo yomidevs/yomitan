@@ -235,7 +235,7 @@ export class JapaneseUtil {
     /**
      * @param {?import('wanakana')|import('../../../lib/wanakana.js')} wanakana
      */
-    constructor(wanakana=null) {
+    constructor(wanakana = null) {
         /** @type {?import('wanakana')} */
         this._wanakana = /** @type {import('wanakana')} */ (wanakana);
     }
@@ -386,7 +386,7 @@ export class JapaneseUtil {
      * @param {boolean} [keepProlongedSoundMarks]
      * @returns {string}
      */
-    convertKatakanaToHiragana(text, keepProlongedSoundMarks=false) {
+    convertKatakanaToHiragana(text, keepProlongedSoundMarks = false) {
         let result = '';
         const offset = (HIRAGANA_CONVERSION_RANGE[0] - KATAKANA_CONVERSION_RANGE[0]);
         for (let char of text) {
@@ -469,7 +469,7 @@ export class JapaneseUtil {
      * @param {?import('../../general/text-source-map.js').TextSourceMap} [sourceMap]
      * @returns {string}
      */
-    convertHalfWidthKanaToFullWidth(text, sourceMap=null) {
+    convertHalfWidthKanaToFullWidth(text, sourceMap = null) {
         let result = '';
 
         // This function is safe to use charCodeAt instead of codePointAt, since all
@@ -516,7 +516,7 @@ export class JapaneseUtil {
      * @param {?import('../../general/text-source-map.js').TextSourceMap} sourceMap
      * @returns {string}
      */
-    convertAlphabeticToKana(text, sourceMap=null) {
+    convertAlphabeticToKana(text, sourceMap = null) {
         let part = '';
         let result = '';
 
@@ -679,7 +679,7 @@ export class JapaneseUtil {
      * @param {?import('../../general/text-source-map.js').TextSourceMap} [sourceMap]
      * @returns {string}
      */
-    collapseEmphaticSequences(text, fullCollapse, sourceMap=null) {
+    collapseEmphaticSequences(text, fullCollapse, sourceMap = null) {
         let result = '';
         let collapseCodePoint = -1;
         const hasSourceMap = (sourceMap !== null);

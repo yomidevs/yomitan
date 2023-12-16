@@ -66,7 +66,7 @@ export class DisplayNotification {
     /**
      * @param {boolean} [animate]
      */
-    close(animate=false) {
+    close(animate = false) {
         if (this.isClosed()) { return; }
 
         if (animate) {

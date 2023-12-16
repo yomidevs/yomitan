@@ -318,7 +318,7 @@ export class AnkiConnect {
      * @param {?string[]} actions A list of actions to check for
      * @returns {Promise<import('anki').ApiReflectResult>} Information about the APIs.
      */
-    async apiReflect(scopes, actions=null) {
+    async apiReflect(scopes, actions = null) {
         const result = await this._invoke('apiReflect', {scopes, actions});
         if (!(typeof result === 'object' && result !== null)) {
             throw this._createUnexpectedResultError('object', result);

@@ -119,7 +119,7 @@ export class DisplayAudio {
      * @param {number} headwordIndex
      * @param {?string} [sourceType]
      */
-    async playAudio(dictionaryEntryIndex, headwordIndex, sourceType=null) {
+    async playAudio(dictionaryEntryIndex, headwordIndex, sourceType = null) {
         let sources = this._audioSources;
         if (sourceType !== null) {
             sources = [];

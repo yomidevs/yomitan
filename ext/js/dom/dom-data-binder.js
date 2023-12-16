@@ -27,7 +27,7 @@ export class DOMDataBinder {
     /**
      * @param {import('dom-data-binder').ConstructorDetails<T>} details
      */
-    constructor({selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError=null}) {
+    constructor({selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError = null}) {
         /** @type {string} */
         this._selector = selector;
         /** @type {import('dom-data-binder').CreateElementMetadataCallback<T>} */

@@ -79,7 +79,7 @@ export class TemplateRendererMediaProvider {
      */
     _getFormattedValue(data, namedArgs) {
         let {value} = data;
-        const {escape=true} = namedArgs;
+        const {escape = true} = namedArgs;
         if (escape) {
             value = Handlebars.Utils.escapeExpression(value);
         }

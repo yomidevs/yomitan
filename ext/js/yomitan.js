@@ -140,7 +140,7 @@ export class Yomitan extends EventDispatcher {
      * Prepares the instance for use.
      * @param {boolean} [isBackground=false] Assigns whether this instance is being used from the background page/service worker.
      */
-    async prepare(isBackground=false) {
+    async prepare(isBackground = false) {
         this._isBackground = isBackground;
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
 

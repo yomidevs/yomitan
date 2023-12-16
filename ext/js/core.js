@@ -600,7 +600,7 @@ export class DynamicProperty extends EventDispatcher {
      * @returns {import('core').TokenString} A string token which can be passed to the clearOverride function
      *   to remove the override.
      */
-    setOverride(value, priority=0) {
+    setOverride(value, priority = 0) {
         const overridesCount = this._overrides.length;
         let i = 0;
         for (; i < overridesCount; ++i) {
@@ -670,7 +670,7 @@ export class Logger extends EventDispatcher {
      *   Other values will be logged at a non-error level.
      * @param {?import('log').LogContext} [context] An optional context object for the error which should typically include a `url` field.
      */
-    log(error, level, context=null) {
+    log(error, level, context = null) {
         if (typeof context !== 'object' || context === null) {
             context = {url: location.href};
         }
@@ -745,7 +745,7 @@ export class Logger extends EventDispatcher {
      * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
      * @param {?import('log').LogContext} context An optional context object for the error which should typically include a `url` field.
      */
-    warn(error, context=null) {
+    warn(error, context = null) {
         this.log(error, 'warn', context);
     }
 
@@ -754,7 +754,7 @@ export class Logger extends EventDispatcher {
      * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
      * @param {?import('log').LogContext} context An optional context object for the error which should typically include a `url` field.
      */
-    error(error, context=null) {
+    error(error, context = null) {
         this.log(error, 'error', context);
     }
 }

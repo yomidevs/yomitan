@@ -284,7 +284,7 @@ export class SearchDisplayController {
     /**
      * @param {{text: string, animate?: boolean}} details
      */
-    _onExternalSearchUpdate({text, animate=true}) {
+    _onExternalSearchUpdate({text, animate = true}) {
         const options = this._display.getOptions();
         if (options === null) { return; }
         const {clipboard: {autoSearchContent, maximumSearchLength}} = options;

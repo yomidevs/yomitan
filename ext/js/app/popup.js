@@ -718,7 +718,7 @@ export class Popup extends EventDispatcher {
      * @param {string} action
      * @param {import('core').SerializableObject} params
      */
-    _invokeWindow(action, params={}) {
+    _invokeWindow(action, params = {}) {
         const contentWindow = this._frame.contentWindow;
         if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
 

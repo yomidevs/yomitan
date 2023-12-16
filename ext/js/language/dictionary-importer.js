@@ -538,7 +538,7 @@ export class DictionaryImporter {
          */
         const createError = (message) => {
             const {expression, reading} = entry;
-            const readingSource = reading.length > 0 ? ` (${reading})`: '';
+            const readingSource = reading.length > 0 ? ` (${reading})` : '';
             return new Error(`${message} at path ${JSON.stringify(path)} for ${expression}${readingSource} in ${dictionary}`);
         };
 

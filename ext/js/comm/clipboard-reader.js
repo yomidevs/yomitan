@@ -26,7 +26,7 @@ export class ClipboardReader {
      * Creates a new instances of a clipboard reader.
      * @param {{document: ?Document, pasteTargetSelector: ?string, richContentPasteTargetSelector: ?string}} details Details about how to set up the instance.
      */
-    constructor({document=null, pasteTargetSelector=null, richContentPasteTargetSelector=null}) {
+    constructor({document = null, pasteTargetSelector = null, richContentPasteTargetSelector = null}) {
         /** @type {?Document} */
         this._document = document;
         /** @type {?import('environment').Browser} */

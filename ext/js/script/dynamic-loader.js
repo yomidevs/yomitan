@@ -64,7 +64,7 @@ export const dynamicLoader = (() => {
      * @returns {Promise<?HTMLStyleElement|HTMLLinkElement>}
      * @throws {Error}
      */
-    async function loadStyle(id, type, value, useWebExtensionApi=false, parentNode=null) {
+    async function loadStyle(id, type, value, useWebExtensionApi = false, parentNode = null) {
         if (useWebExtensionApi && yomitan.isExtensionUrl(window.location.href)) {
             // Permissions error will occur if trying to use the WebExtension API to inject into an extension page
             useWebExtensionApi = false;

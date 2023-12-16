@@ -28,7 +28,7 @@ export class DocumentFocusController {
      * @param {?string} autofocusElementSelector A selector string which can be used to specify an element which
      *   should be automatically focused on prepare.
      */
-    constructor(autofocusElementSelector=null) {
+    constructor(autofocusElementSelector = null) {
         /** @type {?HTMLElement} */
         this._autofocusElement = (autofocusElementSelector !== null ? document.querySelector(autofocusElementSelector) : null);
         /** @type {?HTMLElement} */

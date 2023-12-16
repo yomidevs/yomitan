@@ -72,12 +72,12 @@ export class PopupFactory {
      * @returns {Promise<import('popup').PopupAny>}
      */
     async getOrCreatePopup({
-        frameId=null,
-        id=null,
-        parentPopupId=null,
-        depth=null,
-        popupWindow=false,
-        childrenSupported=false
+        frameId = null,
+        id = null,
+        parentPopupId = null,
+        depth = null,
+        popupWindow = false,
+        childrenSupported = false
     }) {
         // Find by existing id
         if (id !== null) {

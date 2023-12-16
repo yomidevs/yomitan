@@ -41,9 +41,9 @@ export class Frontend {
         parentPopupId,
         parentFrameId,
         useProxyPopup,
-        canUseWindowPopup=true,
+        canUseWindowPopup = true,
         allowRootFramePopupProxy,
-        childrenSupported=true,
+        childrenSupported = true,
         hotkeyHandler
     }) {
         /** @type {import('frontend').PageType} */

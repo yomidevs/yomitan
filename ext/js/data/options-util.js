@@ -39,7 +39,7 @@ export class OptionsUtil {
      * @param {?number} [targetVersion]
      * @returns {Promise<import('settings').Options>}
      */
-    async update(optionsInput, targetVersion=null) {
+    async update(optionsInput, targetVersion = null) {
         // Invalid options
         let options = /** @type {{[key: string]: unknown}} */ (
             typeof optionsInput === 'object' && optionsInput !== null && !Array.isArray(optionsInput) ?

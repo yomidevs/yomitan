@@ -95,7 +95,7 @@ export class PopupMenu extends EventDispatcher {
      * @param {boolean} [cancelable]
      * @returns {boolean}
      */
-    close(cancelable=true) {
+    close(cancelable = true) {
         return this._close(null, 'close', cancelable, null);
     }
 

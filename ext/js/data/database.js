@@ -265,7 +265,7 @@ export class Database {
      * @param {?(completedCount: number, totalCount: number) => void} onProgress
      * @returns {Promise<void>}
      */
-    bulkDelete(objectStoreName, indexName, query, filterKeys=null, onProgress=null) {
+    bulkDelete(objectStoreName, indexName, query, filterKeys = null, onProgress = null) {
         return new Promise((resolve, reject) => {
             const transaction = this._readWriteTransaction([objectStoreName], resolve, reject);
             const objectStore = transaction.objectStore(objectStoreName);
