@@ -77,13 +77,13 @@ function querySelectorChildOrSelf(element, selector) {
 }
 
 /**
- * @param {import('jsdom').JSDOM} dom
+ * @param {import('jsdom').DOMWindow} window
  * @param {?Node} node
  * @returns {?Text|Node}
  */
-function getChildTextNodeOrSelf(dom, node) {
+function getChildTextNodeOrSelf(window, node) {
     if (node === null) { return null; }
-    const Node = dom.window.Node;
+    const Node = window.Node;
     const childNode = node.firstChild;
     return (childNode !== null && childNode.nodeType === Node.TEXT_NODE ? childNode : node);
 }
@@ -111,8 +111,8 @@ function findImposterElement(document) {
 
 describe('DocumentUtil', () => {
     const testDoc = domTest(path.join(dirname, 'data/html/test-document1.html'));
-    testDoc('Text scanning functions', ({dom}) => {
-        const {document} = dom.window;
+    testDoc('Text scanning functions', ({window}) => {
+        const {document} = window;
         for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.test[data-test-type=scan]'))) {
             // Get test parameters
             const {
@@ -131,8 +131,8 @@ describe('DocumentUtil', () => {
 
             const elementFromPointValue = querySelectorChildOrSelf(testElement, elementFromPointSelector);
             const caretRangeFromPointValue = querySelectorChildOrSelf(testElement, caretRangeFromPointSelector);
-            const startNode = getChildTextNodeOrSelf(dom, querySelectorChildOrSelf(testElement, startNodeSelector));
-            const endNode = getChildTextNodeOrSelf(dom, querySelectorChildOrSelf(testElement, endNodeSelector));
+            const startNode = getChildTextNodeOrSelf(window, querySelectorChildOrSelf(testElement, startNodeSelector));
+            const endNode = getChildTextNodeOrSelf(window, querySelectorChildOrSelf(testElement, endNodeSelector));
 
             const startOffset2 = parseInt(/** @type {string} */ (startOffset), 10);
             const endOffset2 = parseInt(/** @type {string} */ (endOffset), 10);
@@ -148,7 +148,7 @@ describe('DocumentUtil', () => {
             document.elementFromPoint = () => elementFromPointValue;
 
             document.caretRangeFromPoint = (x, y) => {
-                const imposter = getChildTextNodeOrSelf(dom, findImposterElement(document));
+                const imposter = getChildTextNodeOrSelf(window, findImposterElement(document));
                 expect(!!imposter).toStrictEqual(hasImposter === 'true');
 
                 const range = document.createRange();
@@ -229,8 +229,8 @@ describe('DocumentUtil', () => {
 
 describe('DOMTextScanner', () => {
     const testDoc = domTest(path.join(dirname, 'data/html/test-document1.html'));
-    testDoc('Seek functions', async ({dom}) => {
-        const {document} = dom.window;
+    testDoc('Seek functions', async ({window}) => {
+        const {document} = window;
         for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.test[data-test-type=text-source-range-seek]'))) {
             // Get test parameters
             const {

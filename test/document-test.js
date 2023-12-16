@@ -17,19 +17,14 @@
  */
 
 import fs from 'fs';
-import {JSDOM} from 'jsdom';
 import {test} from 'vitest';
-import {populateGlobal} from 'vitest/environments';
+import {builtinEnvironments} from 'vitest/environments';
 
 /**
- * @param {string} fileName
- * @returns {import('jsdom').JSDOM}
+ * @param {import('jsdom').DOMWindow} window
  */
-function createJSDOM(fileName) {
-    const domSource = fs.readFileSync(fileName, {encoding: 'utf8'});
-    const dom = new JSDOM(domSource);
-    const document = dom.window.document;
-    const window = dom.window;
+function prepareWindow(window) {
+    const {document} = window;
 
     // Define innerText setter as an alias for textContent setter
     Object.defineProperty(window.HTMLDivElement.prototype, 'innerText', {
@@ -38,28 +33,25 @@ function createJSDOM(fileName) {
 
     // Placeholder for feature detection
     document.caretRangeFromPoint = () => null;
-
-    return dom;
 }
 
 /**
  * @param {string} htmlFilePath
- * @returns {import('vitest').TestAPI<{dom: import('jsdom').JSDOM}>}
+ * @returns {import('vitest').TestAPI<{window: import('jsdom').DOMWindow}>}
  */
 export function domTest(htmlFilePath) {
     return test.extend({
         // eslint-disable-next-line no-empty-pattern
-        dom: async ({}, use) => {
-            const g = /** @type {{[key: (string|symbol)]: unknown}} */ (global);
-            const dom = createJSDOM(htmlFilePath);
-            const {window} = dom;
-            const {keys, originals} = populateGlobal(g, window, {bindFunctions: true});
+        window: async ({}, use) => {
+            const html = fs.readFileSync(htmlFilePath, {encoding: 'utf8'});
+            const env = builtinEnvironments.jsdom;
+            const {teardown} = await env.setup(global, {jsdom: {html}});
+            const window = /** @type {import('jsdom').DOMWindow} */ (/** @type {unknown} */ (global.window));
+            prepareWindow(window);
             try {
-                await use(dom);
+                await use(window);
             } finally {
-                window.close();
-                for (const key of keys) { delete g[key]; }
-                for (const [key, value] of originals) { g[key] = value; }
+                teardown(global);
             }
         }
     });
