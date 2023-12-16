@@ -139,12 +139,12 @@ export class Display extends EventDispatcher {
         this._contentScrollBodyElement = querySelectorNotNull(document, '#content-body');
         /** @type {ScrollElement} */
         this._windowScroll = new ScrollElement(this._contentScrollElement);
-        /** @type {HTMLButtonElement} */
-        this._closeButton = querySelectorNotNull(document, '#close-button');
-        /** @type {HTMLButtonElement} */
-        this._navigationPreviousButton = querySelectorNotNull(document, '#navigate-previous-button');
-        /** @type {HTMLButtonElement} */
-        this._navigationNextButton = querySelectorNotNull(document, '#navigate-next-button');
+        /** @type {?HTMLButtonElement} */
+        this._closeButton = document.querySelector('#close-button');
+        /** @type {?HTMLButtonElement} */
+        this._navigationPreviousButton = document.querySelector('#navigate-previous-button');
+        /** @type {?HTMLButtonElement} */
+        this._navigationNextButton = document.querySelector('#navigate-next-button');
         /** @type {?Frontend} */
         this._frontend = null;
         /** @type {?Promise<void>} */
