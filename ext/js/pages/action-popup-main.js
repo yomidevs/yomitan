@@ -58,7 +58,9 @@ export class DisplayController {
             this._setupOptions(primaryProfile);
         }
 
-        /** @type {HTMLElement} */ (document.querySelector('.action-select-profile')).hidden = (profiles.length <= 1);
+        /** @type {HTMLElement} */
+        const profileSelect = querySelectorNotNull(document, '.action-select-profile');
+        profileSelect.hidden = (profiles.length <= 1);
 
         this._updateProfileSelect(profiles, profileCurrent);
 

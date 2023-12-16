@@ -32,9 +32,11 @@ export class DisplayProfileSelection {
         this._profielList = querySelectorNotNull(document, '#profile-list');
         /** @type {HTMLButtonElement} */
         this._profileButton = querySelectorNotNull(document, '#profile-button');
+        /** @type {HTMLElement} */
+        const profilePanelElement = querySelectorNotNull(document, '#profile-panel');
         /** @type {PanelElement} */
         this._profilePanel = new PanelElement({
-            node: /** @type {HTMLElement} */ (document.querySelector('#profile-panel')),
+            node: profilePanelElement,
             closingAnimationDuration: 375 // Milliseconds; includes buffer
         });
         /** @type {boolean} */

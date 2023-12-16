@@ -75,7 +75,8 @@ export class PopupPreviewFrame {
         window.addEventListener('message', this._onMessage.bind(this), false);
 
         // Setup events
-        const darkThemeCheckbox = /** @type {HTMLInputElement} */ (document.querySelector('#theme-dark-checkbox'));
+        /** @type {HTMLInputElement} */
+        const darkThemeCheckbox = querySelectorNotNull(document, '#theme-dark-checkbox');
         darkThemeCheckbox.addEventListener('change', this._onThemeDarkCheckboxChanged.bind(this), false);
         this._exampleText.addEventListener('click', this._onExampleTextClick.bind(this), false);
         this._exampleTextInput.addEventListener('blur', this._onExampleTextInputBlur.bind(this), false);

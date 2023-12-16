@@ -1051,7 +1051,9 @@ export class Display extends EventDispatcher {
          */
         const addItem = (menuAction, label) => {
             const item = /** @type {HTMLElement} */ (this._displayGenerator.instantiateTemplate('dictionary-entry-popup-menu-item'));
-            /** @type {HTMLElement} */ (item.querySelector('.popup-menu-item-label')).textContent = label;
+            /** @type {HTMLElement} */
+            const labelElement = querySelectorNotNull(item, '.popup-menu-item-label');
+            labelElement.textContent = label;
             item.dataset.menuAction = menuAction;
             menuBodyNode.appendChild(item);
         };

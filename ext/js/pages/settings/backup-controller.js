@@ -652,7 +652,9 @@ export class BackupController {
 
     /** */
     _onSettingsImportDatabaseClick() {
-        /** @type {HTMLElement} */ (document.querySelector('#settings-import-db')).click();
+        /** @type {HTMLElement} */
+        const element = querySelectorNotNull(document, '#settings-import-db');
+        element.click();
     }
 
     /**

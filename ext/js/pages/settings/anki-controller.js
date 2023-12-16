@@ -596,8 +596,12 @@ class AnkiCardController {
         const cardOptions = this._getCardOptions(ankiOptions, this._cardType);
         if (cardOptions === null) { return; }
         const {deck, model, fields} = cardOptions;
-        this._deckController.prepare(/** @type {HTMLSelectElement} */ (this._node.querySelector('.anki-card-deck')), deck);
-        this._modelController.prepare(/** @type {HTMLSelectElement} */ (this._node.querySelector('.anki-card-model')), model);
+        /** @type {HTMLSelectElement} */
+        const deckControllerSelect = querySelectorNotNull(this._node, '.anki-card-deck');
+        /** @type {HTMLSelectElement} */
+        const modelControllerSelect = querySelectorNotNull(this._node, '.anki-card-model');
+        this._deckController.prepare(deckControllerSelect, deck);
+        this._modelController.prepare(modelControllerSelect, model);
         this._fields = fields;
 
         this._ankiCardFieldsContainer = this._node.querySelector('.anki-card-fields');

@@ -228,8 +228,12 @@ class TranslationTextReplacementsEntry {
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
         const testVisible = this._isTestVisible();
-        /** @type {HTMLElement} */ (bodyNode.querySelector('[data-menu-action=showTest]')).hidden = testVisible;
-        /** @type {HTMLElement} */ (bodyNode.querySelector('[data-menu-action=hideTest]')).hidden = !testVisible;
+        /** @type {HTMLElement} */
+        const element1 = querySelectorNotNull(bodyNode, '[data-menu-action=showTest]');
+        /** @type {HTMLElement} */
+        const element2 = querySelectorNotNull(bodyNode, '[data-menu-action=hideTest]');
+        element1.hidden = testVisible;
+        element2.hidden = !testVisible;
     }
 
     /**

@@ -169,12 +169,25 @@ class DictionaryEntry {
         const modal = this._dictionaryController.modalController.getModal('dictionary-details');
         if (modal === null) { return; }
 
-        /** @type {HTMLElement} */ (modal.node.querySelector('.dictionary-title')).textContent = title;
-        /** @type {HTMLElement} */ (modal.node.querySelector('.dictionary-version')).textContent = `rev.${revision}`;
-        /** @type {HTMLElement} */ (modal.node.querySelector('.dictionary-outdated-notification')).hidden = (version >= 3);
-        /** @type {HTMLElement} */ (modal.node.querySelector('.dictionary-counts')).textContent = this._counts !== null ? JSON.stringify(this._counts, null, 4) : '';
-        /** @type {HTMLInputElement} */ (modal.node.querySelector('.dictionary-prefix-wildcard-searches-supported')).checked = prefixWildcardsSupported;
-        this._setupDetails(/** @type {HTMLElement} */ (modal.node.querySelector('.dictionary-details-table')));
+        /** @type {HTMLElement} */
+        const titleElement = querySelectorNotNull(modal.node, '.dictionary-title');
+        /** @type {HTMLElement} */
+        const versionElement = querySelectorNotNull(modal.node, '.dictionary-version');
+        /** @type {HTMLElement} */
+        const outdateElement = querySelectorNotNull(modal.node, '.dictionary-outdated-notification');
+        /** @type {HTMLElement} */
+        const countsElement = querySelectorNotNull(modal.node, '.dictionary-counts');
+        /** @type {HTMLInputElement} */
+        const wildcardSupportedElement = querySelectorNotNull(modal.node, '.dictionary-prefix-wildcard-searches-supported');
+        /** @type {HTMLElement} */
+        const detailsTableElement = querySelectorNotNull(modal.node, '.dictionary-details-table');
+
+        titleElement.textContent = title;
+        versionElement.textContent = `rev.${revision}`;
+        outdateElement.hidden = (version >= 3);
+        countsElement.textContent = this._counts !== null ? JSON.stringify(this._counts, null, 4) : '';
+        wildcardSupportedElement.checked = prefixWildcardsSupported;
+        this._setupDetails(detailsTableElement);
 
         modal.setVisible(true);
     }
@@ -201,8 +214,14 @@ class DictionaryEntry {
 
             const details = /** @type {HTMLElement} */ (this._dictionaryController.instantiateTemplate('dictionary-details-entry'));
             details.dataset.type = key;
-            /** @type {HTMLElement} */ (details.querySelector('.dictionary-details-entry-label')).textContent = `${label}:`;
-            /** @type {HTMLElement} */ (details.querySelector('.dictionary-details-entry-info')).textContent = info;
+
+            /** @type {HTMLElement} */
+            const labelElement = querySelectorNotNull(details, '.dictionary-details-entry-label');
+            /** @type {HTMLElement} */
+            const infoElement = querySelectorNotNull(details, '.dictionary-details-entry-info');
+
+            labelElement.textContent = `${label}:`;
+            infoElement.textContent = info;
             fragment.appendChild(details);
 
             any = true;
