@@ -82,6 +82,7 @@ export class DisplayAudio {
     /** */
     prepare() {
         this._audioSystem.prepare();
+        /* eslint-disable no-multi-spaces */
         this._display.hotkeyHandler.registerActions([
             ['playAudio',           this._onHotkeyActionPlayAudio.bind(this)],
             ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)]
@@ -89,6 +90,7 @@ export class DisplayAudio {
         this._display.registerDirectMessageHandlers([
             ['Display.clearAutoPlayTimer', {async: false, handler: this._onMessageClearAutoPlayTimer.bind(this)}]
         ]);
+        /* eslint-enable no-multi-spaces */
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         this._display.on('contentClear', this._onContentClear.bind(this));
         this._display.on('contentUpdateEntry', this._onContentUpdateEntry.bind(this));

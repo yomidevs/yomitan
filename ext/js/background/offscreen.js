@@ -50,6 +50,7 @@ export class Offscreen {
             richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
         });
 
+        /* eslint-disable no-multi-spaces */
         /** @type {import('offscreen').MessageHandlerMap} */
         const messageHandlers = new Map([
             ['clipboardGetTextOffscreen',    {async: true,  handler: this._getTextHandler.bind(this)}],
@@ -65,6 +66,7 @@ export class Offscreen {
             ['getTermFrequenciesOffscreen',  {async: true,  handler: this._getTermFrequenciesHandler.bind(this)}],
             ['clearDatabaseCachesOffscreen', {async: false, handler: this._clearDatabaseCachesHandler.bind(this)}]
         ]);
+        /* eslint-enable no-multi-spaces */
         /** @type {import('offscreen').MessageHandlerMap<string>} */
         this._messageHandlers = messageHandlers;
 

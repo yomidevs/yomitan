@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable no-multi-spaces */
+
 import {expect, test} from 'vitest';
 import {ProfileConditionsUtil} from '../ext/js/background/profile-conditions-util.js';
 

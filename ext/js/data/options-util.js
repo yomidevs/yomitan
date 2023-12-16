@@ -530,6 +530,7 @@ export class OptionsUtil {
      * @returns {import('options-util').ModernUpdate[]}
      */
     _getVersionUpdates(targetVersion) {
+        /* eslint-disable no-multi-spaces */
         const result = [
             {async: false, update: this._updateVersion1.bind(this)},
             {async: false, update: this._updateVersion2.bind(this)},
@@ -553,6 +554,7 @@ export class OptionsUtil {
             {async: false, update: this._updateVersion20.bind(this)},
             {async: true,  update: this._updateVersion21.bind(this)}
         ];
+        /* eslint-enable no-multi-spaces */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
         }
@@ -818,6 +820,7 @@ export class OptionsUtil {
             };
             delete profile.options.anki.sentenceExt;
             profile.options.general.popupActionBarLocation = 'top';
+            /* eslint-disable no-multi-spaces */
             profile.options.inputs = {
                 hotkeys: [
                     {action: 'close',             key: 'Escape',    modifiers: [],       scopes: ['popup'], enabled: true},
@@ -838,6 +841,7 @@ export class OptionsUtil {
                     {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true}
                 ]
             };
+            /* eslint-enable no-multi-spaces */
             profile.options.anki.suspendNewCards = false;
             profile.options.popupWindow = {
                 width: profile.options.general.popupWidth,

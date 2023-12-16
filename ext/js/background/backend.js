@@ -147,6 +147,7 @@ export class Backend {
         /** @type {PermissionsUtil} */
         this._permissionsUtil = new PermissionsUtil();
 
+        /* eslint-disable no-multi-spaces */
         /** @type {import('backend').MessageHandlerMap} */
         this._messageHandlers = new Map(/** @type {import('backend').MessageHandlerMapInit} */ ([
             ['requestBackendReadySignal',    {async: false, contentScript: true,  handler: this._onApiRequestBackendReadySignal.bind(this)}],
@@ -193,6 +194,7 @@ export class Backend {
             ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}],
             ['openCrossFramePort',           {async: false, contentScript: true,  handler: this._onApiOpenCrossFramePort.bind(this)}]
         ]));
+        /* eslint-enable no-multi-spaces */
         /** @type {import('backend').MessageHandlerWithProgressMap} */
         this._messageHandlersWithProgress = new Map(/** @type {import('backend').MessageHandlerWithProgressMapInit} */ ([
             // Empty
@@ -201,10 +203,10 @@ export class Backend {
         /** @type {Map<string, (params?: import('core').SerializableObject) => void>} */
         this._commandHandlers = new Map(/** @type {[name: string, handler: (params?: import('core').SerializableObject) => void][]} */ ([
             ['toggleTextScanning', this._onCommandToggleTextScanning.bind(this)],
-            ['openInfoPage',       this._onCommandOpenInfoPage.bind(this)],
-            ['openSettingsPage',   this._onCommandOpenSettingsPage.bind(this)],
-            ['openSearchPage',     this._onCommandOpenSearchPage.bind(this)],
-            ['openPopupWindow',    this._onCommandOpenPopupWindow.bind(this)]
+            ['openInfoPage', this._onCommandOpenInfoPage.bind(this)],
+            ['openSettingsPage', this._onCommandOpenSettingsPage.bind(this)],
+            ['openSearchPage', this._onCommandOpenSearchPage.bind(this)],
+            ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)]
         ]));
     }
 

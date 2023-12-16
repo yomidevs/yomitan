@@ -47,6 +47,7 @@ export class PopupFactory {
      */
     prepare() {
         this._frameOffsetForwarder.prepare();
+        /* eslint-disable no-multi-spaces */
         yomitan.crossFrame.registerHandlers([
             ['PopupFactory.getOrCreatePopup',     {async: true,  handler: this._onApiGetOrCreatePopup.bind(this)}],
             ['PopupFactory.setOptionsContext',    {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
@@ -64,6 +65,7 @@ export class PopupFactory {
             ['PopupFactory.getFrameSize',         {async: true,  handler: this._onApiGetFrameSize.bind(this)}],
             ['PopupFactory.setFrameSize',         {async: true,  handler: this._onApiSetFrameSize.bind(this)}]
         ]);
+        /* eslint-enable no-multi-spaces */
     }
 
     /**

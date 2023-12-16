@@ -192,6 +192,7 @@
             }
         ],
         "no-implicit-globals": "error",
+        "no-multi-spaces": "error",
         "no-trailing-spaces": "error",
         "no-whitespace-before-property": "error",
         "object-curly-spacing": [
@@ -521,7 +522,10 @@
             "files": [
                 "*.json"
             ],
-            "parser": "jsonc-eslint-parser"
+            "parser": "jsonc-eslint-parser",
+            "rules": {
+                "no-multi-spaces": "off"
+            }
         },
         {
             "files": [

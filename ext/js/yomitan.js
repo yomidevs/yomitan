@@ -88,6 +88,7 @@ export class Yomitan extends EventDispatcher {
         /** @type {?(() => void)} */
         this._isBackendReadyPromiseResolve = resolve;
 
+        /* eslint-disable no-multi-spaces */
         /** @type {import('core').MessageHandlerMap} */
         this._messageHandlers = new Map(/** @type {import('core').MessageHandlerArray} */ ([
             ['Yomitan.isReady',         {async: false, handler: this._onMessageIsReady.bind(this)}],
@@ -97,6 +98,7 @@ export class Yomitan extends EventDispatcher {
             ['Yomitan.databaseUpdated', {async: false, handler: this._onMessageDatabaseUpdated.bind(this)}],
             ['Yomitan.zoomChanged',     {async: false, handler: this._onMessageZoomChanged.bind(this)}]
         ]));
+        /* eslint-enable no-multi-spaces */
     }
 
     /**

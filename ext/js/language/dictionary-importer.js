@@ -112,11 +112,11 @@ export class DictionaryImporter {
         const dataBankSchemas = this._getDataBankSchemas(version);
 
         // Files
-        const termFiles      = this._getArchiveFiles(fileMap, 'term_bank_?.json');
-        const termMetaFiles  = this._getArchiveFiles(fileMap, 'term_meta_bank_?.json');
-        const kanjiFiles     = this._getArchiveFiles(fileMap, 'kanji_bank_?.json');
+        const termFiles = this._getArchiveFiles(fileMap, 'term_bank_?.json');
+        const termMetaFiles = this._getArchiveFiles(fileMap, 'term_meta_bank_?.json');
+        const kanjiFiles = this._getArchiveFiles(fileMap, 'kanji_bank_?.json');
         const kanjiMetaFiles = this._getArchiveFiles(fileMap, 'kanji_meta_bank_?.json');
-        const tagFiles       = this._getArchiveFiles(fileMap, 'tag_bank_?.json');
+        const tagFiles = this._getArchiveFiles(fileMap, 'tag_bank_?.json');
 
         // Load data
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);

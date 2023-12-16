@@ -72,7 +72,9 @@ test('visual', async ({page, extensionId}) => {
             popup_frame = await frame_attached; // wait for popup to be attached
         }
         try {
-            await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement()).waitForElementState('visible', {timeout: 500});  // some tests don't have a popup, so don't fail if it's not there; TODO: check if the popup is expected to be there
+            // Some tests don't have a popup, so don't fail if it's not there
+            // TODO: check if the popup is expected to be there
+            await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement()).waitForElementState('visible', {timeout: 500});
         } catch (error) {
             console.log(test_name + ' has no popup');
         }

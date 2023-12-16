@@ -195,6 +195,7 @@ export class Display extends EventDispatcher {
         /** @type {ThemeController} */
         this._themeController = new ThemeController(document.documentElement);
 
+        /* eslint-disable no-multi-spaces */
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
             ['nextEntry',         this._onHotkeyActionMoveRelative.bind(this, 1)],
@@ -218,6 +219,7 @@ export class Display extends EventDispatcher {
         this.registerWindowMessageHandlers([
             ['Display.extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
         ]);
+        /* eslint-enable no-multi-spaces */
     }
 
     /** @type {DisplayGenerator} */

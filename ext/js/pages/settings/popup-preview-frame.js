@@ -56,6 +56,7 @@ export class PopupPreviewFrame {
         /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
+        /* eslint-disable no-multi-spaces */
         /** @type {Map<string, (params: import('core').SerializableObjectAny) => void>} */
         this._windowMessageHandlers = new Map(/** @type {[key: string, handler: (params: import('core').SerializableObjectAny) => void][]} */ ([
             ['PopupPreviewFrame.setText',              this._onSetText.bind(this)],
@@ -63,6 +64,7 @@ export class PopupPreviewFrame {
             ['PopupPreviewFrame.setCustomOuterCss',    this._setCustomOuterCss.bind(this)],
             ['PopupPreviewFrame.updateOptionsContext', this._updateOptionsContext.bind(this)]
         ]));
+        /* eslint-enable no-multi-spaces */
     }
 
     /** */
