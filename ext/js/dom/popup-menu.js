@@ -17,6 +17,7 @@
  */
 
 import {EventDispatcher, EventListenerCollection} from '../core.js';
+import {querySelectorNotNull} from './query-selector.js';
 
 /**
  * @augments EventDispatcher<import('popup-menu').EventType>
@@ -33,9 +34,9 @@ export class PopupMenu extends EventDispatcher {
         /** @type {HTMLElement} */
         this._containerNode = containerNode;
         /** @type {HTMLElement} */
-        this._node = /** @type {HTMLElement} */ (containerNode.querySelector('.popup-menu'));
+        this._node = querySelectorNotNull(containerNode, '.popup-menu');
         /** @type {HTMLElement} */
-        this._bodyNode = /** @type {HTMLElement} */ (containerNode.querySelector('.popup-menu-body'));
+        this._bodyNode = querySelectorNotNull(containerNode, '.popup-menu-body');
         /** @type {boolean} */
         this._isClosed = false;
         /** @type {EventListenerCollection} */

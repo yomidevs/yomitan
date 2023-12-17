@@ -775,7 +775,7 @@
         },
         {
             "files": [
-                "test/**"
+                "test/**/*.test.js"
             ],
             "plugins": [
                 "vitest"

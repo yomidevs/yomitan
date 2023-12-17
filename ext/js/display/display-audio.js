@@ -18,6 +18,7 @@
 
 import {EventListenerCollection} from '../core.js';
 import {PopupMenu} from '../dom/popup-menu.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {AudioSystem} from '../media/audio-system.js';
 import {yomitan} from '../yomitan.js';
 
@@ -45,7 +46,7 @@ export class DisplayAudio {
         /** @type {Map<string, import('display-audio').CacheItem>} */
         this._cache = new Map();
         /** @type {Element} */
-        this._menuContainer = /** @type {Element} */ (document.querySelector('#popup-menus'));
+        this._menuContainer = querySelectorNotNull(document, '#popup-menus');
         /** @type {import('core').TokenObject} */
         this._entriesToken = {};
         /** @type {Set<PopupMenu>} */
@@ -717,7 +718,8 @@ export class DisplayAudio {
             button.dataset.potentialAvailableAudioCount = `${potentialAvailableAudioCount}`;
         }
 
-        const badge = /** @type {?HTMLElement} */ (button.querySelector('.action-button-badge'));
+        /** @type {?HTMLElement} */
+        const badge = button.querySelector('.action-button-badge');
         if (badge === null) { return; }
 
         const badgeData = badge.dataset;
@@ -806,7 +808,8 @@ export class DisplayAudio {
     _createMenu(sourceButton, term, reading) {
         // Create menu
         const menuContainerNode = /** @type {HTMLElement} */ (this._display.displayGenerator.instantiateTemplate('audio-button-popup-menu'));
-        const menuBodyNode = /** @type {HTMLElement} */ (menuContainerNode.querySelector('.popup-menu-body'));
+        /** @type {HTMLElement} */
+        const menuBodyNode = querySelectorNotNull(menuContainerNode, '.popup-menu-body');
         menuContainerNode.dataset.term = term;
         menuContainerNode.dataset.reading = reading;
 
@@ -839,7 +842,8 @@ export class DisplayAudio {
                 const existingNode = this._getOrCreateMenuItem(currentItems, index, subIndex);
                 const node = existingNode !== null ? existingNode : /** @type {HTMLElement} */ (displayGenerator.instantiateTemplate('audio-button-popup-menu-item'));
 
-                const labelNode = /** @type {HTMLElement} */ (node.querySelector('.popup-menu-item-audio-button .popup-menu-item-label'));
+                /** @type {HTMLElement} */
+                const labelNode = querySelectorNotNull(node, '.popup-menu-item-audio-button .popup-menu-item-label');
                 let label = name;
                 if (!nameUnique) {
                     label = `${label} ${nameIndex + 1}`;
@@ -849,11 +853,13 @@ export class DisplayAudio {
                 if (typeof subName === 'string' && subName.length > 0) { label += `: ${subName}`; }
                 labelNode.textContent = label;
 
-                const cardButton = /** @type {HTMLElement} */ (node.querySelector('.popup-menu-item-set-primary-audio-button'));
+                /** @type {HTMLElement} */
+                const cardButton = querySelectorNotNull(node, '.popup-menu-item-set-primary-audio-button');
                 cardButton.hidden = !downloadable;
 
                 if (valid !== null) {
-                    const icon = /** @type {HTMLElement} */ (node.querySelector('.popup-menu-item-audio-button .popup-menu-item-icon'));
+                    /** @type {HTMLElement} */
+                    const icon = querySelectorNotNull(node, '.popup-menu-item-audio-button .popup-menu-item-icon');
                     icon.dataset.icon = valid ? 'checkmark' : 'cross';
                     showIcons = true;
                 }

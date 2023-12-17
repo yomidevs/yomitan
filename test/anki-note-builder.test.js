@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// @vitest-environment jsdom
+
 import 'fake-indexeddb/auto';
 import fs from 'fs';
 import {fileURLToPath} from 'node:url';
@@ -134,7 +136,7 @@ function getFieldMarkers(type) {
  * @param {'terms'|'kanji'} type
  * @param {import('settings').ResultOutputMode} mode
  * @param {string} template
- * @param {import('@vitest/expect').ExpectStatic} expect
+ * @param {import('vitest').ExpectStatic} expect
  * @returns {Promise<import('anki').NoteFields[]>}
  */
 async function getRenderResults(dictionaryEntries, type, mode, template, expect) {

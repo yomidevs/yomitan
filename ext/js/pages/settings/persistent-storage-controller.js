@@ -17,22 +17,23 @@
  */
 
 import {isObject} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
 export class PersistentStorageController {
     constructor() {
-        /** @type {?HTMLInputElement} */
-        this._persistentStorageCheckbox = null;
+        /** @type {HTMLInputElement} */
+        this._persistentStorageCheckbox = querySelectorNotNull(document, '#storage-persistent-checkbox');
     }
 
     /** */
     async prepare() {
-        this._persistentStorageCheckbox = /** @type {HTMLInputElement} */ (document.querySelector('#storage-persistent-checkbox'));
         this._persistentStorageCheckbox.addEventListener('change', this._onPersistentStorageCheckboxChange.bind(this), false);
 
         if (!this._isPersistentStorageSupported()) { return; }
 
-        const info = /** @type {?HTMLElement} */ (document.querySelector('#storage-persistent-info'));
+        /** @type {?HTMLElement} */
+        const info = document.querySelector('#storage-persistent-info');
         if (info !== null) { info.hidden = false; }
 
         const isStoragePeristent = await this.isStoragePeristent();
@@ -77,7 +78,8 @@ export class PersistentStorageController {
 
         this._updateCheckbox(isStoragePeristent);
 
-        const node = /** @type {?HTMLElement} */ (document.querySelector('#storage-persistent-fail-warning'));
+        /** @type {?HTMLElement} */
+        const node = document.querySelector('#storage-persistent-fail-warning');
         if (node !== null) { node.hidden = isStoragePeristent; }
 
         yomitan.trigger('storageChanged');

@@ -19,6 +19,7 @@
 import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {EventListenerCollection, invokeMessageHandler} from '../core.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {yomitan} from '../yomitan.js';
 
 export class SearchDisplayController {
@@ -42,17 +43,17 @@ export class SearchDisplayController {
         /** @type {import('./search-persistent-state-controller.js').SearchPersistentStateController} */
         this._searchPersistentStateController = searchPersistentStateController;
         /** @type {HTMLButtonElement} */
-        this._searchButton = /** @type {HTMLButtonElement} */ (document.querySelector('#search-button'));
+        this._searchButton = querySelectorNotNull(document, '#search-button');
         /** @type {HTMLButtonElement} */
-        this._searchBackButton = /** @type {HTMLButtonElement} */ (document.querySelector('#search-back-button'));
+        this._searchBackButton = querySelectorNotNull(document, '#search-back-button');
         /** @type {HTMLTextAreaElement} */
-        this._queryInput = /** @type {HTMLTextAreaElement} */ (document.querySelector('#search-textbox'));
+        this._queryInput = querySelectorNotNull(document, '#search-textbox');
         /** @type {HTMLElement} */
-        this._introElement = /** @type {HTMLElement} */ (document.querySelector('#intro'));
+        this._introElement = querySelectorNotNull(document, '#intro');
         /** @type {HTMLInputElement} */
-        this._clipboardMonitorEnableCheckbox = /** @type {HTMLInputElement} */ (document.querySelector('#clipboard-monitor-enable'));
+        this._clipboardMonitorEnableCheckbox = querySelectorNotNull(document, '#clipboard-monitor-enable');
         /** @type {HTMLInputElement} */
-        this._wanakanaEnableCheckbox = /** @type {HTMLInputElement} */ (document.querySelector('#wanakana-enable'));
+        this._wanakanaEnableCheckbox = querySelectorNotNull(document, '#wanakana-enable');
         /** @type {EventListenerCollection} */
         this._queryInputEvents = new EventListenerCollection();
         /** @type {boolean} */

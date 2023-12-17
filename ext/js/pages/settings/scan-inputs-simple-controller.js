@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
 import {yomitan} from '../../yomitan.js';
 import {ScanInputsController} from './scan-inputs-controller.js';
@@ -27,10 +28,10 @@ export class ScanInputsSimpleController {
     constructor(settingsController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {?HTMLInputElement} */
-        this._middleMouseButtonScan = null;
-        /** @type {?HTMLSelectElement} */
-        this._mainScanModifierKeyInput = null;
+        /** @type {HTMLInputElement} */
+        this._middleMouseButtonScan = querySelectorNotNull(document, '#middle-mouse-button-scan');
+        /** @type {HTMLSelectElement} */
+        this._mainScanModifierKeyInput = querySelectorNotNull(document, '#main-scan-modifier-key');
         /** @type {boolean} */
         this._mainScanModifierKeyInputHasOther = false;
         /** @type {HotkeyUtil} */
@@ -39,9 +40,6 @@ export class ScanInputsSimpleController {
 
     /** */
     async prepare() {
-        this._middleMouseButtonScan = /** @type {HTMLInputElement} */ (document.querySelector('#middle-mouse-button-scan'));
-        this._mainScanModifierKeyInput = /** @type {HTMLSelectElement} */ (document.querySelector('#main-scan-modifier-key'));
-
         const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._hotkeyUtil.os = os;
 

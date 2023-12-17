@@ -22,6 +22,7 @@ import {ThemeController} from '../app/theme-controller.js';
 import {FrameEndpoint} from '../comm/frame-endpoint.js';
 import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, log, promiseTimeout} from '../core.js';
 import {PopupMenu} from '../dom/popup-menu.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {ScrollElement} from '../dom/scroll-element.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {TextScanner} from '../language/text-scanner.js';
@@ -62,7 +63,7 @@ export class Display extends EventDispatcher {
         /** @type {import('../input/hotkey-handler.js').HotkeyHandler} */
         this._hotkeyHandler = hotkeyHandler;
         /** @type {HTMLElement} */
-        this._container = /** @type {HTMLElement} */ (document.querySelector('#dictionary-entries'));
+        this._container = querySelectorNotNull(document, '#dictionary-entries');
         /** @type {import('dictionary').DictionaryEntry[]} */
         this._dictionaryEntries = [];
         /** @type {HTMLElement[]} */
@@ -116,7 +117,7 @@ export class Display extends EventDispatcher {
         /** @type {number} */
         this._queryOffset = 0;
         /** @type {HTMLElement} */
-        this._progressIndicator = /** @type {HTMLElement} */ (document.querySelector('#progress-indicator'));
+        this._progressIndicator = querySelectorNotNull(document, '#progress-indicator');
         /** @type {?import('core').Timeout} */
         this._progressIndicatorTimer = null;
         /** @type {DynamicProperty<boolean>} */
@@ -126,24 +127,24 @@ export class Display extends EventDispatcher {
         /** @type {?boolean} */
         this._queryParserVisibleOverride = null;
         /** @type {HTMLElement} */
-        this._queryParserContainer = /** @type {HTMLElement} */ (document.querySelector('#query-parser-container'));
+        this._queryParserContainer = querySelectorNotNull(document, '#query-parser-container');
         /** @type {QueryParser} */
         this._queryParser = new QueryParser({
             getSearchContext: this._getSearchContext.bind(this),
             japaneseUtil
         });
         /** @type {HTMLElement} */
-        this._contentScrollElement = /** @type {HTMLElement} */ (document.querySelector('#content-scroll'));
+        this._contentScrollElement = querySelectorNotNull(document, '#content-scroll');
         /** @type {HTMLElement} */
-        this._contentScrollBodyElement = /** @type {HTMLElement} */ (document.querySelector('#content-body'));
+        this._contentScrollBodyElement = querySelectorNotNull(document, '#content-body');
         /** @type {ScrollElement} */
         this._windowScroll = new ScrollElement(this._contentScrollElement);
-        /** @type {HTMLButtonElement} */
-        this._closeButton = /** @type {HTMLButtonElement} */ (document.querySelector('#close-button'));
-        /** @type {HTMLButtonElement} */
-        this._navigationPreviousButton = /** @type {HTMLButtonElement} */ (document.querySelector('#navigate-previous-button'));
-        /** @type {HTMLButtonElement} */
-        this._navigationNextButton = /** @type {HTMLButtonElement} */ (document.querySelector('#navigate-next-button'));
+        /** @type {?HTMLButtonElement} */
+        this._closeButton = document.querySelector('#close-button');
+        /** @type {?HTMLButtonElement} */
+        this._navigationPreviousButton = document.querySelector('#navigate-previous-button');
+        /** @type {?HTMLButtonElement} */
+        this._navigationNextButton = document.querySelector('#navigate-next-button');
         /** @type {?Frontend} */
         this._frontend = null;
         /** @type {?Promise<void>} */
@@ -171,7 +172,7 @@ export class Display extends EventDispatcher {
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._tagNotification = null;
         /** @type {HTMLElement} */
-        this._footerNotificationContainer = /** @type {HTMLElement} */ (document.querySelector('#content-footer'));
+        this._footerNotificationContainer = querySelectorNotNull(document, '#content-footer');
         /** @type {OptionToggleHotkeyHandler} */
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         /** @type {ElementOverflowController} */
@@ -179,7 +180,7 @@ export class Display extends EventDispatcher {
         /** @type {boolean} */
         this._frameVisible = (pageType === 'search');
         /** @type {HTMLElement} */
-        this._menuContainer = /** @type {HTMLElement} */ (document.querySelector('#popup-menus'));
+        this._menuContainer = querySelectorNotNull(document, '#popup-menus');
         /** @type {(event: MouseEvent) => void} */
         this._onEntryClickBind = this._onEntryClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
@@ -1043,7 +1044,8 @@ export class Display extends EventDispatcher {
         const node = /** @type {HTMLElement} */ (e.currentTarget);
 
         const menuContainerNode = /** @type {HTMLElement} */ (this._displayGenerator.instantiateTemplate('dictionary-entry-popup-menu'));
-        const menuBodyNode = /** @type {HTMLElement} */ (menuContainerNode.querySelector('.popup-menu-body'));
+        /** @type {HTMLElement} */
+        const menuBodyNode = querySelectorNotNull(menuContainerNode, '.popup-menu-body');
 
         /**
          * @param {string} menuAction
@@ -1051,7 +1053,9 @@ export class Display extends EventDispatcher {
          */
         const addItem = (menuAction, label) => {
             const item = /** @type {HTMLElement} */ (this._displayGenerator.instantiateTemplate('dictionary-entry-popup-menu-item'));
-            /** @type {HTMLElement} */ (item.querySelector('.popup-menu-item-label')).textContent = label;
+            /** @type {HTMLElement} */
+            const labelElement = querySelectorNotNull(item, '.popup-menu-item-label');
+            labelElement.textContent = label;
             item.dataset.menuAction = menuAction;
             menuBodyNode.appendChild(item);
         };
@@ -1293,7 +1297,8 @@ export class Display extends EventDispatcher {
 
     /** */
     _setContentExtensionUnloaded() {
-        const errorExtensionUnloaded = /** @type {?HTMLElement} */ (document.querySelector('#error-extension-unloaded'));
+        /** @type {?HTMLElement} */
+        const errorExtensionUnloaded = document.querySelector('#error-extension-unloaded');
 
         if (this._container !== null) {
             this._container.hidden = true;
@@ -1325,7 +1330,8 @@ export class Display extends EventDispatcher {
      * @param {boolean} visible
      */
     _setNoContentVisible(visible) {
-        const noResults = /** @type {?HTMLElement} */ (document.querySelector('#no-results'));
+        /** @type {?HTMLElement} */
+        const noResults = document.querySelector('#no-results');
 
         if (noResults !== null) {
             noResults.hidden = !visible;
