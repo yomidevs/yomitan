@@ -125,6 +125,9 @@ export class Translator {
      * @returns {Promise<import('dictionary').KanjiDictionaryEntry[]>} An array of definitions. See the _createKanjiDefinition() function for structure details.
      */
     async findKanji(text, options) {
+        if (options.removeNonJapaneseCharacters) {
+            text = this._getJapaneseOnlyText(text);
+        }
         const {enabledDictionaryMap} = options;
         const kanjiUnique = new Set();
         for (const c of text) {

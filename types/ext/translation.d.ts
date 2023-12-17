@@ -29,6 +29,10 @@ export type FindKanjiOptions = {
      * The key is the dictionary name.
      */
     enabledDictionaryMap: Map<string, FindKanjiDictionary>;
+    /**
+     * Whether or not non-Japanese characters should be searched.
+     */
+    removeNonJapaneseCharacters: boolean;
 };
 
 /**
