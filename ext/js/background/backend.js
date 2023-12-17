@@ -2637,7 +2637,7 @@ export class Backend {
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         return {
             enabledDictionaryMap,
-            removeNonJapaneseCharacters: !options.scanning.alphanumeric,
+            removeNonJapaneseCharacters: !options.scanning.alphanumeric
         };
     }
 
