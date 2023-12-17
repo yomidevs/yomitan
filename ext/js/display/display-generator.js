@@ -28,7 +28,7 @@ export class DisplayGenerator {
     /**
      * @param {import('display').DisplayGeneratorConstructorDetails} details
      */
-    constructor({japaneseUtil, contentManager, hotkeyHelpController=null}) {
+    constructor({japaneseUtil, contentManager, hotkeyHelpController = null}) {
         /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {import('./display-content-manager.js').DisplayContentManager} */

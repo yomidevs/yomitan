@@ -99,7 +99,7 @@ export class TemplateRendererProxy {
      * @param {number} [timeout]
      * @returns {Promise<void>}
      */
-    _loadFrame(frame, url, timeout=5000) {
+    _loadFrame(frame, url, timeout = 5000) {
         return new Promise((resolve, reject) => {
             let state = 0x0; // 0x1 = frame added; 0x2 = frame loaded; 0x4 = frame ready
             const cleanup = () => {
@@ -165,7 +165,7 @@ export class TemplateRendererProxy {
      * @param {?number} [timeout]
      * @returns {Promise<unknown>}
      */
-    _invoke(action, params, timeout=null) {
+    _invoke(action, params, timeout = null) {
         return new Promise((resolve, reject) => {
             const frameWindow = (this._frame !== null ? this._frame.contentWindow : null);
             if (frameWindow === null) {

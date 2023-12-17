@@ -25,7 +25,7 @@ export class DisplayHistory extends EventDispatcher {
     /**
      * @param {{clearable?: boolean, useBrowserHistory?: boolean}} details
      */
-    constructor({clearable=true, useBrowserHistory=false}) {
+    constructor({clearable = true, useBrowserHistory = false}) {
         super();
         /** @type {boolean} */
         this._clearable = clearable;

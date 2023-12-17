@@ -196,6 +196,7 @@ export class Display extends EventDispatcher {
         /** @type {ThemeController} */
         this._themeController = new ThemeController(document.documentElement);
 
+        /* eslint-disable no-multi-spaces */
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
             ['nextEntry',         this._onHotkeyActionMoveRelative.bind(this, 1)],
@@ -219,6 +220,7 @@ export class Display extends EventDispatcher {
         this.registerWindowMessageHandlers([
             ['Display.extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
         ]);
+        /* eslint-enable no-multi-spaces */
     }
 
     /** @type {DisplayGenerator} */
@@ -586,7 +588,7 @@ export class Display extends EventDispatcher {
      * @param {import('core').SerializableObject} [params]
      * @returns {Promise<TReturn>}
      */
-    async invokeContentOrigin(action, params={}) {
+    async invokeContentOrigin(action, params = {}) {
         if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
             throw new Error('Content origin is same page');
         }
@@ -602,7 +604,7 @@ export class Display extends EventDispatcher {
      * @param {import('core').SerializableObject} [params]
      * @returns {Promise<TReturn>}
      */
-    async invokeParentFrame(action, params={}) {
+    async invokeParentFrame(action, params = {}) {
         if (this._parentFrameId === null || this._parentFrameId === this._frameId) {
             throw new Error('Invalid parent frame');
         }

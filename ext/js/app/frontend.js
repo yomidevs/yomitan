@@ -41,9 +41,9 @@ export class Frontend {
         parentPopupId,
         parentFrameId,
         useProxyPopup,
-        canUseWindowPopup=true,
+        canUseWindowPopup = true,
         allowRootFramePopupProxy,
-        childrenSupported=true,
+        childrenSupported = true,
         hotkeyHandler
     }) {
         /** @type {import('frontend').PageType} */
@@ -106,6 +106,7 @@ export class Frontend {
         /** @type {?import('settings').OptionsContext} */
         this._optionsContextOverride = null;
 
+        /* eslint-disable no-multi-spaces */
         /** @type {import('core').MessageHandlerMap} */
         this._runtimeMessageHandlers = new Map(/** @type {import('core').MessageHandlerArray} */ ([
             ['Frontend.requestReadyBroadcast',   {async: false, handler: this._onMessageRequestFrontendReadyBroadcast.bind(this)}],
@@ -117,6 +118,7 @@ export class Frontend {
             ['scanSelectedText', this._onActionScanSelectedText.bind(this)],
             ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)]
         ]);
+        /* eslint-enable no-multi-spaces */
     }
 
     /**
@@ -174,6 +176,7 @@ export class Frontend {
         this._textScanner.on('clear', this._onTextScannerClear.bind(this));
         this._textScanner.on('searched', this._onSearched.bind(this));
 
+        /* eslint-disable no-multi-spaces */
         yomitan.crossFrame.registerHandlers([
             ['Frontend.closePopup',       {async: false, handler: this._onApiClosePopup.bind(this)}],
             ['Frontend.copySelection',    {async: false, handler: this._onApiCopySelection.bind(this)}],
@@ -181,6 +184,7 @@ export class Frontend {
             ['Frontend.getPopupInfo',     {async: false, handler: this._onApiGetPopupInfo.bind(this)}],
             ['Frontend.getPageInfo',      {async: false, handler: this._onApiGetPageInfo.bind(this)}]
         ]);
+        /* eslint-enable no-multi-spaces */
 
         this._prepareSiteSpecific();
         this._updateContentScale();

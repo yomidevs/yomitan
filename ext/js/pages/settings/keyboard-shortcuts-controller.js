@@ -46,6 +46,7 @@ export class KeyboardShortcutController {
         this._stringComparer = new Intl.Collator('en-US'); // Invariant locale
         /** @type {HTMLElement} */
         this._scrollContainer = querySelectorNotNull(document, '#keyboard-shortcuts-modal .modal-body');
+        /* eslint-disable no-multi-spaces */
         /** @type {Map<string, import('keyboard-shortcut-controller').ActionDetails>} */
         this._actionDetails = new Map([
             ['',                                 {scopes: new Set()}],
@@ -70,6 +71,7 @@ export class KeyboardShortcutController {
             ['scanTextAtCaret',                  {scopes: new Set(['web'])}],
             ['toggleOption',                     {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-setting-path', default: ''}}]
         ]);
+        /* eslint-enable no-multi-spaces */
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */

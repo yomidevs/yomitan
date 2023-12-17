@@ -324,7 +324,7 @@ class DictionaryExtraInfo {
                 node.parentNode.removeChild(node);
             }
         }
-        this._nodes.length =0;
+        this._nodes.length = 0;
     }
 
     // Private

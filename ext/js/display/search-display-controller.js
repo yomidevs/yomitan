@@ -94,11 +94,13 @@ export class SearchDisplayController {
         this._display.hotkeyHandler.registerActions([
             ['focusSearchBox', this._onActionFocusSearchBox.bind(this)]
         ]);
+        /* eslint-disable no-multi-spaces */
         this._registerMessageHandlers([
             ['SearchDisplayController.getMode',           {async: false, handler: this._onMessageGetMode.bind(this)}],
             ['SearchDisplayController.setMode',           {async: false, handler: this._onMessageSetMode.bind(this)}],
             ['SearchDisplayController.updateSearchQuery', {async: false, handler: this._onExternalSearchUpdate.bind(this)}]
         ]);
+        /* eslint-enable no-multi-spaces */
 
         this._updateClipboardMonitorEnabled();
 
@@ -285,7 +287,7 @@ export class SearchDisplayController {
     /**
      * @param {{text: string, animate?: boolean}} details
      */
-    _onExternalSearchUpdate({text, animate=true}) {
+    _onExternalSearchUpdate({text, animate = true}) {
         const options = this._display.getOptions();
         if (options === null) { return; }
         const {clipboard: {autoSearchContent, maximumSearchLength}} = options;

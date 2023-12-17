@@ -349,7 +349,7 @@ export class DocumentUtil {
      * @param {EventListener} onFullscreenChanged The event callback.
      * @param {?import('../core.js').EventListenerCollection} eventListenerCollection An optional `EventListenerCollection` to add the registration to.
      */
-    static addFullscreenChangeEventListener(onFullscreenChanged, eventListenerCollection=null) {
+    static addFullscreenChangeEventListener(onFullscreenChanged, eventListenerCollection = null) {
         const target = document;
         const options = false;
         const fullscreenEventNames = [

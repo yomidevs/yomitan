@@ -74,7 +74,7 @@ export function getArgs(args, argMap) {
  * @param {?(fileName: string) => boolean} predicate
  * @returns {string[]}
  */
-export function getAllFiles(baseDirectory, predicate=null) {
+export function getAllFiles(baseDirectory, predicate = null) {
     const results = [];
     const directories = [baseDirectory];
     while (directories.length > 0) {

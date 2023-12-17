@@ -103,6 +103,8 @@ export class Deinflector {
     }
 }
 
+
+/* eslint-disable no-multi-spaces */
 /** @type {Map<string, import('translation-internal').DeinflectionRuleFlags>} */
 // eslint-disable-next-line no-underscore-dangle
 Deinflector._ruleTypes = new Map([
@@ -114,3 +116,4 @@ Deinflector._ruleTypes = new Map([
     ['adj-i', /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00100000)], // Adjective i
     ['iru',   /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b01000000)] // Intermediate -iru endings for progressive or perfect tense
 ]);
+/* eslint-enable no-multi-spaces */

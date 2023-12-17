@@ -57,7 +57,7 @@ export class PanelElement extends EventDispatcher {
      * @param {boolean} value
      * @param {boolean} [animate]
      */
-    setVisible(value, animate=true) {
+    setVisible(value, animate = true) {
         value = !!value;
         if (this.isVisible() === value) { return; }
 

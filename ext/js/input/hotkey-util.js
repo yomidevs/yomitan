@@ -24,7 +24,7 @@ export class HotkeyUtil {
      * Creates a new instance.
      * @param {?import('environment').OperatingSystem} os The operating system for this instance.
      */
-    constructor(os=null) {
+    constructor(os = null) {
         /** @type {?import('environment').OperatingSystem} */
         this._os = os;
         /** @type {string} */

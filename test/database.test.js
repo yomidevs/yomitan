@@ -107,7 +107,8 @@ function countKanjiWithCharacter(kanji, character) {
 
 /** */
 async function testDatabase1() {
-    test('Database1', async () => {    // Load dictionary data
+    test('Database1', async () => {
+        // Load dictionary data
         const testDictionary = createTestDictionaryArchive('valid-dictionary1');
         const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
         const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
@@ -849,7 +850,8 @@ async function testFindTagForTitle1(database, title) {
 
 /** */
 async function testDatabase2() {
-    test('Database2', async () => {    // Load dictionary data
+    test('Database2', async () => {
+        // Load dictionary data
         const testDictionary = createTestDictionaryArchive('valid-dictionary1');
         const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
         const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));

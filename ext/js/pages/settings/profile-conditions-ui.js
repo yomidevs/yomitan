@@ -50,6 +50,7 @@ export class ProfileConditionsUI extends EventDispatcher {
         const normalizeInteger = this._normalizeInteger.bind(this);
         const validateFlags = this._validateFlags.bind(this);
         const normalizeFlags = this._normalizeFlags.bind(this);
+        /* eslint-disable no-multi-spaces */
         /** @type {Map<import('profile-conditions-ui').DescriptorType, import('profile-conditions-ui').Descriptor>} */
         this._descriptors = new Map([
             [
@@ -105,6 +106,7 @@ export class ProfileConditionsUI extends EventDispatcher {
                 }
             ]
         ]);
+        /* eslint-enable no-multi-spaces */
         /** @type {Set<string>} */
         this._validFlags = new Set([
             'clipboard'
@@ -217,12 +219,12 @@ export class ProfileConditionsUI extends EventDispatcher {
         const info = this._getOperatorDetails(type, operator);
 
         const {
-            displayName=operator,
-            type: type2='string',
-            defaultValue='',
-            resetDefaultOnChange=false,
-            validate=null,
-            normalize=null
+            displayName = operator,
+            type: type2 = 'string',
+            defaultValue = '',
+            resetDefaultOnChange = false,
+            validate = null,
+            normalize = null
         } = (typeof info === 'undefined' ? {} : info);
 
         return {
