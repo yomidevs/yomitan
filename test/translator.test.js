@@ -19,7 +19,6 @@
 import {readFileSync} from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import {expect} from 'vitest';
 import {createTranslatorTest} from './fixtures/translator-test.js';
 import {createTestAnkiNoteData} from './utilities/anki.js';
 import {createFindOptions} from './utilities/translator.js';
@@ -41,7 +40,7 @@ const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
 for (let i = 0, ii = tests.length; i < ii; ++i) {
-    test(`${i}`, async ({translator, ankiNoteDataCreator}) => {
+    test(`${i}`, async ({translator, ankiNoteDataCreator, expect}) => {
         const t = tests[i];
         const expected1 = expectedResults1[i];
         const expected2 = expectedResults2[i];
