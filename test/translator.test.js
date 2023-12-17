@@ -19,6 +19,7 @@
 import {readFileSync} from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
+import {describe} from 'vitest';
 import {createTranslatorTest} from './fixtures/translator-test.js';
 import {createTestAnkiNoteData} from './utilities/anki.js';
 import {createFindOptions} from './utilities/translator.js';
@@ -26,6 +27,7 @@ import {createFindOptions} from './utilities/translator.js';
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json');
+/** @type {import('test/anki-note-builder').TranslatorTestInputs} */
 const {optionsPresets, tests} = JSON.parse(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
 
 const testResults1FilePath = path.join(dirname, 'data/translator-test-results.json');
@@ -39,39 +41,39 @@ const actualResults2 = [];
 const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
-for (let i = 0, ii = tests.length; i < ii; ++i) {
-    test(`${i}`, async ({translator, ankiNoteDataCreator, expect}) => {
-        const t = tests[i];
-        const expected1 = expectedResults1[i];
-        const expected2 = expectedResults2[i];
-        switch (t.func) {
-            case 'findTerms':
-                {
-                    const {name, mode, text} = t;
-                    /** @type {import('translation').FindTermsOptions} */
-                    const options = createFindOptions(dictionaryName, optionsPresets, t.options);
-                    const {dictionaryEntries, originalTextLength} = await translator.findTerms(mode, text, options);
-                    const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, mode)) : null;
-                    actualResults1.push({name, originalTextLength, dictionaryEntries});
-                    actualResults2.push({name, noteDataList});
-                    expect(originalTextLength).toStrictEqual(expected1.originalTextLength);
-                    expect(dictionaryEntries).toStrictEqual(expected1.dictionaryEntries);
-                    expect(noteDataList).toEqual(expected2.noteDataList);
-                }
-                break;
-            case 'findKanji':
-                {
-                    const {name, text} = t;
-                    /** @type {import('translation').FindKanjiOptions} */
-                    const options = createFindOptions(dictionaryName, optionsPresets, t.options);
-                    const dictionaryEntries = await translator.findKanji(text, options);
-                    const noteDataList = dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, 'split'));
-                    actualResults1.push({name, dictionaryEntries});
-                    actualResults2.push({name, noteDataList});
-                    expect(dictionaryEntries).toStrictEqual(expected1.dictionaryEntries);
-                    expect(noteDataList).toEqual(expected2.noteDataList);
-                }
-                break;
-        }
+describe('Translator', () => {
+    const testData = tests.map((data, i) => ({data, expected1: expectedResults1[i], expected2: expectedResults2[i]}));
+    describe.each(testData)('Test %#: $data.name', ({data, expected1, expected2}) => {
+        test('Test', async ({translator, ankiNoteDataCreator, expect}) => {
+            switch (data.func) {
+                case 'findTerms':
+                    {
+                        const {name, mode, text} = data;
+                        /** @type {import('translation').FindTermsOptions} */
+                        const options = createFindOptions(dictionaryName, optionsPresets, data.options);
+                        const {dictionaryEntries, originalTextLength} = await translator.findTerms(mode, text, options);
+                        const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, mode)) : null;
+                        actualResults1.push({name, originalTextLength, dictionaryEntries});
+                        actualResults2.push({name, noteDataList});
+                        expect(originalTextLength).toStrictEqual(expected1.originalTextLength);
+                        expect(dictionaryEntries).toStrictEqual(expected1.dictionaryEntries);
+                        expect(noteDataList).toEqual(expected2.noteDataList);
+                    }
+                    break;
+                case 'findKanji':
+                    {
+                        const {name, text} = data;
+                        /** @type {import('translation').FindKanjiOptions} */
+                        const options = createFindOptions(dictionaryName, optionsPresets, data.options);
+                        const dictionaryEntries = await translator.findKanji(text, options);
+                        const noteDataList = dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, 'split'));
+                        actualResults1.push({name, dictionaryEntries});
+                        actualResults2.push({name, noteDataList});
+                        expect(dictionaryEntries).toStrictEqual(expected1.dictionaryEntries);
+                        expect(noteDataList).toEqual(expected2.noteDataList);
+                    }
+                    break;
+            }
+        });
     });
-}
+});
