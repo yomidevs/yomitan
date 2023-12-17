@@ -22,14 +22,12 @@ import path from 'path';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {createDictionaryArchive} from '../dev/util.js';
 import {DictionaryDatabase} from '../ext/js/language/dictionary-database.js';
-import {DictionaryImporterMediaLoader} from '../ext/js/language/dictionary-importer-media-loader.js';
 import {DictionaryImporter} from '../ext/js/language/dictionary-importer.js';
+import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
-
-vi.mock('../ext/js/language/dictionary-importer-media-loader.js', async () => await import('../test/mocks/dictionary-importer-media-loader.js'));
 
 /**
  * @param {string} dictionary
