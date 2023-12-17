@@ -181,7 +181,7 @@ const template = readFileSync(path.join(dirname, '../ext/data/templates/default-
 const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
-describe.concurrent('AnkiNoteBuilder', () => {
+describe('AnkiNoteBuilder', () => {
     const testData = tests.map((data, i) => ({data, expected1: expectedResults1[i]}));
     describe.each(testData)('Test %#: $data.name', ({data, expected1}) => {
         test('Test', async ({expect, translator}) => {
