@@ -30,7 +30,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
      * @param {?import('environment').OperatingSystem} os
      * @param {?(pointerType: string) => boolean} [isPointerTypeSupported]
      */
-    constructor(inputNode, mouseButton, os, isPointerTypeSupported=null) {
+    constructor(inputNode, mouseButton, os, isPointerTypeSupported = null) {
         super();
         /** @type {HTMLInputElement} */
         this._inputNode = inputNode;
@@ -65,7 +65,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
      * @param {boolean} [mouseModifiersSupported]
      * @param {boolean} [keySupported]
      */
-    prepare(key, modifiers, mouseModifiersSupported=false, keySupported=false) {
+    prepare(key, modifiers, mouseModifiersSupported = false, keySupported = false) {
         this.cleanup();
 
         this._mouseModifiersSupported = mouseModifiersSupported;

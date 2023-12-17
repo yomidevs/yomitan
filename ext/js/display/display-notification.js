@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../core.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 
 export class DisplayNotification {
     /**
@@ -29,9 +30,9 @@ export class DisplayNotification {
         /** @type {HTMLElement} */
         this._node = node;
         /** @type {HTMLElement} */
-        this._body = /** @type {HTMLElement} */ (node.querySelector('.footer-notification-body'));
+        this._body = querySelectorNotNull(node, '.footer-notification-body');
         /** @type {HTMLElement} */
-        this._closeButton = /** @type {HTMLElement} */ (node.querySelector('.footer-notification-close-button'));
+        this._closeButton = querySelectorNotNull(node, '.footer-notification-close-button');
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
         /** @type {?import('core').Timeout} */
@@ -66,7 +67,7 @@ export class DisplayNotification {
     /**
      * @param {boolean} [animate]
      */
-    close(animate=false) {
+    close(animate = false) {
         if (this.isClosed()) { return; }
 
         if (animate) {

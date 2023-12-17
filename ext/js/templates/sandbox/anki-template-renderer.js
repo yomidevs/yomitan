@@ -74,6 +74,7 @@ export class AnkiTemplateRenderer {
      * Prepares the data that is necessary before the template renderer can be safely used.
      */
     async prepare() {
+        /* eslint-disable no-multi-spaces */
         this._templateRenderer.registerHelpers([
             ['dumpObject',       this._dumpObject.bind(this)],
             ['furigana',         this._furigana.bind(this)],
@@ -103,6 +104,7 @@ export class AnkiTemplateRenderer {
             ['hiragana',         this._hiragana.bind(this)],
             ['katakana',         this._katakana.bind(this)]
         ]);
+        /* eslint-enable no-multi-spaces */
         this._templateRenderer.registerDataType('ankiNote', {
             modifier: ({marker, commonData}) => this._ankiNoteDataCreator.create(marker, commonData),
             composeData: ({marker}, commonData) => ({marker, commonData})
@@ -392,9 +394,9 @@ export class AnkiTemplateRenderer {
             case '!=': return operand1 != operand2; // eslint-disable-line eqeqeq
             case '===': return operand1 === operand2;
             case '!==': return operand1 !== operand2;
-            case '<':  return operand1 < operand2;
+            case '<': return operand1 < operand2;
             case '<=': return operand1 <= operand2;
-            case '>':  return operand1 > operand2;
+            case '>': return operand1 > operand2;
             case '>=': return operand1 >= operand2;
             case '<<': return operand1 << operand2;
             case '>>': return operand1 >> operand2;

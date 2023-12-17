@@ -109,7 +109,7 @@ export class FrameAncestryHandler {
      * @param {number} [timeout]
      * @returns {Promise<number[]>}
      */
-    _getFrameAncestryInfo(timeout=5000) {
+    _getFrameAncestryInfo(timeout = 5000) {
         return new Promise((resolve, reject) => {
             const targetWindow = window.parent;
             if (window === targetWindow) {

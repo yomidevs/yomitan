@@ -31,12 +31,12 @@ export class TextScanner extends EventDispatcher {
     constructor({
         node,
         getSearchContext,
-        ignoreElements=null,
-        ignorePoint=null,
-        searchTerms=false,
-        searchKanji=false,
-        searchOnClick=false,
-        searchOnClickOnly=false
+        ignoreElements = null,
+        ignorePoint = null,
+        searchTerms = false,
+        searchKanji = false,
+        searchOnClick = false,
+        searchOnClickOnly = false
     }) {
         super();
         /** @type {HTMLElement|Window} */

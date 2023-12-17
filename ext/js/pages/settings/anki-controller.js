@@ -20,6 +20,7 @@ import {AnkiConnect} from '../../comm/anki-connect.js';
 import {EventListenerCollection, log} from '../../core.js';
 import {ExtensionError} from '../../core/extension-error.js';
 import {AnkiUtil} from '../../data/anki-util.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
 import {yomitan} from '../../yomitan.js';
@@ -45,26 +46,27 @@ export class AnkiController {
         this._stringComparer = new Intl.Collator(); // Locale does not matter
         /** @type {?Promise<import('anki-controller').AnkiData>} */
         this._getAnkiDataPromise = null;
-        /** @type {?HTMLElement} */
-        this._ankiErrorContainer = null;
-        /** @type {?HTMLElement} */
-        this._ankiErrorMessageNode = null;
+        /** @type {HTMLElement} */
+        this._ankiErrorMessageNode = querySelectorNotNull(document, '#anki-error-message');
+        const ankiErrorMessageNodeDefaultContent = this._ankiErrorMessageNode.textContent;
         /** @type {string} */
-        this._ankiErrorMessageNodeDefaultContent = '';
-        /** @type {?HTMLElement} */
-        this._ankiErrorMessageDetailsNode = null;
-        /** @type {?HTMLElement} */
-        this._ankiErrorMessageDetailsContainer = null;
-        /** @type {?HTMLElement} */
-        this._ankiErrorMessageDetailsToggle = null;
-        /** @type {?HTMLElement} */
-        this._ankiErrorInvalidResponseInfo = null;
-        /** @type {?HTMLElement} */
-        this._ankiCardPrimary = null;
+        this._ankiErrorMessageNodeDefaultContent = typeof ankiErrorMessageNodeDefaultContent === 'string' ? ankiErrorMessageNodeDefaultContent : '';
+        /** @type {HTMLElement} */
+        this._ankiErrorMessageDetailsNode = querySelectorNotNull(document, '#anki-error-message-details');
+        /** @type {HTMLElement} */
+        this._ankiErrorMessageDetailsContainer = querySelectorNotNull(document, '#anki-error-message-details-container');
+        /** @type {HTMLElement} */
+        this._ankiErrorMessageDetailsToggle = querySelectorNotNull(document, '#anki-error-message-details-toggle');
+        /** @type {HTMLElement} */
+        this._ankiErrorInvalidResponseInfo = querySelectorNotNull(document, '#anki-error-invalid-response-info');
+        /** @type {HTMLElement} */
+        this._ankiCardPrimary = querySelectorNotNull(document, '#anki-card-primary');
         /** @type {?Error} */
         this._ankiError = null;
         /** @type {?import('core').TokenObject} */
         this._validateFieldsToken = null;
+        /** @type {?HTMLInputElement} */
+        this._ankiEnableCheckbox = document.querySelector('[data-setting="anki.enable"]');
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */
@@ -74,19 +76,11 @@ export class AnkiController {
 
     /** */
     async prepare() {
-        this._ankiErrorContainer = /** @type {HTMLElement} */ (document.querySelector('#anki-error'));
-        this._ankiErrorMessageNode = /** @type {HTMLElement} */ (document.querySelector('#anki-error-message'));
-        const ankiErrorMessageNodeDefaultContent = this._ankiErrorMessageNode.textContent;
-        this._ankiErrorMessageNodeDefaultContent = typeof ankiErrorMessageNodeDefaultContent === 'string' ? ankiErrorMessageNodeDefaultContent : '';
-        this._ankiErrorMessageDetailsNode = /** @type {HTMLElement} */ (document.querySelector('#anki-error-message-details'));
-        this._ankiErrorMessageDetailsContainer = /** @type {HTMLElement} */ (document.querySelector('#anki-error-message-details-container'));
-        this._ankiErrorMessageDetailsToggle = /** @type {HTMLElement} */ (document.querySelector('#anki-error-message-details-toggle'));
-        this._ankiErrorInvalidResponseInfo = /** @type {HTMLElement} */ (document.querySelector('#anki-error-invalid-response-info'));
-        this._ankiEnableCheckbox = /** @type {?HTMLInputElement} */ (document.querySelector('[data-setting="anki.enable"]'));
-        this._ankiCardPrimary = /** @type {HTMLElement} */ (document.querySelector('#anki-card-primary'));
-        const ankiApiKeyInput = /** @type {HTMLElement} */ (document.querySelector('#anki-api-key-input'));
+        /** @type {HTMLElement} */
+        const ankiApiKeyInput = querySelectorNotNull(document, '#anki-api-key-input');
         const ankiCardPrimaryTypeRadios = /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('input[type=radio][name=anki-card-primary-type]'));
-        const ankiErrorLog = /** @type {HTMLElement} */ (document.querySelector('#anki-error-log'));
+        /** @type {HTMLElement} */
+        const ankiErrorLog = querySelectorNotNull(document, '#anki-error-log');
 
         this._setupFieldMenus();
 
@@ -439,9 +433,6 @@ export class AnkiController {
     /** */
     _hideAnkiError() {
         const ankiErrorMessageNode = /** @type {HTMLElement} */ (this._ankiErrorMessageNode);
-        if (this._ankiErrorContainer !== null) {
-            this._ankiErrorContainer.hidden = true;
-        }
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsContainer).hidden = true;
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsToggle).hidden = true;
         /** @type {HTMLElement} */ (this._ankiErrorInvalidResponseInfo).hidden = true;
@@ -472,9 +463,6 @@ export class AnkiController {
         details += `${error.stack}`.trimRight();
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsNode).textContent = details;
 
-        if (this._ankiErrorContainer !== null) {
-            this._ankiErrorContainer.hidden = false;
-        }
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsContainer).hidden = true;
         /** @type {HTMLElement} */ (this._ankiErrorInvalidResponseInfo).hidden = (errorString.indexOf('Invalid response') < 0);
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsToggle).hidden = false;
@@ -534,7 +522,8 @@ export class AnkiController {
      * @param {?Error} error
      */
     _setAnkiNoteViewerStatus(visible, error) {
-        const node = /** @type {HTMLElement} */ (document.querySelector('#test-anki-note-viewer-results'));
+        /** @type {HTMLElement} */
+        const node = querySelectorNotNull(document, '#test-anki-note-viewer-results');
         if (visible) {
             const success = (error === null);
             node.textContent = success ? 'Success!' : error.message;
@@ -608,8 +597,12 @@ class AnkiCardController {
         const cardOptions = this._getCardOptions(ankiOptions, this._cardType);
         if (cardOptions === null) { return; }
         const {deck, model, fields} = cardOptions;
-        this._deckController.prepare(/** @type {HTMLSelectElement} */ (this._node.querySelector('.anki-card-deck')), deck);
-        this._modelController.prepare(/** @type {HTMLSelectElement} */ (this._node.querySelector('.anki-card-model')), model);
+        /** @type {HTMLSelectElement} */
+        const deckControllerSelect = querySelectorNotNull(this._node, '.anki-card-deck');
+        /** @type {HTMLSelectElement} */
+        const modelControllerSelect = querySelectorNotNull(this._node, '.anki-card-model');
+        this._deckController.prepare(deckControllerSelect, deck);
+        this._modelController.prepare(modelControllerSelect, model);
         this._fields = fields;
 
         this._ankiCardFieldsContainer = this._node.querySelector('.anki-card-fields');
@@ -752,7 +745,8 @@ class AnkiCardController {
     _setFieldMarker(element, marker) {
         const container = element.closest('.anki-card-field-value-container');
         if (container === null) { return; }
-        const input = /** @type {HTMLInputElement} */ (container.querySelector('.anki-card-field-value'));
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(container, '.anki-card-field-value');
         input.value = `{${marker}}`;
         input.dispatchEvent(new Event('change'));
     }
@@ -780,15 +774,19 @@ class AnkiCardController {
         for (const [fieldName, fieldValue] of Object.entries(this._fields)) {
             const content = this._settingsController.instantiateTemplateFragment('anki-card-field');
 
-            const fieldNameContainerNode = /** @type {HTMLElement} */ (content.querySelector('.anki-card-field-name-container'));
+            /** @type {HTMLElement} */
+            const fieldNameContainerNode = querySelectorNotNull(content, '.anki-card-field-name-container');
             fieldNameContainerNode.dataset.index = `${index}`;
-            const fieldNameNode = /** @type {HTMLElement} */ (content.querySelector('.anki-card-field-name'));
+            /** @type {HTMLElement} */
+            const fieldNameNode = querySelectorNotNull(content, '.anki-card-field-name');
             fieldNameNode.textContent = fieldName;
 
-            const valueContainer = /** @type {HTMLElement} */ (content.querySelector('.anki-card-field-value-container'));
+            /** @type {HTMLElement} */
+            const valueContainer = querySelectorNotNull(content, '.anki-card-field-value-container');
             valueContainer.dataset.index = `${index}`;
 
-            const inputField = /** @type {HTMLInputElement} */ (content.querySelector('.anki-card-field-value'));
+            /** @type {HTMLInputElement} */
+            const inputField = querySelectorNotNull(content, '.anki-card-field-value');
             inputField.value = fieldValue;
             inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._cardType, 'fields', fieldName]);
             this._validateFieldPermissions(inputField, index, false);
@@ -798,7 +796,8 @@ class AnkiCardController {
             this._fieldEventListeners.addEventListener(inputField, 'settingChanged', this._onFieldSettingChanged.bind(this, index), false);
             this._validateField(inputField, index);
 
-            const menuButton = /** @type {?HTMLElement} */ (content.querySelector('.anki-card-field-value-menu-button'));
+            /** @type {?HTMLElement} */
+            const menuButton = content.querySelector('.anki-card-field-value-menu-button');
             if (menuButton !== null) {
                 if (typeof this._cardMenu !== 'undefined') {
                     menuButton.dataset.menu = this._cardMenu;

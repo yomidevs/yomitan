@@ -18,6 +18,7 @@
 
 import {EventListenerCollection, generateId} from '../core.js';
 import {PanelElement} from '../dom/panel-element.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {yomitan} from '../yomitan.js';
 
 export class DisplayProfileSelection {
@@ -28,12 +29,14 @@ export class DisplayProfileSelection {
         /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {HTMLElement} */
-        this._profielList = /** @type {HTMLElement} */ (document.querySelector('#profile-list'));
+        this._profielList = querySelectorNotNull(document, '#profile-list');
         /** @type {HTMLButtonElement} */
-        this._profileButton = /** @type {HTMLButtonElement} */ (document.querySelector('#profile-button'));
+        this._profileButton = querySelectorNotNull(document, '#profile-button');
+        /** @type {HTMLElement} */
+        const profilePanelElement = querySelectorNotNull(document, '#profile-panel');
         /** @type {PanelElement} */
         this._profilePanel = new PanelElement({
-            node: /** @type {HTMLElement} */ (document.querySelector('#profile-panel')),
+            node: profilePanelElement,
             closingAnimationDuration: 375 // Milliseconds; includes buffer
         });
         /** @type {boolean} */
@@ -98,9 +101,11 @@ export class DisplayProfileSelection {
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
             const {name} = profiles[i];
             const entry = displayGenerator.createProfileListItem();
-            const radio = /** @type {HTMLInputElement} */ (entry.querySelector('.profile-entry-is-default-radio'));
+            /** @type {HTMLInputElement} */
+            const radio = querySelectorNotNull(entry, '.profile-entry-is-default-radio');
             radio.checked = (i === profileCurrent);
-            const nameNode = /** @type {Element} */ (entry.querySelector('.profile-list-item-name'));
+            /** @type {Element} */
+            const nameNode = querySelectorNotNull(entry, '.profile-list-item-name');
             nameNode.textContent = name;
             fragment.appendChild(entry);
             this._eventListeners.addEventListener(radio, 'change', this._onProfileRadioChange.bind(this, i), false);

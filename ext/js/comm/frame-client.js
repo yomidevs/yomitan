@@ -41,7 +41,7 @@ export class FrameClient {
      * @param {import('frame-client').SetupFrameFunction} setupFrame
      * @param {number} [timeout]
      */
-    async connect(frame, targetOrigin, hostFrameId, setupFrame, timeout=10000) {
+    async connect(frame, targetOrigin, hostFrameId, setupFrame, timeout = 10000) {
         const {secret, token, frameId} = await this._connectInternal(frame, targetOrigin, hostFrameId, setupFrame, timeout);
         this._secret = secret;
         this._token = token;

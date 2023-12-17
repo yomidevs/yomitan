@@ -18,6 +18,7 @@
 
 import {EventListenerCollection} from '../../core.js';
 import {DocumentUtil} from '../../dom/document-util.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
@@ -30,10 +31,10 @@ export class ScanInputsController {
         this._settingsController = settingsController;
         /** @type {?import('environment').OperatingSystem} */
         this._os = null;
-        /** @type {?HTMLElement} */
-        this._container = null;
-        /** @type {?HTMLButtonElement} */
-        this._addButton = null;
+        /** @type {HTMLElement} */
+        this._container = querySelectorNotNull(document, '#scan-input-list');
+        /** @type {HTMLButtonElement} */
+        this._addButton = querySelectorNotNull(document, '#scan-input-add');
         /** @type {?NodeListOf<HTMLElement>} */
         this._scanningInputCountNodes = null;
         /** @type {ScanInputField[]} */
@@ -45,8 +46,6 @@ export class ScanInputsController {
         const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._os = os;
 
-        this._container = /** @type {HTMLElement} */ (document.querySelector('#scan-input-list'));
-        this._addButton = /** @type {HTMLButtonElement} */ (document.querySelector('#scan-input-add'));
         this._scanningInputCountNodes = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.scanning-input-count'));
 
         this._addButton.addEventListener('click', this._onAddButtonClick.bind(this), false);
@@ -157,7 +156,8 @@ export class ScanInputsController {
         // Scroll to bottom
         const button = /** @type {HTMLElement} */ (e.currentTarget);
         const modalContainer = /** @type {HTMLElement} */ (button.closest('.modal'));
-        const scrollContainer = /** @type {HTMLElement} */ (modalContainer.querySelector('.modal-body'));
+        /** @type {HTMLElement} */
+        const scrollContainer = querySelectorNotNull(modalContainer, '.modal-body');
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
     }
 
@@ -265,12 +265,16 @@ class ScanInputField {
         const {include, exclude, options: {showAdvanced}} = scanningInput;
 
         const node = /** @type {HTMLElement} */ (this._parent.instantiateTemplate('scan-input'));
-        const includeInputNode = /** @type {HTMLInputElement} */ (node.querySelector('.scan-input-field[data-property=include]'));
-        const includeMouseButton = /** @type {HTMLButtonElement} */ (node.querySelector('.mouse-button[data-property=include]'));
-        const excludeInputNode = /** @type {HTMLInputElement} */ (node.querySelector('.scan-input-field[data-property=exclude]'));
-        const excludeMouseButton = /** @type {HTMLButtonElement} */ (node.querySelector('.mouse-button[data-property=exclude]'));
-        const removeButton = /** @type {HTMLButtonElement} */ (node.querySelector('.scan-input-remove'));
-        const menuButton = /** @type {HTMLButtonElement} */ (node.querySelector('.scanning-input-menu-button'));
+        /** @type {HTMLInputElement} */
+        const includeInputNode = querySelectorNotNull(node, '.scan-input-field[data-property=include]');
+        /** @type {HTMLButtonElement} */
+        const includeMouseButton = querySelectorNotNull(node, '.mouse-button[data-property=include]');
+        /** @type {HTMLInputElement} */
+        const excludeInputNode = querySelectorNotNull(node, '.scan-input-field[data-property=exclude]');
+        /** @type {HTMLButtonElement} */
+        const excludeMouseButton = querySelectorNotNull(node, '.mouse-button[data-property=exclude]');
+        /** @type {HTMLButtonElement} */
+        const menuButton = querySelectorNotNull(node, '.scanning-input-menu-button');
 
         node.dataset.showAdvanced = `${showAdvanced}`;
 
@@ -285,13 +289,8 @@ class ScanInputField {
 
         this._eventListeners.on(this._includeInputField, 'change', this._onIncludeValueChange.bind(this));
         this._eventListeners.on(this._excludeInputField, 'change', this._onExcludeValueChange.bind(this));
-        if (removeButton !== null) {
-            this._eventListeners.addEventListener(removeButton, 'click', this._onRemoveClick.bind(this));
-        }
-        if (menuButton !== null) {
-            this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this));
-            this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this));
-        }
+        this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this));
+        this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this));
 
         this._updateDataSettingTargets();
     }
@@ -341,8 +340,10 @@ class ScanInputField {
      */
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
-        const showAdvanced = /** @type {?HTMLElement} */ (bodyNode.querySelector('.popup-menu-item[data-menu-action="showAdvanced"]'));
-        const hideAdvanced = /** @type {?HTMLElement} */ (bodyNode.querySelector('.popup-menu-item[data-menu-action="hideAdvanced"]'));
+        /** @type {?HTMLElement} */
+        const showAdvanced = bodyNode.querySelector('.popup-menu-item[data-menu-action="showAdvanced"]');
+        /** @type {?HTMLElement} */
+        const hideAdvanced = bodyNode.querySelector('.popup-menu-item[data-menu-action="hideAdvanced"]');
         const advancedVisible = (this._node !== null && this._node.dataset.showAdvanced === 'true');
         if (showAdvanced !== null) {
             showAdvanced.hidden = advancedVisible;

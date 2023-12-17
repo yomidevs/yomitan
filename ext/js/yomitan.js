@@ -88,6 +88,7 @@ export class Yomitan extends EventDispatcher {
         /** @type {?(() => void)} */
         this._isBackendReadyPromiseResolve = resolve;
 
+        /* eslint-disable no-multi-spaces */
         /** @type {import('core').MessageHandlerMap} */
         this._messageHandlers = new Map(/** @type {import('core').MessageHandlerArray} */ ([
             ['Yomitan.isReady',         {async: false, handler: this._onMessageIsReady.bind(this)}],
@@ -97,6 +98,7 @@ export class Yomitan extends EventDispatcher {
             ['Yomitan.databaseUpdated', {async: false, handler: this._onMessageDatabaseUpdated.bind(this)}],
             ['Yomitan.zoomChanged',     {async: false, handler: this._onMessageZoomChanged.bind(this)}]
         ]));
+        /* eslint-enable no-multi-spaces */
     }
 
     /**
@@ -140,7 +142,7 @@ export class Yomitan extends EventDispatcher {
      * Prepares the instance for use.
      * @param {boolean} [isBackground=false] Assigns whether this instance is being used from the background page/service worker.
      */
-    async prepare(isBackground=false) {
+    async prepare(isBackground = false) {
         this._isBackground = isBackground;
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
 

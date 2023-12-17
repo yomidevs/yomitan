@@ -18,6 +18,7 @@
 
 import {log, promiseTimeout} from '../core.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {yomitan} from '../yomitan.js';
 import {ExtensionContentController} from './common/extension-content-controller.js';
 import {ModalController} from './settings/modal-controller.js';
@@ -99,11 +100,12 @@ function setupPermissionsToggles() {
 
         setupEnvironmentInfo();
 
-        /** @type {[HTMLInputElement, HTMLInputElement]} */
-        const permissionsCheckboxes = [
-            /** @type {HTMLInputElement} */ (document.querySelector('#permission-checkbox-allow-in-private-windows')),
-            /** @type {HTMLInputElement} */ (document.querySelector('#permission-checkbox-allow-file-url-access'))
-        ];
+        /** @type {HTMLInputElement} */
+        const permissionCheckbox1 = querySelectorNotNull(document, '#permission-checkbox-allow-in-private-windows');
+        /** @type {HTMLInputElement} */
+        const permissionCheckbox2 = querySelectorNotNull(document, '#permission-checkbox-allow-file-url-access');
+        /** @type {HTMLInputElement[]} */
+        const permissionsCheckboxes = [permissionCheckbox1, permissionCheckbox2];
 
         const permissions = await Promise.all([
             isAllowedIncognitoAccess(),

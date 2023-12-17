@@ -16,23 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
 export class MecabController {
     constructor() {
-        /** @type {?HTMLButtonElement} */
-        this._testButton = null;
-        /** @type {?HTMLElement} */
-        this._resultsContainer = null;
+        /** @type {HTMLButtonElement} */
+        this._testButton = querySelectorNotNull(document, '#test-mecab-button');
+        /** @type {HTMLElement} */
+        this._resultsContainer = querySelectorNotNull(document, '#test-mecab-results');
         /** @type {boolean} */
         this._testActive = false;
     }
 
     /** */
     prepare() {
-        this._testButton = /** @type {HTMLButtonElement} */ (document.querySelector('#test-mecab-button'));
-        this._resultsContainer = /** @type {HTMLElement} */ (document.querySelector('#test-mecab-results'));
-
         this._testButton.addEventListener('click', this._onTestButtonClick.bind(this), false);
     }
 

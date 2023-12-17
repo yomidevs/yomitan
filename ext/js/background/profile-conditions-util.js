@@ -34,11 +34,11 @@ export class ProfileConditionsUtil {
                 'popupLevel',
                 {
                     operators: new Map(/** @type {import('profile-conditions-util').OperatorMapArray} */ ([
-                        ['equal',              this._createSchemaPopupLevelEqual.bind(this)],
-                        ['notEqual',           this._createSchemaPopupLevelNotEqual.bind(this)],
-                        ['lessThan',           this._createSchemaPopupLevelLessThan.bind(this)],
-                        ['greaterThan',        this._createSchemaPopupLevelGreaterThan.bind(this)],
-                        ['lessThanOrEqual',    this._createSchemaPopupLevelLessThanOrEqual.bind(this)],
+                        ['equal', this._createSchemaPopupLevelEqual.bind(this)],
+                        ['notEqual', this._createSchemaPopupLevelNotEqual.bind(this)],
+                        ['lessThan', this._createSchemaPopupLevelLessThan.bind(this)],
+                        ['greaterThan', this._createSchemaPopupLevelGreaterThan.bind(this)],
+                        ['lessThanOrEqual', this._createSchemaPopupLevelLessThanOrEqual.bind(this)],
                         ['greaterThanOrEqual', this._createSchemaPopupLevelGreaterThanOrEqual.bind(this)]
                     ]))
                 }
