@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {querySelectorNotNull} from '../../dom/query-selector.js';
+
 export class PopupPreviewController {
     /**
      * @param {import('./settings-controller.js').SettingsController} settingsController
@@ -25,24 +27,19 @@ export class PopupPreviewController {
         this._settingsController = settingsController;
         /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
-        /** @type {?HTMLIFrameElement} */
-        this._frame = null;
-        /** @type {?HTMLTextAreaElement} */
-        this._customCss = null;
-        /** @type {?HTMLTextAreaElement} */
-        this._customOuterCss = null;
-        /** @type {?HTMLElement} */
-        this._previewFrameContainer = null;
+        /** @type {HTMLIFrameElement} */
+        this._frame = querySelectorNotNull(document, '#popup-preview-frame');
+        /** @type {HTMLTextAreaElement} */
+        this._customCss = querySelectorNotNull(document, '#custom-popup-css');
+        /** @type {HTMLTextAreaElement} */
+        this._customOuterCss = querySelectorNotNull(document, '#custom-popup-outer-css');
+        /** @type {HTMLElement} */
+        this._previewFrameContainer = querySelectorNotNull(document, '.preview-frame-container');
     }
 
     /** */
     async prepare() {
         if (new URLSearchParams(location.search).get('popup-preview') === 'false') { return; }
-
-        this._frame = /** @type {HTMLIFrameElement} */ (document.querySelector('#popup-preview-frame'));
-        this._customCss = /** @type {HTMLTextAreaElement} */ (document.querySelector('#custom-popup-css'));
-        this._customOuterCss = /** @type {HTMLTextAreaElement} */ (document.querySelector('#custom-popup-outer-css'));
-        this._previewFrameContainer = /** @type {HTMLElement} */ (document.querySelector('.preview-frame-container'));
 
         this._customCss.addEventListener('input', this._onCustomCssChange.bind(this), false);
         this._customCss.addEventListener('settingChanged', this._onCustomCssChange.bind(this), false);

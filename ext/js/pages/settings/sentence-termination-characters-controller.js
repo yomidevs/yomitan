@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class SentenceTerminationCharactersController {
     /**
@@ -27,16 +28,16 @@ export class SentenceTerminationCharactersController {
         this._settingsController = settingsController;
         /** @type {SentenceTerminationCharacterEntry[]} */
         this._entries = [];
-        /** @type {?HTMLButtonElement} */
-        this._addButton = null;
-        /** @type {?HTMLButtonElement} */
-        this._resetButton = null;
-        /** @type {?HTMLElement} */
-        this._listTable = null;
-        /** @type {?HTMLElement} */
-        this._listContainer = null;
-        /** @type {?HTMLElement} */
-        this._emptyIndicator = null;
+        /** @type {HTMLButtonElement} */
+        this._addButton = querySelectorNotNull(document, '#sentence-termination-character-list-add');
+        /** @type {HTMLButtonElement} */
+        this._resetButton = querySelectorNotNull(document, '#sentence-termination-character-list-reset');
+        /** @type {HTMLElement} */
+        this._listTable = querySelectorNotNull(document, '#sentence-termination-character-list-table');
+        /** @type {HTMLElement} */
+        this._listContainer = querySelectorNotNull(document, '#sentence-termination-character-list');
+        /** @type {HTMLElement} */
+        this._emptyIndicator = querySelectorNotNull(document, '#sentence-termination-character-list-empty');
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */
@@ -46,12 +47,6 @@ export class SentenceTerminationCharactersController {
 
     /** */
     async prepare() {
-        this._addButton = /** @type {HTMLButtonElement} */ (document.querySelector('#sentence-termination-character-list-add'));
-        this._resetButton = /** @type {HTMLButtonElement} */ (document.querySelector('#sentence-termination-character-list-reset'));
-        this._listTable = /** @type {HTMLElement} */ (document.querySelector('#sentence-termination-character-list-table'));
-        this._listContainer = /** @type {HTMLElement} */ (document.querySelector('#sentence-termination-character-list'));
-        this._emptyIndicator = /** @type {HTMLElement} */ (document.querySelector('#sentence-termination-character-list-empty'));
-
         this._addButton.addEventListener('click', this._onAddClick.bind(this));
         this._resetButton.addEventListener('click', this._onResetClick.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
@@ -209,13 +204,20 @@ class SentenceTerminationCharacterEntry {
         const {enabled, character1, character2, includeCharacterAtStart, includeCharacterAtEnd} = this._data;
         const node = this._node;
 
-        const enabledToggle = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-enabled'));
-        const typeSelect = /** @type {HTMLSelectElement} */ (node.querySelector('.sentence-termination-character-type'));
-        const character1Input = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-input1'));
-        const character2Input = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-input2'));
-        const includeAtStartCheckbox = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-include-at-start'));
-        const includeAtEndheckbox = /** @type {HTMLInputElement} */ (node.querySelector('.sentence-termination-character-include-at-end'));
-        const menuButton = /** @type {HTMLButtonElement} */ (node.querySelector('.sentence-termination-character-entry-button'));
+        /** @type {HTMLInputElement} */
+        const enabledToggle = querySelectorNotNull(node, '.sentence-termination-character-enabled');
+        /** @type {HTMLSelectElement} */
+        const typeSelect = querySelectorNotNull(node, '.sentence-termination-character-type');
+        /** @type {HTMLInputElement} */
+        const character1Input = querySelectorNotNull(node, '.sentence-termination-character-input1');
+        /** @type {HTMLInputElement} */
+        const character2Input = querySelectorNotNull(node, '.sentence-termination-character-input2');
+        /** @type {HTMLInputElement} */
+        const includeAtStartCheckbox = querySelectorNotNull(node, '.sentence-termination-character-include-at-start');
+        /** @type {HTMLInputElement} */
+        const includeAtEndheckbox = querySelectorNotNull(node, '.sentence-termination-character-include-at-end');
+        /** @type {HTMLButtonElement} */
+        const menuButton = querySelectorNotNull(node, '.sentence-termination-character-entry-button');
 
         this._character1Input = character1Input;
         this._character2Input = character2Input;

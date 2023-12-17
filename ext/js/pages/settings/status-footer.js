@@ -17,6 +17,7 @@
  */
 
 import {PanelElement} from '../../dom/panel-element.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class StatusFooter extends PanelElement {
     /**
@@ -28,12 +29,13 @@ export class StatusFooter extends PanelElement {
             closingAnimationDuration: 375 // Milliseconds; includes buffer
         });
         /** @type {HTMLElement} */
-        this._body = /** @type {HTMLElement} */ (node.querySelector('.status-footer'));
+        this._body = querySelectorNotNull(node, '.status-footer');
     }
 
     /** */
     prepare() {
-        const closeButton = /** @type {HTMLElement} */ (this._body.querySelector('.status-footer-header-close'));
+        /** @type {HTMLElement} */
+        const closeButton = querySelectorNotNull(this._body, '.status-footer-header-close');
         this.on('closeCompleted', this._onCloseCompleted.bind(this));
         closeButton.addEventListener('click', this._onCloseClick.bind(this), false);
     }

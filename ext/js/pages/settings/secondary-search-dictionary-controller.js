@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
 export class SecondarySearchDictionaryController {
@@ -32,14 +33,12 @@ export class SecondarySearchDictionaryController {
         this._dictionaryInfoMap = new Map();
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
-        /** @type {?HTMLElement} */
-        this._container = null;
+        /** @type {HTMLElement} */
+        this._container = querySelectorNotNull(document, '#secondary-search-dictionary-list');
     }
 
     /** */
     async prepare() {
-        this._container = /** @type {HTMLElement} */ (document.querySelector('#secondary-search-dictionary-list'));
-
         await this._onDatabaseUpdated();
 
         yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
@@ -83,13 +82,16 @@ export class SecondarySearchDictionaryController {
             const node = /** @type {HTMLElement} */ (this._settingsController.instantiateTemplate('secondary-search-dictionary'));
             fragment.appendChild(node);
 
-            const nameNode = /** @type {HTMLElement} */ (node.querySelector('.dictionary-title'));
+            /** @type {HTMLElement} */
+            const nameNode = querySelectorNotNull(node, '.dictionary-title');
             nameNode.textContent = name;
 
-            const versionNode = /** @type {HTMLElement} */ (node.querySelector('.dictionary-version'));
+            /** @type {HTMLElement} */
+            const versionNode = querySelectorNotNull(node, '.dictionary-version');
             versionNode.textContent = `rev.${dictionaryInfo.revision}`;
 
-            const toggle = /** @type {HTMLElement} */ (node.querySelector('.dictionary-allow-secondary-searches'));
+            /** @type {HTMLElement} */
+            const toggle = querySelectorNotNull(node, '.dictionary-allow-secondary-searches');
             toggle.dataset.setting = `dictionaries[${i}].allowSecondarySearches`;
             this._eventListeners.addEventListener(toggle, 'settingChanged', this._onEnabledChanged.bind(this, node), false);
         }

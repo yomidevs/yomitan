@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection, isObject} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
 import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
@@ -28,12 +29,12 @@ export class ExtensionKeyboardShortcutController {
     constructor(settingsController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {?HTMLButtonElement} */
-        this._resetButton = null;
-        /** @type {?HTMLButtonElement} */
-        this._clearButton = null;
-        /** @type {?HTMLElement} */
-        this._listContainer = null;
+        /** @type {HTMLButtonElement} */
+        this._resetButton = querySelectorNotNull(document, '#extension-hotkey-list-reset-all');
+        /** @type {HTMLButtonElement} */
+        this._clearButton = querySelectorNotNull(document, '#extension-hotkey-list-clear-all');
+        /** @type {HTMLElement} */
+        this._listContainer = querySelectorNotNull(document, '#extension-hotkey-list');
         /** @type {HotkeyUtil} */
         this._hotkeyUtil = new HotkeyUtil();
         /** @type {?import('environment').OperatingSystem} */
@@ -49,10 +50,6 @@ export class ExtensionKeyboardShortcutController {
 
     /** */
     async prepare() {
-        this._resetButton = /** @type {HTMLButtonElement} */ (document.querySelector('#extension-hotkey-list-reset-all'));
-        this._clearButton = /** @type {HTMLButtonElement} */ (document.querySelector('#extension-hotkey-list-clear-all'));
-        this._listContainer = /** @type {HTMLElement} */ (document.querySelector('#extension-hotkey-list'));
-
         const canResetCommands = this.canResetCommands();
         const canModifyCommands = this.canModifyCommands();
         this._resetButton.hidden = !canResetCommands;
@@ -277,11 +274,14 @@ class ExtensionKeyboardShortcutHotkeyEntry {
 
     /** */
     prepare() {
-        const label = /** @type {HTMLElement} */ (this._node.querySelector('.settings-item-label'));
+        /** @type {HTMLElement} */
+        const label = querySelectorNotNull(this._node, '.settings-item-label');
         label.textContent = this._description || this._name;
 
-        const button = /** @type {HTMLButtonElement} */ (this._node.querySelector('.extension-hotkey-list-item-button'));
-        const input = /** @type {HTMLInputElement} */ (this._node.querySelector('input'));
+        /** @type {HTMLButtonElement} */
+        const button = querySelectorNotNull(this._node, '.extension-hotkey-list-item-button');
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(this._node, 'input');
 
         this._input = input;
 

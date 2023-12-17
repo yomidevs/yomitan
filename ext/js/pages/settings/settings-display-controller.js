@@ -18,6 +18,7 @@
 
 import {DocumentUtil} from '../../dom/document-util.js';
 import {PopupMenu} from '../../dom/popup-menu.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
 
 export class SettingsDisplayController {
@@ -30,10 +31,10 @@ export class SettingsDisplayController {
         this._settingsController = settingsController;
         /** @type {import('./modal-controller.js').ModalController} */
         this._modalController = modalController;
-        /** @type {?HTMLElement} */
-        this._contentNode = null;
-        /** @type {?HTMLElement} */
-        this._menuContainer = null;
+        /** @type {HTMLElement} */
+        this._contentNode = querySelectorNotNull(document, '.content');
+        /** @type {HTMLElement} */
+        this._menuContainer = querySelectorNotNull(document, '#popup-menus');
         /** @type {(event: MouseEvent) => void} */
         this._onMoreToggleClickBind = this._onMoreToggleClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
@@ -42,9 +43,6 @@ export class SettingsDisplayController {
 
     /** */
     prepare() {
-        this._contentNode = /** @type {HTMLElement} */ (document.querySelector('.content'));
-        this._menuContainer = /** @type {HTMLElement} */ (document.querySelector('#popup-menus'));
-
         const onFabButtonClick = this._onFabButtonClick.bind(this);
         for (const fabButton of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.fab-button'))) {
             fabButton.addEventListener('click', onFabButtonClick, false);
@@ -156,7 +154,8 @@ export class SettingsDisplayController {
         const container = this._getMoreContainer(node);
         if (container === null) { return; }
 
-        const more = /** @type {?HTMLElement} */ (container.querySelector('.more'));
+        /** @type {?HTMLElement} */
+        const more = container.querySelector('.more');
         if (more === null) { return; }
 
         const moreVisible = more.hidden;

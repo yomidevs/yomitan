@@ -17,6 +17,7 @@
  */
 
 import {DocumentUtil} from '../../dom/document-util.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class NestedPopupsController {
     /**
@@ -27,20 +28,16 @@ export class NestedPopupsController {
         this._settingsController = settingsController;
         /** @type {number} */
         this._popupNestingMaxDepth = 0;
-        /** @type {?HTMLInputElement} */
-        this._nestedPopupsEnabled = null;
-        /** @type {?HTMLInputElement} */
-        this._nestedPopupsCount = null;
-        /** @type {?HTMLElement} */
-        this._nestedPopupsEnabledMoreOptions = null;
+        /** @type {HTMLInputElement} */
+        this._nestedPopupsEnabled = querySelectorNotNull(document, '#nested-popups-enabled');
+        /** @type {HTMLInputElement} */
+        this._nestedPopupsCount = querySelectorNotNull(document, '#nested-popups-count');
+        /** @type {HTMLElement} */
+        this._nestedPopupsEnabledMoreOptions = querySelectorNotNull(document, '#nested-popups-enabled-more-options');
     }
 
     /** */
     async prepare() {
-        this._nestedPopupsEnabled = /** @type {HTMLInputElement} */ (document.querySelector('#nested-popups-enabled'));
-        this._nestedPopupsCount = /** @type {HTMLInputElement} */ (document.querySelector('#nested-popups-count'));
-        this._nestedPopupsEnabledMoreOptions = /** @type {HTMLElement} */ (document.querySelector('#nested-popups-enabled-more-options'));
-
         const options = await this._settingsController.getOptions();
         const optionsContext = this._settingsController.getOptionsContext();
 
