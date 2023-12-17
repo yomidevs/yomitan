@@ -170,6 +170,7 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
 
 
 const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json');
+/** @type {import('test/anki-note-builder').TranslatorTestInputs} */
 const {optionsPresets, tests} = JSON.parse(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
 
 const testResults1FilePath = path.join(dirname, 'data/anki-note-builder-test-results.json');
@@ -182,34 +183,33 @@ const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
 describe.concurrent('AnkiNoteBuilder', () => {
-    for (let i = 0, ii = tests.length; i < ii; ++i) {
-        const t = tests[i];
-        test(`${t.name}`, async ({expect, translator}) => {
-            const expected1 = expectedResults1[i];
-            switch (t.func) {
+    const testData = tests.map((data, i) => ({data, expected1: expectedResults1[i]}));
+    describe.each(testData)('Test %#: $data.name', ({data, expected1}) => {
+        test('Test', async ({expect, translator}) => {
+            switch (data.func) {
                 case 'findTerms':
                     {
-                        const {name, mode, text} = t;
+                        const {name, mode, text} = data;
                         /** @type {import('translation').FindTermsOptions} */
-                        const options = createFindOptions(dictionaryName, optionsPresets, t.options);
-                        const {dictionaryEntries} = structuredClone(await translator.findTerms(mode, text, options));
-                        const results = mode !== 'simple' ? structuredClone(await getRenderResults(dictionaryEntries, 'terms', mode, template, expect)) : null;
+                        const options = createFindOptions(dictionaryName, optionsPresets, data.options);
+                        const {dictionaryEntries} = await translator.findTerms(mode, text, options);
+                        const results = mode !== 'simple' ? await getRenderResults(dictionaryEntries, 'terms', mode, template, expect) : null;
                         actualResults1.push({name, results});
                         expect(results).toStrictEqual(expected1.results);
                     }
                     break;
                 case 'findKanji':
                     {
-                        const {name, text} = t;
+                        const {name, text} = data;
                         /** @type {import('translation').FindKanjiOptions} */
-                        const options = createFindOptions(dictionaryName, optionsPresets, t.options);
-                        const dictionaryEntries = structuredClone(await translator.findKanji(text, options));
-                        const results = structuredClone(await getRenderResults(dictionaryEntries, 'kanji', 'split', template, expect));
+                        const options = createFindOptions(dictionaryName, optionsPresets, data.options);
+                        const dictionaryEntries = await translator.findKanji(text, options);
+                        const results = await getRenderResults(dictionaryEntries, 'kanji', 'split', template, expect);
                         actualResults1.push({name, results});
                         expect(results).toStrictEqual(expected1.results);
                     }
                     break;
             }
         });
-    }
+    });
 });
