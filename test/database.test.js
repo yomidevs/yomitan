@@ -29,7 +29,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
 
-vi.mock('../ext/js/language/dictionary-importer-media-loader.js');
+vi.mock('../ext/js/language/dictionary-importer-media-loader.js', async () => await import('../test/mocks/dictionary-importer-media-loader.js'));
 
 /**
  * @param {string} dictionary
