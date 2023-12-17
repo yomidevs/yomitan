@@ -101,8 +101,9 @@ function createAbsoluteGetComputedStyle(window) {
 }
 
 
+const testDoc = domTest(path.join(dirname, 'data/html/test-dom-text-scanner.html'));
+
 describe('DOMTextScanner', () => {
-    const testDoc = domTest(path.join(dirname, 'data/html/test-dom-text-scanner.html'));
     testDoc('Seek tests', ({window}) => {
         const {document} = window;
         window.getComputedStyle = createAbsoluteGetComputedStyle(window);

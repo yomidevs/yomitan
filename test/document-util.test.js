@@ -109,8 +109,9 @@ function findImposterElement(document) {
     return document.querySelector('div[style*="2147483646"]>*');
 }
 
+const testDoc = domTest(path.join(dirname, 'data/html/test-document1.html'));
+
 describe('DocumentUtil', () => {
-    const testDoc = domTest(path.join(dirname, 'data/html/test-document1.html'));
     testDoc('Text scanning functions', ({window}) => {
         const {document} = window;
         for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.test[data-test-type=scan]'))) {
@@ -228,7 +229,6 @@ describe('DocumentUtil', () => {
 });
 
 describe('DOMTextScanner', () => {
-    const testDoc = domTest(path.join(dirname, 'data/html/test-document1.html'));
     testDoc('Seek functions', async ({window}) => {
         const {document} = window;
         for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.test[data-test-type=text-source-range-seek]'))) {
