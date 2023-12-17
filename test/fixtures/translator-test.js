@@ -28,7 +28,7 @@ import {DictionaryImporter} from '../../ext/js/language/dictionary-importer.js';
 import {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util.js';
 import {Translator} from '../../ext/js/language/translator.js';
 import {DictionaryImporterMediaLoader} from '../mocks/dictionary-importer-media-loader.js';
-import {domTest} from './dom-test.js';
+import {createDomTest} from './dom-test.js';
 
 const extDir = join(dirname(fileURLToPath(import.meta.url)), '../../ext');
 const deinflectionReasonsPath = join(extDir, 'data/deinflect.json');
@@ -111,10 +111,10 @@ async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
  * @returns {Promise<import('vitest').TestAPI<{window: import('jsdom').DOMWindow, translator: Translator, ankiNoteDataCreator: AnkiNoteDataCreator}>>}
  */
 export async function createTranslatorTest(htmlFilePath, dictionaryDirectory, dictionaryName) {
-    const test2 = domTest(htmlFilePath);
+    const test = createDomTest(htmlFilePath);
     const {translator, ankiNoteDataCreator} = await createTranslatorContext(dictionaryDirectory, dictionaryName);
     /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, translator: Translator, ankiNoteDataCreator: AnkiNoteDataCreator}>} */
-    const result = test2.extend({
+    const result = test.extend({
         window: async ({window}, use) => { await use(window); },
         // eslint-disable-next-line no-empty-pattern
         translator: async ({}, use) => { await use(translator); },

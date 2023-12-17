@@ -23,7 +23,7 @@ import {DocumentUtil} from '../ext/js/dom/document-util.js';
 import {DOMTextScanner} from '../ext/js/dom/dom-text-scanner.js';
 import {TextSourceElement} from '../ext/js/dom/text-source-element.js';
 import {TextSourceRange} from '../ext/js/dom/text-source-range.js';
-import {domTest} from './fixtures/dom-test.js';
+import {createDomTest} from './fixtures/dom-test.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -109,10 +109,10 @@ function findImposterElement(document) {
     return document.querySelector('div[style*="2147483646"]>*');
 }
 
-const testDoc = domTest(path.join(dirname, 'data/html/test-document1.html'));
+const test = createDomTest(path.join(dirname, 'data/html/test-document1.html'));
 
 describe('DocumentUtil', () => {
-    testDoc('Text scanning functions', ({window}) => {
+    test('Text scanning functions', ({window}) => {
         const {document} = window;
         for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.test[data-test-type=scan]'))) {
             // Get test parameters
@@ -229,7 +229,7 @@ describe('DocumentUtil', () => {
 });
 
 describe('DOMTextScanner', () => {
-    testDoc('Seek functions', async ({window}) => {
+    test('Seek functions', async ({window}) => {
         const {document} = window;
         for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.test[data-test-type=text-source-range-seek]'))) {
             // Get test parameters
