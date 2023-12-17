@@ -175,7 +175,6 @@ const {optionsPresets, tests} = JSON.parse(readFileSync(testInputsFilePath, {enc
 
 const testResults1FilePath = path.join(dirname, 'data/anki-note-builder-test-results.json');
 const expectedResults1 = JSON.parse(readFileSync(testResults1FilePath, {encoding: 'utf8'}));
-const actualResults1 = [];
 
 const template = readFileSync(path.join(dirname, '../ext/data/templates/default-anki-field-templates.handlebars'), {encoding: 'utf8'});
 
@@ -189,23 +188,21 @@ describe.concurrent('AnkiNoteBuilder', () => {
             switch (data.func) {
                 case 'findTerms':
                     {
-                        const {name, mode, text} = data;
+                        const {mode, text} = data;
                         /** @type {import('translation').FindTermsOptions} */
                         const options = createFindOptions(dictionaryName, optionsPresets, data.options);
                         const {dictionaryEntries} = await translator.findTerms(mode, text, options);
                         const results = mode !== 'simple' ? await getRenderResults(dictionaryEntries, 'terms', mode, template, expect) : null;
-                        actualResults1.push({name, results});
                         expect(results).toStrictEqual(expected1.results);
                     }
                     break;
                 case 'findKanji':
                     {
-                        const {name, text} = data;
+                        const {text} = data;
                         /** @type {import('translation').FindKanjiOptions} */
                         const options = createFindOptions(dictionaryName, optionsPresets, data.options);
                         const dictionaryEntries = await translator.findKanji(text, options);
                         const results = await getRenderResults(dictionaryEntries, 'kanji', 'split', template, expect);
-                        actualResults1.push({name, results});
                         expect(results).toStrictEqual(expected1.results);
                     }
                     break;

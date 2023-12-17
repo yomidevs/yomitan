@@ -32,11 +32,9 @@ const {optionsPresets, tests} = JSON.parse(readFileSync(testInputsFilePath, {enc
 
 const testResults1FilePath = path.join(dirname, 'data/translator-test-results.json');
 const expectedResults1 = JSON.parse(readFileSync(testResults1FilePath, {encoding: 'utf8'}));
-const actualResults1 = [];
 
 const testResults2FilePath = path.join(dirname, 'data/translator-test-results-note-data1.json');
 const expectedResults2 = JSON.parse(readFileSync(testResults2FilePath, {encoding: 'utf8'}));
-const actualResults2 = [];
 
 const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
@@ -48,13 +46,11 @@ describe('Translator', () => {
             switch (data.func) {
                 case 'findTerms':
                     {
-                        const {name, mode, text} = data;
+                        const {mode, text} = data;
                         /** @type {import('translation').FindTermsOptions} */
                         const options = createFindOptions(dictionaryName, optionsPresets, data.options);
                         const {dictionaryEntries, originalTextLength} = await translator.findTerms(mode, text, options);
                         const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, mode)) : null;
-                        actualResults1.push({name, originalTextLength, dictionaryEntries});
-                        actualResults2.push({name, noteDataList});
                         expect(originalTextLength).toStrictEqual(expected1.originalTextLength);
                         expect(dictionaryEntries).toStrictEqual(expected1.dictionaryEntries);
                         expect(noteDataList).toEqual(expected2.noteDataList);
@@ -62,13 +58,11 @@ describe('Translator', () => {
                     break;
                 case 'findKanji':
                     {
-                        const {name, text} = data;
+                        const {text} = data;
                         /** @type {import('translation').FindKanjiOptions} */
                         const options = createFindOptions(dictionaryName, optionsPresets, data.options);
                         const dictionaryEntries = await translator.findKanji(text, options);
                         const noteDataList = dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, 'split'));
-                        actualResults1.push({name, dictionaryEntries});
-                        actualResults2.push({name, noteDataList});
                         expect(dictionaryEntries).toStrictEqual(expected1.dictionaryEntries);
                         expect(noteDataList).toEqual(expected2.noteDataList);
                     }
