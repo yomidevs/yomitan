@@ -134,7 +134,7 @@ export class DocumentUtil {
             if (quoteStack.length === 0) {
                 let terminatorInfo = terminatorMap.get(c);
                 if (typeof terminatorInfo !== 'undefined') {
-                    // Include the previous character if it is a terminator character and is included at start.
+                    // Include the previous character while it is a terminator character and is included at start.
                     while (typeof terminatorInfo !== 'undefined' && terminatorInfo[0] && cursor.start > 0) {
                         --cursor.start;
                         if (cursor.start === 0) { break; }
@@ -148,7 +148,7 @@ export class DocumentUtil {
             let quoteInfo = forwardQuoteMap.get(c);
             if (typeof quoteInfo !== 'undefined') {
                 if (quoteStack.length === 0) {
-                    // Include the previous character if it is a quote character and is included at start.
+                    // Include the previous character while it is a quote character and is included at start.
                     while (typeof quoteInfo !== 'undefined' && quoteInfo[1] && cursor.start > 0) {
                         --cursor.start;
                         if (cursor.start === 0) { break; }
@@ -178,7 +178,7 @@ export class DocumentUtil {
             if (quoteStack.length === 0) {
                 let terminatorInfo = terminatorMap.get(c);
                 if (typeof terminatorInfo !== 'undefined') {
-                    // Include the following character if it is a terminator character and is included at end.
+                    // Include the following character while it is a terminator character and is included at end.
                     while (typeof terminatorInfo !== 'undefined' && terminatorInfo[1] && cursor.end < textLength) {
                         ++cursor.end;
                         if (cursor.end === textLength) { break; }
@@ -192,7 +192,7 @@ export class DocumentUtil {
             let quoteInfo = backwardQuoteMap.get(c);
             if (typeof quoteInfo !== 'undefined') {
                 if (quoteStack.length === 0) {
-                    // Include the following character if it is a quote character and is included at end.
+                    // Include the following character while it is a quote character and is included at end.
                     while (typeof quoteInfo !== 'undefined' && quoteInfo[1] && cursor.end < textLength) {
                         ++cursor.end;
                         if (cursor.end === textLength) { break; }
