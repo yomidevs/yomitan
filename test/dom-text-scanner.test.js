@@ -20,7 +20,7 @@ import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {describe, expect} from 'vitest';
 import {DOMTextScanner} from '../ext/js/dom/dom-text-scanner.js';
-import {domTest} from './document-test.js';
+import {domTest} from './fixtures/dom-test.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
