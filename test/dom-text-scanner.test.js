@@ -16,23 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import fs from 'fs';
-import {JSDOM} from 'jsdom';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import {expect, test} from 'vitest';
+import {describe, expect} from 'vitest';
 import {DOMTextScanner} from '../ext/js/dom/dom-text-scanner.js';
+import {domTest} from './document-test.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
-
-/**
- * @param {string} fileName
- * @returns {JSDOM}
- */
-function createJSDOM(fileName) {
-    const domSource = fs.readFileSync(fileName, {encoding: 'utf8'});
-    return new JSDOM(domSource);
-}
 
 /**
  * @param {Element} element
@@ -111,13 +101,12 @@ function createAbsoluteGetComputedStyle(window) {
 }
 
 
-/**
- * @param {JSDOM} dom
- */
-async function testDomTextScanner(dom) {
-    const document = dom.window.document;
+describe('DOMTextScanner', () => {
+    const testDoc = domTest(path.join(dirname, 'data/html/test-dom-text-scanner.html'));
+    testDoc('Seek tests', ({window}) => {
+        const {document} = window;
+        window.getComputedStyle = createAbsoluteGetComputedStyle(window);
 
-    test('DomTextScanner', () => {
         for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('y-test'))) {
             let testData = JSON.parse(/** @type {string} */ (testElement.dataset.testData));
             if (!Array.isArray(testData)) {
@@ -185,26 +174,4 @@ async function testDomTextScanner(dom) {
             }
         }
     });
-}
-
-
-/** */
-async function testDocument1() {
-    const dom = createJSDOM(path.join(dirname, 'data', 'html', 'test-dom-text-scanner.html'));
-    const window = dom.window;
-    try {
-        window.getComputedStyle = createAbsoluteGetComputedStyle(window);
-
-        await testDomTextScanner(dom);
-    } finally {
-        window.close();
-    }
-}
-
-
-/** */
-async function main() {
-    await testDocument1();
-}
-
-await main();
+});
