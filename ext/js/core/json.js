@@ -27,3 +27,14 @@
 export function parseJson(value) {
     return JSON.parse(value);
 }
+
+/**
+ * This function is used to ensure more safe usage of `Response.json`,
+ * which returns the `any` type.
+ * @template [T=unknown]
+ * @param {Response} response
+ * @returns {Promise<T>}
+ */
+export async function readResponseJson(response) {
+    return await response.json();
+}
