@@ -53,7 +53,7 @@ async function fetch(url2) {
     };
 }
 vi.stubGlobal('fetch', fetch);
-vi.mock('../ext/js/templates/template-renderer-proxy.js');
+vi.mock('../ext/js/templates/template-renderer-proxy.js', async () => await import('../test/mocks/template-renderer-proxy.js'));
 
 /**
  * @returns {Promise<TranslatorVM>}
