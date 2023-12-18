@@ -18,22 +18,22 @@
 
 import {deferPromise} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
 import {yomitan} from '../yomitan.js';
 import {AnkiUtil} from './anki-util.js';
 
 export class AnkiNoteBuilder {
     /**
      * Initiate an instance of AnkiNoteBuilder.
-     * @param {{japaneseUtil: import('../language/sandbox/japanese-util.js').JapaneseUtil}} details
+     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
+     * @param {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} templateRenderer
      */
-    constructor({japaneseUtil}) {
+    constructor(japaneseUtil, templateRenderer) {
         /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {RegExp} */
         this._markerPattern = AnkiUtil.cloneFieldMarkerPattern(true);
-        /** @type {TemplateRendererProxy} */
-        this._templateRenderer = new TemplateRendererProxy();
+        /** @type {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} */
+        this._templateRenderer = templateRenderer;
         /** @type {import('anki-note-builder').BatchedRequestGroup[]} */
         this._batchedRequests = [];
         /** @type {boolean} */

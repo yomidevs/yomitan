@@ -21,6 +21,7 @@ import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
 import {AnkiUtil} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
 import {yomitan} from '../yomitan.js';
 
 export class DisplayAnki {
@@ -39,7 +40,7 @@ export class DisplayAnki {
         /** @type {?string} */
         this._ankiFieldTemplatesDefault = null;
         /** @type {AnkiNoteBuilder} */
-        this._ankiNoteBuilder = new AnkiNoteBuilder({japaneseUtil});
+        this._ankiNoteBuilder = new AnkiNoteBuilder(japaneseUtil, new TemplateRendererProxy());
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._errorNotification = null;
         /** @type {?EventListenerCollection} */
