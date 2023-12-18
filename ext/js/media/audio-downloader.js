@@ -18,6 +18,7 @@
 
 import {RequestBuilder} from '../background/request-builder.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {readResponseJson} from '../core/json.js';
 import {JsonSchema} from '../data/json-schema.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';
@@ -272,7 +273,8 @@ export class AudioDownloader {
             throw new Error(`Invalid response: ${response.status}`);
         }
 
-        const responseJson = await response.json();
+        /** @type {import('audio-downloader').CustomAudioList} */
+        const responseJson = await readResponseJson(response);
 
         if (this._customAudioListSchema === null) {
             const schema = await this._getCustomAudioListSchema();
@@ -425,6 +427,6 @@ export class AudioDownloader {
             redirect: 'follow',
             referrerPolicy: 'no-referrer'
         });
-        return await response.json();
+        return await readResponseJson(response);
     }
 }

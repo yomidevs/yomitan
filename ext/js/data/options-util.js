@@ -17,7 +17,7 @@
  */
 
 import {escapeRegExp, isObject} from '../core.js';
-import {parseJson} from '../core/json.js';
+import {parseJson, readResponseJson} from '../core/json.js';
 import {TemplatePatcher} from '../templates/template-patcher.js';
 import {JsonSchema} from './json-schema.js';
 
@@ -31,7 +31,8 @@ export class OptionsUtil {
 
     /** */
     async prepare() {
-        const schema = /** @type {import('json-schema').Schema} */ (await this._fetchJson('/data/schemas/options-schema.json'));
+        /** @type {import('json-schema').Schema} */
+        const schema = await this._fetchJson('/data/schemas/options-schema.json');
         this._optionsSchema = new JsonSchema(schema);
     }
 
@@ -478,12 +479,13 @@ export class OptionsUtil {
     }
 
     /**
+     * @template [T=unknown]
      * @param {string} url
-     * @returns {Promise<unknown>}
+     * @returns {Promise<T>}
      */
     async _fetchJson(url) {
         const response = await this._fetchGeneric(url);
-        return await response.json();
+        return await readResponseJson(response);
     }
 
     /**

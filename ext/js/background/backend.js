@@ -24,7 +24,7 @@ import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
 import {clone, deferPromise, generateId, invokeMessageHandler, isObject, log, promiseTimeout} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {parseJson} from '../core/json.js';
+import {parseJson, readResponseJson} from '../core/json.js';
 import {AnkiUtil} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {PermissionsUtil} from '../data/permissions-util.js';
@@ -292,7 +292,8 @@ export class Backend {
                 log.error(e);
             }
 
-            const deinflectionReasons = /** @type {import('deinflector').ReasonsRaw} */ (await this._fetchJson('/data/deinflect.json'));
+            /** @type {import('deinflector').ReasonsRaw} */
+            const deinflectionReasons = await this._fetchJson('/data/deinflect.json');
             this._translator.prepare(deinflectionReasons);
 
             await this._optionsUtil.prepare();
@@ -2067,12 +2068,13 @@ export class Backend {
     }
 
     /**
+     * @template [T=unknown]
      * @param {string} url
-     * @returns {Promise<unknown>}
+     * @returns {Promise<T>}
      */
     async _fetchJson(url) {
         const response = await this._fetchAsset(url);
-        return await response.json();
+        return await readResponseJson(response);
     }
 
     /**

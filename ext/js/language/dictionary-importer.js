@@ -590,25 +590,6 @@ export class DictionaryImporter {
     }
 
     /**
-     * @param {string} url
-     * @returns {Promise<unknown>}
-     */
-    async _fetchJsonAsset(url) {
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.status}`);
-        }
-        return await response.json();
-    }
-
-    /**
      * @param {import('dictionary-data').TermV1} entry
      * @param {string} dictionary
      * @returns {import('dictionary-database').DatabaseTermEntry}
