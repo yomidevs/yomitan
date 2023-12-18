@@ -70,17 +70,17 @@ export type AssignTaskValue = {value: ValueType};
 
 export type ValueType = boolean | string | number | null;
 
-export type UpdateTask<T> = [
+export type UpdateTask<T = unknown> = [
     key: ElementObserver<T> | null,
     task: TaskAccumulator.Task<UpdateTaskValue>,
 ];
 
-export type AssignTask<T> = [
+export type AssignTask<T = unknown> = [
     key: ElementObserver<T> | null,
     task: TaskAccumulator.Task<AssignTaskValue>,
 ];
 
-export type ApplyTarget<T> = [
+export type ApplyTarget<T = unknown> = [
     observer: ElementObserver<T>,
     task: TaskAccumulator.Task<UpdateTaskValue> | TaskAccumulator.Task<AssignTaskValue> | null,
 ];
