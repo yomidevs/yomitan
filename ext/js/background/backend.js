@@ -2635,7 +2635,10 @@ export class Backend {
      */
     _getTranslatorFindKanjiOptions(options) {
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
-        return {enabledDictionaryMap};
+        return {
+            enabledDictionaryMap,
+            removeNonJapaneseCharacters: !options.scanning.alphanumeric
+        };
     }
 
     /**
