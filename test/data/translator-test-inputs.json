@@ -9,7 +9,8 @@
                         "priority": 0
                     }
                 ]
-            ]
+            ],
+            "removeNonJapaneseCharacters": false
         },
         "default": {
             "matchType": "exact",
