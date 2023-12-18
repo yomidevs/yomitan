@@ -17,28 +17,28 @@
 
 import type * as TaskAccumulator from './task-accumulator';
 
-export type CreateElementMetadataCallback<T> = (element: Element) => T | undefined;
+export type CreateElementMetadataCallback<T = unknown> = (element: Element) => T | undefined;
 
-export type CompareElementMetadataCallback<T> = (metadata1: T, metadata2: T) => boolean;
+export type CompareElementMetadataCallback<T = unknown> = (metadata1: T, metadata2: T) => boolean;
 
-export type GetValuesCallback<T> = (args: GetValuesDetails<T>[]) => Promise<TaskResult[]>;
+export type GetValuesCallback<T = unknown> = (args: GetValuesDetails<T>[]) => Promise<TaskResult[]>;
 
-export type SetValuesCallback<T> = (args: SetValuesDetails<T>[]) => Promise<TaskResult[]>;
+export type SetValuesCallback<T = unknown> = (args: SetValuesDetails<T>[]) => Promise<TaskResult[]>;
 
-export type GetValuesDetails<T> = {
+export type GetValuesDetails<T = unknown> = {
     element: Element;
     metadata: T;
 };
 
-export type SetValuesDetails<T> = {
+export type SetValuesDetails<T = unknown> = {
     element: Element;
     metadata: T;
     value: ValueType;
 };
 
-export type OnErrorCallback<T> = (error: Error, stale: boolean, element: Element, metadata: T) => void;
+export type OnErrorCallback<T = unknown> = (error: Error, stale: boolean, element: Element, metadata: T) => void;
 
-export type ConstructorDetails<T> = {
+export type ConstructorDetails<T = unknown> = {
     selector: string;
     createElementMetadata: CreateElementMetadataCallback<T>;
     compareElementMetadata: CompareElementMetadataCallback<T>;
@@ -47,7 +47,7 @@ export type ConstructorDetails<T> = {
     onError?: OnErrorCallback<T> | null;
 };
 
-export type ElementObserver<T> = {
+export type ElementObserver<T = unknown> = {
     element: Element;
     type: NormalizedElementType;
     value: unknown;

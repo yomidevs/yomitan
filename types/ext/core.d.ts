@@ -41,7 +41,7 @@ export type TokenString = string;
 
 export type TokenObject = Record<string, never>;
 
-export type DeferredPromiseDetails<T> = {
+export type DeferredPromiseDetails<T = unknown> = {
     promise: Promise<T>;
     resolve: (value: T) => void;
     reject: (reason?: RejectionReason) => void;
