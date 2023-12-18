@@ -17,6 +17,7 @@
  */
 
 import {ExtensionError} from '../../core/extension-error.js';
+import {parseJson} from '../../core/json.js';
 
 export class TemplateRendererFrameApi {
     /**
@@ -108,7 +109,7 @@ export class TemplateRendererFrameApi {
      * @returns {T}
      */
     _clone(value) {
-        return JSON.parse(JSON.stringify(value));
+        return parseJson(JSON.stringify(value));
     }
 
     /**

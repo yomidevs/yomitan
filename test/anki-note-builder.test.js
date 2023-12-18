@@ -22,6 +22,7 @@ import {readFileSync} from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {describe, vi} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {AnkiNoteBuilder} from '../ext/js/data/anki-note-builder.js';
 import {JapaneseUtil} from '../ext/js/language/sandbox/japanese-util.js';
 import {createTranslatorTest} from './fixtures/translator-test.js';
@@ -171,10 +172,11 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
 
 const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json');
 /** @type {import('test/anki-note-builder').TranslatorTestInputs} */
-const {optionsPresets, tests} = JSON.parse(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
+const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
 
 const testResults1FilePath = path.join(dirname, 'data/anki-note-builder-test-results.json');
-const expectedResults1 = JSON.parse(readFileSync(testResults1FilePath, {encoding: 'utf8'}));
+/** @type {any} */ // TODO
+const expectedResults1 = parseJson(readFileSync(testResults1FilePath, {encoding: 'utf8'}));
 
 const template = readFileSync(path.join(dirname, '../ext/data/templates/default-anki-field-templates.handlebars'), {encoding: 'utf8'});
 

@@ -19,6 +19,7 @@
 import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {describe, expect} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {DOMTextScanner} from '../ext/js/dom/dom-text-scanner.js';
 import {createDomTest} from './fixtures/dom-test.js';
 
@@ -109,28 +110,33 @@ describe('DOMTextScanner', () => {
         window.getComputedStyle = createAbsoluteGetComputedStyle(window);
 
         for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('y-test'))) {
-            let testData = JSON.parse(/** @type {string} */ (testElement.dataset.testData));
+            /** @type {import('test/dom-text-scanner').TestData|import('test/dom-text-scanner').TestData[]} */
+            let testData = parseJson(/** @type {string} */ (testElement.dataset.testData));
             if (!Array.isArray(testData)) {
                 testData = [testData];
             }
             for (const testDataItem of testData) {
-                let {
-                    node,
+                const {
+                    node: nodeSelector,
                     offset,
                     length,
                     forcePreserveWhitespace,
                     generateLayoutContent,
                     reversible,
                     expected: {
-                        node: expectedNode,
+                        node: expectedNodeSelector,
                         offset: expectedOffset,
                         content: expectedContent,
                         remainder: expectedRemainder
                     }
                 } = testDataItem;
 
-                node = querySelectorTextNode(testElement, node);
-                expectedNode = querySelectorTextNode(testElement, expectedNode);
+                const node = querySelectorTextNode(testElement, nodeSelector);
+                const expectedNode = querySelectorTextNode(testElement, expectedNodeSelector);
+
+                expect(node).not.toEqual(null);
+                expect(expectedNode).not.toEqual(null);
+                if (node === null || expectedNode === null) { continue; }
 
                 // Standard test
                 {

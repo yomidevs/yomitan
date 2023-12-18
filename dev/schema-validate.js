@@ -20,6 +20,7 @@ import Ajv from 'ajv';
 import {readFileSync} from 'fs';
 import {JsonSchema} from '../ext/js/data/json-schema.js';
 import {DataError} from './data-error.js';
+import {parseJson} from './json.js';
 
 class JsonSchemaAjv {
     /**
@@ -32,7 +33,8 @@ class JsonSchemaAjv {
             allowUnionTypes: true
         });
         const metaSchemaPath = require.resolve('ajv/dist/refs/json-schema-draft-07.json');
-        const metaSchema = JSON.parse(readFileSync(metaSchemaPath, {encoding: 'utf8'}));
+        /** @type {import('ajv').AnySchemaObject} */
+        const metaSchema = parseJson(readFileSync(metaSchemaPath, {encoding: 'utf8'}));
         ajv.addMetaSchema(metaSchema);
         /** @type {import('ajv').ValidateFunction} */
         this._validate = ajv.compile(/** @type {import('ajv').Schema} */ (schema));
@@ -46,7 +48,7 @@ class JsonSchemaAjv {
         if (this._validate(data)) { return; }
         const {errors} = this._validate;
         const error = new DataError('Schema validation failed');
-        error.data = JSON.parse(JSON.stringify(errors));
+        error.data = parseJson(JSON.stringify(errors));
         throw error;
     }
 }

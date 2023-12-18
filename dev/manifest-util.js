@@ -20,6 +20,7 @@ import childProcess from 'child_process';
 import fs from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
+import {parseJson} from './json.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -29,14 +30,14 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
  * @returns {T}
  */
 function clone(value) {
-    return JSON.parse(JSON.stringify(value));
+    return parseJson(JSON.stringify(value));
 }
 
 
 export class ManifestUtil {
     constructor() {
         const fileName = path.join(dirname, 'data', 'manifest-variants.json');
-        const {manifest, variants, defaultVariant} = /** @type {import('dev/manifest').ManifestConfig} */ (JSON.parse(fs.readFileSync(fileName, {encoding: 'utf8'})));
+        const {manifest, variants, defaultVariant} = /** @type {import('dev/manifest').ManifestConfig} */ (parseJson(fs.readFileSync(fileName, {encoding: 'utf8'})));
         /** @type {import('dev/manifest').Manifest} */
         this._manifest = manifest;
         /** @type {import('dev/manifest').ManifestVariant[]} */

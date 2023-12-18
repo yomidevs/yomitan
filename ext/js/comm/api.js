@@ -18,6 +18,7 @@
 
 import {deferPromise} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {parseJson} from '../core/json.js';
 
 export class API {
     /**
@@ -433,6 +434,7 @@ export class API {
         return new Promise((resolve, reject) => {
             /** @type {?import('core').Timeout} */
             let timer = null;
+            /** @type {import('core').DeferredPromiseDetails<import('api').CreateActionPortResult>} */
             const portDetails = deferPromise();
 
             /**
@@ -441,8 +443,9 @@ export class API {
             const onConnect = async (port) => {
                 try {
                     const {name: expectedName, id: expectedId} = await portDetails.promise;
-                    const {name, id} = JSON.parse(port.name);
-                    if (name !== expectedName || id !== expectedId || timer === null) { return; }
+                    /** @type {import('cross-frame-api').PortDetails} */
+                    const portDetails2 = parseJson(port.name);
+                    if (portDetails2.name !== expectedName || portDetails2.id !== expectedId || timer === null) { return; }
                 } catch (e) {
                     return;
                 }
@@ -470,7 +473,9 @@ export class API {
             timer = setTimeout(() => onError(new Error('Timeout')), timeout);
 
             chrome.runtime.onConnect.addListener(onConnect);
-            this._invoke('createActionPort').then(portDetails.resolve, onError);
+            /** @type {Promise<import('api').CreateActionPortResult>} */
+            const createActionPortResult = this._invoke('createActionPort');
+            createActionPortResult.then(portDetails.resolve, onError);
         });
     }
 

@@ -47,7 +47,7 @@ export function stringReverse(string) {
 }
 
 /**
- * Creates a deep clone of an object or value. This is similar to `JSON.parse(JSON.stringify(value))`.
+ * Creates a deep clone of an object or value. This is similar to `parseJson(JSON.stringify(value))`.
  * @template T
  * @param {T} value The value to clone.
  * @returns {T} A new clone of the value.

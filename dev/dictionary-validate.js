@@ -21,6 +21,7 @@ import JSZip from 'jszip';
 import path from 'path';
 import {performance} from 'perf_hooks';
 import {fileURLToPath} from 'url';
+import {parseJson} from './json.js';
 import {createJsonSchema} from './schema-validate.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -32,7 +33,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 function readSchema(relativeFileName) {
     const fileName = path.join(dirname, relativeFileName);
     const source = fs.readFileSync(fileName, {encoding: 'utf8'});
-    return JSON.parse(source);
+    return parseJson(source);
 }
 
 /**
@@ -57,7 +58,7 @@ async function validateDictionaryBanks(mode, zip, fileNameFormat, schema) {
         const file = zip.files[fileName];
         if (!file) { break; }
 
-        const data = JSON.parse(await file.async('string'));
+        const data = parseJson(await file.async('string'));
         try {
             jsonSchema.validate(data);
         } catch (e) {
@@ -83,7 +84,8 @@ export async function validateDictionary(mode, archive, schemas) {
         throw new Error('No dictionary index found in archive');
     }
 
-    const index = JSON.parse(await indexFile.async('string'));
+    /** @type {import('dictionary-data').Index} */
+    const index = parseJson(await indexFile.async('string'));
     const version = index.format || index.version;
 
     try {

@@ -17,6 +17,7 @@
  */
 
 import {isObject} from '../core.js';
+import {parseJson} from '../core/json.js';
 import {yomitan} from '../yomitan.js';
 import {HotkeyUtil} from './hotkey-util.js';
 
@@ -149,7 +150,7 @@ export class HotkeyHelpController {
     _getNodeInfo(node) {
         const {hotkey} = node.dataset;
         if (typeof hotkey !== 'string') { return null; }
-        const data = /** @type {unknown} */ (JSON.parse(hotkey));
+        const data = /** @type {unknown} */ (parseJson(hotkey));
         if (!Array.isArray(data)) { return null; }
         const [action, attributes, values] = data;
         if (typeof action !== 'string') { return null; }

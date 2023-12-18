@@ -17,6 +17,7 @@
  */
 
 import {escapeRegExp, isObject} from '../core.js';
+import {parseJson} from '../core/json.js';
 import {TemplatePatcher} from '../templates/template-patcher.js';
 import {JsonSchema} from './json-schema.js';
 
@@ -115,7 +116,7 @@ export class OptionsUtil {
                     }
                 });
             });
-            options = JSON.parse(optionsStr);
+            options = parseJson(optionsStr);
         } catch (e) {
             // NOP
         }

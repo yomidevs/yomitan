@@ -467,6 +467,6 @@ export type RequestBackendReadySignalResult = boolean;
 export type CreateActionPortDetails = Record<string, never>;
 
 export type CreateActionPortResult = {
-    name: string;
+    name: 'action-port';
     id: string;
 };
