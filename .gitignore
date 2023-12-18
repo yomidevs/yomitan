@@ -14,6 +14,5 @@ dictionaries/
 ext/manifest.json
 
 ext/lib/*
-!ext/lib/__mocks__/
 
 ext/legal-npm.html
