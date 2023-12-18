@@ -56,7 +56,7 @@ export class FrameClient {
     }
 
     /**
-     * @template T
+     * @template [T=unknown]
      * @param {T} data
      * @returns {import('frame-client').Message<T>}
      * @throws {Error}

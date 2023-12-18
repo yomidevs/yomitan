@@ -153,7 +153,7 @@ export class Database {
     }
 
     /**
-     * @template TPredicateArg
+     * @template [TPredicateArg=unknown]
      * @template [TResult=unknown]
      * @template [TResultDefault=unknown]
      * @param {TObjectStoreName} objectStoreName
@@ -174,8 +174,8 @@ export class Database {
     }
 
     /**
-     * @template TData
-     * @template TPredicateArg
+     * @template [TData=unknown]
+     * @template [TPredicateArg=unknown]
      * @template [TResult=unknown]
      * @template [TResultDefault=unknown]
      * @param {IDBObjectStore|IDBIndex} objectStoreOrIndex

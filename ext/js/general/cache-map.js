@@ -18,7 +18,8 @@
 
 
 /**
- * @template K,V
+ * @template [K=unknown]
+ * @template [V=unknown]
  * Class which caches a map of values, keeping the most recently accessed values.
  */
 export class CacheMap {

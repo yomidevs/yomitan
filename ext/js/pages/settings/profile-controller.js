@@ -595,7 +595,7 @@ export class ProfileController {
     }
 
     /**
-     * @template T
+     * @template [T=unknown]
      * @param {T} currentValue
      * @param {T} value1
      * @param {T} value2

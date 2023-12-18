@@ -249,7 +249,7 @@ export class JsonSchema {
     }
 
     /**
-     * @template T
+     * @template [T=unknown]
      * @param {T} value
      * @returns {T}
      */
