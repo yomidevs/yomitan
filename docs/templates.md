@@ -523,16 +523,16 @@ Returns an array of the mora for a kana string.
   <summary>Example:</summary>
 
   ```handlebars
-  {{#each (getKanaMorae "よみちゃん")}}{{{.}}}<br>{{/each}}
+  {{#each (getKanaMorae "よみたん")}}{{{.}}}<br>{{/each}}
   ```
 
   Output:
   ```html
-  よ<br>み<br>ちゃ<br>ん<br>
+  よ<br>み<br>た<br>ん<br>
   ```
 
   Preview:
-  <pre>よ<br>み<br>ちゃ<br>ん<br></pre>
+  <pre>よ<br>み<br>た<br>ん<br></pre>
 </details>
 
 
@@ -553,9 +553,9 @@ Returns the type of a value. `#typeof` in the block form will always return `'st
   <summary>Example:</summary>
 
   ```handlebars
-  {{typeof "よみちゃん"}}
+  {{typeof "よみたん"}}
   {{typeof 1}}
-  {{#typeof}}よみちゃん{{/typeof}}
+  {{#typeof}}よみたん{{/typeof}}
   ```
 
   Output:
@@ -799,16 +799,16 @@ Converts katakana text to hiragana.
   <summary>Example:</summary>
 
   ```handlebars
-  {{hiragana "よみちゃん ヨミちゃん ヨミチャン"}}
-  {{#hiragana}}よみちゃん ヨミちゃん ヨミチャン{{/hiragana}}
+  {{hiragana "よみたん ヨミたん ヨミタン"}}
+  {{#hiragana}}よみたん ヨミたん ヨミタン{{/hiragana}}
   {{#hiragana}}ローマ字{{/hiragana}}
   {{#hiragana keepProlongedSoundMarks=true}}ローマ字{{/hiragana}}
   ```
 
   Output:
   ```html
-  よみちゃん よみちゃん よみちゃん
-  よみちゃん よみちゃん よみちゃん
+  よみたん よみたん よみたん
+  よみたん よみたん よみたん
   ろうま字
   ろーま字
   ```
@@ -832,13 +832,13 @@ Converts hiragana text to katakana.
   <summary>Example:</summary>
 
   ```handlebars
-  {{katakana "よみちゃん ヨミちゃん ヨミチャン"}}
-  {{#katakana}}よみちゃん ヨミちゃん ヨミチャン{{/katakana}}
+  {{katakana "よみたん ヨミたん ヨミタン"}}
+  {{#katakana}}よみたん ヨミたん ヨミタン{{/katakana}}
   ```
 
   Output:
   ```html
-  ヨミチャン ヨミチャン ヨミチャン
-  ヨミチャン ヨミチャン ヨミチャン
+  ヨミタン ヨミタン ヨミタン
+  ヨミタン ヨミタン ヨミタン
   ```
 </details>
