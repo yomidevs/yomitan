@@ -44,6 +44,8 @@ export type IndexTag = {
     score: number;
 };
 
+export type TermV1Array = TermV1[];
+
 export type TermV1 = [
     expression: string,
     reading: string,
@@ -52,6 +54,8 @@ export type TermV1 = [
     score: number,
     ...glossary: string[],
 ];
+
+export type TermV3Array = TermV3[];
 
 export type TermV3 = [
     expression: string,
@@ -64,6 +68,8 @@ export type TermV3 = [
     termTags: string,
 ];
 
+export type KanjiV1Array = KanjiV1[];
+
 export type KanjiV1 = [
     character: string,
     onyomi: string,
@@ -71,6 +77,8 @@ export type KanjiV1 = [
     tags: string,
     ...meanings: string[],
 ];
+
+export type KanjiV3Array = KanjiV3[];
 
 export type KanjiV3 = [
     character: string,
@@ -93,7 +101,13 @@ export type TermGlossaryText = {type: 'text', text: string};
 export type TermGlossaryImage = {type: 'image'} & TermImage;
 export type TermGlossaryStructuredContent = {type: 'structured-content', content: StructuredContent.Content};
 
-export type TermImage = StructuredContent.ImageElementBase;
+export type TermImage = StructuredContent.ImageElementBase & {
+    // Compatibility properties
+    verticalAlign?: undefined;
+    sizeUnits?: undefined;
+};
+
+export type TagArray = Tag[];
 
 export type Tag = [
     name: string,
@@ -108,6 +122,8 @@ export type GenericFrequencyData = string | number | {
     displayValue?: string;
     reading?: undefined; // Used for type disambiguation, field does not actually exist
 };
+
+export type TermMetaArray = TermMeta[];
 
 export type TermMeta = TermMetaFrequency | TermMetaPitch;
 
@@ -137,6 +153,8 @@ export type TermMetaPitch = [
     mode: 'pitch',
     data: TermMetaPitchData,
 ];
+
+export type KanjiMetaArray = KanjiMeta[];
 
 export type KanjiMeta = KanjiMetaFrequency;
 
