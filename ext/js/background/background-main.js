@@ -19,9 +19,12 @@
 import {yomitan} from '../yomitan.js';
 import {Backend} from './backend.js';
 
-(() => {
+/** Entry point. */
+async function main() {
     yomitan.prepare(true);
 
     const backend = new Backend();
-    backend.prepare();
-})();
+    await backend.prepare();
+}
+
+await main();

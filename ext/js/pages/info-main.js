@@ -56,7 +56,8 @@ function getOperatingSystemDisplayName(os) {
     }
 }
 
-(async () => {
+/** Entry point. */
+async function main() {
     try {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
@@ -157,4 +158,6 @@ function getOperatingSystemDisplayName(os) {
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+await main();

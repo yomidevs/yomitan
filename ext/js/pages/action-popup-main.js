@@ -21,7 +21,7 @@ import {querySelectorNotNull} from '../dom/query-selector.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {yomitan} from '../yomitan.js';
 
-export class DisplayController {
+class DisplayController {
     constructor() {
         /** @type {?import('settings').Options} */
         this._optionsFull = null;
@@ -302,7 +302,8 @@ export class DisplayController {
     }
 }
 
-(async () => {
+/** Entry point. */
+async function main() {
     await yomitan.prepare();
 
     yomitan.api.logIndicatorClear();
@@ -311,4 +312,6 @@ export class DisplayController {
     displayController.prepare();
 
     yomitan.ready();
-})();
+}
+
+await main();
