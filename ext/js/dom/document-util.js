@@ -122,6 +122,7 @@ export class DocumentUtil {
         // Move backward
         let quoteStack = [];
         for (; cursorStart > 0; --cursorStart) {
+            // Check if the previous character should be included.
             let c = text[cursorStart - 1];
             if (c === '\n' && terminateAtNewlines) { break; }
 
@@ -129,11 +130,12 @@ export class DocumentUtil {
                 let terminatorInfo = terminatorMap.get(c);
                 if (typeof terminatorInfo !== 'undefined') {
                     // Include the previous character while it is a terminator character and is included at start.
-                    while (typeof terminatorInfo !== 'undefined' && terminatorInfo[0] && cursorStart > 0) {
+                    while (terminatorInfo[0] && cursorStart > 0) {
                         --cursorStart;
                         if (cursorStart === 0) { break; }
                         c = text[cursorStart - 1];
                         terminatorInfo = terminatorMap.get(c);
+                        if (typeof terminatorInfo === 'undefined') { break; }
                     }
                     break;
                 }
@@ -143,11 +145,12 @@ export class DocumentUtil {
             if (typeof quoteInfo !== 'undefined') {
                 if (quoteStack.length === 0) {
                     // Include the previous character while it is a quote character and is included at start.
-                    while (typeof quoteInfo !== 'undefined' && quoteInfo[1] && cursorStart > 0) {
+                    while (quoteInfo[1] && cursorStart > 0) {
                         --cursorStart;
                         if (cursorStart === 0) { break; }
                         c = text[cursorStart - 1];
                         quoteInfo = forwardQuoteMap.get(c);
+                        if (typeof quoteInfo === 'undefined') { break; }
                     }
                     break;
                 } else if (quoteStack[0] === c) {
@@ -173,11 +176,12 @@ export class DocumentUtil {
                 let terminatorInfo = terminatorMap.get(c);
                 if (typeof terminatorInfo !== 'undefined') {
                     // Include the following character while it is a terminator character and is included at end.
-                    while (typeof terminatorInfo !== 'undefined' && terminatorInfo[1] && cursorEnd < textLength) {
+                    while (terminatorInfo[1] && cursorEnd < textLength) {
                         ++cursorEnd;
                         if (cursorEnd === textLength) { break; }
                         c = text[cursorEnd];
                         terminatorInfo = terminatorMap.get(c);
+                        if (typeof terminatorInfo === 'undefined') { break; }
                     }
                     break;
                 }
@@ -187,11 +191,12 @@ export class DocumentUtil {
             if (typeof quoteInfo !== 'undefined') {
                 if (quoteStack.length === 0) {
                     // Include the following character while it is a quote character and is included at end.
-                    while (typeof quoteInfo !== 'undefined' && quoteInfo[1] && cursorEnd < textLength) {
+                    while (quoteInfo[1] && cursorEnd < textLength) {
                         ++cursorEnd;
                         if (cursorEnd === textLength) { break; }
                         c = text[cursorEnd];
                         quoteInfo = forwardQuoteMap.get(c);
+                        if (typeof quoteInfo === 'undefined') { break; }
                     }
                     break;
                 } else if (quoteStack[0] === c) {
