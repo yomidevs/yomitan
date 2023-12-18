@@ -70,11 +70,13 @@ export class Offscreen {
         /** @type {import('offscreen').MessageHandlerMap<string>} */
         this._messageHandlers = messageHandlers;
 
-        const onMessage = this._onMessage.bind(this);
-        chrome.runtime.onMessage.addListener(onMessage);
-
         /** @type {?Promise<void>} */
         this._prepareDatabasePromise = null;
+    }
+
+    /** */
+    prepare() {
+        chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
     }
 
     /** @type {import('offscreen').MessageHandler<'clipboardGetTextOffscreen', true>} */
