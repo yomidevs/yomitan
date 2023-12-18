@@ -99,8 +99,9 @@ export class CssStyleApplier {
 
     /**
      * Fetches and parses a JSON file.
+     * @template [T=unknown]
      * @param {string} url The URL to the file.
-     * @returns {Promise<*>} A JSON object.
+     * @returns {Promise<T>} A JSON object.
      * @throws {Error} An error is thrown if the fetch fails.
      */
     async _fetchJsonAsset(url) {
