@@ -27,4 +27,4 @@ async function main() {
     await backend.prepare();
 }
 
-await main();
+main();
