@@ -279,8 +279,7 @@ export class Database {
                     if (typeof filterKeys === 'function') {
                         keys = filterKeys(keys);
                     }
-                    this._bulkDeleteInternal(objectStore, keys, onProgress);
-                    transaction.commit();
+                    this._bulkDeleteInternal(objectStore, keys, onProgress, transaction);
                 } catch (e) {
                     reject(e);
                 }
@@ -448,28 +447,43 @@ export class Database {
      * @param {IDBObjectStore} objectStore
      * @param {IDBValidKey[]} keys
      * @param {?(completedCount: number, totalCount: number) => void} onProgress
+     * @param {() => void} onCompletion
+     * @param {number} index
      */
-    _bulkDeleteInternal(objectStore, keys, onProgress) {
+    _deleteKeySequentially(objectStore, keys, onProgress, onCompletion, index) {
+        if (index >= keys.length) {
+            onCompletion();
+            return;
+        }
+
+        const key = keys[index];
+        const request = objectStore.delete(key);
+
+        request.onsuccess = () => {
+            if (typeof onProgress === 'function') {
+                onProgress(index + 1, keys.length);
+            }
+            this._deleteKeySequentially(objectStore, keys, onProgress, onCompletion, index + 1);
+        };
+    }
+
+    /**
+     * @param {IDBObjectStore} objectStore
+     * @param {IDBValidKey[]} keys
+     * @param {?(completedCount: number, totalCount: number) => void} onProgress
+     * @param {IDBTransaction} transaction
+     */
+    _bulkDeleteInternal(objectStore, keys, onProgress, transaction) {
         const count = keys.length;
         if (count === 0) { return; }
-
-        let completedCount = 0;
-        const onSuccess = () => {
-            ++completedCount;
-            try {
-                /** @type {(completedCount: number, totalCount: number) => void}} */ (onProgress)(completedCount, count);
-            } catch (e) {
-                // NOP
+        const onCompletion = () => {
+            if (typeof onProgress === 'function') {
+                onProgress(count, count);
             }
+            transaction.commit();
         };
 
-        const hasProgress = (typeof onProgress === 'function');
-        for (const key of keys) {
-            const request = objectStore.delete(key);
-            if (hasProgress) {
-                request.onsuccess = onSuccess;
-            }
-        }
+        this._deleteKeySequentially(objectStore, keys, onProgress, onCompletion, 0);
     }
 
     /**
