@@ -11,7 +11,7 @@
 
     <h1>Yomitan DOMTextScanner Tests</h1>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div:nth-of-type(1)",
             "offset": 0,
@@ -26,9 +26,9 @@
         <y-description>Layout newlines expected due to entering and exiting display:block nodes.</y-description>
 <div><div>小ぢん</div>まり1</div>
 <div>小ぢん<div>まり2</div></div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div:nth-of-type(1)::text",
             "offset": 0,
@@ -42,9 +42,9 @@
     >
         <y-description>Layout newline expected due to sequential display:block elements.</y-description>
 <div>小ぢんまり1</div><div>小ぢんまり2</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div:nth-of-type(1)::text",
             "offset": 0,
@@ -59,9 +59,9 @@
         <y-description>Layout newline expected due to sequential display:block elements separated by a newline.</y-description>
 <div>小ぢんまり1</div>
 <div>小ぢんまり2</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "span:nth-of-type(1)::text",
             "offset": 0,
@@ -75,9 +75,9 @@
     >
         <y-description>No newlines expected due to display:inline.</y-description>
 <span>小ぢんまり1</span><span>小ぢんまり2</span>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "span:nth-of-type(1)::text",
             "offset": 0,
@@ -92,9 +92,9 @@
         <y-description>No newlines expected due to white-space:normal.</y-description>
 <span>小ぢんまり1</span>
 <span>小ぢんまり2</span>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "span:nth-of-type(1)::text",
             "offset": 0,
@@ -111,9 +111,9 @@
 <span>小ぢんまり1</span>
 <span>小ぢんまり2</span>
 </pre>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "span:nth-of-type(1)::text",
             "offset": 0,
@@ -127,9 +127,9 @@
     >
         <y-description>No newlines expected due to display:inline-block. Actual layout flow cannot be determined by DOM/CSS alone.</y-description>
 <span style="display: inline-block;">小ぢんまり1</span><span style="display: inline-block;">小ぢんまり2</span>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         style="position: relative;"
         data-test-data='{
             "node": "div:nth-of-type(1)::text",
@@ -144,9 +144,9 @@
     >
         <y-description>Single newline expected due to display:block layout.</y-description>
 <div>小ぢんまり1</div><div style="position: relative;">小ぢんまり2</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         style="position: relative; overflow: hidden;"
         data-test-data='{
             "node": "div:nth-of-type(1)::text",
@@ -161,9 +161,9 @@
     >
         <y-description>Two newlines expected due to position:absolute causing a significant layout change.</y-description>
 <div>小ぢんまり1</div><div style="position: absolute;">小ぢんまり2</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         style="position: relative; overflow: hidden;"
         data-test-data='{
             "node": "div:nth-of-type(1)::text",
@@ -178,9 +178,9 @@
     >
         <y-description>Two newlines expected due to position:fixed causing a significant layout change.</y-description>
 <div>小ぢんまり1</div><div style="position: fixed;">小ぢんまり2</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         style="position: relative;"
         data-test-data='{
             "node": "div:nth-of-type(1)::text",
@@ -195,9 +195,9 @@
     >
         <y-description>Two newlines expected due to position:sticky being able to cause a significant layout change.</y-description>
 <div>小ぢんまり1</div><div style="position: sticky;">小ぢんまり2</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "rt",
             "offset": 0,
@@ -211,9 +211,9 @@
     >
         <y-description>Scanning text starting in an &lt;rt&gt; element. Should start scanning at the start of the &lt;ruby&gt; tag instead.</y-description>
 <div><ruby>小<rp>(</rp><rt>こ</rt><rp>)</rp></ruby>ぢんまり1</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div",
             "offset": 0,
@@ -227,9 +227,9 @@
     >
         <y-description>Skip &lt;script&gt; content.</y-description>
 <div>小ぢん<script>/*comment*/</script>まり1</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div",
             "offset": 0,
@@ -243,9 +243,9 @@
     >
         <y-description>Skip &lt;style&gt; content.</y-description>
 <div>小ぢん<style>/*comment*/</style>まり1</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div",
             "offset": 0,
@@ -259,9 +259,9 @@
     >
         <y-description>Skip &lt;textarea&gt; content.</y-description>
 <div>小ぢん<textarea>textarea content</textarea>まり1</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div",
             "offset": 0,
@@ -275,9 +275,9 @@
     >
         <y-description>Skip &lt;input&gt; content.</y-description>
 <div>小ぢん<input value="content">まり1</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div",
             "offset": 0,
@@ -291,9 +291,9 @@
     >
         <y-description>Skip &lt;button&gt; content.</y-description>
 <div>小ぢん<button type="button">content</button>まり1</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div",
             "offset": 0,
@@ -307,9 +307,9 @@
     >
         <y-description>Skip content with font-size:0.</y-description>
 <div>小ぢん<span style="font-size: 0;">content</span>まり1</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div",
             "offset": 0,
@@ -323,9 +323,9 @@
     >
         <y-description>Skip content with opacity:0.</y-description>
 <div>小ぢん<span style="opacity: 0;">content</span>まり1</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div",
             "offset": 0,
@@ -339,9 +339,9 @@
     >
         <y-description>Skip content with visibility:hidden.</y-description>
 <div>小ぢん<span style="visibility: hidden;">content</span>まり1</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div",
             "offset": 0,
@@ -355,9 +355,9 @@
     >
         <y-description>Skip content with display:none.</y-description>
 <div>小ぢん<span style="display: none;">content</span>まり1</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div",
             "offset": 0,
@@ -371,9 +371,9 @@
     >
         <y-description>Don't skip content with user-select:none.</y-description>
 <div>小ぢ<span style="user-select: none;">ん</span>まり1</div>
-    </y-test>
+    </test-case>
 
-    <y-test
+    <test-case
         data-test-data='{
             "node": "div",
             "offset": 0,
@@ -387,7 +387,7 @@
     >
         <y-description>Skip content with user-select:none <em>and</em> a transparent color.</y-description>
 <div>小ぢん<span style="user-select: none; color: rgba(0, 0, 0, 0);">content</span>まり1</div>
-    </y-test>
+    </test-case>
 
 </body>
 </html>

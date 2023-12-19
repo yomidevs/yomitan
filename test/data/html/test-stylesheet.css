@@ -30,7 +30,7 @@ a, a:visited {
 }
 
 .test,
-y-test {
+test-case {
     display: block;
     background-color: #ffffff;
     margin: 1em 0;
@@ -40,7 +40,7 @@ y-test {
 }
 
 .test::before,
-y-test::before {
+test-case::before {
     content: 'Test ' counter(test-id);
     display: block;
     counter-increment: test-id;

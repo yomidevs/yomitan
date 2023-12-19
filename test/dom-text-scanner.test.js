@@ -109,7 +109,7 @@ describe('DOMTextScanner', () => {
         const {document} = window;
         window.getComputedStyle = createAbsoluteGetComputedStyle(window);
 
-        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('y-test'))) {
+        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case'))) {
             /** @type {import('test/dom-text-scanner').TestData|import('test/dom-text-scanner').TestData[]} */
             let testData = parseJson(/** @type {string} */ (testElement.dataset.testData));
             if (!Array.isArray(testData)) {
