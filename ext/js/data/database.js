@@ -17,6 +17,7 @@
  */
 
 /**
+ * Database class to store objects.
  * @template {string} TObjectStoreName
  */
 export class Database {
@@ -28,6 +29,7 @@ export class Database {
     }
 
     /**
+     * Opens the DB.
      * @param {string} databaseName
      * @param {number} version
      * @param {import('database').StructureDefinition<TObjectStoreName>[]} structure
@@ -51,6 +53,7 @@ export class Database {
     }
 
     /**
+     * Closes the DB.
      * @throws {Error}
      */
     close() {
@@ -63,6 +66,7 @@ export class Database {
     }
 
     /**
+     * Returns true if DB opening is in process.
      * @returns {boolean}
      */
     isOpening() {
@@ -70,6 +74,7 @@ export class Database {
     }
 
     /**
+     * Returns true if the DB is open.
      * @returns {boolean}
      */
     isOpen() {
@@ -77,6 +82,7 @@ export class Database {
     }
 
     /**
+     * Returns a new transaction with the given mode ("readonly" or "readwrite") and scope which can be a single object store name or an array of names.
      * @param {string[]} storeNames
      * @param {IDBTransactionMode} mode
      * @returns {IDBTransaction}
@@ -90,10 +96,12 @@ export class Database {
     }
 
     /**
+     * Add items in bulk to the object store.
+     * count items will be added beginning from start index of items list.
      * @param {TObjectStoreName} objectStoreName
-     * @param {unknown[]} items
-     * @param {number} start
-     * @param {number} count
+     * @param {unknown[]} items List of items to add.
+     * @param {number} start Start index. Added items begin at items[start].
+     * @param {number} count Count of items to add.
      * @returns {Promise<void>}
      */
     bulkAdd(objectStoreName, items, start, count) {
@@ -244,6 +252,7 @@ export class Database {
     }
 
     /**
+     * Deletes records in store with the given key or in the given key range in query.
      * @param {TObjectStoreName} objectStoreName
      * @param {IDBValidKey|IDBKeyRange} key
      * @returns {Promise<void>}
@@ -258,6 +267,7 @@ export class Database {
     }
 
     /**
+     * Delete items in bulk from the object store.
      * @param {TObjectStoreName} objectStoreName
      * @param {?string} indexName
      * @param {IDBKeyRange} query
@@ -291,6 +301,9 @@ export class Database {
     }
 
     /**
+     * Attempts to delete the named database.
+     * If the database already exists and there are open connections that don't close in response to a versionchange event, the request will be blocked until all they close.
+     * If the request is successful request's result will be null.
      * @param {string} databaseName
      * @returns {Promise<void>}
      */

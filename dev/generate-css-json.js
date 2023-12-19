@@ -86,11 +86,11 @@ function removeProperty(styles, property, removedProperties) {
 }
 
 /**
- * @param {import('css-style-applier').RawStyleData} rules
+ * Manually formats JSON for improved compactness.
+ * @param {import('css-style-applier').RawStyleData} rules CSS ruleset.
  * @returns {string}
  */
 export function formatRulesJson(rules) {
-    // Manually format JSON, for improved compactness
     // return JSON.stringify(rules, null, 4);
     const indent1 = '    ';
     const indent2 = indent1.repeat(2);
@@ -123,8 +123,9 @@ export function formatRulesJson(rules) {
 }
 
 /**
- * @param {string} cssFile
- * @param {string} overridesCssFile
+ * Generates a CSS ruleset.
+ * @param {string} cssFile Path to CSS file.
+ * @param {string} overridesCssFile Path to override CSS file.
  * @returns {import('css-style-applier').RawStyleData}
  * @throws {Error}
  */

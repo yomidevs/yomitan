@@ -22,9 +22,16 @@ import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
 import {yomitan} from '../yomitan.js';
 import {AnkiUtil} from './anki-util.js';
 
+/**
+ * Anki Note Builder Class.
+ */
 export class AnkiNoteBuilder {
     /**
+     * Initiate an instance of AnkiNoteBuilder.
      * @param {{japaneseUtil: import('../language/sandbox/japanese-util.js').JapaneseUtil}} details
+     * @example
+     * const japaneseUtil = new JapaneseUtil(null);
+     * const ankiNoteBuilder = new AnkiNoteBuilder({japaneseUtil});
      */
     constructor({japaneseUtil}) {
         /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
@@ -40,8 +47,30 @@ export class AnkiNoteBuilder {
     }
 
     /**
+     * Creates an Anki note.
      * @param {import('anki-note-builder').CreateNoteDetails} details
      * @returns {Promise<import('anki-note-builder').CreateNoteResult>}
+     * @example
+     * const ankiNoteBuilder = new AnkiNoteBuilder({japaneseUtil});
+     * const details = {
+     *     dictionaryEntry,
+     *     mode: 'test',
+     *     context,
+     *     template,
+     *     deckName: 'deckName',
+     *     modelName: 'modelName',
+     *     fields,
+     *     tags: ['yomitan'],
+     *     checkForDuplicates: true,
+     *     duplicateScope: 'collection',
+     *     duplicateScopeCheckAllModels: false,
+     *     resultOutputMode: mode,
+     *     glossaryLayoutMode: 'default',
+     *     compactTags: false,
+     *     requirements: [],
+     *     mediaOptions: null
+     * };
+     * const {note: {fields: noteFields}, errors} = await ankiNoteBuilder.createNote(details);
      */
     async createNote({
         dictionaryEntry,

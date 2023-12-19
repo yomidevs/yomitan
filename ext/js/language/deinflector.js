@@ -16,9 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * This class deinflects Japanese terms to its dictionary form.
+ */
 export class Deinflector {
     /**
      * @param {import('deinflector').ReasonsRaw} reasons
+     * @example
+     * const deinflectionReasons = JSON.parse(
+     *   readFileSync(path.join('ext/data/deinflect.json')).toString(),
+     * ) as object;
+     * const deinflector = new Deinflector(deinflectionReasons);
      */
     constructor(reasons) {
         /** @type {import('deinflector').Reason[]} */
@@ -26,8 +34,13 @@ export class Deinflector {
     }
 
     /**
-     * @param {string} source
+     * Deinflects a Japanese term to all of its possible dictionary forms.
+     * @param {string} source The source term to deinflect.
      * @returns {import('translation-internal').Deinflection[]}
+     * @example
+     * const deinflector = new Deinflector(deinflectionReasons);
+     * // [{ term: '食べた', rules: 0, reasons: [] }, { term: '食べる', rules: 1, reasons: ['past'] }, { term: '食ぶ', rules: 2, reasons: ['potential', 'past'] }]
+     * console.log(deinflector.deinflect('食べさせられる'));
      */
     deinflect(source) {
         const results = [this._createDeinflection(source, 0, [])];
@@ -88,6 +101,7 @@ export class Deinflector {
     }
 
     /**
+     * Given a list of rules, return the corresponding deinflection rule flags.
      * @param {string[]} rules
      * @returns {import('translation-internal').DeinflectionRuleFlags}
      */
