@@ -28,15 +28,30 @@ const dirname = pathDirname(fileURLToPath(import.meta.url));
 const rootDir = join(dirname, '..');
 
 /**
+ * @param {import('test/json').JsconfigType|undefined} jsconfigType
+ * @returns {string}
+ */
+function getJsconfigPath(jsconfigType) {
+    let path;
+    switch (jsconfigType) {
+        case 'dev': path = '../dev/jsconfig.json'; break;
+        case 'test': path = '../test/jsconfig.json'; break;
+        default: path = '../jsconfig.json'; break;
+    }
+    return join(dirname, path);
+}
+
+/**
  * @param {string} path
  * @param {string} type
+ * @param {import('test/json').JsconfigType|undefined} jsconfigType
  * @returns {import('ajv').ValidateFunction<unknown>}
  */
-function createValidatorFunctionFromTypeScript(path, type) {
+function createValidatorFunctionFromTypeScript(path, type, jsconfigType) {
     /** @type {import('ts-json-schema-generator/dist/src/Config').Config} */
     const config = {
         path,
-        tsconfig: join(dirname, '../jsconfig.json'),
+        tsconfig: getJsconfigPath(jsconfigType),
         type,
         jsDoc: 'none',
         additionalProperties: false,
@@ -134,8 +149,8 @@ describe.concurrent('JSON validation', () => {
         if (info.ignore || !existingJsonFileSet.has(info.path)) { continue; }
         schemaValidationTargets1.push(info);
     }
-    test.each(schemaValidationTargets1)('Validating file against TypeScript: $path', ({path, typeFile, type}) => {
-        const validate = createValidatorFunctionFromTypeScript(join(rootDir, typeFile), type);
+    test.each(schemaValidationTargets1)('Validating file against TypeScript: $path', ({path, typeFile, type, jsconfig}) => {
+        const validate = createValidatorFunctionFromTypeScript(join(rootDir, typeFile), type, jsconfig);
         const data = parseJson(readFileSync(join(rootDir, path), {encoding: 'utf8'}));
         const valid = validate(data);
         const {errors} = validate;

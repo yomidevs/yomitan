@@ -96,22 +96,26 @@
         {
             "path": "test/data/translator-test-inputs.json",
             "typeFile": "types/test/translator.d.ts",
-            "type": "TranslatorTestInputs"
+            "type": "TranslatorTestInputs",
+            "jsconfig": "test"
         },
         {
             "path": "test/data/translator-test-results.json",
             "typeFile": "types/test/translator.d.ts",
-            "type": "TranslatorTestResults"
+            "type": "TranslatorTestResults",
+            "jsconfig": "test"
         },
         {
             "path": "test/data/translator-test-results-note-data1.json",
             "typeFile": "types/test/translator.d.ts",
-            "type": "TranslatorTestNoteDataResults"
+            "type": "TranslatorTestNoteDataResults",
+            "jsconfig": "test"
         },
         {
             "path": "test/data/anki-note-builder-test-results.json",
             "typeFile": "types/test/translator.d.ts",
-            "type": "AnkiNoteBuilderTestResults"
+            "type": "AnkiNoteBuilderTestResults",
+            "jsconfig": "test"
         },
         {
             "path": "test/data/json.json",
