@@ -124,8 +124,8 @@ export function formatRulesJson(rules) {
 
 /**
  * Generates a CSS ruleset.
- * @param {string} cssFile Path to CSS file.
- * @param {string} overridesCssFilePath Path to override CSS file.
+ * @param {string} cssFilePath
+ * @param {string} overridesCssFilePath
  * @returns {import('css-style-applier').RawStyleData}
  * @throws {Error}
  */
