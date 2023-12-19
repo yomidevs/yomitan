@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// @vitest-environment jsdom
+
 import 'fake-indexeddb/auto';
 import fs from 'fs';
 import {fileURLToPath} from 'node:url';
@@ -51,7 +53,7 @@ async function fetch(url2) {
     };
 }
 vi.stubGlobal('fetch', fetch);
-vi.mock('../ext/js/templates/template-renderer-proxy.js');
+vi.mock('../ext/js/templates/template-renderer-proxy.js', async () => await import('../test/mocks/template-renderer-proxy.js'));
 
 /**
  * @returns {Promise<TranslatorVM>}
@@ -134,7 +136,7 @@ function getFieldMarkers(type) {
  * @param {'terms'|'kanji'} type
  * @param {import('settings').ResultOutputMode} mode
  * @param {string} template
- * @param {import('@vitest/expect').ExpectStatic} expect
+ * @param {import('vitest').ExpectStatic} expect
  * @returns {Promise<import('anki').NoteFields[]>}
  */
 async function getRenderResults(dictionaryEntries, type, mode, template, expect) {

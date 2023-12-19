@@ -17,6 +17,7 @@
  */
 
 import {EventDispatcher, EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {AudioSystem} from '../../media/audio-system.js';
 
 /**
@@ -35,14 +36,14 @@ export class AudioController extends EventDispatcher {
         this._modalController = modalController;
         /** @type {AudioSystem} */
         this._audioSystem = new AudioSystem();
-        /** @type {?HTMLElement} */
-        this._audioSourceContainer = null;
-        /** @type {?HTMLButtonElement} */
-        this._audioSourceAddButton = null;
+        /** @type {HTMLElement} */
+        this._audioSourceContainer = querySelectorNotNull(document, '#audio-source-list');
+        /** @type {HTMLButtonElement} */
+        this._audioSourceAddButton = querySelectorNotNull(document, '#audio-source-add');
         /** @type {AudioSourceEntry[]} */
         this._audioSourceEntries = [];
-        /** @type {?HTMLInputElement} */
-        this._voiceTestTextInput = null;
+        /** @type {HTMLInputElement} */
+        this._voiceTestTextInput = querySelectorNotNull(document, '#text-to-speech-voice-test-text');
         /** @type {import('audio-controller').VoiceInfo[]} */
         this._voices = [];
     }
@@ -61,11 +62,9 @@ export class AudioController extends EventDispatcher {
     async prepare() {
         this._audioSystem.prepare();
 
-        this._voiceTestTextInput = /** @type {HTMLInputElement} */ (document.querySelector('#text-to-speech-voice-test-text'));
-        this._audioSourceContainer = /** @type {HTMLElement} */ (document.querySelector('#audio-source-list'));
-        this._audioSourceAddButton = /** @type {HTMLButtonElement} */ (document.querySelector('#audio-source-add'));
         this._audioSourceContainer.textContent = '';
-        const testButton = /** @type {HTMLButtonElement} */ (document.querySelector('#text-to-speech-voice-test'));
+        /** @type {HTMLButtonElement} */
+        const testButton = querySelectorNotNull(document, '#text-to-speech-voice-test');
 
         this._audioSourceAddButton.addEventListener('click', this._onAddAudioSource.bind(this), false);
 
@@ -270,12 +269,12 @@ class AudioSourceEntry {
         this._node = node;
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
-        /** @type {?HTMLSelectElement} */
-        this._typeSelect = null;
-        /** @type {?HTMLInputElement} */
-        this._urlInput = null;
-        /** @type {?HTMLSelectElement} */
-        this._voiceSelect = null;
+        /** @type {HTMLSelectElement} */
+        this._typeSelect = querySelectorNotNull(this._node, '.audio-source-type-select');
+        /** @type {HTMLInputElement} */
+        this._urlInput = querySelectorNotNull(this._node, '.audio-source-parameter-container[data-field=url] .audio-source-parameter');
+        /** @type {HTMLSelectElement} */
+        this._voiceSelect = querySelectorNotNull(this._node, '.audio-source-parameter-container[data-field=voice] .audio-source-parameter');
     }
 
     /** @type {number} */
@@ -296,10 +295,8 @@ class AudioSourceEntry {
     prepare() {
         this._updateTypeParameter();
 
-        const menuButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.audio-source-menu-button'));
-        this._typeSelect = /** @type {HTMLSelectElement} */ (this._node.querySelector('.audio-source-type-select'));
-        this._urlInput = /** @type {HTMLInputElement} */ (this._node.querySelector('.audio-source-parameter-container[data-field=url] .audio-source-parameter'));
-        this._voiceSelect = /** @type {HTMLSelectElement} */ (this._node.querySelector('.audio-source-parameter-container[data-field=voice] .audio-source-parameter'));
+        /** @type {HTMLButtonElement} */
+        const menuButton = querySelectorNotNull(this._node, '.audio-source-menu-button');
 
         this._typeSelect.value = this._type;
         this._urlInput.value = this._url;
@@ -389,7 +386,8 @@ class AudioSourceEntry {
                 break;
         }
 
-        const helpNode = /** @type {?HTMLElement} */ (menu.bodyNode.querySelector('.popup-menu-item[data-menu-action=help]'));
+        /** @type {?HTMLElement} */
+        const helpNode = menu.bodyNode.querySelector('.popup-menu-item[data-menu-action=help]');
         if (helpNode !== null) {
             helpNode.hidden = !hasHelp;
         }

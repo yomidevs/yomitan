@@ -18,6 +18,7 @@
 
 import * as wanakana from '../../../lib/wanakana.js';
 import {Frontend} from '../../app/frontend.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {TextSourceRange} from '../../dom/text-source-range.js';
 import {yomitan} from '../../yomitan.js';
 
@@ -49,13 +50,14 @@ export class PopupPreviewFrame {
         this._textSource = null;
         /** @type {?import('settings').OptionsContext} */
         this._optionsContext = null;
-        /** @type {?HTMLElement} */
-        this._exampleText = null;
-        /** @type {?HTMLInputElement} */
-        this._exampleTextInput = null;
+        /** @type {HTMLElement} */
+        this._exampleText = querySelectorNotNull(document, '#example-text');
+        /** @type {HTMLInputElement} */
+        this._exampleTextInput = querySelectorNotNull(document, '#example-text-input');
         /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
+        /* eslint-disable no-multi-spaces */
         /** @type {Map<string, (params: import('core').SerializableObjectAny) => void>} */
         this._windowMessageHandlers = new Map(/** @type {[key: string, handler: (params: import('core').SerializableObjectAny) => void][]} */ ([
             ['PopupPreviewFrame.setText',              this._onSetText.bind(this)],
@@ -63,13 +65,11 @@ export class PopupPreviewFrame {
             ['PopupPreviewFrame.setCustomOuterCss',    this._setCustomOuterCss.bind(this)],
             ['PopupPreviewFrame.updateOptionsContext', this._updateOptionsContext.bind(this)]
         ]));
+        /* eslint-enable no-multi-spaces */
     }
 
     /** */
     async prepare() {
-        this._exampleText = /** @type {HTMLElement} */ (document.querySelector('#example-text'));
-        this._exampleTextInput = /** @type {HTMLInputElement} */ (document.querySelector('#example-text-input'));
-
         if (this._exampleTextInput !== null && typeof wanakana !== 'undefined') {
             wanakana.bind(this._exampleTextInput);
         }
@@ -77,7 +77,8 @@ export class PopupPreviewFrame {
         window.addEventListener('message', this._onMessage.bind(this), false);
 
         // Setup events
-        const darkThemeCheckbox = /** @type {HTMLInputElement} */ (document.querySelector('#theme-dark-checkbox'));
+        /** @type {HTMLInputElement} */
+        const darkThemeCheckbox = querySelectorNotNull(document, '#theme-dark-checkbox');
         darkThemeCheckbox.addEventListener('change', this._onThemeDarkCheckboxChanged.bind(this), false);
         this._exampleText.addEventListener('click', this._onExampleTextClick.bind(this), false);
         this._exampleTextInput.addEventListener('blur', this._onExampleTextInputBlur.bind(this), false);

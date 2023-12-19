@@ -18,6 +18,7 @@
 
 import {log, promiseTimeout} from '../core.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {yomitan} from '../yomitan.js';
 import {BackupController} from './settings/backup-controller.js';
 import {SettingsController} from './settings/settings-controller.js';
@@ -69,15 +70,27 @@ function getOperatingSystemDisplayName(os) {
         const {name, version} = manifest;
         const {browser, platform: {os}} = await yomitan.api.getEnvironmentInfo();
 
-        const thisVersionLink = /** @type {HTMLLinkElement} */ (document.querySelector('#release-notes-this-version-link'));
+        /** @type {HTMLLinkElement} */
+        const thisVersionLink = querySelectorNotNull(document, '#release-notes-this-version-link');
         const {hrefFormat} = thisVersionLink.dataset;
         thisVersionLink.href = typeof hrefFormat === 'string' ? hrefFormat.replace(/\{version\}/g, version) : '';
 
-        /** @type {HTMLElement} */ (document.querySelector('#version')).textContent = `${name} ${version}`;
-        /** @type {HTMLElement} */ (document.querySelector('#browser')).textContent = getBrowserDisplayName(browser);
-        /** @type {HTMLElement} */ (document.querySelector('#platform')).textContent = getOperatingSystemDisplayName(os);
-        /** @type {HTMLElement} */ (document.querySelector('#language')).textContent = `${language}`;
-        /** @type {HTMLElement} */ (document.querySelector('#user-agent')).textContent = userAgent;
+        /** @type {HTMLElement} */
+        const versionElement = querySelectorNotNull(document, '#version');
+        /** @type {HTMLElement} */
+        const browserElement = querySelectorNotNull(document, '#browser');
+        /** @type {HTMLElement} */
+        const platformElement = querySelectorNotNull(document, '#platform');
+        /** @type {HTMLElement} */
+        const languageElement = querySelectorNotNull(document, '#language');
+        /** @type {HTMLElement} */
+        const userAgentElement = querySelectorNotNull(document, '#user-agent');
+
+        versionElement.textContent = `${name} ${version}`;
+        browserElement.textContent = getBrowserDisplayName(browser);
+        platformElement.textContent = getOperatingSystemDisplayName(os);
+        languageElement.textContent = `${language}`;
+        userAgentElement.textContent = userAgent;
 
         (async () => {
             let ankiConnectVersion = null;
@@ -87,9 +100,16 @@ function getOperatingSystemDisplayName(os) {
                 // NOP
             }
 
-            /** @type {HTMLElement} */ (document.querySelector('#anki-connect-version')).textContent = (ankiConnectVersion !== null ? `${ankiConnectVersion}` : 'Unknown');
-            /** @type {HTMLElement} */ (document.querySelector('#anki-connect-version-container')).dataset.hasError = `${ankiConnectVersion === null}`;
-            /** @type {HTMLElement} */ (document.querySelector('#anki-connect-version-unknown-message')).hidden = (ankiConnectVersion !== null);
+            /** @type {HTMLElement} */
+            const ankiVersionElement = querySelectorNotNull(document, '#anki-connect-version');
+            /** @type {HTMLElement} */
+            const ankiVersionContainerElement = querySelectorNotNull(document, '#anki-connect-version-container');
+            /** @type {HTMLElement} */
+            const ankiVersionUnknownElement = querySelectorNotNull(document, '#anki-connect-version-unknown-message');
+
+            ankiVersionElement.textContent = (ankiConnectVersion !== null ? `${ankiConnectVersion}` : 'Unknown');
+            ankiVersionContainerElement.dataset.hasError = `${ankiConnectVersion === null}`;
+            ankiVersionUnknownElement.hidden = (ankiConnectVersion !== null);
         })();
 
         (async () => {
@@ -115,8 +135,12 @@ function getOperatingSystemDisplayName(os) {
                 fragment.appendChild(node);
             }
 
-            /** @type {HTMLElement} */ (document.querySelector('#installed-dictionaries-none')).hidden = (dictionaryInfos.length !== 0);
-            const container = /** @type {HTMLElement} */ (document.querySelector('#installed-dictionaries'));
+            /** @type {HTMLElement} */
+            const noneElement = querySelectorNotNull(document, '#installed-dictionaries-none');
+
+            noneElement.hidden = (dictionaryInfos.length !== 0);
+            /** @type {HTMLElement} */
+            const container = querySelectorNotNull(document, '#installed-dictionaries');
             container.textContent = '';
             container.appendChild(fragment);
         })();

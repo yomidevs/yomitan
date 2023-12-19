@@ -21,7 +21,7 @@ export class TextSourceMap {
      * @param {string} source
      * @param {number[]|null} [mapping=null]
      */
-    constructor(source, mapping=null) {
+    constructor(source, mapping = null) {
         /** @type {string} */
         this._source = source;
         /** @type {?number[]} */

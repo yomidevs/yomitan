@@ -482,7 +482,7 @@ export class API {
      * @param {number} [timeout]
      * @returns {Promise<TReturn>}
      */
-    _invokeWithProgress(action, params, onProgress0, timeout=5000) {
+    _invokeWithProgress(action, params, onProgress0, timeout = 5000) {
         return new Promise((resolve, reject) => {
             /** @type {?chrome.runtime.Port} */
             let port = null;
@@ -554,7 +554,7 @@ export class API {
      * @param {import('core').SerializableObject} [params]
      * @returns {Promise<TReturn>}
      */
-    _invoke(action, params={}) {
+    _invoke(action, params = {}) {
         const data = {action, params};
         return new Promise((resolve, reject) => {
             try {

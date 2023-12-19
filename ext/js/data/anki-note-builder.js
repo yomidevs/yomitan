@@ -80,15 +80,15 @@ export class AnkiNoteBuilder {
         deckName,
         modelName,
         fields,
-        tags=[],
-        requirements=[],
-        checkForDuplicates=true,
-        duplicateScope='collection',
-        duplicateScopeCheckAllModels=false,
-        resultOutputMode='split',
-        glossaryLayoutMode='default',
-        compactTags=false,
-        mediaOptions=null
+        tags = [],
+        requirements = [],
+        checkForDuplicates = true,
+        duplicateScope = 'collection',
+        duplicateScopeCheckAllModels = false,
+        resultOutputMode = 'split',
+        glossaryLayoutMode = 'default',
+        compactTags = false,
+        mediaOptions = null
     }) {
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
@@ -159,9 +159,9 @@ export class AnkiNoteBuilder {
         dictionaryEntry,
         mode,
         context,
-        resultOutputMode='split',
-        glossaryLayoutMode='default',
-        compactTags=false,
+        resultOutputMode = 'split',
+        glossaryLayoutMode = 'default',
+        compactTags = false,
         marker
     }) {
         const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0);

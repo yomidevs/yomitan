@@ -17,6 +17,7 @@
  */
 
 import {clone, EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 import {ProfileConditionsUI} from './profile-conditions-ui.js';
 
@@ -34,24 +35,24 @@ export class ProfileController {
         this._profileConditionsUI = new ProfileConditionsUI(settingsController);
         /** @type {?number} */
         this._profileConditionsIndex = null;
-        /** @type {?HTMLSelectElement} */
-        this._profileActiveSelect = null;
-        /** @type {?HTMLSelectElement} */
-        this._profileTargetSelect = null;
-        /** @type {?HTMLSelectElement} */
-        this._profileCopySourceSelect = null;
-        /** @type {?HTMLElement} */
-        this._removeProfileNameElement = null;
-        /** @type {?HTMLButtonElement} */
-        this._profileAddButton = null;
-        /** @type {?HTMLButtonElement} */
-        this._profileRemoveConfirmButton = null;
-        /** @type {?HTMLButtonElement} */
-        this._profileCopyConfirmButton = null;
-        /** @type {?HTMLElement} */
-        this._profileEntryListContainer = null;
-        /** @type {?HTMLElement} */
-        this._profileConditionsProfileName = null;
+        /** @type {HTMLSelectElement} */
+        this._profileActiveSelect = querySelectorNotNull(document, '#profile-active-select');
+        /** @type {HTMLSelectElement} */
+        this._profileTargetSelect = querySelectorNotNull(document, '#profile-target-select');
+        /** @type {HTMLSelectElement} */
+        this._profileCopySourceSelect = querySelectorNotNull(document, '#profile-copy-source-select');
+        /** @type {HTMLElement} */
+        this._removeProfileNameElement = querySelectorNotNull(document, '#profile-remove-name');
+        /** @type {HTMLButtonElement} */
+        this._profileAddButton = querySelectorNotNull(document, '#profile-add-button');
+        /** @type {HTMLButtonElement} */
+        this._profileRemoveConfirmButton = querySelectorNotNull(document, '#profile-remove-confirm-button');
+        /** @type {HTMLButtonElement} */
+        this._profileCopyConfirmButton = querySelectorNotNull(document, '#profile-copy-confirm-button');
+        /** @type {HTMLElement} */
+        this._profileEntryListContainer = querySelectorNotNull(document, '#profile-entry-list');
+        /** @type {HTMLElement} */
+        this._profileConditionsProfileName = querySelectorNotNull(document, '#profile-conditions-profile-name');
         /** @type {?import('./modal.js').Modal} */
         this._profileRemoveModal = null;
         /** @type {?import('./modal.js').Modal} */
@@ -83,15 +84,6 @@ export class ProfileController {
         const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._profileConditionsUI.os = os;
 
-        this._profileActiveSelect = /** @type {HTMLSelectElement} */ (document.querySelector('#profile-active-select'));
-        this._profileTargetSelect = /** @type {HTMLSelectElement} */ (document.querySelector('#profile-target-select'));
-        this._profileCopySourceSelect = /** @type {HTMLSelectElement} */ (document.querySelector('#profile-copy-source-select'));
-        this._removeProfileNameElement = /** @type {HTMLElement} */ (document.querySelector('#profile-remove-name'));
-        this._profileAddButton = /** @type {HTMLButtonElement} */ (document.querySelector('#profile-add-button'));
-        this._profileRemoveConfirmButton = /** @type {HTMLButtonElement} */ (document.querySelector('#profile-remove-confirm-button'));
-        this._profileCopyConfirmButton = /** @type {HTMLButtonElement} */ (document.querySelector('#profile-copy-confirm-button'));
-        this._profileEntryListContainer = /** @type {HTMLElement} */ (document.querySelector('#profile-entry-list'));
-        this._profileConditionsProfileName = /** @type {HTMLElement} */ (document.querySelector('#profile-conditions-profile-name'));
         this._profileRemoveModal = this._modalController.getModal('profile-remove');
         this._profileCopyModal = this._modalController.getModal('profile-copy');
         this._profileConditionsModal = this._modalController.getModal('profile-conditions');
@@ -662,15 +654,15 @@ class ProfileEntry {
         /** @type {number} */
         this._index = index;
         /** @type {HTMLInputElement} */
-        this._isDefaultRadio = /** @type {HTMLInputElement} */ (node.querySelector('.profile-entry-is-default-radio'));
+        this._isDefaultRadio = querySelectorNotNull(node, '.profile-entry-is-default-radio');
         /** @type {HTMLInputElement} */
-        this._nameInput = /** @type {HTMLInputElement} */ (node.querySelector('.profile-entry-name-input'));
+        this._nameInput = querySelectorNotNull(node, '.profile-entry-name-input');
         /** @type {HTMLElement} */
-        this._countLink = /** @type {HTMLElement} */ (node.querySelector('.profile-entry-condition-count-link'));
+        this._countLink = querySelectorNotNull(node, '.profile-entry-condition-count-link');
         /** @type {HTMLElement} */
-        this._countText = /** @type {HTMLElement} */ (node.querySelector('.profile-entry-condition-count'));
+        this._countText = querySelectorNotNull(node, '.profile-entry-condition-count');
         /** @type {HTMLButtonElement} */
-        this._menuButton = /** @type {HTMLButtonElement} */ (node.querySelector('.profile-entry-menu-button'));
+        this._menuButton = querySelectorNotNull(node, '.profile-entry-menu-button');
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
     }

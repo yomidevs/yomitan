@@ -28,7 +28,7 @@ import {JapaneseUtil} from '../ext/js/language/sandbox/japanese-util.js';
 import {Translator} from '../ext/js/language/translator.js';
 import {createDictionaryArchive} from './util.js';
 
-vi.mock('../ext/js/language/dictionary-importer-media-loader.js');
+vi.mock('../ext/js/language/dictionary-importer-media-loader.js', async () => await import('../test/mocks/dictionary-importer-media-loader.js'));
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 

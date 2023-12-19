@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable no-multi-spaces */
+
 import fs from 'fs';
 import url, {fileURLToPath} from 'node:url';
 import path from 'path';

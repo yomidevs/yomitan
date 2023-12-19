@@ -87,7 +87,7 @@ function toggleFullscreen(element) {
  * @param {HTMLElement|DocumentFragment} container
  * @param {?Element} [fullscreenElement]
  */
-function setup(container, fullscreenElement=null) {
+function setup(container, fullscreenElement = null) {
     const fullscreenLink = container.querySelector('.fullscreen-link');
     if (fullscreenLink !== null) {
         if (fullscreenElement === null) {

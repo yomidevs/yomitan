@@ -37,7 +37,8 @@ export class Modal extends PanelElement {
     prepare() {
         const node = this.node;
         this._contentNode = node.querySelector('.modal-content');
-        let dimmerNode = /** @type {?HTMLElement} */ (node.querySelector('.modal-content-dimmer'));
+        /** @type {?HTMLElement} */
+        let dimmerNode = node.querySelector('.modal-content-dimmer');
         if (dimmerNode === null) { dimmerNode = node; }
         dimmerNode.addEventListener('mousedown', this._onModalContainerMouseDown.bind(this), false);
         dimmerNode.addEventListener('mouseup', this._onModalContainerMouseUp.bind(this), false);

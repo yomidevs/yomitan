@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {AnkiTemplateRenderer} from '../sandbox/anki-template-renderer.js';
+import {AnkiTemplateRenderer} from '../../ext/js/templates/sandbox/anki-template-renderer.js';
 
 export class TemplateRendererProxy {
     constructor() {
