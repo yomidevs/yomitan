@@ -10,17 +10,18 @@
 <body>
 
     <h1>Yomitan Manual Performance Tests</h1>
-    <p class="description">Testing Yomitan performance with artificially demanding cases in a real browser</p>
 
-    <div class="test">
-        <div class="description">&lt;iframe&gt; element.</div>
+    <test-description>Testing Yomitan performance with artificially demanding cases in a real browser</test-description>
+
+    <test-case>
+        <test-description>&lt;iframe&gt; element.</test-description>
         <iframe src="test-document3-frame1.html" allowfullscreen="true" style="width: 100%; height: 200px; border: 1px solid #d8d8d8;"></iframe>
-    </div>
+    </test-case>
 
-    <div class="test">
-        <div class="description">&lt;iframe&gt; element containing an &lt;iframe&gt; element inside of an open shadow DOM.</div>
+    <test-case>
+        <test-description>&lt;iframe&gt; element containing an &lt;iframe&gt; element inside of an open shadow DOM.</test-description>
         <iframe src="test-document3-frame2.html" allowfullscreen="true" style="width: 100%; height: 200px; border: 1px solid #d8d8d8;"></iframe>
-    </div>
+    </test-case>
 
 </body>
 </html>
