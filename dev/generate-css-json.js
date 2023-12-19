@@ -97,9 +97,9 @@ export function formatRulesJson(rules) {
     const indent3 = indent1.repeat(3);
     let result = '';
     result += '[';
-    let index1 = 0;
+    let outerIndex = 0;
     for (const {selectors, styles} of rules) {
-        if (index1 > 0) { result += ','; }
+        if (outerIndex > 0) { result += ','; }
         result += `\n${indent1}{\n${indent2}"selectors": `;
         if (selectors.length === 1) {
             result += `[${JSON.stringify(selectors[0], null, 4)}]`;
@@ -107,17 +107,17 @@ export function formatRulesJson(rules) {
             result += JSON.stringify(selectors, null, 4).replace(/\n/g, '\n' + indent2);
         }
         result += `,\n${indent2}"styles": [`;
-        let index2 = 0;
+        let innerIndex = 0;
         for (const [key, value] of styles) {
-            if (index2 > 0) { result += ','; }
+            if (innerIndex > 0) { result += ','; }
             result += `\n${indent3}[${JSON.stringify(key)}, ${JSON.stringify(value)}]`;
-            ++index2;
+            ++innerIndex;
         }
-        if (index2 > 0) { result += `\n${indent2}`; }
+        if (innerIndex > 0) { result += `\n${indent2}`; }
         result += `]\n${indent1}}`;
-        ++index1;
+        ++outerIndex;
     }
-    if (index1 > 0) { result += '\n'; }
+    if (outerIndex > 0) { result += '\n'; }
     result += ']';
     return result;
 }
@@ -130,10 +130,10 @@ export function formatRulesJson(rules) {
  * @throws {Error}
  */
 export function generateRules(cssFilePath, overridesCssFilePath) {
-    const content1 = fs.readFileSync(cssFilePath, {encoding: 'utf8'});
-    const content2 = fs.readFileSync(overridesCssFilePath, {encoding: 'utf8'});
-    const stylesheet1 = /** @type {css.StyleRules} */ (css.parse(content1, {}).stylesheet);
-    const stylesheet2 = /** @type {css.StyleRules} */ (css.parse(content2, {}).stylesheet);
+    const cssFilePathContent = fs.readFileSync(cssFilePath, {encoding: 'utf8'});
+    const overrideCssFilePath = fs.readFileSync(overridesCssFilePath, {encoding: 'utf8'});
+    const defaultStylesheet = /** @type {css.StyleRules} */ (css.parse(cssFilePathContent, {}).stylesheet);
+    const overrideStylesheet = /** @type {css.StyleRules} */ (css.parse(overridesCssFilePath, {}).stylesheet);
 
     const removePropertyPattern = /^remove-property\s+([\w\W]+)$/;
     const removeRulePattern = /^remove-rule$/;
@@ -143,7 +143,7 @@ export function generateRules(cssFilePath, overridesCssFilePath) {
     const rules = [];
 
     // Default stylesheet
-    for (const rule of stylesheet1.rules) {
+    for (const rule of defaultStylesheet.rules) {
         if (rule.type !== 'rule') { continue; }
         const {selectors, declarations} = /** @type {css.Rule} */ (rule);
         if (typeof selectors === 'undefined') { continue; }
@@ -163,7 +163,7 @@ export function generateRules(cssFilePath, overridesCssFilePath) {
     }
 
     // Overrides
-    for (const rule of stylesheet2.rules) {
+    for (const rule of overrideStylesheet.rules) {
         if (rule.type !== 'rule') { continue; }
         const {selectors, declarations} = /** @type {css.Rule} */ (rule);
         if (typeof selectors === 'undefined' || typeof declarations === 'undefined') { continue; }
