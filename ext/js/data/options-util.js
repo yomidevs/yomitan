@@ -31,7 +31,7 @@ export class OptionsUtil {
 
     /** */
     async prepare() {
-        /** @type {import('json-schema').Schema} */
+        /** @type {import('ext/json-schema').Schema} */
         const schema = await this._fetchJson('/data/schemas/options-schema.json');
         this._optionsSchema = new JsonSchema(schema);
     }

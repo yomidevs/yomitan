@@ -62,7 +62,7 @@ function testNormalizeContext() {
 /** */
 function testSchemas() {
     test('Schemas', () => {
-        /** @type {{conditionGroups: import('settings').ProfileConditionGroup[], expectedSchema?: import('json-schema').Schema, inputs?: {expected: boolean, context: import('settings').OptionsContext}[]}[]} */
+        /** @type {{conditionGroups: import('settings').ProfileConditionGroup[], expectedSchema?: import('ext/json-schema').Schema, inputs?: {expected: boolean, context: import('settings').OptionsContext}[]}[]} */
         const data = [
             // Empty
             {
