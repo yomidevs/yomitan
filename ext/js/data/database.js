@@ -17,7 +17,6 @@
  */
 
 /**
- * Database class to store objects.
  * @template {string} TObjectStoreName
  */
 export class Database {
@@ -29,7 +28,6 @@ export class Database {
     }
 
     /**
-     * Opens the DB.
      * @param {string} databaseName
      * @param {number} version
      * @param {import('database').StructureDefinition<TObjectStoreName>[]} structure
@@ -53,7 +51,6 @@ export class Database {
     }
 
     /**
-     * Closes the DB.
      * @throws {Error}
      */
     close() {
@@ -66,7 +63,7 @@ export class Database {
     }
 
     /**
-     * Returns true if DB opening is in process.
+     * Returns true if the database opening is in process.
      * @returns {boolean}
      */
     isOpening() {
@@ -74,7 +71,7 @@ export class Database {
     }
 
     /**
-     * Returns true if the DB is open.
+     * Returns true if the database is fully opened.
      * @returns {boolean}
      */
     isOpen() {
@@ -97,10 +94,10 @@ export class Database {
 
     /**
      * Add items in bulk to the object store.
-     * count items will be added beginning from start index of items list.
+     * _count_ items will be added, starting from _start_ index of _items_ list.
      * @param {TObjectStoreName} objectStoreName
      * @param {unknown[]} items List of items to add.
-     * @param {number} start Start index. Added items begin at items[start].
+     * @param {number} start Start index. Added items begin at _items_[_start_].
      * @param {number} count Count of items to add.
      * @returns {Promise<void>}
      */
