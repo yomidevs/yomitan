@@ -161,32 +161,26 @@ const VOWEL_TO_KANA_MAPPING = new Map([
     ['', 'のノ']
 ]);
 
-const KANA_TO_VOWEL_MAPPING = (() => {
-    /** @type {Map<string, string>} */
-    const map = new Map();
-    for (const [vowel, characters] of VOWEL_TO_KANA_MAPPING) {
-        for (const character of characters) {
-            map.set(character, vowel);
-        }
+/** @type {Map<string, string>} */
+const KANA_TO_VOWEL_MAPPING = new Map();
+for (const [vowel, characters] of VOWEL_TO_KANA_MAPPING) {
+    for (const character of characters) {
+        KANA_TO_VOWEL_MAPPING.set(character, vowel);
     }
-    return map;
-})();
+}
 
-const DIACRITIC_MAPPING = (() => {
-    const kana = 'うゔ-かが-きぎ-くぐ-けげ-こご-さざ-しじ-すず-せぜ-そぞ-ただ-ちぢ-つづ-てで-とど-はばぱひびぴふぶぷへべぺほぼぽワヷ-ヰヸ-ウヴ-ヱヹ-ヲヺ-カガ-キギ-クグ-ケゲ-コゴ-サザ-シジ-スズ-セゼ-ソゾ-タダ-チヂ-ツヅ-テデ-トド-ハバパヒビピフブプヘベペホボポ';
-    /** @type {Map<string, {character: string, type: import('japanese-util').DiacriticType}>} */
-    const map = new Map();
-    for (let i = 0, ii = kana.length; i < ii; i += 3) {
-        const character = kana[i];
-        const dakuten = kana[i + 1];
-        const handakuten = kana[i + 2];
-        map.set(dakuten, {character, type: 'dakuten'});
-        if (handakuten !== '-') {
-            map.set(handakuten, {character, type: 'handakuten'});
-        }
+const kana = 'うゔ-かが-きぎ-くぐ-けげ-こご-さざ-しじ-すず-せぜ-そぞ-ただ-ちぢ-つづ-てで-とど-はばぱひびぴふぶぷへべぺほぼぽワヷ-ヰヸ-ウヴ-ヱヹ-ヲヺ-カガ-キギ-クグ-ケゲ-コゴ-サザ-シジ-スズ-セゼ-ソゾ-タダ-チヂ-ツヅ-テデ-トド-ハバパヒビピフブプヘベペホボポ';
+/** @type {Map<string, {character: string, type: import('japanese-util').DiacriticType}>} */
+const DIACRITIC_MAPPING = new Map();
+for (let i = 0, ii = kana.length; i < ii; i += 3) {
+    const character = kana[i];
+    const dakuten = kana[i + 1];
+    const handakuten = kana[i + 2];
+    DIACRITIC_MAPPING.set(dakuten, {character, type: 'dakuten'});
+    if (handakuten !== '-') {
+        DIACRITIC_MAPPING.set(handakuten, {character, type: 'handakuten'});
     }
-    return map;
-})();
+}
 
 
 /**
