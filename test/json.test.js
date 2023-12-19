@@ -42,6 +42,17 @@ function getJsconfigPath(jsconfigType) {
 }
 
 /**
+ * @returns {Ajv}
+ */
+function createAjv() {
+    return new Ajv({
+        meta: true,
+        strictTuples: false,
+        allowUnionTypes: true
+    });
+}
+
+/**
  * @param {string} path
  * @param {string} type
  * @param {import('test/json').JsconfigType|undefined} jsconfigType
@@ -60,7 +71,7 @@ function createValidatorFunctionFromTypeScript(path, type, jsconfigType) {
         strictTuples: true
     };
     const schema = createGenerator(config).createSchema(config.type);
-    const ajv = new Ajv();
+    const ajv = createAjv();
     return ajv.compile(schema);
 }
 
@@ -71,7 +82,7 @@ function createValidatorFunctionFromTypeScript(path, type, jsconfigType) {
 function createValidatorFunctionFromSchemaJson(path) {
     /** @type {import('ajv').Schema} */
     const schema = parseJson(readFileSync(path, {encoding: 'utf8'}));
-    const ajv = new Ajv();
+    const ajv = createAjv();
     return ajv.compile(schema);
 }
 
