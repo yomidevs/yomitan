@@ -102,7 +102,7 @@ function createAbsoluteGetComputedStyle(window) {
 }
 
 
-const test = createDomTest(path.join(dirname, 'data/html/test-dom-text-scanner.html'));
+const test = createDomTest(path.join(dirname, 'data/html/dom-text-scanner.html'));
 
 describe('DOMTextScanner', () => {
     test('Seek tests', ({window}) => {
