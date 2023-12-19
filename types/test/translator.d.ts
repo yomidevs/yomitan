@@ -17,6 +17,9 @@
 
 import type {OptionsPresetObject} from 'dev/vm';
 import type {FindTermsMode} from 'translator';
+import type {DictionaryEntry} from 'dictionary';
+import type {NoteData} from 'anki-templates';
+import type {NoteFields} from 'anki';
 
 export type TranslatorTestInputs = {
     optionsPresets: OptionsPresetObject;
@@ -38,4 +41,26 @@ export type TestInputFindTerm = {
     mode: FindTermsMode;
     text: string;
     options: string;
+};
+
+export type TranslatorTestResults = TranslatorTestResult[];
+
+export type TranslatorTestResult = {
+    name: string;
+    originalTextLength?: number;
+    dictionaryEntries: DictionaryEntry[];
+};
+
+export type TranslatorTestNoteDataResults = TranslatorTestNoteDataResult[];
+
+export type TranslatorTestNoteDataResult = {
+    name: string;
+    noteDataList: NoteData[];
+};
+
+export type AnkiNoteBuilderTestResults = AnkiNoteBuilderTestResult[];
+
+export type AnkiNoteBuilderTestResult = {
+    name: string;
+    results: NoteFields[] | null;
 };

@@ -32,11 +32,11 @@ const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json'
 const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
 
 const testResults1FilePath = path.join(dirname, 'data/translator-test-results.json');
-/** @type {any} */ // TODO
+/** @type {import('test/translator').TranslatorTestResults} */
 const expectedResults1 = parseJson(readFileSync(testResults1FilePath, {encoding: 'utf8'}));
 
 const testResults2FilePath = path.join(dirname, 'data/translator-test-results-note-data1.json');
-/** @type {any} */ // TODO
+/** @type {import('test/translator').TranslatorTestNoteDataResults} */
 const expectedResults2 = parseJson(readFileSync(testResults2FilePath, {encoding: 'utf8'}));
 
 const dictionaryName = 'Test Dictionary 2';

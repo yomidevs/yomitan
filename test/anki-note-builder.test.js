@@ -175,7 +175,7 @@ const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json'
 const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
 
 const testResults1FilePath = path.join(dirname, 'data/anki-note-builder-test-results.json');
-/** @type {any} */ // TODO
+/** @type {import('test/translator').AnkiNoteBuilderTestResults} */
 const expectedResults1 = parseJson(readFileSync(testResults1FilePath, {encoding: 'utf8'}));
 
 const template = readFileSync(path.join(dirname, '../ext/data/templates/default-anki-field-templates.handlebars'), {encoding: 'utf8'});
