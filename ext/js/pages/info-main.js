@@ -56,7 +56,63 @@ function getOperatingSystemDisplayName(os) {
     }
 }
 
-(async () => {
+/** */
+async function showAnkiConnectInfo() {
+    let ankiConnectVersion = null;
+    try {
+        ankiConnectVersion = await yomitan.api.getAnkiConnectVersion();
+    } catch (e) {
+        // NOP
+    }
+
+    /** @type {HTMLElement} */
+    const ankiVersionElement = querySelectorNotNull(document, '#anki-connect-version');
+    /** @type {HTMLElement} */
+    const ankiVersionContainerElement = querySelectorNotNull(document, '#anki-connect-version-container');
+    /** @type {HTMLElement} */
+    const ankiVersionUnknownElement = querySelectorNotNull(document, '#anki-connect-version-unknown-message');
+
+    ankiVersionElement.textContent = (ankiConnectVersion !== null ? `${ankiConnectVersion}` : 'Unknown');
+    ankiVersionContainerElement.dataset.hasError = `${ankiConnectVersion === null}`;
+    ankiVersionUnknownElement.hidden = (ankiConnectVersion !== null);
+}
+
+/** */
+async function showDictionaryInfo() {
+    let dictionaryInfos;
+    try {
+        dictionaryInfos = await yomitan.api.getDictionaryInfo();
+    } catch (e) {
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    let first = true;
+    for (const {title} of dictionaryInfos) {
+        if (first) {
+            first = false;
+        } else {
+            fragment.appendChild(document.createTextNode(', '));
+        }
+
+        const node = document.createElement('span');
+        node.className = 'installed-dictionary';
+        node.textContent = title;
+        fragment.appendChild(node);
+    }
+
+    /** @type {HTMLElement} */
+    const noneElement = querySelectorNotNull(document, '#installed-dictionaries-none');
+
+    noneElement.hidden = (dictionaryInfos.length !== 0);
+    /** @type {HTMLElement} */
+    const container = querySelectorNotNull(document, '#installed-dictionaries');
+    container.textContent = '';
+    container.appendChild(fragment);
+}
+
+/** Entry point. */
+async function main() {
     try {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
@@ -92,58 +148,8 @@ function getOperatingSystemDisplayName(os) {
         languageElement.textContent = `${language}`;
         userAgentElement.textContent = userAgent;
 
-        (async () => {
-            let ankiConnectVersion = null;
-            try {
-                ankiConnectVersion = await yomitan.api.getAnkiConnectVersion();
-            } catch (e) {
-                // NOP
-            }
-
-            /** @type {HTMLElement} */
-            const ankiVersionElement = querySelectorNotNull(document, '#anki-connect-version');
-            /** @type {HTMLElement} */
-            const ankiVersionContainerElement = querySelectorNotNull(document, '#anki-connect-version-container');
-            /** @type {HTMLElement} */
-            const ankiVersionUnknownElement = querySelectorNotNull(document, '#anki-connect-version-unknown-message');
-
-            ankiVersionElement.textContent = (ankiConnectVersion !== null ? `${ankiConnectVersion}` : 'Unknown');
-            ankiVersionContainerElement.dataset.hasError = `${ankiConnectVersion === null}`;
-            ankiVersionUnknownElement.hidden = (ankiConnectVersion !== null);
-        })();
-
-        (async () => {
-            let dictionaryInfos;
-            try {
-                dictionaryInfos = await yomitan.api.getDictionaryInfo();
-            } catch (e) {
-                return;
-            }
-
-            const fragment = document.createDocumentFragment();
-            let first = true;
-            for (const {title} of dictionaryInfos) {
-                if (first) {
-                    first = false;
-                } else {
-                    fragment.appendChild(document.createTextNode(', '));
-                }
-
-                const node = document.createElement('span');
-                node.className = 'installed-dictionary';
-                node.textContent = title;
-                fragment.appendChild(node);
-            }
-
-            /** @type {HTMLElement} */
-            const noneElement = querySelectorNotNull(document, '#installed-dictionaries-none');
-
-            noneElement.hidden = (dictionaryInfos.length !== 0);
-            /** @type {HTMLElement} */
-            const container = querySelectorNotNull(document, '#installed-dictionaries');
-            container.textContent = '';
-            container.appendChild(fragment);
-        })();
+        showAnkiConnectInfo();
+        showDictionaryInfo();
 
         const settingsController = new SettingsController();
         await settingsController.prepare();
@@ -157,4 +163,6 @@ function getOperatingSystemDisplayName(os) {
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+await main();

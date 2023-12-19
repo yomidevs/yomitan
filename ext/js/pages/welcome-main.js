@@ -48,7 +48,8 @@ async function setupGenericSettingsController(genericSettingController) {
     await genericSettingController.refresh();
 }
 
-(async () => {
+/** Entry point. */
+async function main() {
     try {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
@@ -104,4 +105,6 @@ async function setupGenericSettingsController(genericSettingController) {
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+await main();

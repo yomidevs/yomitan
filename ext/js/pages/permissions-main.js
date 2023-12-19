@@ -86,7 +86,8 @@ function setupPermissionsToggles() {
     }
 }
 
-(async () => {
+/** Entry point. */
+async function main() {
     try {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
@@ -140,4 +141,6 @@ function setupPermissionsToggles() {
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+await main();

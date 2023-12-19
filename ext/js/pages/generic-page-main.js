@@ -19,7 +19,8 @@
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {ExtensionContentController} from './common/extension-content-controller.js';
 
-(() => {
+/** Entry point. */
+function main() {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
@@ -27,4 +28,6 @@ import {ExtensionContentController} from './common/extension-content-controller.
     extensionContentController.prepare();
 
     document.documentElement.dataset.loaded = 'true';
-})();
+}
+
+main();
