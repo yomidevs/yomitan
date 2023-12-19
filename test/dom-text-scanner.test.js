@@ -20,7 +20,7 @@ import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {describe, expect} from 'vitest';
 import {DOMTextScanner} from '../ext/js/dom/dom-text-scanner.js';
-import {domTest} from './document-test.js';
+import {createDomTest} from './fixtures/dom-test.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -101,9 +101,10 @@ function createAbsoluteGetComputedStyle(window) {
 }
 
 
+const test = createDomTest(path.join(dirname, 'data/html/test-dom-text-scanner.html'));
+
 describe('DOMTextScanner', () => {
-    const testDoc = domTest(path.join(dirname, 'data/html/test-dom-text-scanner.html'));
-    testDoc('Seek tests', ({window}) => {
+    test('Seek tests', ({window}) => {
         const {document} = window;
         window.getComputedStyle = createAbsoluteGetComputedStyle(window);
 

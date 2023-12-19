@@ -17,6 +17,7 @@
  */
 
 /**
+ * Database class to store objects.
  * @template {string} TObjectStoreName
  */
 export class Database {
@@ -28,6 +29,7 @@ export class Database {
     }
 
     /**
+     * Opens the DB.
      * @param {string} databaseName
      * @param {number} version
      * @param {import('database').StructureDefinition<TObjectStoreName>[]} structure
@@ -51,6 +53,7 @@ export class Database {
     }
 
     /**
+     * Closes the DB.
      * @throws {Error}
      */
     close() {
@@ -63,6 +66,7 @@ export class Database {
     }
 
     /**
+     * Returns true if DB opening is in process.
      * @returns {boolean}
      */
     isOpening() {
@@ -70,6 +74,7 @@ export class Database {
     }
 
     /**
+     * Returns true if the DB is open.
      * @returns {boolean}
      */
     isOpen() {
@@ -77,6 +82,7 @@ export class Database {
     }
 
     /**
+     * Returns a new transaction with the given mode ("readonly" or "readwrite") and scope which can be a single object store name or an array of names.
      * @param {string[]} storeNames
      * @param {IDBTransactionMode} mode
      * @returns {IDBTransaction}
@@ -90,10 +96,12 @@ export class Database {
     }
 
     /**
+     * Add items in bulk to the object store.
+     * count items will be added beginning from start index of items list.
      * @param {TObjectStoreName} objectStoreName
-     * @param {unknown[]} items
-     * @param {number} start
-     * @param {number} count
+     * @param {unknown[]} items List of items to add.
+     * @param {number} start Start index. Added items begin at items[start].
+     * @param {number} count Count of items to add.
      * @returns {Promise<void>}
      */
     bulkAdd(objectStoreName, items, start, count) {
@@ -244,6 +252,7 @@ export class Database {
     }
 
     /**
+     * Deletes records in store with the given key or in the given key range in query.
      * @param {TObjectStoreName} objectStoreName
      * @param {IDBValidKey|IDBKeyRange} key
      * @returns {Promise<void>}
@@ -258,6 +267,7 @@ export class Database {
     }
 
     /**
+     * Delete items in bulk from the object store.
      * @param {TObjectStoreName} objectStoreName
      * @param {?string} indexName
      * @param {IDBKeyRange} query
@@ -279,8 +289,11 @@ export class Database {
                     if (typeof filterKeys === 'function') {
                         keys = filterKeys(keys);
                     }
-                    this._bulkDeleteInternal(objectStore, keys, onProgress);
-                    transaction.commit();
+                    this._bulkDeleteInternal(objectStore, keys, 1000, 0, onProgress, (error) => {
+                        if (error !== null) {
+                            transaction.commit();
+                        }
+                    });
                 } catch (e) {
                     reject(e);
                 }
@@ -291,6 +304,9 @@ export class Database {
     }
 
     /**
+     * Attempts to delete the named database.
+     * If the database already exists and there are open connections that don't close in response to a versionchange event, the request will be blocked until all they close.
+     * If the request is successful request's result will be null.
      * @param {string} databaseName
      * @returns {Promise<void>}
      */
@@ -445,31 +461,74 @@ export class Database {
     }
 
     /**
-     * @param {IDBObjectStore} objectStore
-     * @param {IDBValidKey[]} keys
-     * @param {?(completedCount: number, totalCount: number) => void} onProgress
+     * @param {IDBObjectStore} objectStore The object store from which items are being deleted.
+     * @param {IDBValidKey[]} keys An array of keys to delete from the object store.
+     * @param {number} maxActiveRequests The maximum number of concurrent requests.
+     * @param {number} maxActiveRequestsForContinue The maximum number of requests that can be active before the next set of requests is started.
+     *   For example:
+     *   - If this value is `0`, all of the `maxActiveRequests` requests must complete before another group of `maxActiveRequests` is started off.
+     *   - If the value is greater than or equal to `maxActiveRequests-1`, every time a single request completes, a new single request will be started.
+     * @param {?(completedCount: number, totalCount: number) => void} onProgress An optional progress callback function.
+     * @param {(error: ?Error) => void} onComplete A function which is called after all operations have finished.
+     *   If an error occured, the `error` parameter will be non-`null`. Otherwise, it will be `null`.
+     * @throws {Error} An error is thrown if the input parameters are invalid.
      */
-    _bulkDeleteInternal(objectStore, keys, onProgress) {
+    _bulkDeleteInternal(objectStore, keys, maxActiveRequests, maxActiveRequestsForContinue, onProgress, onComplete) {
+        if (maxActiveRequests <= 0) { throw new Error(`maxActiveRequests has an invalid value: ${maxActiveRequests}`); }
+        if (maxActiveRequestsForContinue < 0) { throw new Error(`maxActiveRequestsForContinue has an invalid value: ${maxActiveRequestsForContinue}`); }
+
         const count = keys.length;
-        if (count === 0) { return; }
+        if (count === 0) {
+            onComplete(null);
+            return;
+        }
 
         let completedCount = 0;
+        let completed = false;
+        let index = 0;
+        let active = 0;
+
         const onSuccess = () => {
+            if (completed) { return; }
+            --active;
             ++completedCount;
-            try {
-                /** @type {(completedCount: number, totalCount: number) => void}} */ (onProgress)(completedCount, count);
-            } catch (e) {
-                // NOP
+            if (onProgress !== null) {
+                try {
+                    onProgress(completedCount, count);
+                } catch (e) {
+                    // NOP
+                }
+            }
+            if (completedCount >= count) {
+                completed = true;
+                onComplete(null);
+            } else if (active <= maxActiveRequestsForContinue) {
+                next();
             }
         };
 
-        const hasProgress = (typeof onProgress === 'function');
-        for (const key of keys) {
-            const request = objectStore.delete(key);
-            if (hasProgress) {
+        /**
+         * @param {Event} event
+         */
+        const onError = (event) => {
+            if (completed) { return; }
+            completed = true;
+            const request = /** @type {IDBRequest<undefined>} */ (event.target);
+            const {error} = request;
+            onComplete(error);
+        };
+
+        const next = () => {
+            for (; index < count && active < maxActiveRequests; ++index) {
+                const key = keys[index];
+                const request = objectStore.delete(key);
                 request.onsuccess = onSuccess;
+                request.onerror = onError;
+                ++active;
             }
-        }
+        };
+
+        next();
     }
 
     /**

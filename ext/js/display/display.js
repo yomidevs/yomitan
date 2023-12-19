@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Frontend} from '../app/frontend.js';
-import {PopupFactory} from '../app/popup-factory.js';
 import {ThemeController} from '../app/theme-controller.js';
 import {FrameEndpoint} from '../comm/frame-endpoint.js';
 import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, log, promiseTimeout} from '../core.js';
@@ -26,7 +24,6 @@ import {querySelectorNotNull} from '../dom/query-selector.js';
 import {ScrollElement} from '../dom/scroll-element.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {TextScanner} from '../language/text-scanner.js';
-import {dynamicLoader} from '../script/dynamic-loader.js';
 import {yomitan} from '../yomitan.js';
 import {DisplayContentManager} from './display-content-manager.js';
 import {DisplayGenerator} from './display-generator.js';
@@ -145,7 +142,7 @@ export class Display extends EventDispatcher {
         this._navigationPreviousButton = document.querySelector('#navigate-previous-button');
         /** @type {?HTMLButtonElement} */
         this._navigationNextButton = document.querySelector('#navigate-next-button');
-        /** @type {?Frontend} */
+        /** @type {?import('../app/frontend.js').Frontend} */
         this._frontend = null;
         /** @type {?Promise<void>} */
         this._frontendSetupPromise = null;
@@ -1707,7 +1704,7 @@ export class Display extends EventDispatcher {
             }
         }
 
-        /** @type {Frontend} */ (this._frontend).setDisabledOverride(!isEnabled);
+        /** @type {import('../app/frontend.js').Frontend} */ (this._frontend).setDisabledOverride(!isEnabled);
     }
 
     /** */
@@ -1720,16 +1717,9 @@ export class Display extends EventDispatcher {
         const parentPopupId = this._parentPopupId;
         const parentFrameId = this._parentFrameId;
 
-        await dynamicLoader.loadScripts([
-            '/js/language/text-scanner.js',
-            '/js/comm/frame-client.js',
-            '/js/app/popup.js',
-            '/js/app/popup-proxy.js',
-            '/js/app/popup-window.js',
-            '/js/app/popup-factory.js',
-            '/js/comm/frame-ancestry-handler.js',
-            '/js/comm/frame-offset-forwarder.js',
-            '/js/app/frontend.js'
+        const [{PopupFactory}, {Frontend}] = await Promise.all([
+            import('../app/popup-factory.js'),
+            import('../app/frontend.js')
         ]);
 
         const popupFactory = new PopupFactory(this._frameId);

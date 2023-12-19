@@ -113,19 +113,30 @@ export class DocumentUtil {
         const text = source.text();
         const textLength = text.length;
         const textEndAnchor = textLength - endLength;
-        let pos1 = startLength;
-        let pos2 = textEndAnchor;
+
+        /** Relative start position of the sentence (inclusive). */
+        let cursorStart = startLength;
+        /** Relative end position of the sentence (exclusive). */
+        let cursorEnd = textEndAnchor;
 
         // Move backward
         let quoteStack = [];
-        for (; pos1 > 0; --pos1) {
-            const c = text[pos1 - 1];
+        for (; cursorStart > 0; --cursorStart) {
+            // Check if the previous character should be included.
+            let c = text[cursorStart - 1];
             if (c === '\n' && terminateAtNewlines) { break; }
 
             if (quoteStack.length === 0) {
-                const terminatorInfo = terminatorMap.get(c);
+                let terminatorInfo = terminatorMap.get(c);
                 if (typeof terminatorInfo !== 'undefined') {
-                    if (terminatorInfo[0]) { --pos1; }
+                    // Include the previous character while it is a terminator character and is included at start.
+                    while (terminatorInfo[0] && cursorStart > 0) {
+                        --cursorStart;
+                        if (cursorStart === 0) { break; }
+                        c = text[cursorStart - 1];
+                        terminatorInfo = terminatorMap.get(c);
+                        if (typeof terminatorInfo === 'undefined') { break; }
+                    }
                     break;
                 }
             }
@@ -133,7 +144,14 @@ export class DocumentUtil {
             let quoteInfo = forwardQuoteMap.get(c);
             if (typeof quoteInfo !== 'undefined') {
                 if (quoteStack.length === 0) {
-                    if (quoteInfo[1]) { --pos1; }
+                    // Include the previous character while it is a quote character and is included at start.
+                    while (quoteInfo[1] && cursorStart > 0) {
+                        --cursorStart;
+                        if (cursorStart === 0) { break; }
+                        c = text[cursorStart - 1];
+                        quoteInfo = forwardQuoteMap.get(c);
+                        if (typeof quoteInfo === 'undefined') { break; }
+                    }
                     break;
                 } else if (quoteStack[0] === c) {
                     quoteStack.pop();
@@ -149,14 +167,22 @@ export class DocumentUtil {
 
         // Move forward
         quoteStack = [];
-        for (; pos2 < textLength; ++pos2) {
-            const c = text[pos2];
+        for (; cursorEnd < textLength; ++cursorEnd) {
+            // Check if the following character should be included.
+            let c = text[cursorEnd];
             if (c === '\n' && terminateAtNewlines) { break; }
 
             if (quoteStack.length === 0) {
-                const terminatorInfo = terminatorMap.get(c);
+                let terminatorInfo = terminatorMap.get(c);
                 if (typeof terminatorInfo !== 'undefined') {
-                    if (terminatorInfo[1]) { ++pos2; }
+                    // Include the following character while it is a terminator character and is included at end.
+                    while (terminatorInfo[1] && cursorEnd < textLength) {
+                        ++cursorEnd;
+                        if (cursorEnd === textLength) { break; }
+                        c = text[cursorEnd];
+                        terminatorInfo = terminatorMap.get(c);
+                        if (typeof terminatorInfo === 'undefined') { break; }
+                    }
                     break;
                 }
             }
@@ -164,7 +190,14 @@ export class DocumentUtil {
             let quoteInfo = backwardQuoteMap.get(c);
             if (typeof quoteInfo !== 'undefined') {
                 if (quoteStack.length === 0) {
-                    if (quoteInfo[1]) { ++pos2; }
+                    // Include the following character while it is a quote character and is included at end.
+                    while (quoteInfo[1] && cursorEnd < textLength) {
+                        ++cursorEnd;
+                        if (cursorEnd === textLength) { break; }
+                        c = text[cursorEnd];
+                        quoteInfo = forwardQuoteMap.get(c);
+                        if (typeof quoteInfo === 'undefined') { break; }
+                    }
                     break;
                 } else if (quoteStack[0] === c) {
                     quoteStack.pop();
@@ -179,13 +212,13 @@ export class DocumentUtil {
         }
 
         // Trim whitespace
-        for (; pos1 < startLength && this._isWhitespace(text[pos1]); ++pos1) { /* NOP */ }
-        for (; pos2 > textEndAnchor && this._isWhitespace(text[pos2 - 1]); --pos2) { /* NOP */ }
+        for (; cursorStart < startLength && this._isWhitespace(text[cursorStart]); ++cursorStart) { /* NOP */ }
+        for (; cursorEnd > textEndAnchor && this._isWhitespace(text[cursorEnd - 1]); --cursorEnd) { /* NOP */ }
 
         // Result
         return {
-            text: text.substring(pos1, pos2),
-            offset: startLength - pos1
+            text: text.substring(cursorStart, cursorEnd),
+            offset: startLength - cursorStart
         };
     }
 

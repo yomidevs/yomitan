@@ -20,7 +20,7 @@ import {FrameClient} from '../comm/frame-client.js';
 import {DynamicProperty, EventDispatcher, EventListenerCollection, deepEqual} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {DocumentUtil} from '../dom/document-util.js';
-import {dynamicLoader} from '../script/dynamic-loader.js';
+import {loadStyle} from '../dom/style-util.js';
 import {yomitan} from '../yomitan.js';
 import {ThemeController} from './theme-controller.js';
 
@@ -359,7 +359,7 @@ export class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        const node = await dynamicLoader.loadStyle('yomitan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
+        const node = await loadStyle('yomitan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
         /** @type {import('popup').CustomOuterCssChangedEvent} */
         const event = {node, useWebExtensionApi, inShadow};
         this.trigger('customOuterCssChanged', event);
@@ -574,7 +574,7 @@ export class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        await dynamicLoader.loadStyle('yomitan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
+        await loadStyle('yomitan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
     }
 
     /**

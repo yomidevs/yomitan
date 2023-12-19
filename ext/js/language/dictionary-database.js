@@ -19,6 +19,9 @@
 import {log, stringReverse} from '../core.js';
 import {Database} from '../data/database.js';
 
+/**
+ * This class represents the dictionary database.
+ */
 export class DictionaryDatabase {
     constructor() {
         /** @type {Database<import('dictionary-database').ObjectStoreName>} */
@@ -141,6 +144,7 @@ export class DictionaryDatabase {
     }
 
     /**
+     * Purges the database.
      * @returns {Promise<boolean>}
      */
     async purge() {
@@ -162,6 +166,7 @@ export class DictionaryDatabase {
     }
 
     /**
+     * Deletes a dictionary.
      * @param {string} dictionaryName
      * @param {number} progressRate
      * @param {import('dictionary-database').DeleteDictionaryProgressCallback} onProgress
@@ -225,9 +230,10 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {string[]} termList
-     * @param {import('dictionary-database').DictionarySet} dictionaries
-     * @param {import('dictionary-database').MatchType} matchType
+     * Find terms in bulk.
+     * @param {string[]} termList The list of terms to find.
+     * @param {import('dictionary-database').DictionarySet} dictionaries Dictionaries to find the terms from.
+     * @param {import('dictionary-database').MatchType} matchType Matching type.
      * @returns {Promise<import('dictionary-database').TermEntry[]>}
      */
     findTermsBulk(termList, dictionaries, matchType) {
@@ -259,8 +265,9 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {import('dictionary-database').TermExactRequest[]} termList
-     * @param {import('dictionary-database').DictionarySet} dictionaries
+     * Find exact terms in bulk.
+     * @param {import('dictionary-database').TermExactRequest[]} termList The list of terms to find.
+     * @param {import('dictionary-database').DictionarySet} dictionaries Dictionaries to find the term from.
      * @returns {Promise<import('dictionary-database').TermEntry[]>}
      */
     findTermsExactBulk(termList, dictionaries) {
@@ -270,6 +277,7 @@ export class DictionaryDatabase {
     }
 
     /**
+     * Find terms by sequence in bulk.
      * @param {import('dictionary-database').DictionaryAndQueryRequest[]} items
      * @returns {Promise<import('dictionary-database').TermEntry[]>}
      */
@@ -280,6 +288,7 @@ export class DictionaryDatabase {
     }
 
     /**
+     * Find term meta in bulk.
      * @param {string[]} termList
      * @param {import('dictionary-database').DictionarySet} dictionaries
      * @returns {Promise<import('dictionary-database').TermMeta[]>}
@@ -291,8 +300,9 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {string[]} kanjiList
-     * @param {import('dictionary-database').DictionarySet} dictionaries
+     * Find kanji in bulk.
+     * @param {string[]} kanjiList The list of kanji to find.
+     * @param {import('dictionary-database').DictionarySet} dictionaries Dictionaries to find from.
      * @returns {Promise<import('dictionary-database').KanjiEntry[]>}
      */
     findKanjiBulk(kanjiList, dictionaries) {
@@ -302,6 +312,7 @@ export class DictionaryDatabase {
     }
 
     /**
+     * Find kanji meta in bulk.
      * @param {string[]} kanjiList
      * @param {import('dictionary-database').DictionarySet} dictionaries
      * @returns {Promise<import('dictionary-database').KanjiMeta[]>}
@@ -313,6 +324,7 @@ export class DictionaryDatabase {
     }
 
     /**
+     * Find tag meta in bulk.
      * @param {import('dictionary-database').DictionaryAndQueryRequest[]} items
      * @returns {Promise<(import('dictionary-database').Tag|undefined)[]>}
      */
@@ -323,6 +335,7 @@ export class DictionaryDatabase {
     }
 
     /**
+     * Find tag for title.
      * @param {string} name
      * @param {string} dictionary
      * @returns {Promise<?import('dictionary-database').Tag>}
@@ -343,6 +356,7 @@ export class DictionaryDatabase {
     }
 
     /**
+     * Get dictionary metadata.
      * @returns {Promise<import('dictionary-importer').Summary[]>}
      */
     getDictionaryInfo() {

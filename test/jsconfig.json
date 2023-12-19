@@ -31,6 +31,7 @@
         "../ext/**/*.js",
         "../types/ext/**/*.ts",
         "../types/dev/**/*.ts",
+        "../types/test/**/*.ts",
         "../types/other/globals.d.ts"
     ],
     "exclude": [

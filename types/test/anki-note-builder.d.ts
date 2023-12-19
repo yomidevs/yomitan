@@ -15,6 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type DynamicLoaderSentinelDetails = {
-    scriptUrl: string;
+import type {OptionsPresetObject} from 'dev/vm';
+import type {FindTermsMode} from 'translator';
+
+export type TranslatorTestInputs = {
+    optionsPresets: OptionsPresetObject;
+    tests: TestInput[];
+};
+
+export type TestInput = TestInputFindKanji | TestInputFindTerm;
+
+export type TestInputFindKanji = {
+    func: 'findKanji';
+    name: string;
+    text: string;
+    options: string;
+};
+
+export type TestInputFindTerm = {
+    func: 'findTerms';
+    name: string;
+    mode: FindTermsMode;
+    text: string;
+    options: string;
 };
