@@ -17,6 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
+import {parseJson} from '../core/json.js';
 import {AnkiUtil} from '../data/anki-util.js';
 
 /**
@@ -419,7 +420,7 @@ export class AnkiConnect {
         let result;
         try {
             responseText = await response.text();
-            result = JSON.parse(responseText);
+            result = parseJson(responseText);
         } catch (e) {
             const error = new ExtensionError('Invalid Anki response');
             error.data = {action, params, status: response.status, responseText, originalError: e};

@@ -19,6 +19,7 @@
 /* eslint-disable no-multi-spaces */
 
 import {expect, test} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {JsonSchema} from '../ext/js/data/json-schema.js';
 
 /**
@@ -54,7 +55,7 @@ function createProxy(schema, value) {
  * @returns {T}
  */
 function clone(value) {
-    return JSON.parse(JSON.stringify(value));
+    return parseJson(JSON.stringify(value));
 }
 
 

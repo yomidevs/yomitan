@@ -17,6 +17,7 @@
  */
 
 import {ExtensionError} from '../../core/extension-error.js';
+import {parseJson} from '../../core/json.js';
 import {DocumentUtil} from '../../dom/document-util.js';
 import {DOMDataBinder} from '../../dom/dom-data-binder.js';
 
@@ -265,7 +266,7 @@ export class GenericSettingController {
      */
     _getTransformDataArray(transformRaw) {
         if (typeof transformRaw === 'string') {
-            const transforms = JSON.parse(transformRaw);
+            const transforms = parseJson(transformRaw);
             return Array.isArray(transforms) ? transforms : [transforms];
         }
         return [];

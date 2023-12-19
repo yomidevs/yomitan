@@ -24,6 +24,7 @@ import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
 import {clone, deferPromise, generateId, invokeMessageHandler, isObject, log, promiseTimeout} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {parseJson, readResponseJson} from '../core/json.js';
 import {AnkiUtil} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {PermissionsUtil} from '../data/permissions-util.js';
@@ -291,7 +292,8 @@ export class Backend {
                 log.error(e);
             }
 
-            const deinflectionReasons = /** @type {import('deinflector').ReasonsRaw} */ (await this._fetchJson('/data/deinflect.json'));
+            /** @type {import('deinflector').ReasonsRaw} */
+            const deinflectionReasons = await this._fetchJson('/data/deinflect.json');
             this._translator.prepare(deinflectionReasons);
 
             await this._optionsUtil.prepare();
@@ -764,6 +766,7 @@ export class Backend {
 
         const frameId = sender.frameId;
         const id = generateId(16);
+        /** @type {import('cross-frame-api').ActionPortDetails} */
         const details = {
             name: 'action-port',
             id
@@ -908,11 +911,13 @@ export class Backend {
             throw new Error('Port does not have an associated frame ID');
         }
 
+        /** @type {import('cross-frame-api').CrossFrameCommunicationPortDetails} */
         const sourceDetails = {
             name: 'cross-frame-communication-port',
             otherTabId: targetTabId,
             otherFrameId: targetFrameId
         };
+        /** @type {import('cross-frame-api').CrossFrameCommunicationPortDetails} */
         const targetDetails = {
             name: 'cross-frame-communication-port',
             otherTabId: sourceTabId,
@@ -1530,7 +1535,8 @@ export class Backend {
                             hasStarted = true;
                             port.onMessage.removeListener(onMessage);
 
-                            const messageData = JSON.parse(messageString);
+                            /** @type {{action: string, params?: import('core').SerializableObject}} */
+                            const messageData = parseJson(messageString);
                             messageString = null;
                             onMessageComplete(messageData);
                         }
@@ -2062,12 +2068,13 @@ export class Backend {
     }
 
     /**
+     * @template [T=unknown]
      * @param {string} url
-     * @returns {Promise<unknown>}
+     * @returns {Promise<T>}
      */
     async _fetchJson(url) {
         const response = await this._fetchAsset(url);
-        return await response.json();
+        return await readResponseJson(response);
     }
 
     /**

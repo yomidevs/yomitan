@@ -20,6 +20,7 @@ import {readFileSync} from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {describe} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {createTranslatorTest} from './fixtures/translator-test.js';
 import {createTestAnkiNoteData} from './utilities/anki.js';
 import {createFindOptions} from './utilities/translator.js';
@@ -27,14 +28,16 @@ import {createFindOptions} from './utilities/translator.js';
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json');
-/** @type {import('test/anki-note-builder').TranslatorTestInputs} */
-const {optionsPresets, tests} = JSON.parse(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
+/** @type {import('test/translator').TranslatorTestInputs} */
+const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
 
 const testResults1FilePath = path.join(dirname, 'data/translator-test-results.json');
-const expectedResults1 = JSON.parse(readFileSync(testResults1FilePath, {encoding: 'utf8'}));
+/** @type {import('test/translator').TranslatorTestResults} */
+const expectedResults1 = parseJson(readFileSync(testResults1FilePath, {encoding: 'utf8'}));
 
 const testResults2FilePath = path.join(dirname, 'data/translator-test-results-note-data1.json');
-const expectedResults2 = JSON.parse(readFileSync(testResults2FilePath, {encoding: 'utf8'}));
+/** @type {import('test/translator').TranslatorTestNoteDataResults} */
+const expectedResults2 = parseJson(readFileSync(testResults2FilePath, {encoding: 'utf8'}));
 
 const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);

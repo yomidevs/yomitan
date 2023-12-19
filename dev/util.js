@@ -19,6 +19,7 @@
 import fs from 'fs';
 import JSZip from 'jszip';
 import path from 'path';
+import {parseJson} from './json.js';
 
 /**
  * @param {string[]} args
@@ -112,9 +113,9 @@ export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
     for (const fileName of fileNames) {
         if (/\.json$/.test(fileName)) {
             const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: 'utf8'});
-            const json = JSON.parse(content);
+            const json = parseJson(content);
             if (fileName === 'index.json' && typeof dictionaryName === 'string') {
-                json.title = dictionaryName;
+                /** @type {import('dictionary-data').Index} */ (json).title = dictionaryName;
             }
             archive.file(fileName, JSON.stringify(json, null, 0));
 

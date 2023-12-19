@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {readResponseJson} from '../../core/json.js';
+
 /**
  * This class is used to apply CSS styles to elements using a consistent method
  * that is the same across different browsers.
@@ -99,8 +101,9 @@ export class CssStyleApplier {
 
     /**
      * Fetches and parses a JSON file.
+     * @template [T=unknown]
      * @param {string} url The URL to the file.
-     * @returns {Promise<*>} A JSON object.
+     * @returns {Promise<T>} A JSON object.
      * @throws {Error} An error is thrown if the fetch fails.
      */
     async _fetchJsonAsset(url) {
@@ -115,7 +118,7 @@ export class CssStyleApplier {
         if (!response.ok) {
             throw new Error(`Failed to fetch ${url}: ${response.status}`);
         }
-        return await response.json();
+        return await readResponseJson(response);
     }
 
     /**

@@ -18,6 +18,7 @@
 
 import {EventDispatcher, EventListenerCollection, invokeMessageHandler, log} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {parseJson} from '../core/json.js';
 import {yomitan} from '../yomitan.js';
 
 /**
@@ -377,9 +378,10 @@ export class CrossFrameAPI {
      */
     _onConnect(port) {
         try {
+            /** @type {import('cross-frame-api').PortDetails} */
             let details;
             try {
-                details = JSON.parse(port.name);
+                details = parseJson(port.name);
             } catch (e) {
                 return;
             }

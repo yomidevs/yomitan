@@ -15,40 +15,4 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Audio from './audio';
-
-export type GetInfoHandler = (
-    term: string,
-    reading: string,
-    details?: Audio.AudioSourceInfo,
-) => Promise<Info[]>;
-
-export type Info = Info1 | Info2;
-
-export type Info1 = {
-    type: 'url';
-    url: string;
-    name?: string;
-};
-
-export type Info2 = {
-    type: 'tts';
-    text: string;
-    voice: string;
-    name?: undefined;
-};
-
-export type AudioBinaryBase64 = {
-    data: string;
-    contentType: string | null;
-};
-
-export type CustomAudioList = {
-    type: 'audioSourceList';
-    audioSources: CustomAudioListSource[];
-};
-
-export type CustomAudioListSource = {
-    url: string;
-    name?: string;
-};
+export {parseJson} from '../ext/js/core/json.js';

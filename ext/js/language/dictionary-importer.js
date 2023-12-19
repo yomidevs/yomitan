@@ -26,6 +26,7 @@ import {
 } from '../../lib/zip.js';
 import {stringReverse} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {parseJson} from '../core/json.js';
 import {MediaUtil} from '../media/media-util.js';
 
 const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
@@ -89,7 +90,7 @@ export class DictionaryImporter {
         const indexFile2 = /** @type {import('@zip.js/zip.js').Entry} */ (indexFile);
 
         const indexContent = await this._getData(indexFile2, new TextWriter());
-        const index = /** @type {import('dictionary-data').Index} */ (JSON.parse(indexContent));
+        const index = /** @type {import('dictionary-data').Index} */ (parseJson(indexContent));
 
         if (!ajvSchemas.dictionaryIndex(index)) {
             throw this._formatAjvSchemaError(ajvSchemas.dictionaryIndex, indexFileName);
@@ -589,25 +590,6 @@ export class DictionaryImporter {
     }
 
     /**
-     * @param {string} url
-     * @returns {Promise<unknown>}
-     */
-    async _fetchJsonAsset(url) {
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.status}`);
-        }
-        return await response.json();
-    }
-
-    /**
      * @param {import('dictionary-data').TermV1} entry
      * @param {string} dictionary
      * @returns {import('dictionary-database').DatabaseTermEntry}
@@ -730,7 +712,7 @@ export class DictionaryImporter {
         const results = [];
         for (const file of files) {
             const content = await this._getData(file, new TextWriter());
-            const entries = /** @type {unknown} */ (JSON.parse(content));
+            const entries = /** @type {unknown} */ (parseJson(content));
 
             startIndex = progressData.index;
             this._progress();

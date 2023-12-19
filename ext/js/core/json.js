@@ -15,40 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Audio from './audio';
+/**
+ * This function is used to ensure more safe usage of `JSON.parse`.
+ * By default, `JSON.parse` returns a value with type `any`, which is easy to misuse.
+ * By changing the default to `unknown` and allowing it to be templatized,
+ * this improves how the return type is used.
+ * @template [T=unknown]
+ * @param {string} value
+ * @returns {T}
+ */
+export function parseJson(value) {
+    return JSON.parse(value);
+}
 
-export type GetInfoHandler = (
-    term: string,
-    reading: string,
-    details?: Audio.AudioSourceInfo,
-) => Promise<Info[]>;
-
-export type Info = Info1 | Info2;
-
-export type Info1 = {
-    type: 'url';
-    url: string;
-    name?: string;
-};
-
-export type Info2 = {
-    type: 'tts';
-    text: string;
-    voice: string;
-    name?: undefined;
-};
-
-export type AudioBinaryBase64 = {
-    data: string;
-    contentType: string | null;
-};
-
-export type CustomAudioList = {
-    type: 'audioSourceList';
-    audioSources: CustomAudioListSource[];
-};
-
-export type CustomAudioListSource = {
-    url: string;
-    name?: string;
-};
+/**
+ * This function is used to ensure more safe usage of `Response.json`,
+ * which returns the `any` type.
+ * @template [T=unknown]
+ * @param {Response} response
+ * @returns {Promise<T>}
+ */
+export async function readResponseJson(response) {
+    return await response.json();
+}

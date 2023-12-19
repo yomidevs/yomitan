@@ -15,27 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {OptionsPresetObject} from 'dev/vm';
-import type {FindTermsMode} from 'translator';
-
-export type TranslatorTestInputs = {
-    optionsPresets: OptionsPresetObject;
-    tests: TestInput[];
+export type TestData = {
+    node: string;
+    offset: number;
+    length: number;
+    forcePreserveWhitespace?: boolean;
+    generateLayoutContent?: boolean;
+    reversible?: boolean;
+    expected: {
+        node: string;
+        offset: number;
+        content: string;
+        remainder?: number;
+    };
 };
 
-export type TestInput = TestInputFindKanji | TestInputFindTerm;
-
-export type TestInputFindKanji = {
-    func: 'findKanji';
-    name: string;
-    text: string;
-    options: string;
-};
-
-export type TestInputFindTerm = {
-    func: 'findTerms';
-    name: string;
-    mode: FindTermsMode;
-    text: string;
-    options: string;
-};

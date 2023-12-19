@@ -22,6 +22,7 @@ import fs from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {describe, expect, test} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {Deinflector} from '../ext/js/language/deinflector.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -929,7 +930,8 @@ function testDeinflections() {
         }
     ];
 
-    const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/deinflect.json'), {encoding: 'utf8'}));
+    /** @type {import('deinflector').ReasonsRaw} */
+    const deinflectionReasons = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/deinflect.json'), {encoding: 'utf8'}));
     const deinflector = new Deinflector(deinflectionReasons);
 
     describe('deinflections', () => {

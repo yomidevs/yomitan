@@ -22,6 +22,7 @@ import fs from 'fs';
 import url, {fileURLToPath} from 'node:url';
 import path from 'path';
 import {expect, test, vi} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {OptionsUtil} from '../ext/js/data/options-util.js';
 import {TemplatePatcher} from '../ext/js/templates/template-patcher.js';
 
@@ -40,7 +41,7 @@ async function fetch(url2) {
         status: 200,
         statusText: 'OK',
         text: async () => Promise.resolve(content.toString('utf8')),
-        json: async () => Promise.resolve(JSON.parse(content.toString('utf8')))
+        json: async () => Promise.resolve(parseJson(content.toString('utf8')))
     };
 }
 /** @type {import('dev/vm').PseudoChrome} */

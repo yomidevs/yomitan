@@ -18,6 +18,7 @@
 
 import {Dexie} from '../../../lib/dexie.js';
 import {isObject, log} from '../../core.js';
+import {parseJson} from '../../core/json.js';
 import {OptionsUtil} from '../../data/options-util.js';
 import {ArrayBufferUtil} from '../../data/sandbox/array-buffer-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
@@ -427,7 +428,8 @@ export class BackupController {
         if (this._optionsUtil === null) { throw new Error('OptionsUtil invalid'); }
 
         const dataString = ArrayBufferUtil.arrayBufferUtf8Decode(await this._readFileArrayBuffer(file));
-        const data = JSON.parse(dataString);
+        /** @type {import('backup-controller').BackupData} */
+        const data = parseJson(dataString);
 
         // Type check
         if (!isObject(data)) {
