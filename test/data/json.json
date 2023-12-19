@@ -95,23 +95,23 @@
         },
         {
             "path": "test/data/translator-test-inputs.json",
-            "typeFile": null,
-            "type": null
+            "typeFile": "types/test/translator.d.ts",
+            "type": "TranslatorTestInputs"
         },
         {
             "path": "test/data/translator-test-results.json",
-            "typeFile": null,
-            "type": null
+            "typeFile": "types/test/translator.d.ts",
+            "type": "TranslatorTestResults"
         },
         {
             "path": "test/data/translator-test-results-note-data1.json",
-            "typeFile": null,
-            "type": null
+            "typeFile": "types/test/translator.d.ts",
+            "type": "TranslatorTestNoteDataResults"
         },
         {
             "path": "test/data/anki-note-builder-test-results.json",
-            "typeFile": null,
-            "type": null
+            "typeFile": "types/test/translator.d.ts",
+            "type": "AnkiNoteBuilderTestResults"
         },
         {
             "path": "test/data/json.json",

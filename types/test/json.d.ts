@@ -21,19 +21,11 @@ export type JsonInfo = {
     files: JsonFileInfo[];
 };
 
-export type JsonFileInfo = JsonFileIgnoreInfo | JsonFileParseInfo | JsonFileParseInfoNull;
+export type JsonFileInfo = JsonFileIgnoreInfo | JsonFileParseInfo;
 
 export type JsonFileIgnoreInfo = {
     path: string;
     ignore: true;
-};
-
-// TODO : Remove this
-export type JsonFileParseInfoNull = {
-    path: string;
-    ignore?: undefined;
-    typeFile: null;
-    type: null;
 };
 
 export type JsonFileParseInfo = {

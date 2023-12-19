@@ -132,8 +132,6 @@ describe.concurrent('JSON validation', () => {
     const schemaValidationTargets1 = [];
     for (const info of jsonFileData.files) {
         if (info.ignore || !existingJsonFileSet.has(info.path)) { continue; }
-        // TODO : Remove next line
-        if (info.type === null || info.typeFile === null) { continue; }
         schemaValidationTargets1.push(info);
     }
     test.each(schemaValidationTargets1)('Validating file against TypeScript: $path', ({path, typeFile, type}) => {
@@ -150,8 +148,6 @@ describe.concurrent('JSON validation', () => {
     const schemaValidationTargets2 = [];
     for (const info of jsonFileData.files) {
         if (info.ignore || !existingJsonFileSet.has(info.path)) { continue; }
-        // TODO : Remove next line
-        if (info.type === null || info.typeFile === null) { continue; }
         const {schema, path} = info;
         if (typeof schema !== 'string') { continue; }
         schemaValidationTargets2.push({schema, path});
