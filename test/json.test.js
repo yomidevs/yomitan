@@ -56,7 +56,7 @@ function createValidatorFunctionFromTypeScript(path, type, jsconfigType) {
         jsDoc: 'none',
         additionalProperties: false,
         minify: false,
-        expose: 'all',
+        expose: 'none',
         strictTuples: true
     };
     const schema = createGenerator(config).createSchema(config.type);
