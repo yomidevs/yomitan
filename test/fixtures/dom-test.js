@@ -39,11 +39,11 @@ function prepareWindow(window) {
  * @param {string} [htmlFilePath]
  * @returns {import('vitest').TestAPI<{window: import('jsdom').DOMWindow}>}
  */
-export function domTest(htmlFilePath) {
+export function createDomTest(htmlFilePath) {
+    const html = typeof htmlFilePath === 'string' ? fs.readFileSync(htmlFilePath, {encoding: 'utf8'}) : '<!DOCTYPE html>';
     return test.extend({
         // eslint-disable-next-line no-empty-pattern
         window: async ({}, use) => {
-            const html = typeof htmlFilePath === 'string' ? fs.readFileSync(htmlFilePath, {encoding: 'utf8'}) : '<!DOCTYPE html>';
             const env = builtinEnvironments.jsdom;
             const {teardown} = await env.setup(global, {jsdom: {html}});
             const window = /** @type {import('jsdom').DOMWindow} */ (/** @type {unknown} */ (global.window));
