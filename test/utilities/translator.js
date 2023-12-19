@@ -18,10 +18,11 @@
 
 
 /**
+ * TODO : This function is not very type safe at the moment, could be improved.
  * @template {import('translation').FindTermsOptions|import('translation').FindKanjiOptions} T
  * @param {string} dictionaryName
  * @param {import('dev/vm').OptionsPresetObject} optionsPresets
- * @param {string|import('dev/vm').OptionsPresetObject|(string|import('dev/vm').OptionsPresetObject)[]} optionsArray
+ * @param {import('dev/vm').OptionsList} optionsArray
  * @returns {T}
  * @throws {Error}
  */

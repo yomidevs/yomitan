@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Translation from '../ext/translation';
+import type {FindTermsMatchType, FindTermsSortOrder, FindTermsVariantMode, FindTermsEmphaticSequencesMode, FindKanjiDictionary, FindTermDictionary} from '../ext/translation';
 
 export type PseudoChrome = {
     runtime: {
@@ -35,4 +35,35 @@ export type OptionsPresetObject = {
     [key: string]: OptionsPreset;
 };
 
-export type OptionsPreset = Partial<Translation.FindTermsOptions>;
+export type OptionsList = string | (string | OptionsPreset)[];
+
+export type OptionsPreset = FindKanjiOptionsPreset | FindTermsOptionsPreset;
+
+export type FindKanjiOptionsPreset = {
+    enabledDictionaryMap?: [key: string, value: FindKanjiDictionary][];
+    removeNonJapaneseCharacters?: boolean;
+};
+
+export type FindTermsOptionsPreset = {
+    matchType?: FindTermsMatchType;
+    deinflect?: boolean;
+    mainDictionary?: string;
+    sortFrequencyDictionary?: string | null;
+    sortFrequencyDictionaryOrder?: FindTermsSortOrder;
+    removeNonJapaneseCharacters?: boolean;
+    convertHalfWidthCharacters?: FindTermsVariantMode;
+    convertNumericCharacters?: FindTermsVariantMode;
+    convertAlphabeticCharacters?: FindTermsVariantMode;
+    convertHiraganaToKatakana?: FindTermsVariantMode;
+    convertKatakanaToHiragana?: FindTermsVariantMode;
+    collapseEmphaticSequences?: FindTermsEmphaticSequencesMode;
+    textReplacements?: (FindTermsTextReplacement[] | null)[];
+    enabledDictionaryMap?: [key: string, value: FindTermDictionary][];
+    excludeDictionaryDefinitions?: string[] | null;
+};
+
+export type FindTermsTextReplacement = {
+    pattern: string;
+    flags: string;
+    replacement: string;
+};

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {OptionsPresetObject} from 'dev/vm';
+import type {OptionsList, OptionsPresetObject} from 'dev/vm';
 import type {FindTermsMode} from 'translator';
 import type {DictionaryEntry} from 'dictionary';
 import type {NoteData} from 'anki-templates';
@@ -32,7 +32,7 @@ export type TestInputFindKanji = {
     func: 'findKanji';
     name: string;
     text: string;
-    options: string;
+    options: OptionsList;
 };
 
 export type TestInputFindTerm = {
@@ -40,7 +40,7 @@ export type TestInputFindTerm = {
     name: string;
     mode: FindTermsMode;
     text: string;
-    options: string;
+    options: OptionsList;
 };
 
 export type TranslatorTestResults = TranslatorTestResult[];
@@ -55,7 +55,7 @@ export type TranslatorTestNoteDataResults = TranslatorTestNoteDataResult[];
 
 export type TranslatorTestNoteDataResult = {
     name: string;
-    noteDataList: NoteData[];
+    noteDataList: Omit<NoteData, 'dictionaryEntry'>[] | null;
 };
 
 export type AnkiNoteBuilderTestResults = AnkiNoteBuilderTestResult[];
