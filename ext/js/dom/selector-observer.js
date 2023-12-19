@@ -18,7 +18,7 @@
 
 /**
  * Class which is used to observe elements matching a selector in specific element.
- * @template T
+ * @template [T=unknown]
  */
 export class SelectorObserver {
     /**

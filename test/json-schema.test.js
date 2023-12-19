@@ -50,7 +50,7 @@ function createProxy(schema, value) {
 }
 
 /**
- * @template T
+ * @template [T=unknown]
  * @param {T} value
  * @returns {T}
  */

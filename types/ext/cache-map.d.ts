@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type Node<K, V> = {
+export type Node<K = unknown, V = unknown> = {
     key: K | null;
     value: V | null;
     previous: Node<K, V> | null;

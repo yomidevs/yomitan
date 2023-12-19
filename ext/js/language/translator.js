@@ -1887,7 +1887,7 @@ export class Translator {
     // Miscellaneous
 
     /**
-     * @template T
+     * @template [T=unknown]
      * @param {Set<T>} set
      * @param {T[]} values
      * @returns {boolean}

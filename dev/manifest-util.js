@@ -25,7 +25,7 @@ import {parseJson} from './json.js';
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * @template T
+ * @template [T=unknown]
  * @param {T} value
  * @returns {T}
  */
@@ -240,7 +240,7 @@ export class ManifestUtil {
     }
 
     /**
-     * @template T
+     * @template [T=unknown]
      * @param {T[]} array1
      * @param {T[]} array2
      * @param {number} lengthOffset

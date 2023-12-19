@@ -15,15 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type OnAddedCallback<T> = (element: Element) => T | undefined;
+export type OnAddedCallback<T = unknown> = (element: Element) => T | undefined;
 
-export type OnRemovedCallback<T> = (element: Element, data: T) => void;
+export type OnRemovedCallback<T = unknown> = (element: Element, data: T) => void;
 
-export type OnChildrenUpdatedCallback<T> = (element: Element, data: T) => void;
+export type OnChildrenUpdatedCallback<T = unknown> = (element: Element, data: T) => void;
 
-export type IsStaleCallback<T> = (element: Element, data: T) => boolean;
+export type IsStaleCallback<T = unknown> = (element: Element, data: T) => boolean;
 
-export type ConstructorDetails<T> = {
+export type ConstructorDetails<T = unknown> = {
     /** A string CSS selector used to find elements. */
     selector: string;
     /** A string CSS selector used to filter elements, or `null` for no filtering. */
@@ -48,7 +48,7 @@ export type MutationRecordLike = {
     target: Node;
 };
 
-export type Observer<T> = {
+export type Observer<T = unknown> = {
     element: Element;
     ancestors: Node[];
     data: T;

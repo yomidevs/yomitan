@@ -845,7 +845,7 @@ export class DisplayGenerator {
     }
 
     /**
-     * @template TItem
+     * @template [TItem=unknown]
      * @template [TExtraArg=void]
      * @param {HTMLElement} container
      * @param {(item: TItem, arg: TExtraArg) => ?Node} createItem

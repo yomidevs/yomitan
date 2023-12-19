@@ -53,7 +53,7 @@ export type CreateDetails = {
     media?: AnkiTemplates.Media;
 };
 
-export type CachedValue<T> = {
+export type CachedValue<T = unknown> = {
     getter: () => T;
     hasValue: boolean;
     value: T | undefined;

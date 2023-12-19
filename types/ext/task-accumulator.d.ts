@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type Task<V> = {
+export type Task<V = unknown> = {
     data: V;
     stale: boolean;
 };

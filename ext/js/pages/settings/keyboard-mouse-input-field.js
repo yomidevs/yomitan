@@ -315,7 +315,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
     }
 
     /**
-     * @template T
+     * @template [T=unknown]
      * @param {T[]} array1
      * @param {T[]} array2
      * @returns {boolean}

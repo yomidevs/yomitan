@@ -45,7 +45,7 @@ export type KanjiFrequenciesMap2Data = {
 
 export type TermFrequenciesMap3 = Map<string, FrequencyData>;
 
-export type DictionaryFrequency<T> = {
+export type DictionaryFrequency<T = unknown> = {
     dictionary: string;
     frequencies: T[];
 };

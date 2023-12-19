@@ -48,7 +48,7 @@ export function stringReverse(string) {
 
 /**
  * Creates a deep clone of an object or value. This is similar to `parseJson(JSON.stringify(value))`.
- * @template T
+ * @template [T=unknown]
  * @param {T} value The value to clone.
  * @returns {T} A new clone of the value.
  * @throws An error if the value is circular and cannot be cloned.
@@ -245,7 +245,7 @@ export function generateId(length) {
 
 /**
  * Creates an unresolved promise that can be resolved later, outside the promise's executor function.
- * @template T
+ * @template [T=unknown]
  * @returns {import('core').DeferredPromiseDetails<T>} An object `{promise, resolve, reject}`, containing the promise and the resolve/reject functions.
  */
 export function deferPromise() {
@@ -514,7 +514,7 @@ export class EventListenerCollection {
 /**
  * Class representing a generic value with an override stack.
  * Changes can be observed by listening to the 'change' event.
- * @template T
+ * @template [T=unknown]
  * @augments EventDispatcher<import('dynamic-property').EventType>
  */
 export class DynamicProperty extends EventDispatcher {

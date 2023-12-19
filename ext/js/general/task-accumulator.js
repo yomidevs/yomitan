@@ -19,7 +19,8 @@
 import {log} from '../core.js';
 
 /**
- * @template K,V
+ * @template [K=unknown]
+ * @template [V=unknown]
  */
 export class TaskAccumulator {
     /**
