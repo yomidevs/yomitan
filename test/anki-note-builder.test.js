@@ -21,16 +21,15 @@
 import {readFileSync} from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import {describe, vi} from 'vitest';
+import {describe} from 'vitest';
 import {parseJson} from '../dev/json.js';
 import {AnkiNoteBuilder} from '../ext/js/data/anki-note-builder.js';
 import {JapaneseUtil} from '../ext/js/language/sandbox/japanese-util.js';
+import {AnkiTemplateRenderer} from '../ext/js/templates/sandbox/anki-template-renderer.js';
 import {createTranslatorTest} from './fixtures/translator-test.js';
 import {createFindOptions} from './utilities/translator.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
-
-vi.mock('../ext/js/templates/template-renderer-proxy.js', async () => await import('../test/mocks/template-renderer-proxy.js'));
 
 /**
  * @param {'terms'|'kanji'} type
@@ -112,6 +111,8 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
         fields.push([marker, `{${marker}}`]);
     }
 
+    const ankiTemplateRenderer = new AnkiTemplateRenderer();
+    await ankiTemplateRenderer.prepare();
     const japaneseUtil = new JapaneseUtil(null);
     const clozePrefix = 'cloze-prefix';
     const clozeSuffix = 'cloze-suffix';
@@ -128,7 +129,7 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
                 }
                 break;
         }
-        const ankiNoteBuilder = new AnkiNoteBuilder({japaneseUtil});
+        const ankiNoteBuilder = new AnkiNoteBuilder(japaneseUtil, ankiTemplateRenderer.templateRenderer);
         const context = {
             url: 'url:',
             sentence: {
