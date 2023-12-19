@@ -24,18 +24,18 @@ import {fileURLToPath} from 'url';
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * @returns {{cssFile: string, overridesCssFile: string, outputPath: string}[]}
+ * @returns {{cssFilePath: string, overridesCssFilePath: string, outputPath: string}[]}
  */
 export function getTargets() {
     return [
         {
-            cssFile: path.join(dirname, '..', 'ext/css/structured-content.css'),
-            overridesCssFile: path.join(dirname, 'data/structured-content-overrides.css'),
+            cssFilePath: path.join(dirname, '..', 'ext/css/structured-content.css'),
+            overridesCssFilePath: path.join(dirname, 'data/structured-content-overrides.css'),
             outputPath: path.join(dirname, '..', 'ext/data/structured-content-style.json')
         },
         {
-            cssFile: path.join(dirname, '..', 'ext/css/display-pronunciation.css'),
-            overridesCssFile: path.join(dirname, 'data/display-pronunciation-overrides.css'),
+            cssFilePath: path.join(dirname, '..', 'ext/css/display-pronunciation.css'),
+            overridesCssFilePath: path.join(dirname, 'data/display-pronunciation-overrides.css'),
             outputPath: path.join(dirname, '..', 'ext/data/pronunciation-style.json')
         }
     ];
@@ -123,14 +123,14 @@ export function formatRulesJson(rules) {
 }
 
 /**
- * @param {string} cssFile
- * @param {string} overridesCssFile
+ * @param {string} cssFilePath
+ * @param {string} overridesCssFilePath
  * @returns {import('css-style-applier').RawStyleData}
  * @throws {Error}
  */
-export function generateRules(cssFile, overridesCssFile) {
-    const content1 = fs.readFileSync(cssFile, {encoding: 'utf8'});
-    const content2 = fs.readFileSync(overridesCssFile, {encoding: 'utf8'});
+export function generateRules(cssFilePath, overridesCssFilePath) {
+    const content1 = fs.readFileSync(cssFilePath, {encoding: 'utf8'});
+    const content2 = fs.readFileSync(overridesCssFilePath, {encoding: 'utf8'});
     const stylesheet1 = /** @type {css.StyleRules} */ (css.parse(content1, {}).stylesheet);
     const stylesheet2 = /** @type {css.StyleRules} */ (css.parse(content2, {}).stylesheet);
 
