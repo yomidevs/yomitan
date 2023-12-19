@@ -41,7 +41,7 @@ export type JsonFileParseInfo = {
     ignore?: undefined;
     typeFile: string;
     type: string;
-    // TODO : Should have an option for custom schema validation
+    schema?: string;
 };
 
 export type AjvSchema = Schema;

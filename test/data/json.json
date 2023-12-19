@@ -121,42 +121,50 @@
         {
             "path": "test/data/dictionaries/valid-dictionary1/index.json",
             "typeFile": "types/ext/dictionary-data.d.ts",
-            "type": "Index"
+            "type": "Index",
+            "schema": "ext/data/schemas/dictionary-index-schema.json"
         },
         {
             "path": "test/data/dictionaries/valid-dictionary1/kanji_bank_1.json",
             "typeFile": "types/ext/dictionary-data.d.ts",
-            "type": "KanjiV3Array"
+            "type": "KanjiV3Array",
+            "schema": "ext/data/schemas/dictionary-kanji-bank-v3-schema.json"
         },
         {
             "path": "test/data/dictionaries/valid-dictionary1/kanji_meta_bank_1.json",
             "typeFile": "types/ext/dictionary-data.d.ts",
-            "type": "KanjiMetaArray"
+            "type": "KanjiMetaArray",
+            "schema": "ext/data/schemas/dictionary-kanji-meta-bank-v3-schema.json"
         },
         {
             "path": "test/data/dictionaries/valid-dictionary1/tag_bank_1.json",
             "typeFile": "types/ext/dictionary-data.d.ts",
-            "type": "TagArray"
+            "type": "TagArray",
+            "schema": "ext/data/schemas/dictionary-tag-bank-v3-schema.json"
         },
         {
             "path": "test/data/dictionaries/valid-dictionary1/tag_bank_2.json",
             "typeFile": "types/ext/dictionary-data.d.ts",
-            "type": "TagArray"
+            "type": "TagArray",
+            "schema": "ext/data/schemas/dictionary-tag-bank-v3-schema.json"
         },
         {
             "path": "test/data/dictionaries/valid-dictionary1/tag_bank_3.json",
             "typeFile": "types/ext/dictionary-data.d.ts",
-            "type": "TagArray"
+            "type": "TagArray",
+            "schema": "ext/data/schemas/dictionary-tag-bank-v3-schema.json"
         },
         {
             "path": "test/data/dictionaries/valid-dictionary1/term_bank_1.json",
             "typeFile": "types/ext/dictionary-data.d.ts",
-            "type": "TermV3Array"
+            "type": "TermV3Array",
+            "schema": "ext/data/schemas/dictionary-term-bank-v3-schema.json"
         },
         {
             "path": "test/data/dictionaries/valid-dictionary1/term_meta_bank_1.json",
             "typeFile": "types/ext/dictionary-data.d.ts",
-            "type": "TermMetaArray"
+            "type": "TermMetaArray",
+            "schema": "ext/data/schemas/dictionary-term-meta-bank-v3-schema.json"
         }
     ]
 }

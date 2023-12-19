@@ -31,7 +31,7 @@ const rootDir = join(dirname, '..');
  * @param {string} type
  * @returns {import('ajv').ValidateFunction<unknown>}
  */
-function createValidatorFunction(path, type) {
+function createValidatorFunctionFromTypeScript(path, type) {
     /** @type {import('ts-json-schema-generator/dist/src/Config').Config} */
     const config = {
         path,
@@ -44,6 +44,18 @@ function createValidatorFunction(path, type) {
         strictTuples: true
     };
     const schema = createGenerator(config).createSchema(config.type);
+    const ajv = new Ajv();
+    return ajv.compile(schema);
+}
+
+/**
+ * @param {string} path
+ * @returns {import('ajv').ValidateFunction<unknown>}
+ */
+function createValidatorFunctionFromSchemaJson(path) {
+    // TODO
+    /** @type {import('ajv').Schema} */
+    const schema = JSON.parse(readFileSync(path, {encoding: 'utf8'}));
     const ajv = new Ajv();
     return ajv.compile(schema);
 }
@@ -115,17 +127,37 @@ describe.concurrent('JSON validation', () => {
         expect(jsonFileMap.has(path)).toBe(true);
     });
 
-    // Validate schemas
+    // Validate schemas 1
     /** @type {import('test/json').JsonFileParseInfo[]} */
-    const schemaValidationTargets = [];
+    const schemaValidationTargets1 = [];
     for (const info of jsonFileData.files) {
         if (info.ignore || !existingJsonFileSet.has(info.path)) { continue; }
         // TODO : Remove next line
         if (info.type === null || info.typeFile === null) { continue; }
-        schemaValidationTargets.push(info);
+        schemaValidationTargets1.push(info);
     }
-    test.each(schemaValidationTargets)('Validating file: $path', ({path, typeFile, type}) => {
-        const validate = createValidatorFunction(join(rootDir, typeFile), type);
+    test.each(schemaValidationTargets1)('Validating file against TypeScript: $path', ({path, typeFile, type}) => {
+        const validate = createValidatorFunctionFromTypeScript(join(rootDir, typeFile), type);
+        const data = JSON.parse(readFileSync(join(rootDir, path), {encoding: 'utf8'}));
+        const valid = validate(data);
+        const {errors} = validate;
+        expect(errors).toBe(null);
+        expect(valid).toBe(true);
+    });
+
+    // Validate schemas 2
+    /** @type {{path: string, schema: string}[]} */
+    const schemaValidationTargets2 = [];
+    for (const info of jsonFileData.files) {
+        if (info.ignore || !existingJsonFileSet.has(info.path)) { continue; }
+        // TODO : Remove next line
+        if (info.type === null || info.typeFile === null) { continue; }
+        const {schema, path} = info;
+        if (typeof schema !== 'string') { continue; }
+        schemaValidationTargets2.push({schema, path});
+    }
+    test.each(schemaValidationTargets2)('Validating file against schema: $path', ({path, schema}) => {
+        const validate = createValidatorFunctionFromSchemaJson(join(rootDir, schema));
         const data = JSON.parse(readFileSync(join(rootDir, path), {encoding: 'utf8'}));
         const valid = validate(data);
         const {errors} = validate;
