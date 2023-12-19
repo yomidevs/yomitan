@@ -21,6 +21,7 @@ import {readFileSync} from 'fs';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {dirname, join, resolve} from 'path';
 import {expect, vi} from 'vitest';
+import {parseJson} from '../../dev/json.js';
 import {createDictionaryArchive} from '../../dev/util.js';
 import {AnkiNoteDataCreator} from '../../ext/js/data/sandbox/anki-note-data-creator.js';
 import {DictionaryDatabase} from '../../ext/js/language/dictionary-database.js';
@@ -60,7 +61,7 @@ async function fetch(url) {
         status: 200,
         statusText: 'OK',
         text: async () => content.toString('utf8'),
-        json: async () => JSON.parse(content.toString('utf8'))
+        json: async () => parseJson(content.toString('utf8'))
     };
 }
 
@@ -96,7 +97,8 @@ async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
     // Setup translator
     const japaneseUtil = new JapaneseUtil(null);
     const translator = new Translator({japaneseUtil, database: dictionaryDatabase});
-    const deinflectionReasons = JSON.parse(readFileSync(deinflectionReasonsPath, {encoding: 'utf8'}));
+    /** @type {import('deinflector').ReasonsRaw} */
+    const deinflectionReasons = parseJson(readFileSync(deinflectionReasonsPath, {encoding: 'utf8'}));
     translator.prepare(deinflectionReasons);
 
     // Assign properties

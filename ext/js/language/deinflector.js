@@ -20,7 +20,7 @@ export class Deinflector {
     /**
      * @param {import('deinflector').ReasonsRaw} reasons
      * @example
-     * const deinflectionReasons = JSON.parse(
+     * const deinflectionReasons = parseJson(
      *   readFileSync(path.join('ext/data/deinflect.json')).toString(),
      * );
      * const deinflector = new Deinflector(deinflectionReasons);
