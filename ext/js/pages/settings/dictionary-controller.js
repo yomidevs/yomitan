@@ -380,14 +380,14 @@ export class DictionaryController {
         this._databaseStateToken = null;
         /** @type {boolean} */
         this._checkingIntegrity = false;
-        /** @type {HTMLButtonElement} */
-        this._checkIntegrityButton = querySelectorNotNull(document, '#dictionary-check-integrity');
+        /** @type {?HTMLButtonElement} */
+        this._checkIntegrityButton = document.querySelector('#dictionary-check-integrity');
         /** @type {HTMLElement} */
         this._dictionaryEntryContainer = querySelectorNotNull(document, '#dictionary-list');
-        /** @type {HTMLElement} */
-        this._dictionaryInstallCountNode = querySelectorNotNull(document, '#dictionary-install-count');
-        /** @type {HTMLElement} */
-        this._dictionaryEnabledCountNode = querySelectorNotNull(document, '#dictionary-enabled-count');
+        /** @type {?HTMLElement} */
+        this._dictionaryInstallCountNode = document.querySelector('#dictionary-install-count');
+        /** @type {?HTMLElement} */
+        this._dictionaryEnabledCountNode = document.querySelector('#dictionary-enabled-count');
         /** @type {?NodeListOf<HTMLElement>} */
         this._noDictionariesInstalledWarnings = null;
         /** @type {?NodeListOf<HTMLElement>} */
