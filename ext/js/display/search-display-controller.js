@@ -96,9 +96,9 @@ export class SearchDisplayController {
         ]);
         /* eslint-disable no-multi-spaces */
         this._registerMessageHandlers([
-            ['SearchDisplayController.getMode',           {async: false, handler: this._onMessageGetMode.bind(this)}],
-            ['SearchDisplayController.setMode',           {async: false, handler: this._onMessageSetMode.bind(this)}],
-            ['SearchDisplayController.updateSearchQuery', {async: false, handler: this._onExternalSearchUpdate.bind(this)}]
+            ['SearchDisplayController.getMode',           this._onMessageGetMode.bind(this)],
+            ['SearchDisplayController.setMode',           this._onMessageSetMode.bind(this)],
+            ['SearchDisplayController.updateSearchQuery', this._onExternalSearchUpdate.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
 
@@ -549,7 +549,7 @@ export class SearchDisplayController {
     }
 
     /**
-     * @param {import('core').MessageHandlerArray} handlers
+     * @param {import('core').MessageHandlerMapInit} handlers
      */
     _registerMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {

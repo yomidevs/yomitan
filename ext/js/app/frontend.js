@@ -108,10 +108,10 @@ export class Frontend {
 
         /* eslint-disable no-multi-spaces */
         /** @type {import('core').MessageHandlerMap} */
-        this._runtimeMessageHandlers = new Map(/** @type {import('core').MessageHandlerArray} */ ([
-            ['Frontend.requestReadyBroadcast',   {async: false, handler: this._onMessageRequestFrontendReadyBroadcast.bind(this)}],
-            ['Frontend.setAllVisibleOverride',   {async: true,  handler: this._onApiSetAllVisibleOverride.bind(this)}],
-            ['Frontend.clearAllVisibleOverride', {async: true,  handler: this._onApiClearAllVisibleOverride.bind(this)}]
+        this._runtimeMessageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
+            ['Frontend.requestReadyBroadcast',   this._onMessageRequestFrontendReadyBroadcast.bind(this)],
+            ['Frontend.setAllVisibleOverride',   this._onApiSetAllVisibleOverride.bind(this)],
+            ['Frontend.clearAllVisibleOverride', this._onApiClearAllVisibleOverride.bind(this)]
         ]));
 
         this._hotkeyHandler.registerActions([
@@ -178,11 +178,11 @@ export class Frontend {
 
         /* eslint-disable no-multi-spaces */
         yomitan.crossFrame.registerHandlers([
-            ['Frontend.closePopup',       {async: false, handler: this._onApiClosePopup.bind(this)}],
-            ['Frontend.copySelection',    {async: false, handler: this._onApiCopySelection.bind(this)}],
-            ['Frontend.getSelectionText', {async: false, handler: this._onApiGetSelectionText.bind(this)}],
-            ['Frontend.getPopupInfo',     {async: false, handler: this._onApiGetPopupInfo.bind(this)}],
-            ['Frontend.getPageInfo',      {async: false, handler: this._onApiGetPageInfo.bind(this)}]
+            ['Frontend.closePopup',       this._onApiClosePopup.bind(this)],
+            ['Frontend.copySelection',    this._onApiCopySelection.bind(this)],
+            ['Frontend.getSelectionText', this._onApiGetSelectionText.bind(this)],
+            ['Frontend.getPopupInfo',     this._onApiGetPopupInfo.bind(this)],
+            ['Frontend.getPageInfo',      this._onApiGetPageInfo.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
 

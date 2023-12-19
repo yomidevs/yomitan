@@ -18,14 +18,6 @@
 import type * as Api from './api';
 import type * as Core from './core';
 
-export type MessageHandlerDetails = {
-    async: boolean;
-    contentScript: boolean;
-    handler: (params: Core.SerializableObject | undefined, sender: chrome.runtime.MessageSender) => unknown;
-};
-export type MessageHandlerMap = Map<string, MessageHandlerDetails>;
-export type MessageHandlerMapInit = [key: string, handlerDetails: MessageHandlerDetails][];
-
 export type MessageHandlerWithProgressDetails = {
     async: boolean;
     contentScript: boolean;

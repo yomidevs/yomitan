@@ -164,7 +164,9 @@ export class FrameAncestryHandler {
             };
 
             // Start
-            yomitan.crossFrame.registerHandlers([[responseMessageId, {async: false, handler: onMessage}]]);
+            yomitan.crossFrame.registerHandlers([
+                [responseMessageId, onMessage]
+            ]);
             resetTimeout();
             const frameId = this._frameId;
             this._requestFrameInfo(targetWindow, frameId, frameId, uniqueId, nonce);

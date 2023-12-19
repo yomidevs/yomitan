@@ -324,7 +324,7 @@ export function promiseAnimationFrame(timeout) {
  * Invokes a standard message handler. This function is used to react and respond
  * to communication messages within the extension.
  * @template {import('core').SafeAny} TParams
- * @param {import('core').MessageHandlerDetails} details Details about how to handle messages.
+ * @param {import('core').MessageHandler} handler The message handler function.
  * @param {TParams} params Information which was passed with the original message.
  * @param {(response: import('core').Response) => void} callback A callback function which is invoked after the handler has completed. The value passed
  *   to the function is in the format:
@@ -333,13 +333,10 @@ export function promiseAnimationFrame(timeout) {
  * @param {...*} extraArgs Additional arguments which are passed to the `handler` function.
  * @returns {boolean} `true` if the function is invoked asynchronously, `false` otherwise.
  */
-export function invokeMessageHandler({handler, async}, params, callback, ...extraArgs) {
+export function invokeMessageHandler(handler, params, callback, ...extraArgs) {
     try {
-        let promiseOrResult = handler(params, ...extraArgs);
-        if (async === 'dynamic') {
-            ({async, result: promiseOrResult} = promiseOrResult);
-        }
-        if (async) {
+        const promiseOrResult = handler(params, ...extraArgs);
+        if (promiseOrResult instanceof Promise) {
             /** @type {Promise<any>} */ (promiseOrResult).then(
                 (result) => { callback({result}); },
                 (error) => { callback({error: ExtensionError.serialize(error)}); }
