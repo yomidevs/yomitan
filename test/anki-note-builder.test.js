@@ -171,7 +171,7 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
 
 
 const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json');
-/** @type {import('test/anki-note-builder').TranslatorTestInputs} */
+/** @type {import('test/translator').TranslatorTestInputs} */
 const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
 
 const testResults1FilePath = path.join(dirname, 'data/anki-note-builder-test-results.json');
