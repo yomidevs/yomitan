@@ -19,39 +19,14 @@
 /* eslint-disable no-multi-spaces */
 
 import fs from 'fs';
-import url, {fileURLToPath} from 'node:url';
+import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {expect, test, vi} from 'vitest';
-import {parseJson} from '../dev/json.js';
 import {OptionsUtil} from '../ext/js/data/options-util.js';
 import {TemplatePatcher} from '../ext/js/templates/template-patcher.js';
+import {chrome, fetch} from './mocks/common.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
-
-/**
- * @param {string} url2
- * @returns {Promise<import('test/mocks').PseudoFetchResponse>}
- */
-async function fetch(url2) {
-    const filePath = url.fileURLToPath(url2);
-    await Promise.resolve();
-    const content = fs.readFileSync(filePath, {encoding: null});
-    return {
-        ok: true,
-        status: 200,
-        statusText: 'OK',
-        text: async () => Promise.resolve(content.toString('utf8')),
-        json: async () => Promise.resolve(parseJson(content.toString('utf8')))
-    };
-}
-/** @type {import('test/mocks').PseudoChrome} */
-const chrome = {
-    runtime: {
-        getURL(path2) {
-            return url.pathToFileURL(path.join(dirname, '..', 'ext', path2.replace(/^\//, ''))).href;
-        }
-    }
-};
 
 vi.stubGlobal('fetch', fetch);
 vi.stubGlobal('chrome', chrome);
