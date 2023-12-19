@@ -23,6 +23,9 @@ import {TextSourceRange} from '../dom/text-source-range.js';
  * This class is a helper for handling Google Docs content in content scripts.
  */
 export class GoogleDocsUtil {
+    /** @type {HTMLStyleElement|undefined} */
+    static _styleNode = void 0;
+
     /**
      * Scans the document for text or elements with text information at the given coordinate.
      * Coordinates are provided in [client space](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems).
@@ -148,7 +151,3 @@ export class GoogleDocsUtil {
         style.setProperty(propertyName, value, 'important');
     }
 }
-
-/** @type {HTMLStyleElement|undefined} */
-// eslint-disable-next-line no-underscore-dangle
-GoogleDocsUtil._styleNode = void 0;

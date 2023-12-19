@@ -22,6 +22,9 @@ import {isObject} from '../core.js';
  * This class has some general utility functions for working with Anki data.
  */
 export class AnkiUtil {
+    /** @type {RegExp} @readonly */
+    static _markerPattern = /\{([\w-]+)\}/g;
+
     /**
      * Gets the root deck name of a full deck name. If the deck is a root deck,
      * the same name is returned. Nested decks are separated using '::'.
@@ -84,6 +87,3 @@ export class AnkiUtil {
         );
     }
 }
-
-// eslint-disable-next-line no-underscore-dangle
-AnkiUtil._markerPattern = /\{([\w-]+)\}/g;

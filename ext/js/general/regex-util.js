@@ -21,6 +21,9 @@
  * This class provides some general utility functions for regular expressions.
  */
 export class RegexUtil {
+    /** @type {RegExp} @readonly */
+    static _matchReplacementPattern = /\$(?:\$|&|`|'|(\d\d?)|<([^>]*)>)/g;
+
     /**
      * Applies string.replace using a regular expression and replacement string as arguments.
      * A source map of the changes is also maintained.
@@ -92,6 +95,3 @@ export class RegexUtil {
         });
     }
 }
-
-// eslint-disable-next-line no-underscore-dangle
-RegexUtil._matchReplacementPattern = /\$(?:\$|&|`|'|(\d\d?)|<([^>]*)>)/g;
