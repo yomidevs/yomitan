@@ -23,7 +23,7 @@
             }
         }'
     >
-        <y-description>Layout newlines expected due to entering and exiting display:block nodes.</y-description>
+        <test-description>Layout newlines expected due to entering and exiting display:block nodes.</test-description>
 <div><div>小ぢん</div>まり1</div>
 <div>小ぢん<div>まり2</div></div>
     </test-case>
@@ -40,7 +40,7 @@
             }
         }'
     >
-        <y-description>Layout newline expected due to sequential display:block elements.</y-description>
+        <test-description>Layout newline expected due to sequential display:block elements.</test-description>
 <div>小ぢんまり1</div><div>小ぢんまり2</div>
     </test-case>
 
@@ -56,7 +56,7 @@
             }
         }'
     >
-        <y-description>Layout newline expected due to sequential display:block elements separated by a newline.</y-description>
+        <test-description>Layout newline expected due to sequential display:block elements separated by a newline.</test-description>
 <div>小ぢんまり1</div>
 <div>小ぢんまり2</div>
     </test-case>
@@ -73,7 +73,7 @@
             }
         }'
     >
-        <y-description>No newlines expected due to display:inline.</y-description>
+        <test-description>No newlines expected due to display:inline.</test-description>
 <span>小ぢんまり1</span><span>小ぢんまり2</span>
     </test-case>
 
@@ -89,7 +89,7 @@
             }
         }'
     >
-        <y-description>No newlines expected due to white-space:normal.</y-description>
+        <test-description>No newlines expected due to white-space:normal.</test-description>
 <span>小ぢんまり1</span>
 <span>小ぢんまり2</span>
     </test-case>
@@ -106,7 +106,7 @@
             }
         }'
     >
-        <y-description>Newline expected due to white-space:pre.</y-description>
+        <test-description>Newline expected due to white-space:pre.</test-description>
 <pre>
 <span>小ぢんまり1</span>
 <span>小ぢんまり2</span>
@@ -125,7 +125,7 @@
             }
         }'
     >
-        <y-description>No newlines expected due to display:inline-block. Actual layout flow cannot be determined by DOM/CSS alone.</y-description>
+        <test-description>No newlines expected due to display:inline-block. Actual layout flow cannot be determined by DOM/CSS alone.</test-description>
 <span style="display: inline-block;">小ぢんまり1</span><span style="display: inline-block;">小ぢんまり2</span>
     </test-case>
 
@@ -142,7 +142,7 @@
             }
         }'
     >
-        <y-description>Single newline expected due to display:block layout.</y-description>
+        <test-description>Single newline expected due to display:block layout.</test-description>
 <div>小ぢんまり1</div><div style="position: relative;">小ぢんまり2</div>
     </test-case>
 
@@ -159,7 +159,7 @@
             }
         }'
     >
-        <y-description>Two newlines expected due to position:absolute causing a significant layout change.</y-description>
+        <test-description>Two newlines expected due to position:absolute causing a significant layout change.</test-description>
 <div>小ぢんまり1</div><div style="position: absolute;">小ぢんまり2</div>
     </test-case>
 
@@ -176,7 +176,7 @@
             }
         }'
     >
-        <y-description>Two newlines expected due to position:fixed causing a significant layout change.</y-description>
+        <test-description>Two newlines expected due to position:fixed causing a significant layout change.</test-description>
 <div>小ぢんまり1</div><div style="position: fixed;">小ぢんまり2</div>
     </test-case>
 
@@ -193,7 +193,7 @@
             }
         }'
     >
-        <y-description>Two newlines expected due to position:sticky being able to cause a significant layout change.</y-description>
+        <test-description>Two newlines expected due to position:sticky being able to cause a significant layout change.</test-description>
 <div>小ぢんまり1</div><div style="position: sticky;">小ぢんまり2</div>
     </test-case>
 
@@ -209,7 +209,7 @@
             }
         }'
     >
-        <y-description>Scanning text starting in an &lt;rt&gt; element. Should start scanning at the start of the &lt;ruby&gt; tag instead.</y-description>
+        <test-description>Scanning text starting in an &lt;rt&gt; element. Should start scanning at the start of the &lt;ruby&gt; tag instead.</test-description>
 <div><ruby>小<rp>(</rp><rt>こ</rt><rp>)</rp></ruby>ぢんまり1</div>
     </test-case>
 
@@ -225,7 +225,7 @@
             }
         }'
     >
-        <y-description>Skip &lt;script&gt; content.</y-description>
+        <test-description>Skip &lt;script&gt; content.</test-description>
 <div>小ぢん<script>/*comment*/</script>まり1</div>
     </test-case>
 
@@ -241,7 +241,7 @@
             }
         }'
     >
-        <y-description>Skip &lt;style&gt; content.</y-description>
+        <test-description>Skip &lt;style&gt; content.</test-description>
 <div>小ぢん<style>/*comment*/</style>まり1</div>
     </test-case>
 
@@ -257,7 +257,7 @@
             }
         }'
     >
-        <y-description>Skip &lt;textarea&gt; content.</y-description>
+        <test-description>Skip &lt;textarea&gt; content.</test-description>
 <div>小ぢん<textarea>textarea content</textarea>まり1</div>
     </test-case>
 
@@ -273,7 +273,7 @@
             }
         }'
     >
-        <y-description>Skip &lt;input&gt; content.</y-description>
+        <test-description>Skip &lt;input&gt; content.</test-description>
 <div>小ぢん<input value="content">まり1</div>
     </test-case>
 
@@ -289,7 +289,7 @@
             }
         }'
     >
-        <y-description>Skip &lt;button&gt; content.</y-description>
+        <test-description>Skip &lt;button&gt; content.</test-description>
 <div>小ぢん<button type="button">content</button>まり1</div>
     </test-case>
 
@@ -305,7 +305,7 @@
             }
         }'
     >
-        <y-description>Skip content with font-size:0.</y-description>
+        <test-description>Skip content with font-size:0.</test-description>
 <div>小ぢん<span style="font-size: 0;">content</span>まり1</div>
     </test-case>
 
@@ -321,7 +321,7 @@
             }
         }'
     >
-        <y-description>Skip content with opacity:0.</y-description>
+        <test-description>Skip content with opacity:0.</test-description>
 <div>小ぢん<span style="opacity: 0;">content</span>まり1</div>
     </test-case>
 
@@ -337,7 +337,7 @@
             }
         }'
     >
-        <y-description>Skip content with visibility:hidden.</y-description>
+        <test-description>Skip content with visibility:hidden.</test-description>
 <div>小ぢん<span style="visibility: hidden;">content</span>まり1</div>
     </test-case>
 
@@ -353,7 +353,7 @@
             }
         }'
     >
-        <y-description>Skip content with display:none.</y-description>
+        <test-description>Skip content with display:none.</test-description>
 <div>小ぢん<span style="display: none;">content</span>まり1</div>
     </test-case>
 
@@ -369,7 +369,7 @@
             }
         }'
     >
-        <y-description>Don't skip content with user-select:none.</y-description>
+        <test-description>Don't skip content with user-select:none.</test-description>
 <div>小ぢ<span style="user-select: none;">ん</span>まり1</div>
     </test-case>
 
@@ -385,7 +385,7 @@
             }
         }'
     >
-        <y-description>Skip content with user-select:none <em>and</em> a transparent color.</y-description>
+        <test-description>Skip content with user-select:none <em>and</em> a transparent color.</test-description>
 <div>小ぢん<span style="user-select: none; color: rgba(0, 0, 0, 0);">content</span>まり1</div>
     </test-case>
 
