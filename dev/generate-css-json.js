@@ -86,7 +86,7 @@ function removeProperty(styles, property, removedProperties) {
 }
 
 /**
- * Manually formats JSON for improved compactness.
+ * Manually formats JSON for easier CSS parseability.
  * @param {import('css-style-applier').RawStyleData} rules CSS ruleset.
  * @returns {string}
  */
