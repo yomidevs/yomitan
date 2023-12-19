@@ -97,9 +97,9 @@ export function formatRulesJson(rules) {
     const indent3 = indent1.repeat(3);
     let result = '';
     result += '[';
-    let outerIndex = 0;
+    let ruleIndex = 0;
     for (const {selectors, styles} of rules) {
-        if (outerIndex > 0) { result += ','; }
+        if (ruleIndex > 0) { result += ','; }
         result += `\n${indent1}{\n${indent2}"selectors": `;
         if (selectors.length === 1) {
             result += `[${JSON.stringify(selectors[0], null, 4)}]`;
@@ -107,17 +107,17 @@ export function formatRulesJson(rules) {
             result += JSON.stringify(selectors, null, 4).replace(/\n/g, '\n' + indent2);
         }
         result += `,\n${indent2}"styles": [`;
-        let innerIndex = 0;
+        let styleIndex = 0;
         for (const [key, value] of styles) {
-            if (innerIndex > 0) { result += ','; }
+            if (styleIndex > 0) { result += ','; }
             result += `\n${indent3}[${JSON.stringify(key)}, ${JSON.stringify(value)}]`;
-            ++innerIndex;
+            ++styleIndex;
         }
-        if (innerIndex > 0) { result += `\n${indent2}`; }
+        if (styleIndex > 0) { result += `\n${indent2}`; }
         result += `]\n${indent1}}`;
-        ++outerIndex;
+        ++ruleIndex;
     }
-    if (outerIndex > 0) { result += '\n'; }
+    if (ruleIndex > 0) { result += '\n'; }
     result += ']';
     return result;
 }
