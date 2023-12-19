@@ -289,8 +289,11 @@ export class Database {
                     if (typeof filterKeys === 'function') {
                         keys = filterKeys(keys);
                     }
-                    this._bulkDeleteInternal(objectStore, keys, onProgress);
-                    transaction.commit();
+                    this._bulkDeleteInternal(objectStore, keys, 1000, 0, onProgress, (error) => {
+                        if (error !== null) {
+                            transaction.commit();
+                        }
+                    });
                 } catch (e) {
                     reject(e);
                 }
@@ -458,31 +461,74 @@ export class Database {
     }
 
     /**
-     * @param {IDBObjectStore} objectStore
-     * @param {IDBValidKey[]} keys
-     * @param {?(completedCount: number, totalCount: number) => void} onProgress
+     * @param {IDBObjectStore} objectStore The object store from which items are being deleted.
+     * @param {IDBValidKey[]} keys An array of keys to delete from the object store.
+     * @param {number} maxActiveRequests The maximum number of concurrent requests.
+     * @param {number} maxActiveRequestsForContinue The maximum number of requests that can be active before the next set of requests is started.
+     *   For example:
+     *   - If this value is `0`, all of the `maxActiveRequests` requests must complete before another group of `maxActiveRequests` is started off.
+     *   - If the value is greater than or equal to `maxActiveRequests-1`, every time a single request completes, a new single request will be started.
+     * @param {?(completedCount: number, totalCount: number) => void} onProgress An optional progress callback function.
+     * @param {(error: ?Error) => void} onComplete A function which is called after all operations have finished.
+     *   If an error occured, the `error` parameter will be non-`null`. Otherwise, it will be `null`.
+     * @throws {Error} An error is thrown if the input parameters are invalid.
      */
-    _bulkDeleteInternal(objectStore, keys, onProgress) {
+    _bulkDeleteInternal(objectStore, keys, maxActiveRequests, maxActiveRequestsForContinue, onProgress, onComplete) {
+        if (maxActiveRequests <= 0) { throw new Error(`maxActiveRequests has an invalid value: ${maxActiveRequests}`); }
+        if (maxActiveRequestsForContinue < 0) { throw new Error(`maxActiveRequestsForContinue has an invalid value: ${maxActiveRequestsForContinue}`); }
+
         const count = keys.length;
-        if (count === 0) { return; }
+        if (count === 0) {
+            onComplete(null);
+            return;
+        }
 
         let completedCount = 0;
+        let completed = false;
+        let index = 0;
+        let active = 0;
+
         const onSuccess = () => {
+            if (completed) { return; }
+            --active;
             ++completedCount;
-            try {
-                /** @type {(completedCount: number, totalCount: number) => void}} */ (onProgress)(completedCount, count);
-            } catch (e) {
-                // NOP
+            if (onProgress !== null) {
+                try {
+                    onProgress(completedCount, count);
+                } catch (e) {
+                    // NOP
+                }
+            }
+            if (completedCount >= count) {
+                completed = true;
+                onComplete(null);
+            } else if (active <= maxActiveRequestsForContinue) {
+                next();
             }
         };
 
-        const hasProgress = (typeof onProgress === 'function');
-        for (const key of keys) {
-            const request = objectStore.delete(key);
-            if (hasProgress) {
+        /**
+         * @param {Event} event
+         */
+        const onError = (event) => {
+            if (completed) { return; }
+            completed = true;
+            const request = /** @type {IDBRequest<undefined>} */ (event.target);
+            const {error} = request;
+            onComplete(error);
+        };
+
+        const next = () => {
+            for (; index < count && active < maxActiveRequests; ++index) {
+                const key = keys[index];
+                const request = objectStore.delete(key);
                 request.onsuccess = onSuccess;
+                request.onerror = onError;
+                ++active;
             }
-        }
+        };
+
+        next();
     }
 
     /**
