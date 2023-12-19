@@ -230,8 +230,7 @@ export class DocumentUtil {
      */
     static computeZoomScale(node) {
         if (this._cssZoomSupported === null) {
-            // @ts-expect-error - zoom is a non-standard property that exists in Chromium-based browsers
-            this._cssZoomSupported = (typeof document.createElement('div').style.zoom === 'string');
+            this._cssZoomSupported = this._computeCssZoomSupported();
         }
         if (!this._cssZoomSupported) { return 1; }
         // documentElement must be excluded because the computer style of its zoom property is inconsistent.
@@ -1074,6 +1073,17 @@ export class DocumentUtil {
             value = parseFloat(value);
         }
         return !Number.isNaN(value) ? value : null;
+    }
+
+    /**
+     * Computes whether or not this browser and document supports CSS zoom, which is primarily a legacy Chromium feature.
+     * @returns {boolean}
+     */
+    static _computeCssZoomSupported() {
+        // 'style' can be undefined in certain contexts, such as when document is an SVG document.
+        const {style} = document.createElement('div');
+        // @ts-expect-error - zoom is a non-standard property.
+        return (typeof style === 'object' && style !== null && typeof style.zoom === 'string');
     }
 }
 /** @type {RegExp} */
