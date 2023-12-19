@@ -34,7 +34,7 @@ import {createDomTest} from './dom-test.js';
 const extDir = join(dirname(fileURLToPath(import.meta.url)), '../../ext');
 const deinflectionReasonsPath = join(extDir, 'data/deinflect.json');
 
-/** @type {import('dev/vm').PseudoChrome} */
+/** @type {import('test/mocks').PseudoChrome} */
 const chrome = {
     runtime: {
         getURL: (path) => {
@@ -45,7 +45,7 @@ const chrome = {
 
 /**
  * @param {string} url
- * @returns {Promise<import('dev/vm').PseudoFetchResponse>}
+ * @returns {Promise<import('test/mocks').PseudoFetchResponse>}
  */
 async function fetch(url) {
     let filePath;

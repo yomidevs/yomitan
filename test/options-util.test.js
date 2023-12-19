@@ -30,7 +30,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * @param {string} url2
- * @returns {Promise<import('dev/vm').PseudoFetchResponse>}
+ * @returns {Promise<import('test/mocks').PseudoFetchResponse>}
  */
 async function fetch(url2) {
     const filePath = url.fileURLToPath(url2);
@@ -44,7 +44,7 @@ async function fetch(url2) {
         json: async () => Promise.resolve(parseJson(content.toString('utf8')))
     };
 }
-/** @type {import('dev/vm').PseudoChrome} */
+/** @type {import('test/mocks').PseudoChrome} */
 const chrome = {
     runtime: {
         getURL(path2) {
