@@ -21,8 +21,8 @@
  * TODO : This function is not very type safe at the moment, could be improved.
  * @template {import('translation').FindTermsOptions|import('translation').FindKanjiOptions} T
  * @param {string} dictionaryName
- * @param {import('dev/vm').OptionsPresetObject} optionsPresets
- * @param {import('dev/vm').OptionsList} optionsArray
+ * @param {import('test/translator').OptionsPresetObject} optionsPresets
+ * @param {import('test/translator').OptionsList} optionsArray
  * @returns {T}
  * @throws {Error}
  */
