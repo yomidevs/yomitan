@@ -1,42 +1,38 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Yomitan Manual Tests</title>
-    <link rel="icon" type="image/gif"
-        href="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
+    <link rel="icon" type="image/gif" href="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
     <link rel="stylesheet" href="test-stylesheet.css">
-    <script src="test-document2-script.js"></script>
+    <script src="js/html-test-utilities.js"></script>
+    <script src="js/test-document2.js"></script>
+    <style id="container-styles">
+.container {
+    width: 100%;
+    height: 200px;
+    border: 1px solid #d8d8d8;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.container-inner {
+    background-color: #f8f8f8;
+    padding: 0.5em;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.danger {
+    color: #c83c28;
+}
+    </style>
 </head>
-<style id="container-styles">
-    .container {
-        width: 100%;
-        height: 200px;
-        border: 1px solid #d8d8d8;
-        position: relative;
-        box-sizing: border-box;
-    }
-
-    .container-inner {
-        background-color: #f8f8f8;
-        padding: 0.5em;
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        right: 0;
-    }
-
-    .danger {
-        color: #c83c28;
-    }
-
-</style>
-
 <body>
-
     <h1>Yomitan Manual Tests</h1>
     <test-description>Manual tests involving fullscreen elements, &lt;iframe&gt;s, and shadow DOMs.</test-description>
 
@@ -177,46 +173,5 @@
             </text>
         </svg>
     </test-case>
-
-
-    <script>
-        (() => {
-            function stringToTypedArray(string) {
-                const array = new Uint8Array(string.length);
-                for (let i = 0; i < string.length; ++i) {
-                    array[i] = string.charCodeAt(i);
-                }
-                return array;
-            }
-
-            function dataUrlToContent(dataUrl) {
-                const [, type, isBase64, data] = /^data:([^;]*);(base64,)?([\w\W]*)$/.exec(dataUrl);
-                const content = (
-                    isBase64 ?
-                        new TextDecoder().decode(stringToTypedArray(atob(data))) :
-                        data
-                );
-                return { content, type };
-            }
-
-            function dataUrlToBlob(dataUrl) {
-                const { content, type } = dataUrlToContent(dataUrl);
-                return new Blob([content], { type });
-            }
-
-            for (const element of document.querySelectorAll('test-case')) {
-                setup(element);
-            }
-
-            const iframeWithDataUrl = document.querySelector('#iframe-with-data-url');
-            const iframeWithBlobUrl = document.querySelector('#iframe-with-blob-url');
-            iframeWithBlobUrl.src = URL.createObjectURL(dataUrlToBlob(iframeWithDataUrl.src));
-            for (const iframeWithSrcdoc of document.querySelectorAll('.iframe-with-srcdoc')) {
-                iframeWithSrcdoc.srcdoc = dataUrlToContent(iframeWithDataUrl.src).content;
-            }
-        })();
-    </script>
-
 </body>
-
 </html>

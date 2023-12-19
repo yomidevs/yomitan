@@ -661,7 +661,7 @@
         },
         {
             "files": [
-                "test/data/html/*.js"
+                "test/data/html/**/*.js"
             ],
             "parserOptions": {
                 "sourceType": "script"
@@ -670,9 +670,17 @@
                 "browser": true,
                 "node": false,
                 "webextensions": false
-            },
-            "rules": {
-                "no-implicit-globals": "off"
+            }
+        },
+        {
+            "files": [
+                "test/data/html/**/*.js"
+            ],
+            "excludedFiles": [
+                "test/data/html/js/html-test-utilities.js"
+            ],
+            "globals": {
+                "HtmlTestUtilities": "readonly"
             }
         },
         {
