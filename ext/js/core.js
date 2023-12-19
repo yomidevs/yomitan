@@ -53,101 +53,91 @@ export function stringReverse(string) {
  * @returns {T} A new clone of the value.
  * @throws An error if the value is circular and cannot be cloned.
  */
-export const clone = (() => {
-    /**
-     * @template T
-     * @param {T} value
-     * @returns {T}
-     */
-    // eslint-disable-next-line no-shadow, @typescript-eslint/no-shadow
-    function clone(value) {
-        if (value === null) { return /** @type {T} */ (null); }
-        switch (typeof value) {
-            case 'boolean':
-            case 'number':
-            case 'string':
-            case 'bigint':
-            case 'symbol':
-            case 'undefined':
-                return value;
-            default:
-                return cloneInternal(value, new Set());
-        }
+export function clone(value) {
+    if (value === null) { return /** @type {T} */ (null); }
+    switch (typeof value) {
+        case 'boolean':
+        case 'number':
+        case 'string':
+        case 'bigint':
+        case 'symbol':
+        case 'undefined':
+            return value;
+        default:
+            return cloneInternal(value, new Set());
     }
+}
 
-    /**
-     * @template [T=unknown]
-     * @param {T} value
-     * @param {Set<unknown>} visited
-     * @returns {T}
-     * @throws {Error}
-     */
-    function cloneInternal(value, visited) {
-        if (value === null) { return /** @type {T} */ (null); }
-        switch (typeof value) {
-            case 'boolean':
-            case 'number':
-            case 'string':
-            case 'bigint':
-            case 'symbol':
-            case 'undefined':
-                return value;
-            case 'object':
-                return /** @type {T} */ (
+/**
+ * @template [T=unknown]
+ * @param {T} value
+ * @param {Set<unknown>} visited
+ * @returns {T}
+ * @throws {Error}
+ */
+function cloneInternal(value, visited) {
+    if (value === null) { return /** @type {T} */ (null); }
+    switch (typeof value) {
+        case 'boolean':
+        case 'number':
+        case 'string':
+        case 'bigint':
+        case 'symbol':
+        case 'undefined':
+            return value;
+        case 'object':
+            return /** @type {T} */ (
                     Array.isArray(value) ?
                     cloneArray(value, visited) :
                     cloneObject(/** @type {import('core').SerializableObject} */ (value), visited)
-                );
-            default:
-                throw new Error(`Cannot clone object of type ${typeof value}`);
-        }
+            );
+        default:
+            throw new Error(`Cannot clone object of type ${typeof value}`);
     }
+}
 
-    /**
-     * @param {unknown[]} value
-     * @param {Set<unknown>} visited
-     * @returns {unknown[]}
-     * @throws {Error}
-     */
-    function cloneArray(value, visited) {
-        if (visited.has(value)) { throw new Error('Circular'); }
-        try {
-            visited.add(value);
-            const result = [];
-            for (const item of value) {
-                result.push(cloneInternal(item, visited));
+/**
+ * @param {unknown[]} value
+ * @param {Set<unknown>} visited
+ * @returns {unknown[]}
+ * @throws {Error}
+ */
+function cloneArray(value, visited) {
+    if (visited.has(value)) { throw new Error('Circular'); }
+    try {
+        visited.add(value);
+        const result = [];
+        for (const item of value) {
+            result.push(cloneInternal(item, visited));
+        }
+        return result;
+    } finally {
+        visited.delete(value);
+    }
+}
+
+/**
+ * @param {import('core').SerializableObject} value
+ * @param {Set<unknown>} visited
+ * @returns {import('core').SerializableObject}
+ * @throws {Error}
+ */
+function cloneObject(value, visited) {
+    if (visited.has(value)) { throw new Error('Circular'); }
+    try {
+        visited.add(value);
+        /** @type {import('core').SerializableObject} */
+        const result = {};
+        for (const key in value) {
+            if (Object.prototype.hasOwnProperty.call(value, key)) {
+                result[key] = cloneInternal(value[key], visited);
             }
-            return result;
-        } finally {
-            visited.delete(value);
         }
+        return result;
+    } finally {
+        visited.delete(value);
     }
-
-    /**
-     * @param {import('core').SerializableObject} value
-     * @param {Set<unknown>} visited
-     * @returns {import('core').SerializableObject}
-     * @throws {Error}
-     */
-    function cloneObject(value, visited) {
-        if (visited.has(value)) { throw new Error('Circular'); }
-        try {
-            visited.add(value);
-            /** @type {import('core').SerializableObject} */
-            const result = {};
-            for (const key in value) {
-                if (Object.prototype.hasOwnProperty.call(value, key)) {
-                    result[key] = cloneInternal(value[key], visited);
-                }
-            }
-            return result;
-        } finally {
-            visited.delete(value);
-        }
-    }
-
-    return clone;
-})();
+}
 
 /**
  * Checks if an object or value is deeply equal to another object or value.
@@ -155,98 +145,88 @@ export const clone = (() => {
  * @param {unknown} value2 The second value to check.
  * @returns {boolean} `true` if the values are the same object, or deeply equal without cycles. `false` otherwise.
  */
-export const deepEqual = (() => {
-    /**
-     * @param {unknown} value1
-     * @param {unknown} value2
-     * @returns {boolean}
-     */
-    // eslint-disable-next-line no-shadow, @typescript-eslint/no-shadow
-    function deepEqual(value1, value2) {
-        if (value1 === value2) { return true; }
+export function deepEqual(value1, value2) {
+    if (value1 === value2) { return true; }
 
-        const type = typeof value1;
-        if (typeof value2 !== type) { return false; }
+    const type = typeof value1;
+    if (typeof value2 !== type) { return false; }
 
-        switch (type) {
-            case 'object':
-            case 'function':
-                return deepEqualInternal(value1, value2, new Set());
-            default:
-                return false;
-        }
+    switch (type) {
+        case 'object':
+        case 'function':
+            return deepEqualInternal(value1, value2, new Set());
+        default:
+            return false;
     }
+}
 
-    /**
-     * @param {unknown} value1
-     * @param {unknown} value2
-     * @param {Set<unknown>} visited1
-     * @returns {boolean}
-     */
-    function deepEqualInternal(value1, value2, visited1) {
-        if (value1 === value2) { return true; }
+/**
+ * @param {unknown} value1
+ * @param {unknown} value2
+ * @param {Set<unknown>} visited1
+ * @returns {boolean}
+ */
+function deepEqualInternal(value1, value2, visited1) {
+    if (value1 === value2) { return true; }
 
-        const type = typeof value1;
-        if (typeof value2 !== type) { return false; }
+    const type = typeof value1;
+    if (typeof value2 !== type) { return false; }
 
-        switch (type) {
-            case 'object':
-            case 'function':
-            {
-                if (value1 === null || value2 === null) { return false; }
-                const array = Array.isArray(value1);
-                if (array !== Array.isArray(value2)) { return false; }
-                if (visited1.has(value1)) { return false; }
-                visited1.add(value1);
-                return (
+    switch (type) {
+        case 'object':
+        case 'function':
+        {
+            if (value1 === null || value2 === null) { return false; }
+            const array = Array.isArray(value1);
+            if (array !== Array.isArray(value2)) { return false; }
+            if (visited1.has(value1)) { return false; }
+            visited1.add(value1);
+            return (
                     array ?
                     areArraysEqual(/** @type {unknown[]} */ (value1), /** @type {unknown[]} */ (value2), visited1) :
                     areObjectsEqual(/** @type {import('core').UnknownObject} */ (value1), /** @type {import('core').UnknownObject} */ (value2), visited1)
-                );
-            }
-            default:
-                return false;
+            );
         }
+        default:
+            return false;
+    }
+}
+
+/**
+ * @param {import('core').UnknownObject} value1
+ * @param {import('core').UnknownObject} value2
+ * @param {Set<unknown>} visited1
+ * @returns {boolean}
+ */
+function areObjectsEqual(value1, value2, visited1) {
+    const keys1 = Object.keys(value1);
+    const keys2 = Object.keys(value2);
+    if (keys1.length !== keys2.length) { return false; }
+
+    const keys1Set = new Set(keys1);
+    for (const key of keys2) {
+        if (!keys1Set.has(key) || !deepEqualInternal(value1[key], value2[key], visited1)) { return false; }
     }
 
-    /**
-     * @param {import('core').UnknownObject} value1
-     * @param {import('core').UnknownObject} value2
-     * @param {Set<unknown>} visited1
-     * @returns {boolean}
-     */
-    function areObjectsEqual(value1, value2, visited1) {
-        const keys1 = Object.keys(value1);
-        const keys2 = Object.keys(value2);
-        if (keys1.length !== keys2.length) { return false; }
+    return true;
+}
 
-        const keys1Set = new Set(keys1);
-        for (const key of keys2) {
-            if (!keys1Set.has(key) || !deepEqualInternal(value1[key], value2[key], visited1)) { return false; }
-        }
+/**
+ * @param {unknown[]} value1
+ * @param {unknown[]} value2
+ * @param {Set<unknown>} visited1
+ * @returns {boolean}
+ */
+function areArraysEqual(value1, value2, visited1) {
+    const length = value1.length;
+    if (length !== value2.length) { return false; }
 
-        return true;
+    for (let i = 0; i < length; ++i) {
+        if (!deepEqualInternal(value1[i], value2[i], visited1)) { return false; }
     }
 
-    /**
-     * @param {unknown[]} value1
-     * @param {unknown[]} value2
-     * @param {Set<unknown>} visited1
-     * @returns {boolean}
-     */
-    function areArraysEqual(value1, value2, visited1) {
-        const length = value1.length;
-        if (length !== value2.length) { return false; }
-
-        for (let i = 0; i < length; ++i) {
-            if (!deepEqualInternal(value1[i], value2[i], visited1)) { return false; }
-        }
-
-        return true;
-    }
-
-    return deepEqual;
-})();
+    return true;
+}
 
 /**
  * Creates a new base-16 (lower case) string of a sequence of random bytes of the given length.

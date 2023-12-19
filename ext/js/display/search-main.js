@@ -29,7 +29,8 @@ import {SearchActionPopupController} from './search-action-popup-controller.js';
 import {SearchDisplayController} from './search-display-controller.js';
 import {SearchPersistentStateController} from './search-persistent-state-controller.js';
 
-(async () => {
+/** Entry point. */
+async function main() {
     try {
         const documentFocusController = new DocumentFocusController('#search-textbox');
         documentFocusController.prepare();
@@ -69,4 +70,6 @@ import {SearchPersistentStateController} from './search-persistent-state-control
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+await main();

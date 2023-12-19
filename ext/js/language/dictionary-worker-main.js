@@ -19,11 +19,14 @@
 import {log} from '../core.js';
 import {DictionaryWorkerHandler} from './dictionary-worker-handler.js';
 
-(() => {
+/** Entry point. */
+function main() {
     try {
         const dictionaryWorkerHandler = new DictionaryWorkerHandler();
         dictionaryWorkerHandler.prepare();
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+main();

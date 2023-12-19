@@ -18,6 +18,9 @@
 
 import {Offscreen} from './offscreen.js';
 
-(() => {
+/** Entry point. */
+async function main() {
     new Offscreen();
-})();
+}
+
+await main();

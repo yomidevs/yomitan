@@ -21,8 +21,8 @@ import {formatRulesJson, generateRules, getTargets} from '../generate-css-json.j
 
 /** */
 function main() {
-    for (const {cssFile, overridesCssFile, outputPath} of getTargets()) {
-        const json = formatRulesJson(generateRules(cssFile, overridesCssFile));
+    for (const {cssFilePath, overridesCssFilePath, outputPath} of getTargets()) {
+        const json = formatRulesJson(generateRules(cssFilePath, overridesCssFilePath));
         fs.writeFileSync(outputPath, json, {encoding: 'utf8'});
     }
 }
