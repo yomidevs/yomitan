@@ -21,6 +21,7 @@ import {join, dirname as pathDirname} from 'path';
 import {createGenerator} from 'ts-json-schema-generator';
 import {fileURLToPath} from 'url';
 import {describe, expect, test} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {getAllFiles} from '../dev/util.js';
 
 const dirname = pathDirname(fileURLToPath(import.meta.url));
@@ -53,9 +54,8 @@ function createValidatorFunctionFromTypeScript(path, type) {
  * @returns {import('ajv').ValidateFunction<unknown>}
  */
 function createValidatorFunctionFromSchemaJson(path) {
-    // TODO
     /** @type {import('ajv').Schema} */
-    const schema = JSON.parse(readFileSync(path, {encoding: 'utf8'}));
+    const schema = parseJson(readFileSync(path, {encoding: 'utf8'}));
     const ajv = new Ajv();
     return ajv.compile(schema);
 }
@@ -98,7 +98,7 @@ describe.concurrent('JSON validation', () => {
     const jsonFileName = 'json.json';
 
     /** @type {import('test/json').JsonInfo} */
-    const jsonFileData = JSON.parse(readFileSync(join(dirname, `data/${jsonFileName}`), {encoding: 'utf8'}));
+    const jsonFileData = parseJson(readFileSync(join(dirname, `data/${jsonFileName}`), {encoding: 'utf8'}));
 
     test(`Each item in ${jsonFileName} must have a unique path`, () => {
         /** @type {Set<string>} */
@@ -138,7 +138,7 @@ describe.concurrent('JSON validation', () => {
     }
     test.each(schemaValidationTargets1)('Validating file against TypeScript: $path', ({path, typeFile, type}) => {
         const validate = createValidatorFunctionFromTypeScript(join(rootDir, typeFile), type);
-        const data = JSON.parse(readFileSync(join(rootDir, path), {encoding: 'utf8'}));
+        const data = parseJson(readFileSync(join(rootDir, path), {encoding: 'utf8'}));
         const valid = validate(data);
         const {errors} = validate;
         expect(errors).toBe(null);
@@ -158,7 +158,7 @@ describe.concurrent('JSON validation', () => {
     }
     test.each(schemaValidationTargets2)('Validating file against schema: $path', ({path, schema}) => {
         const validate = createValidatorFunctionFromSchemaJson(join(rootDir, schema));
-        const data = JSON.parse(readFileSync(join(rootDir, path), {encoding: 'utf8'}));
+        const data = parseJson(readFileSync(join(rootDir, path), {encoding: 'utf8'}));
         const valid = validate(data);
         const {errors} = validate;
         expect(errors).toBe(null);
