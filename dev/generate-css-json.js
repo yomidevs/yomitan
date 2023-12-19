@@ -130,10 +130,10 @@ export function formatRulesJson(rules) {
  * @throws {Error}
  */
 export function generateRules(cssFilePath, overridesCssFilePath) {
-    const cssFilePathContent = fs.readFileSync(cssFilePath, {encoding: 'utf8'});
-    const overrideCssFilePath = fs.readFileSync(overridesCssFilePath, {encoding: 'utf8'});
-    const defaultStylesheet = /** @type {css.StyleRules} */ (css.parse(cssFilePathContent, {}).stylesheet);
-    const overrideStylesheet = /** @type {css.StyleRules} */ (css.parse(overridesCssFilePath, {}).stylesheet);
+    const cssFileContent = fs.readFileSync(cssFilePath, {encoding: 'utf8'});
+    const overridesCssFileContent = fs.readFileSync(overridesCssFilePath, {encoding: 'utf8'});
+    const defaultStylesheet = /** @type {css.StyleRules} */ (css.parse(cssFileContent, {}).stylesheet);
+    const overridesStylesheet = /** @type {css.StyleRules} */ (css.parse(overridesCssFileContent, {}).stylesheet);
 
     const removePropertyPattern = /^remove-property\s+([\w\W]+)$/;
     const removeRulePattern = /^remove-rule$/;
@@ -142,7 +142,6 @@ export function generateRules(cssFilePath, overridesCssFilePath) {
     /** @type {import('css-style-applier').RawStyleData} */
     const rules = [];
 
-    // Default stylesheet
     for (const rule of defaultStylesheet.rules) {
         if (rule.type !== 'rule') { continue; }
         const {selectors, declarations} = /** @type {css.Rule} */ (rule);
@@ -162,8 +161,7 @@ export function generateRules(cssFilePath, overridesCssFilePath) {
         }
     }
 
-    // Overrides
-    for (const rule of overrideStylesheet.rules) {
+    for (const rule of overridesStylesheet.rules) {
         if (rule.type !== 'rule') { continue; }
         const {selectors, declarations} = /** @type {css.Rule} */ (rule);
         if (typeof selectors === 'undefined' || typeof declarations === 'undefined') { continue; }
