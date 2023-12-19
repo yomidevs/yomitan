@@ -92,8 +92,8 @@ test('visual', async ({page, extensionId}) => {
         i++;
     }
 
-    // Load test-document2.html
-    await page.goto(pathToFileURL(path.join(root, 'test/data/html/test-document2.html')).toString());
+    // Test document 2
+    await page.goto(pathToFileURL(path.join(root, 'test/data/html/popup-tests.html')).toString());
     await page.setViewportSize({width: 1000, height: 4500});
     await page.keyboard.down('Shift');
     i = 1;

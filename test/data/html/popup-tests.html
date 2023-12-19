@@ -7,7 +7,7 @@
     <link rel="icon" type="image/gif" href="data:image/gif;base64,R0lGODdhAQABAIABAAAAAP///ywAAAAAAQABAAACAkQBADs=">
     <link rel="stylesheet" href="test-stylesheet.css">
     <script src="js/html-test-utilities.js"></script>
-    <script src="js/test-document2.js"></script>
+    <script src="js/popup-tests.js"></script>
     <style id="container-styles">
 .container {
     width: 100%;
@@ -89,14 +89,14 @@
 
     <test-case>
         <test-description>&lt;iframe&gt; element.</test-description>
-        <iframe src="test-document2-frame1.html" allowfullscreen="true" class="container hovertarget"></iframe>
+        <iframe src="popup-tests-frame1.html" allowfullscreen="true" class="container hovertarget"></iframe>
     </test-case>
 
     <test-case data-shadow-mode="open">
         <test-description>&lt;iframe&gt; element inside of an open shadow DOM.</test-description>
         <div class="template-content-container hovertarget"></div>
         <template>
-            <iframe src="test-document2-frame1.html" allowfullscreen="true" class="container"></iframe>
+            <iframe src="popup-tests-frame1.html" allowfullscreen="true" class="container"></iframe>
         </template>
     </test-case>
 
@@ -104,7 +104,7 @@
         <test-description>&lt;iframe&gt; element inside of a closed shadow DOM.</test-description>
         <div class="template-content-container hovertarget"></div>
         <template>
-            <iframe src="test-document2-frame1.html" allowfullscreen="true" class="container"></iframe>
+            <iframe src="popup-tests-frame1.html" allowfullscreen="true" class="container"></iframe>
         </template>
     </test-case>
 
@@ -143,22 +143,22 @@
 
     <test-case>
         <test-description>SVG &lt;img&gt;.</test-description>
-        <img src="test-document2-frame2.svg" class="container hovertarget" alt="">
+        <img src="popup-tests-frame2.svg" class="container hovertarget" alt="">
     </test-case>
 
     <test-case>
         <test-description>SVG &lt;object&gt;.</test-description>
-        <object data="test-document2-frame2.svg" type="image/svg+xml" class="container hovertarget"></object>
+        <object data="popup-tests-frame2.svg" type="image/svg+xml" class="container hovertarget"></object>
     </test-case>
 
     <test-case>
         <test-description>SVG &lt;embed&gt;.</test-description>
-        <embed type="image/svg+xml" src="test-document2-frame2.svg" class="container hovertarget">
+        <embed type="image/svg+xml" src="popup-tests-frame2.svg" class="container hovertarget">
     </test-case>
 
     <test-case>
         <test-description>SVG &lt;iframe&gt;.</test-description>
-        <iframe src="test-document2-frame2.svg" allowfullscreen="true" class="container hovertarget"></iframe>
+        <iframe src="popup-tests-frame2.svg" allowfullscreen="true" class="container hovertarget"></iframe>
     </test-case>
 
     <test-case>
