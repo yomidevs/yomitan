@@ -82,8 +82,8 @@ test('visual', async ({page, extensionId}) => {
         await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement()).waitForElementState('hidden'); // wait for popup to disappear
     };
 
-    // Load test-document1.html
-    await page.goto(pathToFileURL(path.join(root, 'test/data/html/test-document1.html')).toString());
+    // Test document 1
+    await page.goto(pathToFileURL(path.join(root, 'test/data/html/document-util.html')).toString());
     await page.setViewportSize({width: 1000, height: 1800});
     await page.keyboard.down('Shift');
     let i = 1;

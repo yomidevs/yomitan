@@ -109,7 +109,7 @@ function findImposterElement(document) {
     return document.querySelector('div[style*="2147483646"]>*');
 }
 
-const test = createDomTest(path.join(dirname, 'data/html/test-document1.html'));
+const test = createDomTest(path.join(dirname, 'data/html/document-util.html'));
 
 describe('DocumentUtil', () => {
     test('Text scanning functions', ({window}) => {
