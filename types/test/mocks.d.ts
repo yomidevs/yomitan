@@ -15,13 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type PseudoChrome = {
+export type ChromeMock = {
     runtime: {
         getURL(path: string): string;
     };
 };
 
-export type PseudoFetchResponse = {
+export type FetchMock = (url: string) => Promise<FetchResponseMock>;
+
+export type FetchResponseMock = {
     ok: boolean;
     status: number;
     statusText: string;

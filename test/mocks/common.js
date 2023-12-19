@@ -23,7 +23,7 @@ import {parseJson} from '../../dev/json.js';
 
 const extDir = join(dirname(fileURLToPath(import.meta.url)), '../../ext');
 
-/** @type {import('test/mocks').PseudoChrome} */
+/** @type {import('test/mocks').ChromeMock} */
 export const chrome = {
     runtime: {
         getURL: (path) => {
@@ -32,10 +32,7 @@ export const chrome = {
     }
 };
 
-/**
- * @param {string} url
- * @returns {Promise<import('test/mocks').PseudoFetchResponse>}
- */
+/** @type {import('test/mocks').FetchMock} */
 export async function fetch(url) {
     let filePath;
     try {
