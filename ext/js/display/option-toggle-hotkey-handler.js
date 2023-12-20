@@ -71,17 +71,17 @@ export class OptionToggleHotkeyHandler {
         try {
             const optionsContext = this._display.getOptionsContext();
 
-            const result = (await yomitan.api.getSettings([{
+            const getSettingsResponse = (await yomitan.api.getSettings([{
                 scope: 'profile',
                 path,
                 optionsContext
             }]))[0];
-            const {error} = result;
-            if (typeof error !== 'undefined') {
-                throw ExtensionError.deserialize(error);
+            const {error: getSettingsError} = getSettingsResponse;
+            if (typeof getSettingsError !== 'undefined') {
+                throw ExtensionError.deserialize(getSettingsError);
             }
 
-            value = result.result;
+            value = getSettingsResponse.result;
             if (typeof value !== 'boolean') {
                 throw new Error(`Option value of type ${typeof value} cannot be toggled`);
             }
@@ -96,10 +96,10 @@ export class OptionToggleHotkeyHandler {
                 value,
                 optionsContext
             };
-            const result2 = (await yomitan.api.modifySettings([modification], this._source))[0];
-            const {error: error2} = result2;
-            if (typeof error2 !== 'undefined') {
-                throw ExtensionError.deserialize(error2);
+            const modifySettingsResponse = (await yomitan.api.modifySettings([modification], this._source))[0];
+            const {error: modifySettingsError} = modifySettingsResponse;
+            if (typeof modifySettingsError !== 'undefined') {
+                throw ExtensionError.deserialize(modifySettingsError);
             }
 
             this._showNotification(this._createSuccessMessage(path, value), true);

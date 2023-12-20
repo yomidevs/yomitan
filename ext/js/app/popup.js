@@ -417,7 +417,7 @@ export class Popup extends EventDispatcher {
     _inject() {
         let injectPromise = this._injectPromise;
         if (injectPromise === null) {
-            injectPromise = this._injectInner1();
+            injectPromise = this._injectInnerWrapper();
             this._injectPromise = injectPromise;
             injectPromise.then(
                 () => {
@@ -433,9 +433,9 @@ export class Popup extends EventDispatcher {
     /**
      * @returns {Promise<boolean>}
      */
-    async _injectInner1() {
+    async _injectInnerWrapper() {
         try {
-            await this._injectInner2();
+            await this._injectInner();
             return true;
         } catch (e) {
             this._resetFrame();
@@ -447,7 +447,7 @@ export class Popup extends EventDispatcher {
     /**
      * @returns {Promise<void>}
      */
-    async _injectInner2() {
+    async _injectInner() {
         if (this._optionsContext === null) {
             throw new Error('Options not initialized');
         }

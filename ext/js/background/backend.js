@@ -2418,13 +2418,13 @@ export class Backend {
         if (error instanceof ExtensionError && typeof error.data === 'object' && error.data !== null) {
             const {errors} = /** @type {import('core').SerializableObject} */ (error.data);
             if (Array.isArray(errors)) {
-                for (const error2 of errors) {
-                    if (!(error2 instanceof Error)) { continue; }
-                    if (error2.name === 'AbortError') {
+                for (const errorDetail of errors) {
+                    if (!(errorDetail instanceof Error)) { continue; }
+                    if (errorDetail.name === 'AbortError') {
                         return this._createAudioDownloadError('Audio download was cancelled due to an idle timeout', 'audio-download-idle-timeout', errors);
                     }
-                    if (!(error2 instanceof ExtensionError)) { continue; }
-                    const {data} = error2;
+                    if (!(errorDetail instanceof ExtensionError)) { continue; }
+                    const {data} = errorDetail;
                     if (!(typeof data === 'object' && data !== null)) { continue; }
                     const {details} = /** @type {import('core').SerializableObject} */ (data);
                     if (!(typeof details === 'object' && details !== null)) { continue; }

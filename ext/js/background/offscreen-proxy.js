@@ -95,16 +95,16 @@ export class OffscreenProxy {
      * @throws {Error}
      */
     _getMessageResponseResult(response) {
-        const error = chrome.runtime.lastError;
-        if (error) {
-            throw new Error(error.message);
+        const runtimeError = chrome.runtime.lastError;
+        if (typeof runtimeError !== 'undefined') {
+            throw new Error(runtimeError.message);
         }
         if (!isObject(response)) {
             throw new Error('Offscreen document did not respond');
         }
-        const error2 = response.error;
-        if (error2) {
-            throw ExtensionError.deserialize(error2);
+        const responseError = response.error;
+        if (responseError) {
+            throw ExtensionError.deserialize(responseError);
         }
         return response.result;
     }
