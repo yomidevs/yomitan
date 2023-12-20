@@ -55,9 +55,7 @@ export class Backend {
         this._japaneseUtil = new JapaneseUtil(wanakana);
         /** @type {Environment} */
         this._environment = new Environment();
-        /**
-         *
-         */
+        /** @type {AnkiConnect} */
         this._anki = new AnkiConnect();
         /** @type {Mecab} */
         this._mecab = new Mecab();

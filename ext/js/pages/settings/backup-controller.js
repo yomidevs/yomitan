@@ -50,13 +50,9 @@ export class BackupController {
         /** @type {?OptionsUtil} */
         this._optionsUtil = null;
 
-        /**
-         *
-         */
+        /** @type {string} */
         this._dictionariesDatabaseName = 'dict';
-        /**
-         *
-         */
+        /** @type {?import('core').TokenObject} */
         this._settingsExportDatabaseToken = null;
 
         try {
@@ -586,9 +582,7 @@ export class BackupController {
         return blob;
     }
 
-    /**
-     *
-     */
+    /** */
     async _onSettingsExportDatabaseClick() {
         if (this._settingsExportDatabaseToken !== null) {
             // An existing import or export is in progress.
@@ -603,6 +597,7 @@ export class BackupController {
         const date = new Date(Date.now());
         const pageExitPrevention = this._settingsController.preventPageExit();
         try {
+            /** @type {import('core').TokenObject} */
             const token = {};
             this._settingsExportDatabaseToken = token;
             const fileName = `yomitan-dictionaries-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
@@ -681,6 +676,7 @@ export class BackupController {
         const file = files[0];
         element.value = '';
         try {
+            /** @type {import('core').TokenObject} */
             const token = {};
             this._settingsExportDatabaseToken = token;
             await this._importDatabase(this._dictionariesDatabaseName, file);
