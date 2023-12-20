@@ -389,6 +389,7 @@ export class ProfileConditionsUI extends EventDispatcher {
      */
     _validateRegExp(value) {
         try {
+            // eslint-disable-next-line no-new
             new RegExp(value, 'i');
             return true;
         } catch (e) {

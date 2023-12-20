@@ -62,6 +62,7 @@
         "no-const-assign": "error",
         "no-constant-condition": "off",
         "no-global-assign": "error",
+        "no-new": "error",
         "no-param-reassign": "off",
         "no-prototype-builtins": "error",
         "no-shadow": [
