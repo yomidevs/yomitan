@@ -68,11 +68,13 @@ export class Offscreen {
         ]));
         /* eslint-enable no-multi-spaces */
 
-        const onMessage = this._onMessage.bind(this);
-        chrome.runtime.onMessage.addListener(onMessage);
-
         /** @type {?Promise<void>} */
         this._prepareDatabasePromise = null;
+    }
+
+    /** */
+    prepare() {
+        chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
     }
 
     /** @type {import('offscreen').MessageHandler<'clipboardGetTextOffscreen', true>} */
