@@ -394,21 +394,17 @@ for dictionary in dicts:
             if line.strip().startswith('"##'):
                 print(counters['lines']['n'], line.strip())
             elif line.strip().startswith('"') and ':' in line:
-                # try:
-                    line = line.rstrip(',\n')
+                line = line.rstrip(',\n')
 
-                    xml = getXMLfromLine(line)
+                xml = getXMLfromLine(line)
 
-                    new_entries, new_ipa = parse_xml(xml)
-                    termBank.extend(new_entries)
-                    ipaBank.extend(new_ipa)
+                new_entries, new_ipa = parse_xml(xml)
+                termBank.extend(new_entries)
+                ipaBank.extend(new_ipa)
 
-                    incrementCounter('entries.no', counters, not len(new_entries))
-                    incrementCounter('entries.yes', counters, len(new_entries))
-                    incrementCounter('entries.yes.multiple', counters, len(new_entries) > 1)
-
-                # except Exception as e:
-                #     print(count, 'Exception', e.__traceback__.tb_lineno)
+                incrementCounter('entries.no', counters, not len(new_entries))
+                incrementCounter('entries.yes', counters, len(new_entries))
+                incrementCounter('entries.yes.multiple', counters, len(new_entries) > 1)
             else:
                 print(counters['lines']['n'], 'ERROR', line.strip())
 
