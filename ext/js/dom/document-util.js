@@ -24,6 +24,13 @@ import {TextSourceRange} from './text-source-range.js';
  * This class contains utility functions related to the HTML document.
  */
 export class DocumentUtil {
+    /** @type {RegExp} @readonly */
+    static _transparentColorPattern = /rgba\s*\([^)]*,\s*0(?:\.0+)?\s*\)/;
+    /** @type {?boolean} */
+    static _cssZoomSupported = null;
+    /** @type {import('document-util').GetRangeFromPointHandler[]} @readonly */
+    static _getRangeFromPointHandlers = [];
+
     /**
      * Scans the document for text or elements with text information at the given coordinate.
      * Coordinates are provided in [client space](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems).
@@ -1086,12 +1093,3 @@ export class DocumentUtil {
         return (typeof style === 'object' && style !== null && typeof style.zoom === 'string');
     }
 }
-/** @type {RegExp} */
-// eslint-disable-next-line no-underscore-dangle
-DocumentUtil._transparentColorPattern = /rgba\s*\([^)]*,\s*0(?:\.0+)?\s*\)/;
-/** @type {?boolean} */
-// eslint-disable-next-line no-underscore-dangle
-DocumentUtil._cssZoomSupported = null;
-/** @type {import('document-util').GetRangeFromPointHandler[]} */
-// eslint-disable-next-line no-underscore-dangle
-DocumentUtil._getRangeFromPointHandlers = [];

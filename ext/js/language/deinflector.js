@@ -17,6 +17,19 @@
  */
 
 export class Deinflector {
+    /* eslint-disable no-multi-spaces */
+    /** @type {Map<string, import('translation-internal').DeinflectionRuleFlags>} @readonly */
+    static _ruleTypes = new Map([
+        ['v1',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00000001)], // Verb ichidan
+        ['v5',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00000010)], // Verb godan
+        ['vs',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00000100)], // Verb suru
+        ['vk',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00001000)], // Verb kuru
+        ['vz',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00010000)], // Verb zuru
+        ['adj-i', /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00100000)], // Adjective i
+        ['iru',   /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b01000000)] // Intermediate -iru endings for progressive or perfect tense
+    ]);
+    /* eslint-enable no-multi-spaces */
+
     /**
      * @param {import('deinflector').ReasonsRaw} reasons
      * @example
@@ -112,18 +125,3 @@ export class Deinflector {
         return value;
     }
 }
-
-
-/* eslint-disable no-multi-spaces */
-/** @type {Map<string, import('translation-internal').DeinflectionRuleFlags>} */
-// eslint-disable-next-line no-underscore-dangle
-Deinflector._ruleTypes = new Map([
-    ['v1',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00000001)], // Verb ichidan
-    ['v5',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00000010)], // Verb godan
-    ['vs',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00000100)], // Verb suru
-    ['vk',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00001000)], // Verb kuru
-    ['vz',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00010000)], // Verb zuru
-    ['adj-i', /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00100000)], // Adjective i
-    ['iru',   /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b01000000)] // Intermediate -iru endings for progressive or perfect tense
-]);
-/* eslint-enable no-multi-spaces */
