@@ -62,6 +62,6 @@ class JsonSchemaAjv {
 export function createJsonSchema(mode, schema) {
     switch (mode) {
         case 'ajv': return new JsonSchemaAjv(schema);
-        default: return new JsonSchema(/** @type {import('json-schema').Schema} */ (schema));
+        default: return new JsonSchema(/** @type {import('ext/json-schema').Schema} */ (schema));
     }
 }

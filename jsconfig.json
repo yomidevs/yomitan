@@ -12,7 +12,8 @@
         "skipLibCheck": false,
         "baseUrl": ".",
         "paths": {
-            "*": ["./types/ext/*"]
+            "*": ["./types/ext/*"],
+            "ext/json-schema": ["./types/ext/json-schema"]
         },
         "types": [
             "chrome",

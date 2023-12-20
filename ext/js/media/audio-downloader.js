@@ -278,7 +278,7 @@ export class AudioDownloader {
 
         if (this._customAudioListSchema === null) {
             const schema = await this._getCustomAudioListSchema();
-            this._customAudioListSchema = new JsonSchema(/** @type {import('json-schema').Schema} */ (schema));
+            this._customAudioListSchema = new JsonSchema(/** @type {import('ext/json-schema').Schema} */ (schema));
         }
         this._customAudioListSchema.validate(responseJson);
 

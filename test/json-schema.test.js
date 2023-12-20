@@ -23,7 +23,7 @@ import {parseJson} from '../dev/json.js';
 import {JsonSchema} from '../ext/js/data/json-schema.js';
 
 /**
- * @param {import('json-schema').Schema} schema
+ * @param {import('ext/json-schema').Schema} schema
  * @param {unknown} value
  * @returns {boolean}
  */
@@ -32,18 +32,18 @@ function schemaValidate(schema, value) {
 }
 
 /**
- * @param {import('json-schema').Schema} schema
+ * @param {import('ext/json-schema').Schema} schema
  * @param {unknown} value
- * @returns {import('json-schema').Value}
+ * @returns {import('ext/json-schema').Value}
  */
 function getValidValueOrDefault(schema, value) {
     return new JsonSchema(schema).getValidValueOrDefault(value);
 }
 
 /**
- * @param {import('json-schema').Schema} schema
- * @param {import('json-schema').Value} value
- * @returns {import('json-schema').Value}
+ * @param {import('ext/json-schema').Schema} schema
+ * @param {import('ext/json-schema').Value} value
+ * @returns {import('ext/json-schema').Value}
  */
 function createProxy(schema, value) {
     return new JsonSchema(schema).createProxy(value);
@@ -62,7 +62,7 @@ function clone(value) {
 /** */
 function testValidate1() {
     test('Validate1', () => {
-        /** @type {import('json-schema').Schema} */
+        /** @type {import('ext/json-schema').Schema} */
         const schema = {
             allOf: [
                 {
@@ -123,7 +123,7 @@ function testValidate1() {
 /** */
 function testValidate2() {
     test('Validate2', () => {
-        /** @type {{schema: import('json-schema').Schema, inputs: {expected: boolean, value: unknown}[]}[]} */
+        /** @type {{schema: import('ext/json-schema').Schema, inputs: {expected: boolean, value: unknown}[]}[]} */
         const data = [
             // String tests
             {
@@ -530,7 +530,7 @@ function testValidate2() {
 /** */
 function testGetValidValueOrDefault1() {
     test('GetValidValueOrDefault1', () => {
-        /** @type {{schema: import('json-schema').Schema, inputs: [value: unknown, expected: unknown][]}[]} */
+        /** @type {{schema: import('ext/json-schema').Schema, inputs: [value: unknown, expected: unknown][]}[]} */
         const data = [
             // Test value defaulting on objects with additionalProperties=false
             {
@@ -702,7 +702,7 @@ function testGetValidValueOrDefault1() {
                     type: 'object',
                     required: ['toString'],
                     properties: {
-                        toString: /** @type {import('json-schema').SchemaObject} */ ({
+                        toString: /** @type {import('ext/json-schema').SchemaObject} */ ({
                             type: 'string',
                             default: 'default'
                         })
@@ -888,7 +888,7 @@ function testGetValidValueOrDefault1() {
 /** */
 function testProxy1() {
     test('Proxy1', () => {
-        /** @type {{schema: import('json-schema').Schema, tests: {error: boolean, value?: import('json-schema').Value, action: (value: import('core').SafeAny) => void}[]}[]} */
+        /** @type {{schema: import('ext/json-schema').Schema, tests: {error: boolean, value?: import('ext/json-schema').Value, action: (value: import('core').SafeAny) => void}[]}[]} */
         const data = [
             // Object tests
             {

@@ -15,7 +15,9 @@
             "*": ["../types/ext/*"],
             "dev/*": ["../types/dev/*"],
             "test/*": ["../types/test/*"],
-            "rollup/parseAst": ["../types/other/rollup-parse-ast"]
+            "rollup/parseAst": ["../types/other/rollup-parse-ast"],
+            "ext/json-schema": ["../types/ext/json-schema"],
+            "json-schema": ["json-schema"]
         },
         "types": [
             "chrome",

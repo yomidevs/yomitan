@@ -18,8 +18,8 @@
 
 import {IDBKeyRange, indexedDB} from 'fake-indexeddb';
 import {readFileSync} from 'fs';
-import {fileURLToPath, pathToFileURL} from 'node:url';
-import {dirname, join, resolve} from 'path';
+import {fileURLToPath} from 'node:url';
+import {dirname, join} from 'path';
 import {expect, vi} from 'vitest';
 import {parseJson} from '../../dev/json.js';
 import {createDictionaryArchive} from '../../dev/util.js';
@@ -28,42 +28,12 @@ import {DictionaryDatabase} from '../../ext/js/language/dictionary-database.js';
 import {DictionaryImporter} from '../../ext/js/language/dictionary-importer.js';
 import {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util.js';
 import {Translator} from '../../ext/js/language/translator.js';
+import {chrome, fetch} from '../mocks/common.js';
 import {DictionaryImporterMediaLoader} from '../mocks/dictionary-importer-media-loader.js';
 import {createDomTest} from './dom-test.js';
 
 const extDir = join(dirname(fileURLToPath(import.meta.url)), '../../ext');
 const deinflectionReasonsPath = join(extDir, 'data/deinflect.json');
-
-/** @type {import('dev/vm').PseudoChrome} */
-const chrome = {
-    runtime: {
-        getURL: (path) => {
-            return pathToFileURL(join(extDir, path.replace(/^\//, ''))).href;
-        }
-    }
-};
-
-/**
- * @param {string} url
- * @returns {Promise<import('dev/vm').PseudoFetchResponse>}
- */
-async function fetch(url) {
-    let filePath;
-    try {
-        filePath = fileURLToPath(url);
-    } catch (e) {
-        filePath = resolve(extDir, url.replace(/^[/\\]/, ''));
-    }
-    await Promise.resolve();
-    const content = readFileSync(filePath, {encoding: null});
-    return {
-        ok: true,
-        status: 200,
-        statusText: 'OK',
-        text: async () => content.toString('utf8'),
-        json: async () => parseJson(content.toString('utf8'))
-    };
-}
 
 vi.stubGlobal('indexedDB', indexedDB);
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);

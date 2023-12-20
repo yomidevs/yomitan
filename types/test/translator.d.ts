@@ -15,11 +15,48 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {OptionsPresetObject} from 'dev/vm';
+import type {FindTermsMatchType, FindTermsSortOrder, FindTermsVariantMode, FindTermsEmphaticSequencesMode, FindKanjiDictionary, FindTermDictionary} from '../ext/translation';
 import type {FindTermsMode} from 'translator';
 import type {DictionaryEntry} from 'dictionary';
 import type {NoteData} from 'anki-templates';
 import type {NoteFields} from 'anki';
+
+export type OptionsPresetObject = {
+    [key: string]: OptionsPreset;
+};
+
+export type OptionsList = string | (string | OptionsPreset)[];
+
+export type OptionsPreset = FindKanjiOptionsPreset | FindTermsOptionsPreset;
+
+export type FindKanjiOptionsPreset = {
+    enabledDictionaryMap?: [key: string, value: FindKanjiDictionary][];
+    removeNonJapaneseCharacters?: boolean;
+};
+
+export type FindTermsOptionsPreset = {
+    matchType?: FindTermsMatchType;
+    deinflect?: boolean;
+    mainDictionary?: string;
+    sortFrequencyDictionary?: string | null;
+    sortFrequencyDictionaryOrder?: FindTermsSortOrder;
+    removeNonJapaneseCharacters?: boolean;
+    convertHalfWidthCharacters?: FindTermsVariantMode;
+    convertNumericCharacters?: FindTermsVariantMode;
+    convertAlphabeticCharacters?: FindTermsVariantMode;
+    convertHiraganaToKatakana?: FindTermsVariantMode;
+    convertKatakanaToHiragana?: FindTermsVariantMode;
+    collapseEmphaticSequences?: FindTermsEmphaticSequencesMode;
+    textReplacements?: (FindTermsTextReplacement[] | null)[];
+    enabledDictionaryMap?: [key: string, value: FindTermDictionary][];
+    excludeDictionaryDefinitions?: string[] | null;
+};
+
+export type FindTermsTextReplacement = {
+    pattern: string;
+    flags: string;
+    replacement: string;
+};
 
 export type TranslatorTestInputs = {
     optionsPresets: OptionsPresetObject;
@@ -32,7 +69,7 @@ export type TestInputFindKanji = {
     func: 'findKanji';
     name: string;
     text: string;
-    options: string;
+    options: OptionsList;
 };
 
 export type TestInputFindTerm = {
@@ -40,7 +77,7 @@ export type TestInputFindTerm = {
     name: string;
     mode: FindTermsMode;
     text: string;
-    options: string;
+    options: OptionsList;
 };
 
 export type TranslatorTestResults = TranslatorTestResult[];
@@ -55,7 +92,7 @@ export type TranslatorTestNoteDataResults = TranslatorTestNoteDataResult[];
 
 export type TranslatorTestNoteDataResult = {
     name: string;
-    noteDataList: NoteData[];
+    noteDataList: Omit<NoteData, 'dictionaryEntry'>[] | null;
 };
 
 export type AnkiNoteBuilderTestResults = AnkiNoteBuilderTestResult[];

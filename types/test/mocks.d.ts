@@ -15,24 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Translation from '../ext/translation';
-
-export type PseudoChrome = {
+export type ChromeMock = {
     runtime: {
         getURL(path: string): string;
     };
 };
 
-export type PseudoFetchResponse = {
+export type FetchMock = (url: string) => Promise<FetchResponseMock>;
+
+export type FetchResponseMock = {
     ok: boolean;
     status: number;
     statusText: string;
     text(): Promise<string>;
     json(): Promise<unknown>;
 };
-
-export type OptionsPresetObject = {
-    [key: string]: OptionsPreset;
-};
-
-export type OptionsPreset = Partial<Translation.FindTermsOptions>;

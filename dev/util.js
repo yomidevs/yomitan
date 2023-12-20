@@ -72,7 +72,7 @@ export function getArgs(args, argMap) {
 
 /**
  * @param {string} baseDirectory
- * @param {?(fileName: string) => boolean} predicate
+ * @param {?(fileName: string, isDirectory: boolean) => boolean} predicate
  * @returns {string[]}
  */
 export function getAllFiles(baseDirectory, predicate = null) {
@@ -86,11 +86,13 @@ export function getAllFiles(baseDirectory, predicate = null) {
             const relativeFileName = path.relative(baseDirectory, fullFileName);
             const stats = fs.lstatSync(fullFileName);
             if (stats.isFile()) {
-                if (typeof predicate !== 'function' || predicate(relativeFileName)) {
+                if (typeof predicate !== 'function' || predicate(relativeFileName, false)) {
                     results.push(relativeFileName);
                 }
             } else if (stats.isDirectory()) {
-                directories.push(fullFileName);
+                if (typeof predicate !== 'function' || predicate(relativeFileName, true)) {
+                    directories.push(fullFileName);
+                }
             }
         }
     }

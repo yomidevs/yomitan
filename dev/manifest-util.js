@@ -121,7 +121,7 @@ export class ManifestUtil {
 
     /**
      * @param {import('dev/manifest').Manifest} manifest
-     * @param {import('dev/manifest').Modification[]} modifications
+     * @param {import('dev/manifest').Modification[]|undefined} modifications
      * @returns {import('dev/manifest').Manifest}
      */
     _applyModifications(manifest, modifications) {

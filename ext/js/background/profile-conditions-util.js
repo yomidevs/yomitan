@@ -158,7 +158,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaPopupLevelEqual(value) {
         const number = this._stringToNumber(value);
@@ -172,7 +172,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaPopupLevelNotEqual(value) {
         return {
@@ -184,7 +184,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaPopupLevelLessThan(value) {
         const number = this._stringToNumber(value);
@@ -198,7 +198,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaPopupLevelGreaterThan(value) {
         const number = this._stringToNumber(value);
@@ -212,7 +212,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaPopupLevelLessThanOrEqual(value) {
         const number = this._stringToNumber(value);
@@ -226,7 +226,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaPopupLevelGreaterThanOrEqual(value) {
         const number = this._stringToNumber(value);
@@ -242,7 +242,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaUrlMatchDomain(value) {
         const oneOf = [];
@@ -261,7 +261,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaUrlMatchRegExp(value) {
         return {
@@ -276,7 +276,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaModifierKeysAre(value) {
         return this._createSchemaArrayCheck('modifierKeys', value, true, false);
@@ -284,7 +284,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaModifierKeysAreNot(value) {
         return {
@@ -296,7 +296,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaModifierKeysInclude(value) {
         return this._createSchemaArrayCheck('modifierKeys', value, false, false);
@@ -304,7 +304,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaModifierKeysNotInclude(value) {
         return this._createSchemaArrayCheck('modifierKeys', value, false, true);
@@ -314,7 +314,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaFlagsAre(value) {
         return this._createSchemaArrayCheck('flags', value, true, false);
@@ -322,7 +322,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaFlagsAreNot(value) {
         return {
@@ -334,7 +334,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaFlagsInclude(value) {
         return this._createSchemaArrayCheck('flags', value, false, false);
@@ -342,7 +342,7 @@ export class ProfileConditionsUtil {
 
     /**
      * @param {string} value
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaFlagsNotInclude(value) {
         return this._createSchemaArrayCheck('flags', value, false, true);
@@ -355,10 +355,10 @@ export class ProfileConditionsUtil {
      * @param {string} value
      * @param {boolean} exact
      * @param {boolean} none
-     * @returns {import('json-schema').Schema}
+     * @returns {import('ext/json-schema').Schema}
      */
     _createSchemaArrayCheck(key, value, exact, none) {
-        /** @type {import('json-schema').Schema[]} */
+        /** @type {import('ext/json-schema').Schema[]} */
         const containsList = [];
         for (const item of this._split(value)) {
             if (item.length === 0) { continue; }
@@ -369,7 +369,7 @@ export class ProfileConditionsUtil {
             });
         }
         const containsListCount = containsList.length;
-        /** @type {import('json-schema').Schema} */
+        /** @type {import('ext/json-schema').Schema} */
         const schema = {
             type: 'array'
         };
