@@ -339,6 +339,7 @@ export class QueryParser extends EventDispatcher {
     }
 
     /**
+     * Convert _reading_ to hiragana, katakana, or romaji, or _term_ if it is entirely kana and _reading_ is an empty string,  based on _readingMode.
      * @param {string} term
      * @param {string} reading
      * @returns {string}

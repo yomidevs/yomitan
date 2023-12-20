@@ -171,10 +171,10 @@ export class AnkiTemplateRenderer {
     /** @type {import('template-renderer').HelperFunction<string>} */
     _furigana(args, context, options) {
         const {expression, reading} = this._getFuriganaExpressionAndReading(args, context, options);
-        const segs = this._japaneseUtil.distributeFurigana(expression, reading);
+        const segments = this._japaneseUtil.distributeFurigana(expression, reading);
 
         let result = '';
-        for (const {text, reading: reading2} of segs) {
+        for (const {text, reading: reading2} of segments) {
             const safeText = this._escape(text);
             const safeReading = this._escape(reading2);
             if (safeReading.length > 0) {
@@ -190,10 +190,10 @@ export class AnkiTemplateRenderer {
     /** @type {import('template-renderer').HelperFunction<string>} */
     _furiganaPlain(args, context, options) {
         const {expression, reading} = this._getFuriganaExpressionAndReading(args, context, options);
-        const segs = this._japaneseUtil.distributeFurigana(expression, reading);
+        const segments = this._japaneseUtil.distributeFurigana(expression, reading);
 
         let result = '';
-        for (const {text, reading: reading2} of segs) {
+        for (const {text, reading: reading2} of segments) {
             if (reading2.length > 0) {
                 if (result.length > 0) { result += ' '; }
                 result += `${text}[${reading2}]`;

@@ -275,11 +275,13 @@ export class AnkiController {
      */
     _onTestAnkiNoteViewerButtonClick(e) {
         const element = /** @type {HTMLElement} */ (e.currentTarget);
+        // Anki note GUI mode
         const {mode} = element.dataset;
         if (typeof mode !== 'string') { return; }
-        const mode2 = this._normalizeAnkiNoteGuiMode(mode);
-        if (mode2 === null) { return; }
-        this._testAnkiNoteViewerSafe(mode2);
+
+        const normalizedMode = this._normalizeAnkiNoteGuiMode(mode);
+        if (normalizedMode === null) { return; }
+        this._testAnkiNoteViewerSafe(normalizedMode);
     }
 
     /**
@@ -379,17 +381,17 @@ export class AnkiController {
     async _getAnkiData() {
         this._setAnkiStatusChanging();
         const [
-            [deckNames, error1],
-            [modelNames, error2]
+            [deckNames, getDeckNamesError],
+            [modelNames, getModelNamesError]
         ] = await Promise.all([
             this._getDeckNames(),
             this._getModelNames()
         ]);
 
-        if (error1 !== null) {
-            this._showAnkiError(error1);
-        } else if (error2 !== null) {
-            this._showAnkiError(error2);
+        if (getDeckNamesError !== null) {
+            this._showAnkiError(getDeckNamesError);
+        } else if (getModelNamesError !== null) {
+            this._showAnkiError(getModelNamesError);
         } else {
             this._hideAnkiError();
         }

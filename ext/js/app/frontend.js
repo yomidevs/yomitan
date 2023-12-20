@@ -964,7 +964,7 @@ export class Frontend {
     _prepareSiteSpecific() {
         switch (location.hostname.toLowerCase()) {
             case 'docs.google.com':
-                this._prepareGoogleDocs();
+                this._prepareGoogleDocsWrapper();
                 break;
         }
     }
@@ -972,18 +972,18 @@ export class Frontend {
     /**
      * @returns {Promise<void>}
      */
-    async _prepareGoogleDocs() {
+    async _prepareGoogleDocsWrapper() {
         if (typeof GoogleDocsUtil !== 'undefined') { return; }
         await yomitan.api.loadExtensionScripts([
             '/js/accessibility/google-docs-util.js'
         ]);
-        this._prepareGoogleDocs2();
+        this._prepareGoogleDocs();
     }
 
     /**
      * @returns {Promise<void>}
      */
-    async _prepareGoogleDocs2() {
+    async _prepareGoogleDocs() {
         if (typeof GoogleDocsUtil === 'undefined') { return; }
         DocumentUtil.registerGetRangeFromPointHandler(GoogleDocsUtil.getRangeFromPoint.bind(GoogleDocsUtil));
     }

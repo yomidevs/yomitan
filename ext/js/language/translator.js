@@ -70,7 +70,7 @@ export class Translator {
     async findTerms(mode, text, options) {
         const {enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder} = options;
         const tagAggregator = new TranslatorTagAggregator();
-        let {dictionaryEntries, originalTextLength} = await this._findTermsInternal(text, enabledDictionaryMap, options, tagAggregator);
+        let {dictionaryEntries, originalTextLength} = await this._findTermsInternalWrapper(text, enabledDictionaryMap, options, tagAggregator);
 
         switch (mode) {
             case 'group':
@@ -208,7 +208,7 @@ export class Translator {
      * @param {TranslatorTagAggregator} tagAggregator
      * @returns {Promise<import('translator').FindTermsResult>}
      */
-    async _findTermsInternal(text, enabledDictionaryMap, options, tagAggregator) {
+    async _findTermsInternalWrapper(text, enabledDictionaryMap, options, tagAggregator) {
         if (options.removeNonJapaneseCharacters) {
             text = this._getJapaneseOnlyText(text);
         }
@@ -216,7 +216,7 @@ export class Translator {
             return {dictionaryEntries: [], originalTextLength: 0};
         }
 
-        const deinflections = await this._findTermsInternal2(text, enabledDictionaryMap, options);
+        const deinflections = await this._findTermsInternal(text, enabledDictionaryMap, options);
 
         let originalTextLength = 0;
         const dictionaryEntries = [];
@@ -242,7 +242,7 @@ export class Translator {
      * @param {import('translation').FindTermsOptions} options
      * @returns {Promise<import('translation-internal').DatabaseDeinflection[]>}
      */
-    async _findTermsInternal2(text, enabledDictionaryMap, options) {
+    async _findTermsInternal(text, enabledDictionaryMap, options) {
         const deinflections = (
             options.deinflect ?
             this._getAllDeinflections(text, options) :

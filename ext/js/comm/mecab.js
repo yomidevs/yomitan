@@ -105,7 +105,7 @@ export class Mecab {
      */
     async getVersion() {
         try {
-            await this._setupPort();
+            await this._setupPortWrapper();
         } catch (e) {
             // NOP
         }
@@ -132,7 +132,7 @@ export class Mecab {
      * @returns {Promise<import('mecab').ParseResult[]>} A collection of parsing results of the text.
      */
     async parseText(text) {
-        await this._setupPort();
+        await this._setupPortWrapper();
         const rawResults = await this._invoke('parse_text', {text});
         // Note: The format of rawResults is not validated
         return this._convertParseTextResults(/** @type {import('mecab').ParseResultRaw} */ (rawResults));
@@ -225,12 +225,12 @@ export class Mecab {
     /**
      * @returns {Promise<void>}
      */
-    async _setupPort() {
+    async _setupPortWrapper() {
         if (!this._enabled) {
             throw new Error('MeCab not enabled');
         }
         if (this._setupPortPromise === null) {
-            this._setupPortPromise = this._setupPort2();
+            this._setupPortPromise = this._setupPort();
         }
         try {
             await this._setupPortPromise;
@@ -242,7 +242,7 @@ export class Mecab {
     /**
      * @returns {Promise<void>}
      */
-    async _setupPort2() {
+    async _setupPort() {
         const port = chrome.runtime.connectNative('yomitan_mecab');
         this._eventListeners.addListener(port.onMessage, this._onMessage.bind(this));
         this._eventListeners.addListener(port.onDisconnect, this._onDisconnect.bind(this));
