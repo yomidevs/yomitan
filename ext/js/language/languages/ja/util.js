@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,9 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * wanakana
-*/
+import * as wanakana from '../../../../lib/wanakana.js';
 
 import {
     KANA_TO_VOWEL_MAPPING
