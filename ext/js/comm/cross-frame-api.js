@@ -351,7 +351,7 @@ export class CrossFrameAPI {
     }
 
     /**
-     * @param {import('core').MessageHandlerArray} messageHandlers
+     * @param {import('core').MessageHandlerMapInit} messageHandlers
      * @throws {Error}
      */
     registerHandlers(messageHandlers) {

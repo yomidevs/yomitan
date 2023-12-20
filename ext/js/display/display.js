@@ -207,15 +207,15 @@ export class Display extends EventDispatcher {
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
         ]);
         this.registerDirectMessageHandlers([
-            ['Display.setOptionsContext', {async: true,  handler: this._onMessageSetOptionsContext.bind(this)}],
-            ['Display.setContent',        {async: false, handler: this._onMessageSetContent.bind(this)}],
-            ['Display.setCustomCss',      {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
-            ['Display.setContentScale',   {async: false, handler: this._onMessageSetContentScale.bind(this)}],
-            ['Display.configure',         {async: true,  handler: this._onMessageConfigure.bind(this)}],
-            ['Display.visibilityChanged', {async: false, handler: this._onMessageVisibilityChanged.bind(this)}]
+            ['Display.setOptionsContext', this._onMessageSetOptionsContext.bind(this)],
+            ['Display.setContent',        this._onMessageSetContent.bind(this)],
+            ['Display.setCustomCss',      this._onMessageSetCustomCss.bind(this)],
+            ['Display.setContentScale',   this._onMessageSetContentScale.bind(this)],
+            ['Display.configure',         this._onMessageConfigure.bind(this)],
+            ['Display.visibilityChanged', this._onMessageVisibilityChanged.bind(this)]
         ]);
         this.registerWindowMessageHandlers([
-            ['Display.extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
+            ['Display.extensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
     }
@@ -328,7 +328,7 @@ export class Display extends EventDispatcher {
         this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
         yomitan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         yomitan.crossFrame.registerHandlers([
-            ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
+            ['popupMessage', this._onDirectMessage.bind(this)]
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
 
@@ -506,7 +506,7 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {import('core').MessageHandlerArray} handlers
+     * @param {import('core').MessageHandlerMapInit} handlers
      */
     registerDirectMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {
@@ -515,7 +515,7 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {import('core').MessageHandlerArray} handlers
+     * @param {import('core').MessageHandlerMapInit} handlers
      */
     registerWindowMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {
@@ -638,22 +638,17 @@ export class Display extends EventDispatcher {
 
     /**
      * @param {import('frame-client').Message<import('display').MessageDetails>} data
-     * @returns {import('core').MessageHandlerAsyncResult}
+     * @returns {import('core').MessageHandlerResult}
      * @throws {Error}
      */
     _onDirectMessage(data) {
         const {action, params} = this._authenticateMessageData(data);
-        const handlerInfo = this._directMessageHandlers.get(action);
-        if (typeof handlerInfo === 'undefined') {
+        const handler = this._directMessageHandlers.get(action);
+        if (typeof handler === 'undefined') {
             throw new Error(`Invalid action: ${action}`);
         }
 
-        const {async, handler} = handlerInfo;
-        const result = handler(params);
-        return {
-            async: typeof async === 'boolean' && async,
-            result
-        };
+        return handler(params);
     }
 
     /**

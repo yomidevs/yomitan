@@ -149,51 +149,51 @@ export class Backend {
         this._permissionsUtil = new PermissionsUtil();
 
         /* eslint-disable no-multi-spaces */
-        /** @type {import('backend').MessageHandlerMap} */
-        this._messageHandlers = new Map(/** @type {import('backend').MessageHandlerMapInit} */ ([
-            ['requestBackendReadySignal',    {async: false, contentScript: true,  handler: this._onApiRequestBackendReadySignal.bind(this)}],
-            ['optionsGet',                   {async: false, contentScript: true,  handler: this._onApiOptionsGet.bind(this)}],
-            ['optionsGetFull',               {async: false, contentScript: true,  handler: this._onApiOptionsGetFull.bind(this)}],
-            ['kanjiFind',                    {async: true,  contentScript: true,  handler: this._onApiKanjiFind.bind(this)}],
-            ['termsFind',                    {async: true,  contentScript: true,  handler: this._onApiTermsFind.bind(this)}],
-            ['parseText',                    {async: true,  contentScript: true,  handler: this._onApiParseText.bind(this)}],
-            ['getAnkiConnectVersion',        {async: true,  contentScript: true,  handler: this._onApiGetAnkiConnectVersion.bind(this)}],
-            ['isAnkiConnected',              {async: true,  contentScript: true,  handler: this._onApiIsAnkiConnected.bind(this)}],
-            ['addAnkiNote',                  {async: true,  contentScript: true,  handler: this._onApiAddAnkiNote.bind(this)}],
-            ['getAnkiNoteInfo',              {async: true,  contentScript: true,  handler: this._onApiGetAnkiNoteInfo.bind(this)}],
-            ['injectAnkiNoteMedia',          {async: true,  contentScript: true,  handler: this._onApiInjectAnkiNoteMedia.bind(this)}],
-            ['noteView',                     {async: true,  contentScript: true,  handler: this._onApiNoteView.bind(this)}],
-            ['suspendAnkiCardsForNote',      {async: true,  contentScript: true,  handler: this._onApiSuspendAnkiCardsForNote.bind(this)}],
-            ['commandExec',                  {async: false, contentScript: true,  handler: this._onApiCommandExec.bind(this)}],
-            ['getTermAudioInfoList',         {async: true,  contentScript: true,  handler: this._onApiGetTermAudioInfoList.bind(this)}],
-            ['sendMessageToFrame',           {async: false, contentScript: true,  handler: this._onApiSendMessageToFrame.bind(this)}],
-            ['broadcastTab',                 {async: false, contentScript: true,  handler: this._onApiBroadcastTab.bind(this)}],
-            ['frameInformationGet',          {async: true,  contentScript: true,  handler: this._onApiFrameInformationGet.bind(this)}],
-            ['injectStylesheet',             {async: true,  contentScript: true,  handler: this._onApiInjectStylesheet.bind(this)}],
-            ['getStylesheetContent',         {async: true,  contentScript: true,  handler: this._onApiGetStylesheetContent.bind(this)}],
-            ['getEnvironmentInfo',           {async: false, contentScript: true,  handler: this._onApiGetEnvironmentInfo.bind(this)}],
-            ['clipboardGet',                 {async: true,  contentScript: true,  handler: this._onApiClipboardGet.bind(this)}],
-            ['getDisplayTemplatesHtml',      {async: true,  contentScript: true,  handler: this._onApiGetDisplayTemplatesHtml.bind(this)}],
-            ['getZoom',                      {async: true,  contentScript: true,  handler: this._onApiGetZoom.bind(this)}],
-            ['getDefaultAnkiFieldTemplates', {async: false, contentScript: true,  handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this)}],
-            ['getDictionaryInfo',            {async: true,  contentScript: true,  handler: this._onApiGetDictionaryInfo.bind(this)}],
-            ['purgeDatabase',                {async: true,  contentScript: false, handler: this._onApiPurgeDatabase.bind(this)}],
-            ['getMedia',                     {async: true,  contentScript: true,  handler: this._onApiGetMedia.bind(this)}],
-            ['log',                          {async: false, contentScript: true,  handler: this._onApiLog.bind(this)}],
-            ['logIndicatorClear',            {async: false, contentScript: true,  handler: this._onApiLogIndicatorClear.bind(this)}],
-            ['createActionPort',             {async: false, contentScript: true,  handler: this._onApiCreateActionPort.bind(this)}],
-            ['modifySettings',               {async: true,  contentScript: true,  handler: this._onApiModifySettings.bind(this)}],
-            ['getSettings',                  {async: false, contentScript: true,  handler: this._onApiGetSettings.bind(this)}],
-            ['setAllSettings',               {async: true,  contentScript: false, handler: this._onApiSetAllSettings.bind(this)}],
-            ['getOrCreateSearchPopup',       {async: true,  contentScript: true,  handler: this._onApiGetOrCreateSearchPopup.bind(this)}],
-            ['isTabSearchPopup',             {async: true,  contentScript: true,  handler: this._onApiIsTabSearchPopup.bind(this)}],
-            ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}],
-            ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}],
-            ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
-            ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}],
-            ['findAnkiNotes',                {async: true,  contentScript: true,  handler: this._onApiFindAnkiNotes.bind(this)}],
-            ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}],
-            ['openCrossFramePort',           {async: false, contentScript: true,  handler: this._onApiOpenCrossFramePort.bind(this)}]
+        /** @type {import('core').MessageHandlerMap} */
+        this._messageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
+            ['requestBackendReadySignal',    this._onApiRequestBackendReadySignal.bind(this)],
+            ['optionsGet',                   this._onApiOptionsGet.bind(this)],
+            ['optionsGetFull',               this._onApiOptionsGetFull.bind(this)],
+            ['kanjiFind',                    this._onApiKanjiFind.bind(this)],
+            ['termsFind',                    this._onApiTermsFind.bind(this)],
+            ['parseText',                    this._onApiParseText.bind(this)],
+            ['getAnkiConnectVersion',        this._onApiGetAnkiConnectVersion.bind(this)],
+            ['isAnkiConnected',              this._onApiIsAnkiConnected.bind(this)],
+            ['addAnkiNote',                  this._onApiAddAnkiNote.bind(this)],
+            ['getAnkiNoteInfo',              this._onApiGetAnkiNoteInfo.bind(this)],
+            ['injectAnkiNoteMedia',          this._onApiInjectAnkiNoteMedia.bind(this)],
+            ['noteView',                     this._onApiNoteView.bind(this)],
+            ['suspendAnkiCardsForNote',      this._onApiSuspendAnkiCardsForNote.bind(this)],
+            ['commandExec',                  this._onApiCommandExec.bind(this)],
+            ['getTermAudioInfoList',         this._onApiGetTermAudioInfoList.bind(this)],
+            ['sendMessageToFrame',           this._onApiSendMessageToFrame.bind(this)],
+            ['broadcastTab',                 this._onApiBroadcastTab.bind(this)],
+            ['frameInformationGet',          this._onApiFrameInformationGet.bind(this)],
+            ['injectStylesheet',             this._onApiInjectStylesheet.bind(this)],
+            ['getStylesheetContent',         this._onApiGetStylesheetContent.bind(this)],
+            ['getEnvironmentInfo',           this._onApiGetEnvironmentInfo.bind(this)],
+            ['clipboardGet',                 this._onApiClipboardGet.bind(this)],
+            ['getDisplayTemplatesHtml',      this._onApiGetDisplayTemplatesHtml.bind(this)],
+            ['getZoom',                      this._onApiGetZoom.bind(this)],
+            ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)],
+            ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
+            ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
+            ['getMedia',                     this._onApiGetMedia.bind(this)],
+            ['log',                          this._onApiLog.bind(this)],
+            ['logIndicatorClear',            this._onApiLogIndicatorClear.bind(this)],
+            ['createActionPort',             this._onApiCreateActionPort.bind(this)],
+            ['modifySettings',               this._onApiModifySettings.bind(this)],
+            ['getSettings',                  this._onApiGetSettings.bind(this)],
+            ['setAllSettings',               this._onApiSetAllSettings.bind(this)],
+            ['getOrCreateSearchPopup',       this._onApiGetOrCreateSearchPopup.bind(this)],
+            ['isTabSearchPopup',             this._onApiIsTabSearchPopup.bind(this)],
+            ['triggerDatabaseUpdated',       this._onApiTriggerDatabaseUpdated.bind(this)],
+            ['testMecab',                    this._onApiTestMecab.bind(this)],
+            ['textHasJapaneseCharacters',    this._onApiTextHasJapaneseCharacters.bind(this)],
+            ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
+            ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
+            ['loadExtensionScripts',         this._onApiLoadExtensionScripts.bind(this)],
+            ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)]
         ]));
         /* eslint-enable no-multi-spaces */
         /** @type {import('backend').MessageHandlerWithProgressMap} */
@@ -408,16 +408,6 @@ export class Backend {
     _onMessage({action, params}, sender, callback) {
         const messageHandler = this._messageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return false; }
-
-        if (!messageHandler.contentScript) {
-            try {
-                this._validatePrivilegedMessageSender(sender);
-            } catch (error) {
-                callback({error: ExtensionError.serialize(error)});
-                return false;
-            }
-        }
-
         return invokeMessageHandler(messageHandler, params, callback, sender);
     }
 

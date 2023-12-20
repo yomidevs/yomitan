@@ -51,7 +51,7 @@ export class HotkeyHandler extends EventDispatcher {
         this._isPrepared = true;
         this._updateEventHandlers();
         yomitan.crossFrame.registerHandlers([
-            ['HotkeyHandler.forwardHotkey', {async: false, handler: this._onMessageForwardHotkey.bind(this)}]
+            ['HotkeyHandler.forwardHotkey', this._onMessageForwardHotkey.bind(this)]
         ]);
     }
 

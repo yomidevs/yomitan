@@ -75,30 +75,16 @@ export type ResponseError = {
 export type Response<T = unknown> = ResponseSuccess<T> | ResponseError;
 
 export type MessageHandler = (params: SafeAny, ...extraArgs: SafeAny[]) => (
-    SafeAny |
-    Promise<SafeAny> |
-    MessageHandlerAsyncResult
+    MessageHandlerResult |
+    Promise<MessageHandlerResult>
 );
 
-export type MessageHandlerAsyncResult = {
-    async: boolean;
-    result: SafeAny | Promise<SafeAny>;
-};
+export type MessageHandlerResult = SafeAny;
 
-export type MessageHandlerDetails = {
-    /**
-     * Whether or not the handler is async or not. Values include `false`, `true`, or `'dynamic'`.
-     * When the value is `'dynamic'`, the handler should return an object of the format `{async: boolean, result: any}`.
-     */
-    async: boolean | 'dynamic';
-    /**
-     * A handler function which is passed `params` and `...extraArgs` as arguments.
-     */
-    handler: MessageHandler;
-};
+export type MessageHandlerMap = Map<string, MessageHandler>;
 
-export type MessageHandlerMap = Map<string, MessageHandlerDetails>;
+export type MessageHandlerMapInit = MessageHandlerMapInitItem[];
 
-export type MessageHandlerArray = [key: string, handlerDetails: MessageHandlerDetails][];
+export type MessageHandlerMapInitItem = [key: string, handlerDetails: MessageHandler];
 
 export type Timeout = number | NodeJS.Timeout;

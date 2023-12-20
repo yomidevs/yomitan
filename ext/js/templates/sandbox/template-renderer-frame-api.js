@@ -27,10 +27,10 @@ export class TemplateRendererFrameApi {
         /** @type {import('./template-renderer.js').TemplateRenderer} */
         this._templateRenderer = templateRenderer;
         /** @type {import('core').MessageHandlerMap} */
-        this._windowMessageHandlers = new Map(/** @type {import('core').MessageHandlerArray} */ ([
-            ['render', {async: false, handler: this._onRender.bind(this)}],
-            ['renderMulti', {async: false, handler: this._onRenderMulti.bind(this)}],
-            ['getModifiedData', {async: false, handler: this._onGetModifiedData.bind(this)}]
+        this._windowMessageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
+            ['render', this._onRender.bind(this)],
+            ['renderMulti', this._onRenderMulti.bind(this)],
+            ['getModifiedData', this._onGetModifiedData.bind(this)]
         ]));
     }
 
@@ -56,17 +56,17 @@ export class TemplateRendererFrameApi {
     }
 
     /**
-     * @param {import('core').MessageHandlerDetails} handlerItem
+     * @param {import('core').MessageHandler} handler
      * @param {string} action
      * @param {import('core').SerializableObject} params
      * @param {Window} source
      * @param {?string} id
      */
-    async _onWindowMessageInner({handler, async}, action, params, source, id) {
+    async _onWindowMessageInner(handler, action, params, source, id) {
         let response;
         try {
             let result = handler(params);
-            if (async) {
+            if (result instanceof Promise) {
                 result = await result;
             }
             response = {result};

@@ -52,23 +52,21 @@ export class Offscreen {
 
         /* eslint-disable no-multi-spaces */
         /** @type {import('offscreen').MessageHandlerMap} */
-        const messageHandlers = new Map([
-            ['clipboardGetTextOffscreen',    {async: true,  handler: this._getTextHandler.bind(this)}],
-            ['clipboardGetImageOffscreen',   {async: true,  handler: this._getImageHandler.bind(this)}],
-            ['clipboardSetBrowserOffscreen', {async: false, handler: this._setClipboardBrowser.bind(this)}],
-            ['databasePrepareOffscreen',     {async: true,  handler: this._prepareDatabaseHandler.bind(this)}],
-            ['getDictionaryInfoOffscreen',   {async: true,  handler: this._getDictionaryInfoHandler.bind(this)}],
-            ['databasePurgeOffscreen',       {async: true,  handler: this._purgeDatabaseHandler.bind(this)}],
-            ['databaseGetMediaOffscreen',    {async: true,  handler: this._getMediaHandler.bind(this)}],
-            ['translatorPrepareOffscreen',   {async: false, handler: this._prepareTranslatorHandler.bind(this)}],
-            ['findKanjiOffscreen',           {async: true,  handler: this._findKanjiHandler.bind(this)}],
-            ['findTermsOffscreen',           {async: true,  handler: this._findTermsHandler.bind(this)}],
-            ['getTermFrequenciesOffscreen',  {async: true,  handler: this._getTermFrequenciesHandler.bind(this)}],
-            ['clearDatabaseCachesOffscreen', {async: false, handler: this._clearDatabaseCachesHandler.bind(this)}]
-        ]);
+        this._messageHandlers = new Map(/** @type {import('offscreen').MessageHandlerMapInit} */ ([
+            ['clipboardGetTextOffscreen',    this._getTextHandler.bind(this)],
+            ['clipboardGetImageOffscreen',   this._getImageHandler.bind(this)],
+            ['clipboardSetBrowserOffscreen', this._setClipboardBrowser.bind(this)],
+            ['databasePrepareOffscreen',     this._prepareDatabaseHandler.bind(this)],
+            ['getDictionaryInfoOffscreen',   this._getDictionaryInfoHandler.bind(this)],
+            ['databasePurgeOffscreen',       this._purgeDatabaseHandler.bind(this)],
+            ['databaseGetMediaOffscreen',    this._getMediaHandler.bind(this)],
+            ['translatorPrepareOffscreen',   this._prepareTranslatorHandler.bind(this)],
+            ['findKanjiOffscreen',           this._findKanjiHandler.bind(this)],
+            ['findTermsOffscreen',           this._findTermsHandler.bind(this)],
+            ['getTermFrequenciesOffscreen',  this._getTermFrequenciesHandler.bind(this)],
+            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)]
+        ]));
         /* eslint-enable no-multi-spaces */
-        /** @type {import('offscreen').MessageHandlerMap<string>} */
-        this._messageHandlers = messageHandlers;
 
         const onMessage = this._onMessage.bind(this);
         chrome.runtime.onMessage.addListener(onMessage);
@@ -172,7 +170,7 @@ export class Offscreen {
 
     /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
     _onMessage({action, params}, sender, callback) {
-        const messageHandler = this._messageHandlers.get(action);
+        const messageHandler = this._messageHandlers.get(/** @type {import('offscreen').MessageType} */ (action));
         if (typeof messageHandler === 'undefined') { return false; }
         return invokeMessageHandler(messageHandler, params, callback, sender);
     }

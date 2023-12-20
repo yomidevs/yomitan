@@ -110,4 +110,8 @@ export type MessageHandler<
     details: MessageDetailsMap[TMessage],
 ) => (TIsAsync extends true ? Promise<MessageReturn<TMessage>> : MessageReturn<TMessage>);
 
-export type MessageHandlerMap<T = MessageType> = Map<T, Core.MessageHandlerDetails>;
+export type MessageHandlerMap = Map<MessageType, Core.MessageHandler>;
+
+export type MessageHandlerMapInit = MessageHandlerMapInitItem[];
+
+export type MessageHandlerMapInitItem = [messageType: MessageType, handler: Core.MessageHandler];
