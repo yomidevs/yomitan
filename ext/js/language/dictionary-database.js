@@ -205,7 +205,7 @@ export class DictionaryDatabase {
             onProgress(progressData);
             return keys;
         };
-        const onProgress2 = () => {
+        const onProgressWrapper = () => {
             const processed = progressData.processed + 1;
             progressData.processed = processed;
             if ((processed % progressRate) === 0 || processed === progressData.count) {
@@ -217,7 +217,7 @@ export class DictionaryDatabase {
             const promises = [];
             for (const [objectStoreName, indexName] of targets) {
                 const query = IDBKeyRange.only(dictionaryName);
-                const promise = this._db.bulkDelete(objectStoreName, indexName, query, filterKeys, onProgress2);
+                const promise = this._db.bulkDelete(objectStoreName, indexName, query, filterKeys, onProgressWrapper);
                 promises.push(promise);
             }
             await Promise.all(promises);
