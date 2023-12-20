@@ -331,7 +331,7 @@ export class Backend {
             text = text.substring(0, maximumSearchLength);
         }
         try {
-            const {tab, created} = await this._getOrCreateSearchPopup();
+            const {tab, created} = await this._getOrCreateSearchPopupWrapper();
             const {id} = tab;
             if (typeof id !== 'number') {
                 throw new Error('Tab does not have an id');
@@ -799,7 +799,7 @@ export class Backend {
 
     /** @type {import('api').Handler<import('api').GetOrCreateSearchPopupDetails, import('api').GetOrCreateSearchPopupResult>} */
     async _onApiGetOrCreateSearchPopup({focus = false, text}) {
-        const {tab, created} = await this._getOrCreateSearchPopup();
+        const {tab, created} = await this._getOrCreateSearchPopupWrapper();
         if (focus === true || (focus === 'ifCreated' && created)) {
             await this._focusTab(tab);
         }
@@ -960,18 +960,18 @@ export class Backend {
         const queryParams = {};
         if (query.length > 0) { queryParams.query = query; }
         const queryString = new URLSearchParams(queryParams).toString();
-        let url = baseUrl;
+        let queryUrl = baseUrl;
         if (queryString.length > 0) {
-            url += `?${queryString}`;
+            queryUrl += `?${queryString}`;
         }
 
         /** @type {import('backend').FindTabsPredicate} */
-        const predicate = ({url: url2}) => {
-            if (url2 === null || !url2.startsWith(baseUrl)) { return false; }
-            const parsedUrl = new URL(url2);
-            const baseUrl2 = `${parsedUrl.origin}${parsedUrl.pathname}`;
-            const mode2 = parsedUrl.searchParams.get('mode');
-            return baseUrl2 === baseUrl && (mode2 === mode || (!mode2 && mode === 'existingOrNewTab'));
+        const predicate = ({url}) => {
+            if (url === null || !url.startsWith(baseUrl)) { return false; }
+            const parsedUrl = new URL(url);
+            const parsedBaseUrl = `${parsedUrl.origin}${parsedUrl.pathname}`;
+            const parsedMode = parsedUrl.searchParams.get('mode');
+            return parsedBaseUrl === baseUrl && (parsedMode === mode || (!parsedMode && mode === 'existingOrNewTab'));
         };
 
         const openInTab = async () => {
@@ -997,10 +997,10 @@ export class Backend {
                 } catch (e) {
                     // NOP
                 }
-                await this._createTab(url);
+                await this._createTab(queryUrl);
                 return;
             case 'newTab':
-                await this._createTab(url);
+                await this._createTab(queryUrl);
                 return;
         }
     }
@@ -1072,9 +1072,9 @@ export class Backend {
     /**
      * @returns {Promise<{tab: chrome.tabs.Tab, created: boolean}>}
      */
-    _getOrCreateSearchPopup() {
+    _getOrCreateSearchPopupWrapper() {
         if (this._searchPopupTabCreatePromise === null) {
-            const promise = this._getOrCreateSearchPopup2();
+            const promise = this._getOrCreateSearchPopup();
             this._searchPopupTabCreatePromise = promise;
             promise.then(() => { this._searchPopupTabCreatePromise = null; });
         }
@@ -1084,7 +1084,7 @@ export class Backend {
     /**
      * @returns {Promise<{tab: chrome.tabs.Tab, created: boolean}>}
      */
-    async _getOrCreateSearchPopup2() {
+    async _getOrCreateSearchPopup() {
         // Use existing tab
         const baseUrl = chrome.runtime.getURL('/search.html');
         /**
