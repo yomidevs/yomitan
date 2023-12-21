@@ -24,36 +24,36 @@ type ApiDescriptor = {
     return: unknown;
 };
 
-export type ApiParams<TApiDescriptor extends ApiDescriptor> = TApiDescriptor['params'];
+export type ApiParams<TDescriptor extends ApiDescriptor> = TDescriptor['params'];
 
-export type ApiReturn<TApiDescriptor extends ApiDescriptor> = TApiDescriptor['return'];
+export type ApiReturn<TDescriptor extends ApiDescriptor> = TDescriptor['return'];
 
-export type ApiHandlerSync<TApiDescriptor extends ApiDescriptor> = (params: ApiParams<TApiDescriptor>) => ApiReturn<TApiDescriptor>;
+export type ApiHandlerSync<TDescriptor extends ApiDescriptor> = (params: ApiParams<TDescriptor>) => ApiReturn<TDescriptor>;
 
-export type ApiHandlerAsync<TApiDescriptor extends ApiDescriptor> = (params: ApiParams<TApiDescriptor>) => Promise<ApiReturn<TApiDescriptor>>;
+export type ApiHandlerAsync<TDescriptor extends ApiDescriptor> = (params: ApiParams<TDescriptor>) => Promise<ApiReturn<TDescriptor>>;
 
-export type ApiHandler<TApiDescriptor extends ApiDescriptor> = (params: ApiParams<TApiDescriptor>) => ApiReturn<TApiDescriptor> | Promise<ApiReturn<TApiDescriptor>>;
+export type ApiHandler<TDescriptor extends ApiDescriptor> = (params: ApiParams<TDescriptor>) => ApiReturn<TDescriptor> | Promise<ApiReturn<TDescriptor>>;
 
-type ApiHandlerSurface<TApiSurface extends ApiSurface> = {[name in ApiNames<TApiSurface>]: ApiHandler<TApiSurface[name]>};
+type ApiHandlerSurface<TSurface extends ApiSurface> = {[name in ApiNames<TSurface>]: ApiHandler<TSurface[name]>};
 
-export type ApiHandlerAny<TApiSurface extends ApiSurface> = ApiHandlerSurface<TApiSurface>[ApiNames<TApiSurface>];
+export type ApiHandlerAny<TSurface extends ApiSurface> = ApiHandlerSurface<TSurface>[ApiNames<TSurface>];
 
-export type ApiNames<TApiSurface extends ApiSurface> = keyof TApiSurface;
+export type ApiNames<TSurface extends ApiSurface> = keyof TSurface;
 
-export type ApiMap<TApiSurface extends ApiSurface> = Map<ApiNames<TApiSurface>, ApiHandlerAny<TApiSurface>>;
+export type ApiMap<TSurface extends ApiSurface> = Map<ApiNames<TSurface>, ApiHandlerAny<TSurface>>;
 
-export type ApiMapInit<TApiSurface extends ApiSurface> = ApiMapInitItemAny<TApiSurface>[];
+export type ApiMapInit<TSurface extends ApiSurface> = ApiMapInitItemAny<TSurface>[];
 
-export type ApiMapInitLax<TApiSurface extends ApiSurface> = ApiMapInitLaxItem<TApiSurface>[];
+export type ApiMapInitLax<TSurface extends ApiSurface> = ApiMapInitLaxItem<TSurface>[];
 
-export type ApiMapInitLaxItem<TApiSurface extends ApiSurface> = [
-    name: ApiNames<TApiSurface>,
-    handler: ApiHandlerAny<TApiSurface>,
+export type ApiMapInitLaxItem<TSurface extends ApiSurface> = [
+    name: ApiNames<TSurface>,
+    handler: ApiHandlerAny<TSurface>,
 ];
 
-type ApiMapInitItem<TApiSurface extends ApiSurface, TName extends ApiNames<TApiSurface>> = [
+type ApiMapInitItem<TSurface extends ApiSurface, TName extends ApiNames<TSurface>> = [
     name: TName,
-    handler: ApiHandler<TApiSurface[TName]>,
+    handler: ApiHandler<TSurface[TName]>,
 ];
 
-type ApiMapInitItemAny<TApiSurface extends ApiSurface> = {[key in ApiNames<TApiSurface>]: ApiMapInitItem<TApiSurface, key>}[ApiNames<TApiSurface>];
+type ApiMapInitItemAny<TSurface extends ApiSurface> = {[key in ApiNames<TSurface>]: ApiMapInitItem<TSurface, key>}[ApiNames<TSurface>];
