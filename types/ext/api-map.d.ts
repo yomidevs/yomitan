@@ -26,21 +26,30 @@ type ApiItem = {
 
 export type ApiHandler<TApiItem extends ApiItem> = (params: TApiItem['params']) => TApiItem['return'] | Promise<TApiItem['return']>;
 
-type ApiHandlerSurface<TApiSurface extends ApiSurface> = {[name in keyof TApiSurface]: ApiHandler<TApiSurface[name]>};
+type ApiHandlerSurface<TApiSurface extends ApiSurface> = {[name in ApiNames<TApiSurface>]: ApiHandler<TApiSurface[name]>};
 
-export type ApiHandlerAny<TApiSurface extends ApiSurface> = ApiHandlerSurface<TApiSurface>[keyof TApiSurface];
+export type ApiHandlerAny<TApiSurface extends ApiSurface> = ApiHandlerSurface<TApiSurface>[ApiNames<TApiSurface>];
 
-export type ApiParams<TApiSurface extends ApiSurface, TName extends keyof TApiSurface> = TApiSurface[TName]['params'];
+export type ApiNames<TApiSurface extends ApiSurface> = keyof TApiSurface;
 
-export type ApiReturn<TApiSurface extends ApiSurface, TName extends keyof TApiSurface> = TApiSurface[TName]['return'];
+export type ApiParams<TApiSurface extends ApiSurface, TName extends ApiNames<TApiSurface>> = TApiSurface[TName]['params'];
 
-export type ApiMap<TApiSurface extends ApiSurface> = Map<keyof TApiSurface, ApiHandlerAny<TApiSurface>>;
+export type ApiReturn<TApiSurface extends ApiSurface, TName extends ApiNames<TApiSurface>> = TApiSurface[TName]['return'];
+
+export type ApiMap<TApiSurface extends ApiSurface> = Map<ApiNames<TApiSurface>, ApiHandlerAny<TApiSurface>>;
 
 export type ApiMapInit<TApiSurface extends ApiSurface> = ApiMapInitItemAny<TApiSurface>[];
 
-type ApiMapInitItem<TApiSurface extends ApiSurface, TName extends keyof TApiSurface> = [
+export type ApiMapInitLax<TApiSurface extends ApiSurface> = ApiMapInitLaxItem<TApiSurface>[];
+
+export type ApiMapInitLaxItem<TApiSurface extends ApiSurface> = [
+    name: ApiNames<TApiSurface>,
+    handler: ApiHandlerAny<TApiSurface>,
+];
+
+type ApiMapInitItem<TApiSurface extends ApiSurface, TName extends ApiNames<TApiSurface>> = [
     name: TName,
     handler: ApiHandler<TApiSurface[TName]>,
 ];
 
-type ApiMapInitItemAny<TApiSurface extends ApiSurface> = {[key in keyof TApiSurface]: ApiMapInitItem<TApiSurface, key>}[keyof TApiSurface];
+type ApiMapInitItemAny<TApiSurface extends ApiSurface> = {[key in ApiNames<TApiSurface>]: ApiMapInitItem<TApiSurface, key>}[ApiNames<TApiSurface>];
