@@ -15,38 +15,68 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * This type describes the structure of an API surface.
+ * It is effectively just an object containing a list of items which describe a basic API functionality.
+ */
 type ApiSurface = {
     [name: string]: ApiDescriptor;
 };
 
+/**
+ * This type describes the structure of a single API function.
+ */
 type ApiDescriptor = {
+    /** The parameters for the function. If there are no parameters, `void` should be used. */
     params: void | {[name: string]: unknown};
+    /** The return type for the function. */
     return: unknown;
 };
 
-export type ApiParams<TDescriptor extends ApiDescriptor> = TDescriptor['params'];
+/**
+ * This type represents a mapping of an entire API surface to its handlers.
+ */
+type ApiHandlerSurface<TSurface extends ApiSurface> = {
+    [name in ApiNames<TSurface>]: ApiHandler<TSurface[name]>;
+};
 
-export type ApiReturn<TDescriptor extends ApiDescriptor> = TDescriptor['return'];
-
-export type ApiHandlerSync<TDescriptor extends ApiDescriptor> = (params: ApiParams<TDescriptor>) => ApiReturn<TDescriptor>;
-
-export type ApiHandlerAsync<TDescriptor extends ApiDescriptor> = (params: ApiParams<TDescriptor>) => Promise<ApiReturn<TDescriptor>>;
-
-export type ApiHandler<TDescriptor extends ApiDescriptor> = (params: ApiParams<TDescriptor>) => ApiReturn<TDescriptor> | Promise<ApiReturn<TDescriptor>>;
-
-type ApiHandlerSurface<TSurface extends ApiSurface> = {[name in ApiNames<TSurface>]: ApiHandler<TSurface[name]>};
-
-export type ApiHandlerAny<TSurface extends ApiSurface> = ApiHandlerSurface<TSurface>[ApiNames<TSurface>];
-
-export type ApiNames<TSurface extends ApiSurface> = keyof TSurface;
-
-export type ApiMap<TSurface extends ApiSurface> = Map<ApiNames<TSurface>, ApiHandlerAny<TSurface>>;
-
-export type ApiMapInit<TSurface extends ApiSurface> = ApiMapInitItemAny<TSurface>[];
-
+/**
+ * This type represents a single API map initializer.
+ * Type safety is enforced by ensuring that the name and handler signature are valid.
+ */
 type ApiMapInitItem<TSurface extends ApiSurface, TName extends ApiNames<TSurface>> = [
     name: TName,
     handler: ApiHandler<TSurface[TName]>,
 ];
 
+/**
+ * This type represents a a union of all API map initializers for a given surface.
+ */
 type ApiMapInitItemAny<TSurface extends ApiSurface> = {[key in ApiNames<TSurface>]: ApiMapInitItem<TSurface, key>}[ApiNames<TSurface>];
+
+/** Type alias for the params member of an descriptor. */
+export type ApiParams<TDescriptor extends ApiDescriptor> = TDescriptor['params'];
+
+/** Type alias for the return member of an descriptor. */
+export type ApiReturn<TDescriptor extends ApiDescriptor> = TDescriptor['return'];
+
+/** A type representing a synchronous handler. */
+export type ApiHandlerSync<TDescriptor extends ApiDescriptor> = (params: ApiParams<TDescriptor>) => ApiReturn<TDescriptor>;
+
+/** A type representing an asynchronous handler. */
+export type ApiHandlerAsync<TDescriptor extends ApiDescriptor> = (params: ApiParams<TDescriptor>) => Promise<ApiReturn<TDescriptor>>;
+
+/** A type representing a generic handler. */
+export type ApiHandler<TDescriptor extends ApiDescriptor> = (params: ApiParams<TDescriptor>) => ApiReturn<TDescriptor> | Promise<ApiReturn<TDescriptor>>;
+
+/** A union of all of the handlers for a given surface. */
+export type ApiHandlerAny<TSurface extends ApiSurface> = ApiHandlerSurface<TSurface>[ApiNames<TSurface>];
+
+/** A union of all of the names for a given surface. */
+export type ApiNames<TSurface extends ApiSurface> = keyof TSurface;
+
+/** A mapping of names to the corresponding handler function. */
+export type ApiMap<TSurface extends ApiSurface> = Map<ApiNames<TSurface>, ApiHandlerAny<TSurface>>;
+
+/** The initialization array structure for populating an API map. */
+export type ApiMapInit<TSurface extends ApiSurface> = ApiMapInitItemAny<TSurface>[];
