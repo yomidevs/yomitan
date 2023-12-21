@@ -23,3 +23,16 @@
 export function createApiMap(init) {
     return new Map(init);
 }
+
+/**
+ * @template {import('api-map').ApiSurface} [TApiSurface=never]
+ * @param {import('api-map').ApiMap<TApiSurface>} map
+ * @param {import('api-map').ApiMapInit<TApiSurface>} init
+ * @throws {Error}
+ */
+export function extendApiMap(map, init) {
+    for (const [key, value] of init) {
+        if (map.has(key)) { throw new Error(`The handler for ${String(key)} has already been registered`); }
+        map.set(key, value);
+    }
+}
