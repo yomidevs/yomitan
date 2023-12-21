@@ -106,7 +106,7 @@ export type ArchiveFileMap = Map<string, ZipJS.Entry>;
 export type QueryDetails = Map<string, string>;
 
 /**
- * A map of file types inside a dictionary and its matching ZipJS entries.
+ * A map of file types inside a dictionary and its matching entries.
  */
 export type QueryResult = Map<string, ZipJS.Entry[]>;
 
