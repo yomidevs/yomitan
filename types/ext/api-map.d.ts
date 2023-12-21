@@ -38,13 +38,6 @@ export type ApiMap<TApiSurface extends ApiSurface> = Map<keyof TApiSurface, ApiH
 
 export type ApiMapInit<TApiSurface extends ApiSurface> = ApiMapInitItemAny<TApiSurface>[];
 
-export type ApiMapInitLax<TApiSurface extends ApiSurface> = ApiMapInitLaxItem<TApiSurface>[];
-
-export type ApiMapInitLaxItem<TApiSurface extends ApiSurface> = [
-    name: keyof TApiSurface,
-    handler: ApiHandlerAny<TApiSurface>,
-];
-
 type ApiMapInitItem<TApiSurface extends ApiSurface, TName extends keyof TApiSurface> = [
     name: TName,
     handler: ApiHandler<TApiSurface[TName]>,
