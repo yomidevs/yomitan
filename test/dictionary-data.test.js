@@ -20,151 +20,9 @@ import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {describe} from 'vitest';
 import {parseJson} from '../dev/json.js';
-import {AnkiNoteBuilder} from '../ext/js/data/anki-note-builder.js';
-import {JapaneseUtil} from '../ext/js/language/sandbox/japanese-util.js';
-import {AnkiTemplateRenderer} from '../ext/js/templates/sandbox/anki-template-renderer.js';
 import {createTranslatorTest} from './fixtures/translator-test.js';
-import {createTestAnkiNoteData} from './utilities/anki.js';
+import {createTestAnkiNoteData, getTemplateRenderResults} from './utilities/anki.js';
 import {createFindOptions} from './utilities/translator.js';
-
-/**
- * @param {'terms'|'kanji'} type
- * @returns {string[]}
- */
-function getFieldMarkers(type) {
-    switch (type) {
-        case 'terms':
-            return [
-                'audio',
-                'clipboard-image',
-                'clipboard-text',
-                'cloze-body',
-                'cloze-prefix',
-                'cloze-suffix',
-                'conjugation',
-                'dictionary',
-                'document-title',
-                'expression',
-                'frequencies',
-                'furigana',
-                'furigana-plain',
-                'glossary',
-                'glossary-brief',
-                'glossary-no-dictionary',
-                'part-of-speech',
-                'pitch-accents',
-                'pitch-accent-graphs',
-                'pitch-accent-positions',
-                'reading',
-                'screenshot',
-                'search-query',
-                'selection-text',
-                'sentence',
-                'sentence-furigana',
-                'tags',
-                'url'
-            ];
-        case 'kanji':
-            return [
-                'character',
-                'clipboard-image',
-                'clipboard-text',
-                'cloze-body',
-                'cloze-prefix',
-                'cloze-suffix',
-                'dictionary',
-                'document-title',
-                'glossary',
-                'kunyomi',
-                'onyomi',
-                'screenshot',
-                'search-query',
-                'selection-text',
-                'sentence',
-                'sentence-furigana',
-                'stroke-count',
-                'tags',
-                'url'
-            ];
-        default:
-            return [];
-    }
-}
-
-/**
- * @param {import('dictionary').DictionaryEntry[]} dictionaryEntries
- * @param {'terms'|'kanji'} type
- * @param {import('settings').ResultOutputMode} mode
- * @param {string} template
- * @param {import('vitest').ExpectStatic} expect
- * @returns {Promise<import('anki').NoteFields[]>}
- */
-async function getRenderResults(dictionaryEntries, type, mode, template, expect) {
-    const markers = getFieldMarkers(type);
-    /** @type {import('anki-note-builder').Field[]} */
-    const fields = [];
-    for (const marker of markers) {
-        fields.push([marker, `{${marker}}`]);
-    }
-
-    const ankiTemplateRenderer = new AnkiTemplateRenderer();
-    await ankiTemplateRenderer.prepare();
-    const japaneseUtil = new JapaneseUtil(null);
-    const clozePrefix = 'cloze-prefix';
-    const clozeSuffix = 'cloze-suffix';
-    const results = [];
-    for (const dictionaryEntry of dictionaryEntries) {
-        let source = '';
-        switch (dictionaryEntry.type) {
-            case 'kanji':
-                source = dictionaryEntry.character;
-                break;
-            case 'term':
-                if (dictionaryEntry.headwords.length > 0 && dictionaryEntry.headwords[0].sources.length > 0) {
-                    source = dictionaryEntry.headwords[0].sources[0].originalText;
-                }
-                break;
-        }
-        const ankiNoteBuilder = new AnkiNoteBuilder(japaneseUtil, ankiTemplateRenderer.templateRenderer);
-        const context = {
-            url: 'url:',
-            sentence: {
-                text: `${clozePrefix}${source}${clozeSuffix}`,
-                offset: clozePrefix.length
-            },
-            documentTitle: 'title',
-            query: 'query',
-            fullQuery: 'fullQuery'
-        };
-        /** @type {import('anki-note-builder').CreateNoteDetails} */
-        const details = {
-            dictionaryEntry,
-            mode: 'test',
-            context,
-            template,
-            deckName: 'deckName',
-            modelName: 'modelName',
-            fields,
-            tags: ['yomitan'],
-            checkForDuplicates: true,
-            duplicateScope: 'collection',
-            duplicateScopeCheckAllModels: false,
-            resultOutputMode: mode,
-            glossaryLayoutMode: 'default',
-            compactTags: false,
-            requirements: [],
-            mediaOptions: null
-        };
-        const {note: {fields: noteFields}, errors} = await ankiNoteBuilder.createNote(details);
-        for (const error of errors) {
-            console.error(error);
-        }
-        expect(errors.length).toStrictEqual(0);
-        results.push(noteFields);
-    }
-
-    return results;
-}
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dictionaryName = 'Test Dictionary 2';
@@ -204,7 +62,7 @@ describe('Dictionary data', () => {
                         /** @type {import('translation').FindTermsOptions} */
                         const options = createFindOptions(dictionaryName, optionsPresets, data.options);
                         const {dictionaryEntries, originalTextLength} = await translator.findTerms(mode, text, options);
-                        const renderResults = mode !== 'simple' ? await getRenderResults(dictionaryEntries, 'terms', mode, template, expect) : null;
+                        const renderResults = mode !== 'simple' ? await getTemplateRenderResults(dictionaryEntries, 'terms', mode, template, expect) : null;
                         const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, mode)) : null;
                         expect.soft(originalTextLength).toStrictEqual(expected1.originalTextLength);
                         expect.soft(dictionaryEntries).toStrictEqual(expected1.dictionaryEntries);
@@ -218,7 +76,7 @@ describe('Dictionary data', () => {
                         /** @type {import('translation').FindKanjiOptions} */
                         const options = createFindOptions(dictionaryName, optionsPresets, data.options);
                         const dictionaryEntries = await translator.findKanji(text, options);
-                        const renderResults = await getRenderResults(dictionaryEntries, 'kanji', 'split', template, expect);
+                        const renderResults = await getTemplateRenderResults(dictionaryEntries, 'kanji', 'split', template, expect);
                         const noteDataList = dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, 'split'));
                         expect.soft(dictionaryEntries).toStrictEqual(expected1.dictionaryEntries);
                         expect.soft(noteDataList).toEqual(expected2.noteDataList);
