@@ -113,11 +113,15 @@ export class DictionaryImporter {
         const dataBankSchemas = this._getDataBankSchemas(version);
 
         // Files
-        const termFiles = this._getArchiveFiles(fileMap, 'term_bank_?.json');
-        const termMetaFiles = this._getArchiveFiles(fileMap, 'term_meta_bank_?.json');
-        const kanjiFiles = this._getArchiveFiles(fileMap, 'kanji_bank_?.json');
-        const kanjiMetaFiles = this._getArchiveFiles(fileMap, 'kanji_meta_bank_?.json');
-        const tagFiles = this._getArchiveFiles(fileMap, 'tag_bank_?.json');
+        /** @type {import('dictionary-importer').QueryDetails} */
+        const queryDetails = new Map([
+            ['termFiles', /^term_bank_(\d+)\.json$/],
+            ['termMetaFiles', /^term_meta_bank_(\d+)\.json$/],
+            ['kanjiFiles', /^kanji_bank_(\d+)\.json$/],
+            ['kanjiMetaFiles', /^kanji_meta_bank_(\d+)\.json$/],
+            ['tagFiles', /^tag_bank_(\d+)\.json$/]
+        ]);
+        const {termFiles, termMetaFiles, kanjiFiles, kanjiMetaFiles, tagFiles} = Object.fromEntries(this._getArchiveFiles(fileMap, queryDetails));
 
         // Load data
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
@@ -679,18 +683,24 @@ export class DictionaryImporter {
 
     /**
      * @param {import('dictionary-importer').ArchiveFileMap} fileMap
-     * @param {string} fileNameFormat
-     * @returns {import('@zip.js/zip.js').Entry[]}
+     * @param {import('dictionary-importer').QueryDetails} queryDetails
+     * @returns {import('dictionary-importer').QueryResult}
      */
-    _getArchiveFiles(fileMap, fileNameFormat) {
-        const indexPosition = fileNameFormat.indexOf('?');
-        const prefix = fileNameFormat.substring(0, indexPosition);
-        const suffix = fileNameFormat.substring(indexPosition + 1);
-        /** @type {import('@zip.js/zip.js').Entry[]} */
-        const results = [];
+    _getArchiveFiles(fileMap, queryDetails) {
+        /** @type {import('dictionary-importer').QueryResult} */
+        const results = new Map();
         for (const [name, value] of fileMap.entries()) {
-            if (name.startsWith(prefix) && name.endsWith(suffix)) {
-                results.push(value);
+            for (const [fileType, fileNameFormat] of queryDetails.entries()) {
+                let entries = results.get(fileType);
+                if (typeof entries === 'undefined') {
+                    entries = [];
+                    results.set(fileType, entries);
+                }
+
+                if (fileNameFormat.test(name)) {
+                    entries.push(value);
+                    break;
+                }
             }
         }
         return results;
