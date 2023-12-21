@@ -32,9 +32,9 @@ export type ApiHandlerAny<TApiSurface extends ApiSurface> = ApiHandlerSurface<TA
 
 export type ApiNames<TApiSurface extends ApiSurface> = keyof TApiSurface;
 
-export type ApiParams<TApiSurface extends ApiSurface, TName extends ApiNames<TApiSurface>> = TApiSurface[TName]['params'];
+export type ApiParams<TApiItem extends ApiItem> = TApiItem['params'];
 
-export type ApiReturn<TApiSurface extends ApiSurface, TName extends ApiNames<TApiSurface>> = TApiSurface[TName]['return'];
+export type ApiReturn<TApiItem extends ApiItem> = TApiItem['return'];
 
 export type ApiMap<TApiSurface extends ApiSurface> = Map<ApiNames<TApiSurface>, ApiHandlerAny<TApiSurface>>;
 

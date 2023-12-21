@@ -22,7 +22,7 @@ import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
-import type {ApiMap, ApiMapInit, ApiHandler, ApiParams, ApiReturn} from './api-map';
+import type {ApiMap, ApiMapInit, ApiHandler, ApiParams, ApiReturn, ApiNames} from './api-map';
 
 type OffscreenApiSurface = {
     databasePrepareOffscreen: {
@@ -99,7 +99,7 @@ export type Message<TName extends MessageType> = (
         {action: TName, params: OffscreenApiParams<TName>}
 );
 
-export type MessageType = keyof OffscreenApiSurface;
+export type MessageType = ApiNames<OffscreenApiSurface>;
 
 export type FindKanjiOptionsOffscreen = Omit<Translation.FindKanjiOptions, 'enabledDictionaryMap'> & {
     enabledDictionaryMap: [
@@ -126,8 +126,8 @@ export type OffscreenApiMap = ApiMap<OffscreenApiSurface>;
 
 export type OffscreenApiMapInit = ApiMapInit<OffscreenApiSurface>;
 
-export type OffscreenApiHandler<TName extends keyof OffscreenApiSurface> = ApiHandler<OffscreenApiSurface[TName]>;
+export type OffscreenApiHandler<TName extends MessageType> = ApiHandler<OffscreenApiSurface[TName]>;
 
-export type OffscreenApiParams<TName extends keyof OffscreenApiSurface> = ApiParams<OffscreenApiSurface, TName>;
+export type OffscreenApiParams<TName extends MessageType> = ApiParams<OffscreenApiSurface[TName]>;
 
-export type OffscreenApiReturn<TName extends keyof OffscreenApiSurface> = ApiReturn<OffscreenApiSurface, TName>;
+export type OffscreenApiReturn<TName extends MessageType> = ApiReturn<OffscreenApiSurface[TName]>;
