@@ -34,14 +34,13 @@ describe('Dictionary data', () => {
     const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
 
     const testResults1FilePath = path.join(dirname, 'data/translator-test-results.json');
+    const testResults2FilePath = path.join(dirname, 'data/translator-test-results-note-data1.json');
+    const testResults3FilePath = path.join(dirname, 'data/anki-note-builder-test-results.json');
+
     /** @type {import('test/translator').TranslatorTestResults} */
     const expectedResults1 = parseJson(readFileSync(testResults1FilePath, {encoding: 'utf8'}));
-
-    const testResults2FilePath = path.join(dirname, 'data/translator-test-results-note-data1.json');
     /** @type {import('test/translator').TranslatorTestNoteDataResults} */
     const expectedResults2 = parseJson(readFileSync(testResults2FilePath, {encoding: 'utf8'}));
-
-    const testResults3FilePath = path.join(dirname, 'data/anki-note-builder-test-results.json');
     /** @type {import('test/translator').AnkiNoteBuilderTestResults} */
     const expectedResults3 = parseJson(readFileSync(testResults3FilePath, {encoding: 'utf8'}));
 
