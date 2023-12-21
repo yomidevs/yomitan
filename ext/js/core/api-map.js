@@ -17,8 +17,9 @@
 
 /**
  * @template {import('api-map').ApiSurface} [TApiSurface=never]
- * @param {import('api-map').ApiMapInit<TApiSurface>} init
- * @returns {import('api-map').ApiMap<TApiSurface>}
+ * @template {unknown[]} [TExtraParams=[]]
+ * @param {import('api-map').ApiMapInit<TApiSurface, TExtraParams>} init
+ * @returns {import('api-map').ApiMap<TApiSurface, TExtraParams>}
  */
 export function createApiMap(init) {
     return new Map(init);
@@ -26,8 +27,9 @@ export function createApiMap(init) {
 
 /**
  * @template {import('api-map').ApiSurface} [TApiSurface=never]
- * @param {import('api-map').ApiMap<TApiSurface>} map
- * @param {import('api-map').ApiMapInit<TApiSurface>} init
+ * @template {unknown[]} [TExtraParams=[]]
+ * @param {import('api-map').ApiMap<TApiSurface, TExtraParams>} map
+ * @param {import('api-map').ApiMapInit<TApiSurface, TExtraParams>} init
  * @throws {Error}
  */
 export function extendApiMap(map, init) {
@@ -39,9 +41,10 @@ export function extendApiMap(map, init) {
 
 /**
  * @template {import('api-map').ApiSurface} [TApiSurface=never]
- * @param {import('api-map').ApiMap<TApiSurface>} map
+ * @template {unknown[]} [TExtraParams=[]]
+ * @param {import('api-map').ApiMap<TApiSurface, TExtraParams>} map
  * @param {string} name
- * @returns {import('api-map').ApiHandlerAny<TApiSurface>|undefined}
+ * @returns {import('api-map').ApiHandlerAny<TApiSurface, TExtraParams>|undefined}
  */
 export function getApiMapHandler(map, name) {
     return map.get(/** @type {import('api-map').ApiNames<TApiSurface>} */ (name));
