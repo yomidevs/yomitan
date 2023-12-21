@@ -24,7 +24,7 @@ type ApiItem = {
     return: unknown;
 };
 
-export type ApiHandler<TApiItem extends ApiItem> = (params: TApiItem['params']) => TApiItem['return'];
+export type ApiHandler<TApiItem extends ApiItem> = (params: TApiItem['params']) => TApiItem['return'] | Promise<TApiItem['return']>;
 
 type ApiHandlerSurface<TApiSurface extends ApiSurface> = {[name in keyof TApiSurface]: ApiHandler<TApiSurface[name]>};
 
