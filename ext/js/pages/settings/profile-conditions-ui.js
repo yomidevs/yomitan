@@ -459,7 +459,7 @@ class ProfileConditionGroupUI {
         /** @type {HTMLElement} */
         this._node = /** @type {HTMLElement} */ (this._parent.instantiateTemplate('profile-condition-group'));
         /** @type {HTMLElement} */
-        this._conditionContainer = /** @type {HTMLElement} */ querySelectorNotNull(this._node, '.profile-condition-list');
+        this._conditionContainer = querySelectorNotNull(this._node, '.profile-condition-list');
         /** @type {HTMLElement} */
         this._addConditionButton = querySelectorNotNull(this._node, '.profile-condition-add-button');
         /** @type {ProfileConditionUI[]} */
@@ -626,7 +626,7 @@ class ProfileConditionUI {
         /** @type {HTMLElement} */
         this._mouseButtonContainer = querySelectorNotNull(this._node, '.mouse-button-container');
         /** @type {HTMLButtonElement} */
-        this._menuButton = /** @type {HTMLButtonElement} */ querySelectorNotNull(this._node, '.profile-condition-menu-button');
+        this._menuButton = querySelectorNotNull(this._node, '.profile-condition-menu-button');
         /** @type {HTMLElement} */
         this._typeOptionContainer = querySelectorNotNull(this._typeInput, 'optgroup');
         /** @type {HTMLElement} */
