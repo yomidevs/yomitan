@@ -16,23 +16,23 @@
  */
 
 type ApiSurface = {
-    [name: string]: ApiItem;
+    [name: string]: ApiDescriptor;
 };
 
-type ApiItem = {
+type ApiDescriptor = {
     params: void | {[name: string]: unknown};
     return: unknown;
 };
 
-export type ApiParams<TApiItem extends ApiItem> = TApiItem['params'];
+export type ApiParams<TApiDescriptor extends ApiDescriptor> = TApiDescriptor['params'];
 
-export type ApiReturn<TApiItem extends ApiItem> = TApiItem['return'];
+export type ApiReturn<TApiDescriptor extends ApiDescriptor> = TApiDescriptor['return'];
 
-export type ApiHandlerSync<TApiItem extends ApiItem> = (params: ApiParams<TApiItem>) => ApiReturn<TApiItem>;
+export type ApiHandlerSync<TApiDescriptor extends ApiDescriptor> = (params: ApiParams<TApiDescriptor>) => ApiReturn<TApiDescriptor>;
 
-export type ApiHandlerAsync<TApiItem extends ApiItem> = (params: ApiParams<TApiItem>) => Promise<ApiReturn<TApiItem>>;
+export type ApiHandlerAsync<TApiDescriptor extends ApiDescriptor> = (params: ApiParams<TApiDescriptor>) => Promise<ApiReturn<TApiDescriptor>>;
 
-export type ApiHandler<TApiItem extends ApiItem> = (params: ApiParams<TApiItem>) => ApiReturn<TApiItem> | Promise<ApiReturn<TApiItem>>;
+export type ApiHandler<TApiDescriptor extends ApiDescriptor> = (params: ApiParams<TApiDescriptor>) => ApiReturn<TApiDescriptor> | Promise<ApiReturn<TApiDescriptor>>;
 
 type ApiHandlerSurface<TApiSurface extends ApiSurface> = {[name in ApiNames<TApiSurface>]: ApiHandler<TApiSurface[name]>};
 
