@@ -36,3 +36,13 @@ export function extendApiMap(map, init) {
         map.set(key, value);
     }
 }
+
+/**
+ * @template {import('api-map').ApiSurface} [TApiSurface=never]
+ * @param {import('api-map').ApiMap<TApiSurface>} map
+ * @param {string} name
+ * @returns {import('api-map').ApiHandlerAny<TApiSurface>|undefined}
+ */
+export function getApiMapHandler(map, name) {
+    return map.get(/** @type {import('api-map').ApiNames<TApiSurface>} */ (name));
+}
