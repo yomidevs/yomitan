@@ -459,7 +459,7 @@ class ProfileConditionGroupUI {
         /** @type {HTMLElement} */
         this._node = /** @type {HTMLElement} */ (this._parent.instantiateTemplate('profile-condition-group'));
         /** @type {HTMLElement} */
-        this._conditionContainer = querySelectorNotNull(this._node, '.profile-condition-list');
+        this._conditionContainer = /** @type {HTMLElement} */ (this._node.querySelector('.profile-condition-list'));
         /** @type {HTMLElement} */
         this._addConditionButton = querySelectorNotNull(this._node, '.profile-condition-add-button');
         /** @type {ProfileConditionUI[]} */
@@ -624,13 +624,13 @@ class ProfileConditionUI {
         /** @type {HTMLSelectElement} */
         this._operatorInput = querySelectorNotNull(this._node, '.profile-condition-operator');
         /** @type {HTMLButtonElement} */
-        this._removeButton = querySelectorNotNull(this._node, '.profile-condition-remove');
+        this._removeButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.profile-condition-remove'));
         /** @type {HTMLButtonElement} */
         this._mouseButton = querySelectorNotNull(this._node, '.mouse-button');
         /** @type {HTMLElement} */
         this._mouseButtonContainer = querySelectorNotNull(this._node, '.mouse-button-container');
         /** @type {HTMLButtonElement} */
-        this._menuButton = querySelectorNotNull(this._node, '.profile-condition-menu-button');
+        this._menuButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.profile-condition-menu-button'));
         /** @type {HTMLElement} */
         this._typeOptionContainer = querySelectorNotNull(this._typeInput, 'optgroup');
         /** @type {HTMLElement} */
@@ -777,7 +777,7 @@ class ProfileConditionUI {
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
         /** @type {HTMLElement} */
-        const deleteGroup = querySelectorNotNull(bodyNode, '.popup-menu-item[data-menu-action="deleteGroup"]');
+        const deleteGroup = /** @type {HTMLElement} */ (bodyNode.querySelector('.popup-menu-item[data-menu-action="deleteGroup"]'));
         if (deleteGroup !== null) {
             deleteGroup.hidden = (this._parent.childCount <= 1);
         }
