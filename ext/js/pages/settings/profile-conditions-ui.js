@@ -459,7 +459,7 @@ class ProfileConditionGroupUI {
         /** @type {HTMLElement} */
         this._node = /** @type {HTMLElement} */ (this._parent.instantiateTemplate('profile-condition-group'));
         /** @type {HTMLElement} */
-        this._conditionContainer = /** @type {HTMLElement} */ (this._node.querySelector('.profile-condition-list'));
+        this._conditionContainer = /** @type {HTMLElement} */ querySelectorNotNull(this._node, '.profile-condition-list');
         /** @type {HTMLElement} */
         this._addConditionButton = querySelectorNotNull(this._node, '.profile-condition-add-button');
         /** @type {ProfileConditionUI[]} */
@@ -600,9 +600,7 @@ class ProfileConditionGroupUI {
         const child = new ProfileConditionUI(this, index);
         child.prepare(condition);
         this._children.push(child);
-        if (this._conditionContainer !== null) {
-            this._conditionContainer.appendChild(child.node);
-        }
+        this._conditionContainer.appendChild(child.node);
         return child;
     }
 }
@@ -624,13 +622,11 @@ class ProfileConditionUI {
         /** @type {HTMLSelectElement} */
         this._operatorInput = querySelectorNotNull(this._node, '.profile-condition-operator');
         /** @type {HTMLButtonElement} */
-        this._removeButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.profile-condition-remove'));
-        /** @type {HTMLButtonElement} */
         this._mouseButton = querySelectorNotNull(this._node, '.mouse-button');
         /** @type {HTMLElement} */
         this._mouseButtonContainer = querySelectorNotNull(this._node, '.mouse-button-container');
         /** @type {HTMLButtonElement} */
-        this._menuButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.profile-condition-menu-button'));
+        this._menuButton = /** @type {HTMLButtonElement} */ querySelectorNotNull(this._node, '.profile-condition-menu-button');
         /** @type {HTMLElement} */
         this._typeOptionContainer = querySelectorNotNull(this._typeInput, 'optgroup');
         /** @type {HTMLElement} */
@@ -684,11 +680,8 @@ class ProfileConditionUI {
 
         this._eventListeners.addEventListener(this._typeInput, 'change', this._onTypeChange.bind(this), false);
         this._eventListeners.addEventListener(this._operatorInput, 'change', this._onOperatorChange.bind(this), false);
-        if (this._removeButton !== null) { this._eventListeners.addEventListener(this._removeButton, 'click', this._onRemoveButtonClick.bind(this), false); }
-        if (this._menuButton !== null) {
-            this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
-            this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
-        }
+        this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
+        this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
     }
 
     /** */
@@ -764,11 +757,6 @@ class ProfileConditionUI {
             const normalizedValue = this._normalizeValue(modifiers, normalize);
             this.settingsController.setGlobalSetting(this.getPath('value'), normalizedValue);
         }
-    }
-
-    /** */
-    _onRemoveButtonClick() {
-        this._removeSelf();
     }
 
     /**
