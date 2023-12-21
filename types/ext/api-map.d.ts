@@ -24,17 +24,17 @@ type ApiItem = {
     return: unknown;
 };
 
-export type ApiHandler<TApiItem extends ApiItem> = (params: TApiItem['params']) => TApiItem['return'] | Promise<TApiItem['return']>;
+export type ApiParams<TApiItem extends ApiItem> = TApiItem['params'];
+
+export type ApiReturn<TApiItem extends ApiItem> = TApiItem['return'];
+
+export type ApiHandler<TApiItem extends ApiItem> = (params: ApiParams<TApiItem>) => ApiReturn<TApiItem> | Promise<ApiReturn<TApiItem>>;
 
 type ApiHandlerSurface<TApiSurface extends ApiSurface> = {[name in ApiNames<TApiSurface>]: ApiHandler<TApiSurface[name]>};
 
 export type ApiHandlerAny<TApiSurface extends ApiSurface> = ApiHandlerSurface<TApiSurface>[ApiNames<TApiSurface>];
 
 export type ApiNames<TApiSurface extends ApiSurface> = keyof TApiSurface;
-
-export type ApiParams<TApiItem extends ApiItem> = TApiItem['params'];
-
-export type ApiReturn<TApiItem extends ApiItem> = TApiItem['return'];
 
 export type ApiMap<TApiSurface extends ApiSurface> = Map<ApiNames<TApiSurface>, ApiHandlerAny<TApiSurface>>;
 
