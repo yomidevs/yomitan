@@ -28,6 +28,10 @@ export type ApiParams<TApiItem extends ApiItem> = TApiItem['params'];
 
 export type ApiReturn<TApiItem extends ApiItem> = TApiItem['return'];
 
+export type ApiHandlerSync<TApiItem extends ApiItem> = (params: ApiParams<TApiItem>) => ApiReturn<TApiItem>;
+
+export type ApiHandlerAsync<TApiItem extends ApiItem> = (params: ApiParams<TApiItem>) => Promise<ApiReturn<TApiItem>>;
+
 export type ApiHandler<TApiItem extends ApiItem> = (params: ApiParams<TApiItem>) => ApiReturn<TApiItem> | Promise<ApiReturn<TApiItem>>;
 
 type ApiHandlerSurface<TApiSurface extends ApiSurface> = {[name in ApiNames<TApiSurface>]: ApiHandler<TApiSurface[name]>};
