@@ -36,23 +36,23 @@ type ApiDescriptor = {
 /**
  * This type represents a mapping of an entire API surface to its handlers.
  */
-type ApiHandlerSurface<TSurface extends ApiSurface> = {
-    [name in ApiNames<TSurface>]: ApiHandler<TSurface[name]>;
+type ApiHandlerSurface<TSurface extends ApiSurface, TExtraParams extends []> = {
+    [name in ApiNames<TSurface>]: ApiHandler<TSurface[name], TExtraParams>;
 };
 
 /**
  * This type represents a single API map initializer.
  * Type safety is enforced by ensuring that the name and handler signature are valid.
  */
-type ApiMapInitItem<TSurface extends ApiSurface, TName extends ApiNames<TSurface>> = [
+type ApiMapInitItem<TSurface extends ApiSurface, TExtraParams extends [], TName extends ApiNames<TSurface>> = [
     name: TName,
-    handler: ApiHandler<TSurface[TName]>,
+    handler: ApiHandler<TSurface[TName], TExtraParams>,
 ];
 
 /**
  * This type represents a a union of all API map initializers for a given surface.
  */
-type ApiMapInitItemAny<TSurface extends ApiSurface> = {[key in ApiNames<TSurface>]: ApiMapInitItem<TSurface, key>}[ApiNames<TSurface>];
+type ApiMapInitItemAny<TSurface extends ApiSurface, TExtraParams extends []> = {[key in ApiNames<TSurface>]: ApiMapInitItem<TSurface, TExtraParams, key>}[ApiNames<TSurface>];
 
 /** Type alias for the params member of an descriptor. */
 export type ApiParams<TDescriptor extends ApiDescriptor> = TDescriptor['params'];
@@ -61,22 +61,22 @@ export type ApiParams<TDescriptor extends ApiDescriptor> = TDescriptor['params']
 export type ApiReturn<TDescriptor extends ApiDescriptor> = TDescriptor['return'];
 
 /** A type representing a synchronous handler. */
-export type ApiHandlerSync<TDescriptor extends ApiDescriptor> = (params: ApiParams<TDescriptor>) => ApiReturn<TDescriptor>;
+export type ApiHandlerSync<TDescriptor extends ApiDescriptor, TExtraParams extends [] = []> = (params: ApiParams<TDescriptor>, ...extraParams: TExtraParams) => ApiReturn<TDescriptor>;
 
 /** A type representing an asynchronous handler. */
-export type ApiHandlerAsync<TDescriptor extends ApiDescriptor> = (params: ApiParams<TDescriptor>) => Promise<ApiReturn<TDescriptor>>;
+export type ApiHandlerAsync<TDescriptor extends ApiDescriptor, TExtraParams extends [] = []> = (params: ApiParams<TDescriptor>, ...extraParams: TExtraParams) => Promise<ApiReturn<TDescriptor>>;
 
 /** A type representing a generic handler. */
-export type ApiHandler<TDescriptor extends ApiDescriptor> = (params: ApiParams<TDescriptor>) => ApiReturn<TDescriptor> | Promise<ApiReturn<TDescriptor>>;
+export type ApiHandler<TDescriptor extends ApiDescriptor, TExtraParams extends [] = []> = (params: ApiParams<TDescriptor>, ...extraParams: TExtraParams) => ApiReturn<TDescriptor> | Promise<ApiReturn<TDescriptor>>;
 
 /** A union of all of the handlers for a given surface. */
-export type ApiHandlerAny<TSurface extends ApiSurface> = ApiHandlerSurface<TSurface>[ApiNames<TSurface>];
+export type ApiHandlerAny<TSurface extends ApiSurface, TExtraParams extends [] = []> = ApiHandlerSurface<TSurface, TExtraParams>[ApiNames<TSurface>];
 
 /** A union of all of the names for a given surface. */
 export type ApiNames<TSurface extends ApiSurface> = keyof TSurface;
 
 /** A mapping of names to the corresponding handler function. */
-export type ApiMap<TSurface extends ApiSurface> = Map<ApiNames<TSurface>, ApiHandlerAny<TSurface>>;
+export type ApiMap<TSurface extends ApiSurface, TExtraParams extends [] = []> = Map<ApiNames<TSurface>, ApiHandlerAny<TSurface, TExtraParams>>;
 
 /** The initialization array structure for populating an API map. */
-export type ApiMapInit<TSurface extends ApiSurface> = ApiMapInitItemAny<TSurface>[];
+export type ApiMapInit<TSurface extends ApiSurface, TExtraParams extends [] = []> = ApiMapInitItemAny<TSurface, TExtraParams>[];
