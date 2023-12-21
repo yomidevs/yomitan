@@ -44,13 +44,6 @@ export type ApiMap<TSurface extends ApiSurface> = Map<ApiNames<TSurface>, ApiHan
 
 export type ApiMapInit<TSurface extends ApiSurface> = ApiMapInitItemAny<TSurface>[];
 
-export type ApiMapInitLax<TSurface extends ApiSurface> = ApiMapInitLaxItem<TSurface>[];
-
-export type ApiMapInitLaxItem<TSurface extends ApiSurface> = [
-    name: ApiNames<TSurface>,
-    handler: ApiHandlerAny<TSurface>,
-];
-
 type ApiMapInitItem<TSurface extends ApiSurface, TName extends ApiNames<TSurface>> = [
     name: TName,
     handler: ApiHandler<TSurface[TName]>,
