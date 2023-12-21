@@ -19,7 +19,7 @@
 import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {invokeMessageHandler} from '../core.js';
-import {createApiMap} from '../core/api-map.js';
+import {createApiMap, getApiMapHandler} from '../core/api-map.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../language/dictionary-database.js';
 import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
@@ -176,7 +176,7 @@ export class Offscreen {
 
     /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
     _onMessage({action, params}, sender, callback) {
-        const messageHandler = this._messageHandlers.get(/** @type {import('offscreen').MessageType} */ (action));
+        const messageHandler = getApiMapHandler(this._messageHandlers, action);
         if (typeof messageHandler === 'undefined') { return false; }
         return invokeMessageHandler(messageHandler, params, callback, sender);
     }
