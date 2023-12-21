@@ -53,15 +53,10 @@ export type Invocation = {
     timer: Core.Timeout | null;
 };
 
-export type PortDetails = CrossFrameCommunicationPortDetails | ActionPortDetails;
+export type PortDetails = CrossFrameCommunicationPortDetails;
 
 export type CrossFrameCommunicationPortDetails = {
     name: 'cross-frame-communication-port';
     otherTabId: number;
     otherFrameId: number;
-};
-
-export type ActionPortDetails = {
-    name: 'action-port';
-    id: string;
 };
