@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Core from './core';
 import type * as Deinflector from './deinflector';
 import type * as Dictionary from './dictionary';
 import type * as DictionaryDatabase from './dictionary-database';
@@ -23,64 +22,84 @@ import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
+import type {ApiMap, ApiMapInit, ApiHandler, ApiParams, ApiReturn} from './api-map';
 
-export type Message<T extends MessageType> = (
-    MessageDetailsMap[T] extends undefined ?
-        {action: T} :
-        {action: T, params: MessageDetailsMap[T]}
-);
-
-export type MessageReturn<T extends MessageType> = MessageReturnMap[T];
-
-type MessageDetailsMap = {
-    databasePrepareOffscreen: undefined;
-    getDictionaryInfoOffscreen: undefined;
-    databasePurgeOffscreen: undefined;
+type OffscreenApiSurface = {
+    databasePrepareOffscreen: {
+        params: void;
+        return: void;
+    };
+    getDictionaryInfoOffscreen: {
+        params: void;
+        return: DictionaryImporter.Summary[];
+    };
+    databasePurgeOffscreen: {
+        params: void;
+        return: boolean;
+    };
     databaseGetMediaOffscreen: {
-        targets: DictionaryDatabase.MediaRequest[];
+        params: {
+            targets: DictionaryDatabase.MediaRequest[];
+        };
+        return: DictionaryDatabase.Media<string>[];
     };
     translatorPrepareOffscreen: {
-        deinflectionReasons: Deinflector.ReasonsRaw;
+        params: {
+            deinflectionReasons: Deinflector.ReasonsRaw;
+        };
+        return: void;
     };
     findKanjiOffscreen: {
-        text: string;
-        options: FindKanjiOptionsOffscreen;
+        params: {
+            text: string;
+            options: FindKanjiOptionsOffscreen;
+        };
+        return: Dictionary.KanjiDictionaryEntry[];
     };
     findTermsOffscreen: {
-        mode: Translator.FindTermsMode;
-        text: string;
-        options: FindTermsOptionsOffscreen;
+        params: {
+            mode: Translator.FindTermsMode;
+            text: string;
+            options: FindTermsOptionsOffscreen;
+        };
+        return: Translator.FindTermsResult;
     };
     getTermFrequenciesOffscreen: {
-        termReadingList: Translator.TermReadingList;
-        dictionaries: string[];
+        params: {
+            termReadingList: Translator.TermReadingList;
+            dictionaries: string[];
+        };
+        return: Translator.TermFrequencySimple[];
     };
-    clearDatabaseCachesOffscreen: undefined;
+    clearDatabaseCachesOffscreen: {
+        params: void;
+        return: void;
+    };
     clipboardSetBrowserOffscreen: {
-        value: Environment.Browser | null;
+        params: {
+            value: Environment.Browser | null;
+        };
+        return: void;
     };
     clipboardGetTextOffscreen: {
-        useRichText: boolean;
+        params: {
+            useRichText: boolean;
+        };
+        return: string;
     };
-    clipboardGetImageOffscreen: undefined;
+    clipboardGetImageOffscreen: {
+        params: void;
+        return: string | null;
+    };
 };
 
-type MessageReturnMap = {
-    databasePrepareOffscreen: void;
-    getDictionaryInfoOffscreen: DictionaryImporter.Summary[];
-    databasePurgeOffscreen: boolean;
-    databaseGetMediaOffscreen: DictionaryDatabase.Media<string>[];
-    translatorPrepareOffscreen: void;
-    findKanjiOffscreen: Dictionary.KanjiDictionaryEntry[];
-    findTermsOffscreen: Translator.FindTermsResult;
-    getTermFrequenciesOffscreen: Translator.TermFrequencySimple[];
-    clearDatabaseCachesOffscreen: void;
-    clipboardSetBrowserOffscreen: void;
-    clipboardGetTextOffscreen: string;
-    clipboardGetImageOffscreen: string | null;
-};
+export type Message<TName extends MessageType> = (
+    OffscreenApiParams<TName> extends void ?
+        {action: TName} :
+        {action: TName, params: OffscreenApiParams<TName>}
+);
 
-export type MessageType = keyof MessageDetailsMap;
+export type MessageType = keyof OffscreenApiSurface;
 
 export type FindKanjiOptionsOffscreen = Omit<Translation.FindKanjiOptions, 'enabledDictionaryMap'> & {
     enabledDictionaryMap: [
@@ -103,15 +122,12 @@ export type FindTermsTextReplacementOffscreen = Omit<Translation.FindTermsTextRe
     pattern: string;
 };
 
-export type MessageHandler<
-    TMessage extends MessageType,
-    TIsAsync extends boolean,
-> = (
-    details: MessageDetailsMap[TMessage],
-) => (TIsAsync extends true ? Promise<MessageReturn<TMessage>> : MessageReturn<TMessage>);
+export type OffscreenApiMap = ApiMap<OffscreenApiSurface>;
 
-export type MessageHandlerMap = Map<MessageType, Core.MessageHandler>;
+export type OffscreenApiMapInit = ApiMapInit<OffscreenApiSurface>;
 
-export type MessageHandlerMapInit = MessageHandlerMapInitItem[];
+export type OffscreenApiHandler<TName extends keyof OffscreenApiSurface> = ApiHandler<OffscreenApiSurface[TName]>;
 
-export type MessageHandlerMapInitItem = [messageType: MessageType, handler: Core.MessageHandler];
+export type OffscreenApiParams<TName extends keyof OffscreenApiSurface> = ApiParams<OffscreenApiSurface, TName>;
+
+export type OffscreenApiReturn<TName extends keyof OffscreenApiSurface> = ApiReturn<OffscreenApiSurface, TName>;
