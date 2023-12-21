@@ -99,11 +99,9 @@ export type ImportRequirementContext = {
 export type ArchiveFileMap = Map<string, ZipJS.Entry>;
 
 /**
- * A map of file types inside a dictionary and its matching queries.
- * Queries should be in the form of `${prefix}?${suffix}`.
- * File names can be matched with `?` as the wildcard.
+ * A map of file types inside a dictionary and its corresponding regular expressions.
  */
-export type QueryDetails = Map<string, string>;
+export type QueryDetails = Map<string, RegExp>;
 
 /**
  * A map of file types inside a dictionary and its matching entries.

@@ -115,11 +115,11 @@ export class DictionaryImporter {
         // Files
         /** @type {import('dictionary-importer').QueryDetails} */
         const queryDetails = new Map([
-            ['termFiles', 'term_bank_?.json'],
-            ['termMetaFiles', 'term_meta_bank_?.json'],
-            ['kanjiFiles', 'kanji_bank_?.json'],
-            ['kanjiMetaFiles', 'kanji_meta_bank_?.json'],
-            ['tagFiles', 'tag_bank_?.json']
+            ['termFiles', /^term_bank_(\d+)\.json$/],
+            ['termMetaFiles', /^term_meta_bank_(\d+)\.json$/],
+            ['kanjiFiles', /^kanji_bank_(\d+)\.json$/],
+            ['kanjiMetaFiles', /^kanji_meta_bank_(\d+)\.json$/],
+            ['tagFiles', /^tag_bank_(\d+)\.json$/]
         ]);
         const {termFiles, termMetaFiles, kanjiFiles, kanjiMetaFiles, tagFiles} = Object.fromEntries(this._getArchiveFiles(fileMap, queryDetails));
 
@@ -691,17 +691,13 @@ export class DictionaryImporter {
         const results = new Map();
         for (const [name, value] of fileMap.entries()) {
             for (const [fileType, fileNameFormat] of queryDetails.entries()) {
-                const indexPosition = fileNameFormat.indexOf('?');
-                const prefix = fileNameFormat.substring(0, indexPosition);
-                const suffix = fileNameFormat.substring(indexPosition + 1);
-
                 let entries = results.get(fileType);
                 if (typeof entries === 'undefined') {
                     entries = [];
                     results.set(fileType, entries);
                 }
 
-                if (name.startsWith(prefix) && name.endsWith(suffix)) {
+                if (fileNameFormat.test(name)) {
                     entries.push(value);
                     break;
                 }
