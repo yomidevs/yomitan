@@ -147,8 +147,8 @@ export class Backend {
         this._permissionsUtil = new PermissionsUtil();
 
         /* eslint-disable no-multi-spaces */
-        /** @type {import('api').ApiMapInit} */
-        const apiMapInit = [
+        /** @type {import('api').ApiMap} */
+        this._apiMap = createApiMap([
             ['requestBackendReadySignal',    this._onApiRequestBackendReadySignal.bind(this)],
             ['optionsGet',                   this._onApiOptionsGet.bind(this)],
             ['optionsGetFull',               this._onApiOptionsGetFull.bind(this)],
@@ -191,10 +191,8 @@ export class Backend {
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['loadExtensionScripts',         this._onApiLoadExtensionScripts.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)]
-        ];
+        ]);
         /* eslint-enable no-multi-spaces */
-        /** @type {import('api').ApiMap} */
-        this._apiMap = createApiMap(apiMapInit);
 
         /** @type {Map<string, (params?: import('core').SerializableObject) => void>} */
         this._commandHandlers = new Map(/** @type {[name: string, handler: (params?: import('core').SerializableObject) => void][]} */ ([
