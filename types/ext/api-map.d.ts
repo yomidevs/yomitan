@@ -63,6 +63,17 @@ type ApiExtraParamsDefault = [];
 /** Type alias for the params member of an descriptor. */
 export type ApiParams<TDescriptor extends ApiDescriptor> = TDescriptor['params'];
 
+/** Type alias for the params member of an descriptor as an object. If params is void, an empty record is used. */
+export type ApiParamsObject<TDescriptor extends ApiDescriptor> = ApiParams<TDescriptor> extends void ? Record<string, never> : ApiParams<TDescriptor>;
+
+/** Type alias for the union of parameter names in an descriptor. */
+export type ApiParamNames<TDescriptor extends ApiDescriptor> = keyof ApiParams<TDescriptor>;
+
+/** Type alias for a tuple of parameter types for a descriptor. */
+export type ApiOrderedParams<TDescriptor extends ApiDescriptor, TParamNames extends ApiParamNames<TDescriptor>[]> = {
+    [index in keyof TParamNames]: ApiParams<TDescriptor>[TParamNames[index]];
+};
+
 /** Type alias for the return member of an descriptor. */
 export type ApiReturn<TDescriptor extends ApiDescriptor> = TDescriptor['return'];
 
@@ -86,3 +97,13 @@ export type ApiMap<TSurface extends ApiSurface, TExtraParams extends ApiTExtraPa
 
 /** The initialization array structure for populating an API map. */
 export type ApiMapInit<TSurface extends ApiSurface, TExtraParams extends ApiTExtraParams = ApiExtraParamsDefault> = ApiMapInitItemAny<TSurface, TExtraParams>[];
+
+/** The type for a public API function, using a parameters object. */
+export type ApiFunction<TSurface extends ApiSurface, TName extends ApiNames<TSurface>> = (
+    params: ApiParams<TSurface[TName]>,
+) => Promise<ApiReturn<TSurface[TName]>>;
+
+/** The type for a public API function, using ordered parameters. */
+export type ApiFunctionOrdered<TSurface extends ApiSurface, TName extends ApiNames<TSurface>, TParamNames extends ApiParamNames<TSurface[TName]>[]> = (
+    ...params: ApiOrderedParams<TSurface[TName], TParamNames>,
+) => Promise<ApiReturn<TSurface[TName]>>;
