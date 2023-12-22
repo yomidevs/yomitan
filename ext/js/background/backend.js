@@ -372,7 +372,7 @@ export class Backend {
         });
     }
 
-    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('api').Message>} */
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('api').MessageAny>} */
     _onMessageWrapper(message, sender, sendResponse) {
         if (this._isPrepared) {
             return this._onMessage(message, sender, sendResponse);
@@ -395,7 +395,7 @@ export class Backend {
     }
 
     /**
-     * @param {import('api').Message} message
+     * @param {import('api').MessageAny} message
      * @param {chrome.runtime.MessageSender} sender
      * @param {(response?: unknown) => void} callback
      * @returns {boolean}

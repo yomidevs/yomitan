@@ -405,9 +405,9 @@ export type ApiReturn<TName extends ApiNames> = BaseApiReturn<ApiSurface[TName]>
 
 export type ApiParamsAny = BaseApiParamsAny<ApiSurface>;
 
-export type Message = MessageItem<ApiNames>;
+export type MessageAny = Message<ApiNames>;
 
-type MessageItem<TName extends ApiNames> = {
+type Message<TName extends ApiNames> = {
     action: TName;
     params: ApiParams<TName>;
 };
