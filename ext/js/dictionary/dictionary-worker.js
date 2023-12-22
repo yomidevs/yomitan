@@ -73,7 +73,7 @@ export class DictionaryWorker {
      */
     _invoke(action, params, transfer, onProgress, formatResult) {
         return new Promise((resolve, reject) => {
-            const worker = new Worker('/js/language/dictionary-worker-main.js', {type: 'module'});
+            const worker = new Worker('/js/dictionary/dictionary-worker-main.js', {type: 'module'});
             /** @type {import('dictionary-worker').InvokeDetails<TResponseRaw, TResponse>} */
             const details = {
                 complete: false,
