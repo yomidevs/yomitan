@@ -233,22 +233,25 @@ the same as the time it originally took to import, which can be significant for 
 
 Required licensing notices for this project follow below:
 
-*   **EDRDG License** \
-    This package uses the [EDICT](https://www.edrdg.org/jmdict/edict.html) and
-    [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project) dictionary files. These files are the property of
-    the [Electronic Dictionary Research and Development Group](https://www.edrdg.org/), and are used in conformance with
-    the Group's [license](https://www.edrdg.org/edrdg/licence.html).
+- **EDRDG License** \
+  This package uses the [EDICT](https://www.edrdg.org/jmdict/edict.html) and
+  [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project) dictionary files. These files are the property of
+  the [Electronic Dictionary Research and Development Group](https://www.edrdg.org/), and are used in conformance with
+  the Group's [license](https://www.edrdg.org/edrdg/licence.html).
 
-*   **Kanjium License** \
-    The pitch accent notation, verb particle data, phonetics, homonyms and other additions or modifications to EDICT,
-    KANJIDIC or KRADFILE were provided by Uros Ozvatic through his free database.
+- **Kanjium License** \
+  The pitch accent notation, verb particle data, phonetics, homonyms and other additions or modifications to EDICT,
+  KANJIDIC or KRADFILE were provided by Uros Ozvatic through his free database.
 
 ## Third-Party Libraries
 
-Yomitan uses several third-party libraries to function. Below are links to homepages, snapshots, and licenses of the exact
-versions packaged.
+Yomitan uses several third-party libraries to function.
 
-*   Handlebars: [homepage](https://handlebarsjs.com/) - [snapshot](https://s3.amazonaws.com/builds.handlebarsjs.com/handlebars.min-v4.7.7.js) - [license](https://github.com/handlebars-lang/handlebars.js/blob/v4.7.7/LICENSE)
-*   JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://github.com/Stuk/jszip/blob/v3.9.1/dist/jszip.min.js) - [license](https://github.com/Stuk/jszip/blob/v3.9.1/LICENSE.markdown)
-*   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://unpkg.com/wanakana@4.0.2/umd/wanakana.min.js) - [license](https://github.com/WaniKani/WanaKana/blob/4.0.2/LICENSE)
-*   parse5: [homepage](https://github.com/inikulin/parse5) - [snapshot](https://github.com/inikulin/parse5/tree/v7.1.1/packages/parse5) - [license](https://github.com/inikulin/parse5/blob/v7.1.1/LICENSE) _(Only used in MV3 build)_
+| Name                | Installed version | License type | Link                                                     |
+| :------------------ | :---------------- | :----------- | :------------------------------------------------------- |
+| @zip.js/zip.js      | 2.7.31            | BSD-3-Clause | git+https://github.com/gildas-lormeau/zip.js.git         |
+| dexie               | 3.2.4             | Apache-2.0   | git+https://github.com/dfahlander/Dexie.js.git           |
+| dexie-export-import | 4.0.7             | Apache-2.0   | git+https://github.com/dexie/Dexie.js.git                |
+| handlebars          | 4.7.8             | MIT          | git+https://github.com/handlebars-lang/handlebars.js.git |
+| parse5              | 7.1.2             | MIT          | git://github.com/inikulin/parse5.git                     |
+| wanakana            | 5.3.1             | MIT          | git+ssh://git@github.com/WaniKani/WanaKana.git           |
