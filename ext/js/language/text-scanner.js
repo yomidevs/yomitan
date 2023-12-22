@@ -137,8 +137,8 @@ export class TextScanner extends EventDispatcher {
         this._preventNextClick = false;
         /** @type {boolean} */
         this._preventScroll = false;
-        /** @type {0|1|2|3} */
-        this._penPointerState = 0; // 0 = not active; 1 = hovering; 2 = touching; 3 = hovering after touching
+        /** @type {import('text-scanner').PenPointerState} */
+        this._penPointerState = 0;
         /** @type {Map<number, string>} */
         this._pointerIdTypeMap = new Map();
 

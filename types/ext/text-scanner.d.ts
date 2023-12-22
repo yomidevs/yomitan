@@ -185,6 +185,19 @@ export type PointerEventType = (
     'script'
 );
 
+/**
+ * An enum representing the pen pointer state.
+ *
+ * `0` Not active.
+ *
+ * `1` Hovering.
+ *
+ * `2` Touching.
+ *
+ * `3` Hovering after touching.
+ */
+export type PenPointerState = 0 | 1 | 2 | 3;
+
 export type SentenceTerminatorMap = Map<string, [includeCharacterAtStart: boolean, includeCharacterAtEnd: boolean]>;
 
 export type SentenceForwardQuoteMap = Map<string, [character: string, includeCharacterAtStart: boolean]>;
