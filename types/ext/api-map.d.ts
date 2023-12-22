@@ -60,13 +60,16 @@ type ApiTExtraParams = unknown[];
 /** Default type for extra params, which is an empty array. */
 type ApiExtraParamsDefault = [];
 
-/** Type alias for the params member of an descriptor. */
+/** Type alias for the params member of a descriptor. */
 export type ApiParams<TDescriptor extends ApiDescriptor> = TDescriptor['params'];
 
-/** Type alias for the params member of an descriptor as an object. If params is void, an empty record is used. */
+/** Type alias for a single param of a descriptor. */
+export type ApiParam<TDescriptor extends ApiDescriptor, TParamName extends ApiParamNames<TDescriptor>> = ApiParams<TDescriptor>[TParamName];
+
+/** Type alias for the params member of a descriptor as an object. If params is void, an empty record is used. */
 export type ApiParamsObject<TDescriptor extends ApiDescriptor> = ApiParams<TDescriptor> extends void ? Record<string, never> : ApiParams<TDescriptor>;
 
-/** Type alias for the union of parameter names in an descriptor. */
+/** Type alias for the union of parameter names in a descriptor. */
 export type ApiParamNames<TDescriptor extends ApiDescriptor> = keyof ApiParams<TDescriptor>;
 
 /** Type alias for a tuple of parameter types for a descriptor. */
@@ -74,7 +77,7 @@ export type ApiOrderedParams<TDescriptor extends ApiDescriptor, TParamNames exte
     [index in keyof TParamNames]: ApiParams<TDescriptor>[TParamNames[index]];
 };
 
-/** Type alias for the return member of an descriptor. */
+/** Type alias for the return member of a descriptor. */
 export type ApiReturn<TDescriptor extends ApiDescriptor> = TDescriptor['return'];
 
 /** A type representing a synchronous handler. */
