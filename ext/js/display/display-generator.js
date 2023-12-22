@@ -670,7 +670,6 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createPronunciation(details) {
-        console.log('createPronunciation', details);
         if (details.type === 'pitch-accent') {
             const {reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} = details;
             const jp = this._japaneseUtil;

@@ -8,7 +8,7 @@
         "Issues": "Issues"
     },
     "settings": {
-        "title": "Yezichak Settings",
+        "title": "Yomitan Settings",
         "outline": {
             "profile": "Profile",
             "language": "Language",
@@ -92,17 +92,17 @@
         },
         "storage": {
             "label": "Storage",
-            "invalid": "Yezichak is using an indeterminate amount of storage.",
+            "invalid": "Yomitan is using an indeterminate amount of storage.",
             "finite":{
-                "1": "Yezichak is using approximately ",
+                "1": "Yomitan is using approximately ",
                 "2": " of "
             },
-            "infinite": "Yezichak is permitted unlimited storage.",
+            "infinite": "Yomitan is permitted unlimited storage.",
             "refresh": "Refresh",
             "persistent":{
                 "label": "Persistent storage",
                 "description": "Enable to help prevent the browser from unexpectedly clearing the database.",
-                "descriptionMore": "Web browsers will sometimes clear stored data if the device is running low on storage space. This can result in the imported dictionaries being deleted unexpectedly, causing Yezichak to stop functioning. Enabling persistent storage tells the browser that the data should not be deleted in those circumstances.",
+                "descriptionMore": "Web browsers will sometimes clear stored data if the device is running low on storage space. This can result in the imported dictionaries being deleted unexpectedly, causing Yomitan to stop functioning. Enabling persistent storage tells the browser that the data should not be deleted in those circumstances.",
                 "firefoxInvalid":{
                     "1": "On Firefox and Firefox for Android, the storage information feature may be hidden behind a browser flag. To enable this flag, open",
                     "2": " and search for ",
@@ -111,7 +111,7 @@
                 },
                 "firefoxMobile": "It may not be possible to enable Persistent Storage on Firefox for Android.",
                 "chromium":{
-                    "1": "Chromium-based browsers should not need to enable this setting since the Yezichak extension has the ",
+                    "1": "Chromium-based browsers should not need to enable this setting since the Yomitan extension has the ",
                     "2": " permission, which should prevent data deletion."
                 }
             }
@@ -249,7 +249,7 @@
         "backup":{
             "heading": "Backup",
             "settings": {
-                "explanation": "Yezichak can import and export settings files which can be used to restore settings, share settings across devices, and to help to debug problems. These files will only contain settings and will not contain dictionaries. Dictionaries must be imported separately. However, you can also import a previously exported collection of dictionaries. See the next section about that.",
+                "explanation": "Yomitan can import and export settings files which can be used to restore settings, share settings across devices, and to help to debug problems. These files will only contain settings and will not contain dictionaries. Dictionaries must be imported separately. However, you can also import a previously exported collection of dictionaries. See the next section about that.",
                 "import": "Import settings",
                 "export": "Export settings",
                 "reset": "Reset settings"
@@ -266,11 +266,11 @@
         "less": "Less\u2026",
         "info": "Info\u2026",
         "details": "Details\u2026",
-        "about": "About Yezichak",
+        "about": "About Yomitan",
         "advanced": "Advanced"
     },
     "welcome": {
-        "title": "Welcome to Yezichak!",
+        "title": "Welcome to Yomitan!",
         "subtitle": "Here are some basics to get started",
         "actionPopup": {
             "1": "Clicking the ",
@@ -292,11 +292,11 @@
             "questionMark": "question mark",
             "1": "The ",
             "2": " button will open the ",
-            "3": " page, which has some helpful information and links about Yezichak."
+            "3": " page, which has some helpful information and links about Yomitan."
         },
         "dictionaries": {
-            "1": "Yezichak requires one or more dictionaries to be installed in order to look up terms, kanji, and other information. Several downloadable dictionaries can be found on the ",
-            "discordServer": "Yezichak Discord server",
+            "1": "Yomitan requires one or more dictionaries to be installed in order to look up terms, kanji, and other information. Several downloadable dictionaries can be found on the ",
+            "discordServer": "Yomitan Discord server",
             "2": ", allowing you to choose the dictionaries most relevant for you. Dictionaries can be configured using the button below, or later from the the ",
             "3": " page."
         },

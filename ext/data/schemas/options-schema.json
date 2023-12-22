@@ -933,7 +933,7 @@
                                             "type": "string"
                                         },
                                         "default": [
-                                            "yezichak"
+                                            "yomitan"
                                         ]
                                     },
                                     "screenshot": {

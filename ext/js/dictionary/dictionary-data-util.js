@@ -218,7 +218,6 @@ export class DictionaryDataUtil {
             results2.push({dictionary, pronunciations: pronunciationsWithExclusive});
         }
 
-        console.log("grouped result2", results2);
         return results2;
     }
 

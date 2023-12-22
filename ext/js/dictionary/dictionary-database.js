@@ -629,6 +629,8 @@ export class DictionaryDatabase {
                 return {index, term, mode, data, dictionary};
             case 'pitch':
                 return {index, term, mode, data, dictionary};
+            case 'ipa':
+                return {index, term, mode, data, dictionary};
             default:
                 throw new Error(`Unknown mode: ${mode}`);
         }

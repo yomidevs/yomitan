@@ -1,8 +1,8 @@
-# Yezichak 👅
+# Yomitan 👅
 
-Yezichak is a fork of yomichan meant to work with languages other than Japanese. It turns your web browser into a tool for building language proficiency by helping you to decipher texts which would be otherwise too difficult to tackle. 
+Yomitan is a fork of yomichan meant to work with languages other than Japanese. It turns your web browser into a tool for building language proficiency by helping you to decipher texts which would be otherwise too difficult to tackle. 
 
-Yezichak provides advanced features not available in other browser-based dictionaries:
+Yomitan provides advanced features not available in other browser-based dictionaries:
 
 *   Support for many languages
 *   Interactive popup definition window for displaying search results
@@ -51,16 +51,16 @@ This requires less setup if you don't have git, but you won't be able to easily 
 https://developer.chrome.com/docs/extensions/mv3/getstarted/development-basics/#load-unpacked
 
 ### Importing settings
-If you have settings you want to keep from another version of Yomichan, you can try exporting them from that version and importing them into Yezichak.
+If you have settings you want to keep from another version of Yomichan, you can try exporting them from that version and importing them into Yomitan.
 The import/export feature is in the Backup section at the bottom of the Settings page.
 
 ## Dictionaries
 
-To get dictionaries, visit the #dictionaries channel in the [Yezichak Discord server](https://discord.gg/WuqdTDQWd).
+To get dictionaries, visit the #dictionaries channel in the [Yomitan Discord server](https://discord.gg/WuqdTDQWd).
 
 ## Basic Usage
 
-1.  Click the <img src="ext/images/yezichak-icon.svg" alt="" width="16" height="16"> _Yezichak_ button in the browser bar to open the quick-actions popup.
+1.  Click the <img src="ext/images/yomitan-icon.svg" alt="" width="16" height="16"> _Yomitan_ button in the browser bar to open the quick-actions popup.
 
     <img src="resources/images/browser-action-popup1.png" alt="">
 
@@ -70,7 +70,7 @@ To get dictionaries, visit the #dictionaries channel in the [Yezichak Discord se
     *   The <img src="ext/images/profile.svg" alt="" width="16" height="16"> _profile_ button will appear when multiple profiles exist, allowing the current profile to be quickly changed.
 
 2.  Import the dictionaries you wish to search. 
-    If you do not have any dictionaries installed or enabled, Yezichak will warn you that it is not ready for use by displaying an orange exclamation mark over its icon. 
+    If you do not have any dictionaries installed or enabled, Yomitan will warn you that it is not ready for use by displaying an orange exclamation mark over its icon. 
     This exclamation mark will disappear once you have installed and enabled at least one dictionary.
 
     <img src="resources/images/settings-dictionaries-popup.png" alt="">
@@ -91,7 +91,7 @@ Once a working audio source is in place, you can click on the <img src="ext/imag
 
 ## Anki Integration
 
-Yezichak features automatic flashcard creation for [Anki](https://apps.ankiweb.net/), a free application designed to help you
+Yomitan features automatic flashcard creation for [Anki](https://apps.ankiweb.net/), a free application designed to help you
 retain knowledge. This feature requires the prior installation of an Anki plugin called [AnkiConnect](https://foosoft.net/projects/anki-connect).
 Check the respective project page for more information about how to set up this software.
 
@@ -100,11 +100,11 @@ Check the respective project page for more information about how to set up this 
 Before flashcards can be automatically created, you must configure the templates used to create notes.
 If you are unfamiliar with Anki deck and model management, this would be a good time to reference the [Anki
 Manual](https://docs.ankiweb.net/#/). In short, you must specify what information should be included in the
-flashcards that Yezichak creates through AnkiConnect.
+flashcards that Yomitan creates through AnkiConnect.
 
 Flashcard fields can be configured with the following steps:
 
-1.  Open the Yezichak options page and scroll down to the section labeled *Anki Options*.
+1.  Open the Yomitan options page and scroll down to the section labeled *Anki Options*.
 2.  Tick the checkbox labeled *Enable Anki integration* (Anki must be running with [AnkiConnect](https://foosoft.net/projects/anki-connect) installed).
 3.  Select the type of template to configure by clicking on either the *Terms* or *Kanji* tabs.
 4.  Select the Anki deck and model to use for new creating new flashcards of this type.
@@ -120,7 +120,7 @@ Flashcard fields can be configured with the following steps:
     `{audio}` | Audio sample of a native speaker's pronunciation in MP3 format (if available).
     `{clipboard-image}` | An image which is stored in the system clipboard, if present.
     `{clipboard-text}` | Text which is stored in the system clipboard, if present.
-    `{cloze-body}` | Raw, inflected term as it appeared before being reduced to dictionary form by Yezichak.
+    `{cloze-body}` | Raw, inflected term as it appeared before being reduced to dictionary form by Yomitan.
     `{cloze-prefix}` | Fragment of the containing `{sentence}` starting at the beginning of `{sentence}` until the beginning of `{cloze-body}`.
     `{cloze-suffix}` | Fragment of the containing `{sentence}` starting at the end of `{cloze-body}` until the end of `{sentence}`.
     `{conjugation}` | Conjugation path from the raw inflected term to the source term.
@@ -145,7 +145,7 @@ Flashcard fields can be configured with the following steps:
     `{pitch-accent-positions}` | List of accent downstep positions for the term as a number.
     `{reading}` | Kana reading for the term (empty for terms where the expression is the reading).
 
-When creating your model for Yezichak, *make sure that you pick a unique field to be first*; fields that will
+When creating your model for Yomitan, *make sure that you pick a unique field to be first*; fields that will
 contain `{expression}` or `{character}` are ideal candidates for this. Anki does not allow duplicate flashcards to be
 added to a deck by default; it uses the first field in the model to check for duplicates. For example, if you have `{reading}`
 configured to be the first field in your model and <ruby>橋<rt>はし</rt></ruby> is already in your deck, you will not
@@ -153,7 +153,7 @@ be able to create a flashcard for <ruby>箸<rt>はし</rt></ruby> because they s
 
 ### Flashcard Creation
 
-Once Yezichak is configured, it becomes trivial to create new flashcards with a single click. You will see the following
+Once Yomitan is configured, it becomes trivial to create new flashcards with a single click. You will see the following
 icons next to term definitions:
 
 *   Clicking ![](img/btn-add-expression.png) adds the current expression as a term (e.g. 食べる).
@@ -199,13 +199,13 @@ Shortcut | Action
 
 **I'm having problems importing dictionaries in Firefox, what do I do?**
 
-Yezichak uses the cross-browser IndexedDB system for storing imported dictionary data into your user profile. Although
+Yomitan uses the cross-browser IndexedDB system for storing imported dictionary data into your user profile. Although
 everything "just works" in Chrome, depending on settings, Firefox users can run into problems due to browser bugs.
-Yezichak catches errors and tries to offer suggestions about how to work around Firefox issues, but in general at least
+Yomitan catches errors and tries to offer suggestions about how to work around Firefox issues, but in general at least
 one of the following solutions should work for you:
 
 *   Make sure you have cookies enabled. It appears that disabling them also disables IndexedDB for some reason. You
-    can still have cookies be disabled on other sites; just make sure to add the Yezichak extension to the whitelist of
+    can still have cookies be disabled on other sites; just make sure to add the Yomitan extension to the whitelist of
     whatever tool you are using to restrict cookies. You can get the extension "URL" by looking at the address bar when
     you have the search page open.
 *   Make sure that you have sufficient disk space available on the drive Firefox uses to store your user profile.
@@ -215,17 +215,17 @@ one of the following solutions should work for you:
     set to "Never remember history", IndexedDB access is once again disabled for an inexplicable reason.
 *   As a last resort, try using the [Refresh Firefox](https://support.mozilla.org/en-US/kb/reset-preferences-fix-problems)
     feature to reset your user profile. It appears that the Firefox profile system can corrupt itself preventing
-    IndexedDB from being accessible to Yezichak.
+    IndexedDB from being accessible to Yomitan.
 
-**Is it possible to use Yezichak with files saved locally on my computer with Chrome?**
+**Is it possible to use Yomitan with files saved locally on my computer with Chrome?**
 
-In order to use Yezichak with local files in Chrome, you must first tick the *Allow access to file URLs* checkbox
-for Yezichak on the extensions page. Due to the restrictions placed on browser addons in the WebExtensions model, it
-will likely never be possible to use Yezichak with PDF files.
+In order to use Yomitan with local files in Chrome, you must first tick the *Allow access to file URLs* checkbox
+for Yomitan on the extensions page. Due to the restrictions placed on browser addons in the WebExtensions model, it
+will likely never be possible to use Yomitan with PDF files.
 
 **Is it possible to delete individual dictionaries without purging the database?**
 
-Yezichak is able to delete individual dictionaries, but keep in mind that this process can be *very* slow and can
+Yomitan is able to delete individual dictionaries, but keep in mind that this process can be *very* slow and can
 cause the browser to become unresponsive. The time it takes to delete a single dictionary can sometimes be roughly
 the same as the time it originally took to import, which can be significant for certain large dictionaries.
 
@@ -245,7 +245,7 @@ Required licensing notices for this project follow below:
 
 ## Third-Party Libraries
 
-Yezichak uses several third-party libraries to function. Below are links to homepages, snapshots, and licenses of the exact
+Yomitan uses several third-party libraries to function. Below are links to homepages, snapshots, and licenses of the exact
 versions packaged.
 
 *   Handlebars: [homepage](https://handlebarsjs.com/) - [snapshot](https://s3.amazonaws.com/builds.handlebarsjs.com/handlebars.min-v4.7.7.js) - [license](https://github.com/handlebars-lang/handlebars.js/blob/v4.7.7/LICENSE)

@@ -106,7 +106,7 @@ export type Tag = {
     dictionary: string;
 };
 
-export type DatabaseTermMeta = DatabaseTermMetaFrequency | DatabaseTermMetaPitch;
+export type DatabaseTermMeta = DatabaseTermMetaFrequency | DatabaseTermMetaPitch | DatabaseTermMetaIpa;
 
 export type DatabaseTermMetaFrequency = {
     expression: string;
@@ -119,6 +119,13 @@ export type DatabaseTermMetaPitch = {
     expression: string;
     mode: 'pitch';
     data: DictionaryData.TermMetaPitchData;
+    dictionary: string;
+};
+
+export type DatabaseTermMetaIpa = {
+    expression: string;
+    mode: 'ipa';
+    data: DictionaryData.TermMetaIpaData;
     dictionary: string;
 };
 

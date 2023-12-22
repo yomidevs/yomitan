@@ -632,7 +632,7 @@ export class BackupController {
             // eslint-disable-next-line no-console
             console.log('Done importing.');
             messageContainer.style.color = '#006633';
-            messageContainer.textContent = 'Done importing. You will need to re-enable the dictionaries and refresh afterward. If you run into issues, please restart the browser. If it continues to fail, reinstall Yezichak and import dictionaries one-by-one.';
+            messageContainer.textContent = 'Done importing. You will need to re-enable the dictionaries and refresh afterward. If you run into issues, please restart the browser. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.';
         }
     }
 
@@ -686,7 +686,7 @@ export class BackupController {
             /** @type {HTMLElement} */
             const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
             messageContainer.style.color = 'red';
-            this._databaseExportImportErrorMessage('Encountered errors when importing. Please restart the browser and try again. If it continues to fail, reinstall Yezichak and import dictionaries one-by-one.');
+            this._databaseExportImportErrorMessage('Encountered errors when importing. Please restart the browser and try again. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.');
         } finally {
             pageExitPrevention.end();
             this._settingsExportDatabaseToken = null;
