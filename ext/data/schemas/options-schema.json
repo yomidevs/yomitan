@@ -163,12 +163,12 @@
                                     "popupWidth": {
                                         "type": "number",
                                         "minimum": 0,
-                                        "default": 500
+                                        "default": 400
                                     },
                                     "popupHeight": {
                                         "type": "number",
                                         "minimum": 0,
-                                        "default": 300
+                                        "default": 250
                                     },
                                     "popupHorizontalOffset": {
                                         "type": "number",
