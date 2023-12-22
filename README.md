@@ -345,6 +345,11 @@ A setup guide can be found [here](https://github.com/themoeway/yomitan-mecab-ins
 
 ## Frequently Asked Questions
 
+**I can't scan text in Firefox!**
+
+In Firefox's Manifest V3, host permissions are treated as opt-in. For Yomitan to work properly, the recommended permissions must be explicitly set. Go to the `Recommended Permissions (Important)`
+section and check `Enable recommended permissions`. 
+
 **I'm having problems importing dictionaries in Firefox, what do I do?**
 
 Yomitan uses the cross-browser IndexedDB system for storing imported dictionary data into your user profile. Although
