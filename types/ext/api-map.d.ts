@@ -66,9 +66,6 @@ export type ApiParams<TDescriptor extends ApiDescriptor> = TDescriptor['params']
 /** Type alias for a single param of a descriptor. */
 export type ApiParam<TDescriptor extends ApiDescriptor, TParamName extends ApiParamNames<TDescriptor>> = ApiParams<TDescriptor>[TParamName];
 
-/** Type alias for the params member of a descriptor as an object. If params is void, an empty record is used. */
-export type ApiParamsObject<TDescriptor extends ApiDescriptor> = ApiParams<TDescriptor> extends void ? Record<string, never> : ApiParams<TDescriptor>;
-
 /** Type alias for the union of parameter names in a descriptor. */
 export type ApiParamNames<TDescriptor extends ApiDescriptor> = keyof ApiParams<TDescriptor>;
 
@@ -110,3 +107,9 @@ export type ApiFunction<TSurface extends ApiSurface, TName extends ApiNames<TSur
 export type ApiFunctionOrdered<TSurface extends ApiSurface, TName extends ApiNames<TSurface>, TParamNames extends ApiParamNames<TSurface[TName]>[]> = (
     ...params: ApiOrderedParams<TSurface[TName], TParamNames>,
 ) => Promise<ApiReturn<TSurface[TName]>>;
+
+/** Type alias for a union of all params types. */
+export type ApiParamsAny<TSurface extends ApiSurface> = ApiParams<TSurface[keyof TSurface]>;
+
+/** Type alias for a union of all return types. */
+export type ApiReturnAny<TSurface extends ApiSurface> = ApiReturn<TSurface[keyof TSurface]>;
