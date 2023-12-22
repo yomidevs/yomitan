@@ -23,7 +23,7 @@ import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
 import {clone, deferPromise, isObject, log, promiseTimeout} from '../core.js';
-import {invokeApiMapHandler} from '../core/api-map.js';
+import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {readResponseJson} from '../core/json.js';
 import {AnkiUtil} from '../data/anki-util.js';
@@ -147,8 +147,8 @@ export class Backend {
         this._permissionsUtil = new PermissionsUtil();
 
         /* eslint-disable no-multi-spaces */
-        /** @type {import('core').MessageHandlerMap} */
-        this._messageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
+        /** @type {import('api').ApiMapInit} */
+        const apiMapInit = [
             ['requestBackendReadySignal',    this._onApiRequestBackendReadySignal.bind(this)],
             ['optionsGet',                   this._onApiOptionsGet.bind(this)],
             ['optionsGetFull',               this._onApiOptionsGetFull.bind(this)],
@@ -191,8 +191,10 @@ export class Backend {
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['loadExtensionScripts',         this._onApiLoadExtensionScripts.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)]
-        ]));
+        ];
         /* eslint-enable no-multi-spaces */
+        /** @type {import('api').ApiMap} */
+        this._apiMap = createApiMap(apiMapInit);
 
         /** @type {Map<string, (params?: import('core').SerializableObject) => void>} */
         this._commandHandlers = new Map(/** @type {[name: string, handler: (params?: import('core').SerializableObject) => void][]} */ ([
@@ -399,7 +401,7 @@ export class Backend {
      * @returns {boolean}
      */
     _onMessage({action, params}, sender, callback) {
-        return invokeApiMapHandler(this._messageHandlers, action, params, [sender], callback);
+        return invokeApiMapHandler(this._apiMap, action, params, [sender], callback);
     }
 
     /**
