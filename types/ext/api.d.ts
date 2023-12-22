@@ -31,57 +31,22 @@ import type * as Settings from './settings';
 import type * as SettingsModifications from './settings-modifications';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
-
-// Generic
-
-export type Handler<TDetails = unknown, TResult = unknown, THasSender extends boolean = false> = (
-    details: TDetails,
-    sender: (THasSender extends true ? chrome.runtime.MessageSender : void)
-) => (TResult | Promise<TResult>);
-
-// optionsGet
-
-export type OptionsGetDetails = {
-    optionsContext: Settings.OptionsContext;
-};
-
-export type OptionsGetResult = Settings.ProfileOptions;
-
-// optionsGetFull
-
-export type OptionsGetFullDetails = Record<string, never>;
-
-export type OptionsGetFullResult = Settings.Options;
-
-// termsFind
+import type {
+    ApiMap as BaseApiMap,
+    ApiMapInit as BaseApiMapInit,
+    ApiHandler as BaseApiHandler,
+    ApiParams as BaseApiParams,
+    ApiReturn as BaseApiReturn,
+    ApiNames as BaseApiNames,
+    ApiParam as BaseApiParam,
+    ApiParamNames as BaseApiParamNames,
+    ApiParamsAny as BaseApiParamsAny,
+} from './api-map';
 
 export type FindTermsDetails = {
     matchType?: Translation.FindTermsMatchType;
     deinflect?: boolean;
 };
-
-export type TermsFindDetails = {
-    text: string;
-    details: FindTermsDetails;
-    optionsContext: Settings.OptionsContext;
-};
-
-export type TermsFindResult = {
-    dictionaryEntries: Dictionary.TermDictionaryEntry[];
-    originalTextLength: number;
-};
-
-// parseText
-
-export type ParseTextDetails = {
-    text: string;
-    optionsContext: Settings.OptionsContext;
-    scanLength: number;
-    useInternalParser: boolean;
-    useMecabParser: boolean;
-};
-
-export type ParseTextResult = ParseTextResultItem[];
 
 export type ParseTextResultItem = {
     id: string;
@@ -96,55 +61,6 @@ export type ParseTextSegment = {
 };
 
 export type ParseTextLine = ParseTextSegment[];
-
-// kanjiFind
-
-export type KanjiFindDetails = {
-    text: string;
-    optionsContext: Settings.OptionsContext;
-};
-
-export type KanjiFindResult = Dictionary.KanjiDictionaryEntry[];
-
-// isAnkiConnected
-
-export type IsAnkiConnectedDetails = Record<string, never>;
-
-export type IsAnkiConnectedResult = boolean;
-
-// getAnkiConnectVersion
-
-export type GetAnkiConnectVersionDetails = Record<string, never>;
-
-export type GetAnkiConnectVersionResult = number | null;
-
-// addAnkiNote
-
-export type AddAnkiNoteDetails = {
-    note: Anki.Note;
-};
-
-export type AddAnkiNoteResult = Anki.NoteId | null;
-
-// getAnkiNoteInfo
-
-export type GetAnkiNoteInfoDetails = {
-    notes: Anki.Note[];
-    fetchAdditionalInfo: boolean;
-};
-
-export type GetAnkiNoteInfoResult = Anki.NoteInfoWrapper[];
-
-// injectAnkiNoteMedia
-
-export type InjectAnkiNoteMediaDetails = {
-    timestamp: number;
-    definitionDetails: InjectAnkiNoteMediaDefinitionDetails;
-    audioDetails: InjectAnkiNoteMediaAudioDetails | null;
-    screenshotDetails: InjectAnkiNoteMediaScreenshotDetails | null;
-    clipboardDetails: InjectAnkiNoteMediaClipboardDetails | null;
-    dictionaryMediaDetails: InjectAnkiNoteMediaDictionaryMediaDetails[];
-};
 
 export type InjectAnkiNoteMediaTermDefinitionDetails = {
     type: 'term';
@@ -178,148 +94,10 @@ export type InjectAnkiNoteMediaDictionaryMediaDetails = {
     path: string;
 };
 
-export type InjectAnkiNoteMediaResult = {
-    screenshotFileName: string | null;
-    clipboardImageFileName: string | null;
-    clipboardText: string | null;
-    audioFileName: string | null;
-    dictionaryMedia: InjectAnkiNoteDictionaryMediaResult[];
-    errors: Core.SerializedError[];
-};
-
 export type InjectAnkiNoteDictionaryMediaResult = {
     dictionary: string;
     path: string;
     fileName: string | null;
-};
-
-// noteView
-
-export type NoteViewDetails = {
-    noteId: Anki.NoteId;
-    mode: Settings.AnkiNoteGuiMode;
-    allowFallback: boolean;
-};
-
-export type NoteViewResult = Settings.AnkiNoteGuiMode;
-
-// suspendAnkiCardsForNote
-
-export type SuspendAnkiCardsForNoteDetails = {
-    noteId: Anki.NoteId;
-};
-
-export type SuspendAnkiCardsForNoteResult = number;
-
-// getTermAudioInfoList
-
-export type GetTermAudioInfoListDetails = {
-    source: Audio.AudioSourceInfo;
-    term: string;
-    reading: string;
-};
-
-export type GetTermAudioInfoListResult = AudioDownloader.Info[];
-
-// commandExec
-
-export type CommandExecDetails = {
-    command: string;
-    params?: Core.SerializableObject;
-};
-
-export type CommandExecResult = boolean;
-
-// sendMessageToFrame
-
-export type SendMessageToFrameDetails = {
-    frameId: number;
-    action: string;
-    params?: Core.SerializableObject;
-};
-
-export type SendMessageToFrameResult = boolean;
-
-// broadcastTab
-
-export type BroadcastTabDetails = {
-    action: string;
-    params?: Core.SerializableObject;
-};
-
-export type BroadcastTabResult = boolean;
-
-// frameInformationGet
-
-export type FrameInformationGetDetails = Record<string, never>;
-
-export type FrameInformationGetResult = Extension.ContentOrigin;
-
-// injectStylesheet
-
-export type InjectStylesheetDetails = {
-    type: 'file' | 'code';
-    value: string;
-};
-
-export type InjectStylesheetResult = void;
-
-// getStylesheetContent
-
-export type GetStylesheetContentDetails = {
-    url: string;
-};
-
-export type GetStylesheetContentResult = string;
-
-// getEnvironmentInfo
-
-export type GetEnvironmentInfoDetails = Record<string, never>;
-
-export type GetEnvironmentInfoResult = Environment.Info;
-
-// clipboardGet
-
-export type ClipboardGetDetails = Record<string, never>;
-
-export type ClipboardGetResult = string;
-
-// getDisplayTemplatesHtml
-
-export type GetDisplayTemplatesHtmlDetails = Record<string, never>;
-
-export type GetDisplayTemplatesHtmlResult = string;
-
-// getZoom
-
-export type GetZoomDetails = Record<string, never>;
-
-export type GetZoomResult = {
-    zoomFactor: number;
-};
-
-// getDefaultAnkiFieldTemplates
-
-export type GetDefaultAnkiFieldTemplatesDetails = Record<string, never>;
-
-export type GetDefaultAnkiFieldTemplatesResult = string;
-
-// getDictionaryInfo
-
-export type GetDictionaryInfoDetails = Record<string, never>;
-
-export type GetDictionaryInfoResult = DictionaryImporter.Summary[];
-
-// purgeDatabase
-
-export type PurgeDatabaseDetails = Record<string, never>;
-
-export type PurgeDatabaseResult = void;
-
-// getMedia
-
-export type GetMediaDetails = {
-    targets: GetMediaDetailsTarget[];
 };
 
 export type GetMediaDetailsTarget = {
@@ -327,137 +105,309 @@ export type GetMediaDetailsTarget = {
     dictionary: string;
 };
 
-export type GetMediaResult = DictionaryDatabase.MediaDataStringContent[];
-
-// log
-
-export type LogDetails = {
-    error: Core.SerializedError;
-    level: Log.LogLevel;
-    context: Log.LogContext | undefined;
-};
-
-export type LogResult = void;
-
-// logIndicatorClear
-
-export type LogIndicatorClearDetails = Record<string, never>;
-
-export type LogIndicatorClearResult = void;
-
-// modifySettings
-
-export type ModifySettingsDetails = {
-    targets: SettingsModifications.ScopedModification[];
-    source: string;
-};
-
-export type ModifySettingsResult = Core.Response<SettingsModifications.ModificationResult>[];
-
-// getSettings
-
-export type GetSettingsDetails = {
-    targets: SettingsModifications.ScopedRead[];
-};
-
-export type GetSettingsResult = Core.Response<SettingsModifications.ModificationResult>[];
-
-// setAllSettings
-
-export type SetAllSettingsDetails = {
-    value: Settings.Options;
-    source: string;
-};
-
-export type SetAllSettingsResult = void;
-
-// getOrCreateSearchPopup
-
-export type GetOrCreateSearchPopupDetails = {
-    focus?: boolean | 'ifCreated';
-    text?: string;
-};
-
-export type GetOrCreateSearchPopupResult = {
-    tabId: number | null;
-    windowId: number;
-};
-
-// isTabSearchPopup
-
-export type IsTabSearchPopupDetails = {
-    tabId: number;
-};
-
-export type IsTabSearchPopupResult = boolean;
-
-// triggerDatabaseUpdated
-
-export type TriggerDatabaseUpdatedDetails = {
-    type: Backend.DatabaseUpdateType;
-    cause: Backend.DatabaseUpdateCause;
-};
-
-export type TriggerDatabaseUpdatedResult = void;
-
-// testMecab
-
-export type TestMecabDetails = Record<string, never>;
-
-export type TestMecabResult = true;
-
-// textHasJapaneseCharacters
-
-export type TextHasJapaneseCharactersDetails = {
-    text: string;
-};
-
-export type TextHasJapaneseCharactersResult = boolean;
-
-// getTermFrequencies
-
-export type GetTermFrequenciesDetails = {
-    termReadingList: GetTermFrequenciesDetailsTermReadingListItem[];
-    dictionaries: string[];
-};
-
 export type GetTermFrequenciesDetailsTermReadingListItem = {
     term: string;
     reading: string | null;
 };
 
-export type GetTermFrequenciesResult = Translator.TermFrequencySimple[];
-
-// findAnkiNotes
-
-export type FindAnkiNotesDetails = {
-    query: string;
+type ApiSurface = {
+    optionsGet: {
+        params: {
+            optionsContext: Settings.OptionsContext;
+        };
+        return: Settings.ProfileOptions;
+    };
+    optionsGetFull: {
+        params: void;
+        return: Settings.Options;
+    };
+    termsFind: {
+        params: {
+            text: string;
+            details: FindTermsDetails;
+            optionsContext: Settings.OptionsContext;
+        };
+        return: {
+            dictionaryEntries: Dictionary.TermDictionaryEntry[];
+            originalTextLength: number;
+        };
+    };
+    parseText: {
+        params: {
+            text: string;
+            optionsContext: Settings.OptionsContext;
+            scanLength: number;
+            useInternalParser: boolean;
+            useMecabParser: boolean;
+        };
+        return: ParseTextResultItem[];
+    };
+    kanjiFind: {
+        params: {
+            text: string;
+            optionsContext: Settings.OptionsContext;
+        };
+        return: Dictionary.KanjiDictionaryEntry[];
+    };
+    isAnkiConnected: {
+        params: void;
+        return: boolean;
+    };
+    getAnkiConnectVersion: {
+        params: void;
+        return: number | null;
+    };
+    addAnkiNote: {
+        params: {
+            note: Anki.Note;
+        };
+        return: Anki.NoteId | null;
+    };
+    getAnkiNoteInfo: {
+        params: {
+            notes: Anki.Note[];
+            fetchAdditionalInfo: boolean;
+        };
+        return: Anki.NoteInfoWrapper[];
+    };
+    injectAnkiNoteMedia: {
+        params: {
+            timestamp: number;
+            definitionDetails: InjectAnkiNoteMediaDefinitionDetails;
+            audioDetails: InjectAnkiNoteMediaAudioDetails | null;
+            screenshotDetails: InjectAnkiNoteMediaScreenshotDetails | null;
+            clipboardDetails: InjectAnkiNoteMediaClipboardDetails | null;
+            dictionaryMediaDetails: InjectAnkiNoteMediaDictionaryMediaDetails[];
+        };
+        return: {
+            screenshotFileName: string | null;
+            clipboardImageFileName: string | null;
+            clipboardText: string | null;
+            audioFileName: string | null;
+            dictionaryMedia: InjectAnkiNoteDictionaryMediaResult[];
+            errors: Core.SerializedError[];
+        };
+    };
+    noteView: {
+        params: {
+            noteId: Anki.NoteId;
+            mode: Settings.AnkiNoteGuiMode;
+            allowFallback: boolean;
+        };
+        return: Settings.AnkiNoteGuiMode;
+    };
+    suspendAnkiCardsForNote: {
+        params: {
+            noteId: Anki.NoteId;
+        };
+        return: number;
+    };
+    getTermAudioInfoList: {
+        params: {
+            source: Audio.AudioSourceInfo;
+            term: string;
+            reading: string;
+        };
+        return: AudioDownloader.Info[];
+    };
+    commandExec: {
+        params: {
+            command: string;
+            params?: Core.SerializableObject;
+        };
+        return: boolean;
+    };
+    sendMessageToFrame: {
+        params: {
+            frameId: number;
+            action: string;
+            params?: Core.SerializableObject;
+        };
+        return: boolean;
+    };
+    broadcastTab: {
+        params: {
+            action: string;
+            params?: Core.SerializableObject;
+        };
+        return: boolean;
+    };
+    frameInformationGet: {
+        params: void;
+        return: Extension.ContentOrigin;
+    };
+    injectStylesheet: {
+        params: {
+            type: 'file' | 'code';
+            value: string;
+        };
+        return: void;
+    };
+    getStylesheetContent: {
+        params: {
+            url: string;
+        };
+        return: string;
+    };
+    getEnvironmentInfo: {
+        params: void;
+        return: Environment.Info;
+    };
+    clipboardGet: {
+        params: void;
+        return: string;
+    };
+    getDisplayTemplatesHtml: {
+        params: void;
+        return: string;
+    };
+    getZoom: {
+        params: void;
+        return: {
+            zoomFactor: number;
+        };
+    };
+    getDefaultAnkiFieldTemplates: {
+        params: void;
+        return: string;
+    };
+    getDictionaryInfo: {
+        params: void;
+        return: DictionaryImporter.Summary[];
+    };
+    purgeDatabase: {
+        params: void;
+        return: void;
+    };
+    getMedia: {
+        params: {
+            targets: GetMediaDetailsTarget[];
+        };
+        return: DictionaryDatabase.MediaDataStringContent[];
+    };
+    log: {
+        params: {
+            error: Core.SerializedError;
+            level: Log.LogLevel;
+            context: Log.LogContext | undefined;
+        };
+        return: void;
+    };
+    logIndicatorClear: {
+        params: void;
+        return: void;
+    };
+    modifySettings: {
+        params: {
+            targets: SettingsModifications.ScopedModification[];
+            source: string;
+        };
+        return: Core.Response<SettingsModifications.ModificationResult>[];
+    };
+    getSettings: {
+        params: {
+            targets: SettingsModifications.ScopedRead[];
+        };
+        return: Core.Response<SettingsModifications.ModificationResult>[];
+    };
+    setAllSettings: {
+        params: {
+            value: Settings.Options;
+            source: string;
+        };
+        return: void;
+    };
+    getOrCreateSearchPopup: {
+        params: {
+            focus?: boolean | 'ifCreated';
+            text?: string;
+        };
+        return: {
+            tabId: number | null;
+            windowId: number;
+        };
+    };
+    isTabSearchPopup: {
+        params: {
+            tabId: number;
+        };
+        return: boolean;
+    };
+    triggerDatabaseUpdated: {
+        params: {
+            type: Backend.DatabaseUpdateType;
+            cause: Backend.DatabaseUpdateCause;
+        };
+        return: void;
+    };
+    testMecab: {
+        params: void;
+        return: true;
+    };
+    textHasJapaneseCharacters: {
+        params: {
+            text: string;
+        };
+        return: boolean;
+    };
+    getTermFrequencies: {
+        params: {
+            termReadingList: GetTermFrequenciesDetailsTermReadingListItem[];
+            dictionaries: string[];
+        };
+        return: Translator.TermFrequencySimple[];
+    };
+    findAnkiNotes: {
+        params: {
+            query: string;
+        };
+        return: Anki.NoteId[];
+    };
+    loadExtensionScripts: {
+        params: {
+            files: string[];
+        };
+        return: void;
+    };
+    openCrossFramePort: {
+        params: {
+            targetTabId: number;
+            targetFrameId: number;
+        };
+        return: {
+            targetTabId: number;
+            targetFrameId: number;
+        };
+    };
+    requestBackendReadySignal: {
+        params: void;
+        return: boolean;
+    };
 };
 
-export type FindAnkiNotesResult = Anki.NoteId[];
+type ApiExtraArgs = [sender: chrome.runtime.MessageSender];
 
-// loadExtensionScripts
+export type ApiNames = BaseApiNames<ApiSurface>;
 
-export type LoadExtensionScriptsDetails = {
-    files: string[];
+export type ApiMap = BaseApiMap<ApiSurface, ApiExtraArgs>;
+
+export type ApiMapInit = BaseApiMapInit<ApiSurface, ApiExtraArgs>;
+
+export type ApiHandler<TName extends ApiNames> = BaseApiHandler<ApiSurface[TName], ApiExtraArgs>;
+
+export type ApiHandlerNoExtraArgs<TName extends ApiNames> = BaseApiHandler<ApiSurface[TName], []>;
+
+export type ApiParams<TName extends ApiNames> = BaseApiParams<ApiSurface[TName]>;
+
+export type ApiParam<TName extends ApiNames, TParamName extends BaseApiParamNames<ApiSurface[TName]>> = BaseApiParam<ApiSurface[TName], TParamName>;
+
+export type ApiReturn<TName extends ApiNames> = BaseApiReturn<ApiSurface[TName]>;
+
+export type ApiParamsAny = BaseApiParamsAny<ApiSurface>;
+
+export type Message = MessageItem<ApiNames>;
+
+type MessageItem<TName extends ApiNames> = {
+    action: TName;
+    params: ApiParams<TName>;
 };
-
-export type LoadExtensionScriptsResult = void;
-
-// openCrossFramePort
-
-export type OpenCrossFramePortDetails = {
-    targetTabId: number;
-    targetFrameId: number;
-};
-
-export type OpenCrossFramePortResult = {
-    targetTabId: number;
-    targetFrameId: number;
-};
-
-// requestBackendReadySignal
-
-export type RequestBackendReadySignalDetails = Record<string, never>;
-
-export type RequestBackendReadySignalResult = boolean;
