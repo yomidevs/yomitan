@@ -209,7 +209,7 @@ export class BackupController {
         }
         this._settingsExportToken = null;
 
-        const fileName = `yezichak-settings-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
+        const fileName = `yomitan-settings-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
         const blob = new Blob([JSON.stringify(data, null, 4)], {type: 'application/json'});
         this._saveBlob(blob, fileName);
     }
@@ -600,7 +600,7 @@ export class BackupController {
             /** @type {import('core').TokenObject} */
             const token = {};
             this._settingsExportDatabaseToken = token;
-            const fileName = `yezichak-dictionaries-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
+            const fileName = `yomitan-dictionaries-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
             const data = await this._exportDatabase(this._dictionariesDatabaseName);
             const blob = new Blob([data], {type: 'application/json'});
             this._saveBlob(blob, fileName);
