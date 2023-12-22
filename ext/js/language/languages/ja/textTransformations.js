@@ -81,9 +81,9 @@ export function convertHiraganaToKatakana(text) {
 }
 
 /**
-     * @param {string} text
-     * @returns {string}
-     */
+ * @param {string} text
+ * @returns {string}
+ */
 export function convertNumericToFullWidth(text) {
     let result = '';
     for (const char of text) {

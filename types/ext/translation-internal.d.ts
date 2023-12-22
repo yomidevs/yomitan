@@ -70,7 +70,7 @@ export type TextTransformation = {
     name: string;
     transform: Function;
     setting: Translation.FindTermsVariantMode;
-}
+};
 
 export type InflectionHypothesis = {
     source: string;

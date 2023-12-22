@@ -73,7 +73,7 @@ export class PersistentStorageController {
         try {
             isStoragePeristent = await navigator.storage.persist();
         } catch (e) {
-            console.error(e);
+            // NOP
         }
 
         this._updateCheckbox(isStoragePeristent);

@@ -216,6 +216,10 @@ export class AnkiNoteDataCreator {
         return results;
     }
 
+    /**
+     *
+     * @param dictionaryEntry
+     */
     _getPhoneticTranscriptions(dictionaryEntry) {
         const results = [];
         if (dictionaryEntry.type === 'term') {
@@ -543,6 +547,9 @@ export class AnkiNoteDataCreator {
         return results;
     }
 
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     */
     _getTermPhoneticTranscriptions(dictionaryEntry) {
         const results = [];
         const {headwords} = dictionaryEntry;
@@ -584,7 +591,12 @@ export class AnkiNoteDataCreator {
         return results;
     }
 
+    /**
+     *
+     * @param {import('dictionary').TermIPA[]} phoneticTranscriptions
+     */
     _getTermPhoneticTranscriptionsInner(phoneticTranscriptions) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         const results = [];
         for (const {ipa, tags} of phoneticTranscriptions) {

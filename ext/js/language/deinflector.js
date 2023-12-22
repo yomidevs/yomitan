@@ -41,6 +41,9 @@ export class Deinflector {
      * @param {import('../language/language-util.js').LanguageUtil} languageUtil
      */
     constructor(languageUtil) {
+        /**
+         *
+         */
         this._languageUtil = languageUtil;
     }
 
@@ -77,6 +80,11 @@ export class Deinflector {
         return results;
     }
 
+    /**
+     *
+     * @param rules1
+     * @param rules2
+     */
     _rulesFit(rules1, rules2) {
         return rules1 === 0 || (rules1 & rules2) !== 0;
     }

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +19,13 @@
 
 import {suffixInflection} from '../../deinflection-ruleset.js';
 
+/**
+ *
+ * @param inflectedSuffix
+ * @param deinflectedSuffix
+ * @param rulesIn
+ * @param rulesOut
+ */
 function conjugationIISuffixInflection(inflectedSuffix, deinflectedSuffix, rulesIn, rulesOut){
     return {
         ...suffixInflection(inflectedSuffix, deinflectedSuffix, rulesIn, rulesOut),
@@ -25,6 +33,9 @@ function conjugationIISuffixInflection(inflectedSuffix, deinflectedSuffix, rules
     };
 }
 
+/**
+ *
+ */
 export async function getDeinflectionReasons() {
     return new Map([
         // Nouns

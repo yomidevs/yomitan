@@ -17,13 +17,32 @@
 
 import {yomitan} from '../../yomitan.js';
 export class TextTransformationsController {
+    /**
+     *
+     * @param settingsController
+     */
     constructor(settingsController) {
+        /**
+         *
+         */
         this._settingsController = settingsController;
+        /**
+         *
+         */
         this._container = null;
+        /**
+         *
+         */
         this._transformations = [];
+        /**
+         *
+         */
         this._language = null;
     }
 
+    /**
+     *
+     */
     async prepare() {
         this._container = document.querySelector('#text-transformations');
 
@@ -34,6 +53,11 @@ export class TextTransformationsController {
 
     // Private
 
+    /**
+     *
+     * @param root0
+     * @param root0.options
+     */
     async _onOptionsChanged({options}) {
         if (options.general.language !== this._language) {
             this._language = options.general.language;
@@ -94,6 +118,9 @@ export class TextTransformationsController {
     }
 
 
+    /**
+     *
+     */
     async _updateOptions() {
         const options = await this._settingsController.getOptions();
         this._onOptionsChanged({options});

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +19,9 @@
 import {fetchText} from '../../../general/helpers.js';
 import {infixInflection, prefixInflection, suffixInflection, wholeWordInflection} from '../../deinflection-ruleset.js';
 
+/**
+ *
+ */
 export async function getDeinflectionReasons(){
     const pastSuffixInflections = [
         suffixInflection('ed', '', [], ['v']), // 'walked'
@@ -46,10 +50,20 @@ export async function getDeinflectionReasons(){
         suffixInflection('ies', 'y', ['v'], ['v'])
     ];
 
+    /**
+     *
+     * @param consonants
+     * @param suffix
+     * @param inTypes
+     * @param outTypes
+     */
     function doubledConsonantInflection(consonants, suffix, inTypes, outTypes){
         return consonants.split('').map((consonant) => suffixInflection(`${consonant}${consonant}${suffix}`, consonant, inTypes, outTypes));
     }
 
+    /**
+     *
+     */
     async function createIrregularVerbInflections(){
         const verbs = {
             'past': [],
@@ -69,6 +83,9 @@ export async function getDeinflectionReasons(){
 
     const irregularVerbInflections = createIrregularVerbInflections();
 
+    /**
+     *
+     */
     async function createPhrasalVerbInflections(){
         const phrasalVerbParticles = JSON.parse(await fetchText('/js/language/languages/en/phrasal-verb-particles.json'));
         const particlesDisjunction = phrasalVerbParticles.join('|');
@@ -78,6 +95,11 @@ export async function getDeinflectionReasons(){
         const combinedSet = new Set([...phrasalVerbParticles, ...phrasalVerbPrepositions]);
         const combinedDisjunction = Array.from(combinedSet).join('|');
 
+        /**
+         *
+         * @param inflected
+         * @param deinflected
+         */
         function createPhrasalVerbInflection(inflected, deinflected){
             return {
                 inflected: new RegExp(`^\\w*${inflected} (?:${combinedDisjunction})`),
@@ -89,6 +111,10 @@ export async function getDeinflectionReasons(){
             };
         }
 
+        /**
+         *
+         * @param sourceRules
+         */
         function createPhrasalVerbInflectionsFromRules(sourceRules){
             return sourceRules.map(({inflected, deinflected}) => {
                 const inflectedSuffix = inflected.source.replace('.*', '').replace('$', '');
@@ -120,6 +146,9 @@ export async function getDeinflectionReasons(){
 
     const mainModalVerbs = ['can', 'could', 'may', 'might', 'shall', 'should', 'will', 'would', 'must'];
 
+    /**
+     *
+     */
     function createModalVerbNegations(){
         return mainModalVerbs.map((modalVerb) => prefixInflection(`${modalVerb} not`, modalVerb, ['v'], ['v']));
     }

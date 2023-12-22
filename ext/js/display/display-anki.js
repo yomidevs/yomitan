@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { EventListenerCollection, deferPromise } from '../core.js';
-import { AnkiNoteBuilder } from '../data/anki-note-builder.js';
-import { AnkiUtil } from '../data/anki-util.js';
-import { PopupMenu } from '../dom/popup-menu.js';
-import { querySelectorNotNull } from '../dom/query-selector.js';
-import { TemplateRendererProxy } from '../templates/template-renderer-proxy.js';
-import { yomitan } from '../yomitan.js';
+import {EventListenerCollection, deferPromise} from '../core.js';
+import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
+import {AnkiUtil} from '../data/anki-util.js';
+import {PopupMenu} from '../dom/popup-menu.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
+import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
+import {yomitan} from '../yomitan.js';
 
 export class DisplayAnki {
     /**

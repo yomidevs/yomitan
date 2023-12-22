@@ -29,7 +29,7 @@
             "accessibility": "Accessibility",
             "security": "Security"
         },
-        "profile":{
+        "profile": {
             "heading": "Profile",
             "default": {
                 "label": "Default profile",
@@ -41,24 +41,24 @@
             },
             "configure": "Configure profiles\u2026"
         },
-        "language":{
+        "language": {
             "heading": "Language",
-            "language":{
+            "language": {
                 "label": "Language",
                 "description": "The language you are reading with this profile"
             },
-            "locale":{
+            "locale": {
                 "label": "Locale",
                 "description": "The language the interface will be displayed in"
             },
-            "deinflection":{
+            "deinflection": {
                 "label": "Deinflection source",
                 "description": "Deinflect via algorithm or dictionary lookup.",
                 "algorithm": "Algorithm 🧩",
                 "both": "Both 📖 🧩",
                 "dictionary": "Dictionary 📖"
             },
-            "posFilter":{
+            "posFilter": {
                 "label": "Part of speech filtering",
                 "description": "Filter algorithm deinflections using part of speech tags."
             },
@@ -87,44 +87,44 @@
         "dictionaries": {
             "heading": "Dictionaries",
             "installed": "installed",
-            "enabled" : "enabled",
+            "enabled": "enabled",
             "configure": "Configure installed and enabled dictionaries\u2026"
         },
         "storage": {
             "label": "Storage",
             "invalid": "Yomitan is using an indeterminate amount of storage.",
-            "finite":{
+            "finite": {
                 "1": "Yomitan is using approximately ",
                 "2": " of "
             },
             "infinite": "Yomitan is permitted unlimited storage.",
             "refresh": "Refresh",
-            "persistent":{
+            "persistent": {
                 "label": "Persistent storage",
                 "description": "Enable to help prevent the browser from unexpectedly clearing the database.",
                 "descriptionMore": "Web browsers will sometimes clear stored data if the device is running low on storage space. This can result in the imported dictionaries being deleted unexpectedly, causing Yomitan to stop functioning. Enabling persistent storage tells the browser that the data should not be deleted in those circumstances.",
-                "firefoxInvalid":{
+                "firefoxInvalid": {
                     "1": "On Firefox and Firefox for Android, the storage information feature may be hidden behind a browser flag. To enable this flag, open",
                     "2": " and search for ",
                     "3": " Setting its value to ",
                     "4": "should allow storage information to be calculated."
                 },
                 "firefoxMobile": "It may not be possible to enable Persistent Storage on Firefox for Android.",
-                "chromium":{
+                "chromium": {
                     "1": "Chromium-based browsers should not need to enable this setting since the Yomitan extension has the ",
                     "2": " permission, which should prevent data deletion."
                 }
             }
         },
-        "general":{
+        "general": {
             "heading": "General",
             "enableScanning": "Enable content scanning",
-            "showWelcome":{
+            "showWelcome": {
                 "1": "Show the ",
                 "welcomeGuide": "welcome guide",
                 "2": " on browser startup"
             },
-            "freqSort":{
+            "freqSort": {
                 "label": "Frequency sorting dictionary",
                 "description": "Sort results using a frequency dictionary.",
                 "descriptionMore": "Enabling this option will sort search results using a specific dictionary. This can be beneficial when using multiple dictionaries which may not have consistent sorting information.",
@@ -138,13 +138,13 @@
             "heading": "Scanning",
             "key": {
                 "label": "Scan modifier key",
-                "description": "Hold a key while moving the cursor to scan text."    
+                "description": "Hold a key while moving the cursor to scan text."
             },
             "middleMouse": {
                 "label": "Scan using middle mouse button",
                 "description": "Hold the middle mouse button while moving the cursor to scan text."
             },
-            "autoHide":{
+            "autoHide": {
                 "label": "Auto-hide search popup",
                 "description": "When no definitions are found after scanning text, the popup will be hidden.",
                 "delay": {
@@ -167,25 +167,25 @@
             },
             "selectMatched": "Select matched text"
         },
-        "appearance":{
+        "appearance": {
             "heading": "Appearance",
             "theme": {
                 "label": "Theme",
                 "description": "Adjust the style of the popup.",
-                "body":{
+                "body": {
                     "body": "Body",
                     "light": "Light",
                     "dark": "Dark",
                     "browser": "Browser"
                 },
-                "shadow":{
+                "shadow": {
                     "shadow": "Shadow",
                     "light": "Light",
                     "dark": "Dark",
                     "browser": "Browser"
                 }
             },
-            "actionBar":{
+            "actionBar": {
                 "label": "Action bar appearance",
                 "description": "Control when and where the action bar is visible.",
                 "visibility": "Visibility",
@@ -197,7 +197,7 @@
                 "bottom": "Bottom"
             }
         },
-        "posAndSize":{
+        "posAndSize": {
             "heading": "Popup Position \u0026 Size",
             "displayMode": {
                 "label": "Display mode",
@@ -216,7 +216,7 @@
                 "height": "Height"
             }
         },
-        "audio":{
+        "audio": {
             "heading": "Audio",
             "enable": {
                 "label": "Enable audio playback for terms",
@@ -224,10 +224,10 @@
             },
             "configureSources": "Configure audio playback sources\u2026"
         },
-        "translation":{
+        "translation": {
             "heading": "Translation"
         },
-        "anki":{
+        "anki": {
             "heading": "Anki",
             "enable": {
                 "label": "Enable Anki integration",
@@ -235,18 +235,18 @@
             },
             "configure": "Configure Anki card format\u2026"
         },
-        "clipboard":{
+        "clipboard": {
             "heading": "Clipboard",
-            "background":{
+            "background": {
                 "label": "Enable background clipboard text monitoring",
                 "description": "Open the search page in a new window when the clipboard contains text."
             },
-            "search":{
+            "search": {
                 "label": "Enable search page clipboard text monitoring",
                 "description": "The query on the search page will be automatically updated with text in the clipboard."
             }
         },
-        "backup":{
+        "backup": {
             "heading": "Backup",
             "settings": {
                 "explanation": "Yomitan can import and export settings files which can be used to restore settings, share settings across devices, and to help to debug problems. These files will only contain settings and will not contain dictionaries. Dictionaries must be imported separately. However, you can also import a previously exported collection of dictionaries. See the next section about that.",
@@ -327,10 +327,10 @@
         "supportAndDictionaries": "Support and downloadable dictionaries: ",
         "informationAndSourceCode": "Information and source code: ",
         "moreExtensionInformation": "More extension information: "
-      },
-      "actionPopup":{
+    },
+    "actionPopup": {
         "on": "On",
         "off": "Off",
         "changeProfile": "Change primary profile"
-      }
+    }
 }

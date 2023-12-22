@@ -792,12 +792,12 @@
                                             }
                                         }
                                     },
-                                    "deinflectionSource":{
+                                    "deinflectionSource": {
                                         "type": "string",
                                         "enum": ["algorithm", "dictionary", "both"],
                                         "default": "algorithm"
                                     },
-                                    "deinflectionPosFitler":{
+                                    "deinflectionPosFitler": {
                                         "type": "boolean",
                                         "default": true
                                     }
@@ -826,7 +826,7 @@
                                 },
                                 "default": {
                                     "ja": {
-                                      "textTransformations": {}
+                                        "textTransformations": {}
                                     }
                                 }
                             },

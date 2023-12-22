@@ -23,6 +23,10 @@ import {readResponseJson} from '../core/json.js';
  * @returns {Promise<Response|string>}
  */
 
+/**
+ *
+ * @param url
+ */
 export async function fetchAsset(url) {
     if (typeof global !== 'undefined') {
         const fs = require('fs');
@@ -54,7 +58,7 @@ export async function fetchText(url) {
     if (typeof global === 'undefined') {
         const response = await fetchAsset(url);
         return await response.text();
-    } else  {
+    } else {
         return fetchAsset(url);
     }
 }

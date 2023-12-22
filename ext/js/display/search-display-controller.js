@@ -17,10 +17,10 @@
  */
 
 import * as wanakana from '../../lib/wanakana.js';
-import { ClipboardMonitor } from '../comm/clipboard-monitor.js';
-import { EventListenerCollection, invokeMessageHandler } from '../core.js';
-import { querySelectorNotNull } from '../dom/query-selector.js';
-import { yomitan } from '../yomitan.js';
+import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
+import {EventListenerCollection, invokeMessageHandler} from '../core.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
+import {yomitan} from '../yomitan.js';
 
 export class SearchDisplayController {
     /**
@@ -56,6 +56,9 @@ export class SearchDisplayController {
         this._wanakanaEnableCheckbox = querySelectorNotNull(document, '#wanakana-enable');
         /** @type {EventListenerCollection} */
         this._queryInputEvents = new EventListenerCollection();
+        /**
+         *
+         */
         this._wanakanaSearchOption = document.querySelector('#search-option-wanakana');
         /** @type {boolean} */
         this._queryInputEventsSetup = false;

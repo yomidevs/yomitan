@@ -63,6 +63,9 @@ async function hasTermReasons(deinflector, source, expectedTerm, expectedRule, e
 }
 
 
+/**
+ *
+ */
 async function testDeinflections() {
     const languageUtil = new LanguageUtil();
     await languageUtil.prepare();
@@ -72,8 +75,8 @@ async function testDeinflections() {
 
     const deinflectionTests = Object.fromEntries(await Promise.all(languages.map(async ({iso}) => {
         const file = `../ext/js/language/languages/${iso}/test-deinflections.js`;
-        const path = pathResolve(dirname, file);
-        if (!existsSync(path)) {
+        const filepath = pathResolve(dirname, file);
+        if (!existsSync(filepath)) {
             return [iso, null];
         }
         // eslint-disable-next-line no-unsanitized/method
@@ -104,6 +107,9 @@ async function testDeinflections() {
 }
 
 
+/**
+ *
+ */
 async function main() {
     await testDeinflections();
 }

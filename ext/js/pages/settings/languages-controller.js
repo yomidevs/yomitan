@@ -18,24 +18,44 @@
 
 import {yomitan} from '../../yomitan.js';
 export class LanguagesController {
+    /**
+     *
+     * @param settingsController
+     */
     constructor(settingsController) {
+        /**
+         *
+         */
         this._settingsController = settingsController;
+        /**
+         *
+         */
         this._languages = [
             {'iso': 'ja', 'language': 'Japanese', 'flag': '🇯🇵'}
         ];
     }
 
+    /**
+     *
+     */
     async prepare() {
         this._languages = await yomitan.api.getLanguages();
         this._languages.sort((a, b) => a.iso.localeCompare(b.iso));
         this._setSelectElement('language-select');
     }
 
+    /**
+     *
+     * @param selectId
+     */
     _setSelectElement(selectId) {
         this._selectElement = document.getElementById(selectId);
         this._fillSelect();
     }
 
+    /**
+     *
+     */
     _fillSelect() {
         this._languages.forEach((lang) => {
             const option = document.createElement('option');

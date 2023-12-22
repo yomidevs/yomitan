@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { RequestBuilder } from '../background/request-builder.js';
-import { ExtensionError } from '../core/extension-error.js';
-import { readResponseJson } from '../core/json.js';
-import { JsonSchema } from '../data/json-schema.js';
-import { ArrayBufferUtil } from '../data/sandbox/array-buffer-util.js';
-import { NativeSimpleDOMParser } from '../dom/native-simple-dom-parser.js';
-import { SimpleDOMParser } from '../dom/simple-dom-parser.js';
+import {RequestBuilder} from '../background/request-builder.js';
+import {ExtensionError} from '../core/extension-error.js';
+import {readResponseJson} from '../core/json.js';
+import {JsonSchema} from '../data/json-schema.js';
+import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';
+import {SimpleDOMParser} from '../dom/simple-dom-parser.js';
 
 export class AudioDownloader {
     /**
@@ -51,6 +51,7 @@ export class AudioDownloader {
      * @param {import('audio').AudioSourceInfo} source
      * @param {string} term
      * @param {string} reading
+     * @param language
      * @returns {Promise<import('audio-downloader').Info[]>}
      */
     async getTermAudioInfoList(source, term, reading, language) {
@@ -59,7 +60,6 @@ export class AudioDownloader {
             try {
                 return await handler(term, reading, source, language);
             } catch (e) {
-                console.error(e);
                 // NOP
             }
         }
@@ -71,6 +71,7 @@ export class AudioDownloader {
      * @param {?number} preferredAudioIndex
      * @param {string} term
      * @param {string} reading
+     * @param language
      * @param {?number} idleTimeout
      * @returns {Promise<import('audio-downloader').AudioBinaryBase64>}
      */
@@ -298,6 +299,7 @@ export class AudioDownloader {
     /**
      * @param {string} term
      * @param {string} reading
+     * @param language
      * @param {string} url
      * @returns {string}
      * @throws {Error}

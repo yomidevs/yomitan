@@ -165,7 +165,7 @@ export class Translator {
      * Gets a list of frequency information for a given list of term-reading pairs
      * and a list of dictionaries.
      * @param {import('translator').TermReadingList} termReadingList An array of `{term, reading}` pairs. If reading is null,
-         *   the reading won't be compared.
+     *   the reading won't be compared.
      * @param {string[]} dictionaries An array of dictionary names.
      * @returns {Promise<import('translator').TermFrequencySimple[]>} An array of term frequencies.
      */
@@ -231,7 +231,7 @@ export class Translator {
         const ids = new Set();
         for (const {databaseEntries, originalText, transformedText, deinflectedText, inflectionHypotheses} of deinflections) {
             if (databaseEntries.length === 0) { continue; }
-            if(inflectionHypotheses.some(hypothesis => hypothesis.source !== 'algorithm')) {              
+            if (inflectionHypotheses.some((hypothesis) => hypothesis.source !== 'algorithm')) {
                 originalTextLength = Math.max(originalTextLength, originalText.length);
             }
             for (const databaseEntry of databaseEntries) {
@@ -240,7 +240,7 @@ export class Translator {
                     const existingEntry = dictionaryEntries.find((entry) => {
                         return entry.definitions.some((definition) => definition.id === id);
                     });
-                    if(!existingEntry) { continue; }
+                    if (!existingEntry) { continue; }
                     if (transformedText.length >= existingEntry.headwords[0].sources[0].transformedText.length) {
                         const existingHypotheses = existingEntry.inflectionHypotheses;
 
@@ -277,10 +277,10 @@ export class Translator {
     }
 
     /**
-     * 
+     *
      * @param {import('dictionary-data').InflectionHypothesis} hypotheses1
      * @param {import('dictionary-data').InflectionHypothesis} hypotheses2
-     * @returns 
+     * @returns
      */
     _areInflectionHyphothesesEqual(hypotheses1, hypotheses2) {
         const set1 = new Set(hypotheses1);
@@ -318,11 +318,11 @@ export class Translator {
     }
 
     /**
-     * 
-     * @param {import('translation-internal').DatabaseDeinflection[]} deinflections 
+     *
+     * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
      * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
-     * @param {import('dictionary').TermSourceMatchType} matchType 
-     * @param {boolean} checkRules 
+     * @param {import('dictionary').TermSourceMatchType} matchType
+     * @param {boolean} checkRules
      */
     async _addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType, checkRules) {
         const uniqueDeinflectionsMap = this._groupDeinflectionsByTerm(deinflections);
@@ -334,9 +334,9 @@ export class Translator {
     }
 
     /**
-     * @param {import('translation-internal').DatabaseDeinflection[]} deinflections 
+     * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
      * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
-     * @param {import('dictionary').TermSourceMatchType} matchType 
+     * @param {import('dictionary').TermSourceMatchType} matchType
      * @returns {Promise<import('translation-internal').DatabaseDeinflection[]>}
      */
     async _getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType) {
@@ -345,7 +345,7 @@ export class Translator {
         deinflections.forEach((deinflection) => {
             const {originalText, transformedText, inflectionHypotheses: algHypotheses, databaseEntries} = deinflection;
             databaseEntries.forEach((entry) => {
-                const {definitionTags, formOf, inflectionHypotheses}  = entry;
+                const {definitionTags, formOf, inflectionHypotheses} = entry;
                 if (definitionTags.includes('non-lemma')) {
                     const lemma = formOf || '';
                     const hypotheses = (inflectionHypotheses || [])
@@ -368,8 +368,8 @@ export class Translator {
     }
 
     /**
-     * 
-     * @param {import('translation-internal').DatabaseDeinflection[]} deinflections 
+     *
+     * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
      * @returns {Record<string, import('translation-internal').DatabaseDeinflection[]>}
      */
     _groupDeinflectionsByTerm(deinflections) {
@@ -379,15 +379,14 @@ export class Translator {
             deinflectionArray.push(deinflection);
             map[term] = deinflectionArray;
             return map;
-        }, /** @type {Record<string, import('translation-internal').DatabaseDeinflection[]>} */ ({})
-        );
+        }, /** @type {Record<string, import('translation-internal').DatabaseDeinflection[]>} */ ({}));
     }
 
     /**
-     * 
-     * @param {import('dictionary-database').TermEntry[]} databaseEntries 
-     * @param {*} uniqueDeinflectionArrays 
-     * @param {*} checkRules 
+     *
+     * @param {import('dictionary-database').TermEntry[]} databaseEntries
+     * @param {*} uniqueDeinflectionArrays
+     * @param {*} checkRules
      */
     _matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, checkRules) {
         for (const databaseEntry of databaseEntries) {
@@ -402,10 +401,10 @@ export class Translator {
     }
 
     /**
-     * 
+     *
      * @param {import('translation-internal').DeinflectionRuleFlags} rules1
      * @param {import('translation-internal').DeinflectionRuleFlags} rules2
-     * @returns 
+     * @returns
      */
     _rulesFit(rules1, rules2) {
         return rules1 === 0 || (rules1 & rules2) !== 0;
@@ -424,8 +423,7 @@ export class Translator {
         const textTransformationsVectorSpace = Object.entries(textTransformationsOptions).reduce((map, [key, value]) => {
             map[key] = this._getTextOptionEntryVariants(value.setting);
             return map;
-        }, /** @type {Record<string, boolean[]>} */ ({})
-        );
+        }, /** @type {Record<string, boolean[]>} */ ({}));
 
         const variantVectorSpace = {
             textReplacements: this._getTextReplacementsVariants(options),
@@ -470,7 +468,7 @@ export class Translator {
 
                 if (options.deinflectionSource !== 'dictionary'){
                     for (const {term, rules, reasons} of await /** @type {Deinflector} */ this._deinflector.deinflect(source, options)) {
-                        const inflectionHypotheses =  {
+                        const inflectionHypotheses = {
                             source: 'algorithm',
                             inflections: reasons
                         };
@@ -492,7 +490,7 @@ export class Translator {
     }
 
     /**
-     * 
+     *
      * @param {import('translation').FindTermsOptions} options
      * @returns
      */
@@ -500,18 +498,19 @@ export class Translator {
         const textTransformationsOptions = options?.textTransformations || {};
         const textTransformations = await this._languageUtil.getTextTransformations(options.language);
 
-        const textTransformationsResult = Object.keys(textTransformationsOptions).reduce((result, key) => {
-            const value = textTransformationsOptions[key];
-            const transformation = textTransformations.find((t) => t.id === key);
-            if (transformation) {
-                result[key] = {
-                    ...transformation,
-                    setting: value
-                };
-            }
-            return result;
-        }, 
-        /** @type {Record<string, import('translation-internal').TextTransformation}>} */ ({}) 
+        const textTransformationsResult = Object.keys(textTransformationsOptions).reduce(
+            (result, key) => {
+                const value = textTransformationsOptions[key];
+                const transformation = textTransformations.find((t) => t.id === key);
+                if (transformation) {
+                    result[key] = {
+                        ...transformation,
+                        setting: value
+                    };
+                }
+                return result;
+            },
+            /** @type {Record<string, import('translation-internal').TextTransformation>} */ ({})
         );
 
         return textTransformationsResult;
@@ -530,11 +529,11 @@ export class Translator {
         return text;
     }
 
-     /**
+    /**
      * @param {string} text
      * @returns {string}
      */
-     _getJapaneseOnlyText(text) {
+    _getJapaneseOnlyText(text) {
         const jp = this._japaneseUtil;
         let length = 0;
         for (const c of text) {
@@ -584,7 +583,7 @@ export class Translator {
         return options.textReplacements;
     }
 
-     /**
+    /**
      * @param {string} originalText
      * @param {string} transformedText
      * @param {string} deinflectedText
@@ -592,7 +591,7 @@ export class Translator {
      * @param {import('translation-internal').InflectionHypothesis[]} inflectionHypotheses
      * @returns {import('translation-internal').DatabaseDeinflection}
      */
-     _createDeinflection(originalText, transformedText, deinflectedText, rules, inflectionHypotheses) {
+    _createDeinflection(originalText, transformedText, deinflectedText, rules, inflectionHypotheses) {
         return {originalText, transformedText, deinflectedText, rules, inflectionHypotheses, databaseEntries: []};
     }
 
@@ -743,7 +742,7 @@ export class Translator {
         }
     }
 
-     /**
+    /**
      * @param {Iterable<import('dictionary').TermDictionaryEntry>} dictionaryEntries
      * @param {TranslatorTagAggregator} tagAggregator
      * @returns {import('dictionary').TermDictionaryEntry[]}
@@ -770,7 +769,7 @@ export class Translator {
 
     // Removing data
 
-        /**
+    /**
      * @param {import('dictionary').TermDictionaryEntry[]} dictionaryEntries
      * @param {Set<string>} excludeDictionaryDefinitions
      */
@@ -1355,8 +1354,8 @@ export class Translator {
     }
 
     /**
-     * 
-     * @param {*} variantVectorSpace 
+     *
+     * @param {*} variantVectorSpace
      */
     *_generateArrayVariants(variantVectorSpace) {
         const variantKeys = Object.keys(variantVectorSpace);
@@ -1397,7 +1396,7 @@ export class Translator {
 
     // Kanji data
 
-   /**
+    /**
      * @param {string} name
      * @param {string|number} value
      * @param {import('dictionary-database').Tag} databaseInfo

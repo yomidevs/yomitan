@@ -92,7 +92,7 @@ export type FindTermsOptions = {
      */
     textReplacements: (FindTermsTextReplacement[] | null)[];
     /**
-     * 
+     *
      */
     textTransformations: Array<any>;
     /**
@@ -121,12 +121,12 @@ export type FindTermsOptions = {
 export enum DeinflectionSource {
     Dictionary = 'dictionary',
     Algorithm = 'algorithm',
-    Both = 'both'
+    Both = 'both',
 }
 
 export enum SearchResolution {
     Letter = 'letter',
-    Word = 'word'
+    Word = 'word',
 }
 
 /**

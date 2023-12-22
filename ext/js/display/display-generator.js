@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { isObject } from '../core.js';
-import { ExtensionError } from '../core/extension-error.js';
-import { DictionaryDataUtil } from '../dictionary/dictionary-data-util.js';
-import { HtmlTemplateCollection } from '../dom/html-template-collection.js';
-import { yomitan } from '../yomitan.js';
-import { PronunciationGenerator } from './sandbox/pronunciation-generator.js';
-import { StructuredContentGenerator } from './sandbox/structured-content-generator.js';
+import {isObject} from '../core.js';
+import {ExtensionError} from '../core/extension-error.js';
+import {DictionaryDataUtil} from '../dictionary/dictionary-data-util.js';
+import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
+import {yomitan} from '../yomitan.js';
+import {PronunciationGenerator} from './sandbox/pronunciation-generator.js';
+import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
 
 export class DisplayGenerator {
     /**
@@ -359,6 +359,10 @@ export class DisplayGenerator {
         return node;
     }
 
+    /**
+     *
+     * @param inflectionHypothesis
+     */
     _createInflectionHypothesis(inflectionHypothesis) {
         const {source, inflections} = inflectionHypothesis;
         if (!Array.isArray(inflections) || inflections.length === 0) { return null; }
@@ -375,6 +379,10 @@ export class DisplayGenerator {
         return fragment;
     }
 
+    /**
+     *
+     * @param source
+     */
     _getIconForInflectionSource(source) {
         switch (source) {
             case 'dictionary':

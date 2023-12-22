@@ -22,7 +22,7 @@ export default defineConfig({
             ...configDefaults.exclude,
             'dev/lib/**',
             'test/playwright/**',
-            'dict/**',
+            'dict/**'
         ],
         // @ts-expect-error - Appears to not be defined in the type definitions (https://vitest.dev/advanced/pool)
         poolOptions: {

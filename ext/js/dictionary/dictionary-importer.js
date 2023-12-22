@@ -127,7 +127,7 @@ export class DictionaryImporter {
 
         // Load data
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
-        const termList      = await this._readFileSequence(termFiles,      convertTermBankEntry,      dataBankSchemas[0], dictionaryTitle);
+        const termList = await this._readFileSequence(termFiles, convertTermBankEntry, dataBankSchemas[0], dictionaryTitle);
 
         const termMetaList = await this._readFileSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
         const kanjiList = await (

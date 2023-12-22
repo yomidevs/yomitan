@@ -73,13 +73,13 @@ export type GroupedPitchAccentInternal = {
     tags: Dictionary.Tag[];
 };
 
-export type GroupedIpaInternal= {
+export type GroupedIpaInternal = {
     type: 'phonetic-transcription';
     terms: Set<string>;
     reading: string;
     tags: Dictionary.Tag[];
     ipa: string;
-}
+};
 
 export type GroupedPronunciationInternal = GroupedPitchAccentInternal | GroupedIpaInternal;
 

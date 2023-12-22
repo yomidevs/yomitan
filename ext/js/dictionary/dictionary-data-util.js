@@ -146,7 +146,7 @@ export class DictionaryDataUtil {
 
         /** @type {Map<string, import('dictionary-data-util').GroupedPronunciationInternal[]>} */
         const groupedPronunciationsMap = new Map();
-        
+
         for (const {headwordIndex, dictionary, pitches, phoneticTranscriptions} of pronunciations) {
             const {term, reading} = headwords[headwordIndex];
             let dictionaryGroupedPronunciationList = groupedPronunciationsMap.get(dictionary);
@@ -193,7 +193,7 @@ export class DictionaryDataUtil {
             /** @type {import('dictionary-data-util').GroupedPronunciation[]} */
             const pronunciationsWithExclusive = [];
             for (const groupedPronunciation of dictionaryGroupedPronunciationList) {
-                const {terms, type, reading,tags} = groupedPronunciation;
+                const {terms, type, reading, tags} = groupedPronunciation;
                 const ipa = groupedPronunciation.type === 'phonetic-transcription' ? groupedPronunciation.ipa : null;
                 const {position, nasalPositions, devoicePositions} = groupedPronunciation.type === 'pitch-accent' ? groupedPronunciation : {position: null, nasalPositions: null, devoicePositions: null};
 
@@ -331,7 +331,7 @@ export class DictionaryDataUtil {
                     ||
                     pronunciation.type === 'phonetic-transcription' &&
                     pronunciation.ipa === ipa
-                ) 
+                )
             ) {
                 return pronunciation;
             }

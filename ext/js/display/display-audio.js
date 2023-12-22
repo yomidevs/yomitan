@@ -41,6 +41,9 @@ export class DisplayAudio {
         this._autoPlayAudioTimer = null;
         /** @type {number} */
         this._autoPlayAudioDelay = 400;
+        /**
+         *
+         */
         this._playInflectedText = false;
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();

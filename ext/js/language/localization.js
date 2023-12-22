@@ -18,12 +18,29 @@
 
 import {yomitan} from '../yomitan.js';
 export class LocalizationController {
+    /**
+     *
+     * @param settingsController
+     */
     constructor(settingsController) {
+        /**
+         *
+         */
         this._settingsController = settingsController;
+        /**
+         *
+         */
         this._locale = '';
+        /**
+         *
+         */
         this._translations = {};
     }
 
+    /**
+     *
+     * @param options
+     */
     async prepare(options) {
         this._settingsController?.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._locales = await yomitan.api.getLocales();
@@ -35,6 +52,10 @@ export class LocalizationController {
         }
     }
 
+    /**
+     *
+     * @param selectId
+     */
     _setSelectElement(selectId) {
         this._selectElement = document.getElementById(selectId);
         if (!this._selectElement) { return; }
@@ -42,10 +63,16 @@ export class LocalizationController {
         this._selectElement.addEventListener('change', this._onSelectChange.bind(this));
     }
 
+    /**
+     *
+     */
     _onSelectChange() {
         this._updateOptions();
     }
 
+    /**
+     *
+     */
     _fillSelect() {
         this._locales.forEach((locale) => {
             const option = document.createElement('option');
@@ -56,6 +83,13 @@ export class LocalizationController {
         });
     }
 
+    /**
+     *
+     * @param root0
+     * @param root0.options
+     * @param root0.options.general
+     * @param root0.options.general.locale
+     */
     async _onOptionsChanged({options: {general: {locale}}}) {
         if (locale !== this._locale) {
             this._locale = locale;
@@ -64,11 +98,17 @@ export class LocalizationController {
         }
     }
 
+    /**
+     *
+     */
     async _updateOptions() {
         const options = await this._settingsController.getOptions();
         this._onOptionsChanged({options});
     }
 
+    /**
+     *
+     */
     _translateAll() {
         const translatables = document.querySelectorAll('[i18n], [i18n-title]');
         translatables.forEach((element) => {
@@ -76,6 +116,10 @@ export class LocalizationController {
         });
     }
 
+    /**
+     *
+     * @param element
+     */
     _translateElement(element) {
         const key = element.getAttribute('i18n');
         const title = element.getAttribute('i18n-title');
@@ -89,6 +133,12 @@ export class LocalizationController {
         }
     }
 
+    /**
+     *
+     * @param object
+     * @param path
+     * @param defaultValue
+     */
     getDeep(object, path, defaultValue = null) {
         return path
             .split('.')

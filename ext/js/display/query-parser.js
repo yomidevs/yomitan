@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { EventDispatcher, log } from '../core.js';
-import { querySelectorNotNull } from '../dom/query-selector.js';
-import { TextScanner } from '../language/text-scanner.js';
-import { yomitan } from '../yomitan.js';
+import {EventDispatcher, log} from '../core.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
+import {TextScanner} from '../language/text-scanner.js';
+import {yomitan} from '../yomitan.js';
 
 /**
  * @augments EventDispatcher<import('display').QueryParserEventType>

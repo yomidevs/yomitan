@@ -405,7 +405,7 @@ export type TermPitch = {
 export type TermIPA = {
     ipa: string;
     tags: Tag[];
-}
+};
 
 /**
  * Frequency information corresponds to how frequently a term appears in a corpus,

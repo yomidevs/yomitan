@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,6 +18,9 @@
 
 import {prefixInflection, separatedPrefix, suffixInflection} from '../../deinflection-ruleset.js';
 
+/**
+ *
+ */
 export async function getDeinflectionReasons(){
     const separablePrefixes = [ // https://www.dartmouth.edu/~deutsch/Grammatik/Wortbildung/Separables.html
         'ab',
@@ -92,7 +96,7 @@ export async function getDeinflectionReasons(){
     });
 
     const zuInfinitiveInflections = separablePrefixes.map((prefix) => {
-        return prefixInflection(prefix+'zu', prefix, [], ['verb']);
+        return prefixInflection(prefix + 'zu', prefix, [], ['verb']);
     });
 
     return new Map([

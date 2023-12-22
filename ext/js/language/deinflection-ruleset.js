@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,36 +15,63 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+/**
+ *
+ * @param inflectedSuffix
+ * @param deinflectedSuffix
+ * @param rulesIn
+ * @param rulesOut
+ */
 export function suffixInflection(inflectedSuffix, deinflectedSuffix, rulesIn, rulesOut){
     return {
         inflected: new RegExp('.*' + inflectedSuffix + '$'),
         deinflected: deinflectedSuffix,
-        uninflect: (term) =>  term.replace(new RegExp(inflectedSuffix + '$'), deinflectedSuffix),
+        uninflect: (term) => term.replace(new RegExp(inflectedSuffix + '$'), deinflectedSuffix),
         rulesIn,
         rulesOut
     };
 }
 
+/**
+ *
+ * @param inflectedPrefix
+ * @param deinflectedPrefix
+ * @param rulesIn
+ * @param rulesOut
+ */
 export function prefixInflection(inflectedPrefix, deinflectedPrefix, rulesIn, rulesOut){
     return {
         inflected: new RegExp('^' + inflectedPrefix + '.*'),
         deinflected: deinflectedPrefix,
-        uninflect: (term) =>  term.replace(new RegExp('^' + inflectedPrefix), deinflectedPrefix),
+        uninflect: (term) => term.replace(new RegExp('^' + inflectedPrefix), deinflectedPrefix),
         rulesIn,
         rulesOut
     };
 }
 
+/**
+ *
+ * @param inflectedInfix
+ * @param deinflectedInfix
+ * @param rulesIn
+ * @param rulesOut
+ */
 export function infixInflection(inflectedInfix, deinflectedInfix, rulesIn, rulesOut){
     return {
         inflected: new RegExp('.*' + inflectedInfix + '.*'),
         deinflected: deinflectedInfix,
-        uninflect: (term) =>  term.replace(new RegExp(inflectedInfix), deinflectedInfix),
+        uninflect: (term) => term.replace(new RegExp(inflectedInfix), deinflectedInfix),
         rulesIn,
         rulesOut
     };
 }
 
+/**
+ *
+ * @param prefix
+ * @param rulesIn
+ * @param rulesOut
+ */
 export function separatedPrefix(prefix, rulesIn, rulesOut) {
     const de = 'a-zA-ZäöüÄÖÜß';
     const regex = new RegExp(`^([${de}]+) .+ ${prefix}$`);
@@ -57,11 +85,18 @@ export function separatedPrefix(prefix, rulesIn, rulesOut) {
     };
 }
 
+/**
+ *
+ * @param inflected
+ * @param deinflected
+ * @param rulesIn
+ * @param rulesOut
+ */
 export function wholeWordInflection(inflected, deinflected, rulesIn, rulesOut){
     return {
         inflected: new RegExp('^' + inflected + '$'),
         deinflected,
-        uninflect: () =>  deinflected,
+        uninflect: () => deinflected,
         rulesIn,
         rulesOut
     };

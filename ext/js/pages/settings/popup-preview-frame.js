@@ -49,7 +49,13 @@ export class PopupPreviewFrame {
         this._textSource = null;
         /** @type {?import('settings').OptionsContext} */
         this._optionsContext = null;
+        /**
+         *
+         */
         this._options = null;
+        /**
+         *
+         */
         this._exampleTexts = [];
         /** @type {HTMLElement} */
         this._exampleText = querySelectorNotNull(document, '#example-text');
@@ -132,6 +138,9 @@ export class PopupPreviewFrame {
 
     // Private
 
+    /**
+     *
+     */
     async _setExampleText() {
         const options = this._options;
 
@@ -147,6 +156,7 @@ export class PopupPreviewFrame {
 
     /**
      * @param {import('settings').OptionsContext} optionsContext
+     * @param {...any} args
      * @returns {Promise<import('settings').ProfileOptions>}
      */
     async _apiOptionsGet(...args) {
@@ -301,6 +311,10 @@ export class PopupPreviewFrame {
         this._setExampleText();
     }
 
+    /**
+     *
+     * @param optionsContext
+     */
     async _getOptions(optionsContext = {current: true}) {
         this._options = await yomitan.api.optionsGet(optionsContext);
         return this._options;

@@ -22,10 +22,21 @@ import {
     KANA_TO_VOWEL_MAPPING
 } from './constants.js';
 
+/**
+ *
+ * @param codePoint
+ * @param root0
+ * @param root0."0"
+ * @param root0."1"
+ */
 export function isCodePointInRange(codePoint, [min, max]) {
     return (codePoint >= min && codePoint <= max);
 }
 
+/**
+ *
+ * @param previousCharacter
+ */
 export function getProlongedHiragana(previousCharacter) {
     switch (KANA_TO_VOWEL_MAPPING.get(previousCharacter)) {
         case 'a': return 'あ';

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2023  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,9 +30,9 @@ export const decapitalize = {
         variant: 'Use both variants'
     },
     /**
-     * 
-     * @param {string} str 
-     * @returns 
+     *
+     * @param {string} str
+     * @returns
      */
     transform: (str) => str.toLowerCase()
 };
@@ -46,9 +47,9 @@ export const capitalizeFirstLetter = {
         variant: 'Use both variants'
     },
     /**
-     * 
-     * @param {string} str 
-     * @returns 
+     *
+     * @param {string} str
+     * @returns
      */
     transform: (str) => str.charAt(0).toUpperCase() + str.slice(1)
 };

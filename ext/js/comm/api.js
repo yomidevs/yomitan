@@ -422,19 +422,32 @@ export class API {
         return this._invoke('openCrossFramePort', {targetTabId, targetFrameId});
     }
 
+    /**
+     * @param {string} language
+     */
     getTextTransformations(language){
         const result = this._invoke('getTextTransformations', {language});
         return result;
     }
 
+    /**
+     *
+     */
     getLanguages(){
         return this._invoke('getLanguages');
     }
 
+    /**
+     *
+     */
     getLocales(){
         return this._invoke('getLocales');
     }
 
+    /**
+     *
+     * @param language
+     */
     getTranslations(language){
         return this._invoke('getTranslations', {language});
     }

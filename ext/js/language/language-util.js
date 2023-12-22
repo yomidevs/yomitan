@@ -23,6 +23,9 @@ export class LanguageUtil {
     constructor() {
     }
 
+    /**
+     *
+     */
     async prepare() {
         const languagesJSON = JSON.parse(await fetchText('/js/language/languages.json')) || {};
         languagesJSON.forEach(({iso, language, flag, exampleText, i18n}) => {
@@ -30,15 +33,25 @@ export class LanguageUtil {
         });
     }
 
+    /**
+     *
+     */
     getLanguages() {
         return Object.values(languages).map(({iso, language, flag, exampleText}) =>
             ({iso, language, flag, exampleText}));
     }
 
+    /**
+     *
+     */
     getLocales(){
         return Object.values(languages).filter(({i18n}) => i18n);
     }
 
+    /**
+     *
+     * @param language
+     */
     async getDeinflectionReasons(language) {
         try {
             if (!languages[language].deinflectionReasons) {
@@ -51,6 +64,10 @@ export class LanguageUtil {
         }
     }
 
+    /**
+     *
+     * @param language
+     */
     async getTextTransformations(language) {
         try {
             return languages[language].textTransformations;
@@ -60,6 +77,10 @@ export class LanguageUtil {
         }
     }
 
+    /**
+     *
+     * @param locale
+     */
     async getTranslations(locale) {
         try {
             if (!languages[locale].translations) {
