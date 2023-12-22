@@ -129,6 +129,9 @@ export class Translator {
      * @returns {Promise<import('dictionary').KanjiDictionaryEntry[]>} An array of definitions. See the _createKanjiDefinition() function for structure details.
      */
     async findKanji(text, options) {
+        if (options.removeNonJapaneseCharacters) {
+            text = this._getJapaneseOnlyText(text);
+        }
         const {enabledDictionaryMap} = options;
         const kanjiUnique = new Set();
         for (const c of text) {
@@ -161,8 +164,8 @@ export class Translator {
     /**
      * Gets a list of frequency information for a given list of term-reading pairs
      * and a list of dictionaries.
-     * @param {{term: string, reading: string|null}[]} termReadingList An array of `{term, reading}` pairs. If reading is null,
-     *   the reading won't be compared.
+     * @param {import('translator').TermReadingList} termReadingList An array of `{term, reading}` pairs. If reading is null,
+         *   the reading won't be compared.
      * @param {string[]} dictionaries An array of dictionary names.
      * @returns {Promise<import('translator').TermFrequencySimple[]>} An array of term frequencies.
      */
@@ -207,7 +210,7 @@ export class Translator {
      * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
      * @param {import('translation').FindTermsOptions} options
      * @param {TranslatorTagAggregator} tagAggregator
-     * @returns {Promise<{dictionaryEntries: import('dictionary').TermDictionaryEntry[], originalTextLength: number}>}
+     * @returns {Promise<import('translator').FindTermsResult>}
      */
     async _findTermsInternal(text, enabledDictionaryMap, options, tagAggregator) {
         // TODO: generalize to other languages
@@ -2090,7 +2093,7 @@ export class Translator {
     // Miscellaneous
 
     /**
-     * @template T
+     * @template [T=unknown]
      * @param {Set<T>} set
      * @param {T[]} values
      * @returns {boolean}
