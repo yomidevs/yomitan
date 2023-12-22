@@ -538,6 +538,8 @@
         {"kanaIn": "ねる", "kanaOut": "ぬ", "rulesIn": ["v1"], "rulesOut": ["v5"]},
         {"kanaIn": "べる", "kanaOut": "ぶ", "rulesIn": ["v1"], "rulesOut": ["v5"]},
         {"kanaIn": "める", "kanaOut": "む", "rulesIn": ["v1"], "rulesOut": ["v5"]},
+        {"kanaIn": "できる", "kanaOut": "する", "rulesIn": ["v1"], "rulesOut": ["vs"]},
+        {"kanaIn": "出来る", "kanaOut": "する", "rulesIn": ["v1"], "rulesOut": ["vs"]},
         {"kanaIn": "これる", "kanaOut": "くる", "rulesIn": ["v1"], "rulesOut": ["vk"]},
         {"kanaIn": "来れる", "kanaOut": "来る", "rulesIn": ["v1"], "rulesOut": ["vk"]},
         {"kanaIn": "來れる", "kanaOut": "來る", "rulesIn": ["v1"], "rulesOut": ["vk"]}

@@ -562,6 +562,8 @@ function testDeinflections() {
                 {term: 'する', source: 'した',           rule: 'vs', reasons: ['past']},
                 {term: 'する', source: 'しました',       rule: 'vs', reasons: ['polite past']},
                 {term: 'する', source: 'して',           rule: 'vs', reasons: ['-te']},
+                {term: 'する', source: 'できる',         rule: 'vs', reasons: ['potential']},
+                {term: 'する', source: '出来る',         rule: 'vs', reasons: ['potential']},
                 {term: 'する', source: 'せられる',       rule: 'vs', reasons: ['potential or passive']},
                 {term: 'する', source: 'される',         rule: 'vs', reasons: ['passive']},
                 {term: 'する', source: 'させる',         rule: 'vs', reasons: ['causative']},
