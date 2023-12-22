@@ -6,23 +6,23 @@
         "description": "Japanese dictionary with Anki integration",
         "author": "TheMoeWay",
         "icons": {
-            "16": "images/tongue.png",
-            "19": "images/tongue.png",
-            "32": "images/tongue.png",
-            "38": "images/tongue.png",
-            "48": "images/tongue.png",
-            "64": "images/tongue.png",
-            "128": "images/tongue.png"
+            "16": "images/icon16.png",
+            "19": "images/icon19.png",
+            "32": "images/icon32.png",
+            "38": "images/icon38.png",
+            "48": "images/icon48.png",
+            "64": "images/icon64.png",
+            "128": "images/icon128.png"
         },
         "action": {
             "default_icon": {
-                "16": "images/tongue.png",
-                "19": "images/tongue.png",
-                "32": "images/tongue.png",
-                "38": "images/tongue.png",
-                "48": "images/tongue.png",
-                "64": "images/tongue.png",
-                "128": "images/tongue.png"
+                "16": "images/icon16.png",
+            "19": "images/icon19.png",
+            "32": "images/icon32.png",
+            "38": "images/icon38.png",
+            "48": "images/icon48.png",
+            "64": "images/icon64.png",
+            "128": "images/icon128.png"
             },
             "default_title": "Yomitan",
             "default_popup": "action-popup.html"
