@@ -18,10 +18,10 @@
 
 export class PronunciationGenerator {
     /**
-     * @param {import('../../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
+     * @param {import('../../language/languages/ja/japanese-util.js').JapaneseUtil} japaneseUtil
      */
     constructor(japaneseUtil) {
-        /** @type {import('../../language/sandbox/japanese-util.js').JapaneseUtil} */
+        /** @type {import('../../language/languages/ja/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
     }
 

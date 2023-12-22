@@ -24,11 +24,11 @@ import {AnkiUtil} from './anki-util.js';
 export class AnkiNoteBuilder {
     /**
      * Initiate an instance of AnkiNoteBuilder.
-     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
+     * @param {import('../language/languages/ja/japanese-util.js').JapaneseUtil} japaneseUtil
      * @param {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} templateRenderer
      */
     constructor(japaneseUtil, templateRenderer) {
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
+        /** @type {import('../language/languages/ja/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {RegExp} */
         this._markerPattern = AnkiUtil.cloneFieldMarkerPattern(true);
@@ -120,7 +120,6 @@ export class AnkiNoteBuilder {
                 }
             }
         };
-
         return {note, errors: allErrors, requirements: [...uniqueRequirements.values()]};
     }
 

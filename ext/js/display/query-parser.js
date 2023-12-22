@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, log} from '../core.js';
-import {querySelectorNotNull} from '../dom/query-selector.js';
-import {TextScanner} from '../language/text-scanner.js';
-import {yomitan} from '../yomitan.js';
+import { EventDispatcher, log } from '../core.js';
+import { querySelectorNotNull } from '../dom/query-selector.js';
+import { TextScanner } from '../language/text-scanner.js';
+import { yomitan } from '../yomitan.js';
 
 /**
  * @augments EventDispatcher<import('display').QueryParserEventType>
@@ -32,7 +32,7 @@ export class QueryParser extends EventDispatcher {
         super();
         /** @type {import('display').GetSearchContextCallback} */
         this._getSearchContext = getSearchContext;
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
+        /** @type {import('../language/languages/ja/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {string} */
         this._text = '';

@@ -16,20 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {RequestBuilder} from '../background/request-builder.js';
-import {ExtensionError} from '../core/extension-error.js';
-import {readResponseJson} from '../core/json.js';
-import {JsonSchema} from '../data/json-schema.js';
-import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
-import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';
-import {SimpleDOMParser} from '../dom/simple-dom-parser.js';
+import { RequestBuilder } from '../background/request-builder.js';
+import { ExtensionError } from '../core/extension-error.js';
+import { readResponseJson } from '../core/json.js';
+import { JsonSchema } from '../data/json-schema.js';
+import { ArrayBufferUtil } from '../data/sandbox/array-buffer-util.js';
+import { NativeSimpleDOMParser } from '../dom/native-simple-dom-parser.js';
+import { SimpleDOMParser } from '../dom/simple-dom-parser.js';
 
 export class AudioDownloader {
     /**
-     * @param {{japaneseUtil: import('../language/sandbox/japanese-util.js').JapaneseUtil, requestBuilder: RequestBuilder}} details
+     * @param {{japaneseUtil: import('../language/languages/ja/japanese-util.js').JapaneseUtil, requestBuilder: RequestBuilder}} details
      */
     constructor({japaneseUtil, requestBuilder}) {
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
+        /** @type {import('../language/languages/ja/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {RequestBuilder} */
         this._requestBuilder = requestBuilder;

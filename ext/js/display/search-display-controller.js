@@ -17,10 +17,10 @@
  */
 
 import * as wanakana from '../../lib/wanakana.js';
-import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
-import {EventListenerCollection, invokeMessageHandler} from '../core.js';
-import {querySelectorNotNull} from '../dom/query-selector.js';
-import {yomitan} from '../yomitan.js';
+import { ClipboardMonitor } from '../comm/clipboard-monitor.js';
+import { EventListenerCollection, invokeMessageHandler } from '../core.js';
+import { querySelectorNotNull } from '../dom/query-selector.js';
+import { yomitan } from '../yomitan.js';
 
 export class SearchDisplayController {
     /**
@@ -28,7 +28,7 @@ export class SearchDisplayController {
      * @param {number|undefined} frameId
      * @param {import('./display.js').Display} display
      * @param {import('./display-audio.js').DisplayAudio} displayAudio
-     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
+     * @param {import('../language/languages/ja/japanese-util.js').JapaneseUtil} japaneseUtil
      * @param {import('./search-persistent-state-controller.js').SearchPersistentStateController} searchPersistentStateController
      */
     constructor(tabId, frameId, display, displayAudio, japaneseUtil, searchPersistentStateController) {

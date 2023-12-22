@@ -23,11 +23,11 @@ import {EventDispatcher} from '../core.js';
  */
 export class ClipboardMonitor extends EventDispatcher {
     /**
-     * @param {{japaneseUtil: import('../language/sandbox/japanese-util.js').JapaneseUtil, clipboardReader: import('clipboard-monitor').ClipboardReaderLike}} details
+     * @param {{japaneseUtil: import('../language/languages/ja/japanese-util.js').JapaneseUtil, clipboardReader: import('clipboard-monitor').ClipboardReaderLike}} details
      */
     constructor({japaneseUtil, clipboardReader}) {
         super();
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
+        /** @type {import('../language/languages/ja/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {import('clipboard-monitor').ClipboardReaderLike} */
         this._clipboardReader = clipboardReader;

@@ -16,20 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core.js';
-import {ExtensionError} from '../core/extension-error.js';
-import {DictionaryDataUtil} from '../dictionary/dictionary-data-util.js';
-import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
-import {yomitan} from '../yomitan.js';
-import {PronunciationGenerator} from './sandbox/pronunciation-generator.js';
-import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
+import { isObject } from '../core.js';
+import { ExtensionError } from '../core/extension-error.js';
+import { DictionaryDataUtil } from '../dictionary/dictionary-data-util.js';
+import { HtmlTemplateCollection } from '../dom/html-template-collection.js';
+import { yomitan } from '../yomitan.js';
+import { PronunciationGenerator } from './sandbox/pronunciation-generator.js';
+import { StructuredContentGenerator } from './sandbox/structured-content-generator.js';
 
 export class DisplayGenerator {
     /**
      * @param {import('display').DisplayGeneratorConstructorDetails} details
      */
     constructor({japaneseUtil, contentManager, hotkeyHelpController = null}) {
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
+        /** @type {import('../language/languages/ja/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {import('./display-content-manager.js').DisplayContentManager} */
         this._contentManager = contentManager;

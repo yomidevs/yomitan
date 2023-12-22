@@ -16,22 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {ThemeController} from '../app/theme-controller.js';
-import {FrameEndpoint} from '../comm/frame-endpoint.js';
-import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, log, promiseTimeout} from '../core.js';
-import {PopupMenu} from '../dom/popup-menu.js';
-import {querySelectorNotNull} from '../dom/query-selector.js';
-import {ScrollElement} from '../dom/scroll-element.js';
-import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
-import {TextScanner} from '../language/text-scanner.js';
-import {yomitan} from '../yomitan.js';
-import {DisplayContentManager} from './display-content-manager.js';
-import {DisplayGenerator} from './display-generator.js';
-import {DisplayHistory} from './display-history.js';
-import {DisplayNotification} from './display-notification.js';
-import {ElementOverflowController} from './element-overflow-controller.js';
-import {OptionToggleHotkeyHandler} from './option-toggle-hotkey-handler.js';
-import {QueryParser} from './query-parser.js';
+import { ThemeController } from '../app/theme-controller.js';
+import { FrameEndpoint } from '../comm/frame-endpoint.js';
+import { DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, log, promiseTimeout } from '../core.js';
+import { PopupMenu } from '../dom/popup-menu.js';
+import { querySelectorNotNull } from '../dom/query-selector.js';
+import { ScrollElement } from '../dom/scroll-element.js';
+import { HotkeyHelpController } from '../input/hotkey-help-controller.js';
+import { TextScanner } from '../language/text-scanner.js';
+import { yomitan } from '../yomitan.js';
+import { DisplayContentManager } from './display-content-manager.js';
+import { DisplayGenerator } from './display-generator.js';
+import { DisplayHistory } from './display-history.js';
+import { DisplayNotification } from './display-notification.js';
+import { ElementOverflowController } from './element-overflow-controller.js';
+import { OptionToggleHotkeyHandler } from './option-toggle-hotkey-handler.js';
+import { QueryParser } from './query-parser.js';
 
 /**
  * @augments EventDispatcher<import('display').DisplayEventType>
@@ -41,7 +41,7 @@ export class Display extends EventDispatcher {
      * @param {number|undefined} tabId
      * @param {number|undefined} frameId
      * @param {import('display').DisplayPageType} pageType
-     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
+     * @param {import('../language/languages/ja/japanese-util.js').JapaneseUtil} japaneseUtil
      * @param {import('../dom/document-focus-controller.js').DocumentFocusController} documentFocusController
      * @param {import('../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
@@ -53,7 +53,7 @@ export class Display extends EventDispatcher {
         this._frameId = frameId;
         /** @type {import('display').DisplayPageType} */
         this._pageType = pageType;
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
+        /** @type {import('../language/languages/ja/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {import('../dom/document-focus-controller.js').DocumentFocusController} */
         this._documentFocusController = documentFocusController;
@@ -235,7 +235,7 @@ export class Display extends EventDispatcher {
         this._updateQueryParser();
     }
 
-    /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
+    /** @type {import('../language/languages/ja/japanese-util.js').JapaneseUtil} */
     get japaneseUtil() {
         return this._japaneseUtil;
     }

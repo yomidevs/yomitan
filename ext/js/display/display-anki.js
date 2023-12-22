@@ -16,19 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection, deferPromise} from '../core.js';
-import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
-import {AnkiUtil} from '../data/anki-util.js';
-import {PopupMenu} from '../dom/popup-menu.js';
-import {querySelectorNotNull} from '../dom/query-selector.js';
-import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
-import {yomitan} from '../yomitan.js';
+import { EventListenerCollection, deferPromise } from '../core.js';
+import { AnkiNoteBuilder } from '../data/anki-note-builder.js';
+import { AnkiUtil } from '../data/anki-util.js';
+import { PopupMenu } from '../dom/popup-menu.js';
+import { querySelectorNotNull } from '../dom/query-selector.js';
+import { TemplateRendererProxy } from '../templates/template-renderer-proxy.js';
+import { yomitan } from '../yomitan.js';
 
 export class DisplayAnki {
     /**
      * @param {import('./display.js').Display} display
      * @param {import('./display-audio.js').DisplayAudio} displayAudio
-     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
+     * @param {import('../language/languages/ja/japanese-util.js').JapaneseUtil} japaneseUtil
      */
     constructor(display, displayAudio, japaneseUtil) {
         /** @type {import('./display.js').Display} */

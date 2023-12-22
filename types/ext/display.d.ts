@@ -17,7 +17,7 @@
 
 import type {DisplayContentManager} from '../../ext/js/display/display-content-manager';
 import type {HotkeyHelpController} from '../../ext/js/input/hotkey-help-controller';
-import type {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util';
+import type {JapaneseUtil} from '../../ext/js/language/languages/ja/japanese-util';
 import type {TextScanner} from '../../ext/js/language/text-scanner';
 import type * as Core from './core';
 import type * as Dictionary from './dictionary';
