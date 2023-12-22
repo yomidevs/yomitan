@@ -1,8 +1,0 @@
-[
-    ["打", "freq", 1],
-    ["込", "freq", 2],
-    ["打", "freq", "three"],
-    ["込", "freq", "four (4)"],
-    ["打", "freq", {"value": 5}],
-    ["込", "freq", {"value": 6, "displayValue": "six"}]
-]

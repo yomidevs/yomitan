@@ -1,8 +1,0 @@
-[
-    ["E1", "default", 0, "example tag 1", 0],
-    ["E2", "default", 0, "example tag 2", 0],
-    ["P", "popular", 0, "popular term", 0],
-    ["n", "partOfSpeech", 0, "noun", 0],
-    ["vt", "partOfSpeech", 0, "transitive verb", 0],
-    ["abbr", "default", 0, "abbreviation", 0]
-]
