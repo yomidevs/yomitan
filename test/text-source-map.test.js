@@ -19,6 +19,7 @@
 import {expect, test} from 'vitest';
 import {TextSourceMap} from '../ext/js/general/text-source-map.js';
 
+/** */
 function testSource() {
     test('Source', () => {
         const data = [
@@ -34,8 +35,10 @@ function testSource() {
     });
 }
 
+/** */
 function testEquals() {
     test('Equals', () => {
+        /** @type {[args1: [source1: string, mapping1: ?(number[])], args2: [source2: string, mapping2: ?(number[])], expectedEquals: boolean][]} */
         const data = [
             [['source1', null], ['source1', null], true],
             [['source2', null], ['source2', null], true],
@@ -76,8 +79,10 @@ function testEquals() {
     });
 }
 
+/** */
 function testGetSourceLength() {
     test('GetSourceLength', () => {
+        /** @type {[args: [source: string, mapping: number[]], finalLength: number, expectedValue: number][]} */
         const data = [
             [['source', [1, 1, 1, 1, 1, 1]], 1, 1],
             [['source', [1, 1, 1, 1, 1, 1]], 2, 2],
@@ -103,10 +108,12 @@ function testGetSourceLength() {
     });
 }
 
+/** */
 function testCombineInsert() {
     test('CombineInsert', () => {
+        /** @type {[args: [source: string, mapping: ?(number[])], expectedArgs: [expectedSource: string, expectedMapping: ?(number[])], operations: [operation: string, arg1: number, arg2: number][]][]} */
         const data = [
-        // No operations
+            // No operations
             [
                 ['source', null],
                 ['source', [1, 1, 1, 1, 1, 1]],
@@ -226,6 +233,7 @@ function testCombineInsert() {
 }
 
 
+/** */
 function main() {
     testSource();
     testEquals();

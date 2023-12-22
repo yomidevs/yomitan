@@ -27,7 +27,8 @@ import {DisplayProfileSelection} from './display-profile-selection.js';
 import {DisplayResizer} from './display-resizer.js';
 import {Display} from './display.js';
 
-(async () => {
+/** Entry point. */
+async function main() {
     try {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
@@ -64,4 +65,6 @@ import {Display} from './display.js';
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+await main();

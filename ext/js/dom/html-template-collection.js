@@ -17,9 +17,15 @@
  */
 
 export class HtmlTemplateCollection {
-    constructor(source) {
+    constructor() {
+        /** @type {Map<string, HTMLTemplateElement>} */
         this._templates = new Map();
+    }
 
+    /**
+     * @param {string|Document} source
+     */
+    load(source) {
         const sourceNode = (
             typeof source === 'string' ?
             new DOMParser().parseFromString(source, 'text/html') :
@@ -35,28 +41,53 @@ export class HtmlTemplateCollection {
         }
     }
 
+    /**
+     * @template {Element} T
+     * @param {string} name
+     * @returns {T}
+     * @throws {Error}
+     */
     instantiate(name) {
         const template = this._templates.get(name);
-        return document.importNode(template.content.firstChild, true);
+        if (typeof template === 'undefined') { throw new Error(`Failed to find template: ${name}`); }
+        const {firstElementChild} = template.content;
+        if (firstElementChild === null) { throw new Error(`Failed to find template content element: ${name}`); }
+        return /** @type {T} */ (document.importNode(firstElementChild, true));
     }
 
+    /**
+     * @param {string} name
+     * @returns {DocumentFragment}
+     * @throws {Error}
+     */
     instantiateFragment(name) {
         const template = this._templates.get(name);
-        return document.importNode(template.content, true);
+        if (typeof template === 'undefined') { throw new Error(`Failed to find template: ${name}`); }
+        const {content} = template;
+        return document.importNode(content, true);
     }
 
+    /**
+     * @returns {IterableIterator<HTMLTemplateElement>}
+     */
     getAllTemplates() {
         return this._templates.values();
     }
 
     // Private
 
+    /**
+     * @param {HTMLTemplateElement} template
+     */
     _prepareTemplate(template) {
         if (template.dataset.removeWhitespaceText === 'true') {
             this._removeWhitespaceText(template);
         }
     }
 
+    /**
+     * @param {HTMLTemplateElement} template
+     */
     _removeWhitespaceText(template) {
         const {content} = template;
         const {TEXT_NODE} = Node;
@@ -65,7 +96,7 @@ export class HtmlTemplateCollection {
         while (true) {
             const node = iterator.nextNode();
             if (node === null) { break; }
-            if (node.nodeType === TEXT_NODE && node.nodeValue.trim().length === 0) {
+            if (node.nodeType === TEXT_NODE && /** @type {string} */ (node.nodeValue).trim().length === 0) {
                 removeNodes.push(node);
             }
         }

@@ -21,9 +21,10 @@ export default defineConfig({
         exclude: [
             ...configDefaults.exclude,
             'dev/lib/**',
-            'test/playwright/**'
+            'test/playwright/**',
+            'dict/**',
         ],
-        environment: 'jsdom',
+        // @ts-expect-error - Appears to not be defined in the type definitions (https://vitest.dev/advanced/pool)
         poolOptions: {
             threads: {
                 useAtomics: true

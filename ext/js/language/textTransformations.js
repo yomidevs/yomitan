@@ -28,6 +28,11 @@ export const decapitalize = {
         true: 'Enabled',
         variant: 'Use both variants'
     },
+    /**
+     * 
+     * @param {string} str 
+     * @returns 
+     */
     transform: (str) => str.toLowerCase()
 };
 
@@ -40,5 +45,10 @@ export const capitalizeFirstLetter = {
         true: 'Enabled',
         variant: 'Use both variants'
     },
+    /**
+     * 
+     * @param {string} str 
+     * @returns 
+     */
     transform: (str) => str.charAt(0).toUpperCase() + str.slice(1)
 };

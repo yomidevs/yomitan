@@ -1,7 +1,5 @@
 name: publish-chrome
 on:
-  release:
-    types: [released]
   workflow_dispatch:
     inputs:
       attemptNumber:
@@ -56,7 +54,7 @@ jobs:
       - name: Upload to Google Web Store
         id: webStoreUpload
         continue-on-error: true
-        uses: djahandarie/webext-buildtools-chrome-webstore-upload-action@d3ce3b6f6a07d1267b0f5a24416a153159255372
+        uses: cardinalby/webext-buildtools-chrome-webstore-upload-action@8db7a005529498d95d3e2e0166f6f4050d2b96a5 # pin@v1.0.10
         with:
           zipFilePath: yomitan-chrome.zip
           extensionId: ${{ secrets.G_STABLE_EXTENSION_ID }}

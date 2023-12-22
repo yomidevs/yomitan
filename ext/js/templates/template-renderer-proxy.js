@@ -16,35 +16,60 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deserializeError, generateId} from '../core.js';
+import {generateId} from '../core.js';
+import {ExtensionError} from '../core/extension-error.js';
 
 export class TemplateRendererProxy {
     constructor() {
+        /** @type {?HTMLIFrameElement} */
         this._frame = null;
+        /** @type {boolean} */
         this._frameNeedsLoad = true;
+        /** @type {boolean} */
         this._frameLoading = false;
+        /** @type {?Promise<void>} */
         this._frameLoadPromise = null;
+        /** @type {string} */
         this._frameUrl = chrome.runtime.getURL('/template-renderer.html');
+        /** @type {Set<{cancel: () => void}>} */
         this._invocations = new Set();
     }
 
+    /**
+     * @param {string} template
+     * @param {import('template-renderer').PartialOrCompositeRenderData} data
+     * @param {import('anki-templates').RenderMode} type
+     * @returns {Promise<import('template-renderer').RenderResult>}
+     */
     async render(template, data, type) {
         await this._prepareFrame();
-        return await this._invoke('render', {template, data, type});
+        return /** @type {import('template-renderer').RenderResult} */ (await this._invoke('render', {template, data, type}));
     }
 
+    /**
+     * @param {import('template-renderer').RenderMultiItem[]} items
+     * @returns {Promise<import('core').Response<import('template-renderer').RenderResult>[]>}
+     */
     async renderMulti(items) {
         await this._prepareFrame();
-        return await this._invoke('renderMulti', {items});
+        return /** @type {import('core').Response<import('template-renderer').RenderResult>[]} */ (await this._invoke('renderMulti', {items}));
     }
 
+    /**
+     * @param {import('template-renderer').CompositeRenderData} data
+     * @param {import('anki-templates').RenderMode} type
+     * @returns {Promise<import('anki-templates').NoteData>}
+     */
     async getModifiedData(data, type) {
         await this._prepareFrame();
-        return await this._invoke('getModifiedData', {data, type});
+        return /** @type {import('anki-templates').NoteData} */ (await this._invoke('getModifiedData', {data, type}));
     }
 
     // Private
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _prepareFrame() {
         if (this._frame === null) {
             this._frame = document.createElement('iframe');
@@ -68,7 +93,13 @@ export class TemplateRendererProxy {
         await this._frameLoadPromise;
     }
 
-    _loadFrame(frame, url, timeout=5000) {
+    /**
+     * @param {HTMLIFrameElement} frame
+     * @param {string} url
+     * @param {number} [timeout]
+     * @returns {Promise<void>}
+     */
+    _loadFrame(frame, url, timeout = 5000) {
         return new Promise((resolve, reject) => {
             let state = 0x0; // 0x1 = frame added; 0x2 = frame loaded; 0x4 = frame ready
             const cleanup = () => {
@@ -79,6 +110,9 @@ export class TemplateRendererProxy {
                     timer = null;
                 }
             };
+            /**
+             * @param {number} flags
+             */
             const updateState = (flags) => {
                 state |= flags;
                 if (state !== 0x7) { return; }
@@ -89,16 +123,20 @@ export class TemplateRendererProxy {
                 if ((state & 0x3) !== 0x1) { return; }
                 updateState(0x2);
             };
+            /**
+             * @param {MessageEvent<unknown>} e
+             */
             const onWindowMessage = (e) => {
                 if ((state & 0x5) !== 0x1) { return; }
                 const frameWindow = frame.contentWindow;
                 if (frameWindow === null || frameWindow !== e.source) { return; }
                 const {data} = e;
-                if (!(typeof data === 'object' && data !== null && data.action === 'ready')) { return; }
+                if (!(typeof data === 'object' && data !== null && /** @type {import('core').SerializableObject} */ (data).action === 'ready')) { return; }
                 updateState(0x4);
             };
 
-            let timer = setTimeout(() => {
+            /** @type {?number} */
+            let timer = window.setTimeout(() => {
                 timer = null;
                 cleanup();
                 reject(new Error('Timeout'));
@@ -111,7 +149,9 @@ export class TemplateRendererProxy {
             try {
                 document.body.appendChild(frame);
                 state = 0x1;
-                frame.contentDocument.location.href = url;
+                const {contentDocument} = frame;
+                if (contentDocument === null) { throw new Error('Failed to initialize frame URL'); }
+                contentDocument.location.href = url;
             } catch (e) {
                 cleanup();
                 reject(e);
@@ -119,7 +159,13 @@ export class TemplateRendererProxy {
         });
     }
 
-    _invoke(action, params, timeout=null) {
+    /**
+     * @param {string} action
+     * @param {import('core').SerializableObject} params
+     * @param {?number} [timeout]
+     * @returns {Promise<unknown>}
+     */
+    _invoke(action, params, timeout = null) {
         return new Promise((resolve, reject) => {
             const frameWindow = (this._frame !== null ? this._frame.contentWindow : null);
             if (frameWindow === null) {
@@ -143,22 +189,30 @@ export class TemplateRendererProxy {
                     timer = null;
                 }
             };
-            const onMessage = (e) => {
+            /**
+             * @param {MessageEvent<unknown>} event
+             */
+            const onMessage = (event) => {
+                if (event.source !== frameWindow) { return; }
+                const {data} = event;
                 if (
-                    e.source !== frameWindow ||
-                    e.data.id !== id ||
-                    e.data.action !== `${action}.response`
+                    typeof data !== 'object' ||
+                    data === null ||
+                    /** @type {import('core').SerializableObject} */ (data).id !== id ||
+                    /** @type {import('core').SerializableObject} */ (data).action !== `${action}.response`
                 ) {
                     return;
                 }
 
-                const response = e.data.params;
+                const response = /** @type {import('core').SerializableObject} */ (data).params;
+                if (typeof response !== 'object' || response === null) { return; }
+
                 cleanup();
-                const {error} = response;
+                const {error} = /** @type {import('core').Response} */ (response);
                 if (error) {
-                    reject(deserializeError(error));
+                    reject(ExtensionError.deserialize(error));
                 } else {
-                    resolve(response.result);
+                    resolve(/** @type {import('core').Response} */ (response).result);
                 }
             };
 
@@ -174,6 +228,9 @@ export class TemplateRendererProxy {
         });
     }
 
+    /**
+     * @returns {void}
+     */
     _onFrameLoad() {
         if (this._frameLoading) { return; }
         this._frameNeedsLoad = true;

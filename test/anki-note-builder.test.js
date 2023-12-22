@@ -16,47 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'fake-indexeddb/auto';
-import fs from 'fs';
+// @vitest-environment jsdom
+
+import {readFileSync} from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import url from 'url';
-import {describe, test, vi} from 'vitest';
-import {TranslatorVM} from '../dev/translator-vm.js';
+import {describe} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {AnkiNoteBuilder} from '../ext/js/data/anki-note-builder.js';
 import {JapaneseUtil} from '../ext/js/language/languages/ja/japanese-util.js';
-
-vi.stubGlobal('fetch', async (url2) => {
-    const extDir = path.join(__dirname, '..', 'ext');
-    let filePath;
-    try {
-        filePath = url.fileURLToPath(url2);
-    } catch (e) {
-        filePath = path.resolve(extDir, url2.replace(/^[/\\]/, ''));
-    }
-    await Promise.resolve();
-    const content = fs.readFileSync(filePath, {encoding: null});
-    return {
-        ok: true,
-        status: 200,
-        statusText: 'OK',
-        text: async () => Promise.resolve(content.toString('utf8')),
-        json: async () => Promise.resolve(JSON.parse(content.toString('utf8')))
-    };
-});
-vi.mock('../ext/js/templates/template-renderer-proxy.js');
+import {AnkiTemplateRenderer} from '../ext/js/templates/sandbox/anki-template-renderer.js';
+import {createTranslatorTest} from './fixtures/translator-test.js';
+import {createFindOptions} from './utilities/translator.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-async function createVM() {
-    const dictionaryDirectory = path.join(dirname, 'data', 'dictionaries', 'valid-dictionary1');
-    const vm = new TranslatorVM();
-
-    await vm.prepare(dictionaryDirectory, 'Test Dictionary 2');
-
-    return vm;
-}
-
+/**
+ * @param {'terms'|'kanji'} type
+ * @returns {string[]}
+ */
 function getFieldMarkers(type) {
     switch (type) {
         case 'terms':
@@ -117,13 +95,24 @@ function getFieldMarkers(type) {
     }
 }
 
+/**
+ * @param {import('dictionary').DictionaryEntry[]} dictionaryEntries
+ * @param {'terms'|'kanji'} type
+ * @param {import('settings').ResultOutputMode} mode
+ * @param {string} template
+ * @param {import('vitest').ExpectStatic} expect
+ * @returns {Promise<import('anki').NoteFields[]>}
+ */
 async function getRenderResults(dictionaryEntries, type, mode, template, expect) {
     const markers = getFieldMarkers(type);
+    /** @type {import('anki-note-builder').Field[]} */
     const fields = [];
     for (const marker of markers) {
         fields.push([marker, `{${marker}}`]);
     }
 
+    const ankiTemplateRenderer = new AnkiTemplateRenderer();
+    await ankiTemplateRenderer.prepare();
     const japaneseUtil = new JapaneseUtil(null);
     const clozePrefix = 'cloze-prefix';
     const clozeSuffix = 'cloze-suffix';
@@ -140,7 +129,7 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
                 }
                 break;
         }
-        const ankiNoteBuilder = new AnkiNoteBuilder({japaneseUtil});
+        const ankiNoteBuilder = new AnkiNoteBuilder(japaneseUtil, ankiTemplateRenderer.templateRenderer);
         const context = {
             url: 'url:',
             sentence: {
@@ -151,9 +140,10 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
             query: 'query',
             fullQuery: 'fullQuery'
         };
-        const {note: {fields: noteFields}, errors} = await ankiNoteBuilder.createNote({
+        /** @type {import('anki-note-builder').CreateNoteDetails} */
+        const details = {
             dictionaryEntry,
-            mode: null,
+            mode: 'test',
             context,
             template,
             deckName: 'deckName',
@@ -165,8 +155,11 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
             duplicateScopeCheckAllModels: false,
             resultOutputMode: mode,
             glossaryLayoutMode: 'default',
-            compactTags: false
-        });
+            compactTags: false,
+            requirements: [],
+            mediaOptions: null
+        };
+        const {note: {fields: noteFields}, errors} = await ankiNoteBuilder.createNote(details);
         for (const error of errors) {
             console.error(error);
         }
@@ -178,47 +171,45 @@ async function getRenderResults(dictionaryEntries, type, mode, template, expect)
 }
 
 
-async function main() {
-    const vm = await createVM();
+const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json');
+/** @type {import('test/translator').TranslatorTestInputs} */
+const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
 
-    const testInputsFilePath = path.join(dirname, 'data', 'translator-test-inputs.json');
-    const {optionsPresets, tests} = JSON.parse(fs.readFileSync(testInputsFilePath, {encoding: 'utf8'}));
+const testResults1FilePath = path.join(dirname, 'data/anki-note-builder-test-results.json');
+/** @type {import('test/translator').AnkiNoteBuilderTestResults} */
+const expectedResults1 = parseJson(readFileSync(testResults1FilePath, {encoding: 'utf8'}));
 
-    const testResults1FilePath = path.join(dirname, 'data', 'anki-note-builder-test-results.json');
-    const expectedResults1 = JSON.parse(fs.readFileSync(testResults1FilePath, {encoding: 'utf8'}));
-    const actualResults1 = [];
+const template = readFileSync(path.join(dirname, '../ext/data/templates/default-anki-field-templates.handlebars'), {encoding: 'utf8'});
 
-    const template = fs.readFileSync(path.join(dirname, '..', 'ext', 'data/templates/default-anki-field-templates.handlebars'), {encoding: 'utf8'});
+const dictionaryName = 'Test Dictionary 2';
+const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
-    describe.concurrent('AnkiNoteBuilder', () => {
-        for (let i = 0, ii = tests.length; i < ii; ++i) {
-            const t = tests[i];
-            test(`${t.name}`, async ({expect}) => {
-                const expected1 = expectedResults1[i];
-                switch (t.func) {
-                    case 'findTerms':
-                        {
-                            const {name, mode, text} = t;
-                            const options = vm.buildOptions(optionsPresets, t.options);
-                            const {dictionaryEntries} = structuredClone(await vm.translator.findTerms(mode, text, options));
-                            const results = mode !== 'simple' ? structuredClone(await getRenderResults(dictionaryEntries, 'terms', mode, template, expect)) : null;
-                            actualResults1.push({name, results});
-                            expect(results).toStrictEqual(expected1.results);
-                        }
-                        break;
-                    case 'findKanji':
-                        {
-                            const {name, text} = t;
-                            const options = vm.buildOptions(optionsPresets, t.options);
-                            const dictionaryEntries = structuredClone(await vm.translator.findKanji(text, options));
-                            const results = structuredClone(await getRenderResults(dictionaryEntries, 'kanji', null, template, expect));
-                            actualResults1.push({name, results});
-                            expect(results).toStrictEqual(expected1.results);
-                        }
-                        break;
-                }
-            });
-        }
+describe('AnkiNoteBuilder', () => {
+    const testData = tests.map((data, i) => ({data, expected1: expectedResults1[i]}));
+    describe.each(testData)('Test %#: $data.name', ({data, expected1}) => {
+        test('Test', async ({expect, translator}) => {
+            switch (data.func) {
+                case 'findTerms':
+                    {
+                        const {mode, text} = data;
+                        /** @type {import('translation').FindTermsOptions} */
+                        const options = createFindOptions(dictionaryName, optionsPresets, data.options);
+                        const {dictionaryEntries} = await translator.findTerms(mode, text, options);
+                        const results = mode !== 'simple' ? await getRenderResults(dictionaryEntries, 'terms', mode, template, expect) : null;
+                        expect(results).toStrictEqual(expected1.results);
+                    }
+                    break;
+                case 'findKanji':
+                    {
+                        const {text} = data;
+                        /** @type {import('translation').FindKanjiOptions} */
+                        const options = createFindOptions(dictionaryName, optionsPresets, data.options);
+                        const dictionaryEntries = await translator.findKanji(text, options);
+                        const results = await getRenderResults(dictionaryEntries, 'kanji', 'split', template, expect);
+                        expect(results).toStrictEqual(expected1.results);
+                    }
+                    break;
+            }
+        });
     });
-}
-await main();
+});

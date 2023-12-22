@@ -17,22 +17,32 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
 export class CollapsibleDictionaryController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {?import('core').TokenObject} */
         this._getDictionaryInfoToken = null;
+        /** @type {Map<string, import('dictionary-importer').Summary>} */
         this._dictionaryInfoMap = new Map();
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
-        this._container = null;
+        /** @type {HTMLElement} */
+        this._container = querySelectorNotNull(document, '#collapsible-dictionary-list');
+        /** @type {HTMLSelectElement[]} */
         this._selects = [];
+        /** @type {?HTMLSelectElement} */
         this._allSelect = null;
     }
 
+    /** */
     async prepare() {
-        this._container = document.querySelector('#collapsible-dictionary-list');
-
         await this._onDatabaseUpdated();
 
         yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
@@ -42,7 +52,9 @@ export class CollapsibleDictionaryController {
 
     // Private
 
+    /** */
     async _onDatabaseUpdated() {
+        /** @type {?import('core').TokenObject} */
         const token = {};
         this._getDictionaryInfoToken = token;
         const dictionaries = await this._settingsController.getDictionaryInfo();
@@ -54,10 +66,12 @@ export class CollapsibleDictionaryController {
             this._dictionaryInfoMap.set(entry.title, entry);
         }
 
-        const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        await this._onDictionarySettingsReordered();
     }
 
+    /**
+     * @param {import('settings-controller').OptionsChangedEvent} details
+     */
     _onOptionsChanged({options}) {
         this._eventListeners.removeAllEventListeners();
         this._selects = [];
@@ -79,25 +93,37 @@ export class CollapsibleDictionaryController {
             this._selects.push(select);
         }
 
-        this._container.textContent = '';
-        this._container.appendChild(fragment);
+        const container = /** @type {HTMLElement} */ (this._container);
+        container.textContent = '';
+        container.appendChild(fragment);
     }
 
+    /** */
     _onDefinitionsCollapsibleChange() {
         this._updateAllSelectFresh();
     }
 
+    /**
+     * @param {Event} e
+     */
     _onAllSelectChange(e) {
-        const {value} = e.currentTarget;
-        if (value === 'varies') { return; }
-        this._setDefinitionsCollapsibleAll(value);
+        const {value} = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        const value2 = this._normalizeDictionaryDefinitionsCollapsible(value);
+        if (value2 === null) { return; }
+        this._setDefinitionsCollapsibleAll(value2);
     }
 
+    /** */
     async _onDictionarySettingsReordered() {
         const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        const optionsContext = this._settingsController.getOptionsContext();
+        this._onOptionsChanged({options, optionsContext});
     }
 
+    /**
+     * @param {DocumentFragment} fragment
+     * @param {import('settings').ProfileOptions} options
+     */
     _setupAllSelect(fragment, options) {
         const select = this._addSelect(fragment, 'All', '');
 
@@ -113,23 +139,37 @@ export class CollapsibleDictionaryController {
         this._updateAllSelect(options);
     }
 
+    /**
+     * @param {DocumentFragment} fragment
+     * @param {string} dictionary
+     * @param {string} version
+     * @returns {HTMLSelectElement}
+     */
     _addSelect(fragment, dictionary, version) {
         const node = this._settingsController.instantiateTemplate('collapsible-dictionary-item');
         fragment.appendChild(node);
 
-        const nameNode = node.querySelector('.dictionary-title');
+        /** @type {HTMLElement} */
+        const nameNode = querySelectorNotNull(node, '.dictionary-title');
         nameNode.textContent = dictionary;
 
-        const versionNode = node.querySelector('.dictionary-version');
+        /** @type {HTMLElement} */
+        const versionNode = querySelectorNotNull(node, '.dictionary-version');
         versionNode.textContent = version;
 
-        return node.querySelector('.definitions-collapsible');
+        /** @type {HTMLSelectElement} */
+        const select = querySelectorNotNull(node, '.definitions-collapsible');
+        return select;
     }
 
+    /** */
     async _updateAllSelectFresh() {
         this._updateAllSelect(await this._settingsController.getOptions());
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
     _updateAllSelect(options) {
         let value = null;
         let varies = false;
@@ -142,11 +182,17 @@ export class CollapsibleDictionaryController {
             }
         }
 
-        this._allSelect.value = (varies || value === null ? 'varies' : value);
+        if (this._allSelect !== null) {
+            this._allSelect.value = (varies || value === null ? 'varies' : value);
+        }
     }
 
+    /**
+     * @param {import('settings').DictionaryDefinitionsCollapsible} value
+     */
     async _setDefinitionsCollapsibleAll(value) {
         const options = await this._settingsController.getOptions();
+        /** @type {import('settings-modifications').Modification[]} */
         const targets = [];
         const {dictionaries} = options;
         for (let i = 0, ii = dictionaries.length; i < ii; ++i) {
@@ -156,6 +202,23 @@ export class CollapsibleDictionaryController {
         await this._settingsController.modifyProfileSettings(targets);
         for (const select of this._selects) {
             select.value = value;
+        }
+    }
+
+    /**
+     * @param {string} value
+     * @returns {?import('settings').DictionaryDefinitionsCollapsible}
+     */
+    _normalizeDictionaryDefinitionsCollapsible(value) {
+        switch (value) {
+            case 'not-collapsible':
+            case 'expanded':
+            case 'collapsed':
+            case 'force-collapsed':
+            case 'force-expanded':
+                return value;
+            default:
+                return null;
         }
     }
 }

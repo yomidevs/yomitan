@@ -20,18 +20,29 @@ import {yomitan} from '../yomitan.js';
 import {FrameAncestryHandler} from './frame-ancestry-handler.js';
 
 export class FrameOffsetForwarder {
+    /**
+     * @param {number} frameId
+     */
     constructor(frameId) {
+        /** @type {number} */
         this._frameId = frameId;
+        /** @type {FrameAncestryHandler} */
         this._frameAncestryHandler = new FrameAncestryHandler(frameId);
     }
 
+    /**
+     * @returns {void}
+     */
     prepare() {
         this._frameAncestryHandler.prepare();
         yomitan.crossFrame.registerHandlers([
-            ['FrameOffsetForwarder.getChildFrameRect', {async: false, handler: this._onMessageGetChildFrameRect.bind(this)}]
+            ['FrameOffsetForwarder.getChildFrameRect', this._onMessageGetChildFrameRect.bind(this)]
         ]);
     }
 
+    /**
+     * @returns {Promise<?[x: number, y: number]>}
+     */
     async getOffset() {
         if (this._frameAncestryHandler.isRootFrame()) {
             return [0, 0];
@@ -41,6 +52,7 @@ export class FrameOffsetForwarder {
             const ancestorFrameIds = await this._frameAncestryHandler.getFrameAncestryInfo();
 
             let childFrameId = this._frameId;
+            /** @type {Promise<?import('frame-offset-forwarder').ChildFrameRect>[]} */
             const promises = [];
             for (const frameId of ancestorFrameIds) {
                 promises.push(yomitan.crossFrame.invoke(frameId, 'FrameOffsetForwarder.getChildFrameRect', {frameId: childFrameId}));
@@ -64,6 +76,10 @@ export class FrameOffsetForwarder {
 
     // Private
 
+    /**
+     * @param {{frameId: number}} event
+     * @returns {?import('frame-offset-forwarder').ChildFrameRect}
+     */
     _onMessageGetChildFrameRect({frameId}) {
         const frameElement = this._frameAncestryHandler.getChildFrameElement(frameId);
         if (frameElement === null) { return null; }

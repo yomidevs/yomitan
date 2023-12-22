@@ -17,20 +17,28 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
 export class SecondarySearchDictionaryController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {?import('core').TokenObject} */
         this._getDictionaryInfoToken = null;
+        /** @type {Map<string, import('dictionary-importer').Summary>} */
         this._dictionaryInfoMap = new Map();
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
-        this._container = null;
+        /** @type {HTMLElement} */
+        this._container = querySelectorNotNull(document, '#secondary-search-dictionary-list');
     }
 
+    /** */
     async prepare() {
-        this._container = document.querySelector('#secondary-search-dictionary-list');
-
         await this._onDatabaseUpdated();
 
         yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
@@ -40,7 +48,9 @@ export class SecondarySearchDictionaryController {
 
     // Private
 
+    /** */
     async _onDatabaseUpdated() {
+        /** @type {?import('core').TokenObject} */
         const token = {};
         this._getDictionaryInfoToken = token;
         const dictionaries = await this._settingsController.getDictionaryInfo();
@@ -52,10 +62,12 @@ export class SecondarySearchDictionaryController {
             this._dictionaryInfoMap.set(entry.title, entry);
         }
 
-        const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        await this._onDictionarySettingsReordered();
     }
 
+    /**
+     * @param {import('settings-controller').OptionsChangedEvent} details
+     */
     _onOptionsChanged({options}) {
         this._eventListeners.removeAllEventListeners();
 
@@ -67,31 +79,41 @@ export class SecondarySearchDictionaryController {
             const dictionaryInfo = this._dictionaryInfoMap.get(name);
             if (typeof dictionaryInfo === 'undefined') { continue; }
 
-            const node = this._settingsController.instantiateTemplate('secondary-search-dictionary');
+            const node = /** @type {HTMLElement} */ (this._settingsController.instantiateTemplate('secondary-search-dictionary'));
             fragment.appendChild(node);
 
-            const nameNode = node.querySelector('.dictionary-title');
+            /** @type {HTMLElement} */
+            const nameNode = querySelectorNotNull(node, '.dictionary-title');
             nameNode.textContent = name;
 
-            const versionNode = node.querySelector('.dictionary-version');
+            /** @type {HTMLElement} */
+            const versionNode = querySelectorNotNull(node, '.dictionary-version');
             versionNode.textContent = `rev.${dictionaryInfo.revision}`;
 
-            const toggle = node.querySelector('.dictionary-allow-secondary-searches');
+            /** @type {HTMLElement} */
+            const toggle = querySelectorNotNull(node, '.dictionary-allow-secondary-searches');
             toggle.dataset.setting = `dictionaries[${i}].allowSecondarySearches`;
             this._eventListeners.addEventListener(toggle, 'settingChanged', this._onEnabledChanged.bind(this, node), false);
         }
 
-        this._container.textContent = '';
-        this._container.appendChild(fragment);
+        const container = /** @type {HTMLElement} */ (this._container);
+        container.textContent = '';
+        container.appendChild(fragment);
     }
 
+    /**
+     * @param {HTMLElement} node
+     * @param {import('dom-data-binder').SettingChangedEvent} e
+     */
     _onEnabledChanged(node, e) {
         const {detail: {value}} = e;
         node.dataset.enabled = `${value}`;
     }
 
+    /** */
     async _onDictionarySettingsReordered() {
         const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        const optionsContext = this._settingsController.getOptionsContext();
+        this._onOptionsChanged({options, optionsContext});
     }
 }

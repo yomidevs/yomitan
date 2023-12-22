@@ -17,13 +17,22 @@
  */
 
 export class TextToSpeechAudio {
+    /**
+     * @param {string} text
+     * @param {SpeechSynthesisVoice} voice
+     */
     constructor(text, voice) {
+        /** @type {string} */
         this._text = text;
+        /** @type {SpeechSynthesisVoice} */
         this._voice = voice;
+        /** @type {?SpeechSynthesisUtterance} */
         this._utterance = null;
+        /** @type {number} */
         this._volume = 1;
     }
 
+    /** @type {number} */
     get currentTime() {
         return 0;
     }
@@ -32,6 +41,7 @@ export class TextToSpeechAudio {
         // NOP
     }
 
+    /** @type {number} */
     get volume() {
         return this._volume;
     }
@@ -43,6 +53,9 @@ export class TextToSpeechAudio {
         }
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async play() {
         try {
             if (this._utterance === null) {
@@ -61,6 +74,9 @@ export class TextToSpeechAudio {
     }
 
 
+    /**
+     * @returns {void}
+     */
     pause() {
         try {
             speechSynthesis.cancel();

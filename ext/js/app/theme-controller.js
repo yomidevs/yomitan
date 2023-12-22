@@ -22,13 +22,18 @@
 export class ThemeController {
     /**
      * Creates a new instance of the class.
-     * @param {?Element} element A DOM element which theme properties are applied to.
+     * @param {?HTMLElement} element A DOM element which theme properties are applied to.
      */
     constructor(element) {
+        /** @type {?HTMLElement} */
         this._element = element;
-        this._theme = 'default';
-        this._outerTheme = 'default';
+        /** @type {'light'|'dark'|'browser'} */
+        this._theme = 'light';
+        /** @type {'light'|'dark'|'browser'|'site'} */
+        this._outerTheme = 'light';
+        /** @type {?('dark'|'light')} */
         this._siteTheme = null;
+        /** @type {'dark'|'light'} */
         this._browserTheme = 'light';
     }
 
@@ -42,7 +47,7 @@ export class ThemeController {
 
     /**
      * Sets the DOM element which theme properties are applied to.
-     * @param {?Element} value The DOM element to assign.
+     * @param {?HTMLElement} value The DOM element to assign.
      */
     set element(value) {
         this._element = value;
@@ -50,7 +55,7 @@ export class ThemeController {
 
     /**
      * Gets the main theme for the content.
-     * @type {string}
+     * @type {'light'|'dark'|'browser'}
      */
     get theme() {
         return this._theme;
@@ -58,7 +63,7 @@ export class ThemeController {
 
     /**
      * Sets the main theme for the content.
-     * @param {string} value The theme value to assign.
+     * @param {'light'|'dark'|'browser'} value The theme value to assign.
      */
     set theme(value) {
         this._theme = value;
@@ -66,7 +71,7 @@ export class ThemeController {
 
     /**
      * Gets the outer theme for the content.
-     * @type {string}
+     * @type {'light'|'dark'|'browser'|'site'}
      */
     get outerTheme() {
         return this._outerTheme;
@@ -74,7 +79,7 @@ export class ThemeController {
 
     /**
      * Sets the outer theme for the content.
-     * @param {string} value The outer theme value to assign.
+     * @param {'light'|'dark'|'browser'|'site'} value The outer theme value to assign.
      */
     set outerTheme(value) {
         this._outerTheme = value;
@@ -83,7 +88,7 @@ export class ThemeController {
     /**
      * Gets the override value for the site theme.
      * If this value is `null`, the computed value will be used.
-     * @type {?string}
+     * @type {?('dark'|'light')}
      */
     get siteTheme() {
         return this._siteTheme;
@@ -92,7 +97,7 @@ export class ThemeController {
     /**
      * Sets the override value for the site theme.
      * If this value is `null`, the computed value will be used.
-     * @param {?string} value The site theme value to assign.
+     * @param {?('dark'|'light')} value The site theme value to assign.
      */
     set siteTheme(value) {
         this._siteTheme = value;
@@ -101,7 +106,7 @@ export class ThemeController {
     /**
      * Gets the browser's preferred color theme.
      * The value can be either 'light' or 'dark'.
-     * @type {?string}
+     * @type {'dark'|'light'}
      */
     get browserTheme() {
         return this._browserTheme;
@@ -152,7 +157,6 @@ export class ThemeController {
     /**
      * Event handler for when the preferred browser theme changes.
      * @param {MediaQueryList|MediaQueryListEvent} detail The object containing event details.
-     * @param {boolean} detail.matches The object containing event details.
      */
     _onPrefersColorSchemeDarkChange({matches}) {
         this._browserTheme = (matches ? 'dark' : 'light');

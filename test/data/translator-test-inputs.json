@@ -9,7 +9,8 @@
                         "priority": 0
                     }
                 ]
-            ]
+            ],
+            "removeNonJapaneseCharacters": false
         },
         "default": {
             "matchType": "exact",
@@ -18,13 +19,13 @@
             "sortFrequencyDictionary": null,
             "sortFrequencyDictionaryOrder": "descending",
             "removeNonJapaneseCharacters": true,
-            "convertHalfWidthCharacters": false,
-            "convertNumericCharacters": false,
-            "convertAlphabeticCharacters": false,
-            "convertHiraganaToKatakana": false,
-            "convertKatakanaToHiragana": false,
-            "collapseEmphaticSequences": false,
-            "decapitalize": true,
+            "convertHalfWidthCharacters": "false",
+            "convertNumericCharacters": "false",
+            "convertAlphabeticCharacters": "false",
+            "convertHiraganaToKatakana": "false",
+            "convertKatakanaToHiragana": "false",
+            "collapseEmphaticSequences": "false",
+            "decapitalize": "true",
             "textReplacements": [
                 null
             ],

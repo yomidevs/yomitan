@@ -16,34 +16,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable no-multi-spaces */
+
 import {expect, test} from 'vitest';
 import {ProfileConditionsUtil} from '../ext/js/background/profile-conditions-util.js';
 
+/** */
 function testNormalizeContext() {
     test('NormalizeContext', () => {
+        /** @type {{context: import('settings').OptionsContext, expected: import('profile-conditions-util').NormalizedOptionsContext}[]} */
         const data = [
-        // Empty
+            // Empty
             {
-                context: {},
-                expected: {flags: []}
+                context: {index: 0},
+                expected: {index: 0, flags: []}
             },
 
             // Domain normalization
             {
-                context: {url: ''},
-                expected: {url: '', flags: []}
+                context: {depth: 0, url: ''},
+                expected: {depth: 0, url: '', flags: []}
             },
             {
-                context: {url: 'http://example.com/'},
-                expected: {url: 'http://example.com/', domain: 'example.com', flags: []}
+                context: {depth: 0, url: 'http://example.com/'},
+                expected: {depth: 0, url: 'http://example.com/', domain: 'example.com', flags: []}
             },
             {
-                context: {url: 'http://example.com:1234/'},
-                expected: {url: 'http://example.com:1234/', domain: 'example.com', flags: []}
+                context: {depth: 0, url: 'http://example.com:1234/'},
+                expected: {depth: 0, url: 'http://example.com:1234/', domain: 'example.com', flags: []}
             },
             {
-                context: {url: 'http://user@example.com:1234/'},
-                expected: {url: 'http://user@example.com:1234/', domain: 'example.com', flags: []}
+                context: {depth: 0, url: 'http://user@example.com:1234/'},
+                expected: {depth: 0, url: 'http://user@example.com:1234/', domain: 'example.com', flags: []}
             }
         ];
 
@@ -55,15 +59,17 @@ function testNormalizeContext() {
     });
 }
 
+/** */
 function testSchemas() {
     test('Schemas', () => {
+        /** @type {{conditionGroups: import('settings').ProfileConditionGroup[], expectedSchema?: import('ext/json-schema').Schema, inputs?: {expected: boolean, context: import('settings').OptionsContext}[]}[]} */
         const data = [
-        // Empty
+            // Empty
             {
                 conditionGroups: [],
                 expectedSchema: {},
                 inputs: [
-                    {expected: true, context: {url: 'http://example.com/'}}
+                    {expected: true, context: {depth: 0, url: 'http://example.com/'}}
                 ]
             },
             {
@@ -72,7 +78,7 @@ function testSchemas() {
                 ],
                 expectedSchema: {},
                 inputs: [
-                    {expected: true, context: {url: 'http://example.com/'}}
+                    {expected: true, context: {depth: 0, url: 'http://example.com/'}}
                 ]
             },
             {
@@ -82,7 +88,7 @@ function testSchemas() {
                 ],
                 expectedSchema: {},
                 inputs: [
-                    {expected: true, context: {url: 'http://example.com/'}}
+                    {expected: true, context: {depth: 0, url: 'http://example.com/'}}
                 ]
             },
 
@@ -124,14 +130,16 @@ function testSchemas() {
                     }
                 ],
                 expectedSchema: {
-                    not: [
-                        {
-                            properties: {
-                                depth: {const: 0}
-                            },
-                            required: ['depth']
-                        }
-                    ]
+                    not: {
+                        anyOf: [
+                            {
+                                properties: {
+                                    depth: {const: 0}
+                                },
+                                required: ['depth']
+                            }
+                        ]
+                    }
                 },
                 inputs: [
                     {expected: false, context: {depth: 0, url: 'http://example.com/'}},
@@ -371,9 +379,9 @@ function testSchemas() {
                 },
                 inputs: [
                     {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt']}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift']}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift', 'Ctrl']}}
+                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
+                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
+                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}}
                 ]
             },
             {
@@ -383,7 +391,7 @@ function testSchemas() {
                             {
                                 type: 'modifierKeys',
                                 operator: 'are',
-                                value: 'Alt, Shift'
+                                value: 'alt, shift'
                             }
                         ]
                     }
@@ -395,8 +403,8 @@ function testSchemas() {
                             maxItems: 2,
                             minItems: 2,
                             allOf: [
-                                {contains: {const: 'Alt'}},
-                                {contains: {const: 'Shift'}}
+                                {contains: {const: 'alt'}},
+                                {contains: {const: 'shift'}}
                             ]
                         }
                     },
@@ -404,9 +412,9 @@ function testSchemas() {
                 },
                 inputs: [
                     {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift']}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift', 'Ctrl']}}
+                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
+                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}}
                 ]
             },
             {
@@ -422,24 +430,26 @@ function testSchemas() {
                     }
                 ],
                 expectedSchema: {
-                    not: [
-                        {
-                            properties: {
-                                modifierKeys: {
-                                    type: 'array',
-                                    maxItems: 0,
-                                    minItems: 0
-                                }
-                            },
-                            required: ['modifierKeys']
-                        }
-                    ]
+                    not: {
+                        anyOf: [
+                            {
+                                properties: {
+                                    modifierKeys: {
+                                        type: 'array',
+                                        maxItems: 0,
+                                        minItems: 0
+                                    }
+                                },
+                                required: ['modifierKeys']
+                            }
+                        ]
+                    }
                 },
                 inputs: [
                     {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift', 'Ctrl']}}
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}}
                 ]
             },
             {
@@ -449,34 +459,36 @@ function testSchemas() {
                             {
                                 type: 'modifierKeys',
                                 operator: 'areNot',
-                                value: 'Alt, Shift'
+                                value: 'alt, shift'
                             }
                         ]
                     }
                 ],
                 expectedSchema: {
-                    not: [
-                        {
-                            properties: {
-                                modifierKeys: {
-                                    type: 'array',
-                                    maxItems: 2,
-                                    minItems: 2,
-                                    allOf: [
-                                        {contains: {const: 'Alt'}},
-                                        {contains: {const: 'Shift'}}
-                                    ]
-                                }
-                            },
-                            required: ['modifierKeys']
-                        }
-                    ]
+                    not: {
+                        anyOf: [
+                            {
+                                properties: {
+                                    modifierKeys: {
+                                        type: 'array',
+                                        maxItems: 2,
+                                        minItems: 2,
+                                        allOf: [
+                                            {contains: {const: 'alt'}},
+                                            {contains: {const: 'shift'}}
+                                        ]
+                                    }
+                                },
+                                required: ['modifierKeys']
+                            }
+                        ]
+                    }
                 },
                 inputs: [
                     {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt']}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift', 'Ctrl']}}
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
+                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}}
                 ]
             },
             {
@@ -502,9 +514,9 @@ function testSchemas() {
                 },
                 inputs: [
                     {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift', 'Ctrl']}}
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}}
                 ]
             },
             {
@@ -514,7 +526,7 @@ function testSchemas() {
                             {
                                 type: 'modifierKeys',
                                 operator: 'include',
-                                value: 'Alt, Shift'
+                                value: 'alt, shift'
                             }
                         ]
                     }
@@ -525,8 +537,8 @@ function testSchemas() {
                             type: 'array',
                             minItems: 2,
                             allOf: [
-                                {contains: {const: 'Alt'}},
-                                {contains: {const: 'Shift'}}
+                                {contains: {const: 'alt'}},
+                                {contains: {const: 'shift'}}
                             ]
                         }
                     },
@@ -534,9 +546,9 @@ function testSchemas() {
                 },
                 inputs: [
                     {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift', 'Ctrl']}}
+                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}}
                 ]
             },
             {
@@ -561,9 +573,9 @@ function testSchemas() {
                 },
                 inputs: [
                     {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift', 'Ctrl']}}
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
+                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}}
                 ]
             },
             {
@@ -573,7 +585,7 @@ function testSchemas() {
                             {
                                 type: 'modifierKeys',
                                 operator: 'notInclude',
-                                value: 'Alt, Shift'
+                                value: 'alt, shift'
                             }
                         ]
                     }
@@ -582,19 +594,21 @@ function testSchemas() {
                     properties: {
                         modifierKeys: {
                             type: 'array',
-                            not: [
-                                {contains: {const: 'Alt'}},
-                                {contains: {const: 'Shift'}}
-                            ]
+                            not: {
+                                anyOf: [
+                                    {contains: {const: 'alt'}},
+                                    {contains: {const: 'shift'}}
+                                ]
+                            }
                         }
                     },
                     required: ['modifierKeys']
                 },
                 inputs: [
                     {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt']}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift']}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['Alt', 'Shift', 'Ctrl']}}
+                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
+                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
+                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}}
                 ]
             },
 
@@ -622,11 +636,13 @@ function testSchemas() {
                     }
                 },
                 inputs: [
-                    {expected: true,  context: {}},
-                    {expected: true,  context: {flags: []}},
-                    {expected: false, context: {flags: ['test1']}},
-                    {expected: false, context: {flags: ['test1', 'test2']}},
-                    {expected: false, context: {flags: ['test1', 'test2', 'test3']}}
+                    {expected: true,  context: {depth: 0, url: ''}},
+                    {expected: true,  context: {depth: 0, url: '', flags: []}},
+                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
             {
@@ -636,7 +652,7 @@ function testSchemas() {
                             {
                                 type: 'flags',
                                 operator: 'are',
-                                value: 'test1, test2'
+                                value: 'clipboard, test2'
                             }
                         ]
                     }
@@ -649,18 +665,20 @@ function testSchemas() {
                             maxItems: 2,
                             minItems: 2,
                             allOf: [
-                                {contains: {const: 'test1'}},
+                                {contains: {const: 'clipboard'}},
                                 {contains: {const: 'test2'}}
                             ]
                         }
                     }
                 },
                 inputs: [
-                    {expected: false, context: {}},
-                    {expected: false, context: {flags: []}},
-                    {expected: false, context: {flags: ['test1']}},
-                    {expected: true,  context: {flags: ['test1', 'test2']}},
-                    {expected: false, context: {flags: ['test1', 'test2', 'test3']}}
+                    {expected: false, context: {depth: 0, url: ''}},
+                    {expected: false, context: {depth: 0, url: '', flags: []}},
+                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
             {
@@ -676,25 +694,29 @@ function testSchemas() {
                     }
                 ],
                 expectedSchema: {
-                    not: [
-                        {
-                            required: ['flags'],
-                            properties: {
-                                flags: {
-                                    type: 'array',
-                                    maxItems: 0,
-                                    minItems: 0
+                    not: {
+                        anyOf: [
+                            {
+                                required: ['flags'],
+                                properties: {
+                                    flags: {
+                                        type: 'array',
+                                        maxItems: 0,
+                                        minItems: 0
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 },
                 inputs: [
-                    {expected: false, context: {}},
-                    {expected: false, context: {flags: []}},
-                    {expected: true,  context: {flags: ['test1']}},
-                    {expected: true,  context: {flags: ['test1', 'test2']}},
-                    {expected: true,  context: {flags: ['test1', 'test2', 'test3']}}
+                    {expected: false, context: {depth: 0, url: ''}},
+                    {expected: false, context: {depth: 0, url: '', flags: []}},
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
             {
@@ -704,35 +726,39 @@ function testSchemas() {
                             {
                                 type: 'flags',
                                 operator: 'areNot',
-                                value: 'test1, test2'
+                                value: 'clipboard, test2'
                             }
                         ]
                     }
                 ],
                 expectedSchema: {
-                    not: [
-                        {
-                            required: ['flags'],
-                            properties: {
-                                flags: {
-                                    type: 'array',
-                                    maxItems: 2,
-                                    minItems: 2,
-                                    allOf: [
-                                        {contains: {const: 'test1'}},
-                                        {contains: {const: 'test2'}}
-                                    ]
+                    not: {
+                        anyOf: [
+                            {
+                                required: ['flags'],
+                                properties: {
+                                    flags: {
+                                        type: 'array',
+                                        maxItems: 2,
+                                        minItems: 2,
+                                        allOf: [
+                                            {contains: {const: 'clipboard'}},
+                                            {contains: {const: 'test2'}}
+                                        ]
+                                    }
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 },
                 inputs: [
-                    {expected: true,  context: {}},
-                    {expected: true,  context: {flags: []}},
-                    {expected: true,  context: {flags: ['test1']}},
-                    {expected: false, context: {flags: ['test1', 'test2']}},
-                    {expected: true,  context: {flags: ['test1', 'test2', 'test3']}}
+                    {expected: true,  context: {depth: 0, url: ''}},
+                    {expected: true,  context: {depth: 0, url: '', flags: []}},
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
             {
@@ -757,11 +783,13 @@ function testSchemas() {
                     }
                 },
                 inputs: [
-                    {expected: true,  context: {}},
-                    {expected: true,  context: {flags: []}},
-                    {expected: true,  context: {flags: ['test1']}},
-                    {expected: true,  context: {flags: ['test1', 'test2']}},
-                    {expected: true,  context: {flags: ['test1', 'test2', 'test3']}}
+                    {expected: true,  context: {depth: 0, url: ''}},
+                    {expected: true,  context: {depth: 0, url: '', flags: []}},
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
             {
@@ -771,7 +799,7 @@ function testSchemas() {
                             {
                                 type: 'flags',
                                 operator: 'include',
-                                value: 'test1, test2'
+                                value: 'clipboard, test2'
                             }
                         ]
                     }
@@ -783,18 +811,20 @@ function testSchemas() {
                             type: 'array',
                             minItems: 2,
                             allOf: [
-                                {contains: {const: 'test1'}},
+                                {contains: {const: 'clipboard'}},
                                 {contains: {const: 'test2'}}
                             ]
                         }
                     }
                 },
                 inputs: [
-                    {expected: false, context: {}},
-                    {expected: false, context: {flags: []}},
-                    {expected: false, context: {flags: ['test1']}},
-                    {expected: true,  context: {flags: ['test1', 'test2']}},
-                    {expected: true,  context: {flags: ['test1', 'test2', 'test3']}}
+                    {expected: false, context: {depth: 0, url: ''}},
+                    {expected: false, context: {depth: 0, url: '', flags: []}},
+                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
             {
@@ -818,11 +848,13 @@ function testSchemas() {
                     }
                 },
                 inputs: [
-                    {expected: true,  context: {}},
-                    {expected: true,  context: {flags: []}},
-                    {expected: true,  context: {flags: ['test1']}},
-                    {expected: true,  context: {flags: ['test1', 'test2']}},
-                    {expected: true,  context: {flags: ['test1', 'test2', 'test3']}}
+                    {expected: true,  context: {depth: 0, url: ''}},
+                    {expected: true,  context: {depth: 0, url: '', flags: []}},
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
             {
@@ -832,7 +864,7 @@ function testSchemas() {
                             {
                                 type: 'flags',
                                 operator: 'notInclude',
-                                value: 'test1, test2'
+                                value: 'clipboard, test2'
                             }
                         ]
                     }
@@ -842,19 +874,23 @@ function testSchemas() {
                     properties: {
                         flags: {
                             type: 'array',
-                            not: [
-                                {contains: {const: 'test1'}},
-                                {contains: {const: 'test2'}}
-                            ]
+                            not: {
+                                anyOf: [
+                                    {contains: {const: 'clipboard'}},
+                                    {contains: {const: 'test2'}}
+                                ]
+                            }
                         }
                     }
                 },
                 inputs: [
-                    {expected: true,  context: {}},
-                    {expected: true,  context: {flags: []}},
-                    {expected: false, context: {flags: ['test1']}},
-                    {expected: false, context: {flags: ['test1', 'test2']}},
-                    {expected: false, context: {flags: ['test1', 'test2', 'test3']}}
+                    {expected: true,  context: {depth: 0, url: ''}},
+                    {expected: true,  context: {depth: 0, url: '', flags: []}},
+                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    // @ts-expect-error - Ignore type for string flag for testing purposes
+                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}}
                 ]
             },
 
@@ -1082,6 +1118,7 @@ function testSchemas() {
 }
 
 
+/** */
 function main() {
     testNormalizeContext();
     testSchemas();

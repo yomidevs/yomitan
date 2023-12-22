@@ -17,30 +17,39 @@
  */
 
 import {EventListenerCollection, isObject} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
 import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
 export class ExtensionKeyboardShortcutController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        this._resetButton = null;
-        this._clearButton = null;
-        this._listContainer = null;
+        /** @type {HTMLButtonElement} */
+        this._resetButton = querySelectorNotNull(document, '#extension-hotkey-list-reset-all');
+        /** @type {HTMLButtonElement} */
+        this._clearButton = querySelectorNotNull(document, '#extension-hotkey-list-clear-all');
+        /** @type {HTMLElement} */
+        this._listContainer = querySelectorNotNull(document, '#extension-hotkey-list');
+        /** @type {HotkeyUtil} */
         this._hotkeyUtil = new HotkeyUtil();
+        /** @type {?import('environment').OperatingSystem} */
         this._os = null;
+        /** @type {ExtensionKeyboardShortcutHotkeyEntry[]} */
         this._entries = [];
     }
 
+    /** @type {HotkeyUtil} */
     get hotkeyUtil() {
         return this._hotkeyUtil;
     }
 
+    /** */
     async prepare() {
-        this._resetButton = document.querySelector('#extension-hotkey-list-reset-all');
-        this._clearButton = document.querySelector('#extension-hotkey-list-clear-all');
-        this._listContainer = document.querySelector('#extension-hotkey-list');
-
         const canResetCommands = this.canResetCommands();
         const canModifyCommands = this.canModifyCommands();
         this._resetButton.hidden = !canResetCommands;
@@ -61,10 +70,16 @@ export class ExtensionKeyboardShortcutController {
         this._setupCommands(commands);
     }
 
+    /**
+     * @param {string} name
+     * @returns {Promise<{key: ?string, modifiers: import('input').Modifier[]}>}
+     */
     async resetCommand(name) {
         await this._resetCommand(name);
 
+        /** @type {?string} */
         let key = null;
+        /** @type {import('input').Modifier[]} */
         let modifiers = [];
 
         const commands = await this._getCommands();
@@ -78,32 +93,60 @@ export class ExtensionKeyboardShortcutController {
         return {key, modifiers};
     }
 
+    /**
+     * @param {string} name
+     * @param {?string} key
+     * @param {import('input').Modifier[]} modifiers
+     */
     async updateCommand(name, key, modifiers) {
         // Firefox-only; uses Promise API
         const shortcut = this._hotkeyUtil.convertInputToCommand(key, modifiers);
-        return await chrome.commands.update({name, shortcut});
+        await browser.commands.update({name, shortcut});
     }
 
+    /**
+     * @returns {boolean}
+     */
     canResetCommands() {
-        return isObject(chrome.commands) && typeof chrome.commands.reset === 'function';
+        return (
+            typeof browser === 'object' && browser !== null &&
+            typeof browser.commands === 'object' && browser.commands !== null &&
+            typeof browser.commands.reset === 'function'
+        );
     }
 
+    /**
+     * @returns {boolean}
+     */
     canModifyCommands() {
-        return isObject(chrome.commands) && typeof chrome.commands.update === 'function';
+        return (
+            typeof browser === 'object' && browser !== null &&
+            typeof browser.commands === 'object' && browser.commands !== null &&
+            typeof browser.commands.update === 'function'
+        );
     }
 
     // Add
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onResetClick(e) {
         e.preventDefault();
         this._resetAllCommands();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onClearClick(e) {
         e.preventDefault();
         this._clearAllCommands();
     }
 
+    /**
+     * @returns {Promise<chrome.commands.Command[]>}
+     */
     _getCommands() {
         return new Promise((resolve, reject) => {
             if (!(isObject(chrome.commands) && typeof chrome.commands.getAll === 'function')) {
@@ -122,6 +165,9 @@ export class ExtensionKeyboardShortcutController {
         });
     }
 
+    /**
+     * @param {chrome.commands.Command[]} commands
+     */
     _setupCommands(commands) {
         for (const entry of this._entries) {
             entry.cleanup();
@@ -131,7 +177,7 @@ export class ExtensionKeyboardShortcutController {
         const fragment = document.createDocumentFragment();
 
         for (const {name, description, shortcut} of commands) {
-            if (name.startsWith('_')) { continue; }
+            if (typeof name !== 'string' || name.startsWith('_')) { continue; }
 
             const {key, modifiers} = this._hotkeyUtil.convertCommandToInput(shortcut);
 
@@ -143,10 +189,12 @@ export class ExtensionKeyboardShortcutController {
             this._entries.push(entry);
         }
 
-        this._listContainer.textContent = '';
-        this._listContainer.appendChild(fragment);
+        const listContainer = /** @type {HTMLElement} */ (this._listContainer);
+        listContainer.textContent = '';
+        listContainer.appendChild(fragment);
     }
 
+    /** */
     async _resetAllCommands() {
         if (!this.canModifyCommands()) { return; }
 
@@ -154,7 +202,7 @@ export class ExtensionKeyboardShortcutController {
         const promises = [];
 
         for (const {name} of commands) {
-            if (name.startsWith('_')) { continue; }
+            if (typeof name !== 'string' || name.startsWith('_')) { continue; }
             promises.push(this._resetCommand(name));
         }
 
@@ -164,6 +212,7 @@ export class ExtensionKeyboardShortcutController {
         this._setupCommands(commands);
     }
 
+    /** */
     async _clearAllCommands() {
         if (!this.canModifyCommands()) { return; }
 
@@ -171,7 +220,7 @@ export class ExtensionKeyboardShortcutController {
         const promises = [];
 
         for (const {name} of commands) {
-            if (name.startsWith('_')) { continue; }
+            if (typeof name !== 'string' || name.startsWith('_')) { continue; }
             promises.push(this.updateCommand(name, null, []));
         }
 
@@ -181,31 +230,58 @@ export class ExtensionKeyboardShortcutController {
         this._setupCommands(commands);
     }
 
+    /**
+     * @param {string} name
+     */
     async _resetCommand(name) {
         // Firefox-only; uses Promise API
-        return await chrome.commands.reset(name);
+        await browser.commands.reset(name);
     }
 }
 
 class ExtensionKeyboardShortcutHotkeyEntry {
+    /**
+     * @param {ExtensionKeyboardShortcutController} parent
+     * @param {Element} node
+     * @param {string} name
+     * @param {string|undefined} description
+     * @param {?string} key
+     * @param {import('input').Modifier[]} modifiers
+     * @param {?import('environment').OperatingSystem} os
+     */
     constructor(parent, node, name, description, key, modifiers, os) {
+        /** @type {ExtensionKeyboardShortcutController} */
         this._parent = parent;
+        /** @type {Element} */
         this._node = node;
+        /** @type {string} */
         this._name = name;
+        /** @type {string|undefined} */
         this._description = description;
+        /** @type {?string} */
         this._key = key;
+        /** @type {import('input').Modifier[]} */
         this._modifiers = modifiers;
+        /** @type {?import('environment').OperatingSystem} */
         this._os = os;
+        /** @type {?HTMLInputElement} */
         this._input = null;
+        /** @type {?KeyboardMouseInputField} */
         this._inputField = null;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
     }
 
+    /** */
     prepare() {
-        this._node.querySelector('.settings-item-label').textContent = this._description || this._name;
+        /** @type {HTMLElement} */
+        const label = querySelectorNotNull(this._node, '.settings-item-label');
+        label.textContent = this._description || this._name;
 
-        const button = this._node.querySelector('.extension-hotkey-list-item-button');
-        const input = this._node.querySelector('input');
+        /** @type {HTMLButtonElement} */
+        const button = querySelectorNotNull(this._node, '.extension-hotkey-list-item-button');
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(this._node, 'input');
 
         this._input = input;
 
@@ -222,6 +298,7 @@ class ExtensionKeyboardShortcutHotkeyEntry {
         }
     }
 
+    /** */
     cleanup() {
         this._eventListeners.removeAllEventListeners();
         if (this._node.parentNode !== null) {
@@ -235,15 +312,22 @@ class ExtensionKeyboardShortcutHotkeyEntry {
 
     // Private
 
+    /**
+     * @param {import('keyboard-mouse-input-field').ChangeEvent} e
+     */
     _onInputFieldChange(e) {
         const {key, modifiers} = e;
         this._tryUpdateInput(key, modifiers, false);
     }
 
+    /** */
     _onInputFieldBlur() {
         this._updateInput();
     }
 
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} e
+     */
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'clearInput':
@@ -255,11 +339,19 @@ class ExtensionKeyboardShortcutHotkeyEntry {
         }
     }
 
+    /** */
     _updateInput() {
-        this._inputField.setInput(this._key, this._modifiers);
-        delete this._input.dataset.invalid;
+        /** @type {KeyboardMouseInputField} */ (this._inputField).setInput(this._key, this._modifiers);
+        if (this._input !== null) {
+            delete this._input.dataset.invalid;
+        }
     }
 
+    /**
+     * @param {?string} key
+     * @param {import('input').Modifier[]} modifiers
+     * @param {boolean} updateInput
+     */
     async _tryUpdateInput(key, modifiers, updateInput) {
         let okay = (key === null ? (modifiers.length === 0) : (modifiers.length !== 0));
         if (okay) {
@@ -273,9 +365,13 @@ class ExtensionKeyboardShortcutHotkeyEntry {
         if (okay) {
             this._key = key;
             this._modifiers = modifiers;
-            delete this._input.dataset.invalid;
+            if (this._input !== null) {
+                delete this._input.dataset.invalid;
+            }
         } else {
-            this._input.dataset.invalid = 'true';
+            if (this._input !== null) {
+                this._input.dataset.invalid = 'true';
+            }
         }
 
         if (updateInput) {
@@ -283,6 +379,7 @@ class ExtensionKeyboardShortcutHotkeyEntry {
         }
     }
 
+    /** */
     async _resetInput() {
         const {key, modifiers} = await this._parent.resetCommand(this._name);
         this._key = key;

@@ -17,17 +17,25 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class TranslationTextReplacementsController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        this._entryContainer = null;
+        /** @type {HTMLElement} */
+        this._entryContainer = querySelectorNotNull(document, '#translation-text-replacement-list');
+        /** @type {TranslationTextReplacementsEntry[]} */
         this._entries = [];
     }
 
+    /** */
     async prepare() {
-        this._entryContainer = document.querySelector('#translation-text-replacement-list');
-        const addButton = document.querySelector('#translation-text-replacement-add');
+        /** @type {HTMLButtonElement} */
+        const addButton = querySelectorNotNull(document, '#translation-text-replacement-add');
 
         addButton.addEventListener('click', this._onAdd.bind(this), false);
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
@@ -35,11 +43,12 @@ export class TranslationTextReplacementsController {
         await this._updateOptions();
     }
 
-
+    /** */
     async addGroup() {
         const options = await this._settingsController.getOptions();
         const {groups} = options.translation.textReplacements;
         const newEntry = this._createNewEntry();
+        /** @type {import('settings-modifications').Modification} */
         const target = (
             (groups.length === 0) ?
             {
@@ -62,6 +71,10 @@ export class TranslationTextReplacementsController {
         await this._updateOptions();
     }
 
+    /**
+     * @param {number} index
+     * @returns {Promise<boolean>}
+     */
     async deleteGroup(index) {
         const options = await this._settingsController.getOptions();
         const {groups} = options.translation.textReplacements;
@@ -70,6 +83,7 @@ export class TranslationTextReplacementsController {
         const group0 = groups[0];
         if (index < 0 || index >= group0.length) { return false; }
 
+        /** @type {import('settings-modifications').Modification} */
         const target = (
             (group0.length > 1) ?
             {
@@ -95,6 +109,9 @@ export class TranslationTextReplacementsController {
 
     // Private
 
+    /**
+     * @param {import('settings-controller').OptionsChangedEvent} details
+     */
     _onOptionsChanged({options}) {
         for (const entry of this._entries) {
             entry.cleanup();
@@ -105,50 +122,76 @@ export class TranslationTextReplacementsController {
         if (groups.length > 0) {
             const group0 = groups[0];
             for (let i = 0, ii = group0.length; i < ii; ++i) {
-                const data = group0[i];
-                const node = this._settingsController.instantiateTemplate('translation-text-replacement-entry');
-                this._entryContainer.appendChild(node);
-                const entry = new TranslationTextReplacementsEntry(this, node, i, data);
+                const node = /** @type {HTMLElement} */ (this._settingsController.instantiateTemplate('translation-text-replacement-entry'));
+                /** @type {HTMLElement} */ (this._entryContainer).appendChild(node);
+                const entry = new TranslationTextReplacementsEntry(this, node, i);
                 this._entries.push(entry);
                 entry.prepare();
             }
         }
     }
 
+    /** */
     _onAdd() {
         this.addGroup();
     }
 
+    /** */
     async _updateOptions() {
         const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        const optionsContext = this._settingsController.getOptionsContext();
+        this._onOptionsChanged({options, optionsContext});
     }
 
+    /**
+     * @returns {import('settings').TranslationTextReplacementGroup}
+     */
     _createNewEntry() {
         return {pattern: '', ignoreCase: false, replacement: ''};
     }
 }
 
 class TranslationTextReplacementsEntry {
+    /**
+     * @param {TranslationTextReplacementsController} parent
+     * @param {HTMLElement} node
+     * @param {number} index
+     */
     constructor(parent, node, index) {
+        /** @type {TranslationTextReplacementsController} */
         this._parent = parent;
+        /** @type {HTMLElement} */
         this._node = node;
+        /** @type {number} */
         this._index = index;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {?HTMLInputElement} */
         this._patternInput = null;
+        /** @type {?HTMLInputElement} */
         this._replacementInput = null;
+        /** @type {?HTMLInputElement} */
         this._ignoreCaseToggle = null;
+        /** @type {?HTMLInputElement} */
         this._testInput = null;
+        /** @type {?HTMLInputElement} */
         this._testOutput = null;
     }
 
+    /** */
     prepare() {
-        const patternInput = this._node.querySelector('.translation-text-replacement-pattern');
-        const replacementInput = this._node.querySelector('.translation-text-replacement-replacement');
-        const ignoreCaseToggle = this._node.querySelector('.translation-text-replacement-pattern-ignore-case');
-        const menuButton = this._node.querySelector('.translation-text-replacement-button');
-        const testInput = this._node.querySelector('.translation-text-replacement-test-input');
-        const testOutput = this._node.querySelector('.translation-text-replacement-test-output');
+        /** @type {HTMLInputElement} */
+        const patternInput = querySelectorNotNull(this._node, '.translation-text-replacement-pattern');
+        /** @type {HTMLInputElement} */
+        const replacementInput = querySelectorNotNull(this._node, '.translation-text-replacement-replacement');
+        /** @type {HTMLInputElement} */
+        const ignoreCaseToggle = querySelectorNotNull(this._node, '.translation-text-replacement-pattern-ignore-case');
+        /** @type {HTMLInputElement} */
+        const menuButton = querySelectorNotNull(this._node, '.translation-text-replacement-button');
+        /** @type {HTMLInputElement} */
+        const testInput = querySelectorNotNull(this._node, '.translation-text-replacement-test-input');
+        /** @type {HTMLInputElement} */
+        const testOutput = querySelectorNotNull(this._node, '.translation-text-replacement-test-output');
 
         this._patternInput = patternInput;
         this._replacementInput = replacementInput;
@@ -169,6 +212,7 @@ class TranslationTextReplacementsEntry {
         this._eventListeners.addEventListener(testInput, 'input', this._updateTestInput.bind(this), false);
     }
 
+    /** */
     cleanup() {
         this._eventListeners.removeAllEventListeners();
         if (this._node.parentNode !== null) {
@@ -178,13 +222,23 @@ class TranslationTextReplacementsEntry {
 
     // Private
 
+    /**
+     * @param {import('popup-menu').MenuOpenEvent} e
+     */
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
         const testVisible = this._isTestVisible();
-        bodyNode.querySelector('[data-menu-action=showTest]').hidden = testVisible;
-        bodyNode.querySelector('[data-menu-action=hideTest]').hidden = !testVisible;
+        /** @type {HTMLElement} */
+        const element1 = querySelectorNotNull(bodyNode, '[data-menu-action=showTest]');
+        /** @type {HTMLElement} */
+        const element2 = querySelectorNotNull(bodyNode, '[data-menu-action=hideTest]');
+        element1.hidden = testVisible;
+        element2.hidden = !testVisible;
     }
 
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} e
+     */
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'remove':
@@ -199,34 +253,58 @@ class TranslationTextReplacementsEntry {
         }
     }
 
+    /**
+     * @param {import('dom-data-binder').SettingChangedEvent} deatils
+     */
     _onPatternChanged({detail: {value}}) {
         this._validatePattern(value);
         this._updateTestInput();
     }
 
+    /**
+     * @param {unknown} value
+     */
     _validatePattern(value) {
         let okay = false;
         try {
-            new RegExp(value, 'g');
-            okay = true;
+            if (typeof value === 'string') {
+                new RegExp(value, 'g');
+                okay = true;
+            }
         } catch (e) {
             // NOP
         }
 
-        this._patternInput.dataset.invalid = `${!okay}`;
+        if (this._patternInput !== null) {
+            this._patternInput.dataset.invalid = `${!okay}`;
+        }
     }
 
+    /**
+     * @returns {boolean}
+     */
     _isTestVisible() {
         return this._node.dataset.testVisible === 'true';
     }
 
+    /**
+     * @param {boolean} visible
+     */
     _setTestVisible(visible) {
         this._node.dataset.testVisible = `${visible}`;
         this._updateTestInput();
     }
 
+    /** */
     _updateTestInput() {
-        if (!this._isTestVisible()) { return; }
+        if (
+            !this._isTestVisible() ||
+            this._ignoreCaseToggle === null ||
+            this._patternInput === null ||
+            this._replacementInput === null ||
+            this._testInput === null ||
+            this._testOutput === null
+        ) { return; }
 
         const ignoreCase = this._ignoreCaseToggle.checked;
         const pattern = this._patternInput.value;

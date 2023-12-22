@@ -37,6 +37,12 @@ export function getProlongedHiragana(previousCharacter) {
     }
 }
 
+/**
+ * @param {string} text
+ * @param {?import('../../../general/text-source-map.js').TextSourceMap} sourceMap
+ * @param {number} sourceMapStart
+ * @returns {string}
+ */
 export function convertAlphabeticPartToKana(text, sourceMap, sourceMapStart) {
     const result = wanakana.toHiragana(text);
 

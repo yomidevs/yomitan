@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {fetchAsset} from '../../../general/helpers.js';
+import {fetchText} from '../../../general/helpers.js';
 import {infixInflection, prefixInflection, suffixInflection, wholeWordInflection} from '../../deinflection-ruleset.js';
 
 export async function getDeinflectionReasons(){
@@ -56,7 +56,7 @@ export async function getDeinflectionReasons(){
             'participle': []
         };
 
-        const irregularVerbs = JSON.parse(await fetchAsset('/js/language/languages/en/irregular-verbs.json'));
+        const irregularVerbs = JSON.parse(await fetchText('/js/language/languages/en/irregular-verbs.json'));
         for (const [verb, inflections] of Object.entries(irregularVerbs)){
             for (const [past, participle] of inflections){
                 if (past !== verb) { verbs.past.push(suffixInflection(past, verb, ['v'], ['v'])); }
@@ -70,10 +70,10 @@ export async function getDeinflectionReasons(){
     const irregularVerbInflections = createIrregularVerbInflections();
 
     async function createPhrasalVerbInflections(){
-        const phrasalVerbParticles = JSON.parse(await fetchAsset('/js/language/languages/en/phrasal-verb-particles.json'));
+        const phrasalVerbParticles = JSON.parse(await fetchText('/js/language/languages/en/phrasal-verb-particles.json'));
         const particlesDisjunction = phrasalVerbParticles.join('|');
 
-        const phrasalVerbPrepositions = JSON.parse(await fetchAsset('/js/language/languages/en/phrasal-verb-prepositions.json'));
+        const phrasalVerbPrepositions = JSON.parse(await fetchText('/js/language/languages/en/phrasal-verb-prepositions.json'));
 
         const combinedSet = new Set([...phrasalVerbParticles, ...phrasalVerbPrepositions]);
         const combinedDisjunction = Array.from(combinedSet).join('|');

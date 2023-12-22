@@ -16,12 +16,39 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 export class Deinflector {
+    // TODO: generalize, extract to language-specific file?
+    /* eslint-disable no-multi-spaces */
+    /** @type {Map<string, import('translation-internal').DeinflectionRuleFlags>} */
+    static _ruleTypes = new Map([
+        ['v',       /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0000011111)], // Verb
+        ['verb',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0000011111)], // Verb
+        ['v1',      /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0000000001)], // Verb ichidan
+        ['v5',      /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0000000010)], // Verb godan
+        ['vs',      /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0000000100)], // Verb suru
+        ['vk',      /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0000001000)], // Verb kuru
+        ['vz',      /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0000010000)], // Verb zuru
+        ['adj',     /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0000100000)], // Adjective
+        ['adj-i',   /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0000100000)], // Adjective i
+        ['iru',     /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0001000000)], // Intermediate -iru endings for progressive or perfect tens
+        ['n',       /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0010000000)], // Noun
+        ['noun',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0010000000)], // Noun'
+        ['pn',      /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0100000000)] // Pronoun
+    ]);
+    /* eslint-enable no-multi-spaces */
+
+    /**
+     * @param {import('../language/language-util.js').LanguageUtil} languageUtil
+     */
     constructor(languageUtil) {
         this._languageUtil = languageUtil;
     }
 
+    /**
+     * Deinflects a term to all of its possible dictionary forms.
+     * @param {string} source
+     * @param {any} options
+     */
     async deinflect(source, options) {
         const checkRules = options.deinflectionPosFilter;
         const results = [this._createDeinflection(source, 0, [])];
@@ -54,13 +81,23 @@ export class Deinflector {
         return rules1 === 0 || (rules1 & rules2) !== 0;
     }
 
+    /**
+     * @param {string} term
+     * @param {import('translation-internal').DeinflectionRuleFlags} rules
+     * @param {string[]} reasons
+     * @returns {import('translation-internal').Deinflection}
+     */
     _createDeinflection(term, rules, reasons) {
         return {term, rules, reasons};
     }
 
+    /**
+     * @param {import('deinflector').ReasonsRaw} reasons
+     * @returns {Map<string[], import('deinflector').Reason[]>}
+     */
     static normalizeReasons(reasons) {
+        /** @type {Map<string[], import('deinflector').Reason[]>} */
         const normalizedReasons = new Map();
-
         for (let [reason, reasonInfo] of reasons) {
             if (!Array.isArray(reason)) {
                 reason = [reason];
@@ -77,6 +114,10 @@ export class Deinflector {
         return normalizedReasons;
     }
 
+    /**
+     * @param {string[]} rules
+     * @returns {import('translation-internal').DeinflectionRuleFlags}
+     */
     static rulesToRuleFlags(rules) {
         const ruleTypes = this._ruleTypes;
         let value = 0;
@@ -89,20 +130,3 @@ export class Deinflector {
     }
 }
 
-// TODO: generalize, extract to language-specific file?
-// eslint-disable-next-line no-underscore-dangle
-Deinflector._ruleTypes = new Map([
-    ['v',       0b0000011111], // Verb
-    ['verb',    0b0000011111], // Verb
-    ['v1',      0b0000000001], // Verb ichidan
-    ['v5',      0b0000000010], // Verb godan
-    ['vs',      0b0000000100], // Verb suru
-    ['vk',      0b0000001000], // Verb kuru
-    ['vz',      0b0000010000], // Verb zuru
-    ['adj',     0b0000100000], // Adjective
-    ['adj-i',   0b0000100000], // Adjective i
-    ['iru',     0b0001000000], // Intermediate -iru endings for progressive or perfect tens
-    ['n',       0b0010000000], // Noun
-    ['noun',    0b0010000000], // Noun'
-    ['pn',      0b0100000000] // Pronoun
-]);

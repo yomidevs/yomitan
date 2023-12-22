@@ -16,21 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
 export class PopupWindowController {
+    /** */
     prepare() {
-        const testLink = document.querySelector('#test-window-open-link');
+        /** @type {HTMLElement} */
+        const testLink = querySelectorNotNull(document, '#test-window-open-link');
         testLink.addEventListener('click', this._onTestWindowOpenLinkClick.bind(this), false);
     }
 
     // Private
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onTestWindowOpenLinkClick(e) {
         e.preventDefault();
         this._testWindowOpen();
     }
 
+    /** */
     async _testWindowOpen() {
         await yomitan.api.getOrCreateSearchPopup({focus: true});
     }

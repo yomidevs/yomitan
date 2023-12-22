@@ -55,6 +55,7 @@ export const mockModelFieldNames = [
     'Sentence'
 ];
 
+/** @type {{[key: string]: string|undefined}} */
 export const mockModelFieldsToAnkiValues = {
     'Word': '{expression}',
     'Reading': '{furigana-plain}',
@@ -62,6 +63,10 @@ export const mockModelFieldsToAnkiValues = {
     'Audio': '{audio}'
 };
 
+/**
+ * @param {import('playwright').Route} route
+ * @returns {Promise<void>|undefined}
+ */
 export const mockAnkiRouteHandler = (route) => {
     const reqBody = route.request().postDataJSON();
     const respBody = ankiRouteResponses[reqBody.action];
@@ -71,6 +76,11 @@ export const mockAnkiRouteHandler = (route) => {
     route.fulfill(respBody);
 };
 
+/**
+ * @param {import('playwright').Page} page
+ * @param {string} text
+ * @returns {Promise<void>}
+ */
 export const writeToClipboardFromPage = async (page, text) => {
     await page.evaluate(`navigator.clipboard.writeText('${text}')`);
 };
@@ -100,6 +110,7 @@ const baseAnkiResp = {
     contentType: 'text/json'
 };
 
+/** @type {{[key: string]: import('core').SerializableObject}} */
 const ankiRouteResponses = {
     'version': Object.assign({body: JSON.stringify(6)}, baseAnkiResp),
     'deckNames': Object.assign({body: JSON.stringify(['Mock Deck'])}, baseAnkiResp),

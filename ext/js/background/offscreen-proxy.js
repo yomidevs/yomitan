@@ -16,15 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deserializeError, isObject} from '../core.js';
+import {isObject} from '../core.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 
 export class OffscreenProxy {
     constructor() {
+        /** @type {?Promise<void>} */
         this._creatingOffscreen = null;
     }
 
-    // https://developer.chrome.com/docs/extensions/reference/offscreen/
+    /**
+     * @see https://developer.chrome.com/docs/extensions/reference/offscreen/
+     */
     async prepare() {
         if (await this._hasOffscreenDocument()) {
             return;
@@ -36,20 +40,30 @@ export class OffscreenProxy {
 
         this._creatingOffscreen = chrome.offscreen.createDocument({
             url: 'offscreen.html',
-            reasons: ['CLIPBOARD'],
+            reasons: [
+                /** @type {chrome.offscreen.Reason} */ ('CLIPBOARD')
+            ],
             justification: 'Access to the clipboard'
         });
         await this._creatingOffscreen;
         this._creatingOffscreen = null;
     }
 
+    /**
+     * @returns {Promise<boolean>}
+     */
     async _hasOffscreenDocument() {
         const offscreenUrl = chrome.runtime.getURL('offscreen.html');
-        if (!chrome.runtime.getContexts) { // chrome version <116
+        // @ts-expect-error - API not defined yet
+        if (!chrome.runtime.getContexts) { // chrome version below 116
+            // Clients: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/clients
+            // @ts-expect-error - Types not set up for service workers yet
             const matchedClients = await clients.matchAll();
+            // @ts-expect-error - Types not set up for service workers yet
             return await matchedClients.some((client) => client.url === offscreenUrl);
         }
 
+        // @ts-expect-error - API not defined yet
         const contexts = await chrome.runtime.getContexts({
             contextTypes: ['OFFSCREEN_DOCUMENT'],
             documentUrls: [offscreenUrl]
@@ -57,116 +71,186 @@ export class OffscreenProxy {
         return !!contexts.length;
     }
 
-    sendMessagePromise(...args) {
+    /**
+     * @template {import('offscreen').MessageType} TMessageType
+     * @param {import('offscreen').Message<TMessageType>} message
+     * @returns {Promise<import('offscreen').MessageReturn<TMessageType>>}
+     */
+    sendMessagePromise(message) {
         return new Promise((resolve, reject) => {
-            const callback = (response) => {
+            chrome.runtime.sendMessage(message, (response) => {
                 try {
                     resolve(this._getMessageResponseResult(response));
                 } catch (error) {
                     reject(error);
                 }
-            };
-
-            chrome.runtime.sendMessage(...args, callback);
+            });
         });
     }
 
+    /**
+     * @template [TReturn=unknown]
+     * @param {import('core').Response<TReturn>} response
+     * @returns {TReturn}
+     * @throws {Error}
+     */
     _getMessageResponseResult(response) {
-        let error = chrome.runtime.lastError;
-        if (error) {
-            throw new Error(error.message);
+        const runtimeError = chrome.runtime.lastError;
+        if (typeof runtimeError !== 'undefined') {
+            throw new Error(runtimeError.message);
         }
         if (!isObject(response)) {
             throw new Error('Offscreen document did not respond');
         }
-        error = response.error;
-        if (error) {
-            throw deserializeError(error);
+        const responseError = response.error;
+        if (responseError) {
+            throw ExtensionError.deserialize(responseError);
         }
         return response.result;
     }
 }
 
 export class DictionaryDatabaseProxy {
+    /**
+     * @param {OffscreenProxy} offscreen
+     */
     constructor(offscreen) {
+        /** @type {OffscreenProxy} */
         this._offscreen = offscreen;
     }
 
-    prepare() {
-        return this._offscreen.sendMessagePromise({action: 'databasePrepareOffscreen'});
+    /**
+     * @returns {Promise<void>}
+     */
+    async prepare() {
+        await this._offscreen.sendMessagePromise({action: 'databasePrepareOffscreen'});
     }
 
-    getDictionaryInfo() {
+    /**
+     * @returns {Promise<import('dictionary-importer').Summary[]>}
+     */
+    async getDictionaryInfo() {
         return this._offscreen.sendMessagePromise({action: 'getDictionaryInfoOffscreen'});
     }
 
-    purge() {
-        return this._offscreen.sendMessagePromise({action: 'databasePurgeOffscreen'});
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async purge() {
+        return await this._offscreen.sendMessagePromise({action: 'databasePurgeOffscreen'});
     }
 
+    /**
+     * @param {import('dictionary-database').MediaRequest[]} targets
+     * @returns {Promise<import('dictionary-database').Media[]>}
+     */
     async getMedia(targets) {
-        const serializedMedia = await this._offscreen.sendMessagePromise({action: 'databaseGetMediaOffscreen', params: {targets}});
+        const serializedMedia = /** @type {import('dictionary-database').Media<string>[]} */ (await this._offscreen.sendMessagePromise({action: 'databaseGetMediaOffscreen', params: {targets}}));
         const media = serializedMedia.map((m) => ({...m, content: ArrayBufferUtil.base64ToArrayBuffer(m.content)}));
         return media;
     }
 }
 
 export class TranslatorProxy {
+    /**
+     * @param {OffscreenProxy} offscreen
+     */
     constructor(offscreen) {
+        /** @type {OffscreenProxy} */
         this._offscreen = offscreen;
     }
 
-    prepare(deinflectionReasons) {
-        return this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {deinflectionReasons}});
+    /**
+     * @param {import('deinflector').ReasonsRaw} deinflectionReasons
+     */
+    async prepare(deinflectionReasons) {
+        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {deinflectionReasons}});
     }
 
-    async findKanji(text, findKanjiOptions) {
-        const enabledDictionaryMapList = [...findKanjiOptions.enabledDictionaryMap];
-        const modifiedKanjiOptions = {
-            ...findKanjiOptions,
+    /**
+     * @param {string} text
+     * @param {import('translation').FindKanjiOptions} options
+     * @returns {Promise<import('dictionary').KanjiDictionaryEntry[]>}
+     */
+    async findKanji(text, options) {
+        const enabledDictionaryMapList = [...options.enabledDictionaryMap];
+        /** @type {import('offscreen').FindKanjiOptionsOffscreen} */
+        const modifiedOptions = {
+            ...options,
             enabledDictionaryMap: enabledDictionaryMapList
         };
-        return this._offscreen.sendMessagePromise({action: 'findKanjiOffscreen', params: {text, findKanjiOptions: modifiedKanjiOptions}});
+        return this._offscreen.sendMessagePromise({action: 'findKanjiOffscreen', params: {text, options: modifiedOptions}});
     }
 
-    async findTerms(mode, text, findTermsOptions) {
-        const {enabledDictionaryMap, excludeDictionaryDefinitions, textReplacements} = findTermsOptions;
+    /**
+     * @param {import('translator').FindTermsMode} mode
+     * @param {string} text
+     * @param {import('translation').FindTermsOptions} options
+     * @returns {Promise<import('translator').FindTermsResult>}
+     */
+    async findTerms(mode, text, options) {
+        const {enabledDictionaryMap, excludeDictionaryDefinitions, textReplacements} = options;
         const enabledDictionaryMapList = [...enabledDictionaryMap];
         const excludeDictionaryDefinitionsList = excludeDictionaryDefinitions ? [...excludeDictionaryDefinitions] : null;
         const textReplacementsSerialized = textReplacements.map((group) => {
-            if (!group) {
-                return group;
-            }
-            return group.map((opt) => ({...opt, pattern: opt.pattern.toString()}));
+            return group !== null ? group.map((opt) => ({...opt, pattern: opt.pattern.toString()})) : null;
         });
-        const modifiedFindTermsOptions = {
-            ...findTermsOptions,
+        /** @type {import('offscreen').FindTermsOptionsOffscreen} */
+        const modifiedOptions = {
+            ...options,
             enabledDictionaryMap: enabledDictionaryMapList,
             excludeDictionaryDefinitions: excludeDictionaryDefinitionsList,
             textReplacements: textReplacementsSerialized
         };
-        return this._offscreen.sendMessagePromise({action: 'findTermsOffscreen', params: {mode, text, findTermsOptions: modifiedFindTermsOptions}});
+        return this._offscreen.sendMessagePromise({action: 'findTermsOffscreen', params: {mode, text, options: modifiedOptions}});
     }
 
+    /**
+     * @param {import('translator').TermReadingList} termReadingList
+     * @param {string[]} dictionaries
+     * @returns {Promise<import('translator').TermFrequencySimple[]>}
+     */
     async getTermFrequencies(termReadingList, dictionaries) {
         return this._offscreen.sendMessagePromise({action: 'getTermFrequenciesOffscreen', params: {termReadingList, dictionaries}});
     }
 
-    clearDatabaseCaches() {
-        return this._offscreen.sendMessagePromise({action: 'clearDatabaseCachesOffscreen'});
+    /** */
+    async clearDatabaseCaches() {
+        await this._offscreen.sendMessagePromise({action: 'clearDatabaseCachesOffscreen'});
     }
 }
 
 export class ClipboardReaderProxy {
+    /**
+     * @param {OffscreenProxy} offscreen
+     */
     constructor(offscreen) {
+        /** @type {?import('environment').Browser} */
+        this._browser = null;
+        /** @type {OffscreenProxy} */
         this._offscreen = offscreen;
     }
 
-    async getText(useRichText) {
-        return this._offscreen.sendMessagePromise({action: 'clipboardGetTextOffscreen', params: {useRichText}});
+    /** @type {?import('environment').Browser} */
+    get browser() { return this._browser; }
+    set browser(value) {
+        if (this._browser === value) { return; }
+        this._browser = value;
+        this._offscreen.sendMessagePromise({action: 'clipboardSetBrowserOffscreen', params: {value}});
     }
 
+    /**
+     * @param {boolean} useRichText
+     * @returns {Promise<string>}
+     */
+    async getText(useRichText) {
+        return await this._offscreen.sendMessagePromise({action: 'clipboardGetTextOffscreen', params: {useRichText}});
+    }
+
+    /**
+     * @returns {Promise<?string>}
+     */
     async getImage() {
-        return this._offscreen.sendMessagePromise({action: 'clipboardGetImageOffscreen'});
+        return await this._offscreen.sendMessagePromise({action: 'clipboardGetImageOffscreen'});
     }
 }

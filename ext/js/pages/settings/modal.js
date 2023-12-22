@@ -19,40 +19,56 @@
 import {PanelElement} from '../../dom/panel-element.js';
 
 export class Modal extends PanelElement {
+    /**
+     * @param {HTMLElement} node
+     */
     constructor(node) {
         super({
             node,
             closingAnimationDuration: 375 // Milliseconds; includes buffer
         });
+        /** @type {?Element} */
         this._contentNode = null;
+        /** @type {boolean} */
         this._canCloseOnClick = false;
     }
 
+    /** */
     prepare() {
         const node = this.node;
         this._contentNode = node.querySelector('.modal-content');
+        /** @type {?HTMLElement} */
         let dimmerNode = node.querySelector('.modal-content-dimmer');
         if (dimmerNode === null) { dimmerNode = node; }
         dimmerNode.addEventListener('mousedown', this._onModalContainerMouseDown.bind(this), false);
         dimmerNode.addEventListener('mouseup', this._onModalContainerMouseUp.bind(this), false);
         dimmerNode.addEventListener('click', this._onModalContainerClick.bind(this), false);
 
-        for (const actionNode of node.querySelectorAll('[data-modal-action]')) {
+        for (const actionNode of /** @type {NodeListOf<HTMLElement>} */ (node.querySelectorAll('[data-modal-action]'))) {
             actionNode.addEventListener('click', this._onActionNodeClick.bind(this), false);
         }
     }
 
     // Private
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onModalContainerMouseDown(e) {
         this._canCloseOnClick = (e.currentTarget === e.target);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onModalContainerMouseUp(e) {
         if (!this._canCloseOnClick) { return; }
         this._canCloseOnClick = (e.currentTarget === e.target);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onModalContainerClick(e) {
         if (!this._canCloseOnClick) { return; }
         this._canCloseOnClick = false;
@@ -60,8 +76,12 @@ export class Modal extends PanelElement {
         this.setVisible(false);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onActionNodeClick(e) {
-        const {modalAction} = e.currentTarget.dataset;
+        const element = /** @type {HTMLElement} */ (e.currentTarget);
+        const {modalAction} = element.dataset;
         switch (modalAction) {
             case 'expand':
                 this._setExpanded(true);
@@ -72,6 +92,9 @@ export class Modal extends PanelElement {
         }
     }
 
+    /**
+     * @param {boolean} expanded
+     */
     _setExpanded(expanded) {
         if (this._contentNode === null) { return; }
         this._contentNode.classList.toggle('modal-content-full', expanded);

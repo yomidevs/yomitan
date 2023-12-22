@@ -18,6 +18,7 @@
 
 import {log} from '../core.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {LocalizationController} from '../language/localization.js';
 import {yomitan} from '../yomitan.js';
 import {ExtensionContentController} from './common/extension-content-controller.js';
@@ -31,6 +32,7 @@ import {SettingsController} from './settings/settings-controller.js';
 import {SettingsDisplayController} from './settings/settings-display-controller.js';
 import {StatusFooter} from './settings/status-footer.js';
 
+/** */
 async function setupEnvironmentInfo() {
     const {manifest_version: manifestVersion} = chrome.runtime.getManifest();
     const {browser, platform} = await yomitan.api.getEnvironmentInfo();
@@ -39,12 +41,16 @@ async function setupEnvironmentInfo() {
     document.documentElement.dataset.manifestVersion = `${manifestVersion}`;
 }
 
+/**
+ * @param {GenericSettingController} genericSettingController
+ */
 async function setupGenericSettingsController(genericSettingController) {
     await genericSettingController.prepare();
     await genericSettingController.refresh();
 }
 
-(async () => {
+/** Entry point. */
+async function main() {
     try {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
@@ -52,7 +58,9 @@ async function setupGenericSettingsController(genericSettingController) {
         const extensionContentController = new ExtensionContentController();
         extensionContentController.prepare();
 
-        const statusFooter = new StatusFooter(document.querySelector('.status-footer-container'));
+        /** @type {HTMLElement} */
+        const statusFooterElement = querySelectorNotNull(document, '.status-footer-container');
+        const statusFooter = new StatusFooter(statusFooterElement);
         statusFooter.prepare();
 
         await yomitan.prepare();
@@ -101,4 +109,6 @@ async function setupGenericSettingsController(genericSettingController) {
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+await main();

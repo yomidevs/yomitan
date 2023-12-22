@@ -18,11 +18,16 @@
 
 import {log, promiseTimeout} from '../core.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {LocalizationController} from '../language/localization.js';
 import {yomitan} from '../yomitan.js';
 import {BackupController} from './settings/backup-controller.js';
 import {SettingsController} from './settings/settings-controller.js';
 
+/**
+ * @param {import('environment').Browser} browser
+ * @returns {string}
+ */
 function getBrowserDisplayName(browser) {
     switch (browser) {
         case 'chrome': return 'Chrome';
@@ -30,10 +35,15 @@ function getBrowserDisplayName(browser) {
         case 'firefox-mobile': return 'Firefox for Android';
         case 'edge': return 'Edge';
         case 'edge-legacy': return 'Edge Legacy';
+        case 'safari': return 'Safari';
         default: return `${browser}`;
     }
 }
 
+/**
+ * @param {import('environment').OperatingSystem} os
+ * @returns {string}
+ */
 function getOperatingSystemDisplayName(os) {
     switch (os) {
         case 'mac': return 'Mac OS';
@@ -47,7 +57,63 @@ function getOperatingSystemDisplayName(os) {
     }
 }
 
-(async () => {
+/** */
+async function showAnkiConnectInfo() {
+    let ankiConnectVersion = null;
+    try {
+        ankiConnectVersion = await yomitan.api.getAnkiConnectVersion();
+    } catch (e) {
+        // NOP
+    }
+
+    /** @type {HTMLElement} */
+    const ankiVersionElement = querySelectorNotNull(document, '#anki-connect-version');
+    /** @type {HTMLElement} */
+    const ankiVersionContainerElement = querySelectorNotNull(document, '#anki-connect-version-container');
+    /** @type {HTMLElement} */
+    const ankiVersionUnknownElement = querySelectorNotNull(document, '#anki-connect-version-unknown-message');
+
+    ankiVersionElement.textContent = (ankiConnectVersion !== null ? `${ankiConnectVersion}` : 'Unknown');
+    ankiVersionContainerElement.dataset.hasError = `${ankiConnectVersion === null}`;
+    ankiVersionUnknownElement.hidden = (ankiConnectVersion !== null);
+}
+
+/** */
+async function showDictionaryInfo() {
+    let dictionaryInfos;
+    try {
+        dictionaryInfos = await yomitan.api.getDictionaryInfo();
+    } catch (e) {
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    let first = true;
+    for (const {title} of dictionaryInfos) {
+        if (first) {
+            first = false;
+        } else {
+            fragment.appendChild(document.createTextNode(', '));
+        }
+
+        const node = document.createElement('span');
+        node.className = 'installed-dictionary';
+        node.textContent = title;
+        fragment.appendChild(node);
+    }
+
+    /** @type {HTMLElement} */
+    const noneElement = querySelectorNotNull(document, '#installed-dictionaries-none');
+
+    noneElement.hidden = (dictionaryInfos.length !== 0);
+    /** @type {HTMLElement} */
+    const container = querySelectorNotNull(document, '#installed-dictionaries');
+    container.textContent = '';
+    container.appendChild(fragment);
+}
+
+/** Entry point. */
+async function main() {
     try {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
@@ -61,56 +127,30 @@ function getOperatingSystemDisplayName(os) {
         const {name, version} = manifest;
         const {browser, platform: {os}} = await yomitan.api.getEnvironmentInfo();
 
-        // const thisVersionLink = document.querySelector('#release-notes-this-version-link');
-        // thisVersionLink.href = thisVersionLink.dataset.hrefFormat.replace(/\{version\}/g, version);
+        /** @type {HTMLLinkElement} */
+        const thisVersionLink = querySelectorNotNull(document, '#release-notes-this-version-link');
+        const {hrefFormat} = thisVersionLink.dataset;
+        thisVersionLink.href = typeof hrefFormat === 'string' ? hrefFormat.replace(/\{version\}/g, version) : '';
 
-        document.querySelector('#version').textContent = `${name} ${version}`;
-        document.querySelector('#browser').textContent = getBrowserDisplayName(browser);
-        document.querySelector('#platform').textContent = getOperatingSystemDisplayName(os);
-        document.querySelector('#language').textContent = `${language}`;
-        document.querySelector('#user-agent').textContent = userAgent;
+        /** @type {HTMLElement} */
+        const versionElement = querySelectorNotNull(document, '#version');
+        /** @type {HTMLElement} */
+        const browserElement = querySelectorNotNull(document, '#browser');
+        /** @type {HTMLElement} */
+        const platformElement = querySelectorNotNull(document, '#platform');
+        /** @type {HTMLElement} */
+        const languageElement = querySelectorNotNull(document, '#language');
+        /** @type {HTMLElement} */
+        const userAgentElement = querySelectorNotNull(document, '#user-agent');
 
-        (async () => {
-            let ankiConnectVersion = null;
-            try {
-                ankiConnectVersion = await yomitan.api.getAnkiConnectVersion();
-            } catch (e) {
-                // NOP
-            }
+        versionElement.textContent = `${name} ${version}`;
+        browserElement.textContent = getBrowserDisplayName(browser);
+        platformElement.textContent = getOperatingSystemDisplayName(os);
+        languageElement.textContent = `${language}`;
+        userAgentElement.textContent = userAgent;
 
-            document.querySelector('#anki-connect-version').textContent = (ankiConnectVersion !== null ? `${ankiConnectVersion}` : 'Unknown');
-            document.querySelector('#anki-connect-version-container').hasError = `${ankiConnectVersion === null}`;
-            document.querySelector('#anki-connect-version-unknown-message').hidden = (ankiConnectVersion !== null);
-        })();
-
-        (async () => {
-            let dictionaryInfos;
-            try {
-                dictionaryInfos = await yomitan.api.getDictionaryInfo();
-            } catch (e) {
-                return;
-            }
-
-            const fragment = document.createDocumentFragment();
-            let first = true;
-            for (const {title} of dictionaryInfos) {
-                if (first) {
-                    first = false;
-                } else {
-                    fragment.appendChild(document.createTextNode(', '));
-                }
-
-                const node = document.createElement('span');
-                node.className = 'installed-dictionary';
-                node.textContent = title;
-                fragment.appendChild(node);
-            }
-
-            document.querySelector('#installed-dictionaries-none').hidden = (dictionaryInfos.length !== 0);
-            const container = document.querySelector('#installed-dictionaries');
-            container.textContent = '';
-            container.appendChild(fragment);
-        })();
+        showAnkiConnectInfo();
+        showDictionaryInfo();
 
         const settingsController = new SettingsController();
         await settingsController.prepare();
@@ -127,4 +167,6 @@ function getOperatingSystemDisplayName(os) {
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+await main();

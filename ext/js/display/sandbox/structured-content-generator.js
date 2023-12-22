@@ -17,28 +17,51 @@
  */
 
 export class StructuredContentGenerator {
+    /**
+     * @param {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} contentManager
+     * @param {import('../../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
+     * @param {Document} document
+     */
     constructor(contentManager, japaneseUtil, document) {
+        /** @type {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} */
         this._contentManager = contentManager;
+        /** @type {import('../../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
+        /** @type {Document} */
         this._document = document;
     }
 
+    /**
+     * @param {HTMLElement} node
+     * @param {import('structured-content').Content} content
+     * @param {string} dictionary
+     */
     appendStructuredContent(node, content, dictionary) {
         node.classList.add('structured-content');
         this._appendStructuredContent(node, content, dictionary, null);
     }
 
+    /**
+     * @param {import('structured-content').Content} content
+     * @param {string} dictionary
+     * @returns {HTMLElement}
+     */
     createStructuredContent(content, dictionary) {
         const node = this._createElement('span', 'structured-content');
         this._appendStructuredContent(node, content, dictionary, null);
         return node;
     }
 
+    /**
+     * @param {import('structured-content').ImageElement|import('dictionary-data').TermGlossaryImage} data
+     * @param {string} dictionary
+     * @returns {HTMLAnchorElement}
+     */
     createDefinitionImage(data, dictionary) {
         const {
             path,
-            width,
-            height,
+            width = 100,
+            height = 100,
             preferredWidth,
             preferredHeight,
             title,
@@ -65,7 +88,7 @@ export class StructuredContentGenerator {
             (hasPreferredHeight ? preferredHeight / invAspectRatio : width)
         );
 
-        const node = this._createElement('a', 'gloss-image-link');
+        const node = /** @type {HTMLAnchorElement} */ (this._createElement('a', 'gloss-image-link'));
         node.target = '_blank';
         node.rel = 'noreferrer noopener';
 
@@ -78,7 +101,7 @@ export class StructuredContentGenerator {
         const imageBackground = this._createElement('span', 'gloss-image-background');
         imageContainer.appendChild(imageBackground);
 
-        const image = this._createElement('img', 'gloss-image');
+        const image = /** @type {HTMLImageElement} */ (this._createElement('img', 'gloss-image'));
         image.alt = '';
         imageContainer.appendChild(image);
 
@@ -126,6 +149,12 @@ export class StructuredContentGenerator {
 
     // Private
 
+    /**
+     * @param {HTMLElement} container
+     * @param {import('structured-content').Content|undefined} content
+     * @param {string} dictionary
+     * @param {?string} language
+     */
     _appendStructuredContent(container, content, dictionary, language) {
         if (typeof content === 'string') {
             if (content.length > 0) {
@@ -151,16 +180,29 @@ export class StructuredContentGenerator {
         }
     }
 
+    /**
+     * @param {string} tagName
+     * @param {string} className
+     * @returns {HTMLElement}
+     */
     _createElement(tagName, className) {
         const node = this._document.createElement(tagName);
         node.className = className;
         return node;
     }
 
+    /**
+     * @param {string} data
+     * @returns {Text}
+     */
     _createTextNode(data) {
         return this._document.createTextNode(data);
     }
 
+    /**
+     * @param {HTMLElement} element
+     * @param {import('structured-content').Data} data
+     */
     _setElementDataset(element, data) {
         for (let [key, value] of Object.entries(data)) {
             if (key.length > 0) {
@@ -175,6 +217,13 @@ export class StructuredContentGenerator {
         }
     }
 
+    /**
+     * @param {HTMLAnchorElement} node
+     * @param {HTMLImageElement} image
+     * @param {HTMLElement} imageBackground
+     * @param {?string} url
+     * @param {boolean} unloaded
+     */
     _setImageData(node, image, imageBackground, url, unloaded) {
         if (url !== null) {
             image.src = url;
@@ -189,6 +238,12 @@ export class StructuredContentGenerator {
         }
     }
 
+    /**
+     * @param {import('structured-content').Element} content
+     * @param {string} dictionary
+     * @param {?string} language
+     * @returns {?HTMLElement}
+     */
     _createStructuredContentGenericElement(content, dictionary, language) {
         const {tag} = content;
         switch (tag) {
@@ -222,6 +277,13 @@ export class StructuredContentGenerator {
         return null;
     }
 
+    /**
+     * @param {string} tag
+     * @param {import('structured-content').UnstyledElement} content
+     * @param {string} dictionary
+     * @param {?string} language
+     * @returns {HTMLElement}
+     */
     _createStructuredContentTableElement(tag, content, dictionary, language) {
         const container = this._createElement('div', 'gloss-sc-table-container');
         const table = this._createStructuredContentElement(tag, content, dictionary, language, 'table', true, false);
@@ -229,6 +291,16 @@ export class StructuredContentGenerator {
         return container;
     }
 
+    /**
+     * @param {string} tag
+     * @param {import('structured-content').StyledElement|import('structured-content').UnstyledElement|import('structured-content').TableElement|import('structured-content').LineBreak} content
+     * @param {string} dictionary
+     * @param {?string} language
+     * @param {'simple'|'table'|'table-cell'} type
+     * @param {boolean} hasChildren
+     * @param {boolean} hasStyle
+     * @returns {HTMLElement}
+     */
     _createStructuredContentElement(tag, content, dictionary, language, type, hasChildren, hasStyle) {
         const node = this._createElement(tag, `gloss-sc-${tag}`);
         const {data, lang} = content;
@@ -240,14 +312,15 @@ export class StructuredContentGenerator {
         switch (type) {
             case 'table-cell':
                 {
-                    const {colSpan, rowSpan} = content;
-                    if (typeof colSpan === 'number') { node.colSpan = colSpan; }
-                    if (typeof rowSpan === 'number') { node.rowSpan = rowSpan; }
+                    const cell = /** @type {HTMLTableCellElement} */ (node);
+                    const {colSpan, rowSpan} = /** @type {import('structured-content').TableElement} */ (content);
+                    if (typeof colSpan === 'number') { cell.colSpan = colSpan; }
+                    if (typeof rowSpan === 'number') { cell.rowSpan = rowSpan; }
                 }
                 break;
         }
         if (hasStyle) {
-            const {style} = content;
+            const {style} = /** @type {import('structured-content').StyledElement} */ (content);
             if (typeof style === 'object' && style !== null) {
                 this._setStructuredContentElementStyle(node, style);
             }
@@ -258,6 +331,10 @@ export class StructuredContentGenerator {
         return node;
     }
 
+    /**
+     * @param {HTMLElement} node
+     * @param {import('structured-content').StructuredContentStyle} contentStyle
+     */
     _setStructuredContentElementStyle(node, contentStyle) {
         const {style} = node;
         const {
@@ -290,6 +367,12 @@ export class StructuredContentGenerator {
         if (typeof listStyleType === 'string') { style.listStyleType = listStyleType; }
     }
 
+    /**
+     * @param {import('structured-content').LinkElement} content
+     * @param {string} dictionary
+     * @param {?string} language
+     * @returns {HTMLAnchorElement}
+     */
     _createLinkElement(content, dictionary, language) {
         let {href} = content;
         const internal = href.startsWith('?');
@@ -297,7 +380,7 @@ export class StructuredContentGenerator {
             href = `${location.protocol}//${location.host}/search.html${href.length > 1 ? href : ''}`;
         }
 
-        const node = this._createElement('a', 'gloss-link');
+        const node = /** @type {HTMLAnchorElement} */ (this._createElement('a', 'gloss-link'));
         node.dataset.external = `${!internal}`;
 
         const text = this._createElement('span', 'gloss-link-text');

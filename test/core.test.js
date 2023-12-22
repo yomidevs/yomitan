@@ -19,14 +19,17 @@
 import {describe, expect, test} from 'vitest';
 import {DynamicProperty, deepEqual} from '../ext/js/core.js';
 
+/** */
 function testDynamicProperty() {
     test('DynamicProperty', () => {
         const data = [
             {
                 initialValue: 0,
+                /** @type {{operation: ?string, expectedDefaultValue: number, expectedValue: number, expectedOverrideCount: number, expeectedEventOccurred: boolean, args: [value: number, priority?: number]}[]} */
                 operations: [
                     {
                         operation: null,
+                        args: [0],
                         expectedDefaultValue: 0,
                         expectedValue: 0,
                         expectedOverrideCount: 0,
@@ -147,6 +150,7 @@ function testDynamicProperty() {
     });
 }
 
+/** */
 function testDeepEqual() {
     describe('deepEqual', () => {
         const data = [
@@ -280,6 +284,7 @@ function testDeepEqual() {
 }
 
 
+/** */
 function main() {
     testDynamicProperty();
     testDeepEqual();

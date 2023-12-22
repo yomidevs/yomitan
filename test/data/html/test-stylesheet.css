@@ -19,8 +19,7 @@ p {
     margin: 0.33em 0;
 }
 
-h1+p,
-h1+y-description {
+h1+test-description {
     margin-top: -0.67em;
 }
 
@@ -29,8 +28,7 @@ a, a:visited {
     text-decoration: underline;
 }
 
-.test,
-y-test {
+test-case {
     display: block;
     background-color: #ffffff;
     margin: 1em 0;
@@ -39,8 +37,7 @@ y-test {
     border-radius: 4px;
 }
 
-.test::before,
-y-test::before {
+test-case::before {
     content: 'Test ' counter(test-id);
     display: block;
     counter-increment: test-id;
@@ -49,8 +46,7 @@ y-test::before {
     font-weight: bold;
 }
 
-.description,
-y-description {
+test-description {
     color: #444444;
     font-style: italic;
     display: block;

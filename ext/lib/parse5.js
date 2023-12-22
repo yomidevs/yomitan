@@ -1,3 +1,4 @@
+// @ts-nocheck
 var __defProp = Object.defineProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -376,6 +377,7 @@ var decode_data_xml_default = new Uint16Array(
 var _a;
 var decodeMap = /* @__PURE__ */ new Map([
   [0, 65533],
+  // C1 Unicode control character reference replacements
   [128, 8364],
   [130, 8218],
   [131, 402],
@@ -424,90 +426,340 @@ function replaceCodePoint(codePoint) {
   }
   return (_a2 = decodeMap.get(codePoint)) !== null && _a2 !== void 0 ? _a2 : codePoint;
 }
-function decodeCodePoint(codePoint) {
-  return fromCodePoint(replaceCodePoint(codePoint));
-}
 
 // node_modules/entities/lib/esm/decode.js
 var CharCodes;
 (function(CharCodes2) {
   CharCodes2[CharCodes2["NUM"] = 35] = "NUM";
   CharCodes2[CharCodes2["SEMI"] = 59] = "SEMI";
+  CharCodes2[CharCodes2["EQUALS"] = 61] = "EQUALS";
   CharCodes2[CharCodes2["ZERO"] = 48] = "ZERO";
   CharCodes2[CharCodes2["NINE"] = 57] = "NINE";
   CharCodes2[CharCodes2["LOWER_A"] = 97] = "LOWER_A";
   CharCodes2[CharCodes2["LOWER_F"] = 102] = "LOWER_F";
   CharCodes2[CharCodes2["LOWER_X"] = 120] = "LOWER_X";
-  CharCodes2[CharCodes2["To_LOWER_BIT"] = 32] = "To_LOWER_BIT";
+  CharCodes2[CharCodes2["LOWER_Z"] = 122] = "LOWER_Z";
+  CharCodes2[CharCodes2["UPPER_A"] = 65] = "UPPER_A";
+  CharCodes2[CharCodes2["UPPER_F"] = 70] = "UPPER_F";
+  CharCodes2[CharCodes2["UPPER_Z"] = 90] = "UPPER_Z";
 })(CharCodes || (CharCodes = {}));
+var TO_LOWER_BIT = 32;
 var BinTrieFlags;
 (function(BinTrieFlags2) {
   BinTrieFlags2[BinTrieFlags2["VALUE_LENGTH"] = 49152] = "VALUE_LENGTH";
   BinTrieFlags2[BinTrieFlags2["BRANCH_LENGTH"] = 16256] = "BRANCH_LENGTH";
   BinTrieFlags2[BinTrieFlags2["JUMP_TABLE"] = 127] = "JUMP_TABLE";
 })(BinTrieFlags || (BinTrieFlags = {}));
-function getDecoder(decodeTree) {
-  return function decodeHTMLBinary(str, strict) {
-    let ret = "";
-    let lastIdx = 0;
-    let strIdx = 0;
-    while ((strIdx = str.indexOf("&", strIdx)) >= 0) {
-      ret += str.slice(lastIdx, strIdx);
-      lastIdx = strIdx;
-      strIdx += 1;
-      if (str.charCodeAt(strIdx) === CharCodes.NUM) {
-        let start = strIdx + 1;
-        let base = 10;
-        let cp = str.charCodeAt(start);
-        if ((cp | CharCodes.To_LOWER_BIT) === CharCodes.LOWER_X) {
-          base = 16;
-          strIdx += 1;
-          start += 1;
+function isNumber(code) {
+  return code >= CharCodes.ZERO && code <= CharCodes.NINE;
+}
+function isHexadecimalCharacter(code) {
+  return code >= CharCodes.UPPER_A && code <= CharCodes.UPPER_F || code >= CharCodes.LOWER_A && code <= CharCodes.LOWER_F;
+}
+function isAsciiAlphaNumeric(code) {
+  return code >= CharCodes.UPPER_A && code <= CharCodes.UPPER_Z || code >= CharCodes.LOWER_A && code <= CharCodes.LOWER_Z || isNumber(code);
+}
+function isEntityInAttributeInvalidEnd(code) {
+  return code === CharCodes.EQUALS || isAsciiAlphaNumeric(code);
+}
+var EntityDecoderState;
+(function(EntityDecoderState2) {
+  EntityDecoderState2[EntityDecoderState2["EntityStart"] = 0] = "EntityStart";
+  EntityDecoderState2[EntityDecoderState2["NumericStart"] = 1] = "NumericStart";
+  EntityDecoderState2[EntityDecoderState2["NumericDecimal"] = 2] = "NumericDecimal";
+  EntityDecoderState2[EntityDecoderState2["NumericHex"] = 3] = "NumericHex";
+  EntityDecoderState2[EntityDecoderState2["NamedEntity"] = 4] = "NamedEntity";
+})(EntityDecoderState || (EntityDecoderState = {}));
+var DecodingMode;
+(function(DecodingMode2) {
+  DecodingMode2[DecodingMode2["Legacy"] = 0] = "Legacy";
+  DecodingMode2[DecodingMode2["Strict"] = 1] = "Strict";
+  DecodingMode2[DecodingMode2["Attribute"] = 2] = "Attribute";
+})(DecodingMode || (DecodingMode = {}));
+var EntityDecoder = class {
+  constructor(decodeTree, emitCodePoint, errors) {
+    this.decodeTree = decodeTree;
+    this.emitCodePoint = emitCodePoint;
+    this.errors = errors;
+    this.state = EntityDecoderState.EntityStart;
+    this.consumed = 1;
+    this.result = 0;
+    this.treeIndex = 0;
+    this.excess = 1;
+    this.decodeMode = DecodingMode.Strict;
+  }
+  /** Resets the instance to make it reusable. */
+  startEntity(decodeMode) {
+    this.decodeMode = decodeMode;
+    this.state = EntityDecoderState.EntityStart;
+    this.result = 0;
+    this.treeIndex = 0;
+    this.excess = 1;
+    this.consumed = 1;
+  }
+  /**
+   * Write an entity to the decoder. This can be called multiple times with partial entities.
+   * If the entity is incomplete, the decoder will return -1.
+   *
+   * Mirrors the implementation of `getDecoder`, but with the ability to stop decoding if the
+   * entity is incomplete, and resume when the next string is written.
+   *
+   * @param string The string containing the entity (or a continuation of the entity).
+   * @param offset The offset at which the entity begins. Should be 0 if this is not the first call.
+   * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+   */
+  write(str, offset) {
+    switch (this.state) {
+      case EntityDecoderState.EntityStart: {
+        if (str.charCodeAt(offset) === CharCodes.NUM) {
+          this.state = EntityDecoderState.NumericStart;
+          this.consumed += 1;
+          return this.stateNumericStart(str, offset + 1);
         }
-        do
-          cp = str.charCodeAt(++strIdx);
-        while (cp >= CharCodes.ZERO && cp <= CharCodes.NINE || base === 16 && (cp | CharCodes.To_LOWER_BIT) >= CharCodes.LOWER_A && (cp | CharCodes.To_LOWER_BIT) <= CharCodes.LOWER_F);
-        if (start !== strIdx) {
-          const entity = str.substring(start, strIdx);
-          const parsed = parseInt(entity, base);
-          if (str.charCodeAt(strIdx) === CharCodes.SEMI) {
-            strIdx += 1;
-          } else if (strict) {
-            continue;
-          }
-          ret += decodeCodePoint(parsed);
-          lastIdx = strIdx;
-        }
-        continue;
+        this.state = EntityDecoderState.NamedEntity;
+        return this.stateNamedEntity(str, offset);
       }
-      let resultIdx = 0;
-      let excess = 1;
-      let treeIdx = 0;
-      let current = decodeTree[treeIdx];
-      for (; strIdx < str.length; strIdx++, excess++) {
-        treeIdx = determineBranch(decodeTree, current, treeIdx + 1, str.charCodeAt(strIdx));
-        if (treeIdx < 0)
-          break;
-        current = decodeTree[treeIdx];
-        const masked = current & BinTrieFlags.VALUE_LENGTH;
-        if (masked) {
-          if (!strict || str.charCodeAt(strIdx) === CharCodes.SEMI) {
-            resultIdx = treeIdx;
-            excess = 0;
-          }
-          const valueLength = (masked >> 14) - 1;
-          if (valueLength === 0)
-            break;
-          treeIdx += valueLength;
-        }
+      case EntityDecoderState.NumericStart: {
+        return this.stateNumericStart(str, offset);
       }
-      if (resultIdx !== 0) {
-        const valueLength = (decodeTree[resultIdx] & BinTrieFlags.VALUE_LENGTH) >> 14;
-        ret += valueLength === 1 ? String.fromCharCode(decodeTree[resultIdx] & ~BinTrieFlags.VALUE_LENGTH) : valueLength === 2 ? String.fromCharCode(decodeTree[resultIdx + 1]) : String.fromCharCode(decodeTree[resultIdx + 1], decodeTree[resultIdx + 2]);
-        lastIdx = strIdx - excess + 1;
+      case EntityDecoderState.NumericDecimal: {
+        return this.stateNumericDecimal(str, offset);
+      }
+      case EntityDecoderState.NumericHex: {
+        return this.stateNumericHex(str, offset);
+      }
+      case EntityDecoderState.NamedEntity: {
+        return this.stateNamedEntity(str, offset);
       }
     }
-    return ret + str.slice(lastIdx);
+  }
+  /**
+   * Switches between the numeric decimal and hexadecimal states.
+   *
+   * Equivalent to the `Numeric character reference state` in the HTML spec.
+   *
+   * @param str The string containing the entity (or a continuation of the entity).
+   * @param offset The current offset.
+   * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+   */
+  stateNumericStart(str, offset) {
+    if (offset >= str.length) {
+      return -1;
+    }
+    if ((str.charCodeAt(offset) | TO_LOWER_BIT) === CharCodes.LOWER_X) {
+      this.state = EntityDecoderState.NumericHex;
+      this.consumed += 1;
+      return this.stateNumericHex(str, offset + 1);
+    }
+    this.state = EntityDecoderState.NumericDecimal;
+    return this.stateNumericDecimal(str, offset);
+  }
+  addToNumericResult(str, start, end, base) {
+    if (start !== end) {
+      const digitCount = end - start;
+      this.result = this.result * Math.pow(base, digitCount) + parseInt(str.substr(start, digitCount), base);
+      this.consumed += digitCount;
+    }
+  }
+  /**
+   * Parses a hexadecimal numeric entity.
+   *
+   * Equivalent to the `Hexademical character reference state` in the HTML spec.
+   *
+   * @param str The string containing the entity (or a continuation of the entity).
+   * @param offset The current offset.
+   * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+   */
+  stateNumericHex(str, offset) {
+    const startIdx = offset;
+    while (offset < str.length) {
+      const char = str.charCodeAt(offset);
+      if (isNumber(char) || isHexadecimalCharacter(char)) {
+        offset += 1;
+      } else {
+        this.addToNumericResult(str, startIdx, offset, 16);
+        return this.emitNumericEntity(char, 3);
+      }
+    }
+    this.addToNumericResult(str, startIdx, offset, 16);
+    return -1;
+  }
+  /**
+   * Parses a decimal numeric entity.
+   *
+   * Equivalent to the `Decimal character reference state` in the HTML spec.
+   *
+   * @param str The string containing the entity (or a continuation of the entity).
+   * @param offset The current offset.
+   * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+   */
+  stateNumericDecimal(str, offset) {
+    const startIdx = offset;
+    while (offset < str.length) {
+      const char = str.charCodeAt(offset);
+      if (isNumber(char)) {
+        offset += 1;
+      } else {
+        this.addToNumericResult(str, startIdx, offset, 10);
+        return this.emitNumericEntity(char, 2);
+      }
+    }
+    this.addToNumericResult(str, startIdx, offset, 10);
+    return -1;
+  }
+  /**
+   * Validate and emit a numeric entity.
+   *
+   * Implements the logic from the `Hexademical character reference start
+   * state` and `Numeric character reference end state` in the HTML spec.
+   *
+   * @param lastCp The last code point of the entity. Used to see if the
+   *               entity was terminated with a semicolon.
+   * @param expectedLength The minimum number of characters that should be
+   *                       consumed. Used to validate that at least one digit
+   *                       was consumed.
+   * @returns The number of characters that were consumed.
+   */
+  emitNumericEntity(lastCp, expectedLength) {
+    var _a2;
+    if (this.consumed <= expectedLength) {
+      (_a2 = this.errors) === null || _a2 === void 0 ? void 0 : _a2.absenceOfDigitsInNumericCharacterReference(this.consumed);
+      return 0;
+    }
+    if (lastCp === CharCodes.SEMI) {
+      this.consumed += 1;
+    } else if (this.decodeMode === DecodingMode.Strict) {
+      return 0;
+    }
+    this.emitCodePoint(replaceCodePoint(this.result), this.consumed);
+    if (this.errors) {
+      if (lastCp !== CharCodes.SEMI) {
+        this.errors.missingSemicolonAfterCharacterReference();
+      }
+      this.errors.validateNumericCharacterReference(this.result);
+    }
+    return this.consumed;
+  }
+  /**
+   * Parses a named entity.
+   *
+   * Equivalent to the `Named character reference state` in the HTML spec.
+   *
+   * @param str The string containing the entity (or a continuation of the entity).
+   * @param offset The current offset.
+   * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+   */
+  stateNamedEntity(str, offset) {
+    const { decodeTree } = this;
+    let current = decodeTree[this.treeIndex];
+    let valueLength = (current & BinTrieFlags.VALUE_LENGTH) >> 14;
+    for (; offset < str.length; offset++, this.excess++) {
+      const char = str.charCodeAt(offset);
+      this.treeIndex = determineBranch(decodeTree, current, this.treeIndex + Math.max(1, valueLength), char);
+      if (this.treeIndex < 0) {
+        return this.result === 0 || // If we are parsing an attribute
+        this.decodeMode === DecodingMode.Attribute && // We shouldn't have consumed any characters after the entity,
+        (valueLength === 0 || // And there should be no invalid characters.
+        isEntityInAttributeInvalidEnd(char)) ? 0 : this.emitNotTerminatedNamedEntity();
+      }
+      current = decodeTree[this.treeIndex];
+      valueLength = (current & BinTrieFlags.VALUE_LENGTH) >> 14;
+      if (valueLength !== 0) {
+        if (char === CharCodes.SEMI) {
+          return this.emitNamedEntityData(this.treeIndex, valueLength, this.consumed + this.excess);
+        }
+        if (this.decodeMode !== DecodingMode.Strict) {
+          this.result = this.treeIndex;
+          this.consumed += this.excess;
+          this.excess = 0;
+        }
+      }
+    }
+    return -1;
+  }
+  /**
+   * Emit a named entity that was not terminated with a semicolon.
+   *
+   * @returns The number of characters consumed.
+   */
+  emitNotTerminatedNamedEntity() {
+    var _a2;
+    const { result, decodeTree } = this;
+    const valueLength = (decodeTree[result] & BinTrieFlags.VALUE_LENGTH) >> 14;
+    this.emitNamedEntityData(result, valueLength, this.consumed);
+    (_a2 = this.errors) === null || _a2 === void 0 ? void 0 : _a2.missingSemicolonAfterCharacterReference();
+    return this.consumed;
+  }
+  /**
+   * Emit a named entity.
+   *
+   * @param result The index of the entity in the decode tree.
+   * @param valueLength The number of bytes in the entity.
+   * @param consumed The number of characters consumed.
+   *
+   * @returns The number of characters consumed.
+   */
+  emitNamedEntityData(result, valueLength, consumed) {
+    const { decodeTree } = this;
+    this.emitCodePoint(valueLength === 1 ? decodeTree[result] & ~BinTrieFlags.VALUE_LENGTH : decodeTree[result + 1], consumed);
+    if (valueLength === 3) {
+      this.emitCodePoint(decodeTree[result + 2], consumed);
+    }
+    return consumed;
+  }
+  /**
+   * Signal to the parser that the end of the input was reached.
+   *
+   * Remaining data will be emitted and relevant errors will be produced.
+   *
+   * @returns The number of characters consumed.
+   */
+  end() {
+    var _a2;
+    switch (this.state) {
+      case EntityDecoderState.NamedEntity: {
+        return this.result !== 0 && (this.decodeMode !== DecodingMode.Attribute || this.result === this.treeIndex) ? this.emitNotTerminatedNamedEntity() : 0;
+      }
+      case EntityDecoderState.NumericDecimal: {
+        return this.emitNumericEntity(0, 2);
+      }
+      case EntityDecoderState.NumericHex: {
+        return this.emitNumericEntity(0, 3);
+      }
+      case EntityDecoderState.NumericStart: {
+        (_a2 = this.errors) === null || _a2 === void 0 ? void 0 : _a2.absenceOfDigitsInNumericCharacterReference(this.consumed);
+        return 0;
+      }
+      case EntityDecoderState.EntityStart: {
+        return 0;
+      }
+    }
+  }
+};
+function getDecoder(decodeTree) {
+  let ret = "";
+  const decoder = new EntityDecoder(decodeTree, (str) => ret += fromCodePoint(str));
+  return function decodeWithTrie(str, decodeMode) {
+    let lastIndex = 0;
+    let offset = 0;
+    while ((offset = str.indexOf("&", offset)) >= 0) {
+      ret += str.slice(lastIndex, offset);
+      decoder.startEntity(decodeMode);
+      const len = decoder.write(
+        str,
+        // Skip the "&"
+        offset + 1
+      );
+      if (len < 0) {
+        lastIndex = offset + decoder.end();
+        break;
+      }
+      lastIndex = offset + len;
+      offset = len === 0 ? lastIndex + 1 : lastIndex;
+    }
+    const result = ret + str.slice(lastIndex);
+    ret = "";
+    return result;
   };
 }
 function determineBranch(decodeTree, current, nodeIdx, char) {
@@ -1195,7 +1447,7 @@ function isAsciiLower(cp) {
 function isAsciiLetter(cp) {
   return isAsciiLower(cp) || isAsciiUpper(cp);
 }
-function isAsciiAlphaNumeric(cp) {
+function isAsciiAlphaNumeric2(cp) {
   return isAsciiLetter(cp) || isAsciiDigit(cp);
 }
 function isAsciiUpperHexDigit(cp) {
@@ -1213,8 +1465,8 @@ function toAsciiLower(cp) {
 function isWhitespace(cp) {
   return cp === CODE_POINTS.SPACE || cp === CODE_POINTS.LINE_FEED || cp === CODE_POINTS.TABULATION || cp === CODE_POINTS.FORM_FEED;
 }
-function isEntityInAttributeInvalidEnd(nextCp) {
-  return nextCp === CODE_POINTS.EQUALS_SIGN || isAsciiAlphaNumeric(nextCp);
+function isEntityInAttributeInvalidEnd2(nextCp) {
+  return nextCp === CODE_POINTS.EQUALS_SIGN || isAsciiAlphaNumeric2(nextCp);
 }
 function isScriptDataDoubleEscapeSequenceEnd(cp) {
   return isWhitespace(cp) || cp === CODE_POINTS.SOLIDUS || cp === CODE_POINTS.GREATER_THAN_SIGN;
@@ -1530,7 +1782,7 @@ var Tokenizer = class {
       const masked = current & BinTrieFlags.VALUE_LENGTH;
       if (masked) {
         const valueLength = (masked >> 14) - 1;
-        if (cp !== CODE_POINTS.SEMICOLON && this._isCharacterReferenceInAttribute() && isEntityInAttributeInvalidEnd(this.preprocessor.peek(1))) {
+        if (cp !== CODE_POINTS.SEMICOLON && this._isCharacterReferenceInAttribute() && isEntityInAttributeInvalidEnd2(this.preprocessor.peek(1))) {
           result = [CODE_POINTS.AMPERSAND];
           i += valueLength;
         } else {
@@ -3727,7 +3979,7 @@ var Tokenizer = class {
   _stateCharacterReference(cp) {
     if (cp === CODE_POINTS.NUMBER_SIGN) {
       this.state = State.NUMERIC_CHARACTER_REFERENCE;
-    } else if (isAsciiAlphaNumeric(cp)) {
+    } else if (isAsciiAlphaNumeric2(cp)) {
       this.state = State.NAMED_CHARACTER_REFERENCE;
       this._stateNamedCharacterReference(cp);
     } else {
@@ -3753,7 +4005,7 @@ var Tokenizer = class {
   // Ambiguos ampersand state
   //------------------------------------------------------------------
   _stateAmbiguousAmpersand(cp) {
-    if (isAsciiAlphaNumeric(cp)) {
+    if (isAsciiAlphaNumeric2(cp)) {
       this._flushCodePointConsumedAsCharacterReference(cp);
     } else {
       if (cp === CODE_POINTS.SEMICOLON) {

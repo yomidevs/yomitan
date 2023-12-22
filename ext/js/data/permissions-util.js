@@ -20,12 +20,17 @@ import {AnkiUtil} from './anki-util.js';
 
 export class PermissionsUtil {
     constructor() {
+        /** @type {Set<string>} */
         this._ankiFieldMarkersRequiringClipboardPermission = new Set([
             'clipboard-image',
             'clipboard-text'
         ]);
     }
 
+    /**
+     * @param {chrome.permissions.Permissions} permissions
+     * @returns {Promise<boolean>}
+     */
     hasPermissions(permissions) {
         return new Promise((resolve, reject) => chrome.permissions.contains(permissions, (result) => {
             const e = chrome.runtime.lastError;
@@ -37,6 +42,11 @@ export class PermissionsUtil {
         }));
     }
 
+    /**
+     * @param {chrome.permissions.Permissions} permissions
+     * @param {boolean} shouldHave
+     * @returns {Promise<boolean>}
+     */
     setPermissionsGranted(permissions, shouldHave) {
         return (
             shouldHave ?
@@ -59,6 +69,9 @@ export class PermissionsUtil {
         );
     }
 
+    /**
+     * @returns {Promise<chrome.permissions.Permissions>}
+     */
     getAllPermissions() {
         return new Promise((resolve, reject) => chrome.permissions.getAll((result) => {
             const e = chrome.runtime.lastError;
@@ -70,6 +83,10 @@ export class PermissionsUtil {
         }));
     }
 
+    /**
+     * @param {string} fieldValue
+     * @returns {string[]}
+     */
     getRequiredPermissionsForAnkiFieldValue(fieldValue) {
         const markers = AnkiUtil.getFieldMarkers(fieldValue);
         const markerPermissions = this._ankiFieldMarkersRequiringClipboardPermission;
@@ -81,6 +98,11 @@ export class PermissionsUtil {
         return [];
     }
 
+    /**
+     * @param {chrome.permissions.Permissions} permissions
+     * @param {import('settings').ProfileOptions} options
+     * @returns {boolean}
+     */
     hasRequiredPermissionsForOptions(permissions, options) {
         const permissionsSet = new Set(permissions.permissions);
 

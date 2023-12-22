@@ -16,23 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {querySelectorNotNull} from '../../dom/query-selector.js';
+
 export class PopupPreviewController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
-        this._frame = null;
-        this._customCss = null;
-        this._customOuterCss = null;
-        this._previewFrameContainer = null;
+        /** @type {HTMLIFrameElement} */
+        this._frame = querySelectorNotNull(document, '#popup-preview-frame');
+        /** @type {HTMLTextAreaElement} */
+        this._customCss = querySelectorNotNull(document, '#custom-popup-css');
+        /** @type {HTMLTextAreaElement} */
+        this._customOuterCss = querySelectorNotNull(document, '#custom-popup-outer-css');
+        /** @type {HTMLElement} */
+        this._previewFrameContainer = querySelectorNotNull(document, '.preview-frame-container');
     }
 
+    /** */
     async prepare() {
         if (new URLSearchParams(location.search).get('popup-preview') === 'false') { return; }
-
-        this._frame = document.querySelector('#popup-preview-frame');
-        this._customCss = document.querySelector('#custom-popup-css');
-        this._customOuterCss = document.querySelector('#custom-popup-outer-css');
-        this._previewFrameContainer = document.querySelector('.preview-frame-container');
 
         this._customCss.addEventListener('input', this._onCustomCssChange.bind(this), false);
         this._customCss.addEventListener('settingChanged', this._onCustomCssChange.bind(this), false);
@@ -46,25 +53,35 @@ export class PopupPreviewController {
 
     // Private
 
+    /** */
     _onFrameLoad() {
         this._onOptionsContextChange();
         this._onCustomCssChange();
         this._onCustomOuterCssChange();
     }
 
+    /** */
     _onCustomCssChange() {
-        this._invoke('PopupPreviewFrame.setCustomCss', {css: this._customCss.value});
+        const css = /** @type {HTMLTextAreaElement} */ (this._customCss).value;
+        this._invoke('PopupPreviewFrame.setCustomCss', {css});
     }
 
+    /** */
     _onCustomOuterCssChange() {
-        this._invoke('PopupPreviewFrame.setCustomOuterCss', {css: this._customOuterCss.value});
+        const css = /** @type {HTMLTextAreaElement} */ (this._customOuterCss).value;
+        this._invoke('PopupPreviewFrame.setCustomOuterCss', {css});
     }
 
+    /** */
     _onOptionsContextChange() {
         const optionsContext = this._settingsController.getOptionsContext();
         this._invoke('PopupPreviewFrame.updateOptionsContext', {optionsContext});
     }
 
+    /**
+     * @param {string} action
+     * @param {import('core').SerializableObject} params
+     */
     _invoke(action, params) {
         if (this._frame === null || this._frame.contentWindow === null) { return; }
         this._frame.contentWindow.postMessage({action, params}, this._targetOrigin);

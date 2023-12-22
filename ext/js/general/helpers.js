@@ -16,7 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export async function fetchAsset(url, json=false) {
+import {readResponseJson} from '../core/json.js';
+
+/**
+ * @param {string} url
+ * @returns {Promise<Response|string>}
+ */
+
+export async function fetchAsset(url) {
     if (typeof global !== 'undefined') {
         const fs = require('fs');
         const path = require('path');
@@ -35,53 +42,29 @@ export async function fetchAsset(url, json=false) {
         if (!response.ok) {
             throw new Error(`Failed to fetch ${url}: ${response.status}`);
         }
-        return await (json ? response.json() : response.text());
+        return response;
     }
 }
 
-export function loadScript(filename) {
-    return new Promise((resolve) => {
-        const fileref = document.createElement('script');
-        fileref.setAttribute('type', 'text/javascript');
-        fileref.setAttribute('src', filename);
-
-        if (typeof fileref !== 'undefined') {
-            fileref.onload = () => {
-                resolve(); // Resolve the Promise when the script has loaded
-            };
-            fileref.onerror = () => {
-                console.error('Error loading script: ' + filename); // Reject the Promise on error
-                resolve(); // Resolve the Promise when the script has loaded
-            };
-
-            document.getElementsByTagName('head')[0].appendChild(fileref);
-        }
-    });
-}
-
-export function loadModule(filename){
-    return new Promise((resolve) => {
-        const fileref = document.createElement('script');
-        fileref.setAttribute('type', 'module');
-        fileref.setAttribute('src', filename);
-
-        if (typeof fileref !== 'undefined') {
-            fileref.onload = () => {
-                resolve(); // Resolve the Promise when the script has loaded
-            };
-            fileref.onerror = () => {
-                console.error('Error loading script: ' + filename); // Reject the Promise on error
-                resolve(); // Resolve the Promise when the script has loaded
-            };
-
-            document.getElementsByTagName('head')[0].appendChild(fileref);
-        }
-    });
-}
-
-export function removeScript(filename){
-    const scriptElement = document.querySelector(`script[src="${filename}"]`);
-    if (scriptElement) {
-        document.head.removeChild(scriptElement);
+/**
+ * @param {string} url
+ * @returns {Promise<string>}
+ */
+export async function fetchText(url) {
+    if (typeof global === 'undefined') {
+        const response = await fetchAsset(url);
+        return await response.text();
+    } else  {
+        return fetchAsset(url);
     }
+}
+
+/**
+ * @template [T=unknown]
+ * @param {string} url
+ * @returns {Promise<T>}
+ */
+export async function fetchJson(url) {
+    const response = await fetchAsset(url);
+    return await readResponseJson(response);
 }

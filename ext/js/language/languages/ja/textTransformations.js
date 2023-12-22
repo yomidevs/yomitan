@@ -31,11 +31,16 @@ import {
     isCodePointInRange
 } from './util.js';
 
-export function convertKatakanaToHiragana(text, keepProlongedSoundMarks=false) {
+/**
+ * @param {string} text
+ * @param {boolean} [keepProlongedSoundMarks]
+ * @returns {string}
+ */
+export function convertKatakanaToHiragana(text, keepProlongedSoundMarks = false) {
     let result = '';
     const offset = (HIRAGANA_CONVERSION_RANGE[0] - KATAKANA_CONVERSION_RANGE[0]);
     for (let char of text) {
-        const codePoint = char.codePointAt(0);
+        const codePoint = /** @type {number} */ (char.codePointAt(0));
         switch (codePoint) {
             case KATAKANA_SMALL_KA_CODE_POINT:
             case KATAKANA_SMALL_KE_CODE_POINT:
@@ -58,11 +63,15 @@ export function convertKatakanaToHiragana(text, keepProlongedSoundMarks=false) {
     return result;
 }
 
+/**
+ * @param {string} text
+ * @returns {string}
+ */
 export function convertHiraganaToKatakana(text) {
     let result = '';
     const offset = (KATAKANA_CONVERSION_RANGE[0] - HIRAGANA_CONVERSION_RANGE[0]);
     for (let char of text) {
-        const codePoint = char.codePointAt(0);
+        const codePoint = /** @type {number} */ (char.codePointAt(0));
         if (isCodePointInRange(codePoint, HIRAGANA_CONVERSION_RANGE)) {
             char = String.fromCodePoint(codePoint + offset);
         }
@@ -71,10 +80,14 @@ export function convertHiraganaToKatakana(text) {
     return result;
 }
 
+/**
+     * @param {string} text
+     * @returns {string}
+     */
 export function convertNumericToFullWidth(text) {
     let result = '';
     for (const char of text) {
-        let c = char.codePointAt(0);
+        let c = /** @type {number} */ (char.codePointAt(0));
         if (c >= 0x30 && c <= 0x39) { // ['0', '9']
             c += 0xff10 - 0x30; // 0xff10 = '0' full width
             result += String.fromCodePoint(c);
@@ -85,7 +98,12 @@ export function convertNumericToFullWidth(text) {
     return result;
 }
 
-export function convertHalfWidthKanaToFullWidth(text, sourceMap=null) {
+/**
+ * @param {string} text
+ * @param {?import('../../../general/text-source-map.js').TextSourceMap} [sourceMap]
+ * @returns {string}
+ */
+export function convertHalfWidthKanaToFullWidth(text, sourceMap = null) {
     let result = '';
 
     // This function is safe to use charCodeAt instead of codePointAt, since all
@@ -127,13 +145,18 @@ export function convertHalfWidthKanaToFullWidth(text, sourceMap=null) {
     return result;
 }
 
-export function convertAlphabeticToKana(text, sourceMap=null) {
+/**
+ * @param {string} text
+ * @param {?import('../../../general/text-source-map.js').TextSourceMap} sourceMap
+ * @returns {string}
+ */
+export function convertAlphabeticToKana(text, sourceMap = null) {
     let part = '';
     let result = '';
 
     for (const char of text) {
         // Note: 0x61 is the character code for 'a'
-        let c = char.codePointAt(0);
+        let c = /** @type {number} */ (char.codePointAt(0));
         if (c >= 0x41 && c <= 0x5a) { // ['A', 'Z']
             c += (0x61 - 0x41);
         } else if (c >= 0x61 && c <= 0x7a) { // ['a', 'z']
@@ -158,7 +181,6 @@ export function convertAlphabeticToKana(text, sourceMap=null) {
     if (part.length > 0) {
         result += convertAlphabeticPartToKana(part, sourceMap, result.length);
     }
-
     return result;
 }
 

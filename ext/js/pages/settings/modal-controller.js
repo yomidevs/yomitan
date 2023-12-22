@@ -20,13 +20,16 @@ import {Modal} from './modal.js';
 
 export class ModalController {
     constructor() {
+        /** @type {Modal[]} */
         this._modals = [];
+        /** @type {Map<string|Element, Modal>} */
         this._modalMap = new Map();
     }
 
+    /** */
     prepare() {
         const idSuffix = '-modal';
-        for (const node of document.querySelectorAll('.modal')) {
+        for (const node of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.modal'))) {
             let {id} = node;
             if (typeof id !== 'string') { continue; }
 
@@ -42,11 +45,18 @@ export class ModalController {
         }
     }
 
+    /**
+     * @param {string|Element} nameOrNode
+     * @returns {?Modal}
+     */
     getModal(nameOrNode) {
         const modal = this._modalMap.get(nameOrNode);
         return (typeof modal !== 'undefined' ? modal : null);
     }
 
+    /**
+     * @returns {?Modal}
+     */
     getTopVisibleModal() {
         for (let i = this._modals.length - 1; i >= 0; --i) {
             const modal = this._modals[i];

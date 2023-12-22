@@ -22,23 +22,38 @@ export const KATAKANA_SMALL_KA_CODE_POINT = 0x30f5;
 export const KATAKANA_SMALL_KE_CODE_POINT = 0x30f6;
 export const KANA_PROLONGED_SOUND_MARK_CODE_POINT = 0x30fc;
 
+/** @type {import('japanese-util').CodepointRange} */
 export const HIRAGANA_RANGE = [0x3040, 0x309f];
+/** @type {import('japanese-util').CodepointRange} */
 export const KATAKANA_RANGE = [0x30a0, 0x30ff];
 
+/** @type {import('japanese-util').CodepointRange} */
 export const HIRAGANA_CONVERSION_RANGE = [0x3041, 0x3096];
+/** @type {import('japanese-util').CodepointRange} */
 export const KATAKANA_CONVERSION_RANGE = [0x30a1, 0x30f6];
 
+/** @type {import('japanese-util').CodepointRange[]} */
 export const KANA_RANGES = [HIRAGANA_RANGE, KATAKANA_RANGE];
 
+/** @type {import('japanese-util').CodepointRange} */
 export const CJK_UNIFIED_IDEOGRAPHS_RANGE = [0x4e00, 0x9fff];
+/** @type {import('japanese-util').CodepointRange} */
 export const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A_RANGE = [0x3400, 0x4dbf];
+/** @type {import('japanese-util').CodepointRange} */
 export const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B_RANGE = [0x20000, 0x2a6df];
+/** @type {import('japanese-util').CodepointRange} */
 export const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C_RANGE = [0x2a700, 0x2b73f];
+/** @type {import('japanese-util').CodepointRange} */
 export const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D_RANGE = [0x2b740, 0x2b81f];
+/** @type {import('japanese-util').CodepointRange} */
 export const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_E_RANGE = [0x2b820, 0x2ceaf];
+/** @type {import('japanese-util').CodepointRange} */
 export const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_F_RANGE = [0x2ceb0, 0x2ebef];
+/** @type {import('japanese-util').CodepointRange} */
 export const CJK_COMPATIBILITY_IDEOGRAPHS_RANGE = [0xf900, 0xfaff];
+/** @type {import('japanese-util').CodepointRange} */
 export const CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT_RANGE = [0x2f800, 0x2fa1f];
+/** @type {import('japanese-util').CodepointRange[]} */
 export const CJK_IDEOGRAPH_RANGES = [
     CJK_UNIFIED_IDEOGRAPHS_RANGE,
     CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A_RANGE,
@@ -52,6 +67,7 @@ export const CJK_IDEOGRAPH_RANGES = [
 ];
 
 // Japanese character ranges, roughly ordered in order of expected frequency
+/** @type {import('japanese-util').CodepointRange[]} */
 export const JAPANESE_RANGES = [
     HIRAGANA_RANGE,
     KATAKANA_RANGE,
@@ -72,7 +88,7 @@ export const JAPANESE_RANGES = [
     [0xff1a, 0xff1f], // Fullwidth punctuation 2
     [0xff3b, 0xff3f], // Fullwidth punctuation 3
     [0xff5b, 0xff60], // Fullwidth punctuation 4
-    [0xffe0, 0xffee]  // Currency markers
+    [0xffe0, 0xffee] // Currency markers
 ];
 
 export const SMALL_KANA_SET = new Set(Array.from('ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ'));
@@ -145,27 +161,23 @@ export const VOWEL_TO_KANA_MAPPING = new Map([
     ['', 'のノ']
 ]);
 
-export const KANA_TO_VOWEL_MAPPING = (() => {
-    const map = new Map();
-    for (const [vowel, characters] of VOWEL_TO_KANA_MAPPING) {
-        for (const character of characters) {
-            map.set(character, vowel);
-        }
+/** @type {Map<string, string>} */
+export const KANA_TO_VOWEL_MAPPING = new Map();
+for (const [vowel, characters] of VOWEL_TO_KANA_MAPPING) {
+    for (const character of characters) {
+        KANA_TO_VOWEL_MAPPING.set(character, vowel);
     }
-    return map;
-})();
+}
 
-export const DIACRITIC_MAPPING = (() => {
-    const kana = 'うゔ-かが-きぎ-くぐ-けげ-こご-さざ-しじ-すず-せぜ-そぞ-ただ-ちぢ-つづ-てで-とど-はばぱひびぴふぶぷへべぺほぼぽワヷ-ヰヸ-ウヴ-ヱヹ-ヲヺ-カガ-キギ-クグ-ケゲ-コゴ-サザ-シジ-スズ-セゼ-ソゾ-タダ-チヂ-ツヅ-テデ-トド-ハバパヒビピフブプヘベペホボポ';
-    const map = new Map();
-    for (let i = 0, ii = kana.length; i < ii; i += 3) {
-        const character = kana[i];
-        const dakuten = kana[i + 1];
-        const handakuten = kana[i + 2];
-        map.set(dakuten, {character, type: 'dakuten'});
-        if (handakuten !== '-') {
-            map.set(handakuten, {character, type: 'handakuten'});
-        }
+const kana = 'うゔ-かが-きぎ-くぐ-けげ-こご-さざ-しじ-すず-せぜ-そぞ-ただ-ちぢ-つづ-てで-とど-はばぱひびぴふぶぷへべぺほぼぽワヷ-ヰヸ-ウヴ-ヱヹ-ヲヺ-カガ-キギ-クグ-ケゲ-コゴ-サザ-シジ-スズ-セゼ-ソゾ-タダ-チヂ-ツヅ-テデ-トド-ハバパヒビピフブプヘベペホボポ';
+/** @type {Map<string, {character: string, type: import('japanese-util').DiacriticType}>} */
+export const DIACRITIC_MAPPING = new Map();
+for (let i = 0, ii = kana.length; i < ii; i += 3) {
+    const character = kana[i];
+    const dakuten = kana[i + 1];
+    const handakuten = kana[i + 2];
+    DIACRITIC_MAPPING.set(dakuten, {character, type: 'dakuten'});
+    if (handakuten !== '-') {
+        DIACRITIC_MAPPING.set(handakuten, {character, type: 'handakuten'});
     }
-    return map;
-})();
+}

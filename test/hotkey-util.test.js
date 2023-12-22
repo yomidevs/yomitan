@@ -16,11 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable no-multi-spaces */
+
 import {expect, test} from 'vitest';
 import {HotkeyUtil} from '../ext/js/input/hotkey-util.js';
 
+/** */
 function testCommandConversions() {
     test('CommandConversions', () => {
+        /** @type {{os: import('environment').OperatingSystem, command: string, expectedCommand: string, expectedInput: {key: string, modifiers: import('input').Modifier[]}}[]} */
         const data = [
             {os: 'win', command: 'Alt+F', expectedCommand: 'Alt+F', expectedInput: {key: 'KeyF', modifiers: ['alt']}},
             {os: 'win', command: 'F1',    expectedCommand: 'F1',    expectedInput: {key: 'F1', modifiers: []}},
@@ -49,8 +53,10 @@ function testCommandConversions() {
     });
 }
 
+/** */
 function testDisplayNames() {
     test('DisplayNames', () => {
+        /** @type {{os: import('environment').OperatingSystem, key: ?string, modifiers: import('input').Modifier[], expected: string}[]} */
         const data = [
             {os: 'win', key: null,   modifiers: [], expected: ''},
             {os: 'win', key: 'KeyF', modifiers: [], expected: 'F'},
@@ -138,8 +144,10 @@ function testDisplayNames() {
     });
 }
 
+/** */
 function testSortModifiers() {
     test('SortModifiers', () => {
+        /** @type {{modifiers: import('input').Modifier[], expected: import('input').Modifier[]}[]} */
         const data = [
             {modifiers: [], expected: []},
             {modifiers: ['shift', 'alt', 'ctrl', 'mouse4', 'meta', 'mouse1', 'mouse0'], expected: ['meta', 'ctrl', 'alt', 'shift', 'mouse0', 'mouse1', 'mouse4']}
@@ -155,6 +163,7 @@ function testSortModifiers() {
 }
 
 
+/** */
 function main() {
     testCommandConversions();
     testDisplayNames();

@@ -17,10 +17,15 @@
  */
 
 export class SearchActionPopupController {
+    /**
+     * @param {import('./search-persistent-state-controller.js').SearchPersistentStateController} searchPersistentStateController
+     */
     constructor(searchPersistentStateController) {
+        /** @type {import('./search-persistent-state-controller.js').SearchPersistentStateController} */
         this._searchPersistentStateController = searchPersistentStateController;
     }
 
+    /** */
     prepare() {
         const searchParams = new URLSearchParams(location.search);
         if (searchParams.get('action-popup') !== 'true') { return; }

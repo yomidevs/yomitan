@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>DOMTextScanner Tests</title>
+    <link rel="icon" type="image/gif" href="data:image/gif;base64,R0lGODdhAQABAIABAAAAAP///ywAAAAAAQABAAACAkQBADs=">
+    <link rel="stylesheet" href="test-stylesheet.css">
+</head>
+<body>
+
+    <h1>DOMTextScanner Tests</h1>
+
+    <test-description>Automated test cases for DOMTextScanner.</test-description>
+
+    <test-case
+        data-test-data='{
+            "node": "div:nth-of-type(1)",
+            "offset": 0,
+            "length": 15,
+            "expected": {
+                "node": "div:nth-of-type(2)>div::text",
+                "offset": 3,
+                "content": "小ぢん\nまり1\n小ぢん\nまり2"
+            }
+        }'
+    >
+        <test-description>Layout newlines expected due to entering and exiting display:block nodes.</test-description>
+<div><div>小ぢん</div>まり1</div>
+<div>小ぢん<div>まり2</div></div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 13,
+            "expected": {
+                "node": "div:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n小ぢんまり2"
+            }
+        }'
+    >
+        <test-description>Layout newline expected due to sequential display:block elements.</test-description>
+<div>小ぢんまり1</div><div>小ぢんまり2</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 13,
+            "expected": {
+                "node": "div:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n小ぢんまり2"
+            }
+        }'
+    >
+        <test-description>Layout newline expected due to sequential display:block elements separated by a newline.</test-description>
+<div>小ぢんまり1</div>
+<div>小ぢんまり2</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "span:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 12,
+            "expected": {
+                "node": "span:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1小ぢんまり2"
+            }
+        }'
+    >
+        <test-description>No newlines expected due to display:inline.</test-description>
+<span>小ぢんまり1</span><span>小ぢんまり2</span>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "span:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 13,
+            "expected": {
+                "node": "span:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1 小ぢんまり2"
+            }
+        }'
+    >
+        <test-description>No newlines expected due to white-space:normal.</test-description>
+<span>小ぢんまり1</span>
+<span>小ぢんまり2</span>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "span:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 13,
+            "expected": {
+                "node": "span:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n小ぢんまり2"
+            }
+        }'
+    >
+        <test-description>Newline expected due to white-space:pre.</test-description>
+<pre>
+<span>小ぢんまり1</span>
+<span>小ぢんまり2</span>
+</pre>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "span:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 12,
+            "expected": {
+                "node": "span:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1小ぢんまり2"
+            }
+        }'
+    >
+        <test-description>No newlines expected due to display:inline-block. Actual layout flow cannot be determined by DOM/CSS alone.</test-description>
+<span style="display: inline-block;">小ぢんまり1</span><span style="display: inline-block;">小ぢんまり2</span>
+    </test-case>
+
+    <test-case
+        style="position: relative;"
+        data-test-data='{
+            "node": "div:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 13,
+            "expected": {
+                "node": "div:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n小ぢんまり2"
+            }
+        }'
+    >
+        <test-description>Single newline expected due to display:block layout.</test-description>
+<div>小ぢんまり1</div><div style="position: relative;">小ぢんまり2</div>
+    </test-case>
+
+    <test-case
+        style="position: relative; overflow: hidden;"
+        data-test-data='{
+            "node": "div:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 14,
+            "expected": {
+                "node": "div:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n\n小ぢんまり2"
+            }
+        }'
+    >
+        <test-description>Two newlines expected due to position:absolute causing a significant layout change.</test-description>
+<div>小ぢんまり1</div><div style="position: absolute;">小ぢんまり2</div>
+    </test-case>
+
+    <test-case
+        style="position: relative; overflow: hidden;"
+        data-test-data='{
+            "node": "div:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 14,
+            "expected": {
+                "node": "div:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n\n小ぢんまり2"
+            }
+        }'
+    >
+        <test-description>Two newlines expected due to position:fixed causing a significant layout change.</test-description>
+<div>小ぢんまり1</div><div style="position: fixed;">小ぢんまり2</div>
+    </test-case>
+
+    <test-case
+        style="position: relative;"
+        data-test-data='{
+            "node": "div:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 14,
+            "expected": {
+                "node": "div:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n\n小ぢんまり2"
+            }
+        }'
+    >
+        <test-description>Two newlines expected due to position:sticky being able to cause a significant layout change.</test-description>
+<div>小ぢんまり1</div><div style="position: sticky;">小ぢんまり2</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "rt",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::text",
+                "offset": 5,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <test-description>Scanning text starting in an &lt;rt&gt; element. Should start scanning at the start of the &lt;ruby&gt; tag instead.</test-description>
+<div><ruby>小<rp>(</rp><rt>こ</rt><rp>)</rp></ruby>ぢんまり1</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <test-description>Skip &lt;script&gt; content.</test-description>
+<div>小ぢん<script>/*comment*/</script>まり1</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <test-description>Skip &lt;style&gt; content.</test-description>
+<div>小ぢん<style>/*comment*/</style>まり1</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <test-description>Skip &lt;textarea&gt; content.</test-description>
+<div>小ぢん<textarea>textarea content</textarea>まり1</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <test-description>Skip &lt;input&gt; content.</test-description>
+<div>小ぢん<input value="content">まり1</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <test-description>Skip &lt;button&gt; content.</test-description>
+<div>小ぢん<button type="button">content</button>まり1</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <test-description>Skip content with font-size:0.</test-description>
+<div>小ぢん<span style="font-size: 0;">content</span>まり1</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <test-description>Skip content with opacity:0.</test-description>
+<div>小ぢん<span style="opacity: 0;">content</span>まり1</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <test-description>Skip content with visibility:hidden.</test-description>
+<div>小ぢん<span style="visibility: hidden;">content</span>まり1</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <test-description>Skip content with display:none.</test-description>
+<div>小ぢん<span style="display: none;">content</span>まり1</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <test-description>Don't skip content with user-select:none.</test-description>
+<div>小ぢ<span style="user-select: none;">ん</span>まり1</div>
+    </test-case>
+
+    <test-case
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <test-description>Skip content with user-select:none <em>and</em> a transparent color.</test-description>
+<div>小ぢん<span style="user-select: none; color: rgba(0, 0, 0, 0);">content</span>まり1</div>
+    </test-case>
+
+</body>
+</html>

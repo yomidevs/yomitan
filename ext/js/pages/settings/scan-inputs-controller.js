@@ -17,26 +17,36 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
+import {DocumentUtil} from '../../dom/document-util.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
 export class ScanInputsController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {?import('environment').OperatingSystem} */
         this._os = null;
-        this._container = null;
-        this._addButton = null;
+        /** @type {HTMLElement} */
+        this._container = querySelectorNotNull(document, '#scan-input-list');
+        /** @type {HTMLButtonElement} */
+        this._addButton = querySelectorNotNull(document, '#scan-input-add');
+        /** @type {?NodeListOf<HTMLElement>} */
         this._scanningInputCountNodes = null;
+        /** @type {ScanInputField[]} */
         this._entries = [];
     }
 
+    /** */
     async prepare() {
         const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
         this._os = os;
 
-        this._container = document.querySelector('#scan-input-list');
-        this._addButton = document.querySelector('#scan-input-add');
-        this._scanningInputCountNodes = document.querySelectorAll('.scanning-input-count');
+        this._scanningInputCountNodes = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.scanning-input-count'));
 
         this._addButton.addEventListener('click', this._onAddButtonClick.bind(this), false);
         this._settingsController.on('scanInputsChanged', this._onScanInputsChanged.bind(this));
@@ -45,6 +55,10 @@ export class ScanInputsController {
         this.refresh();
     }
 
+    /**
+     * @param {number} index
+     * @returns {boolean}
+     */
     removeInput(index) {
         if (index < 0 || index >= this._entries.length) { return false; }
         const input = this._entries[index];
@@ -64,6 +78,12 @@ export class ScanInputsController {
         return true;
     }
 
+    /**
+     * @param {number} index
+     * @param {string} property
+     * @param {unknown} value
+     * @param {boolean} event
+     */
     async setProperty(index, property, value, event) {
         const path = `scanning.inputs[${index}].${property}`;
         await this._settingsController.setProfileSetting(path, value);
@@ -72,22 +92,34 @@ export class ScanInputsController {
         }
     }
 
+    /**
+     * @param {string} name
+     * @returns {Element}
+     */
     instantiateTemplate(name) {
         return this._settingsController.instantiateTemplate(name);
     }
 
+    /** */
     async refresh() {
         const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        const optionsContext = this._settingsController.getOptionsContext();
+        this._onOptionsChanged({options, optionsContext});
     }
 
     // Private
 
+    /**
+     * @param {import('settings-controller').ScanInputsChangedEvent} details
+     */
     _onScanInputsChanged({source}) {
         if (source === this) { return; }
         this.refresh();
     }
 
+    /**
+     * @param {import('settings-controller').OptionsChangedEvent} details
+     */
     _onOptionsChanged({options}) {
         const {inputs} = options.scanning;
 
@@ -103,6 +135,9 @@ export class ScanInputsController {
         this._updateCounts();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onAddButtonClick(e) {
         e.preventDefault();
 
@@ -119,34 +154,52 @@ export class ScanInputsController {
         }]);
 
         // Scroll to bottom
-        const button = e.currentTarget;
-        const modalContainer = button.closest('.modal');
-        const scrollContainer = modalContainer.querySelector('.modal-body');
+        const button = /** @type {HTMLElement} */ (e.currentTarget);
+        const modalContainer = /** @type {HTMLElement} */ (button.closest('.modal'));
+        /** @type {HTMLElement} */
+        const scrollContainer = querySelectorNotNull(modalContainer, '.modal-body');
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
     }
 
+    /**
+     * @param {number} index
+     * @param {import('settings').ScanningInput} scanningInput
+     */
     _addOption(index, scanningInput) {
+        if (this._os === null || this._container === null) { return; }
         const field = new ScanInputField(this, index, this._os);
         this._entries.push(field);
         field.prepare(this._container, scanningInput);
     }
 
+    /** */
     _updateCounts() {
         const stringValue = `${this._entries.length}`;
-        for (const node of this._scanningInputCountNodes) {
+        for (const node of /** @type {NodeListOf<HTMLElement>} */ (this._scanningInputCountNodes)) {
             node.textContent = stringValue;
         }
     }
 
+    /**
+     * @param {import('settings-modifications').Modification[]} targets
+     */
     async _modifyProfileSettings(targets) {
         await this._settingsController.modifyProfileSettings(targets);
         this._triggerScanInputsChanged();
     }
 
+    /** */
     _triggerScanInputsChanged() {
-        this._settingsController.trigger('scanInputsChanged', {source: this});
+        /** @type {import('settings-controller').ScanInputsChangedEvent} */
+        const event = {source: this};
+        this._settingsController.trigger('scanInputsChanged', event);
     }
 
+    /**
+     * @param {string} include
+     * @param {string} exclude
+     * @returns {import('settings').ScanningInput}
+     */
     static createDefaultMouseInput(include, exclude) {
         return {
             include,
@@ -172,16 +225,29 @@ export class ScanInputsController {
 }
 
 class ScanInputField {
+    /**
+     * @param {ScanInputsController} parent
+     * @param {number} index
+     * @param {import('environment').OperatingSystem} os
+     */
     constructor(parent, index, os) {
+        /** @type {ScanInputsController} */
         this._parent = parent;
+        /** @type {number} */
         this._index = index;
+        /** @type {import('environment').OperatingSystem} */
         this._os = os;
+        /** @type {?HTMLElement} */
         this._node = null;
+        /** @type {?KeyboardMouseInputField} */
         this._includeInputField = null;
+        /** @type {?KeyboardMouseInputField} */
         this._excludeInputField = null;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
     }
 
+    /** @type {number} */
     get index() {
         return this._index;
     }
@@ -191,16 +257,24 @@ class ScanInputField {
         this._updateDataSettingTargets();
     }
 
+    /**
+     * @param {HTMLElement} container
+     * @param {import('settings').ScanningInput} scanningInput
+     */
     prepare(container, scanningInput) {
         const {include, exclude, options: {showAdvanced}} = scanningInput;
 
-        const node = this._parent.instantiateTemplate('scan-input');
-        const includeInputNode = node.querySelector('.scan-input-field[data-property=include]');
-        const includeMouseButton = node.querySelector('.mouse-button[data-property=include]');
-        const excludeInputNode = node.querySelector('.scan-input-field[data-property=exclude]');
-        const excludeMouseButton = node.querySelector('.mouse-button[data-property=exclude]');
-        const removeButton = node.querySelector('.scan-input-remove');
-        const menuButton = node.querySelector('.scanning-input-menu-button');
+        const node = /** @type {HTMLElement} */ (this._parent.instantiateTemplate('scan-input'));
+        /** @type {HTMLInputElement} */
+        const includeInputNode = querySelectorNotNull(node, '.scan-input-field[data-property=include]');
+        /** @type {HTMLButtonElement} */
+        const includeMouseButton = querySelectorNotNull(node, '.mouse-button[data-property=include]');
+        /** @type {HTMLInputElement} */
+        const excludeInputNode = querySelectorNotNull(node, '.scan-input-field[data-property=exclude]');
+        /** @type {HTMLButtonElement} */
+        const excludeMouseButton = querySelectorNotNull(node, '.mouse-button[data-property=exclude]');
+        /** @type {HTMLButtonElement} */
+        const menuButton = querySelectorNotNull(node, '.scanning-input-menu-button');
 
         node.dataset.showAdvanced = `${showAdvanced}`;
 
@@ -215,17 +289,13 @@ class ScanInputField {
 
         this._eventListeners.on(this._includeInputField, 'change', this._onIncludeValueChange.bind(this));
         this._eventListeners.on(this._excludeInputField, 'change', this._onExcludeValueChange.bind(this));
-        if (removeButton !== null) {
-            this._eventListeners.addEventListener(removeButton, 'click', this._onRemoveClick.bind(this));
-        }
-        if (menuButton !== null) {
-            this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this));
-            this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this));
-        }
+        this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this));
+        this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this));
 
         this._updateDataSettingTargets();
     }
 
+    /** */
     cleanup() {
         this._eventListeners.removeAllEventListeners();
         if (this._includeInputField !== null) {
@@ -241,26 +311,40 @@ class ScanInputField {
 
     // Private
 
+    /**
+     * @param {import('keyboard-mouse-input-field').ChangeEvent} details
+     */
     _onIncludeValueChange({modifiers}) {
-        modifiers = this._joinModifiers(modifiers);
-        this._parent.setProperty(this._index, 'include', modifiers, true);
+        const modifiers2 = this._joinModifiers(modifiers);
+        this._parent.setProperty(this._index, 'include', modifiers2, true);
     }
 
+    /**
+     * @param {import('keyboard-mouse-input-field').ChangeEvent} details
+     */
     _onExcludeValueChange({modifiers}) {
-        modifiers = this._joinModifiers(modifiers);
-        this._parent.setProperty(this._index, 'exclude', modifiers, true);
+        const modifiers2 = this._joinModifiers(modifiers);
+        this._parent.setProperty(this._index, 'exclude', modifiers2, true);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onRemoveClick(e) {
         e.preventDefault();
         this._removeSelf();
     }
 
+    /**
+     * @param {import('popup-menu').MenuOpenEvent} e
+     */
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
+        /** @type {?HTMLElement} */
         const showAdvanced = bodyNode.querySelector('.popup-menu-item[data-menu-action="showAdvanced"]');
+        /** @type {?HTMLElement} */
         const hideAdvanced = bodyNode.querySelector('.popup-menu-item[data-menu-action="hideAdvanced"]');
-        const advancedVisible = (this._node.dataset.showAdvanced === 'true');
+        const advancedVisible = (this._node !== null && this._node.dataset.showAdvanced === 'true');
         if (showAdvanced !== null) {
             showAdvanced.hidden = advancedVisible;
         }
@@ -269,6 +353,9 @@ class ScanInputField {
         }
     }
 
+    /**
+     * @param {import('popup-menu').MenuCloseEvent} e
+     */
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'remove':
@@ -281,40 +368,67 @@ class ScanInputField {
                 this._setAdvancedOptionsVisible(false);
                 break;
             case 'clearInputs':
-                this._includeInputField.clearInputs();
-                this._excludeInputField.clearInputs();
+                /** @type {KeyboardMouseInputField} */ (this._includeInputField).clearInputs();
+                /** @type {KeyboardMouseInputField} */ (this._excludeInputField).clearInputs();
                 break;
         }
     }
 
+    /**
+     * @param {string} pointerType
+     * @returns {boolean}
+     */
     _isPointerTypeSupported(pointerType) {
         if (this._node === null) { return false; }
-        const node = this._node.querySelector(`input.scan-input-settings-checkbox[data-property="types.${pointerType}"]`);
+        const node = /** @type {?HTMLInputElement} */ (this._node.querySelector(`input.scan-input-settings-checkbox[data-property="types.${pointerType}"]`));
         return node !== null && node.checked;
     }
 
+    /** */
     _updateDataSettingTargets() {
+        if (this._node === null) { return; }
         const index = this._index;
-        for (const typeCheckbox of this._node.querySelectorAll('.scan-input-settings-checkbox')) {
+        for (const typeCheckbox of /** @type {NodeListOf<HTMLElement>} */ (this._node.querySelectorAll('.scan-input-settings-checkbox'))) {
             const {property} = typeCheckbox.dataset;
             typeCheckbox.dataset.setting = `scanning.inputs[${index}].${property}`;
         }
     }
 
+    /** */
     _removeSelf() {
         this._parent.removeInput(this._index);
     }
 
+    /**
+     * @param {boolean} showAdvanced
+     */
     _setAdvancedOptionsVisible(showAdvanced) {
         showAdvanced = !!showAdvanced;
-        this._node.dataset.showAdvanced = `${showAdvanced}`;
+        if (this._node !== null) {
+            this._node.dataset.showAdvanced = `${showAdvanced}`;
+        }
         this._parent.setProperty(this._index, 'options.showAdvanced', showAdvanced, false);
     }
 
+    /**
+     * @param {string} modifiersString
+     * @returns {import('input').Modifier[]}
+     */
     _splitModifiers(modifiersString) {
-        return modifiersString.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0);
+        /** @type {import('input').Modifier[]} */
+        const results = [];
+        for (const modifier of modifiersString.split(/[,;\s]+/)) {
+            const modifier2 = DocumentUtil.normalizeModifier(modifier.trim().toLowerCase());
+            if (modifier2 === null) { continue; }
+            results.push(modifier2);
+        }
+        return results;
     }
 
+    /**
+     * @param {import('input').Modifier[]} modifiersArray
+     * @returns {string}
+     */
     _joinModifiers(modifiersArray) {
         return modifiersArray.join(', ');
     }

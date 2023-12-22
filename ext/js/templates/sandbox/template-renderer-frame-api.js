@@ -16,16 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ExtensionError} from '../../core/extension-error.js';
+import {parseJson} from '../../core/json.js';
+
 export class TemplateRendererFrameApi {
+    /**
+     * @param {import('./template-renderer.js').TemplateRenderer} templateRenderer
+     */
     constructor(templateRenderer) {
+        /** @type {import('./template-renderer.js').TemplateRenderer} */
         this._templateRenderer = templateRenderer;
-        this._windowMessageHandlers = new Map([
-            ['render', {async: false, handler: this._onRender.bind(this)}],
-            ['renderMulti', {async: false, handler: this._onRenderMulti.bind(this)}],
-            ['getModifiedData', {async: false, handler: this._onGetModifiedData.bind(this)}]
-        ]);
+        /** @type {import('core').MessageHandlerMap} */
+        this._windowMessageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
+            ['render', this._onRender.bind(this)],
+            ['renderMulti', this._onRenderMulti.bind(this)],
+            ['getModifiedData', this._onGetModifiedData.bind(this)]
+        ]));
     }
 
+    /**
+     * @returns {void}
+     */
     prepare() {
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
         this._postMessage(window.parent, 'ready', {}, null);
@@ -33,81 +44,81 @@ export class TemplateRendererFrameApi {
 
     // Private
 
+    /**
+     * @param {MessageEvent<import('template-renderer-frame-api').MessageData>} e
+     */
     _onWindowMessage(e) {
         const {source, data: {action, params, id}} = e;
         const messageHandler = this._windowMessageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return; }
 
-        this._onWindowMessageInner(messageHandler, action, params, source, id);
+        this._onWindowMessageInner(messageHandler, action, params, /** @type {Window} */ (source), id);
     }
 
-    async _onWindowMessageInner({handler, async}, action, params, source, id) {
+    /**
+     * @param {import('core').MessageHandler} handler
+     * @param {string} action
+     * @param {import('core').SerializableObject} params
+     * @param {Window} source
+     * @param {?string} id
+     */
+    async _onWindowMessageInner(handler, action, params, source, id) {
         let response;
         try {
             let result = handler(params);
-            if (async) {
+            if (result instanceof Promise) {
                 result = await result;
             }
             response = {result};
         } catch (error) {
-            response = {error: this._serializeError(error)};
+            response = {error: ExtensionError.serialize(error)};
         }
 
         if (typeof id === 'undefined') { return; }
         this._postMessage(source, `${action}.response`, response, id);
     }
 
+    /**
+     * @param {{template: string, data: import('template-renderer').PartialOrCompositeRenderData, type: import('anki-templates').RenderMode}} event
+     * @returns {import('template-renderer').RenderResult}
+     */
     _onRender({template, data, type}) {
         return this._templateRenderer.render(template, data, type);
     }
 
+    /**
+     * @param {{items: import('template-renderer').RenderMultiItem[]}} event
+     * @returns {import('core').Response<import('template-renderer').RenderResult>[]}
+     */
     _onRenderMulti({items}) {
-        return this._serializeMulti(this._templateRenderer.renderMulti(items));
+        return this._templateRenderer.renderMulti(items);
     }
 
+    /**
+     * @param {{data: import('template-renderer').CompositeRenderData, type: import('anki-templates').RenderMode}} event
+     * @returns {import('anki-templates').NoteData}
+     */
     _onGetModifiedData({data, type}) {
         const result = this._templateRenderer.getModifiedData(data, type);
         return this._clone(result);
     }
 
-    _serializeError(error) {
-        try {
-            if (typeof error === 'object' && error !== null) {
-                const result = {
-                    name: error.name,
-                    message: error.message,
-                    stack: error.stack
-                };
-                if (Object.prototype.hasOwnProperty.call(error, 'data')) {
-                    result.data = error.data;
-                }
-                return result;
-            }
-        } catch (e) {
-            // NOP
-        }
-        return {
-            value: error,
-            hasValue: true
-        };
-    }
-
-    _serializeMulti(array) {
-        for (let i = 0, ii = array.length; i < ii; ++i) {
-            const value = array[i];
-            const {error} = value;
-            if (typeof error !== 'undefined') {
-                value.error = this._serializeError(error);
-            }
-        }
-        return array;
-    }
-
+    /**
+     * @template [T=unknown]
+     * @param {T} value
+     * @returns {T}
+     */
     _clone(value) {
-        return JSON.parse(JSON.stringify(value));
+        return parseJson(JSON.stringify(value));
     }
 
+    /**
+     * @param {Window} target
+     * @param {string} action
+     * @param {import('core').SerializableObject} params
+     * @param {?string} id
+     */
     _postMessage(target, action, params, id) {
-        return target.postMessage({action, params, id}, '*');
+        target.postMessage(/** @type {import('template-renderer-frame-api').MessageData} */ ({action, params, id}), '*');
     }
 }

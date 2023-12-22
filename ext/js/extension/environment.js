@@ -18,18 +18,29 @@
 
 export class Environment {
     constructor() {
+        /** @type {?import('environment').Info} */
         this._cachedEnvironmentInfo = null;
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async prepare() {
         this._cachedEnvironmentInfo = await this._loadEnvironmentInfo();
     }
 
+    /**
+     * @returns {import('environment').Info}
+     * @throws {Error}
+     */
     getInfo() {
         if (this._cachedEnvironmentInfo === null) { throw new Error('Not prepared'); }
         return this._cachedEnvironmentInfo;
     }
 
+    /**
+     * @returns {Promise<import('environment').Info>}
+     */
     async _loadEnvironmentInfo() {
         const os = await this._getOperatingSystem();
         const browser = await this._getBrowser(os);
@@ -40,6 +51,9 @@ export class Environment {
         };
     }
 
+    /**
+     * @returns {Promise<import('environment').OperatingSystem>}
+     */
     async _getOperatingSystem() {
         try {
             const {os} = await this._getPlatformInfo();
@@ -52,6 +66,9 @@ export class Environment {
         return 'unknown';
     }
 
+    /**
+     * @returns {Promise<chrome.runtime.PlatformInfo>}
+     */
     _getPlatformInfo() {
         return new Promise((resolve, reject) => {
             chrome.runtime.getPlatformInfo((result) => {
@@ -65,6 +82,10 @@ export class Environment {
         });
     }
 
+    /**
+     * @param {import('environment').OperatingSystem} os
+     * @returns {Promise<import('environment').Browser>}
+     */
     async _getBrowser(os) {
         try {
             if (chrome.runtime.getURL('/').startsWith('ms-browser-extension://')) {
@@ -89,6 +110,9 @@ export class Environment {
         }
     }
 
+    /**
+     * @returns {boolean};
+     */
     _isSafari() {
         const {vendor, userAgent} = navigator;
         return (

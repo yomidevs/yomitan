@@ -19,15 +19,24 @@
 import assert from 'assert';
 import childProcess from 'child_process';
 import fs from 'fs';
+import JSZip from 'jszip';
+import {fileURLToPath} from 'node:url';
 import path from 'path';
 import readline from 'readline';
-import {fileURLToPath} from 'url';
 import {buildLibs} from '../build-libs.js';
 import {ManifestUtil} from '../manifest-util.js';
 import {getAllFiles, getArgs, testMain} from '../util.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * @param {string} directory
+ * @param {string[]} excludeFiles
+ * @param {string} outputFileName
+ * @param {string[]} sevenZipExes
+ * @param {?import('jszip').OnUpdateCallback} onUpdate
+ * @param {boolean} dryRun
+ */
 async function createZip(directory, excludeFiles, outputFileName, sevenZipExes, onUpdate, dryRun) {
     try {
         fs.unlinkSync(outputFileName);
@@ -57,11 +66,17 @@ async function createZip(directory, excludeFiles, outputFileName, sevenZipExes, 
             }
         }
     }
-    return await createJSZip(directory, excludeFiles, outputFileName, onUpdate, dryRun);
+    await createJSZip(directory, excludeFiles, outputFileName, onUpdate, dryRun);
 }
 
+/**
+ * @param {string} directory
+ * @param {string[]} excludeFiles
+ * @param {string} outputFileName
+ * @param {?import('jszip').OnUpdateCallback} onUpdate
+ * @param {boolean} dryRun
+ */
 async function createJSZip(directory, excludeFiles, outputFileName, onUpdate, dryRun) {
-    const JSZip = null;
     const files = getAllFiles(directory);
     removeItemsFromArray(files, excludeFiles);
     const zip = new JSZip();
@@ -89,6 +104,10 @@ async function createJSZip(directory, excludeFiles, outputFileName, onUpdate, dr
     }
 }
 
+/**
+ * @param {string[]} array
+ * @param {string[]} removeItems
+ */
 function removeItemsFromArray(array, removeItems) {
     for (const item of removeItems) {
         const index = getIndexOfFilePath(array, item);
@@ -98,6 +117,11 @@ function removeItemsFromArray(array, removeItems) {
     }
 }
 
+/**
+ * @param {string[]} array
+ * @param {string} item
+ * @returns {number}
+ */
 function getIndexOfFilePath(array, item) {
     const pattern = /\\/g;
     const separator = '/';
@@ -110,6 +134,16 @@ function getIndexOfFilePath(array, item) {
     return -1;
 }
 
+/**
+ * @param {string} buildDir
+ * @param {string} extDir
+ * @param {ManifestUtil} manifestUtil
+ * @param {string[]} variantNames
+ * @param {string} manifestPath
+ * @param {boolean} dryRun
+ * @param {boolean} dryRunBuildZip
+ * @param {string} yomitanVersion
+ */
 async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath, dryRun, dryRunBuildZip, yomitanVersion) {
     const sevenZipExes = ['7za', '7z'];
 
@@ -119,6 +153,7 @@ async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath,
     }
 
     const dontLogOnUpdate = !process.stdout.isTTY;
+    /** @type {import('jszip').OnUpdateCallback} */
     const onUpdate = (metadata) => {
         if (dontLogOnUpdate) { return; }
 
@@ -127,7 +162,7 @@ async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath,
             message += ` (${metadata.currentFile})`;
         }
 
-        readline.clearLine(process.stdout);
+        readline.clearLine(process.stdout, 0);
         readline.cursorTo(process.stdout, 0);
         process.stdout.write(message);
     };
@@ -173,6 +208,10 @@ async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath,
     }
 }
 
+/**
+ * @param {string} directory
+ * @param {string[]} files
+ */
 function ensureFilesExist(directory, files) {
     for (const file of files) {
         assert.ok(fs.existsSync(path.join(directory, file)));
@@ -180,8 +219,11 @@ function ensureFilesExist(directory, files) {
 }
 
 
+/**
+ * @param {string[]} argv
+ */
 export async function main(argv) {
-    const args = getArgs(argv, new Map([
+    const args = getArgs(argv, new Map(/** @type {[key: string, value: (boolean|null|number|string|string[])][]} */ ([
         ['all', false],
         ['default', false],
         ['manifest', null],
@@ -189,11 +231,11 @@ export async function main(argv) {
         ['dry-run-build-zip', false],
         ['yomitan-version', '0.0.0.0'],
         [null, []]
-    ]));
+    ])));
 
-    const dryRun = args.get('dry-run');
-    const dryRunBuildZip = args.get('dry-run-build-zip');
-    const yomitanVersion = args.get('yomitan-version');
+    const dryRun = /** @type {boolean} */ (args.get('dry-run'));
+    const dryRunBuildZip = /** @type {boolean} */ (args.get('dry-run-build-zip'));
+    const yomitanVersion = /** @type {string} */ (args.get('yomitan-version'));
 
     const manifestUtil = new ManifestUtil();
 
@@ -204,15 +246,15 @@ export async function main(argv) {
 
     try {
         await buildLibs();
-        const variantNames = (
+        const variantNames = /** @type {string[]} */ ((
             argv.length === 0 || args.get('all') ?
             manifestUtil.getVariants().filter(({buildable}) => buildable !== false).map(({name}) => name) :
             args.get(null)
-        );
+        ));
         await build(buildDir, extDir, manifestUtil, variantNames, manifestPath, dryRun, dryRunBuildZip, yomitanVersion);
     } finally {
         // Restore manifest
-        const manifestName = (!args.get('default') && args.get('manifest') !== null) ? args.get('manifest') : null;
+        const manifestName = /** @type {?string} */ ((!args.get('default') && args.get('manifest') !== null) ? args.get('manifest') : null);
         const restoreManifest = manifestUtil.getManifest(manifestName);
         process.stdout.write('Restoring manifest...\n');
         if (!dryRun) {

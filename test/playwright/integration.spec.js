@@ -45,7 +45,8 @@ test('search clipboard', async ({page, extensionId}) => {
 
 test('anki add', async ({context, page, extensionId}) => {
     // mock anki routes
-    let resolve;
+    /** @type {?(value: unknown) => void} */
+    let resolve = null;
     const addNotePromise = new Promise((res) => {
         resolve = res;
     });
@@ -53,7 +54,7 @@ test('anki add', async ({context, page, extensionId}) => {
         mockAnkiRouteHandler(route);
         const req = route.request();
         if (req.url().includes('127.0.0.1:8765') && req.postDataJSON().action === 'addNote') {
-            resolve(req.postDataJSON());
+            /** @type {(value: unknown) => void} */ (resolve)(req.postDataJSON());
         }
     });
 
@@ -63,7 +64,11 @@ test('anki add', async ({context, page, extensionId}) => {
     // load in test dictionary
     const dictionary = createDictionaryArchive(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1');
     const testDictionarySource = await dictionary.generateAsync({type: 'arraybuffer'});
-    await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({name: 'valid-dictionary1.zip', buffer: Buffer.from(testDictionarySource)});
+    await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({
+        name: 'valid-dictionary1.zip',
+        mimeType: 'application/x-zip',
+        buffer: Buffer.from(testDictionarySource)
+    });
     await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
 
     // connect to anki
@@ -75,7 +80,7 @@ test('anki add', async ({context, page, extensionId}) => {
     await page.locator('select.anki-card-deck').selectOption('Mock Deck');
     await page.locator('select.anki-card-model').selectOption('Mock Model');
     for (const modelField of mockModelFieldNames) {
-        await page.locator(`[data-setting="anki.terms.fields.${modelField}"]`).fill(mockModelFieldsToAnkiValues[modelField]);
+        await page.locator(`[data-setting="anki.terms.fields.${modelField}"]`).fill(/** @type {string} */ (mockModelFieldsToAnkiValues[modelField]));
     }
     await page.locator('#anki-cards-modal > div > div.modal-footer > button:nth-child(2)').click();
     await writeToClipboardFromPage(page, '読むの例文');

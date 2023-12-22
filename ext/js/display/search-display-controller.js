@@ -19,38 +19,68 @@
 import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {EventListenerCollection, invokeMessageHandler} from '../core.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {yomitan} from '../yomitan.js';
 
 export class SearchDisplayController {
+    /**
+     * @param {number|undefined} tabId
+     * @param {number|undefined} frameId
+     * @param {import('./display.js').Display} display
+     * @param {import('./display-audio.js').DisplayAudio} displayAudio
+     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
+     * @param {import('./search-persistent-state-controller.js').SearchPersistentStateController} searchPersistentStateController
+     */
     constructor(tabId, frameId, display, displayAudio, japaneseUtil, searchPersistentStateController) {
+        /** @type {number|undefined} */
         this._tabId = tabId;
+        /** @type {number|undefined} */
         this._frameId = frameId;
+        /** @type {import('./display.js').Display} */
         this._display = display;
+        /** @type {import('./display-audio.js').DisplayAudio} */
         this._displayAudio = displayAudio;
+        /** @type {import('./search-persistent-state-controller.js').SearchPersistentStateController} */
         this._searchPersistentStateController = searchPersistentStateController;
-        this._searchButton = document.querySelector('#search-button');
-        this._searchBackButton = document.querySelector('#search-back-button');
-        this._queryInput = document.querySelector('#search-textbox');
-        this._introElement = document.querySelector('#intro');
-        this._clipboardMonitorEnableCheckbox = document.querySelector('#clipboard-monitor-enable');
-        this._wanakanaEnableCheckbox = document.querySelector('#wanakana-enable');
-        this._wanakanaSearchOption = document.querySelector('#search-option-wanakana');
+        /** @type {HTMLButtonElement} */
+        this._searchButton = querySelectorNotNull(document, '#search-button');
+        /** @type {HTMLButtonElement} */
+        this._searchBackButton = querySelectorNotNull(document, '#search-back-button');
+        /** @type {HTMLTextAreaElement} */
+        this._queryInput = querySelectorNotNull(document, '#search-textbox');
+        /** @type {HTMLElement} */
+        this._introElement = querySelectorNotNull(document, '#intro');
+        /** @type {HTMLInputElement} */
+        this._clipboardMonitorEnableCheckbox = querySelectorNotNull(document, '#clipboard-monitor-enable');
+        /** @type {HTMLInputElement} */
+        this._wanakanaEnableCheckbox = querySelectorNotNull(document, '#wanakana-enable');
+        /** @type {EventListenerCollection} */
         this._queryInputEvents = new EventListenerCollection();
+        this._wanakanaSearchOption = document.querySelector('#search-option-wanakana');
+        /** @type {boolean} */
         this._queryInputEventsSetup = false;
+        /** @type {boolean} */
         this._wanakanaEnabled = false;
+        /** @type {boolean} */
         this._wanakanaBound = false;
+        /** @type {boolean} */
         this._introVisible = true;
+        /** @type {?import('core').Timeout} */
         this._introAnimationTimer = null;
+        /** @type {boolean} */
         this._clipboardMonitorEnabled = false;
+        /** @type {ClipboardMonitor} */
         this._clipboardMonitor = new ClipboardMonitor({
             japaneseUtil,
             clipboardReader: {
                 getText: yomitan.api.clipboardGet.bind(yomitan.api)
             }
         });
+        /** @type {import('core').MessageHandlerMap} */
         this._messageHandlers = new Map();
     }
 
+    /** */
     async prepare() {
         await this._display.updateOptions();
 
@@ -65,11 +95,13 @@ export class SearchDisplayController {
         this._display.hotkeyHandler.registerActions([
             ['focusSearchBox', this._onActionFocusSearchBox.bind(this)]
         ]);
+        /* eslint-disable no-multi-spaces */
         this._registerMessageHandlers([
-            ['SearchDisplayController.getMode',           {async: false, handler: this._onMessageGetMode.bind(this)}],
-            ['SearchDisplayController.setMode',           {async: false, handler: this._onMessageSetMode.bind(this)}],
-            ['SearchDisplayController.updateSearchQuery', {async: false, handler: this._onExternalSearchUpdate.bind(this)}]
+            ['SearchDisplayController.getMode',           this._onMessageGetMode.bind(this)],
+            ['SearchDisplayController.setMode',           this._onMessageSetMode.bind(this)],
+            ['SearchDisplayController.updateSearchQuery', this._onExternalSearchUpdate.bind(this)]
         ]);
+        /* eslint-enable no-multi-spaces */
 
         this._updateClipboardMonitorEnabled();
 
@@ -85,15 +117,22 @@ export class SearchDisplayController {
         this._clipboardMonitorEnableCheckbox.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
         this._display.hotkeyHandler.on('keydownNonHotkey', this._onKeyDown.bind(this));
 
-        this._onDisplayOptionsUpdated({options: this._display.getOptions()});
+        const displayOptions = this._display.getOptions();
+        if (displayOptions !== null) {
+            this._onDisplayOptionsUpdated({options: displayOptions});
+        }
     }
 
+    /**
+     * @param {import('display').SearchMode} mode
+     */
     setMode(mode) {
-        this._setMode(mode, true);
+        this._searchPersistentStateController.mode = mode;
     }
 
     // Actions
 
+    /** */
     _onActionFocusSearchBox() {
         if (this._queryInput === null) { return; }
         this._queryInput.focus();
@@ -102,22 +141,37 @@ export class SearchDisplayController {
 
     // Messages
 
+    /**
+     * @param {{mode: import('display').SearchMode}} details
+     */
     _onMessageSetMode({mode}) {
-        this._searchPersistentStateController.mode = mode;
+        this.setMode(mode);
     }
 
+    /**
+     * @returns {import('display').SearchMode}
+     */
     _onMessageGetMode() {
         return this._searchPersistentStateController.mode;
     }
 
     // Private
 
+    /**
+     * @param {{action: string, params?: import('core').SerializableObject}} message
+     * @param {chrome.runtime.MessageSender} sender
+     * @param {(response?: unknown) => void} callback
+     * @returns {boolean}
+     */
     _onMessage({action, params}, sender, callback) {
         const messageHandler = this._messageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return false; }
         return invokeMessageHandler(messageHandler, params, callback, sender);
     }
 
+    /**
+     * @param {KeyboardEvent} e
+     */
     _onKeyDown(e) {
         const {activeElement} = document;
         if (
@@ -133,6 +187,7 @@ export class SearchDisplayController {
         }
     }
 
+    /** */
     async _onOptionsUpdated() {
         await this._display.updateOptions();
         const query = this._queryInput.value;
@@ -141,6 +196,9 @@ export class SearchDisplayController {
         }
     }
 
+    /**
+     * @param {import('display').OptionsUpdatedEvent} details
+     */
     _onDisplayOptionsUpdated({options}) {
         this._clipboardMonitorEnabled = options.clipboard.enableSearchPageMonitor;
         this._updateClipboardMonitorEnabled();
@@ -155,6 +213,9 @@ export class SearchDisplayController {
         this._setWanakanaEnabled(wanakanaEnabled);
     }
 
+    /**
+     * @param {import('display').ContentUpdateStartEvent} details
+     */
     _onContentUpdateStart({type, query}) {
         let animate = false;
         let valid = false;
@@ -188,38 +249,54 @@ export class SearchDisplayController {
         this._setIntroVisible(!valid, animate);
     }
 
+    /** */
     _onSearchInput() {
         this._updateSearchHeight(false);
     }
 
+    /**
+     * @param {KeyboardEvent} e
+     */
     _onSearchKeydown(e) {
         if (e.isComposing) { return; }
         const {code} = e;
         if (!((code === 'Enter' || code === 'NumpadEnter') && !e.shiftKey)) { return; }
 
         // Search
+        const element = /** @type {HTMLElement} */ (e.currentTarget);
         e.preventDefault();
         e.stopImmediatePropagation();
-        this._display.blurElement(e.currentTarget);
+        this._display.blurElement(element);
         this._search(true, 'new', true, null);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
     _onSearch(e) {
         e.preventDefault();
         this._search(true, 'new', true, null);
     }
 
+    /** */
     _onSearchBackButtonClick() {
         this._display.history.back();
     }
 
+    /** */
     _onCopy() {
         // ignore copy from search page
-        this._clipboardMonitor.setPreviousText(window.getSelection().toString().trim());
+        const selection = window.getSelection();
+        this._clipboardMonitor.setPreviousText(selection !== null ? selection.toString().trim() : '');
     }
 
-    _onExternalSearchUpdate({text, animate=true}) {
-        const {clipboard: {autoSearchContent, maximumSearchLength}} = this._display.getOptions();
+    /**
+     * @param {{text: string, animate?: boolean}} details
+     */
+    _onExternalSearchUpdate({text, animate = true}) {
+        const options = this._display.getOptions();
+        if (options === null) { return; }
+        const {clipboard: {autoSearchContent, maximumSearchLength}} = options;
         if (text.length > maximumSearchLength) {
             text = text.substring(0, maximumSearchLength);
         }
@@ -228,27 +305,41 @@ export class SearchDisplayController {
         this._search(animate, 'clear', autoSearchContent, ['clipboard']);
     }
 
+    /**
+     * @param {Event} e
+     */
     _onWanakanaEnableChange(e) {
-        const value = e.target.checked;
+        const element = /** @type {HTMLInputElement} */ (e.target);
+        const value = element.checked;
         this._setWanakanaEnabled(value);
-        yomitan.api.modifySettings([{
+        /** @type {import('settings-modifications').ScopedModificationSet} */
+        const modification = {
             action: 'set',
             path: 'general.enableWanakana',
             value,
             scope: 'profile',
             optionsContext: this._display.getOptionsContext()
-        }], 'search');
+        };
+        yomitan.api.modifySettings([modification], 'search');
     }
 
+    /**
+     * @param {Event} e
+     */
     _onClipboardMonitorEnableChange(e) {
-        const enabled = e.target.checked;
+        const element = /** @type {HTMLInputElement} */ (e.target);
+        const enabled = element.checked;
         this._setClipboardMonitorEnabled(enabled);
     }
 
+    /** */
     _onModeChange() {
         this._updateClipboardMonitorEnabled();
     }
 
+    /**
+     * @param {boolean} enabled
+     */
     _setWanakanaEnabled(enabled) {
         if (this._queryInputEventsSetup && this._wanakanaEnabled === enabled) { return; }
 
@@ -273,6 +364,10 @@ export class SearchDisplayController {
         this._queryInputEventsSetup = true;
     }
 
+    /**
+     * @param {boolean} visible
+     * @param {boolean} animate
+     */
     _setIntroVisible(visible, animate) {
         if (this._introVisible === visible) {
             return;
@@ -296,6 +391,9 @@ export class SearchDisplayController {
         }
     }
 
+    /**
+     * @param {boolean} animate
+     */
     _showIntro(animate) {
         if (animate) {
             const duration = 0.4;
@@ -316,6 +414,9 @@ export class SearchDisplayController {
         }
     }
 
+    /**
+     * @param {boolean} animate
+     */
     _hideIntro(animate) {
         if (animate) {
             const duration = 0.4;
@@ -329,6 +430,9 @@ export class SearchDisplayController {
         this._introElement.style.height = '0';
     }
 
+    /**
+     * @param {boolean} value
+     */
     async _setClipboardMonitorEnabled(value) {
         let modify = true;
         if (value) {
@@ -341,15 +445,18 @@ export class SearchDisplayController {
 
         if (!modify) { return; }
 
-        await yomitan.api.modifySettings([{
+        /** @type {import('settings-modifications').ScopedModificationSet} */
+        const modification = {
             action: 'set',
             path: 'clipboard.enableSearchPageMonitor',
             value,
             scope: 'profile',
             optionsContext: this._display.getOptionsContext()
-        }], 'search');
+        };
+        await yomitan.api.modifySettings([modification], 'search');
     }
 
+    /** */
     _updateClipboardMonitorEnabled() {
         const enabled = this._clipboardMonitorEnabled;
         this._clipboardMonitorEnableCheckbox.checked = enabled;
@@ -360,6 +467,9 @@ export class SearchDisplayController {
         }
     }
 
+    /**
+     * @returns {boolean}
+     */
     _canEnableClipboardMonitor() {
         switch (this._searchPersistentStateController.mode) {
             case 'popup':
@@ -370,6 +480,10 @@ export class SearchDisplayController {
         }
     }
 
+    /**
+     * @param {string[]} permissions
+     * @returns {Promise<boolean>}
+     */
     _requestPermissions(permissions) {
         return new Promise((resolve) => {
             chrome.permissions.request(
@@ -382,15 +496,23 @@ export class SearchDisplayController {
         });
     }
 
+    /**
+     * @param {boolean} animate
+     * @param {import('display').HistoryMode} historyMode
+     * @param {boolean} lookup
+     * @param {?import('settings').OptionsContextFlag[]} flags
+     */
     _search(animate, historyMode, lookup, flags) {
         const query = this._queryInput.value;
         const depth = this._display.depth;
         const url = window.location.href;
         const documentTitle = document.title;
+        /** @type {import('settings').OptionsContext} */
         const optionsContext = {depth, url};
         if (flags !== null) {
             optionsContext.flags = flags;
         }
+        /** @type {import('display').ContentDetails} */
         const details = {
             focus: false,
             historyMode,
@@ -405,7 +527,7 @@ export class SearchDisplayController {
                 documentTitle
             },
             content: {
-                dictionaryEntries: null,
+                dictionaryEntries: void 0,
                 animate,
                 contentOrigin: {
                     tabId: this._tabId,
@@ -417,6 +539,9 @@ export class SearchDisplayController {
         this._display.setContent(details);
     }
 
+    /**
+     * @param {boolean} shrink
+     */
     _updateSearchHeight(shrink) {
         const node = this._queryInput;
         if (shrink) {
@@ -429,12 +554,19 @@ export class SearchDisplayController {
         }
     }
 
+    /**
+     * @param {import('core').MessageHandlerMapInit} handlers
+     */
     _registerMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {
             this._messageHandlers.set(name, handlerInfo);
         }
     }
 
+    /**
+     * @param {?Element} element
+     * @returns {boolean}
+     */
     _isElementInput(element) {
         if (element === null) { return false; }
         switch (element.tagName.toLowerCase()) {
@@ -444,7 +576,7 @@ export class SearchDisplayController {
             case 'select':
                 return true;
         }
-        if (element.isContentEditable) { return true; }
+        if (element instanceof HTMLElement && element.isContentEditable) { return true; }
         return false;
     }
 }

@@ -24,7 +24,6 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {LanguageUtil} from '../language/language-util.js';
 import {JapaneseUtil} from '../language/languages/ja/japanese-util.js';
 import {Translator} from '../language/translator.js';
-import {yomitan} from '../yomitan.js';
 
 /**
  * This class controls the core logic of the extension, including API calls
@@ -36,13 +35,17 @@ export class Offscreen {
      */
     constructor() {
         this._languageUtil = new LanguageUtil();
+        /** @type {JapaneseUtil} */
         this._japaneseUtil = new JapaneseUtil(wanakana);
+        /** @type {DictionaryDatabase} */
         this._dictionaryDatabase = new DictionaryDatabase();
+        /** @type {Translator} */
         this._translator = new Translator({
             languageUtil: this._languageUtil,
             japaneseUtil: this._japaneseUtil,
             database: this._dictionaryDatabase
         });
+        /** @type {ClipboardReader} */
         this._clipboardReader = new ClipboardReader({
             // eslint-disable-next-line no-undef
             document: (typeof document === 'object' && document !== null ? document : null),
@@ -50,35 +53,49 @@ export class Offscreen {
             richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
         });
 
-        this._messageHandlers = new Map([
-            ['clipboardGetTextOffscreen',    {async: true,  contentScript: true,  handler: this._getTextHandler.bind(this)}],
-            ['clipboardGetImageOffscreen',   {async: true,  contentScript: true,  handler: this._getImageHandler.bind(this)}],
-            ['databasePrepareOffscreen',     {async: true,  contentScript: true,  handler: this._prepareDatabaseHandler.bind(this)}],
-            ['getDictionaryInfoOffscreen',   {async: true,  contentScript: true,  handler: this._getDictionaryInfoHandler.bind(this)}],
-            ['databasePurgeOffscreen',       {async: true,  contentScript: true,  handler: this._purgeDatabaseHandler.bind(this)}],
-            ['databaseGetMediaOffscreen',    {async: true,  contentScript: true,  handler: this._getMediaHandler.bind(this)}],
-            ['translatorPrepareOffscreen',   {async: false,  contentScript: true,  handler: this._prepareTranslatorHandler.bind(this)}],
-            ['findKanjiOffscreen',           {async: true,  contentScript: true,  handler: this._findKanjiHandler.bind(this)}],
-            ['findTermsOffscreen',           {async: true,  contentScript: true,  handler: this._findTermsHandler.bind(this)}],
-            ['getTermFrequenciesOffscreen',  {async: true,  contentScript: true,  handler: this._getTermFrequenciesHandler.bind(this)}],
-            ['clearDatabaseCachesOffscreen', {async: false,  contentScript: true,  handler: this._clearDatabaseCachesHandler.bind(this)}]
+        /* eslint-disable no-multi-spaces */
+        /** @type {import('offscreen').MessageHandlerMap} */
+        this._messageHandlers = new Map(/** @type {import('offscreen').MessageHandlerMapInit} */ ([
+            ['clipboardGetTextOffscreen',    this._getTextHandler.bind(this)],
+            ['clipboardGetImageOffscreen',   this._getImageHandler.bind(this)],
+            ['clipboardSetBrowserOffscreen', this._setClipboardBrowser.bind(this)],
+            ['databasePrepareOffscreen',     this._prepareDatabaseHandler.bind(this)],
+            ['getDictionaryInfoOffscreen',   this._getDictionaryInfoHandler.bind(this)],
+            ['databasePurgeOffscreen',       this._purgeDatabaseHandler.bind(this)],
+            ['databaseGetMediaOffscreen',    this._getMediaHandler.bind(this)],
+            ['translatorPrepareOffscreen',   this._prepareTranslatorHandler.bind(this)],
+            ['findKanjiOffscreen',           this._findKanjiHandler.bind(this)],
+            ['findTermsOffscreen',           this._findTermsHandler.bind(this)],
+            ['getTermFrequenciesOffscreen',  this._getTermFrequenciesHandler.bind(this)],
+            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)]
+        ]));
+        /* eslint-enable no-multi-spaces */
 
-        ]);
-
-        const onMessage = this._onMessage.bind(this);
-        chrome.runtime.onMessage.addListener(onMessage);
-
+        /** @type {?Promise<void>} */
         this._prepareDatabasePromise = null;
     }
 
-    _getTextHandler({useRichText}) {
-        return this._clipboardReader.getText(useRichText);
+    /** */
+    prepare() {
+        chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
     }
 
-    _getImageHandler() {
-        return this._clipboardReader.getImage();
+    /** @type {import('offscreen').MessageHandler<'clipboardGetTextOffscreen', true>} */
+    async _getTextHandler({useRichText}) {
+        return await this._clipboardReader.getText(useRichText);
     }
 
+    /** @type {import('offscreen').MessageHandler<'clipboardGetImageOffscreen', true>} */
+    async _getImageHandler() {
+        return await this._clipboardReader.getImage();
+    }
+
+    /** @type {import('offscreen').MessageHandler<'clipboardSetBrowserOffscreen', false>} */
+    _setClipboardBrowser({value}) {
+        this._clipboardReader.browser = value;
+    }
+
+    /** @type {import('offscreen').MessageHandler<'databasePrepareOffscreen', true>} */
     _prepareDatabaseHandler() {
         if (this._prepareDatabasePromise !== null) {
             return this._prepareDatabasePromise;
@@ -87,70 +104,80 @@ export class Offscreen {
         return this._prepareDatabasePromise;
     }
 
-    _getDictionaryInfoHandler() {
-        return this._dictionaryDatabase.getDictionaryInfo();
+    /** @type {import('offscreen').MessageHandler<'getDictionaryInfoOffscreen', true>} */
+    async _getDictionaryInfoHandler() {
+        return await this._dictionaryDatabase.getDictionaryInfo();
     }
 
-    _purgeDatabaseHandler() {
-        return this._dictionaryDatabase.purge();
+    /** @type {import('offscreen').MessageHandler<'databasePurgeOffscreen', true>} */
+    async _purgeDatabaseHandler() {
+        return await this._dictionaryDatabase.purge();
     }
 
+    /** @type {import('offscreen').MessageHandler<'databaseGetMediaOffscreen', true>} */
     async _getMediaHandler({targets}) {
         const media = await this._dictionaryDatabase.getMedia(targets);
         const serializedMedia = media.map((m) => ({...m, content: ArrayBufferUtil.arrayBufferToBase64(m.content)}));
         return serializedMedia;
     }
 
-    _prepareTranslatorHandler({deinflectionReasons}) {
-        return this._translator.prepare(deinflectionReasons);
+    /** @type {import('offscreen').MessageHandler<'translatorPrepareOffscreen', false>} */
+    _prepareTranslatorHandler() {
+        this._translator.prepare();
     }
 
-    _findKanjiHandler({text, findKanjiOptions}) {
-        findKanjiOptions.enabledDictionaryMap = new Map(findKanjiOptions.enabledDictionaryMap);
-        return this._translator.findKanji(text, findKanjiOptions);
+    /** @type {import('offscreen').MessageHandler<'findKanjiOffscreen', true>} */
+    async _findKanjiHandler({text, options}) {
+        /** @type {import('translation').FindKanjiOptions} */
+        const modifiedOptions = {
+            ...options,
+            enabledDictionaryMap: new Map(options.enabledDictionaryMap)
+        };
+        return await this._translator.findKanji(text, modifiedOptions);
     }
 
-    _findTermsHandler({mode, text, findTermsOptions}) {
-        findTermsOptions.enabledDictionaryMap = new Map(findTermsOptions.enabledDictionaryMap);
-        if (findTermsOptions.excludeDictionaryDefinitions) {
-            findTermsOptions.excludeDictionaryDefinitions = new Set(findTermsOptions.excludeDictionaryDefinitions);
-        }
-        findTermsOptions.textReplacements = findTermsOptions.textReplacements.map((group) => {
-            if (!group) {
-                return group;
-            }
+    /** @type {import('offscreen').MessageHandler<'findTermsOffscreen', true>} */
+    _findTermsHandler({mode, text, options}) {
+        console.log(mode, text, options);
+        const enabledDictionaryMap = new Map(options.enabledDictionaryMap);
+        const excludeDictionaryDefinitions = (
+            options.excludeDictionaryDefinitions !== null ?
+            new Set(options.excludeDictionaryDefinitions) :
+            null
+        );
+        const textReplacements = options.textReplacements.map((group) => {
+            if (group === null) { return null; }
             return group.map((opt) => {
-                const [, pattern, flags] = opt.pattern.match(/\/(.*?)\/([a-z]*)?$/i); // https://stackoverflow.com/a/33642463
+                // https://stackoverflow.com/a/33642463
+                const match = opt.pattern.match(/\/(.*?)\/([a-z]*)?$/i);
+                const [, pattern, flags] = match !== null ? match : ['', '', ''];
                 return {...opt, pattern: new RegExp(pattern, flags ?? '')};
             });
         });
-        return this._translator.findTerms(mode, text, findTermsOptions);
+        /** @type {import('translation').FindTermsOptions} */
+        const modifiedOptions = {
+            ...options,
+            enabledDictionaryMap,
+            excludeDictionaryDefinitions,
+            textReplacements
+        };
+        return this._translator.findTerms(mode, text, modifiedOptions);
     }
 
+    /** @type {import('offscreen').MessageHandler<'getTermFrequenciesOffscreen', true>} */
     _getTermFrequenciesHandler({termReadingList, dictionaries}) {
         return this._translator.getTermFrequencies(termReadingList, dictionaries);
     }
 
+    /** @type {import('offscreen').MessageHandler<'clearDatabaseCachesOffscreen', false>} */
     _clearDatabaseCachesHandler() {
-        return this._translator.clearDatabaseCaches();
+        this._translator.clearDatabaseCaches();
     }
 
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
     _onMessage({action, params}, sender, callback) {
-        const messageHandler = this._messageHandlers.get(action);
+        const messageHandler = this._messageHandlers.get(/** @type {import('offscreen').MessageType} */ (action));
         if (typeof messageHandler === 'undefined') { return false; }
-        this._validatePrivilegedMessageSender(sender);
-
         return invokeMessageHandler(messageHandler, params, callback, sender);
-    }
-
-    _validatePrivilegedMessageSender(sender) {
-        let {url} = sender;
-        if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
-        const {tab} = url;
-        if (typeof tab === 'object' && tab !== null) {
-            ({url} = tab);
-            if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
-        }
-        throw new Error('Invalid message sender');
     }
 }

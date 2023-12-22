@@ -20,41 +20,63 @@ import fs from 'fs';
 import JSZip from 'jszip';
 import path from 'path';
 import {performance} from 'perf_hooks';
+import {fileURLToPath} from 'url';
+import {parseJson} from './json.js';
 import {createJsonSchema} from './schema-validate.js';
 
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * @param {string} relativeFileName
+ * @returns {import('dev/dictionary-validate').Schema}
+ */
 function readSchema(relativeFileName) {
-    const fileName = path.join(__dirname, relativeFileName);
+    const fileName = path.join(dirname, relativeFileName);
     const source = fs.readFileSync(fileName, {encoding: 'utf8'});
-    return JSON.parse(source);
+    return parseJson(source);
 }
 
+/**
+ * @param {import('dev/schema-validate').ValidateMode} mode
+ * @param {import('jszip')} zip
+ * @param {string} fileNameFormat
+ * @param {import('dev/dictionary-validate').Schema} schema
+ */
 async function validateDictionaryBanks(mode, zip, fileNameFormat, schema) {
     let jsonSchema;
     try {
         jsonSchema = createJsonSchema(mode, schema);
     } catch (e) {
-        e.message += `\n(in file ${fileNameFormat})}`;
-        throw e;
+        const e2 = e instanceof Error ? e : new Error(`${e}`);
+        e2.message += `\n(in file ${fileNameFormat})}`;
+        throw e2;
     }
     let index = 1;
     while (true) {
-        const fileName = fileNameFormat.replace(/\?/, index);
+        const fileName = fileNameFormat.replace(/\?/, `${index}`);
 
         const file = zip.files[fileName];
         if (!file) { break; }
 
-        const data = JSON.parse(await file.async('string'));
+        const data = parseJson(await file.async('string'));
         try {
             jsonSchema.validate(data);
         } catch (e) {
-            e.message += `\n(in file ${fileName})}`;
-            throw e;
+            const e2 = e instanceof Error ? e : new Error(`${e}`);
+            e2.message += `\n(in file ${fileName})}`;
+            throw e2;
         }
 
         ++index;
     }
 }
 
+/**
+ * Validates a dictionary from its zip archive.
+ * @param {import('dev/schema-validate').ValidateMode} mode
+ * @param {import('jszip')} archive
+ * @param {import('dev/dictionary-validate').Schemas} schemas
+ */
 export async function validateDictionary(mode, archive, schemas) {
     const fileName = 'index.json';
     const indexFile = archive.files[fileName];
@@ -62,15 +84,17 @@ export async function validateDictionary(mode, archive, schemas) {
         throw new Error('No dictionary index found in archive');
     }
 
-    const index = JSON.parse(await indexFile.async('string'));
+    /** @type {import('dictionary-data').Index} */
+    const index = parseJson(await indexFile.async('string'));
     const version = index.format || index.version;
 
     try {
         const jsonSchema = createJsonSchema(mode, schemas.index);
         jsonSchema.validate(index);
     } catch (e) {
-        e.message += `\n(in file ${fileName})}`;
-        throw e;
+        const e2 = e instanceof Error ? e : new Error(`${e}`);
+        e2.message += `\n(in file ${fileName})}`;
+        throw e2;
     }
 
     await validateDictionaryBanks(mode, archive, 'term_bank_?.json', schemas[`termBankV${version}`]);
@@ -80,6 +104,10 @@ export async function validateDictionary(mode, archive, schemas) {
     await validateDictionaryBanks(mode, archive, 'tag_bank_?.json', schemas[`tagBankV${version}`]);
 }
 
+/**
+ * Returns a Schemas object from ext/data/schemas/*.
+ * @returns {import('dev/dictionary-validate').Schemas}
+ */
 export function getSchemas() {
     return {
         index: readSchema('../ext/data/schemas/dictionary-index-schema.json'),
@@ -95,6 +123,11 @@ export function getSchemas() {
     };
 }
 
+/**
+ * Validates dictionary files and logs the results to the console.
+ * @param {import('dev/schema-validate').ValidateMode} mode
+ * @param {string[]} dictionaryFileNames
+ */
 export async function testDictionaryFiles(mode, dictionaryFileNames) {
     const schemas = getSchemas();
 

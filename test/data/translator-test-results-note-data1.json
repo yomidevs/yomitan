@@ -1659,7 +1659,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "sixteen"
                 },
                 {
                   "index": 4,
@@ -1672,7 +1672,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 22
+                  "frequency": "twenty-two (22)"
                 },
                 {
                   "index": 5,
@@ -1791,7 +1791,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "sixteen"
             },
             {
               "index": 4,
@@ -1804,7 +1804,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 22
+              "frequency": "twenty-two (22)"
             },
             {
               "index": 5,
@@ -1963,7 +1963,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "seventeen"
                 },
                 {
                   "index": 4,
@@ -1976,7 +1976,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 23
+                  "frequency": "twenty-three (23)"
                 },
                 {
                   "index": 5,
@@ -1989,7 +1989,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -2095,7 +2095,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "seventeen"
             },
             {
               "index": 4,
@@ -2108,7 +2108,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 23
+              "frequency": "twenty-three (23)"
             },
             {
               "index": 5,
@@ -2121,7 +2121,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -3651,7 +3651,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -3677,7 +3677,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "eighteen"
                 },
                 {
                   "index": 4,
@@ -3690,7 +3690,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": true,
-                  "frequency": 24
+                  "frequency": "twenty-four (24)"
                 },
                 {
                   "index": 5,
@@ -3813,7 +3813,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -3839,7 +3839,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "eighteen"
             },
             {
               "index": 4,
@@ -3852,7 +3852,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": true,
-              "frequency": 24
+              "frequency": "twenty-four (24)"
             },
             {
               "index": 5,
@@ -4045,7 +4045,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -4071,7 +4071,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "nineteen"
                 },
                 {
                   "index": 4,
@@ -4084,7 +4084,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 25
+                  "frequency": "twenty-five (25)"
                 },
                 {
                   "index": 5,
@@ -4097,7 +4097,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -4207,7 +4207,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -4233,7 +4233,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "nineteen"
             },
             {
               "index": 4,
@@ -4246,7 +4246,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 25
+              "frequency": "twenty-five (25)"
             },
             {
               "index": 5,
@@ -4259,7 +4259,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -5079,7 +5079,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "sixteen"
                 },
                 {
                   "index": 4,
@@ -5092,7 +5092,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 22
+                  "frequency": "twenty-two (22)"
                 },
                 {
                   "index": 5,
@@ -5211,7 +5211,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "sixteen"
             },
             {
               "index": 4,
@@ -5224,7 +5224,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 22
+              "frequency": "twenty-two (22)"
             },
             {
               "index": 5,
@@ -5385,7 +5385,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "seventeen"
                 },
                 {
                   "index": 4,
@@ -5398,7 +5398,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 23
+                  "frequency": "twenty-three (23)"
                 },
                 {
                   "index": 5,
@@ -5411,7 +5411,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -5517,7 +5517,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "seventeen"
             },
             {
               "index": 4,
@@ -5530,7 +5530,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 23
+              "frequency": "twenty-three (23)"
             },
             {
               "index": 5,
@@ -5543,7 +5543,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -7394,7 +7394,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "sixteen"
                 },
                 {
                   "index": 4,
@@ -7407,7 +7407,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 22
+                  "frequency": "twenty-two (22)"
                 },
                 {
                   "index": 5,
@@ -7526,7 +7526,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "sixteen"
             },
             {
               "index": 4,
@@ -7539,7 +7539,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 22
+              "frequency": "twenty-two (22)"
             },
             {
               "index": 5,
@@ -8007,7 +8007,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "seventeen"
                 },
                 {
                   "index": 4,
@@ -8020,7 +8020,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 23
+                  "frequency": "twenty-three (23)"
                 },
                 {
                   "index": 5,
@@ -8033,7 +8033,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -8139,7 +8139,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "seventeen"
             },
             {
               "index": 4,
@@ -8152,7 +8152,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 23
+              "frequency": "twenty-three (23)"
             },
             {
               "index": 5,
@@ -8165,7 +8165,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -8684,7 +8684,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -8710,7 +8710,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "eighteen"
                 },
                 {
                   "index": 4,
@@ -8723,7 +8723,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": true,
-                  "frequency": 24
+                  "frequency": "twenty-four (24)"
                 },
                 {
                   "index": 5,
@@ -8846,7 +8846,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -8872,7 +8872,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "eighteen"
             },
             {
               "index": 4,
@@ -8885,7 +8885,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": true,
-              "frequency": 24
+              "frequency": "twenty-four (24)"
             },
             {
               "index": 5,
@@ -9412,7 +9412,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "sixteen"
                 },
                 {
                   "index": 4,
@@ -9425,7 +9425,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 22
+                  "frequency": "twenty-two (22)"
                 },
                 {
                   "index": 5,
@@ -9544,7 +9544,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "sixteen"
             },
             {
               "index": 4,
@@ -9557,7 +9557,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 22
+              "frequency": "twenty-two (22)"
             },
             {
               "index": 5,
@@ -10089,7 +10089,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -10115,7 +10115,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "nineteen"
                 },
                 {
                   "index": 4,
@@ -10128,7 +10128,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 25
+                  "frequency": "twenty-five (25)"
                 },
                 {
                   "index": 5,
@@ -10141,7 +10141,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -10251,7 +10251,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -10277,7 +10277,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "nineteen"
             },
             {
               "index": 4,
@@ -10290,7 +10290,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 25
+              "frequency": "twenty-five (25)"
             },
             {
               "index": 5,
@@ -10303,7 +10303,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -10817,7 +10817,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "seventeen"
                 },
                 {
                   "index": 4,
@@ -10830,7 +10830,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 23
+                  "frequency": "twenty-three (23)"
                 },
                 {
                   "index": 5,
@@ -10843,7 +10843,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -10949,7 +10949,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "seventeen"
             },
             {
               "index": 4,
@@ -10962,7 +10962,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 23
+              "frequency": "twenty-three (23)"
             },
             {
               "index": 5,
@@ -10975,7 +10975,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -16097,7 +16097,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -16123,7 +16123,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "eighteen"
                 },
                 {
                   "index": 4,
@@ -16136,7 +16136,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": true,
-                  "frequency": 24
+                  "frequency": "twenty-four (24)"
                 },
                 {
                   "index": 5,
@@ -16259,7 +16259,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -16285,7 +16285,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "eighteen"
             },
             {
               "index": 4,
@@ -16298,7 +16298,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": true,
-              "frequency": 24
+              "frequency": "twenty-four (24)"
             },
             {
               "index": 5,
@@ -16495,7 +16495,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -16521,7 +16521,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "nineteen"
                 },
                 {
                   "index": 4,
@@ -16534,7 +16534,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 25
+                  "frequency": "twenty-five (25)"
                 },
                 {
                   "index": 5,
@@ -16547,7 +16547,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -16657,7 +16657,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -16683,7 +16683,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "nineteen"
             },
             {
               "index": 4,
@@ -16696,7 +16696,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 25
+              "frequency": "twenty-five (25)"
             },
             {
               "index": 5,
@@ -16709,7 +16709,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -17529,7 +17529,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "sixteen"
                 },
                 {
                   "index": 4,
@@ -17542,7 +17542,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 22
+                  "frequency": "twenty-two (22)"
                 },
                 {
                   "index": 5,
@@ -17661,7 +17661,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "sixteen"
             },
             {
               "index": 4,
@@ -17674,7 +17674,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 22
+              "frequency": "twenty-two (22)"
             },
             {
               "index": 5,
@@ -17835,7 +17835,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "seventeen"
                 },
                 {
                   "index": 4,
@@ -17848,7 +17848,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 23
+                  "frequency": "twenty-three (23)"
                 },
                 {
                   "index": 5,
@@ -17861,7 +17861,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -17967,7 +17967,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "seventeen"
             },
             {
               "index": 4,
@@ -17980,7 +17980,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 23
+              "frequency": "twenty-three (23)"
             },
             {
               "index": 5,
@@ -17993,7 +17993,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -19523,7 +19523,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -19549,7 +19549,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "eighteen"
                 },
                 {
                   "index": 4,
@@ -19562,7 +19562,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": true,
-                  "frequency": 24
+                  "frequency": "twenty-four (24)"
                 },
                 {
                   "index": 5,
@@ -19685,7 +19685,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -19711,7 +19711,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "eighteen"
             },
             {
               "index": 4,
@@ -19724,7 +19724,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": true,
-              "frequency": 24
+              "frequency": "twenty-four (24)"
             },
             {
               "index": 5,
@@ -19917,7 +19917,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -19943,7 +19943,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "nineteen"
                 },
                 {
                   "index": 4,
@@ -19956,7 +19956,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 25
+                  "frequency": "twenty-five (25)"
                 },
                 {
                   "index": 5,
@@ -19969,7 +19969,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -20079,7 +20079,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -20105,7 +20105,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "nineteen"
             },
             {
               "index": 4,
@@ -20118,7 +20118,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 25
+              "frequency": "twenty-five (25)"
             },
             {
               "index": 5,
@@ -20131,7 +20131,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -20951,7 +20951,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "sixteen"
                 },
                 {
                   "index": 4,
@@ -20964,7 +20964,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 22
+                  "frequency": "twenty-two (22)"
                 },
                 {
                   "index": 5,
@@ -21083,7 +21083,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "sixteen"
             },
             {
               "index": 4,
@@ -21096,7 +21096,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 22
+              "frequency": "twenty-two (22)"
             },
             {
               "index": 5,
@@ -21257,7 +21257,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "seventeen"
                 },
                 {
                   "index": 4,
@@ -21270,7 +21270,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 23
+                  "frequency": "twenty-three (23)"
                 },
                 {
                   "index": 5,
@@ -21283,7 +21283,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -21389,7 +21389,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "seventeen"
             },
             {
               "index": 4,
@@ -21402,7 +21402,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 23
+              "frequency": "twenty-three (23)"
             },
             {
               "index": 5,
@@ -21415,7 +21415,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],
@@ -22945,7 +22945,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -22971,7 +22971,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "eighteen"
                 },
                 {
                   "index": 4,
@@ -22984,7 +22984,7 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "hasReading": true,
-                  "frequency": 24
+                  "frequency": "twenty-four (24)"
                 },
                 {
                   "index": 5,
@@ -23107,7 +23107,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -23133,7 +23133,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "eighteen"
             },
             {
               "index": 4,
@@ -23146,7 +23146,7 @@
               "expression": "打ち込む",
               "reading": "うちこむ",
               "hasReading": true,
-              "frequency": 24
+              "frequency": "twenty-four (24)"
             },
             {
               "index": 5,
@@ -23339,7 +23339,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": false,
-                  "frequency": 7
+                  "frequency": "seven"
                 },
                 {
                   "index": 2,
@@ -23365,7 +23365,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "nineteen"
                 },
                 {
                   "index": 4,
@@ -23378,7 +23378,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 25
+                  "frequency": "twenty-five (25)"
                 },
                 {
                   "index": 5,
@@ -23391,7 +23391,7 @@
                   "expression": "打ち込む",
                   "reading": "ぶちこむ",
                   "hasReading": true,
-                  "frequency": 31
+                  "frequency": "thirty-one"
                 }
               ],
               "pitches": [
@@ -23501,7 +23501,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": false,
-              "frequency": 7
+              "frequency": "seven"
             },
             {
               "index": 2,
@@ -23527,7 +23527,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "nineteen"
             },
             {
               "index": 4,
@@ -23540,7 +23540,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 25
+              "frequency": "twenty-five (25)"
             },
             {
               "index": 5,
@@ -23553,7 +23553,7 @@
               "expression": "打ち込む",
               "reading": "ぶちこむ",
               "hasReading": true,
-              "frequency": 31
+              "frequency": "thirty-one"
             }
           ],
           "pitches": [
@@ -24373,7 +24373,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "sixteen"
                 },
                 {
                   "index": 4,
@@ -24386,7 +24386,7 @@
                   "expression": "打つ",
                   "reading": "うつ",
                   "hasReading": true,
-                  "frequency": 22
+                  "frequency": "twenty-two (22)"
                 },
                 {
                   "index": 5,
@@ -24505,7 +24505,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "sixteen"
             },
             {
               "index": 4,
@@ -24518,7 +24518,7 @@
               "expression": "打つ",
               "reading": "うつ",
               "hasReading": true,
-              "frequency": 22
+              "frequency": "twenty-two (22)"
             },
             {
               "index": 5,
@@ -24679,7 +24679,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 0
+                  "frequency": "seventeen"
                 },
                 {
                   "index": 4,
@@ -24692,7 +24692,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 23
+                  "frequency": "twenty-three (23)"
                 },
                 {
                   "index": 5,
@@ -24705,7 +24705,7 @@
                   "expression": "打つ",
                   "reading": "ぶつ",
                   "hasReading": true,
-                  "frequency": 29
+                  "frequency": "twenty-nine"
                 }
               ],
               "pitches": [],
@@ -24811,7 +24811,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 0
+              "frequency": "seventeen"
             },
             {
               "index": 4,
@@ -24824,7 +24824,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 23
+              "frequency": "twenty-three (23)"
             },
             {
               "index": 5,
@@ -24837,7 +24837,7 @@
               "expression": "打つ",
               "reading": "ぶつ",
               "hasReading": true,
-              "frequency": 29
+              "frequency": "twenty-nine"
             }
           ],
           "pitches": [],

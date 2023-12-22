@@ -103,7 +103,7 @@ export class MediaUtil {
     /**
      * Gets the file extension for a corresponding media type.
      * @param {string} mediaType The media type to use.
-     * @returns {string} A file extension including the dot for the media type,
+     * @returns {?string} A file extension including the dot for the media type,
      *   otherwise `null`.
      */
     static getFileExtensionFromAudioMediaType(mediaType) {

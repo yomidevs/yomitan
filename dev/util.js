@@ -19,7 +19,13 @@
 import fs from 'fs';
 import JSZip from 'jszip';
 import path from 'path';
+import {parseJson} from './json.js';
 
+/**
+ * @param {string[]} args
+ * @param {Map<?string, (boolean|null|number|string|string[])>} argMap
+ * @returns {Map<?string, (boolean|null|number|string|string[])>}
+ */
 export function getArgs(args, argMap) {
     let key = null;
     let canKey = true;
@@ -64,28 +70,41 @@ export function getArgs(args, argMap) {
     return argMap;
 }
 
-export function getAllFiles(baseDirectory, predicate=null) {
+/**
+ * @param {string} baseDirectory
+ * @param {?(fileName: string, isDirectory: boolean) => boolean} predicate
+ * @returns {string[]}
+ */
+export function getAllFiles(baseDirectory, predicate = null) {
     const results = [];
     const directories = [baseDirectory];
     while (directories.length > 0) {
-        const directory = directories.shift();
+        const directory = /** @type {string} */ (directories.shift());
         const fileNames = fs.readdirSync(directory);
         for (const fileName of fileNames) {
             const fullFileName = path.join(directory, fileName);
             const relativeFileName = path.relative(baseDirectory, fullFileName);
             const stats = fs.lstatSync(fullFileName);
             if (stats.isFile()) {
-                if (typeof predicate !== 'function' || predicate(relativeFileName)) {
+                if (typeof predicate !== 'function' || predicate(relativeFileName, false)) {
                     results.push(relativeFileName);
                 }
             } else if (stats.isDirectory()) {
-                directories.push(fullFileName);
+                if (typeof predicate !== 'function' || predicate(relativeFileName, true)) {
+                    directories.push(fullFileName);
+                }
             }
         }
     }
     return results;
 }
 
+/**
+ * Creates a zip archive from the given dictionary directory.
+ * @param {string} dictionaryDirectory
+ * @param {string} [dictionaryName]
+ * @returns {import('jszip')}
+ */
 export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
     const fileNames = fs.readdirSync(dictionaryDirectory);
 
@@ -96,9 +115,9 @@ export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
     for (const fileName of fileNames) {
         if (/\.json$/.test(fileName)) {
             const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: 'utf8'});
-            const json = JSON.parse(content);
+            const json = parseJson(content);
             if (fileName === 'index.json' && typeof dictionaryName === 'string') {
-                json.title = dictionaryName;
+                /** @type {import('dictionary-data').Index} */ (json).title = dictionaryName;
             }
             archive.file(fileName, JSON.stringify(json, null, 0));
 
@@ -125,6 +144,10 @@ export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
     // return zipFileBlob;
 }
 
+/**
+ * @param {(...args: import('core').SafeAny[]) => (unknown|Promise<unknown>)} func
+ * @param {...import('core').SafeAny} args
+ */
 export async function testMain(func, ...args) {
     try {
         await func(...args);

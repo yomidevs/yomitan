@@ -20,42 +20,66 @@ import {TaskAccumulator} from '../general/task-accumulator.js';
 import {DocumentUtil} from './document-util.js';
 import {SelectorObserver} from './selector-observer.js';
 
+/**
+ * @template [T=unknown]
+ */
 export class DOMDataBinder {
-    constructor({selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError=null}) {
+    /**
+     * @param {import('dom-data-binder').ConstructorDetails<T>} details
+     */
+    constructor({selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError = null}) {
+        /** @type {string} */
         this._selector = selector;
+        /** @type {import('dom-data-binder').CreateElementMetadataCallback<T>} */
         this._createElementMetadata = createElementMetadata;
+        /** @type {import('dom-data-binder').CompareElementMetadataCallback<T>} */
         this._compareElementMetadata = compareElementMetadata;
+        /** @type {import('dom-data-binder').GetValuesCallback<T>} */
         this._getValues = getValues;
+        /** @type {import('dom-data-binder').SetValuesCallback<T>} */
         this._setValues = setValues;
+        /** @type {?import('dom-data-binder').OnErrorCallback<T>} */
         this._onError = onError;
+        /** @type {TaskAccumulator<import('dom-data-binder').ElementObserver<T>, import('dom-data-binder').UpdateTaskValue>} */
         this._updateTasks = new TaskAccumulator(this._onBulkUpdate.bind(this));
+        /** @type {TaskAccumulator<import('dom-data-binder').ElementObserver<T>, import('dom-data-binder').AssignTaskValue>} */
         this._assignTasks = new TaskAccumulator(this._onBulkAssign.bind(this));
-        this._selectorObserver = new SelectorObserver({
+        /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>} */
+        this._selectorObserver = /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>} */ (new SelectorObserver({
             selector,
             ignoreSelector: null,
             onAdded: this._createObserver.bind(this),
             onRemoved: this._removeObserver.bind(this),
             onChildrenUpdated: this._onObserverChildrenUpdated.bind(this),
             isStale: this._isObserverStale.bind(this)
-        });
+        }));
     }
 
+    /**
+     * @param {Element} element
+     */
     observe(element) {
         this._selectorObserver.observe(element, true);
     }
 
+    /** */
     disconnect() {
         this._selectorObserver.disconnect();
     }
 
+    /** */
     async refresh() {
         await this._updateTasks.enqueue(null, {all: true});
     }
 
     // Private
 
+    /**
+     * @param {import('dom-data-binder').UpdateTask<T>[]} tasks
+     */
     async _onBulkUpdate(tasks) {
         let all = false;
+        /** @type {import('dom-data-binder').ApplyTarget<T>[]} */
         const targets = [];
         for (const [observer, task] of tasks) {
             if (observer === null) {
@@ -82,17 +106,29 @@ export class DOMDataBinder {
         this._applyValues(targets, responses, true);
     }
 
+    /**
+     * @param {import('dom-data-binder').AssignTask<T>[]} tasks
+     */
     async _onBulkAssign(tasks) {
-        const targets = tasks;
-        const args = targets.map(([observer, task]) => ({
-            element: observer.element,
-            metadata: observer.metadata,
-            value: task.data.value
-        }));
+        /** @type {import('dom-data-binder').ApplyTarget<T>[]} */
+        const targets = [];
+        const args = [];
+        for (const [observer, task] of tasks) {
+            if (observer === null) { continue; }
+            args.push({
+                element: observer.element,
+                metadata: observer.metadata,
+                value: task.data.value
+            });
+            targets.push([observer, task]);
+        }
         const responses = await this._setValues(args);
         this._applyValues(targets, responses, false);
     }
 
+    /**
+     * @param {import('dom-data-binder').ElementObserver<T>} observer
+     */
     _onElementChange(observer) {
         const value = this._getElementValue(observer.element);
         observer.value = value;
@@ -100,9 +136,12 @@ export class DOMDataBinder {
         this._assignTasks.enqueue(observer, {value});
     }
 
+    /**
+     * @param {import('dom-data-binder').ApplyTarget<T>[]} targets
+     * @param {import('dom-data-binder').TaskResult[]} response
+     * @param {boolean} ignoreStale
+     */
     _applyValues(targets, response, ignoreStale) {
-        if (!Array.isArray(response)) { return; }
-
         for (let i = 0, ii = targets.length; i < ii; ++i) {
             const [observer, task] = targets[i];
             const {error, result} = response[i];
@@ -123,8 +162,14 @@ export class DOMDataBinder {
         }
     }
 
+    /**
+     * @param {Element} element
+     * @returns {import('dom-data-binder').ElementObserver<T>|undefined}
+     */
     _createObserver(element) {
         const metadata = this._createElementMetadata(element);
+        if (typeof metadata === 'undefined') { return void 0; }
+        /** @type {import('dom-data-binder').ElementObserver<T>} */
         const observer = {
             element,
             type: this._getNormalizedElementType(element),
@@ -137,76 +182,121 @@ export class DOMDataBinder {
 
         element.addEventListener('change', observer.onChange, false);
 
-        this._updateTasks.enqueue(observer);
+        this._updateTasks.enqueue(observer, {all: false});
 
         return observer;
     }
 
+    /**
+     * @param {Element} element
+     * @param {import('dom-data-binder').ElementObserver<T>} observer
+     */
     _removeObserver(element, observer) {
+        if (observer.onChange === null) { return; }
         element.removeEventListener('change', observer.onChange, false);
         observer.onChange = null;
     }
 
+    /**
+     * @param {Element} element
+     * @param {import('dom-data-binder').ElementObserver<T>} observer
+     */
     _onObserverChildrenUpdated(element, observer) {
         if (observer.hasValue) {
             this._setElementValue(element, observer.value);
         }
     }
 
+    /**
+     * @param {Element} element
+     * @param {import('dom-data-binder').ElementObserver<T>} observer
+     * @returns {boolean}
+     */
     _isObserverStale(element, observer) {
         const {type, metadata} = observer;
-        return !(
-            type === this._getNormalizedElementType(element) &&
-            this._compareElementMetadata(metadata, this._createElementMetadata(element))
-        );
+        if (type !== this._getNormalizedElementType(element)) { return false; }
+        const newMetadata = this._createElementMetadata(element);
+        return typeof newMetadata === 'undefined' || !this._compareElementMetadata(metadata, newMetadata);
     }
 
+    /**
+     * @param {Element} element
+     * @param {unknown} value
+     */
     _setElementValue(element, value) {
         switch (this._getNormalizedElementType(element)) {
             case 'checkbox':
-                element.checked = value;
+                /** @type {HTMLInputElement} */ (element).checked = typeof value === 'boolean' && value;
                 break;
             case 'text':
             case 'number':
             case 'textarea':
             case 'select':
-                element.value = value;
+                /** @type {HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement} */ (element).value = typeof value === 'string' ? value : `${value}`;
                 break;
         }
 
-        const event = new CustomEvent('settingChanged', {detail: {value}});
+        /** @type {number|string|boolean} */
+        let safeValue;
+        switch (typeof value) {
+            case 'number':
+            case 'string':
+            case 'boolean':
+                safeValue = value;
+                break;
+            default:
+                safeValue = `${value}`;
+                break;
+        }
+        /** @type {import('dom-data-binder').SettingChangedEvent} */
+        const event = new CustomEvent('settingChanged', {detail: {value: safeValue}});
         element.dispatchEvent(event);
     }
 
+    /**
+     * @param {Element} element
+     * @returns {boolean|string|number|null}
+     */
     _getElementValue(element) {
         switch (this._getNormalizedElementType(element)) {
             case 'checkbox':
-                return !!element.checked;
+                return !!(/** @type {HTMLInputElement} */ (element).checked);
             case 'text':
-                return `${element.value}`;
+                return `${/** @type {HTMLInputElement} */ (element).value}`;
             case 'number':
-                return DocumentUtil.convertElementValueToNumber(element.value, element);
+                return DocumentUtil.convertElementValueToNumber(/** @type {HTMLInputElement} */ (element).value, /** @type {HTMLInputElement} */ (element));
             case 'textarea':
+                return /** @type {HTMLTextAreaElement} */ (element).value;
             case 'select':
-                return element.value;
+                return /** @type {HTMLSelectElement} */ (element).value;
         }
         return null;
     }
 
+    /**
+     * @param {Element} element
+     * @returns {import('dom-data-binder').NormalizedElementType}
+     */
     _getNormalizedElementType(element) {
         switch (element.nodeName.toUpperCase()) {
             case 'INPUT':
             {
-                let {type} = element;
-                if (type === 'password') { type = 'text'; }
-                return type;
+                const {type} = /** @type {HTMLInputElement} */ (element);
+                switch (type) {
+                    case 'text':
+                    case 'password':
+                        return 'text';
+                    case 'number':
+                    case 'checkbox':
+                        return type;
+                }
+                break;
             }
             case 'TEXTAREA':
                 return 'textarea';
             case 'SELECT':
                 return 'select';
-            default:
-                return null;
         }
+        return null;
     }
 }

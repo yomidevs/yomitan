@@ -20,11 +20,12 @@ import fs from 'fs';
 import {expect, test} from 'vitest';
 import {formatRulesJson, generateRules, getTargets} from '../dev/generate-css-json';
 
+/** */
 function main() {
     test('css-json', () => {
-        for (const {cssFile, overridesCssFile, outputPath} of getTargets()) {
+        for (const {cssFilePath, overridesCssFilePath, outputPath} of getTargets()) {
             const actual = fs.readFileSync(outputPath, {encoding: 'utf8'});
-            const expected = formatRulesJson(generateRules(cssFile, overridesCssFile));
+            const expected = formatRulesJson(generateRules(cssFilePath, overridesCssFilePath));
             expect(actual).toStrictEqual(expected);
         }
     });

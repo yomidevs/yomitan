@@ -1101,8 +1101,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "sixteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -1112,8 +1112,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 22,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -1266,8 +1266,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "seventeen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -1277,8 +1277,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 23,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -1288,7 +1288,7 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 29,
-            "displayValue": null,
+            "displayValue": "twenty-nine",
             "displayValueParsed": false
           }
         ]
@@ -2150,7 +2150,7 @@
             "dictionaryPriority": 0,
             "hasReading": false,
             "frequency": 7,
-            "displayValue": null,
+            "displayValue": "seven",
             "displayValueParsed": false
           },
           {
@@ -2172,8 +2172,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "eighteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -2183,8 +2183,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 24,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -2337,7 +2337,7 @@
             "dictionaryPriority": 0,
             "hasReading": false,
             "frequency": 7,
-            "displayValue": null,
+            "displayValue": "seven",
             "displayValueParsed": false
           },
           {
@@ -2359,8 +2359,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "nineteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -2370,8 +2370,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 25,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -2381,7 +2381,7 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 31,
-            "displayValue": null,
+            "displayValue": "thirty-one",
             "displayValueParsed": false
           }
         ]
@@ -2860,8 +2860,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "sixteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -2871,8 +2871,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 22,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -3027,8 +3027,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "seventeen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -3038,8 +3038,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 23,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -3049,7 +3049,7 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 29,
-            "displayValue": null,
+            "displayValue": "twenty-nine",
             "displayValueParsed": false
           }
         ]
@@ -4166,8 +4166,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "sixteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -4177,8 +4177,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 22,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -4502,8 +4502,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "seventeen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -4513,8 +4513,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 23,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -4524,7 +4524,7 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 29,
-            "displayValue": null,
+            "displayValue": "twenty-nine",
             "displayValueParsed": false
           }
         ]
@@ -4860,7 +4860,7 @@
             "dictionaryPriority": 0,
             "hasReading": false,
             "frequency": 7,
-            "displayValue": null,
+            "displayValue": "seven",
             "displayValueParsed": false
           },
           {
@@ -4882,8 +4882,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "eighteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -4893,8 +4893,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 24,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -5216,8 +5216,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "sixteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -5227,8 +5227,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 22,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -5574,7 +5574,7 @@
             "dictionaryPriority": 0,
             "hasReading": false,
             "frequency": 7,
-            "displayValue": null,
+            "displayValue": "seven",
             "displayValueParsed": false
           },
           {
@@ -5596,8 +5596,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "nineteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -5607,8 +5607,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 25,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -5618,7 +5618,7 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 31,
-            "displayValue": null,
+            "displayValue": "thirty-one",
             "displayValueParsed": false
           }
         ]
@@ -5930,8 +5930,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "seventeen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -5941,8 +5941,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 23,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -5952,7 +5952,7 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 29,
-            "displayValue": null,
+            "displayValue": "twenty-nine",
             "displayValueParsed": false
           }
         ]
@@ -9645,7 +9645,7 @@
             "dictionaryPriority": 0,
             "hasReading": false,
             "frequency": 7,
-            "displayValue": null,
+            "displayValue": "seven",
             "displayValueParsed": false
           },
           {
@@ -9667,8 +9667,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "eighteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -9678,8 +9678,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 24,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -9836,7 +9836,7 @@
             "dictionaryPriority": 0,
             "hasReading": false,
             "frequency": 7,
-            "displayValue": null,
+            "displayValue": "seven",
             "displayValueParsed": false
           },
           {
@@ -9858,8 +9858,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "nineteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -9869,8 +9869,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 25,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -9880,7 +9880,7 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 31,
-            "displayValue": null,
+            "displayValue": "thirty-one",
             "displayValueParsed": false
           }
         ]
@@ -10359,8 +10359,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "sixteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -10370,8 +10370,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 22,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -10526,8 +10526,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "seventeen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -10537,8 +10537,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 23,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -10548,7 +10548,7 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 29,
-            "displayValue": null,
+            "displayValue": "twenty-nine",
             "displayValueParsed": false
           }
         ]
@@ -11410,7 +11410,7 @@
             "dictionaryPriority": 0,
             "hasReading": false,
             "frequency": 7,
-            "displayValue": null,
+            "displayValue": "seven",
             "displayValueParsed": false
           },
           {
@@ -11432,8 +11432,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "eighteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -11443,8 +11443,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 24,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -11597,7 +11597,7 @@
             "dictionaryPriority": 0,
             "hasReading": false,
             "frequency": 7,
-            "displayValue": null,
+            "displayValue": "seven",
             "displayValueParsed": false
           },
           {
@@ -11619,8 +11619,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "nineteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -11630,8 +11630,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 25,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -11641,7 +11641,7 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 31,
-            "displayValue": null,
+            "displayValue": "thirty-one",
             "displayValueParsed": false
           }
         ]
@@ -12120,8 +12120,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "sixteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -12131,8 +12131,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 22,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -12287,8 +12287,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "seventeen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -12298,8 +12298,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 23,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -12309,7 +12309,7 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 29,
-            "displayValue": null,
+            "displayValue": "twenty-nine",
             "displayValueParsed": false
           }
         ]
@@ -13171,7 +13171,7 @@
             "dictionaryPriority": 0,
             "hasReading": false,
             "frequency": 7,
-            "displayValue": null,
+            "displayValue": "seven",
             "displayValueParsed": false
           },
           {
@@ -13193,8 +13193,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "eighteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -13204,8 +13204,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 24,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -13358,7 +13358,7 @@
             "dictionaryPriority": 0,
             "hasReading": false,
             "frequency": 7,
-            "displayValue": null,
+            "displayValue": "seven",
             "displayValueParsed": false
           },
           {
@@ -13380,8 +13380,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "nineteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -13391,8 +13391,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 25,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -13402,7 +13402,7 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 31,
-            "displayValue": null,
+            "displayValue": "thirty-one",
             "displayValueParsed": false
           }
         ]
@@ -13881,8 +13881,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "sixteen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -13892,8 +13892,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 22,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -14048,8 +14048,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 0,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "seventeen",
+            "displayValueParsed": true
           },
           {
             "index": 4,
@@ -14059,8 +14059,8 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 23,
-            "displayValue": null,
-            "displayValueParsed": false
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
           },
           {
             "index": 5,
@@ -14070,7 +14070,7 @@
             "dictionaryPriority": 0,
             "hasReading": true,
             "frequency": 29,
-            "displayValue": null,
+            "displayValue": "twenty-nine",
             "displayValueParsed": false
           }
         ]

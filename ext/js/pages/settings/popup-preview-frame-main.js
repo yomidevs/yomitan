@@ -22,11 +22,18 @@ import {HotkeyHandler} from '../../input/hotkey-handler.js';
 import {yomitan} from '../../yomitan.js';
 import {PopupPreviewFrame} from './popup-preview-frame.js';
 
-(async () => {
+/** Entry point. */
+async function main() {
     try {
         await yomitan.prepare();
 
         const {tabId, frameId} = await yomitan.api.frameInformationGet();
+        if (typeof tabId === 'undefined') {
+            throw new Error('Failed to get tabId');
+        }
+        if (typeof frameId === 'undefined') {
+            throw new Error('Failed to get frameId');
+        }
 
         const hotkeyHandler = new HotkeyHandler();
         hotkeyHandler.prepare();
@@ -41,4 +48,6 @@ import {PopupPreviewFrame} from './popup-preview-frame.js';
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+await main();

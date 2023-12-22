@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Popup Tests</title>
+    <link rel="icon" type="image/gif" href="data:image/gif;base64,R0lGODdhAQABAIABAAAAAP///ywAAAAAAQABAAACAkQBADs=">
+    <link rel="stylesheet" href="test-stylesheet.css">
+    <script src="js/html-test-utilities.js"></script>
+    <script src="js/popup-tests.js"></script>
+    <style id="container-styles">
+.container {
+    width: 100%;
+    height: 200px;
+    border: 1px solid #d8d8d8;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.container-inner {
+    background-color: #f8f8f8;
+    padding: 0.5em;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.danger {
+    color: #c83c28;
+}
+    </style>
+</head>
+<body>
+    <h1>Popup Tests</h1>
+
+    <test-description>
+        Tests involving popup functionality in different contextsts, such as fullscreen elements, &lt;iframe&gt; elements, and shadow DOMs.
+    </test-description>
+
+    <test-case>
+        <test-description>Standard content.</test-description>
+        <div class="fullscreen-element container hovertarget">
+            <div class="container-inner">
+                <div>
+                    ありがとう
+                </div>
+                <div>
+                    <a href="#" class="fullscreen-link">Toggle fullscreen</a>
+                </div>
+            </div>
+        </div>
+    </test-case>
+
+    <test-case data-shadow-mode="open">
+        <test-description>Content inside of an open shadow DOM.</test-description>
+        <div class="template-content-container hovertarget"></div>
+        <template>
+            <link rel="stylesheet" href="test-stylesheet.css">
+            <div class="fullscreen-element container">
+                <div class="container-inner">
+                    <div>
+                        ありがとう
+                    </div>
+                    <div>
+                        <a href="#" class="fullscreen-link">Toggle fullscreen</a>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </test-case>
+
+    <test-case data-shadow-mode="closed">
+        <test-description>Content inside of a closed shadow DOM.</test-description>
+        <div class="template-content-container hovertarget"></div>
+        <template>
+            <link rel="stylesheet" href="test-stylesheet.css">
+            <div class="fullscreen-element container">
+                <div class="container-inner">
+                    <div>
+                        ありがとう
+                    </div>
+                    <div>
+                        <a href="#" class="fullscreen-link">Toggle fullscreen</a>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </test-case>
+
+    <test-case>
+        <test-description>&lt;iframe&gt; element.</test-description>
+        <iframe src="popup-tests-frame1.html" allowfullscreen="true" class="container hovertarget"></iframe>
+    </test-case>
+
+    <test-case data-shadow-mode="open">
+        <test-description>&lt;iframe&gt; element inside of an open shadow DOM.</test-description>
+        <div class="template-content-container hovertarget"></div>
+        <template>
+            <iframe src="popup-tests-frame1.html" allowfullscreen="true" class="container"></iframe>
+        </template>
+    </test-case>
+
+    <test-case data-shadow-mode="closed">
+        <test-description>&lt;iframe&gt; element inside of a closed shadow DOM.</test-description>
+        <div class="template-content-container hovertarget"></div>
+        <template>
+            <iframe src="popup-tests-frame1.html" allowfullscreen="true" class="container"></iframe>
+        </template>
+    </test-case>
+
+    <test-case>
+        <test-description>&lt;iframe&gt; element with data URL.</test-description>
+        <iframe id="iframe-with-data-url"
+            src="data:text/html;base64,PCFET0NUWVBFIGh0bWw+DQo8aHRtbD4NCiAgICA8aGVhZD4NCiAgICAgICAgPG1ldGEgY2hhcnNldD0iVVRGLTgiPg0KICAgICAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLGluaXRpYWwtc2NhbGU9MSI+DQogICAgICAgIDx0aXRsZT5Zb21pY2hhbiBUZXN0czwvdGl0bGU+DQogICAgICAgIDxzY3JpcHQ+DQogZnVuY3Rpb24gcmVxdWVzdEZ1bGxzY3JlZW4oZWxlbWVudCkgew0KICAgIGlmIChlbGVtZW50LnJlcXVlc3RGdWxsc2NyZWVuKSB7DQogICAgICAgIGVsZW1lbnQucmVxdWVzdEZ1bGxzY3JlZW4oKTsNCiAgICB9IGVsc2UgaWYgKGVsZW1lbnQubW96UmVxdWVzdEZ1bGxTY3JlZW4pIHsNCiAgICAgICAgZWxlbWVudC5tb3pSZXF1ZXN0RnVsbFNjcmVlbigpOw0KICAgIH0gZWxzZSBpZiAoZWxlbWVudC53ZWJraXRSZXF1ZXN0RnVsbHNjcmVlbikgew0KICAgICAgICBlbGVtZW50LndlYmtpdFJlcXVlc3RGdWxsc2NyZWVuKCk7DQogICAgfSBlbHNlIGlmIChlbGVtZW50Lm1zUmVxdWVzdEZ1bGxzY3JlZW4pIHsNCiAgICAgICAgZWxlbWVudC5tc1JlcXVlc3RGdWxsc2NyZWVuKCk7DQogICAgfQ0KfQ0KDQpmdW5jdGlvbiBleGl0RnVsbHNjcmVlbigpIHsNCiAgICBpZiAoZG9jdW1lbnQuZXhpdEZ1bGxzY3JlZW4pIHsNCiAgICAgICAgZG9jdW1lbnQuZXhpdEZ1bGxzY3JlZW4oKTsNCiAgICB9IGVsc2UgaWYgKGRvY3VtZW50Lm1vekNhbmNlbEZ1bGxTY3JlZW4pIHsNCiAgICAgICAgZG9jdW1lbnQubW96Q2FuY2VsRnVsbFNjcmVlbigpOw0KICAgIH0gZWxzZSBpZiAoZG9jdW1lbnQud2Via2l0RXhpdEZ1bGxzY3JlZW4pIHsNCiAgICAgICAgZG9jdW1lbnQud2Via2l0RXhpdEZ1bGxzY3JlZW4oKTsNCiAgICB9IGVsc2UgaWYgKGRvY3VtZW50Lm1zRXhpdEZ1bGxzY3JlZW4pIHsNCiAgICAgICAgZG9jdW1lbnQubXNFeGl0RnVsbHNjcmVlbigpOw0KICAgIH0NCn0NCg0KZnVuY3Rpb24gZ2V0RnVsbHNjcmVlbkVsZW1lbnQoKSB7DQogICAgcmV0dXJuICgNCiAgICAgICAgZG9jdW1lbnQuZnVsbHNjcmVlbkVsZW1lbnQgfHwNCiAgICAgICAgZG9jdW1lbnQubXNGdWxsc2NyZWVuRWxlbWVudCB8fA0KICAgICAgICBkb2N1bWVudC5tb3pGdWxsU2NyZWVuRWxlbWVudCB8fA0KICAgICAgICBkb2N1bWVudC53ZWJraXRGdWxsc2NyZWVuRWxlbWVudCB8fA0KICAgICAgICBudWxsDQogICAgKTsNCn0NCg0KZnVuY3Rpb24gdG9nZ2xlRnVsbHNjcmVlbihlbGVtZW50KSB7DQogICAgaWYgKGdldEZ1bGxzY3JlZW5FbGVtZW50KCkpIHsNCiAgICAgICAgZXhpdEZ1bGxzY3JlZW4oKTsNCiAgICB9IGVsc2Ugew0KICAgICAgICByZXF1ZXN0RnVsbHNjcmVlbihlbGVtZW50KTsNCiAgICB9DQp9DQoNCmZ1bmN0aW9uIHNldHVwKGNvbnRhaW5lciwgZnVsbHNjcmVlbkVsZW1lbnQ9bnVsbCkgew0KICAgIGNvbnN0IGZ1bGxzY3JlZW5MaW5rID0gY29udGFpbmVyLnF1ZXJ5U2VsZWN0b3IoJy5mdWxsc2NyZWVuLWxpbmsnKTsNCiAgICBpZiAoZnVsbHNjcmVlbkxpbmsgIT09IG51bGwpIHsNCiAgICAgICAgaWYgKGZ1bGxzY3JlZW5FbGVtZW50ID09PSBudWxsKSB7DQogICAgICAgICAgICBmdWxsc2NyZWVuRWxlbWVudCA9IGNvbnRhaW5lci5xdWVyeVNlbGVjdG9yKCcuZnVsbHNjcmVlbi1lbGVtZW50Jyk7DQogICAgICAgIH0NCiAgICAgICAgZnVsbHNjcmVlbkxpbmsuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCAoZSkgPT4gew0KICAgICAgICAgICAgdG9nZ2xlRnVsbHNjcmVlbihmdWxsc2NyZWVuRWxlbWVudCk7DQogICAgICAgICAgICBlLnByZXZlbnREZWZhdWx0KCk7DQogICAgICAgICAgICByZXR1cm4gZmFsc2U7DQogICAgICAgIH0sIGZhbHNlKTsNCiAgICB9DQoNCiAgICBjb25zdCB0ZW1wbGF0ZSA9IGNvbnRhaW5lci5xdWVyeVNlbGVjdG9yKCd0ZW1wbGF0ZScpOw0KICAgIGNvbnN0IHRlbXBsYXRlQ29udGVudENvbnRhaW5lciA9IGNvbnRhaW5lci5xdWVyeVNlbGVjdG9yKCcudGVtcGxhdGUtY29udGVudC1jb250YWluZXInKTsNCiAgICBpZiAodGVtcGxhdGUgIT09IG51bGwgJiYgdGVtcGxhdGVDb250ZW50Q29udGFpbmVyICE9PSBudWxsKSB7DQogICAgICAgIGNvbnN0IG1vZGUgPSBjb250YWluZXIuZGF0YXNldC5zaGFkb3dNb2RlOw0KICAgICAgICBjb25zdCBzaGFkb3cgPSB0ZW1wbGF0ZUNvbnRlbnRDb250YWluZXIuYXR0YWNoU2hhZG93KHttb2RlfSk7DQoNCiAgICAgICAgY29uc3QgY29udGFpbmVyU3R5bGVzID0gZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI2NvbnRhaW5lci1zdHlsZXMnKTsNCiAgICAgICAgc2hhZG93LmFwcGVuZENoaWxkKGNvbnRhaW5lclN0eWxlcy5jbG9uZU5vZGUodHJ1ZSkpOw0KDQogICAgICAgIGNvbnN0IGNvbnRlbnQgPSBkb2N1bWVudC5pbXBvcnROb2RlKHRlbXBsYXRlLmNvbnRlbnQsIHRydWUpOw0KICAgICAgICBzZXR1cChjb250ZW50KTsNCiAgICAgICAgc2hhZG93LmFwcGVuZENoaWxkKGNvbnRlbnQpOw0KICAgIH0NCn0NCiAgICAgICAgPC9zY3JpcHQ+DQogICAgICAgIDxzdHlsZT4NCmJvZHkgew0KICAgIGZvbnQtZmFtaWx5OiAiSGVsdmV0aWNhIE5ldWUiLCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmOw0KICAgIGZvbnQtc2l6ZTogMTRweDsNCiAgICBwYWRkaW5nOiAwOw0KICAgIG1hcmdpbjogMDsNCiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjZjhmOGY4Ow0KfQ0KYSwgYTp2aXNpdGVkIHsNCiAgICBjb2xvcjogIzEwODBjMDsNCiAgICB0ZXh0LWRlY29yYXRpb246IHVuZGVybGluZTsNCn0NCi5jb250ZW50IHsNCiAgICBwb3NpdGlvbjogYWJzb2x1dGU7DQogICAgbGVmdDogMDsNCiAgICB0b3A6IDA7DQogICAgcmlnaHQ6IDA7DQogICAgYm90dG9tOiAwOw0KICAgIHBhZGRpbmc6IDAuNWVtOw0KICAgIGJhY2tncm91bmQtY29sb3I6ICNmOGY4Zjg7DQp9DQogICAgICAgIDwvc3R5bGU+DQogICAgPC9oZWFkPg0KPGJvZHk+PGRpdiBjbGFzcz0iY29udGVudCI+DQo8ZGl2Pg0KICAgIOOBguOCiuOBjOOBqOOBhg0KPC9kaXY+DQo8ZGl2Pg0KICAgIDxhIGhyZWY9IiMiIGNsYXNzPSJmdWxsc2NyZWVuLWxpbmsiPlRvZ2dsZSBmdWxsc2NyZWVuPC9hPg0KICAgIDxzY3JpcHQ+c2V0dXAoZG9jdW1lbnQuYm9keSwgZG9jdW1lbnQuYm9keSk7PC9zY3JpcHQ+DQo8L2Rpdj4NCjwvZGl2PjwvYm9keT4NCjwvaHRtbD4="
+            allowfullscreen="true" class="container hovertarget"></iframe>
+    </test-case>
+
+    <test-case>
+        <test-description>&lt;iframe&gt; element with blob URL.</test-description>
+        <iframe id="iframe-with-blob-url" allowfullscreen="true" class="container hovertarget"></iframe>
+    </test-case>
+
+    <test-case>
+        <test-description>&lt;iframe&gt; element with srcdoc.</test-description>
+        <iframe allowfullscreen="true" class="iframe-with-srcdoc container hovertarget"></iframe>
+    </test-case>
+
+    <test-case>
+        <test-description>&lt;iframe&gt; element with srcdoc and
+            <code>sandbox="allow-same-origin allow-scripts"</code>.</test-description>
+        <iframe allowfullscreen="true" class="iframe-with-srcdoc container hovertarget"
+            sandbox="allow-same-origin allow-scripts"></iframe>
+    </test-case>
+
+    <test-case>
+        <test-description>
+            &lt;iframe&gt; element with srcdoc and <code>sandbox="allow-scripts"</code>.<br>
+            <span class="danger">This element is expected to not work.</span>
+        </test-description>
+        <iframe allowfullscreen="true" class="iframe-with-srcdoc container hovertarget"
+            sandbox="allow-scripts"></iframe>
+    </test-case>
+
+    <test-case>
+        <test-description>SVG &lt;img&gt;.</test-description>
+        <img src="popup-tests-frame2.svg" class="container hovertarget" alt="">
+    </test-case>
+
+    <test-case>
+        <test-description>SVG &lt;object&gt;.</test-description>
+        <object data="popup-tests-frame2.svg" type="image/svg+xml" class="container hovertarget"></object>
+    </test-case>
+
+    <test-case>
+        <test-description>SVG &lt;embed&gt;.</test-description>
+        <embed type="image/svg+xml" src="popup-tests-frame2.svg" class="container hovertarget">
+    </test-case>
+
+    <test-case>
+        <test-description>SVG &lt;iframe&gt;.</test-description>
+        <iframe src="popup-tests-frame2.svg" allowfullscreen="true" class="container hovertarget"></iframe>
+    </test-case>
+
+    <test-case>
+        <test-description>SVG &lt;svg&gt;.</test-description>
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="container hovertarget"
+            style="background-color: #f8f8f8;" focusable="false">
+            <text x="7" y="12" style="
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                font-size: 14px;
+                fill: #000000;
+                dominant-baseline: hanging;">
+                ありがとう
+            </text>
+        </svg>
+    </test-case>
+</body>
+</html>

@@ -22,6 +22,9 @@ import {isObject} from '../core.js';
  * This class has some general utility functions for working with Anki data.
  */
 export class AnkiUtil {
+    /** @type {RegExp} @readonly */
+    static _markerPattern = /\{([\w-]+)\}/g;
+
     /**
      * Gets the root deck name of a full deck name. If the deck is a root deck,
      * the same name is returned. Nested decks are separated using '::'.
@@ -71,7 +74,7 @@ export class AnkiUtil {
 
     /**
      * Checks whether or not a note object is valid.
-     * @param {*} note A note object to check.
+     * @param {import('anki').Note} note A note object to check.
      * @returns {boolean} `true` if the note is valid, `false` otherwise.
      */
     static isNoteDataValid(note) {
@@ -84,6 +87,3 @@ export class AnkiUtil {
         );
     }
 }
-
-// eslint-disable-next-line no-underscore-dangle
-AnkiUtil._markerPattern = /\{([\w-]+)\}/g;

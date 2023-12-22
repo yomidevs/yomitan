@@ -18,6 +18,7 @@
 
 import {testDictionaryFiles} from '../dictionary-validate.js';
 
+/** */
 async function main() {
     const dictionaryFileNames = process.argv.slice(2);
     if (dictionaryFileNames.length === 0) {
@@ -28,6 +29,7 @@ async function main() {
         return;
     }
 
+    /** @type {import('dev/schema-validate').ValidateMode} */
     let mode = null;
     if (dictionaryFileNames[0] === '--ajv') {
         mode = 'ajv';

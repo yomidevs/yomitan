@@ -16,50 +16,73 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection, generateId, isObject} from '../core.js';
+import {EventListenerCollection, generateId} from '../core.js';
 import {yomitan} from '../yomitan.js';
 
 export class FrameEndpoint {
     constructor() {
+        /** @type {string} */
         this._secret = generateId(16);
+        /** @type {?string} */
         this._token = null;
+        /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
+        /** @type {boolean} */
         this._eventListenersSetup = false;
     }
 
+    /**
+     * @returns {void}
+     */
     signal() {
         if (!this._eventListenersSetup) {
             this._eventListeners.addEventListener(window, 'message', this._onMessage.bind(this), false);
             this._eventListenersSetup = true;
         }
-        yomitan.api.broadcastTab('frameEndpointReady', {secret: this._secret});
+        /** @type {import('frame-client').FrameEndpointReadyDetails} */
+        const details = {secret: this._secret};
+        yomitan.api.broadcastTab('frameEndpointReady', details);
     }
 
+    /**
+     * @param {unknown} message
+     * @returns {boolean}
+     */
     authenticate(message) {
         return (
             this._token !== null &&
-            isObject(message) &&
-            this._token === message.token &&
-            this._secret === message.secret
+            typeof message === 'object' && message !== null &&
+            this._token === /** @type {import('core').SerializableObject} */ (message).token &&
+            this._secret === /** @type {import('core').SerializableObject} */ (message).secret
         );
     }
 
-    _onMessage(e) {
+    /**
+     * @param {MessageEvent<unknown>} event
+     */
+    _onMessage(event) {
         if (this._token !== null) { return; } // Already initialized
 
-        const data = e.data;
-        if (!isObject(data) || data.action !== 'frameEndpointConnect') { return; } // Invalid message
+        const {data} = event;
+        if (typeof data !== 'object' || data === null) { return; } // Invalid message
 
-        const params = data.params;
-        if (!isObject(params)) { return; } // Invalid data
+        const {action} = /** @type {import('core').SerializableObject} */ (data);
+        if (action !== 'frameEndpointConnect') { return; } // Invalid message
 
-        const secret = params.secret;
+        const {params} = /** @type {import('core').SerializableObject} */ (data);
+        if (typeof params !== 'object' || params === null) { return; } // Invalid data
+
+        const {secret} = /** @type {import('core').SerializableObject} */ (params);
         if (secret !== this._secret) { return; } // Invalid authentication
 
-        const {token, hostFrameId} = params;
+        const {token, hostFrameId} = /** @type {import('core').SerializableObject} */ (params);
+        if (typeof token !== 'string' || typeof hostFrameId !== 'number') { return; } // Invalid target
+
         this._token = token;
 
         this._eventListeners.removeAllEventListeners();
-        yomitan.api.sendMessageToFrame(hostFrameId, 'frameEndpointConnected', {secret, token});
+        /** @type {import('frame-client').FrameEndpointConnectedDetails} */
+        const details = {secret, token};
+        yomitan.api.sendMessageToFrame(hostFrameId, 'frameEndpointConnected', details);
     }
 }

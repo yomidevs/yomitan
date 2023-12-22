@@ -23,67 +23,55 @@ import {JsonSchema} from '../data/json-schema.js';
  */
 export class ProfileConditionsUtil {
     /**
-     * A group of conditions.
-     * @typedef {object} ProfileConditionGroup
-     * @property {ProfileCondition[]} conditions The list of conditions for this group.
-     */
-
-    /**
-     * A single condition.
-     * @typedef {object} ProfileCondition
-     * @property {string} type The type of the condition.
-     * @property {string} operator The condition operator.
-     * @property {string} value The value to compare against.
-     */
-
-    /**
      * Creates a new instance.
      */
     constructor() {
+        /** @type {RegExp} */
         this._splitPattern = /[,;\s]+/;
+        /** @type {Map<string, {operators: Map<string, import('profile-conditions-util').CreateSchemaFunction>}>} */
         this._descriptors = new Map([
             [
                 'popupLevel',
                 {
-                    operators: new Map([
-                        ['equal',              this._createSchemaPopupLevelEqual.bind(this)],
-                        ['notEqual',           this._createSchemaPopupLevelNotEqual.bind(this)],
-                        ['lessThan',           this._createSchemaPopupLevelLessThan.bind(this)],
-                        ['greaterThan',        this._createSchemaPopupLevelGreaterThan.bind(this)],
-                        ['lessThanOrEqual',    this._createSchemaPopupLevelLessThanOrEqual.bind(this)],
+                    operators: new Map(/** @type {import('profile-conditions-util').OperatorMapArray} */ ([
+                        ['equal', this._createSchemaPopupLevelEqual.bind(this)],
+                        ['notEqual', this._createSchemaPopupLevelNotEqual.bind(this)],
+                        ['lessThan', this._createSchemaPopupLevelLessThan.bind(this)],
+                        ['greaterThan', this._createSchemaPopupLevelGreaterThan.bind(this)],
+                        ['lessThanOrEqual', this._createSchemaPopupLevelLessThanOrEqual.bind(this)],
                         ['greaterThanOrEqual', this._createSchemaPopupLevelGreaterThanOrEqual.bind(this)]
-                    ])
+                    ]))
                 }
             ],
             [
                 'url',
                 {
-                    operators: new Map([
+                    operators: new Map(/** @type {import('profile-conditions-util').OperatorMapArray} */ ([
                         ['matchDomain', this._createSchemaUrlMatchDomain.bind(this)],
                         ['matchRegExp', this._createSchemaUrlMatchRegExp.bind(this)]
-                    ])
+                    ]))
                 }
             ],
             [
                 'modifierKeys',
                 {
-                    operators: new Map([
+                    operators: new Map(/** @type {import('profile-conditions-util').OperatorMapArray} */ ([
                         ['are', this._createSchemaModifierKeysAre.bind(this)],
                         ['areNot', this._createSchemaModifierKeysAreNot.bind(this)],
                         ['include', this._createSchemaModifierKeysInclude.bind(this)],
                         ['notInclude', this._createSchemaModifierKeysNotInclude.bind(this)]
-                    ])
+                    ]))
                 }
             ],
             [
                 'flags',
                 {
-                    operators: new Map([
+                    operators: new Map(/** @type {import('profile-conditions-util').OperatorMapArray} */ ([
                         ['are', this._createSchemaFlagsAre.bind(this)],
                         ['areNot', this._createSchemaFlagsAreNot.bind(this)],
                         ['include', this._createSchemaFlagsInclude.bind(this)],
                         ['notInclude', this._createSchemaFlagsNotInclude.bind(this)]
-                    ])
+                    ]))
                 }
             ]
         ]);
@@ -91,7 +79,7 @@ export class ProfileConditionsUtil {
 
     /**
      * Creates a new JSON schema descriptor for the given set of condition groups.
-     * @param {ProfileConditionGroup[]} conditionGroups An array of condition groups.
+     * @param {import('settings').ProfileConditionGroup[]} conditionGroups An array of condition groups.
      *   For a profile match, all of the items must return successfully in at least one of the groups.
      * @returns {JsonSchema} A new `JsonSchema` object.
      */
@@ -127,11 +115,11 @@ export class ProfileConditionsUtil {
     /**
      * Creates a normalized version of the context object to test,
      * assigning dependent fields as needed.
-     * @param {object} context A context object which is used during schema validation.
-     * @returns {object} A normalized context object.
+     * @param {import('settings').OptionsContext} context A context object which is used during schema validation.
+     * @returns {import('profile-conditions-util').NormalizedOptionsContext} A normalized context object.
      */
     normalizeContext(context) {
-        const normalizedContext = Object.assign({}, context);
+        const normalizedContext = /** @type {import('profile-conditions-util').NormalizedOptionsContext} */ (Object.assign({}, context));
         const {url} = normalizedContext;
         if (typeof url === 'string') {
             try {
@@ -149,10 +137,18 @@ export class ProfileConditionsUtil {
 
     // Private
 
+    /**
+     * @param {string} value
+     * @returns {string[]}
+     */
     _split(value) {
         return value.split(this._splitPattern);
     }
 
+    /**
+     * @param {string} value
+     * @returns {number}
+     */
     _stringToNumber(value) {
         const number = Number.parseFloat(value);
         return Number.isFinite(number) ? number : 0;
@@ -160,64 +156,94 @@ export class ProfileConditionsUtil {
 
     // popupLevel schema creation functions
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaPopupLevelEqual(value) {
-        value = this._stringToNumber(value);
+        const number = this._stringToNumber(value);
         return {
             required: ['depth'],
             properties: {
-                depth: {const: value}
+                depth: {const: number}
             }
         };
     }
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaPopupLevelNotEqual(value) {
         return {
-            not: [this._createSchemaPopupLevelEqual(value)]
+            not: {
+                anyOf: [this._createSchemaPopupLevelEqual(value)]
+            }
         };
     }
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaPopupLevelLessThan(value) {
-        value = this._stringToNumber(value);
+        const number = this._stringToNumber(value);
         return {
             required: ['depth'],
             properties: {
-                depth: {type: 'number', exclusiveMaximum: value}
+                depth: {type: 'number', exclusiveMaximum: number}
             }
         };
     }
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaPopupLevelGreaterThan(value) {
-        value = this._stringToNumber(value);
+        const number = this._stringToNumber(value);
         return {
             required: ['depth'],
             properties: {
-                depth: {type: 'number', exclusiveMinimum: value}
+                depth: {type: 'number', exclusiveMinimum: number}
             }
         };
     }
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaPopupLevelLessThanOrEqual(value) {
-        value = this._stringToNumber(value);
+        const number = this._stringToNumber(value);
         return {
             required: ['depth'],
             properties: {
-                depth: {type: 'number', maximum: value}
+                depth: {type: 'number', maximum: number}
             }
         };
     }
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaPopupLevelGreaterThanOrEqual(value) {
-        value = this._stringToNumber(value);
+        const number = this._stringToNumber(value);
         return {
             required: ['depth'],
             properties: {
-                depth: {type: 'number', minimum: value}
+                depth: {type: 'number', minimum: number}
             }
         };
     }
 
     // url schema creation functions
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaUrlMatchDomain(value) {
         const oneOf = [];
         for (let domain of this._split(value)) {
@@ -233,6 +259,10 @@ export class ProfileConditionsUtil {
         };
     }
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaUrlMatchRegExp(value) {
         return {
             required: ['url'],
@@ -244,47 +274,91 @@ export class ProfileConditionsUtil {
 
     // modifierKeys schema creation functions
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaModifierKeysAre(value) {
         return this._createSchemaArrayCheck('modifierKeys', value, true, false);
     }
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaModifierKeysAreNot(value) {
         return {
-            not: [this._createSchemaArrayCheck('modifierKeys', value, true, false)]
+            not: {
+                anyOf: [this._createSchemaArrayCheck('modifierKeys', value, true, false)]
+            }
         };
     }
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaModifierKeysInclude(value) {
         return this._createSchemaArrayCheck('modifierKeys', value, false, false);
     }
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaModifierKeysNotInclude(value) {
         return this._createSchemaArrayCheck('modifierKeys', value, false, true);
     }
 
     // modifierKeys schema creation functions
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaFlagsAre(value) {
         return this._createSchemaArrayCheck('flags', value, true, false);
     }
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaFlagsAreNot(value) {
         return {
-            not: [this._createSchemaArrayCheck('flags', value, true, false)]
+            not: {
+                anyOf: [this._createSchemaArrayCheck('flags', value, true, false)]
+            }
         };
     }
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaFlagsInclude(value) {
         return this._createSchemaArrayCheck('flags', value, false, false);
     }
 
+    /**
+     * @param {string} value
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaFlagsNotInclude(value) {
         return this._createSchemaArrayCheck('flags', value, false, true);
     }
 
     // Generic
 
+    /**
+     * @param {string} key
+     * @param {string} value
+     * @param {boolean} exact
+     * @param {boolean} none
+     * @returns {import('ext/json-schema').Schema}
+     */
     _createSchemaArrayCheck(key, value, exact, none) {
+        /** @type {import('ext/json-schema').Schema[]} */
         const containsList = [];
         for (const item of this._split(value)) {
             if (item.length === 0) { continue; }
@@ -295,6 +369,7 @@ export class ProfileConditionsUtil {
             });
         }
         const containsListCount = containsList.length;
+        /** @type {import('ext/json-schema').Schema} */
         const schema = {
             type: 'array'
         };
@@ -303,7 +378,7 @@ export class ProfileConditionsUtil {
         }
         if (none) {
             if (containsListCount > 0) {
-                schema.not = containsList;
+                schema.not = {anyOf: containsList};
             }
         } else {
             schema.minItems = containsListCount;

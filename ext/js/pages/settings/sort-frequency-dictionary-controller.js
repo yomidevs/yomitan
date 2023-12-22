@@ -16,24 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
 export class SortFrequencyDictionaryController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        this._sortFrequencyDictionarySelect = null;
-        this._sortFrequencyDictionaryOrderSelect = null;
-        this._sortFrequencyDictionaryOrderAutoButton = null;
-        this._sortFrequencyDictionaryOrderContainerNode = null;
+        /** @type {HTMLSelectElement} */
+        this._sortFrequencyDictionarySelect = querySelectorNotNull(document, '#sort-frequency-dictionary');
+        /** @type {HTMLSelectElement} */
+        this._sortFrequencyDictionaryOrderSelect = querySelectorNotNull(document, '#sort-frequency-dictionary-order');
+        /** @type {HTMLButtonElement} */
+        this._sortFrequencyDictionaryOrderAutoButton = querySelectorNotNull(document, '#sort-frequency-dictionary-order-auto');
+        /** @type {HTMLElement} */
+        this._sortFrequencyDictionaryOrderContainerNode = querySelectorNotNull(document, '#sort-frequency-dictionary-order-container');
+        /** @type {?import('core').TokenObject} */
         this._getDictionaryInfoToken = null;
     }
 
+    /** */
     async prepare() {
-        this._sortFrequencyDictionarySelect = document.querySelector('#sort-frequency-dictionary');
-        this._sortFrequencyDictionaryOrderSelect = document.querySelector('#sort-frequency-dictionary-order');
-        this._sortFrequencyDictionaryOrderAutoButton = document.querySelector('#sort-frequency-dictionary-order-auto');
-        this._sortFrequencyDictionaryOrderContainerNode = document.querySelector('#sort-frequency-dictionary-order-container');
-
         await this._onDatabaseUpdated();
 
         yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
@@ -45,7 +51,9 @@ export class SortFrequencyDictionaryController {
 
     // Private
 
+    /** */
     async _onDatabaseUpdated() {
+        /** @type {?import('core').TokenObject} */
         const token = {};
         this._getDictionaryInfoToken = token;
         const dictionaries = await this._settingsController.getDictionaryInfo();
@@ -55,33 +63,44 @@ export class SortFrequencyDictionaryController {
         this._updateDictionaryOptions(dictionaries);
 
         const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        const optionsContext = this._settingsController.getOptionsContext();
+        this._onOptionsChanged({options, optionsContext});
     }
 
+    /**
+     * @param {import('settings-controller').OptionsChangedEvent} details
+     */
     _onOptionsChanged({options}) {
         const {sortFrequencyDictionary, sortFrequencyDictionaryOrder} = options.general;
-        this._sortFrequencyDictionarySelect.value = (sortFrequencyDictionary !== null ? sortFrequencyDictionary : '');
-        this._sortFrequencyDictionaryOrderSelect.value = sortFrequencyDictionaryOrder;
-        this._sortFrequencyDictionaryOrderContainerNode.hidden = (sortFrequencyDictionary === null);
+        /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect).value = (sortFrequencyDictionary !== null ? sortFrequencyDictionary : '');
+        /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionaryOrderSelect).value = sortFrequencyDictionaryOrder;
+        /** @type {HTMLElement} */ (this._sortFrequencyDictionaryOrderContainerNode).hidden = (sortFrequencyDictionary === null);
     }
 
+    /** */
     _onSortFrequencyDictionarySelectChange() {
-        let {value} = this._sortFrequencyDictionarySelect;
-        if (value === '') { value = null; }
-        this._setSortFrequencyDictionaryValue(value);
+        const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
+        this._setSortFrequencyDictionaryValue(value !== '' ? value : null);
     }
 
+    /** */
     _onSortFrequencyDictionaryOrderSelectChange() {
-        const {value} = this._sortFrequencyDictionaryOrderSelect;
-        this._setSortFrequencyDictionaryOrderValue(value);
+        const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionaryOrderSelect);
+        const value2 = this._normalizeSortFrequencyDictionaryOrder(value);
+        if (value2 === null) { return; }
+        this._setSortFrequencyDictionaryOrderValue(value2);
     }
 
+    /** */
     _onSortFrequencyDictionaryOrderAutoButtonClick() {
-        const {value} = this._sortFrequencyDictionarySelect;
+        const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
         if (value === '') { return; }
         this._autoUpdateOrder(value);
     }
 
+    /**
+     * @param {import('dictionary-importer').Summary[]} dictionaries
+     */
     _updateDictionaryOptions(dictionaries) {
         const fragment = document.createDocumentFragment();
         let option = document.createElement('option');
@@ -95,30 +114,44 @@ export class SortFrequencyDictionaryController {
             option.textContent = title;
             fragment.appendChild(option);
         }
-        this._sortFrequencyDictionarySelect.textContent = '';
-        this._sortFrequencyDictionarySelect.appendChild(fragment);
+        const select = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
+        select.textContent = '';
+        select.appendChild(fragment);
     }
 
+    /**
+     * @param {?string} value
+     */
     async _setSortFrequencyDictionaryValue(value) {
-        this._sortFrequencyDictionaryOrderContainerNode.hidden = (value === null);
+        /** @type {HTMLElement} */ (this._sortFrequencyDictionaryOrderContainerNode).hidden = (value === null);
         await this._settingsController.setProfileSetting('general.sortFrequencyDictionary', value);
         if (value !== null) {
             await this._autoUpdateOrder(value);
         }
     }
 
+    /**
+     * @param {import('settings').SortFrequencyDictionaryOrder} value
+     */
     async _setSortFrequencyDictionaryOrderValue(value) {
         await this._settingsController.setProfileSetting('general.sortFrequencyDictionaryOrder', value);
     }
 
+    /**
+     * @param {string} dictionary
+     */
     async _autoUpdateOrder(dictionary) {
         const order = await this._getFrequencyOrder(dictionary);
         if (order === 0) { return; }
         const value = (order > 0 ? 'descending' : 'ascending');
-        this._sortFrequencyDictionaryOrderSelect.value = value;
+        /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionaryOrderSelect).value = value;
         await this._setSortFrequencyDictionaryOrderValue(value);
     }
 
+    /**
+     * @param {string} dictionary
+     * @returns {Promise<number>}
+     */
     async _getFrequencyOrder(dictionary) {
         const moreCommonTerms = ['来る', '言う', '出る', '入る', '方', '男', '女', '今', '何', '時'];
         const lessCommonTerms = ['行なう', '論じる', '過す', '行方', '人口', '猫', '犬', '滝', '理', '暁'];
@@ -129,6 +162,7 @@ export class SortFrequencyDictionaryController {
             [dictionary]
         );
 
+        /** @type {Map<string, {hasValue: boolean, minValue: number, maxValue: number}>} */
         const termDetails = new Map();
         const moreCommonTermDetails = [];
         const lessCommonTermDetails = [];
@@ -144,7 +178,6 @@ export class SortFrequencyDictionaryController {
         }
 
         for (const {term, frequency} of frequencies) {
-            if (typeof frequency !== 'number') { continue; }
             const details = termDetails.get(term);
             if (typeof details === 'undefined') { continue; }
             details.minValue = Math.min(details.minValue, frequency);
@@ -163,10 +196,28 @@ export class SortFrequencyDictionaryController {
         return Math.sign(result);
     }
 
+    /**
+     * @param {import('dictionary-importer').SummaryCounts} counts
+     * @returns {boolean}
+     */
     _dictionaryHasNoFrequencies(counts) {
         if (typeof counts !== 'object' || counts === null) { return false; }
         const {termMeta} = counts;
         if (typeof termMeta !== 'object' || termMeta === null) { return false; }
         return termMeta.freq <= 0;
+    }
+
+    /**
+     * @param {string} value
+     * @returns {?import('settings').SortFrequencyDictionaryOrder}
+     */
+    _normalizeSortFrequencyDictionaryOrder(value) {
+        switch (value) {
+            case 'ascending':
+            case 'descending':
+                return value;
+            default:
+                return null;
+        }
     }
 }

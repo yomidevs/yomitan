@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {fetchAsset} from '../general/helpers.js';
+import {fetchText} from '../general/helpers.js';
 import {languages} from './languages/index.js';
 
 export class LanguageUtil {
@@ -24,7 +24,7 @@ export class LanguageUtil {
     }
 
     async prepare() {
-        const languagesJSON = JSON.parse(await fetchAsset('/js/language/languages.json')) || {};
+        const languagesJSON = JSON.parse(await fetchText('/js/language/languages.json')) || {};
         languagesJSON.forEach(({iso, language, flag, exampleText, i18n}) => {
             languages[iso] = {...languages[iso], iso, language, flag, exampleText, i18n};
         });
@@ -63,7 +63,7 @@ export class LanguageUtil {
     async getTranslations(locale) {
         try {
             if (!languages[locale].translations) {
-                languages[locale].translations = JSON.parse(await fetchAsset(`/js/language/languages/${locale}/i18n.json`));
+                languages[locale].translations = JSON.parse(await fetchText(`/js/language/languages/${locale}/i18n.json`));
             }
             return languages[locale].translations;
         } catch (e){

@@ -17,11 +17,20 @@
  */
 
 import {existsSync} from 'fs';
-import {resolve as pathResolve} from 'path';
+import {fileURLToPath} from 'node:url';
+import path, {resolve as pathResolve} from 'path';
 import {describe, expect, test} from 'vitest';
 import {Deinflector} from '../ext/js/language/deinflector.js';
 import {LanguageUtil} from '../ext/js/language/language-util.js';
 
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+/**
+ * @param {Deinflector} deinflector
+ * @param {string} source
+ * @param {string} expectedTerm
+ * @param {string} expectedRule
+ * @param {string[]|undefined} expectedReasons
+ */
 async function hasTermReasons(deinflector, source, expectedTerm, expectedRule, expectedReasons) {
     const deinflectorOptions = {
         deinflectionPosFilter: true,
@@ -63,7 +72,7 @@ async function testDeinflections() {
 
     const deinflectionTests = Object.fromEntries(await Promise.all(languages.map(async ({iso}) => {
         const file = `../ext/js/language/languages/${iso}/test-deinflections.js`;
-        const path = pathResolve(__dirname, file);
+        const path = pathResolve(dirname, file);
         if (!existsSync(path)) {
             return [iso, null];
         }
@@ -92,7 +101,6 @@ async function testDeinflections() {
             }
         }
     });
-    // }
 }
 
 

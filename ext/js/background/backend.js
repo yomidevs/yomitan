@@ -22,14 +22,16 @@ import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
-import {clone, deferPromise, deserializeError, generateId, invokeMessageHandler, isObject, log, promiseTimeout, serializeError} from '../core.js';
+import {clone, deferPromise, generateId, invokeMessageHandler, isObject, log, promiseTimeout} from '../core.js';
+import {ExtensionError} from '../core/extension-error.js';
+import {parseJson} from '../core/json.js';
 import {AnkiUtil} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {PermissionsUtil} from '../data/permissions-util.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
-import {fetchAsset} from '../general/helpers.js';
+import {fetchText} from '../general/helpers.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {LanguageUtil} from '../language/language-util.js';
 import {JapaneseUtil} from '../language/languages/ja/japanese-util.js';
@@ -42,8 +44,6 @@ import {ProfileConditionsUtil} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {ScriptManager} from './script-manager.js';
 
-
-
 /**
  * This class controls the core logic of the extension, including API calls
  * and various forms of communication between browser tabs and external applications.
@@ -54,18 +54,27 @@ export class Backend {
      */
     constructor() {
         this._languageUtil = new LanguageUtil();
+        /** @type {JapaneseUtil} */
         this._japaneseUtil = new JapaneseUtil(wanakana);
+        /** @type {Environment} */
         this._environment = new Environment();
+        /** @type {AnkiConnect} */
         this._anki = new AnkiConnect();
+        /** @type {Mecab} */
         this._mecab = new Mecab();
 
         if (!chrome.offscreen) {
+            /** @type {?OffscreenProxy} */
+            this._offscreen = null;
+            /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
             this._dictionaryDatabase = new DictionaryDatabase();
+            /** @type {Translator|TranslatorProxy} */
             this._translator = new Translator({
                 languageUtil: this._languageUtil,
                 japaneseUtil: this._japaneseUtil,
                 database: this._dictionaryDatabase
             });
+            /** @type {ClipboardReader|ClipboardReaderProxy} */
             this._clipboardReader = new ClipboardReader({
                 // eslint-disable-next-line no-undef
                 document: (typeof document === 'object' && document !== null ? document : null),
@@ -73,105 +82,140 @@ export class Backend {
                 richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
             });
         } else {
+            /** @type {?OffscreenProxy} */
             this._offscreen = new OffscreenProxy();
+            /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
             this._dictionaryDatabase = new DictionaryDatabaseProxy(this._offscreen);
+            /** @type {Translator|TranslatorProxy} */
             this._translator = new TranslatorProxy(this._offscreen);
+            /** @type {ClipboardReader|ClipboardReaderProxy} */
             this._clipboardReader = new ClipboardReaderProxy(this._offscreen);
         }
 
+        /** @type {ClipboardMonitor} */
         this._clipboardMonitor = new ClipboardMonitor({
             japaneseUtil: this._japaneseUtil,
             clipboardReader: this._clipboardReader
         });
+        /** @type {?import('settings').Options} */
         this._options = null;
+        /** @type {import('../data/json-schema.js').JsonSchema[]} */
         this._profileConditionsSchemaCache = [];
+        /** @type {ProfileConditionsUtil} */
         this._profileConditionsUtil = new ProfileConditionsUtil();
+        /** @type {?string} */
         this._defaultAnkiFieldTemplates = null;
+        /** @type {RequestBuilder} */
         this._requestBuilder = new RequestBuilder();
+        /** @type {AudioDownloader} */
         this._audioDownloader = new AudioDownloader({
             japaneseUtil: this._japaneseUtil,
             requestBuilder: this._requestBuilder
         });
+        /** @type {OptionsUtil} */
         this._optionsUtil = new OptionsUtil();
+        /** @type {ScriptManager} */
         this._scriptManager = new ScriptManager();
+        /** @type {AccessibilityController} */
         this._accessibilityController = new AccessibilityController(this._scriptManager);
 
+        /** @type {?number} */
         this._searchPopupTabId = null;
+        /** @type {?Promise<{tab: chrome.tabs.Tab, created: boolean}>} */
         this._searchPopupTabCreatePromise = null;
 
+        /** @type {boolean} */
         this._isPrepared = false;
+        /** @type {boolean} */
         this._prepareError = false;
+        /** @type {?Promise<void>} */
         this._preparePromise = null;
+        /** @type {import('core').DeferredPromiseDetails<void>} */
         const {promise, resolve, reject} = deferPromise();
+        /** @type {Promise<void>} */
         this._prepareCompletePromise = promise;
+        /** @type {() => void} */
         this._prepareCompleteResolve = resolve;
+        /** @type {(reason?: unknown) => void} */
         this._prepareCompleteReject = reject;
 
+        /** @type {?string} */
         this._defaultBrowserActionTitle = null;
+        /** @type {?import('core').Timeout} */
         this._badgePrepareDelayTimer = null;
+        /** @type {?import('log').LogLevel} */
         this._logErrorLevel = null;
+        /** @type {?chrome.permissions.Permissions} */
         this._permissions = null;
+        /** @type {PermissionsUtil} */
         this._permissionsUtil = new PermissionsUtil();
 
-        this._messageHandlers = new Map([
-            ['requestBackendReadySignal',    {async: false, contentScript: true,  handler: this._onApiRequestBackendReadySignal.bind(this)}],
-            ['optionsGet',                   {async: false, contentScript: true,  handler: this._onApiOptionsGet.bind(this)}],
-            ['optionsGetFull',               {async: false, contentScript: true,  handler: this._onApiOptionsGetFull.bind(this)}],
-            ['kanjiFind',                    {async: true,  contentScript: true,  handler: this._onApiKanjiFind.bind(this)}],
-            ['termsFind',                    {async: true,  contentScript: true,  handler: this._onApiTermsFind.bind(this)}],
-            ['parseText',                    {async: true,  contentScript: true,  handler: this._onApiParseText.bind(this)}],
-            ['getAnkiConnectVersion',        {async: true,  contentScript: true,  handler: this._onApGetAnkiConnectVersion.bind(this)}],
-            ['isAnkiConnected',              {async: true,  contentScript: true,  handler: this._onApiIsAnkiConnected.bind(this)}],
-            ['addAnkiNote',                  {async: true,  contentScript: true,  handler: this._onApiAddAnkiNote.bind(this)}],
-            ['getAnkiNoteInfo',              {async: true,  contentScript: true,  handler: this._onApiGetAnkiNoteInfo.bind(this)}],
-            ['injectAnkiNoteMedia',          {async: true,  contentScript: true,  handler: this._onApiInjectAnkiNoteMedia.bind(this)}],
-            ['noteView',                     {async: true,  contentScript: true,  handler: this._onApiNoteView.bind(this)}],
-            ['suspendAnkiCardsForNote',      {async: true,  contentScript: true,  handler: this._onApiSuspendAnkiCardsForNote.bind(this)}],
-            ['commandExec',                  {async: false, contentScript: true,  handler: this._onApiCommandExec.bind(this)}],
-            ['getTermAudioInfoList',         {async: true,  contentScript: true,  handler: this._onApiGetTermAudioInfoList.bind(this)}],
-            ['sendMessageToFrame',           {async: false, contentScript: true,  handler: this._onApiSendMessageToFrame.bind(this)}],
-            ['broadcastTab',                 {async: false, contentScript: true,  handler: this._onApiBroadcastTab.bind(this)}],
-            ['frameInformationGet',          {async: true,  contentScript: true,  handler: this._onApiFrameInformationGet.bind(this)}],
-            ['injectStylesheet',             {async: true,  contentScript: true,  handler: this._onApiInjectStylesheet.bind(this)}],
-            ['getStylesheetContent',         {async: true,  contentScript: true,  handler: this._onApiGetStylesheetContent.bind(this)}],
-            ['getEnvironmentInfo',           {async: false, contentScript: true,  handler: this._onApiGetEnvironmentInfo.bind(this)}],
-            ['clipboardGet',                 {async: true,  contentScript: true,  handler: this._onApiClipboardGet.bind(this)}],
-            ['getDisplayTemplatesHtml',      {async: true,  contentScript: true,  handler: this._onApiGetDisplayTemplatesHtml.bind(this)}],
-            ['getZoom',                      {async: true,  contentScript: true,  handler: this._onApiGetZoom.bind(this)}],
-            ['getDefaultAnkiFieldTemplates', {async: false, contentScript: true,  handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this)}],
-            ['getDictionaryInfo',            {async: true,  contentScript: true,  handler: this._onApiGetDictionaryInfo.bind(this)}],
-            ['purgeDatabase',                {async: true,  contentScript: false, handler: this._onApiPurgeDatabase.bind(this)}],
-            ['getMedia',                     {async: true,  contentScript: true,  handler: this._onApiGetMedia.bind(this)}],
-            ['log',                          {async: false, contentScript: true,  handler: this._onApiLog.bind(this)}],
-            ['logIndicatorClear',            {async: false, contentScript: true,  handler: this._onApiLogIndicatorClear.bind(this)}],
-            ['createActionPort',             {async: false, contentScript: true,  handler: this._onApiCreateActionPort.bind(this)}],
-            ['modifySettings',               {async: true,  contentScript: true,  handler: this._onApiModifySettings.bind(this)}],
-            ['getSettings',                  {async: false, contentScript: true,  handler: this._onApiGetSettings.bind(this)}],
-            ['setAllSettings',               {async: true,  contentScript: false, handler: this._onApiSetAllSettings.bind(this)}],
-            ['getOrCreateSearchPopup',       {async: true,  contentScript: true,  handler: this._onApiGetOrCreateSearchPopup.bind(this)}],
-            ['isTabSearchPopup',             {async: true,  contentScript: true,  handler: this._onApiIsTabSearchPopup.bind(this)}],
-            ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}],
-            ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}],
-            ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
-            ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}],
-            ['findAnkiNotes',                {async: true,  contentScript: true,  handler: this._onApiFindAnkiNotes.bind(this)}],
-            ['openCrossFramePort',           {async: false, contentScript: true,  handler: this._onApiOpenCrossFramePort.bind(this)}],
-            ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}],
-            ['getTextTransformations',       {async: true,  contentScript: true,  handler: this._onApiGetTextTransformations.bind(this)}],
-            ['getLanguages',                 {async: true,  contentScript: true,  handler: this._onApiGetLanguages.bind(this)}],
-            ['getLocales',                   {async: true,  contentScript: true,  handler: this._onApiGetLocales.bind(this)}],
-            ['getTranslations',              {async: true,  contentScript: true,  handler: this._onApiGetTranslations.bind(this)}]
-        ]);
-        this._messageHandlersWithProgress = new Map([
-        ]);
+        /* eslint-disable no-multi-spaces */
+        /** @type {import('core').MessageHandlerMap} */
+        this._messageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
+            ['requestBackendReadySignal',    this._onApiRequestBackendReadySignal.bind(this)],
+            ['optionsGet',                   this._onApiOptionsGet.bind(this)],
+            ['optionsGetFull',               this._onApiOptionsGetFull.bind(this)],
+            ['kanjiFind',                    this._onApiKanjiFind.bind(this)],
+            ['termsFind',                    this._onApiTermsFind.bind(this)],
+            ['parseText',                    this._onApiParseText.bind(this)],
+            ['getAnkiConnectVersion',        this._onApiGetAnkiConnectVersion.bind(this)],
+            ['isAnkiConnected',              this._onApiIsAnkiConnected.bind(this)],
+            ['addAnkiNote',                  this._onApiAddAnkiNote.bind(this)],
+            ['getAnkiNoteInfo',              this._onApiGetAnkiNoteInfo.bind(this)],
+            ['injectAnkiNoteMedia',          this._onApiInjectAnkiNoteMedia.bind(this)],
+            ['noteView',                     this._onApiNoteView.bind(this)],
+            ['suspendAnkiCardsForNote',      this._onApiSuspendAnkiCardsForNote.bind(this)],
+            ['commandExec',                  this._onApiCommandExec.bind(this)],
+            ['getTermAudioInfoList',         this._onApiGetTermAudioInfoList.bind(this)],
+            ['sendMessageToFrame',           this._onApiSendMessageToFrame.bind(this)],
+            ['broadcastTab',                 this._onApiBroadcastTab.bind(this)],
+            ['frameInformationGet',          this._onApiFrameInformationGet.bind(this)],
+            ['injectStylesheet',             this._onApiInjectStylesheet.bind(this)],
+            ['getStylesheetContent',         this._onApiGetStylesheetContent.bind(this)],
+            ['getEnvironmentInfo',           this._onApiGetEnvironmentInfo.bind(this)],
+            ['clipboardGet',                 this._onApiClipboardGet.bind(this)],
+            ['getDisplayTemplatesHtml',      this._onApiGetDisplayTemplatesHtml.bind(this)],
+            ['getZoom',                      this._onApiGetZoom.bind(this)],
+            ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)],
+            ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
+            ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
+            ['getMedia',                     this._onApiGetMedia.bind(this)],
+            ['log',                          this._onApiLog.bind(this)],
+            ['logIndicatorClear',            this._onApiLogIndicatorClear.bind(this)],
+            ['createActionPort',             this._onApiCreateActionPort.bind(this)],
+            ['modifySettings',               this._onApiModifySettings.bind(this)],
+            ['getSettings',                  this._onApiGetSettings.bind(this)],
+            ['setAllSettings',               this._onApiSetAllSettings.bind(this)],
+            ['getOrCreateSearchPopup',       this._onApiGetOrCreateSearchPopup.bind(this)],
+            ['isTabSearchPopup',             this._onApiIsTabSearchPopup.bind(this)],
+            ['triggerDatabaseUpdated',       this._onApiTriggerDatabaseUpdated.bind(this)],
+            ['testMecab',                    this._onApiTestMecab.bind(this)],
+            ['textHasJapaneseCharacters',    this._onApiTextHasJapaneseCharacters.bind(this)],
+            ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
+            ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
+            ['loadExtensionScripts',         this._onApiLoadExtensionScripts.bind(this)],
+            ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
+            ['loadExtensionScripts',         this._onApiLoadExtensionScripts.bind(this)],
+            ['getTextTransformations',       this._onApiGetTextTransformations.bind(this)],
+            ['getLanguages',                 this._onApiGetLanguages.bind(this)],
+            ['getLocales',                   this._onApiGetLocales.bind(this)],
+            ['getTranslations',              this._onApiGetTranslations.bind(this)]
+        ]));
+        /* eslint-enable no-multi-spaces */
+        /** @type {import('backend').MessageHandlerWithProgressMap} */
+        this._messageHandlersWithProgress = new Map(/** @type {import('backend').MessageHandlerWithProgressMapInit} */ ([
+            // Empty
+        ]));
 
-        this._commandHandlers = new Map([
+        /** @type {Map<string, (params?: import('core').SerializableObject) => void>} */
+        this._commandHandlers = new Map(/** @type {[name: string, handler: (params?: import('core').SerializableObject) => void][]} */ ([
             ['toggleTextScanning', this._onCommandToggleTextScanning.bind(this)],
-            ['openInfoPage',       this._onCommandOpenInfoPage.bind(this)],
-            ['openSettingsPage',   this._onCommandOpenSettingsPage.bind(this)],
-            ['openSearchPage',     this._onCommandOpenSearchPage.bind(this)],
-            ['openPopupWindow',    this._onCommandOpenPopupWindow.bind(this)]
-        ]);
+            ['openInfoPage', this._onCommandOpenInfoPage.bind(this)],
+            ['openSettingsPage', this._onCommandOpenSettingsPage.bind(this)],
+            ['openSearchPage', this._onCommandOpenSearchPage.bind(this)],
+            ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)]
+        ]));
     }
 
     /**
@@ -182,9 +226,9 @@ export class Backend {
         if (this._preparePromise === null) {
             const promise = this._prepareInternal();
             promise.then(
-                (value) => {
+                () => {
                     this._isPrepared = true;
-                    this._prepareCompleteResolve(value);
+                    this._prepareCompleteResolve();
                 },
                 (error) => {
                     this._prepareError = true;
@@ -199,6 +243,9 @@ export class Backend {
 
     // Private
 
+    /**
+     * @returns {void}
+     */
     _prepareInternalSync() {
         if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
             const onCommand = this._onWebExtensionEventWrapper(this._onCommand.bind(this));
@@ -222,6 +269,9 @@ export class Backend {
         chrome.runtime.onInstalled.addListener(this._onInstalled.bind(this));
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _prepareInternal() {
         try {
             this._prepareInternalSync();
@@ -234,11 +284,11 @@ export class Backend {
             }, 1000);
             this._updateBadge();
 
-            yomitan.on('log', this._onLog.bind(this));
+            log.on('log', this._onLog.bind(this));
 
             await this._requestBuilder.prepare();
             await this._environment.prepare();
-            if (chrome.offscreen) {
+            if (this._offscreen !== null) {
                 await this._offscreen.prepare();
             }
             this._clipboardReader.browser = this._environment.getInfo().browser;
@@ -250,7 +300,7 @@ export class Backend {
             }
 
             await this._optionsUtil.prepare();
-            this._defaultAnkiFieldTemplates = (await fetchAsset('/data/templates/default-anki-field-templates.handlebars')).trim();
+            this._defaultAnkiFieldTemplates = (await fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
             this._options = await this._optionsUtil.load();
 
             await this._languageUtil.prepare();
@@ -258,7 +308,7 @@ export class Backend {
 
             this._applyOptions('background');
 
-            const options = this._getProfileOptions({current: true});
+            const options = this._getProfileOptions({current: true}, false);
             if (options.general.showGuide) {
                 this._openWelcomeGuidePageOnce();
             }
@@ -280,20 +330,30 @@ export class Backend {
 
     // Event handlers
 
+    /**
+     * @param {{text: string}} params
+     */
     async _onClipboardTextChange({text}) {
-        const {clipboard: {maximumSearchLength}} = this._getProfileOptions({current: true});
+        const {clipboard: {maximumSearchLength}} = this._getProfileOptions({current: true}, false);
         if (text.length > maximumSearchLength) {
             text = text.substring(0, maximumSearchLength);
         }
         try {
-            const {tab, created} = await this._getOrCreateSearchPopup();
+            const {tab, created} = await this._getOrCreateSearchPopupWrapper();
+            const {id} = tab;
+            if (typeof id !== 'number') {
+                throw new Error('Tab does not have an id');
+            }
             await this._focusTab(tab);
-            await this._updateSearchQuery(tab.id, text, !created);
+            await this._updateSearchQuery(id, text, !created);
         } catch (e) {
             // NOP
         }
     }
 
+    /**
+     * @param {{level: import('log').LogLevel}} params
+     */
     _onLog({level}) {
         const levelValue = this._getErrorLevelValue(level);
         if (levelValue <= this._getErrorLevelValue(this._logErrorLevel)) { return; }
@@ -304,8 +364,13 @@ export class Backend {
 
     // WebExtension event handlers (with prepared checks)
 
+    /**
+     * @template {(...args: import('core').SafeAny[]) => void} T
+     * @param {T} handler
+     * @returns {T}
+     */
     _onWebExtensionEventWrapper(handler) {
-        return (...args) => {
+        return /** @type {T} */ ((...args) => {
             if (this._isPrepared) {
                 handler(...args);
                 return;
@@ -315,9 +380,10 @@ export class Backend {
                 () => { handler(...args); },
                 () => {} // NOP
             );
-        };
+        });
     }
 
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
     _onMessageWrapper(message, sender, sendResponse) {
         if (this._isPrepared) {
             return this._onMessage(message, sender, sendResponse);
@@ -332,34 +398,42 @@ export class Backend {
 
     // WebExtension event handlers
 
+    /**
+     * @param {string} command
+     */
     _onCommand(command) {
-        this._runCommand(command);
+        this._runCommand(command, void 0);
     }
 
+    /**
+     * @param {{action: string, params?: import('core').SerializableObject}} message
+     * @param {chrome.runtime.MessageSender} sender
+     * @param {(response?: unknown) => void} callback
+     * @returns {boolean}
+     */
     _onMessage({action, params}, sender, callback) {
         const messageHandler = this._messageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return false; }
-
-        if (!messageHandler.contentScript) {
-            try {
-                this._validatePrivilegedMessageSender(sender);
-            } catch (error) {
-                callback({error: serializeError(error)});
-                return false;
-            }
-        }
-
         return invokeMessageHandler(messageHandler, params, callback, sender);
     }
 
+    /**
+     * @param {chrome.tabs.ZoomChangeInfo} event
+     */
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
-        this._sendMessageTabIgnoreResponse(tabId, {action: 'Yomitan.zoomChanged', params: {oldZoomFactor, newZoomFactor}});
+        this._sendMessageTabIgnoreResponse(tabId, {action: 'Yomitan.zoomChanged', params: {oldZoomFactor, newZoomFactor}}, {});
     }
 
+    /**
+     * @returns {void}
+     */
     _onPermissionsChanged() {
         this._checkPermissions();
     }
 
+    /**
+     * @param {chrome.runtime.InstalledDetails} event
+     */
     _onInstalled({reason}) {
         if (reason !== 'install') { return; }
         this._requestPersistentStorage();
@@ -367,6 +441,7 @@ export class Backend {
 
     // Message handlers
 
+    /** @type {import('api').Handler<import('api').RequestBackendReadySignalDetails, import('api').RequestBackendReadySignalResult, true>} */
     _onApiRequestBackendReadySignal(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
         const data = {action: 'Yomitan.backendReady', params: {}};
@@ -374,21 +449,27 @@ export class Backend {
             this._sendMessageIgnoreResponse(data);
             return false;
         } else {
-            this._sendMessageTabIgnoreResponse(sender.tab.id, data);
+            const {id} = sender.tab;
+            if (typeof id === 'number') {
+                this._sendMessageTabIgnoreResponse(id, data, {});
+            }
             return true;
         }
     }
 
+    /** @type {import('api').Handler<import('api').OptionsGetDetails, import('api').OptionsGetResult>} */
     _onApiOptionsGet({optionsContext}) {
-        return this._getProfileOptions(optionsContext);
+        return this._getProfileOptions(optionsContext, false);
     }
 
+    /** @type {import('api').Handler<import('api').OptionsGetFullDetails, import('api').OptionsGetFullResult>} */
     _onApiOptionsGetFull() {
-        return this._getOptionsFull();
+        return this._getOptionsFull(false);
     }
 
+    /** @type {import('api').Handler<import('api').KanjiFindDetails, import('api').KanjiFindResult>} */
     async _onApiKanjiFind({text, optionsContext}) {
-        const options = this._getProfileOptions(optionsContext);
+        const options = this._getProfileOptions(optionsContext, false);
         const {general: {maxResults}} = options;
         const findKanjiOptions = this._getTranslatorFindKanjiOptions(options);
         const dictionaryEntries = await this._translator.findKanji(text, findKanjiOptions);
@@ -396,8 +477,9 @@ export class Backend {
         return dictionaryEntries;
     }
 
+    /** @type {import('api').Handler<import('api').TermsFindDetails, import('api').TermsFindResult>} */
     async _onApiTermsFind({text, details, optionsContext}) {
-        const options = this._getProfileOptions(optionsContext);
+        const options = this._getProfileOptions(optionsContext, false);
         const {general: {resultOutputMode: mode, maxResults}} = options;
         const findTermsOptions = await this._getTranslatorFindTermsOptions(mode, details, options);
         const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
@@ -405,12 +487,14 @@ export class Backend {
         return {dictionaryEntries, originalTextLength};
     }
 
+    /** @type {import('api').Handler<import('api').ParseTextDetails, import('api').ParseTextResult>} */
     async _onApiParseText({text, optionsContext, scanLength, useInternalParser, useMecabParser}) {
         const [internalResults, mecabResults] = await Promise.all([
             (useInternalParser ? this._textParseScanning(text, scanLength, optionsContext) : null),
             (useMecabParser ? this._textParseMecab(text) : null)
         ]);
 
+        /** @type {import('api').ParseTextResultItem[]} */
         const results = [];
 
         if (internalResults !== null) {
@@ -436,20 +520,26 @@ export class Backend {
         return results;
     }
 
-    async _onApGetAnkiConnectVersion() {
+    /** @type {import('api').Handler<import('api').GetAnkiConnectVersionDetails, import('api').GetAnkiConnectVersionResult>} */
+    async _onApiGetAnkiConnectVersion() {
         return await this._anki.getVersion();
     }
 
+    /** @type {import('api').Handler<import('api').IsAnkiConnectedDetails, import('api').IsAnkiConnectedResult>} */
     async _onApiIsAnkiConnected() {
         return await this._anki.isConnected();
     }
 
+    /** @type {import('api').Handler<import('api').AddAnkiNoteDetails, import('api').AddAnkiNoteResult>} */
     async _onApiAddAnkiNote({note}) {
         return await this._anki.addNote(note);
     }
 
+    /** @type {import('api').Handler<import('api').GetAnkiNoteInfoDetails, import('api').GetAnkiNoteInfoResult>} */
     async _onApiGetAnkiNoteInfo({notes, fetchAdditionalInfo}) {
+        /** @type {import('anki').NoteInfoWrapper[]} */
         const results = [];
+        /** @type {{note: import('anki').Note, info: import('anki').NoteInfoWrapper}[]} */
         const cannotAdd = [];
         const canAddArray = await this._anki.canAddNotes(notes);
 
@@ -482,6 +572,7 @@ export class Backend {
         return results;
     }
 
+    /** @type {import('api').Handler<import('api').InjectAnkiNoteMediaDetails, import('api').InjectAnkiNoteMediaResult>} */
     async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails}) {
         return await this._injectAnkNoteMedia(
             this._anki,
@@ -494,13 +585,14 @@ export class Backend {
         );
     }
 
+    /** @type {import('api').Handler<import('api').NoteViewDetails, import('api').NoteViewResult>} */
     async _onApiNoteView({noteId, mode, allowFallback}) {
         if (mode === 'edit') {
             try {
                 await this._anki.guiEditNote(noteId);
                 return 'edit';
             } catch (e) {
-                if (!this._anki.isErrorUnsupportedAction(e)) {
+                if (!(e instanceof Error && this._anki.isErrorUnsupportedAction(e))) {
                     throw e;
                 } else if (!allowFallback) {
                     throw new Error('Mode not supported');
@@ -512,6 +604,7 @@ export class Backend {
         return 'browse';
     }
 
+    /** @type {import('api').Handler<import('api').SuspendAnkiCardsForNoteDetails, import('api').SuspendAnkiCardsForNoteResult>} */
     async _onApiSuspendAnkiCardsForNote({noteId}) {
         const cardIds = await this._anki.findCardsForNote(noteId);
         const count = cardIds.length;
@@ -522,77 +615,94 @@ export class Backend {
         return count;
     }
 
+    /** @type {import('api').Handler<import('api').CommandExecDetails, import('api').CommandExecResult>} */
     _onApiCommandExec({command, params}) {
         return this._runCommand(command, params);
     }
 
+    /** @type {import('api').Handler<import('api').GetTermAudioInfoListDetails, import('api').GetTermAudioInfoListResult>} */
     async _onApiGetTermAudioInfoList({source, term, reading}) {
         const language = this._getProfileLanguage({current: true});
         return await this._audioDownloader.getTermAudioInfoList(source, term, reading, language);
     }
 
+    /** @type {import('api').Handler<import('api').SendMessageToFrameDetails, import('api').SendMessageToFrameResult, true>} */
     _onApiSendMessageToFrame({frameId: targetFrameId, action, params}, sender) {
-        if (!(sender && sender.tab)) {
-            return false;
-        }
-
-        const tabId = sender.tab.id;
+        if (!sender) { return false; }
+        const {tab} = sender;
+        if (!tab) { return false; }
+        const {id} = tab;
+        if (typeof id !== 'number') { return false; }
         const frameId = sender.frameId;
-        this._sendMessageTabIgnoreResponse(tabId, {action, params, frameId}, {frameId: targetFrameId});
+        /** @type {import('extension').ChromeRuntimeMessageWithFrameId} */
+        const message = {action, params, frameId};
+        this._sendMessageTabIgnoreResponse(id, message, {frameId: targetFrameId});
         return true;
     }
 
+    /** @type {import('api').Handler<import('api').BroadcastTabDetails, import('api').BroadcastTabResult, true>} */
     _onApiBroadcastTab({action, params}, sender) {
-        if (!(sender && sender.tab)) {
-            return false;
-        }
-
-        const tabId = sender.tab.id;
+        if (!sender) { return false; }
+        const {tab} = sender;
+        if (!tab) { return false; }
+        const {id} = tab;
+        if (typeof id !== 'number') { return false; }
         const frameId = sender.frameId;
-        this._sendMessageTabIgnoreResponse(tabId, {action, params, frameId});
+        /** @type {import('extension').ChromeRuntimeMessageWithFrameId} */
+        const message = {action, params, frameId};
+        this._sendMessageTabIgnoreResponse(id, message, {});
         return true;
     }
 
-    _onApiFrameInformationGet(params, sender) {
+    /** @type {import('api').Handler<import('api').FrameInformationGetDetails, import('api').FrameInformationGetResult, true>} */
+    _onApiFrameInformationGet(_params, sender) {
         const tab = sender.tab;
         const tabId = tab ? tab.id : void 0;
         const frameId = sender.frameId;
         return Promise.resolve({tabId, frameId});
     }
 
+    /** @type {import('api').Handler<import('api').InjectStylesheetDetails, import('api').InjectStylesheetResult, true>} */
     async _onApiInjectStylesheet({type, value}, sender) {
         const {frameId, tab} = sender;
-        if (!isObject(tab)) { throw new Error('Invalid tab'); }
+        if (typeof tab !== 'object' || tab === null || typeof tab.id !== 'number') { throw new Error('Invalid tab'); }
         return await this._scriptManager.injectStylesheet(type, value, tab.id, frameId, false);
     }
 
+    /** @type {import('api').Handler<import('api').GetStylesheetContentDetails, import('api').GetStylesheetContentResult>} */
     async _onApiGetStylesheetContent({url}) {
         if (!url.startsWith('/') || url.startsWith('//') || !url.endsWith('.css')) {
             throw new Error('Invalid URL');
         }
-        return await fetchAsset(url);
+        return await fetchText(url);
     }
 
+    /** @type {import('api').Handler<import('api').GetEnvironmentInfoDetails, import('api').GetEnvironmentInfoResult>} */
     _onApiGetEnvironmentInfo() {
         return this._environment.getInfo();
     }
 
+    /** @type {import('api').Handler<import('api').ClipboardGetDetails, import('api').ClipboardGetResult>} */
     async _onApiClipboardGet() {
         return this._clipboardReader.getText(false);
     }
 
+    /** @type {import('api').Handler<import('api').GetDisplayTemplatesHtmlDetails, import('api').GetDisplayTemplatesHtmlResult>} */
     async _onApiGetDisplayTemplatesHtml() {
-        return await fetchAsset('/display-templates.html');
+        return await fetchText('/display-templates.html');
     }
 
-    _onApiGetZoom(params, sender) {
-        if (!sender || !sender.tab) {
-            return Promise.reject(new Error('Invalid tab'));
-        }
-
+    /** @type {import('api').Handler<import('api').GetZoomDetails, import('api').GetZoomResult, true>} */
+    _onApiGetZoom(_params, sender) {
         return new Promise((resolve, reject) => {
+            if (!sender || !sender.tab) {
+                reject(new Error('Invalid tab'));
+                return;
+            }
+
             const tabId = sender.tab.id;
             if (!(
+                typeof tabId === 'number' &&
                 chrome.tabs !== null &&
                 typeof chrome.tabs === 'object' &&
                 typeof chrome.tabs.getZoom === 'function'
@@ -612,40 +722,48 @@ export class Backend {
         });
     }
 
+    /** @type {import('api').Handler<import('api').GetDefaultAnkiFieldTemplatesDetails, import('api').GetDefaultAnkiFieldTemplatesResult>} */
     _onApiGetDefaultAnkiFieldTemplates() {
-        return this._defaultAnkiFieldTemplates;
+        return /** @type {string} */ (this._defaultAnkiFieldTemplates);
     }
 
+    /** @type {import('api').Handler<import('api').GetDictionaryInfoDetails, import('api').GetDictionaryInfoResult>} */
     async _onApiGetDictionaryInfo() {
         return await this._dictionaryDatabase.getDictionaryInfo();
     }
 
+    /** @type {import('api').Handler<import('api').PurgeDatabaseDetails, import('api').PurgeDatabaseResult>} */
     async _onApiPurgeDatabase() {
         await this._dictionaryDatabase.purge();
         this._triggerDatabaseUpdated('dictionary', 'purge');
     }
 
+    /** @type {import('api').Handler<import('api').GetMediaDetails, import('api').GetMediaResult>} */
     async _onApiGetMedia({targets}) {
         return await this._getNormalizedDictionaryDatabaseMedia(targets);
     }
 
+    /** @type {import('api').Handler<import('api').LogDetails, import('api').LogResult>} */
     _onApiLog({error, level, context}) {
-        log.log(deserializeError(error), level, context);
+        log.log(ExtensionError.deserialize(error), level, context);
     }
 
+    /** @type {import('api').Handler<import('api').LogIndicatorClearDetails, import('api').LogIndicatorClearResult>} */
     _onApiLogIndicatorClear() {
         if (this._logErrorLevel === null) { return; }
         this._logErrorLevel = null;
         this._updateBadge();
     }
 
-    _onApiCreateActionPort(params, sender) {
+    /** @type {import('api').Handler<import('api').CreateActionPortDetails, import('api').CreateActionPortResult, true>} */
+    _onApiCreateActionPort(_params, sender) {
         if (!sender || !sender.tab) { throw new Error('Invalid sender'); }
         const tabId = sender.tab.id;
         if (typeof tabId !== 'number') { throw new Error('Sender has invalid tab ID'); }
 
         const frameId = sender.frameId;
         const id = generateId(16);
+        /** @type {import('cross-frame-api').ActionPortDetails} */
         const details = {
             name: 'action-port',
             id
@@ -662,10 +780,12 @@ export class Backend {
         return details;
     }
 
+    /** @type {import('api').Handler<import('api').ModifySettingsDetails, import('api').ModifySettingsResult>} */
     _onApiModifySettings({targets, source}) {
         return this._modifySettings(targets, source);
     }
 
+    /** @type {import('api').Handler<import('api').GetSettingsDetails, import('api').GetSettingsResult>} */
     _onApiGetSettings({targets}) {
         const results = [];
         for (const target of targets) {
@@ -673,39 +793,48 @@ export class Backend {
                 const result = this._getSetting(target);
                 results.push({result: clone(result)});
             } catch (e) {
-                results.push({error: serializeError(e)});
+                results.push({error: ExtensionError.serialize(e)});
             }
         }
         return results;
     }
 
+    /** @type {import('api').Handler<import('api').SetAllSettingsDetails, import('api').SetAllSettingsResult>} */
     async _onApiSetAllSettings({value, source}) {
         this._optionsUtil.validate(value);
         this._options = clone(value);
         await this._saveOptions(source);
     }
 
-    async _onApiGetOrCreateSearchPopup({focus=false, text=null}) {
-        const {tab, created} = await this._getOrCreateSearchPopup();
+    /** @type {import('api').Handler<import('api').GetOrCreateSearchPopupDetails, import('api').GetOrCreateSearchPopupResult>} */
+    async _onApiGetOrCreateSearchPopup({focus = false, text}) {
+        const {tab, created} = await this._getOrCreateSearchPopupWrapper();
         if (focus === true || (focus === 'ifCreated' && created)) {
             await this._focusTab(tab);
         }
         if (typeof text === 'string') {
-            await this._updateSearchQuery(tab.id, text, !created);
+            const {id} = tab;
+            if (typeof id === 'number') {
+                await this._updateSearchQuery(id, text, !created);
+            }
         }
-        return {tabId: tab.id, windowId: tab.windowId};
+        const {id} = tab;
+        return {tabId: typeof id === 'number' ? id : null, windowId: tab.windowId};
     }
 
+    /** @type {import('api').Handler<import('api').IsTabSearchPopupDetails, import('api').IsTabSearchPopupResult>} */
     async _onApiIsTabSearchPopup({tabId}) {
         const baseUrl = chrome.runtime.getURL('/search.html');
-        const tab = typeof tabId === 'number' ? await this._checkTabUrl(tabId, (url) => url.startsWith(baseUrl)) : null;
+        const tab = typeof tabId === 'number' ? await this._checkTabUrl(tabId, (url) => url !== null && url.startsWith(baseUrl)) : null;
         return (tab !== null);
     }
 
+    /** @type {import('api').Handler<import('api').TriggerDatabaseUpdatedDetails, import('api').TriggerDatabaseUpdatedResult>} */
     _onApiTriggerDatabaseUpdated({type, cause}) {
         this._triggerDatabaseUpdated(type, cause);
     }
 
+    /** @type {import('api').Handler<import('api').TestMecabDetails, import('api').TestMecabResult>} */
     async _onApiTestMecab() {
         if (!this._mecab.isEnabled()) {
             throw new Error('MeCab not enabled');
@@ -742,18 +871,22 @@ export class Backend {
         return true;
     }
 
+    /** @type {import('api').Handler<import('api').TextHasJapaneseCharactersDetails, import('api').TextHasJapaneseCharactersResult>} */
     _onApiTextHasJapaneseCharacters({text}) {
         return this._japaneseUtil.isStringPartiallyJapanese(text);
     }
 
+    /** @type {import('api').Handler<import('api').GetTermFrequenciesDetails, import('api').GetTermFrequenciesResult>} */
     async _onApiGetTermFrequencies({termReadingList, dictionaries}) {
         return await this._translator.getTermFrequencies(termReadingList, dictionaries);
     }
 
+    /** @type {import('api').Handler<import('api').FindAnkiNotesDetails, import('api').FindAnkiNotesResult>} */
     async _onApiFindAnkiNotes({query}) {
         return await this._anki.findNotes(query);
     }
 
+    /** @type {import('api').Handler<import('api').LoadExtensionScriptsDetails, import('api').LoadExtensionScriptsResult, true>} */
     async _onApiLoadExtensionScripts({files}, sender) {
         if (!sender || !sender.tab) { throw new Error('Invalid sender'); }
         const tabId = sender.tab.id;
@@ -764,6 +897,7 @@ export class Backend {
         }
     }
 
+    /** @type {import('api').Handler<import('api').OpenCrossFramePortDetails, import('api').OpenCrossFramePortResult, true>} */
     _onApiOpenCrossFramePort({targetTabId, targetFrameId}, sender) {
         const sourceTabId = (sender && sender.tab ? sender.tab.id : null);
         if (typeof sourceTabId !== 'number') {
@@ -774,17 +908,21 @@ export class Backend {
             throw new Error('Port does not have an associated frame ID');
         }
 
+        /** @type {import('cross-frame-api').CrossFrameCommunicationPortDetails} */
         const sourceDetails = {
             name: 'cross-frame-communication-port',
             otherTabId: targetTabId,
             otherFrameId: targetFrameId
         };
+        /** @type {import('cross-frame-api').CrossFrameCommunicationPortDetails} */
         const targetDetails = {
             name: 'cross-frame-communication-port',
             otherTabId: sourceTabId,
             otherFrameId: sourceFrameId
         };
+        /** @type {?chrome.runtime.Port} */
         let sourcePort = chrome.tabs.connect(sourceTabId, {frameId: sourceFrameId, name: JSON.stringify(sourceDetails)});
+        /** @type {?chrome.runtime.Port} */
         let targetPort = chrome.tabs.connect(targetTabId, {frameId: targetFrameId, name: JSON.stringify(targetDetails)});
 
         const cleanup = () => {
@@ -799,8 +937,12 @@ export class Backend {
             }
         };
 
-        sourcePort.onMessage.addListener((message) => { targetPort.postMessage(message); });
-        targetPort.onMessage.addListener((message) => { sourcePort.postMessage(message); });
+        sourcePort.onMessage.addListener((message) => {
+            if (targetPort !== null) { targetPort.postMessage(message); }
+        });
+        targetPort.onMessage.addListener((message) => {
+            if (sourcePort !== null) { sourcePort.postMessage(message); }
+        });
         sourcePort.onDisconnect.addListener(cleanup);
         targetPort.onDisconnect.addListener(cleanup);
 
@@ -826,36 +968,52 @@ export class Backend {
 
     // Command handlers
 
+    /**
+     * @param {undefined|{mode: 'existingOrNewTab'|'newTab', query?: string}} params
+     */
     async _onCommandOpenSearchPage(params) {
-        const {mode='existingOrNewTab', query} = params || {};
-
-        const baseUrl = chrome.runtime.getURL('/search.html');
-        const queryParams = {};
-        if (query && query.length > 0) { queryParams.query = query; }
-        const queryString = new URLSearchParams(queryParams).toString();
-        let url = baseUrl;
-        if (queryString.length > 0) {
-            url += `?${queryString}`;
+        /** @type {'existingOrNewTab'|'newTab'} */
+        let mode = 'existingOrNewTab';
+        let query = '';
+        if (typeof params === 'object' && params !== null) {
+            mode = this._normalizeOpenSettingsPageMode(params.mode, mode);
+            const paramsQuery = params.query;
+            if (typeof paramsQuery === 'string') { query = paramsQuery; }
         }
 
-        const predicate = ({url: url2}) => {
-            if (url2 === null || !url2.startsWith(baseUrl)) { return false; }
-            const parsedUrl = new URL(url2);
-            const baseUrl2 = `${parsedUrl.origin}${parsedUrl.pathname}`;
-            const mode2 = parsedUrl.searchParams.get('mode');
-            return baseUrl2 === baseUrl && (mode2 === mode || (!mode2 && mode === 'existingOrNewTab'));
+        const baseUrl = chrome.runtime.getURL('/search.html');
+        /** @type {{[key: string]: string}} */
+        const queryParams = {};
+        if (query.length > 0) { queryParams.query = query; }
+        const queryString = new URLSearchParams(queryParams).toString();
+        let queryUrl = baseUrl;
+        if (queryString.length > 0) {
+            queryUrl += `?${queryString}`;
+        }
+
+        /** @type {import('backend').FindTabsPredicate} */
+        const predicate = ({url}) => {
+            if (url === null || !url.startsWith(baseUrl)) { return false; }
+            const parsedUrl = new URL(url);
+            const parsedBaseUrl = `${parsedUrl.origin}${parsedUrl.pathname}`;
+            const parsedMode = parsedUrl.searchParams.get('mode');
+            return parsedBaseUrl === baseUrl && (parsedMode === mode || (!parsedMode && mode === 'existingOrNewTab'));
         };
 
         const openInTab = async () => {
-            const tabInfo = await this._findTabs(1000, false, predicate, false);
+            const tabInfo = /** @type {?import('backend').TabInfo} */ (await this._findTabs(1000, false, predicate, false));
             if (tabInfo !== null) {
                 const {tab} = tabInfo;
-                await this._focusTab(tab);
-                if (queryParams.query) {
-                    await this._updateSearchQuery(tab.id, queryParams.query, true);
+                const {id} = tab;
+                if (typeof id === 'number') {
+                    await this._focusTab(tab);
+                    if (queryParams.query) {
+                        await this._updateSearchQuery(id, queryParams.query, true);
+                    }
+                    return true;
                 }
-                return true;
             }
+            return false;
         };
 
         switch (mode) {
@@ -865,66 +1023,100 @@ export class Backend {
                 } catch (e) {
                     // NOP
                 }
-                await this._createTab(url);
+                await this._createTab(queryUrl);
                 return;
             case 'newTab':
-                await this._createTab(url);
+                await this._createTab(queryUrl);
                 return;
         }
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _onCommandOpenInfoPage() {
         await this._openInfoPage();
     }
 
+    /**
+     * @param {undefined|{mode: 'existingOrNewTab'|'newTab'}} params
+     */
     async _onCommandOpenSettingsPage(params) {
-        const {mode='existingOrNewTab'} = params || {};
+        /** @type {'existingOrNewTab'|'newTab'} */
+        let mode = 'existingOrNewTab';
+        if (typeof params === 'object' && params !== null) {
+            mode = this._normalizeOpenSettingsPageMode(params.mode, mode);
+        }
         await this._openSettingsPage(mode);
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _onCommandToggleTextScanning() {
-        const options = this._getProfileOptions({current: true});
-        await this._modifySettings([{
+        const options = this._getProfileOptions({current: true}, false);
+        /** @type {import('settings-modifications').ScopedModificationSet} */
+        const modification = {
             action: 'set',
             path: 'general.enable',
             value: !options.general.enable,
             scope: 'profile',
             optionsContext: {current: true}
-        }], 'backend');
+        };
+        await this._modifySettings([modification], 'backend');
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _onCommandOpenPopupWindow() {
         await this._onApiGetOrCreateSearchPopup({focus: true});
     }
 
     // Utilities
 
+    /**
+     * @param {import('settings-modifications').ScopedModification[]} targets
+     * @param {string} source
+     * @returns {Promise<import('core').Response<import('settings-modifications').ModificationResult>[]>}
+     */
     async _modifySettings(targets, source) {
+        /** @type {import('core').Response<import('settings-modifications').ModificationResult>[]} */
         const results = [];
         for (const target of targets) {
             try {
                 const result = this._modifySetting(target);
                 results.push({result: clone(result)});
             } catch (e) {
-                results.push({error: serializeError(e)});
+                results.push({error: ExtensionError.serialize(e)});
             }
         }
         await this._saveOptions(source);
         return results;
     }
 
-    _getOrCreateSearchPopup() {
+    /**
+     * @returns {Promise<{tab: chrome.tabs.Tab, created: boolean}>}
+     */
+    _getOrCreateSearchPopupWrapper() {
         if (this._searchPopupTabCreatePromise === null) {
-            const promise = this._getOrCreateSearchPopup2();
+            const promise = this._getOrCreateSearchPopup();
             this._searchPopupTabCreatePromise = promise;
             promise.then(() => { this._searchPopupTabCreatePromise = null; });
         }
         return this._searchPopupTabCreatePromise;
     }
 
-    async _getOrCreateSearchPopup2() {
+    /**
+     * @returns {Promise<{tab: chrome.tabs.Tab, created: boolean}>}
+     */
+    async _getOrCreateSearchPopup() {
         // Use existing tab
         const baseUrl = chrome.runtime.getURL('/search.html');
+        /**
+         * @param {?string} url
+         * @returns {boolean}
+         */
         const urlPredicate = (url) => url !== null && url.startsWith(baseUrl);
         if (this._searchPopupTabId !== null) {
             const tab = await this._checkTabUrl(this._searchPopupTabId, urlPredicate);
@@ -938,8 +1130,11 @@ export class Backend {
         const existingTabInfo = await this._findSearchPopupTab(urlPredicate);
         if (existingTabInfo !== null) {
             const existingTab = existingTabInfo.tab;
-            this._searchPopupTabId = existingTab.id;
-            return {tab: existingTab, created: false};
+            const {id} = existingTab;
+            if (typeof id === 'number') {
+                this._searchPopupTabId = id;
+                return {tab: existingTab, created: false};
+            }
         }
 
         // chrome.windows not supported (e.g. on Firefox mobile)
@@ -948,38 +1143,48 @@ export class Backend {
         }
 
         // Create a new window
-        const options = this._getProfileOptions({current: true});
+        const options = this._getProfileOptions({current: true}, false);
         const createData = this._getSearchPopupWindowCreateData(baseUrl, options);
         const {popupWindow: {windowState}} = options;
         const popupWindow = await this._createWindow(createData);
-        if (windowState !== 'normal') {
+        if (windowState !== 'normal' && typeof popupWindow.id === 'number') {
             await this._updateWindow(popupWindow.id, {state: windowState});
         }
 
         const {tabs} = popupWindow;
-        if (tabs.length === 0) {
+        if (!Array.isArray(tabs) || tabs.length === 0) {
             throw new Error('Created window did not contain a tab');
         }
 
         const tab = tabs[0];
-        await this._waitUntilTabFrameIsReady(tab.id, 0, 2000);
+        const {id} = tab;
+        if (typeof id !== 'number') {
+            throw new Error('Tab does not have an id');
+        }
+        await this._waitUntilTabFrameIsReady(id, 0, 2000);
 
         await this._sendMessageTabPromise(
-            tab.id,
+            id,
             {action: 'SearchDisplayController.setMode', params: {mode: 'popup'}},
             {frameId: 0}
         );
 
-        this._searchPopupTabId = tab.id;
+        this._searchPopupTabId = id;
         return {tab, created: true};
     }
 
+    /**
+     * @param {(url: ?string) => boolean} urlPredicate
+     * @returns {Promise<?import('backend').TabInfo>}
+     */
     async _findSearchPopupTab(urlPredicate) {
+        /** @type {import('backend').FindTabsPredicate} */
         const predicate = async ({url, tab}) => {
-            if (!urlPredicate(url)) { return false; }
+            const {id} = tab;
+            if (typeof id === 'undefined' || !urlPredicate(url)) { return false; }
             try {
                 const mode = await this._sendMessageTabPromise(
-                    tab.id,
+                    id,
                     {action: 'SearchDisplayController.getMode', params: {}},
                     {frameId: 0}
                 );
@@ -988,9 +1193,14 @@ export class Backend {
                 return false;
             }
         };
-        return await this._findTabs(1000, false, predicate, true);
+        return /** @type {?import('backend').TabInfo} */ (await this._findTabs(1000, false, predicate, true));
     }
 
+    /**
+     * @param {string} url
+     * @param {import('settings').ProfileOptions} options
+     * @returns {chrome.windows.CreateData}
+     */
     _getSearchPopupWindowCreateData(url, options) {
         const {popupWindow: {width, height, left, top, useLeft, useTop, windowType}} = options;
         return {
@@ -1004,6 +1214,10 @@ export class Backend {
         };
     }
 
+    /**
+     * @param {chrome.windows.CreateData} createData
+     * @returns {Promise<chrome.windows.Window>}
+     */
     _createWindow(createData) {
         return new Promise((resolve, reject) => {
             chrome.windows.create(
@@ -1013,13 +1227,18 @@ export class Backend {
                     if (error) {
                         reject(new Error(error.message));
                     } else {
-                        resolve(result);
+                        resolve(/** @type {chrome.windows.Window} */ (result));
                     }
                 }
             );
         });
     }
 
+    /**
+     * @param {number} windowId
+     * @param {chrome.windows.UpdateInfo} updateInfo
+     * @returns {Promise<chrome.windows.Window>}
+     */
     _updateWindow(windowId, updateInfo) {
         return new Promise((resolve, reject) => {
             chrome.windows.update(
@@ -1037,21 +1256,31 @@ export class Backend {
         });
     }
 
-    _updateSearchQuery(tabId, text, animate) {
-        return this._sendMessageTabPromise(
+    /**
+     * @param {number} tabId
+     * @param {string} text
+     * @param {boolean} animate
+     * @returns {Promise<void>}
+     */
+    async _updateSearchQuery(tabId, text, animate) {
+        await this._sendMessageTabPromise(
             tabId,
             {action: 'SearchDisplayController.updateSearchQuery', params: {text, animate}},
             {frameId: 0}
         );
     }
 
-    async _applyOptions(source) {
-        const options = this._getProfileOptions({current: true});
+    /**
+     * @param {string} source
+     */
+    _applyOptions(source) {
+        const options = this._getProfileOptions({current: true}, false);
         this._updateBadge();
 
         const enabled = options.general.enable;
 
-        let {apiKey} = options.anki;
+        /** @type {?string} */
+        let apiKey = options.anki.apiKey;
         if (apiKey === '') { apiKey = null; }
         this._anki.server = options.anki.server;
         this._anki.enabled = options.anki.enable && enabled;
@@ -1091,20 +1320,38 @@ export class Backend {
         }
     }
 
-    _getOptionsFull(useSchema=false) {
+    /**
+     * @param {boolean} useSchema
+     * @returns {import('settings').Options}
+     * @throws {Error}
+     */
+    _getOptionsFull(useSchema) {
         const options = this._options;
-        return useSchema ? this._optionsUtil.createValidatingProxy(options) : options;
+        if (options === null) { throw new Error('Options is null'); }
+        return useSchema ? /** @type {import('settings').Options} */ (this._optionsUtil.createValidatingProxy(options)) : options;
     }
 
-    _getProfileOptions(optionsContext, useSchema=false) {
+    /**
+     * @param {import('settings').OptionsContext} optionsContext
+     * @param {boolean} useSchema
+     * @returns {import('settings').ProfileOptions}
+     */
+    _getProfileOptions(optionsContext, useSchema) {
         return this._getProfile(optionsContext, useSchema).options;
     }
+
 
     _getProfileLanguage(optionsContext, useSchema=false) {
         return this._getProfileOptions(optionsContext, useSchema).general.language;
     }
 
-    _getProfile(optionsContext, useSchema=false) {
+    /**
+     * @param {import('settings').OptionsContext} optionsContext
+     * @param {boolean} useSchema
+     * @returns {import('settings').Profile}
+     * @throws {Error}
+     */
+    _getProfile(optionsContext, useSchema) {
         const options = this._getOptionsFull(useSchema);
         const profiles = options.profiles;
         if (!optionsContext.current) {
@@ -1130,8 +1377,13 @@ export class Backend {
         return profiles[profileCurrent];
     }
 
+    /**
+     * @param {import('settings').Options} options
+     * @param {import('settings').OptionsContext} optionsContext
+     * @returns {?import('settings').Profile}
+     */
     _getProfileFromContext(options, optionsContext) {
-        optionsContext = this._profileConditionsUtil.normalizeContext(optionsContext);
+        const normalizedOptionsContext = this._profileConditionsUtil.normalizeContext(optionsContext);
 
         let index = 0;
         for (const profile of options.profiles) {
@@ -1145,7 +1397,7 @@ export class Backend {
                 this._profileConditionsSchemaCache.push(schema);
             }
 
-            if (conditionGroups.length > 0 && schema.isValid(optionsContext)) {
+            if (conditionGroups.length > 0 && schema.isValid(normalizedOptionsContext)) {
                 return profile;
             }
             ++index;
@@ -1154,20 +1406,36 @@ export class Backend {
         return null;
     }
 
+    /**
+     * @param {string} message
+     * @param {unknown} data
+     * @returns {ExtensionError}
+     */
     _createDataError(message, data) {
-        const error = new Error(message);
+        const error = new ExtensionError(message);
         error.data = data;
         return error;
     }
 
+    /**
+     * @returns {void}
+     */
     _clearProfileConditionsSchemaCache() {
         this._profileConditionsSchemaCache = [];
     }
 
-    _checkLastError() {
+    /**
+     * @param {unknown} _ignore
+     */
+    _checkLastError(_ignore) {
         // NOP
     }
 
+    /**
+     * @param {string} command
+     * @param {import('core').SerializableObject|undefined} params
+     * @returns {boolean}
+     */
     _runCommand(command, params) {
         const handler = this._commandHandlers.get(command);
         if (typeof handler !== 'function') { return false; }
@@ -1176,6 +1444,12 @@ export class Backend {
         return true;
     }
 
+    /**
+     * @param {string} text
+     * @param {number} scanLength
+     * @param {import('settings').OptionsContext} optionsContext
+     * @returns {Promise<import('api').ParseTextLine[]>}
+     */
     async _textParseScanning(text, scanLength, optionsContext) {
         const options = this._getProfileOptions(optionsContext);
 
@@ -1226,6 +1500,10 @@ export class Backend {
         }
     }
 
+    /**
+     * @param {string} text
+     * @returns {Promise<import('backend').MecabParseResults>}
+     */
     async _textParseMecab(text) {
         const jp = this._japaneseUtil;
 
@@ -1236,8 +1514,10 @@ export class Backend {
             return [];
         }
 
+        /** @type {import('backend').MecabParseResults} */
         const results = [];
         for (const {name, lines} of parseTextResults) {
+            /** @type {import('api').ParseTextLine[]} */
             const result = [];
             for (const line of lines) {
                 for (const {term, reading, source} of line) {
@@ -1258,34 +1538,48 @@ export class Backend {
         return results;
     }
 
+    /**
+     * @param {chrome.runtime.Port} port
+     * @param {chrome.runtime.MessageSender} sender
+     * @param {import('backend').MessageHandlerWithProgressMap} handlers
+     */
     _createActionListenerPort(port, sender, handlers) {
+        let done = false;
         let hasStarted = false;
+        /** @type {?string} */
         let messageString = '';
 
+        /**
+         * @param {...unknown} data
+         */
         const onProgress = (...data) => {
             try {
-                if (port === null) { return; }
-                port.postMessage({type: 'progress', data});
+                if (done) { return; }
+                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseProgressMessage} */ ({type: 'progress', data}));
             } catch (e) {
                 // NOP
             }
         };
 
+        /**
+         * @param {import('backend').InvokeWithProgressRequestMessage} message
+         */
         const onMessage = (message) => {
             if (hasStarted) { return; }
 
             try {
-                const {action, data} = message;
+                const {action} = message;
                 switch (action) {
                     case 'fragment':
-                        messageString += data;
+                        messageString += message.data;
                         break;
                     case 'invoke':
-                        {
+                        if (messageString !== null) {
                             hasStarted = true;
                             port.onMessage.removeListener(onMessage);
 
-                            const messageData = JSON.parse(messageString);
+                            /** @type {{action: string, params?: import('core').SerializableObject}} */
+                            const messageData = parseJson(messageString);
                             messageString = null;
                             onMessageComplete(messageData);
                         }
@@ -1296,10 +1590,13 @@ export class Backend {
             }
         };
 
+        /**
+         * @param {{action: string, params?: import('core').SerializableObject}} message
+         */
         const onMessageComplete = async (message) => {
             try {
                 const {action, params} = message;
-                port.postMessage({type: 'ack'});
+                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseAcknowledgeMessage} */ ({type: 'ack'}));
 
                 const messageHandler = handlers.get(action);
                 if (typeof messageHandler === 'undefined') {
@@ -1313,7 +1610,7 @@ export class Backend {
 
                 const promiseOrResult = handler(params, sender, onProgress);
                 const result = async ? await promiseOrResult : promiseOrResult;
-                port.postMessage({type: 'complete', data: result});
+                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseCompleteMessage} */ ({type: 'complete', data: result}));
             } catch (e) {
                 cleanup(e);
             }
@@ -1323,23 +1620,29 @@ export class Backend {
             cleanup(null);
         };
 
+        /**
+         * @param {unknown} error
+         */
         const cleanup = (error) => {
-            if (port === null) { return; }
+            if (done) { return; }
             if (error !== null) {
-                port.postMessage({type: 'error', data: serializeError(error)});
+                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseErrorMessage} */ ({type: 'error', data: ExtensionError.serialize(error)}));
             }
             if (!hasStarted) {
                 port.onMessage.removeListener(onMessage);
             }
             port.onDisconnect.removeListener(onDisconnect);
-            port = null;
-            handlers = null;
+            done = true;
         };
 
         port.onMessage.addListener(onMessage);
         port.onDisconnect.addListener(onDisconnect);
     }
 
+    /**
+     * @param {?import('log').LogLevel} errorLevel
+     * @returns {number}
+     */
     _getErrorLevelValue(errorLevel) {
         switch (errorLevel) {
             case 'info': return 0;
@@ -1350,19 +1653,32 @@ export class Backend {
         }
     }
 
+    /**
+     * @param {import('settings-modifications').OptionsScope} target
+     * @returns {import('settings').Options|import('settings').ProfileOptions}
+     * @throws {Error}
+     */
     _getModifySettingObject(target) {
         const scope = target.scope;
         switch (scope) {
             case 'profile':
-                if (!isObject(target.optionsContext)) { throw new Error('Invalid optionsContext'); }
-                return this._getProfileOptions(target.optionsContext, true);
+            {
+                const {optionsContext} = target;
+                if (typeof optionsContext !== 'object' || optionsContext === null) { throw new Error('Invalid optionsContext'); }
+                return /** @type {import('settings').ProfileOptions} */ (this._getProfileOptions(optionsContext, true));
+            }
             case 'global':
-                return this._getOptionsFull(true);
+                return /** @type {import('settings').Options} */ (this._getOptionsFull(true));
             default:
                 throw new Error(`Invalid scope: ${scope}`);
         }
     }
 
+    /**
+     * @param {import('settings-modifications').OptionsScope&import('settings-modifications').Read} target
+     * @returns {unknown}
+     * @throws {Error}
+     */
     _getSetting(target) {
         const options = this._getModifySettingObject(target);
         const accessor = new ObjectPropertyAccessor(options);
@@ -1371,6 +1687,11 @@ export class Backend {
         return accessor.get(ObjectPropertyAccessor.getPathArray(path));
     }
 
+    /**
+     * @param {import('settings-modifications').ScopedModification} target
+     * @returns {import('settings-modifications').ModificationResult}
+     * @throws {Error}
+     */
     _modifySetting(target) {
         const options = this._getModifySettingObject(target);
         const accessor = new ObjectPropertyAccessor(options);
@@ -1429,10 +1750,14 @@ export class Backend {
         }
     }
 
+    /**
+     * @param {chrome.runtime.MessageSender} sender
+     * @throws {Error}
+     */
     _validatePrivilegedMessageSender(sender) {
         let {url} = sender;
         if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
-        const {tab} = url;
+        const {tab} = sender;
         if (typeof tab === 'object' && tab !== null) {
             ({url} = tab);
             if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
@@ -1440,6 +1765,9 @@ export class Backend {
         throw new Error('Invalid message sender');
     }
 
+    /**
+     * @returns {Promise<string>}
+     */
     _getBrowserIconTitle() {
         return (
             isObject(chrome.action) &&
@@ -1449,6 +1777,9 @@ export class Backend {
         );
     }
 
+    /**
+     * @returns {void}
+     */
     _updateBadge() {
         let title = this._defaultBrowserActionTitle;
         if (title === null || !isObject(chrome.action)) {
@@ -1484,7 +1815,7 @@ export class Backend {
                 status = 'Loading';
             }
         } else {
-            const options = this._getProfileOptions({current: true});
+            const options = this._getProfileOptions({current: true}, false);
             if (!options.general.enable) {
                 text = 'off';
                 color = '#555555';
@@ -1514,6 +1845,10 @@ export class Backend {
         }
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     * @returns {boolean}
+     */
     _isAnyDictionaryEnabled(options) {
         for (const {enabled} of options.dictionaries) {
             if (enabled) {
@@ -1523,21 +1858,18 @@ export class Backend {
         return false;
     }
 
-    _anyOptionsMatches(predicate) {
-        for (const {options} of this._options.profiles) {
-            const value = predicate(options);
-            if (value) { return value; }
-        }
-        return false;
-    }
-
+    /**
+     * @param {number} tabId
+     * @returns {Promise<?string>}
+     */
     async _getTabUrl(tabId) {
         try {
-            const {url} = await this._sendMessageTabPromise(
+            const response = await this._sendMessageTabPromise(
                 tabId,
                 {action: 'Yomitan.getUrl', params: {}},
                 {frameId: 0}
             );
+            const url = typeof response === 'object' && response !== null ? /** @type {import('core').SerializableObject} */ (response).url : void 0;
             if (typeof url === 'string') {
                 return url;
             }
@@ -1547,6 +1879,9 @@ export class Backend {
         return null;
     }
 
+    /**
+     * @returns {Promise<chrome.tabs.Tab[]>}
+     */
     _getAllTabs() {
         return new Promise((resolve, reject) => {
             chrome.tabs.query({}, (tabs) => {
@@ -1560,21 +1895,33 @@ export class Backend {
         });
     }
 
+    /**
+     * @param {number} timeout
+     * @param {boolean} multiple
+     * @param {import('backend').FindTabsPredicate} predicate
+     * @param {boolean} predicateIsAsync
+     * @returns {Promise<import('backend').TabInfo[]|(?import('backend').TabInfo)>}
+     */
     async _findTabs(timeout, multiple, predicate, predicateIsAsync) {
         // This function works around the need to have the "tabs" permission to access tab.url.
         const tabs = await this._getAllTabs();
 
         let done = false;
+        /**
+         * @param {chrome.tabs.Tab} tab
+         * @param {(tabInfo: import('backend').TabInfo) => boolean} add
+         */
         const checkTab = async (tab, add) => {
-            const url = await this._getTabUrl(tab.id);
+            const {id} = tab;
+            const url = typeof id === 'number' ? await this._getTabUrl(id) : null;
 
             if (done) { return; }
 
             let okay = false;
             const item = {tab, url};
             try {
-                okay = predicate(item);
-                if (predicateIsAsync) { okay = await okay; }
+                const okayOrPromise = predicate(item);
+                okay = predicateIsAsync ? await okayOrPromise : /** @type {boolean} */ (okayOrPromise);
             } catch (e) {
                 // NOP
             }
@@ -1587,7 +1934,12 @@ export class Backend {
         };
 
         if (multiple) {
+            /** @type {import('backend').TabInfo[]} */
             const results = [];
+            /**
+             * @param {import('backend').TabInfo} value
+             * @returns {boolean}
+             */
             const add = (value) => {
                 results.push(value);
                 return false;
@@ -1599,8 +1951,13 @@ export class Backend {
             ]);
             return results;
         } else {
-            const {promise, resolve} = deferPromise();
+            const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
+            /** @type {?import('backend').TabInfo} */
             let result = null;
+            /**
+             * @param {import('backend').TabInfo} value
+             * @returns {boolean}
+             */
             const add = (value) => {
                 result = value;
                 resolve();
@@ -1617,9 +1974,17 @@ export class Backend {
         }
     }
 
+    /**
+     * @param {chrome.tabs.Tab} tab
+     */
     async _focusTab(tab) {
-        await new Promise((resolve, reject) => {
-            chrome.tabs.update(tab.id, {active: true}, () => {
+        await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
+            const {id} = tab;
+            if (typeof id !== 'number') {
+                reject(new Error('Cannot focus a tab without an id'));
+                return;
+            }
+            chrome.tabs.update(id, {active: true}, () => {
                 const e = chrome.runtime.lastError;
                 if (e) {
                     reject(new Error(e.message));
@@ -1627,7 +1992,7 @@ export class Backend {
                     resolve();
                 }
             });
-        });
+        }));
 
         if (!(typeof chrome.windows === 'object' && chrome.windows !== null)) {
             // Windows not supported (e.g. on Firefox mobile)
@@ -1646,7 +2011,7 @@ export class Backend {
                 });
             });
             if (!tabWindow.focused) {
-                await new Promise((resolve, reject) => {
+                await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
                     chrome.windows.update(tab.windowId, {focused: true}, () => {
                         const e = chrome.runtime.lastError;
                         if (e) {
@@ -1655,23 +2020,31 @@ export class Backend {
                             resolve();
                         }
                     });
-                });
+                }));
             }
         } catch (e) {
             // Edge throws exception for no reason here.
         }
     }
 
-    _waitUntilTabFrameIsReady(tabId, frameId, timeout=null) {
+    /**
+     * @param {number} tabId
+     * @param {number} frameId
+     * @param {?number} [timeout=null]
+     * @returns {Promise<void>}
+     */
+    _waitUntilTabFrameIsReady(tabId, frameId, timeout = null) {
         return new Promise((resolve, reject) => {
+            /** @type {?import('core').Timeout} */
             let timer = null;
+            /** @type {?import('extension').ChromeRuntimeOnMessageCallback} */
             let onMessage = (message, sender) => {
                 if (
                     !sender.tab ||
                     sender.tab.id !== tabId ||
                     sender.frameId !== frameId ||
-                    !isObject(message) ||
-                    message.action !== 'yomitanReady'
+                    !(typeof message === 'object' && message !== null) ||
+                    /** @type {import('core').SerializableObject} */ (message).action !== 'yomitanReady'
                 ) {
                     return;
                 }
@@ -1712,27 +2085,50 @@ export class Backend {
         });
     }
 
-    _sendMessageIgnoreResponse(...args) {
+    /**
+     * @param {{action: string, params: import('core').SerializableObject}} message
+     */
+    _sendMessageIgnoreResponse(message) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
-        chrome.runtime.sendMessage(...args, callback);
+        chrome.runtime.sendMessage(message, callback);
     }
 
-    _sendMessageTabIgnoreResponse(...args) {
+    /**
+     * @param {number} tabId
+     * @param {{action: string, params?: import('core').SerializableObject, frameId?: number}} message
+     * @param {chrome.tabs.MessageSendOptions} options
+     */
+    _sendMessageTabIgnoreResponse(tabId, message, options) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
-        chrome.tabs.sendMessage(...args, callback);
+        chrome.tabs.sendMessage(tabId, message, options, callback);
     }
 
+    /**
+     * @param {string} action
+     * @param {import('core').SerializableObject} params
+     */
     _sendMessageAllTabsIgnoreResponse(action, params) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, (tabs) => {
             for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {action, params}, callback);
+                const {id} = tab;
+                if (typeof id !== 'number') { continue; }
+                chrome.tabs.sendMessage(id, {action, params}, callback);
             }
         });
     }
 
-    _sendMessageTabPromise(...args) {
+    /**
+     * @param {number} tabId
+     * @param {{action: string, params?: import('core').SerializableObject}} message
+     * @param {chrome.tabs.MessageSendOptions} options
+     * @returns {Promise<unknown>}
+     */
+    _sendMessageTabPromise(tabId, message, options) {
         return new Promise((resolve, reject) => {
+            /**
+             * @param {unknown} response
+             */
             const callback = (response) => {
                 try {
                     resolve(this._getMessageResponseResult(response));
@@ -1741,25 +2137,35 @@ export class Backend {
                 }
             };
 
-            chrome.tabs.sendMessage(...args, callback);
+            chrome.tabs.sendMessage(tabId, message, options, callback);
         });
     }
 
+    /**
+     * @param {unknown} response
+     * @returns {unknown}
+     * @throws {Error}
+     */
     _getMessageResponseResult(response) {
-        let error = chrome.runtime.lastError;
+        const error = chrome.runtime.lastError;
         if (error) {
             throw new Error(error.message);
         }
-        if (!isObject(response)) {
+        if (typeof response !== 'object' || response === null) {
             throw new Error('Tab did not respond');
         }
-        error = response.error;
-        if (error) {
-            throw deserializeError(error);
+        const responseError = /** @type {import('core').SerializedError|undefined} */ (/** @type {import('core').SerializableObject} */ (response).error);
+        if (typeof responseError === 'object' && responseError !== null) {
+            throw ExtensionError.deserialize(responseError);
         }
-        return response.result;
+        return /** @type {import('core').SerializableObject} */ (response).result;
     }
 
+    /**
+     * @param {number} tabId
+     * @param {(url: ?string) => boolean} urlPredicate
+     * @returns {Promise<?chrome.tabs.Tab>}
+     */
     async _checkTabUrl(tabId, urlPredicate) {
         let tab;
         try {
@@ -1773,6 +2179,13 @@ export class Backend {
         return isValidTab ? tab : null;
     }
 
+    /**
+     * @param {number} tabId
+     * @param {number} frameId
+     * @param {'jpeg'|'png'} format
+     * @param {number} quality
+     * @returns {Promise<string>}
+     */
     async _getScreenshot(tabId, frameId, format, quality) {
         const tab = await this._getTabById(tabId);
         const {windowId} = tab;
@@ -1808,6 +2221,16 @@ export class Backend {
         }
     }
 
+    /**
+     * @param {AnkiConnect} ankiConnect
+     * @param {number} timestamp
+     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
+     * @param {?import('api').InjectAnkiNoteMediaAudioDetails} audioDetails
+     * @param {?import('api').InjectAnkiNoteMediaScreenshotDetails} screenshotDetails
+     * @param {?import('api').InjectAnkiNoteMediaClipboardDetails} clipboardDetails
+     * @param {import('api').InjectAnkiNoteMediaDictionaryMediaDetails[]} dictionaryMediaDetails
+     * @returns {Promise<import('api').InjectAnkiNoteMediaResult>}
+     */
     async _injectAnkNoteMedia(ankiConnect, timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails) {
         let screenshotFileName = null;
         let clipboardImageFileName = null;
@@ -1820,7 +2243,7 @@ export class Backend {
                 screenshotFileName = await this._injectAnkiNoteScreenshot(ankiConnect, timestamp, definitionDetails, screenshotDetails);
             }
         } catch (e) {
-            errors.push(serializeError(e));
+            errors.push(ExtensionError.serialize(e));
         }
 
         try {
@@ -1828,7 +2251,7 @@ export class Backend {
                 clipboardImageFileName = await this._injectAnkiNoteClipboardImage(ankiConnect, timestamp, definitionDetails);
             }
         } catch (e) {
-            errors.push(serializeError(e));
+            errors.push(ExtensionError.serialize(e));
         }
 
         try {
@@ -1836,7 +2259,7 @@ export class Backend {
                 clipboardText = await this._clipboardReader.getText(false);
             }
         } catch (e) {
-            errors.push(serializeError(e));
+            errors.push(ExtensionError.serialize(e));
         }
 
         try {
@@ -1844,19 +2267,20 @@ export class Backend {
                 audioFileName = await this._injectAnkiNoteAudio(ankiConnect, timestamp, definitionDetails, audioDetails);
             }
         } catch (e) {
-            errors.push(serializeError(e));
+            errors.push(ExtensionError.serialize(e));
         }
 
+        /** @type {import('api').InjectAnkiNoteDictionaryMediaResult[]} */
         let dictionaryMedia;
         try {
             let errors2;
             ({results: dictionaryMedia, errors: errors2} = await this._injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, definitionDetails, dictionaryMediaDetails));
             for (const error of errors2) {
-                errors.push(serializeError(error));
+                errors.push(ExtensionError.serialize(error));
             }
         } catch (e) {
             dictionaryMedia = [];
-            errors.push(serializeError(e));
+            errors.push(ExtensionError.serialize(e));
         }
 
         return {
@@ -1869,16 +2293,17 @@ export class Backend {
         };
     }
 
+    /**
+     * @param {AnkiConnect} ankiConnect
+     * @param {number} timestamp
+     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
+     * @param {import('api').InjectAnkiNoteMediaAudioDetails} details
+     * @returns {Promise<?string>}
+     */
     async _injectAnkiNoteAudio(ankiConnect, timestamp, definitionDetails, details) {
-        const {type, term, reading} = definitionDetails;
-        if (
-            type === 'kanji' ||
-            typeof term !== 'string' ||
-            typeof reading !== 'string' ||
-            (term.length === 0 && reading.length === 0)
-        ) {
-            return null;
-        }
+        if (definitionDetails.type !== 'term') { return null; }
+        const {term, reading} = definitionDetails;
+        if (term.length === 0 && reading.length === 0) { return null; }
 
         const {sources, preferredAudioIndex, idleTimeout} = details;
         const language = this._getProfileLanguage({current: true});
@@ -1901,15 +2326,20 @@ export class Backend {
             return null;
         }
 
-        let extension = MediaUtil.getFileExtensionFromAudioMediaType(contentType);
+        let extension = contentType !== null ? MediaUtil.getFileExtensionFromAudioMediaType(contentType) : null;
         if (extension === null) { extension = '.mp3'; }
         let fileName = this._generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp, definitionDetails);
         fileName = fileName.replace(/\]/g, '');
-        fileName = await ankiConnect.storeMediaFile(fileName, data);
-
-        return fileName;
+        return await ankiConnect.storeMediaFile(fileName, data);
     }
 
+    /**
+     * @param {AnkiConnect} ankiConnect
+     * @param {number} timestamp
+     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
+     * @param {import('api').InjectAnkiNoteMediaScreenshotDetails} details
+     * @returns {Promise<?string>}
+     */
     async _injectAnkiNoteScreenshot(ankiConnect, timestamp, definitionDetails, details) {
         const {tabId, frameId, format, quality} = details;
         const dataUrl = await this._getScreenshot(tabId, frameId, format, quality);
@@ -1920,12 +2350,16 @@ export class Backend {
             throw new Error('Unknown media type for screenshot image');
         }
 
-        let fileName = this._generateAnkiNoteMediaFileName('yomitan_browser_screenshot', extension, timestamp, definitionDetails);
-        fileName = await ankiConnect.storeMediaFile(fileName, data);
-
-        return fileName;
+        const fileName = this._generateAnkiNoteMediaFileName('yomitan_browser_screenshot', extension, timestamp, definitionDetails);
+        return await ankiConnect.storeMediaFile(fileName, data);
     }
 
+    /**
+     * @param {AnkiConnect} ankiConnect
+     * @param {number} timestamp
+     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
+     * @returns {Promise<?string>}
+     */
     async _injectAnkiNoteClipboardImage(ankiConnect, timestamp, definitionDetails) {
         const dataUrl = await this._clipboardReader.getImage();
         if (dataUrl === null) {
@@ -1938,12 +2372,17 @@ export class Backend {
             throw new Error('Unknown media type for clipboard image');
         }
 
-        let fileName = this._generateAnkiNoteMediaFileName('yomitan_clipboard_image', extension, timestamp, definitionDetails);
-        fileName = await ankiConnect.storeMediaFile(fileName, data);
-
-        return fileName;
+        const fileName = this._generateAnkiNoteMediaFileName('yomitan_clipboard_image', extension, timestamp, definitionDetails);
+        return await ankiConnect.storeMediaFile(fileName, data);
     }
 
+    /**
+     * @param {AnkiConnect} ankiConnect
+     * @param {number} timestamp
+     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
+     * @param {import('api').InjectAnkiNoteMediaDictionaryMediaDetails[]} dictionaryMediaDetails
+     * @returns {Promise<{results: import('api').InjectAnkiNoteDictionaryMediaResult[], errors: unknown[]}>}
+     */
     async _injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, definitionDetails, dictionaryMediaDetails) {
         const targets = [];
         const detailsList = [];
@@ -1967,6 +2406,7 @@ export class Backend {
         }
 
         const errors = [];
+        /** @type {import('api').InjectAnkiNoteDictionaryMediaResult[]} */
         const results = [];
         for (let i = 0, ii = detailsList.length; i < ii; ++i) {
             const {dictionary, path, media} = detailsList[i];
@@ -1974,7 +2414,12 @@ export class Backend {
             if (media !== null) {
                 const {content, mediaType} = media;
                 const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
-                fileName = this._generateAnkiNoteMediaFileName(`yomitan_dictionary_media_${i + 1}`, extension, timestamp, definitionDetails);
+                fileName = this._generateAnkiNoteMediaFileName(
+                    `yomitan_dictionary_media_${i + 1}`,
+                    extension !== null ? extension : '',
+                    timestamp,
+                    definitionDetails
+                );
                 try {
                     fileName = await ankiConnect.storeMediaFile(fileName, content);
                 } catch (e) {
@@ -1988,18 +2433,27 @@ export class Backend {
         return {results, errors};
     }
 
+    /**
+     * @param {unknown} error
+     * @returns {?ExtensionError}
+     */
     _getAudioDownloadError(error) {
-        if (isObject(error.data)) {
-            const {errors} = error.data;
+        if (error instanceof ExtensionError && typeof error.data === 'object' && error.data !== null) {
+            const {errors} = /** @type {import('core').SerializableObject} */ (error.data);
             if (Array.isArray(errors)) {
-                for (const error2 of errors) {
-                    if (error2.name === 'AbortError') {
+                for (const errorDetail of errors) {
+                    if (!(errorDetail instanceof Error)) { continue; }
+                    if (errorDetail.name === 'AbortError') {
                         return this._createAudioDownloadError('Audio download was cancelled due to an idle timeout', 'audio-download-idle-timeout', errors);
                     }
-                    if (!isObject(error2.data)) { continue; }
-                    const {details} = error2.data;
-                    if (!isObject(details)) { continue; }
-                    switch (details.error) {
+                    if (!(errorDetail instanceof ExtensionError)) { continue; }
+                    const {data} = errorDetail;
+                    if (!(typeof data === 'object' && data !== null)) { continue; }
+                    const {details} = /** @type {import('core').SerializableObject} */ (data);
+                    if (!(typeof details === 'object' && details !== null)) { continue; }
+                    const error3 = /** @type {import('core').SerializableObject} */ (details).error;
+                    if (typeof error3 !== 'string') { continue; }
+                    switch (error3) {
                         case 'net::ERR_FAILED':
                             // This is potentially an error due to the extension not having enough URL privileges.
                             // The message logged to the console looks like this:
@@ -2016,23 +2470,38 @@ export class Backend {
         return null;
     }
 
+    /**
+     * @param {string} message
+     * @param {?string} issueId
+     * @param {?(Error[])} errors
+     * @returns {ExtensionError}
+     */
     _createAudioDownloadError(message, issueId, errors) {
-        const error = new Error(message);
+        const error = new ExtensionError(message);
         const hasErrors = Array.isArray(errors);
         const hasIssueId = (typeof issueId === 'string');
         if (hasErrors || hasIssueId) {
+            /** @type {{errors?: import('core').SerializedError[], referenceUrl?: string}} */
+            const data = {};
             error.data = {};
             if (hasErrors) {
                 // Errors need to be serialized since they are passed to other frames
-                error.data.errors = errors.map((e) => serializeError(e));
+                data.errors = errors.map((e) => ExtensionError.serialize(e));
             }
             if (hasIssueId) {
-                error.data.referenceUrl = `/issues.html#${issueId}`;
+                data.referenceUrl = `/issues.html#${issueId}`;
             }
         }
         return error;
     }
 
+    /**
+     * @param {string} prefix
+     * @param {string} extension
+     * @param {number} timestamp
+     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
+     * @returns {string}
+     */
     _generateAnkiNoteMediaFileName(prefix, extension, timestamp, definitionDetails) {
         let fileName = prefix;
 
@@ -2060,11 +2529,19 @@ export class Backend {
         return fileName;
     }
 
+    /**
+     * @param {string} fileName
+     * @returns {string}
+     */
     _replaceInvalidFileNameCharacters(fileName) {
         // eslint-disable-next-line no-control-regex
         return fileName.replace(/[<>:"/\\|?*\x00-\x1F]/g, '-');
     }
 
+    /**
+     * @param {Date} date
+     * @returns {string}
+     */
     _ankNoteDateToString(date) {
         const year = date.getUTCFullYear();
         const month = date.getUTCMonth().toString().padStart(2, '0');
@@ -2075,6 +2552,11 @@ export class Backend {
         return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
     }
 
+    /**
+     * @param {string} dataUrl
+     * @returns {{mediaType: string, data: string}}
+     * @throws {Error}
+     */
     _getDataUrlInfo(dataUrl) {
         const match = /^data:([^,]*?)(;base64)?,/.exec(dataUrl);
         if (match === null) {
@@ -2090,28 +2572,35 @@ export class Backend {
         return {mediaType, data};
     }
 
+    /**
+     * @param {import('backend').DatabaseUpdateType} type
+     * @param {import('backend').DatabaseUpdateCause} cause
+     */
     _triggerDatabaseUpdated(type, cause) {
         this._translator.clearDatabaseCaches();
         this._sendMessageAllTabsIgnoreResponse('Yomitan.databaseUpdated', {type, cause});
     }
 
+    /**
+     * @param {string} source
+     */
     async _saveOptions(source) {
         this._clearProfileConditionsSchemaCache();
-        const options = this._getOptionsFull();
+        const options = this._getOptionsFull(false);
         await this._optionsUtil.save(options);
         this._applyOptions(source);
     }
 
     /**
      * Creates an options object for use with `Translator.findTerms`.
-     * @param {string} mode The display mode for the dictionary entries.
-     * @param {{matchType: string, deinflect: boolean}} details Custom info for finding terms.
-     * @param {object} options The options.
-     * @returns {FindTermsOptions} An options object.
+     * @param {import('translator').FindTermsMode} mode The display mode for the dictionary entries.
+     * @param {import('api').FindTermsDetails} details Custom info for finding terms.
+     * @param {import('settings').ProfileOptions} options The options.
+     * @returns {import('translation').FindTermsOptions} An options object.
      */
     async _getTranslatorFindTermsOptions(mode, details, options) {
         let {matchType, deinflect} = details;
-        if (typeof matchType !== 'string') { matchType = 'exact'; }
+        if (typeof matchType !== 'string') { matchType = /** @type {import('translation').FindTermsMatchType} */ ('exact'); }
         if (typeof deinflect !== 'boolean') { deinflect = true; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
@@ -2165,14 +2654,21 @@ export class Backend {
 
     /**
      * Creates an options object for use with `Translator.findKanji`.
-     * @param {object} options The options.
-     * @returns {FindKanjiOptions} An options object.
+     * @param {import('settings').ProfileOptions} options The options.
+     * @returns {import('translation').FindKanjiOptions} An options object.
      */
     _getTranslatorFindKanjiOptions(options) {
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
-        return {enabledDictionaryMap};
+        return {
+            enabledDictionaryMap,
+            removeNonJapaneseCharacters: !options.scanning.alphanumeric
+        };
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     * @returns {Map<string, import('translation').FindTermDictionary>}
+     */
     _getTranslatorEnabledDictionaryMap(options) {
         const enabledDictionaryMap = new Map();
         for (const dictionary of options.dictionaries) {
@@ -2186,18 +2682,25 @@ export class Backend {
         return enabledDictionaryMap;
     }
 
+    /**
+     * @param {import('settings').TranslationTextReplacementOptions} textReplacementsOptions
+     * @returns {(?(import('translation').FindTermsTextReplacement[]))[]}
+     */
     _getTranslatorTextReplacements(textReplacementsOptions) {
+        /** @type {(?(import('translation').FindTermsTextReplacement[]))[]} */
         const textReplacements = [];
         for (const group of textReplacementsOptions.groups) {
+            /** @type {import('translation').FindTermsTextReplacement[]} */
             const textReplacementsEntries = [];
-            for (let {pattern, ignoreCase, replacement} of group) {
+            for (const {pattern, ignoreCase, replacement} of group) {
+                let patternRegExp;
                 try {
-                    pattern = new RegExp(pattern, ignoreCase ? 'gi' : 'g');
+                    patternRegExp = new RegExp(pattern, ignoreCase ? 'gi' : 'g');
                 } catch (e) {
                     // Invalid pattern
                     continue;
                 }
-                textReplacementsEntries.push({pattern, replacement});
+                textReplacementsEntries.push({pattern: patternRegExp, replacement});
             }
             if (textReplacementsEntries.length > 0) {
                 textReplacements.push(textReplacementsEntries);
@@ -2230,6 +2733,9 @@ export class Backend {
         return textTransformationsResult;
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _openWelcomeGuidePageOnce() {
         chrome.storage.session.get(['openedWelcomePage']).then((result) => {
             if (!result.openedWelcomePage) {
@@ -2239,20 +2745,33 @@ export class Backend {
         });
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _openWelcomeGuidePage() {
         await this._createTab(chrome.runtime.getURL('/welcome.html'));
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _openInfoPage() {
         await this._createTab(chrome.runtime.getURL('/info.html'));
     }
 
+    /**
+     * @param {'existingOrNewTab'|'newTab'} mode
+     */
     async _openSettingsPage(mode) {
         const manifest = chrome.runtime.getManifest();
-        const url = chrome.runtime.getURL(manifest.options_ui.page);
+        const optionsUI = manifest.options_ui;
+        if (typeof optionsUI === 'undefined') { throw new Error('Failed to find options_ui'); }
+        const {page} = optionsUI;
+        if (typeof page === 'undefined') { throw new Error('Failed to find options_ui.page'); }
+        const url = chrome.runtime.getURL(page);
         switch (mode) {
             case 'existingOrNewTab':
-                await new Promise((resolve, reject) => {
+                await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
                     chrome.runtime.openOptionsPage(() => {
                         const e = chrome.runtime.lastError;
                         if (e) {
@@ -2261,7 +2780,7 @@ export class Backend {
                             resolve();
                         }
                     });
-                });
+                }));
                 break;
             case 'newTab':
                 await this._createTab(url);
@@ -2269,6 +2788,10 @@ export class Backend {
         }
     }
 
+    /**
+     * @param {string} url
+     * @returns {Promise<chrome.tabs.Tab>}
+     */
     _createTab(url) {
         return new Promise((resolve, reject) => {
             chrome.tabs.create({url}, (tab) => {
@@ -2282,6 +2805,10 @@ export class Backend {
         });
     }
 
+    /**
+     * @param {number} tabId
+     * @returns {Promise<chrome.tabs.Tab>}
+     */
     _getTabById(tabId) {
         return new Promise((resolve, reject) => {
             chrome.tabs.get(
@@ -2298,20 +2825,33 @@ export class Backend {
         });
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _checkPermissions() {
         this._permissions = await this._permissionsUtil.getAllPermissions();
         this._updateBadge();
     }
 
+    /**
+     * @returns {boolean}
+     */
     _canObservePermissionsChanges() {
         return isObject(chrome.permissions) && isObject(chrome.permissions.onAdded) && isObject(chrome.permissions.onRemoved);
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     * @returns {boolean}
+     */
     _hasRequiredPermissionsForSettings(options) {
         if (!this._canObservePermissionsChanges()) { return true; }
         return this._permissions === null || this._permissionsUtil.hasRequiredPermissionsForOptions(this._permissions, options);
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
     async _requestPersistentStorage() {
         try {
             if (await navigator.storage.persisted()) { return; }
@@ -2333,14 +2873,32 @@ export class Backend {
         }
     }
 
+    /**
+     * @param {{path: string, dictionary: string}[]} targets
+     * @returns {Promise<import('dictionary-database').MediaDataStringContent[]>}
+     */
     async _getNormalizedDictionaryDatabaseMedia(targets) {
-        const results = await this._dictionaryDatabase.getMedia(targets);
-        for (const item of results) {
-            const {content} = item;
-            if (content instanceof ArrayBuffer) {
-                item.content = ArrayBufferUtil.arrayBufferToBase64(content);
-            }
+        const results = [];
+        for (const item of await this._dictionaryDatabase.getMedia(targets)) {
+            const {content, dictionary, height, mediaType, path, width} = item;
+            const content2 = ArrayBufferUtil.arrayBufferToBase64(content);
+            results.push({content: content2, dictionary, height, mediaType, path, width});
         }
         return results;
+    }
+
+    /**
+     * @param {unknown} mode
+     * @param {'existingOrNewTab'|'newTab'} defaultValue
+     * @returns {'existingOrNewTab'|'newTab'}
+     */
+    _normalizeOpenSettingsPageMode(mode, defaultValue) {
+        switch (mode) {
+            case 'existingOrNewTab':
+            case 'newTab':
+                return mode;
+            default:
+                return defaultValue;
+        }
     }
 }

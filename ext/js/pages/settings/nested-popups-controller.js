@@ -17,52 +17,78 @@
  */
 
 import {DocumentUtil} from '../../dom/document-util.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class NestedPopupsController {
+    /**
+     * @param {import('./settings-controller.js').SettingsController} settingsController
+     */
     constructor(settingsController) {
+        /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {number} */
         this._popupNestingMaxDepth = 0;
+        /** @type {HTMLInputElement} */
+        this._nestedPopupsEnabled = querySelectorNotNull(document, '#nested-popups-enabled');
+        /** @type {HTMLInputElement} */
+        this._nestedPopupsCount = querySelectorNotNull(document, '#nested-popups-count');
+        /** @type {HTMLElement} */
+        this._nestedPopupsEnabledMoreOptions = querySelectorNotNull(document, '#nested-popups-enabled-more-options');
     }
 
+    /** */
     async prepare() {
-        this._nestedPopupsEnabled = document.querySelector('#nested-popups-enabled');
-        this._nestedPopupsCount = document.querySelector('#nested-popups-count');
-        this._nestedPopupsEnabledMoreOptions = document.querySelector('#nested-popups-enabled-more-options');
-
         const options = await this._settingsController.getOptions();
+        const optionsContext = this._settingsController.getOptionsContext();
 
         this._nestedPopupsEnabled.addEventListener('change', this._onNestedPopupsEnabledChange.bind(this), false);
         this._nestedPopupsCount.addEventListener('change', this._onNestedPopupsCountChange.bind(this), false);
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
-        this._onOptionsChanged({options});
+        this._onOptionsChanged({options, optionsContext});
     }
 
     // Private
 
+    /**
+     * @param {import('settings-controller').OptionsChangedEvent} details
+     */
     _onOptionsChanged({options}) {
         this._updatePopupNestingMaxDepth(options.scanning.popupNestingMaxDepth);
     }
 
+    /**
+     * @param {Event} e
+     */
     _onNestedPopupsEnabledChange(e) {
-        const value = e.currentTarget.checked;
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
+        const value = node.checked;
         if (value && this._popupNestingMaxDepth > 0) { return; }
         this._setPopupNestingMaxDepth(value ? 1 : 0);
     }
 
+    /**
+     * @param {Event} e
+     */
     _onNestedPopupsCountChange(e) {
-        const node = e.currentTarget;
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const value = Math.max(1, DocumentUtil.convertElementValueToNumber(node.value, node));
         this._setPopupNestingMaxDepth(value);
     }
 
+    /**
+     * @param {number} value
+     */
     _updatePopupNestingMaxDepth(value) {
         const enabled = (value > 0);
         this._popupNestingMaxDepth = value;
-        this._nestedPopupsEnabled.checked = enabled;
-        this._nestedPopupsCount.value = `${value}`;
-        this._nestedPopupsEnabledMoreOptions.hidden = !enabled;
+        /** @type {HTMLInputElement} */ (this._nestedPopupsEnabled).checked = enabled;
+        /** @type {HTMLInputElement} */ (this._nestedPopupsCount).value = `${value}`;
+        /** @type {HTMLElement} */ (this._nestedPopupsEnabledMoreOptions).hidden = !enabled;
     }
 
+    /**
+     * @param {number} value
+     */
     async _setPopupNestingMaxDepth(value) {
         this._updatePopupNestingMaxDepth(value);
         await this._settingsController.setProfileSetting('scanning.popupNestingMaxDepth', value);
