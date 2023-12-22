@@ -15,41 +15,101 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * This type describes the structure of an API surface.
+ * It is effectively just an object containing a list of items which describe a basic API functionality.
+ */
 type ApiSurface = {
-    [name: string]: ApiItem;
+    [name: string]: ApiDescriptor;
 };
 
-type ApiItem = {
+/**
+ * This type describes the structure of a single API function.
+ */
+type ApiDescriptor = {
+    /** The parameters for the function. If there are no parameters, `void` should be used. */
     params: void | {[name: string]: unknown};
+    /** The return type for the function. */
     return: unknown;
 };
 
-export type ApiHandler<TApiItem extends ApiItem> = (params: TApiItem['params']) => TApiItem['return'] | Promise<TApiItem['return']>;
+/**
+ * This type represents a mapping of an entire API surface to its handlers.
+ */
+type ApiHandlerSurface<TSurface extends ApiSurface, TExtraParams extends ApiTExtraParams> = {
+    [name in ApiNames<TSurface>]: ApiHandler<TSurface[name], TExtraParams>;
+};
 
-type ApiHandlerSurface<TApiSurface extends ApiSurface> = {[name in ApiNames<TApiSurface>]: ApiHandler<TApiSurface[name]>};
-
-export type ApiHandlerAny<TApiSurface extends ApiSurface> = ApiHandlerSurface<TApiSurface>[ApiNames<TApiSurface>];
-
-export type ApiNames<TApiSurface extends ApiSurface> = keyof TApiSurface;
-
-export type ApiParams<TApiSurface extends ApiSurface, TName extends ApiNames<TApiSurface>> = TApiSurface[TName]['params'];
-
-export type ApiReturn<TApiSurface extends ApiSurface, TName extends ApiNames<TApiSurface>> = TApiSurface[TName]['return'];
-
-export type ApiMap<TApiSurface extends ApiSurface> = Map<ApiNames<TApiSurface>, ApiHandlerAny<TApiSurface>>;
-
-export type ApiMapInit<TApiSurface extends ApiSurface> = ApiMapInitItemAny<TApiSurface>[];
-
-export type ApiMapInitLax<TApiSurface extends ApiSurface> = ApiMapInitLaxItem<TApiSurface>[];
-
-export type ApiMapInitLaxItem<TApiSurface extends ApiSurface> = [
-    name: ApiNames<TApiSurface>,
-    handler: ApiHandlerAny<TApiSurface>,
-];
-
-type ApiMapInitItem<TApiSurface extends ApiSurface, TName extends ApiNames<TApiSurface>> = [
+/**
+ * This type represents a single API map initializer.
+ * Type safety is enforced by ensuring that the name and handler signature are valid.
+ */
+type ApiMapInitItem<TSurface extends ApiSurface, TExtraParams extends ApiTExtraParams, TName extends ApiNames<TSurface>> = [
     name: TName,
-    handler: ApiHandler<TApiSurface[TName]>,
+    handler: ApiHandler<TSurface[TName], TExtraParams>,
 ];
 
-type ApiMapInitItemAny<TApiSurface extends ApiSurface> = {[key in ApiNames<TApiSurface>]: ApiMapInitItem<TApiSurface, key>}[ApiNames<TApiSurface>];
+/**
+ * This type represents a union of all API map initializers for a given surface.
+ */
+type ApiMapInitItemAny<TSurface extends ApiSurface, TExtraParams extends ApiTExtraParams> = {[key in ApiNames<TSurface>]: ApiMapInitItem<TSurface, TExtraParams, key>}[ApiNames<TSurface>];
+
+/** Base type for extra params, which is just a generic array. */
+type ApiTExtraParams = unknown[];
+
+/** Default type for extra params, which is an empty array. */
+type ApiExtraParamsDefault = [];
+
+/** Type alias for the params member of a descriptor. */
+export type ApiParams<TDescriptor extends ApiDescriptor> = TDescriptor['params'];
+
+/** Type alias for a single param of a descriptor. */
+export type ApiParam<TDescriptor extends ApiDescriptor, TParamName extends ApiParamNames<TDescriptor>> = ApiParams<TDescriptor>[TParamName];
+
+/** Type alias for the union of parameter names in a descriptor. */
+export type ApiParamNames<TDescriptor extends ApiDescriptor> = keyof ApiParams<TDescriptor>;
+
+/** Type alias for a tuple of parameter types for a descriptor. */
+export type ApiOrderedParams<TDescriptor extends ApiDescriptor, TParamNames extends ApiParamNames<TDescriptor>[]> = {
+    [index in keyof TParamNames]: ApiParams<TDescriptor>[TParamNames[index]];
+};
+
+/** Type alias for the return member of a descriptor. */
+export type ApiReturn<TDescriptor extends ApiDescriptor> = TDescriptor['return'];
+
+/** A type representing a synchronous handler. */
+export type ApiHandlerSync<TDescriptor extends ApiDescriptor, TExtraParams extends ApiTExtraParams = ApiExtraParamsDefault> = (params: ApiParams<TDescriptor>, ...extraParams: TExtraParams) => ApiReturn<TDescriptor>;
+
+/** A type representing an asynchronous handler. */
+export type ApiHandlerAsync<TDescriptor extends ApiDescriptor, TExtraParams extends ApiTExtraParams = ApiExtraParamsDefault> = (params: ApiParams<TDescriptor>, ...extraParams: TExtraParams) => Promise<ApiReturn<TDescriptor>>;
+
+/** A type representing a generic handler. */
+export type ApiHandler<TDescriptor extends ApiDescriptor, TExtraParams extends ApiTExtraParams = ApiExtraParamsDefault> = (params: ApiParams<TDescriptor>, ...extraParams: TExtraParams) => ApiReturn<TDescriptor> | Promise<ApiReturn<TDescriptor>>;
+
+/** A union of all of the handlers for a given surface. */
+export type ApiHandlerAny<TSurface extends ApiSurface, TExtraParams extends ApiTExtraParams = ApiExtraParamsDefault> = ApiHandlerSurface<TSurface, TExtraParams>[ApiNames<TSurface>];
+
+/** A union of all of the names for a given surface. */
+export type ApiNames<TSurface extends ApiSurface> = keyof TSurface;
+
+/** A mapping of names to the corresponding handler function. */
+export type ApiMap<TSurface extends ApiSurface, TExtraParams extends ApiTExtraParams = ApiExtraParamsDefault> = Map<ApiNames<TSurface>, ApiHandlerAny<TSurface, TExtraParams>>;
+
+/** The initialization array structure for populating an API map. */
+export type ApiMapInit<TSurface extends ApiSurface, TExtraParams extends ApiTExtraParams = ApiExtraParamsDefault> = ApiMapInitItemAny<TSurface, TExtraParams>[];
+
+/** The type for a public API function, using a parameters object. */
+export type ApiFunction<TSurface extends ApiSurface, TName extends ApiNames<TSurface>> = (
+    params: ApiParams<TSurface[TName]>,
+) => Promise<ApiReturn<TSurface[TName]>>;
+
+/** The type for a public API function, using ordered parameters. */
+export type ApiFunctionOrdered<TSurface extends ApiSurface, TName extends ApiNames<TSurface>, TParamNames extends ApiParamNames<TSurface[TName]>[]> = (
+    ...params: ApiOrderedParams<TSurface[TName], TParamNames>,
+) => Promise<ApiReturn<TSurface[TName]>>;
+
+/** Type alias for a union of all params types. */
+export type ApiParamsAny<TSurface extends ApiSurface> = ApiParams<TSurface[keyof TSurface]>;
+
+/** Type alias for a union of all return types. */
+export type ApiReturnAny<TSurface extends ApiSurface> = ApiReturn<TSurface[keyof TSurface]>;

@@ -556,6 +556,8 @@ export async function getDeinflectionReasons(){
             {'inflected': /.*ねる$/, 'uninflect': (term) => term.replace(/ねる$/, 'ぬ'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
             {'inflected': /.*べる$/, 'uninflect': (term) => term.replace(/べる$/, 'ぶ'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
             {'inflected': /.*める$/, 'uninflect': (term) => term.replace(/める$/, 'む'), 'rulesIn': ['v1'], 'rulesOut': ['v5']},
+            suffixInflection('できる', 'する', ['v1'], ['vs']),
+            suffixInflection('出来る', 'する', ['v1'], ['vs']),
             {'inflected': /.*これる$/, 'uninflect': (term) => term.replace(/これる$/, 'くる'), 'rulesIn': ['v1'], 'rulesOut': ['vk']},
             {'inflected': /.*来れる$/, 'uninflect': (term) => term.replace(/来れる$/, '来る'), 'rulesIn': ['v1'], 'rulesOut': ['vk']},
             {'inflected': /.*來れる$/, 'uninflect': (term) => term.replace(/來れる$/, '來る'), 'rulesIn': ['v1'], 'rulesOut': ['vk']}
