@@ -52,8 +52,8 @@ export class Offscreen {
 
 
         /* eslint-disable no-multi-spaces */
-        /** @type {import('offscreen').OffscreenApiMapInit} */
-        const apiMapInit = [
+        /** @type {import('offscreen').OffscreenApiMap} */
+        this._apiMap = createApiMap([
             ['clipboardGetTextOffscreen',    this._getTextHandler.bind(this)],
             ['clipboardGetImageOffscreen',   this._getImageHandler.bind(this)],
             ['clipboardSetBrowserOffscreen', this._setClipboardBrowser.bind(this)],
@@ -66,9 +66,8 @@ export class Offscreen {
             ['findTermsOffscreen',           this._findTermsHandler.bind(this)],
             ['getTermFrequenciesOffscreen',  this._getTermFrequenciesHandler.bind(this)],
             ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)]
-        ];
-        /** @type {import('offscreen').OffscreenApiMap} */
-        this._apiMap = createApiMap(apiMapInit);
+        ]);
+        /* eslint-enable no-multi-spaces */
 
         /** @type {?Promise<void>} */
         this._prepareDatabasePromise = null;
