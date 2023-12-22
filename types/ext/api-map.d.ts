@@ -50,7 +50,7 @@ type ApiMapInitItem<TSurface extends ApiSurface, TExtraParams extends ApiTExtraP
 ];
 
 /**
- * This type represents a a union of all API map initializers for a given surface.
+ * This type represents a union of all API map initializers for a given surface.
  */
 type ApiMapInitItemAny<TSurface extends ApiSurface, TExtraParams extends ApiTExtraParams> = {[key in ApiNames<TSurface>]: ApiMapInitItem<TSurface, TExtraParams, key>}[ApiNames<TSurface>];
 

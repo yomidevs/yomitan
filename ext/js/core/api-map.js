@@ -70,7 +70,7 @@ export function invokeApiMapHandler(map, name, params, extraParams, callback, ha
             try {
                 handlerNotFoundCallback();
             } catch (error) {
-                // Ignore
+                // NOP
             }
         }
         return false;
