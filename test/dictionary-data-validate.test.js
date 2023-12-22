@@ -18,7 +18,7 @@
 
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import {expect, test} from 'vitest';
+import {describe, test} from 'vitest';
 import * as dictionaryValidate from '../dev/dictionary-validate.js';
 import {createDictionaryArchive} from '../dev/util.js';
 
@@ -34,10 +34,8 @@ function createTestDictionaryArchive(dictionary, dictionaryName) {
     return createDictionaryArchive(dictionaryDirectory, dictionaryName);
 }
 
-
-/** */
-async function main() {
-    const dictionaries = [
+describe('Dictionary validation', () => {
+    const testCases = [
         {name: 'valid-dictionary1', valid: true},
         {name: 'invalid-dictionary1', valid: false},
         {name: 'invalid-dictionary2', valid: false},
@@ -46,20 +44,15 @@ async function main() {
         {name: 'invalid-dictionary5', valid: false},
         {name: 'invalid-dictionary6', valid: false}
     ];
-
     const schemas = dictionaryValidate.getSchemas();
-
-    for (const {name, valid} of dictionaries) {
-        test(`${name} is ${valid ? 'valid' : 'invalid'}`, async () => {
+    describe.each(testCases)('Test dictionary $name', ({name, valid}) => {
+        test(`Should be ${valid ? 'valid' : 'invalid'}`, async ({expect}) => {
             const archive = createTestDictionaryArchive(name);
-
             if (valid) {
                 await expect(dictionaryValidate.validateDictionary(null, archive, schemas)).resolves.not.toThrow();
             } else {
                 await expect(dictionaryValidate.validateDictionary(null, archive, schemas)).rejects.toThrow();
             }
         });
-    }
-}
-
-await main();
+    });
+});
