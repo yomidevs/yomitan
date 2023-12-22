@@ -17,8 +17,8 @@
  */
 
 import {EventListenerCollection, log} from '../../core.js';
+import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {DictionaryWorker} from '../../language/dictionary-worker.js';
 import {yomitan} from '../../yomitan.js';
 
 class DictionaryEntry {

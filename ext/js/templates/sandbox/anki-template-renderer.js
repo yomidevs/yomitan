@@ -18,10 +18,10 @@
 
 import {Handlebars} from '../../../lib/handlebars.js';
 import {AnkiNoteDataCreator} from '../../data/sandbox/anki-note-data-creator.js';
+import {DictionaryDataUtil} from '../../dictionary/dictionary-data-util.js';
 import {PronunciationGenerator} from '../../display/sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';
 import {CssStyleApplier} from '../../dom/sandbox/css-style-applier.js';
-import {DictionaryDataUtil} from '../../language/sandbox/dictionary-data-util.js';
 import {JapaneseUtil} from '../../language/sandbox/japanese-util.js';
 import {AnkiTemplateRendererContentManager} from './anki-template-renderer-content-manager.js';
 import {TemplateRendererMediaProvider} from './template-renderer-media-provider.js';
