@@ -53,7 +53,7 @@ export class StructuredContentGenerator {
     }
 
     /**
-     * @param {import('structured-content').ImageElementBase} data
+     * @param {import('structured-content').ImageElement|import('dictionary-data').TermGlossaryImage} data
      * @param {string} dictionary
      * @returns {HTMLAnchorElement}
      */

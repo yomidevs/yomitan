@@ -17,6 +17,6 @@
 
 export type EventType = 'change';
 
-export type ChangeEventDetails<T> = {
+export type ChangeEventDetails<T = unknown> = {
     value: T;
 };

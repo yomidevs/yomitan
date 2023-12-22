@@ -152,7 +152,7 @@ function testConvertKatakanaToHiragana() {
             ['カーナー', 'かーなー', true]
         ];
 
-        for (const [string, expected, keepProlongedSoundMarks=false] of data) {
+        for (const [string, expected, keepProlongedSoundMarks = false] of data) {
             expect(jp.convertKatakanaToHiragana(string, keepProlongedSoundMarks)).toStrictEqual(expected);
         }
     });

@@ -17,6 +17,7 @@
  */
 
 import {escapeRegExp, isObject} from '../core.js';
+import {parseJson, readResponseJson} from '../core/json.js';
 import {TemplatePatcher} from '../templates/template-patcher.js';
 import {JsonSchema} from './json-schema.js';
 
@@ -30,7 +31,8 @@ export class OptionsUtil {
 
     /** */
     async prepare() {
-        const schema = /** @type {import('json-schema').Schema} */ (await this._fetchJson('/data/schemas/options-schema.json'));
+        /** @type {import('ext/json-schema').Schema} */
+        const schema = await this._fetchJson('/data/schemas/options-schema.json');
         this._optionsSchema = new JsonSchema(schema);
     }
 
@@ -39,7 +41,7 @@ export class OptionsUtil {
      * @param {?number} [targetVersion]
      * @returns {Promise<import('settings').Options>}
      */
-    async update(optionsInput, targetVersion=null) {
+    async update(optionsInput, targetVersion = null) {
         // Invalid options
         let options = /** @type {{[key: string]: unknown}} */ (
             typeof optionsInput === 'object' && optionsInput !== null && !Array.isArray(optionsInput) ?
@@ -115,7 +117,7 @@ export class OptionsUtil {
                     }
                 });
             });
-            options = JSON.parse(optionsStr);
+            options = parseJson(optionsStr);
         } catch (e) {
             // NOP
         }
@@ -477,12 +479,13 @@ export class OptionsUtil {
     }
 
     /**
+     * @template [T=unknown]
      * @param {string} url
-     * @returns {Promise<unknown>}
+     * @returns {Promise<T>}
      */
     async _fetchJson(url) {
         const response = await this._fetchGeneric(url);
-        return await response.json();
+        return await readResponseJson(response);
     }
 
     /**
@@ -530,6 +533,7 @@ export class OptionsUtil {
      * @returns {import('options-util').ModernUpdate[]}
      */
     _getVersionUpdates(targetVersion) {
+        /* eslint-disable no-multi-spaces */
         const result = [
             {async: false, update: this._updateVersion1.bind(this)},
             {async: false, update: this._updateVersion2.bind(this)},
@@ -553,6 +557,7 @@ export class OptionsUtil {
             {async: false, update: this._updateVersion20.bind(this)},
             {async: true,  update: this._updateVersion21.bind(this)}
         ];
+        /* eslint-enable no-multi-spaces */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
         }
@@ -818,6 +823,7 @@ export class OptionsUtil {
             };
             delete profile.options.anki.sentenceExt;
             profile.options.general.popupActionBarLocation = 'top';
+            /* eslint-disable no-multi-spaces */
             profile.options.inputs = {
                 hotkeys: [
                     {action: 'close',             key: 'Escape',    modifiers: [],       scopes: ['popup'], enabled: true},
@@ -838,6 +844,7 @@ export class OptionsUtil {
                     {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true}
                 ]
             };
+            /* eslint-enable no-multi-spaces */
             profile.options.anki.suspendNewCards = false;
             profile.options.popupWindow = {
                 width: profile.options.general.popupWidth,

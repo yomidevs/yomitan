@@ -20,7 +20,7 @@ import {FrameClient} from '../comm/frame-client.js';
 import {DynamicProperty, EventDispatcher, EventListenerCollection, deepEqual} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {DocumentUtil} from '../dom/document-util.js';
-import {dynamicLoader} from '../script/dynamic-loader.js';
+import {loadStyle} from '../dom/style-util.js';
 import {yomitan} from '../yomitan.js';
 import {ThemeController} from './theme-controller.js';
 
@@ -359,7 +359,7 @@ export class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        const node = await dynamicLoader.loadStyle('yomitan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
+        const node = await loadStyle('yomitan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
         /** @type {import('popup').CustomOuterCssChangedEvent} */
         const event = {node, useWebExtensionApi, inShadow};
         this.trigger('customOuterCssChanged', event);
@@ -417,7 +417,7 @@ export class Popup extends EventDispatcher {
     _inject() {
         let injectPromise = this._injectPromise;
         if (injectPromise === null) {
-            injectPromise = this._injectInner1();
+            injectPromise = this._injectInnerWrapper();
             this._injectPromise = injectPromise;
             injectPromise.then(
                 () => {
@@ -433,9 +433,9 @@ export class Popup extends EventDispatcher {
     /**
      * @returns {Promise<boolean>}
      */
-    async _injectInner1() {
+    async _injectInnerWrapper() {
         try {
-            await this._injectInner2();
+            await this._injectInner();
             return true;
         } catch (e) {
             this._resetFrame();
@@ -447,7 +447,7 @@ export class Popup extends EventDispatcher {
     /**
      * @returns {Promise<void>}
      */
-    async _injectInner2() {
+    async _injectInner() {
         if (this._optionsContext === null) {
             throw new Error('Options not initialized');
         }
@@ -574,7 +574,7 @@ export class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        await dynamicLoader.loadStyle('yomitan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
+        await loadStyle('yomitan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
     }
 
     /**
@@ -718,7 +718,7 @@ export class Popup extends EventDispatcher {
      * @param {string} action
      * @param {import('core').SerializableObject} params
      */
-    _invokeWindow(action, params={}) {
+    _invokeWindow(action, params = {}) {
         const contentWindow = this._frame.contentWindow;
         if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
 

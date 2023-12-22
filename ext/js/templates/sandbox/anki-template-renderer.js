@@ -74,6 +74,7 @@ export class AnkiTemplateRenderer {
      * Prepares the data that is necessary before the template renderer can be safely used.
      */
     async prepare() {
+        /* eslint-disable no-multi-spaces */
         this._templateRenderer.registerHelpers([
             ['dumpObject',       this._dumpObject.bind(this)],
             ['furigana',         this._furigana.bind(this)],
@@ -103,6 +104,7 @@ export class AnkiTemplateRenderer {
             ['hiragana',         this._hiragana.bind(this)],
             ['katakana',         this._katakana.bind(this)]
         ]);
+        /* eslint-enable no-multi-spaces */
         this._templateRenderer.registerDataType('ankiNote', {
             modifier: ({marker, commonData}) => this._ankiNoteDataCreator.create(marker, commonData),
             composeData: ({marker}, commonData) => ({marker, commonData})
@@ -169,10 +171,10 @@ export class AnkiTemplateRenderer {
     /** @type {import('template-renderer').HelperFunction<string>} */
     _furigana(args, context, options) {
         const {expression, reading} = this._getFuriganaExpressionAndReading(args, context, options);
-        const segs = this._japaneseUtil.distributeFurigana(expression, reading);
+        const segments = this._japaneseUtil.distributeFurigana(expression, reading);
 
         let result = '';
-        for (const {text, reading: reading2} of segs) {
+        for (const {text, reading: reading2} of segments) {
             const safeText = this._escape(text);
             const safeReading = this._escape(reading2);
             if (safeReading.length > 0) {
@@ -188,10 +190,10 @@ export class AnkiTemplateRenderer {
     /** @type {import('template-renderer').HelperFunction<string>} */
     _furiganaPlain(args, context, options) {
         const {expression, reading} = this._getFuriganaExpressionAndReading(args, context, options);
-        const segs = this._japaneseUtil.distributeFurigana(expression, reading);
+        const segments = this._japaneseUtil.distributeFurigana(expression, reading);
 
         let result = '';
-        for (const {text, reading: reading2} of segs) {
+        for (const {text, reading: reading2} of segments) {
             if (reading2.length > 0) {
                 if (result.length > 0) { result += ' '; }
                 result += `${text}[${reading2}]`;
@@ -392,9 +394,9 @@ export class AnkiTemplateRenderer {
             case '!=': return operand1 != operand2; // eslint-disable-line eqeqeq
             case '===': return operand1 === operand2;
             case '!==': return operand1 !== operand2;
-            case '<':  return operand1 < operand2;
+            case '<': return operand1 < operand2;
             case '<=': return operand1 <= operand2;
-            case '>':  return operand1 > operand2;
+            case '>': return operand1 > operand2;
             case '>=': return operand1 >= operand2;
             case '<<': return operand1 << operand2;
             case '>>': return operand1 >> operand2;

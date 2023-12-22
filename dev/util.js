@@ -19,6 +19,7 @@
 import fs from 'fs';
 import JSZip from 'jszip';
 import path from 'path';
+import {parseJson} from './json.js';
 
 /**
  * @param {string[]} args
@@ -71,10 +72,10 @@ export function getArgs(args, argMap) {
 
 /**
  * @param {string} baseDirectory
- * @param {?(fileName: string) => boolean} predicate
+ * @param {?(fileName: string, isDirectory: boolean) => boolean} predicate
  * @returns {string[]}
  */
-export function getAllFiles(baseDirectory, predicate=null) {
+export function getAllFiles(baseDirectory, predicate = null) {
     const results = [];
     const directories = [baseDirectory];
     while (directories.length > 0) {
@@ -85,11 +86,13 @@ export function getAllFiles(baseDirectory, predicate=null) {
             const relativeFileName = path.relative(baseDirectory, fullFileName);
             const stats = fs.lstatSync(fullFileName);
             if (stats.isFile()) {
-                if (typeof predicate !== 'function' || predicate(relativeFileName)) {
+                if (typeof predicate !== 'function' || predicate(relativeFileName, false)) {
                     results.push(relativeFileName);
                 }
             } else if (stats.isDirectory()) {
-                directories.push(fullFileName);
+                if (typeof predicate !== 'function' || predicate(relativeFileName, true)) {
+                    directories.push(fullFileName);
+                }
             }
         }
     }
@@ -97,6 +100,7 @@ export function getAllFiles(baseDirectory, predicate=null) {
 }
 
 /**
+ * Creates a zip archive from the given dictionary directory.
  * @param {string} dictionaryDirectory
  * @param {string} [dictionaryName]
  * @returns {import('jszip')}
@@ -111,9 +115,9 @@ export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
     for (const fileName of fileNames) {
         if (/\.json$/.test(fileName)) {
             const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: 'utf8'});
-            const json = JSON.parse(content);
+            const json = parseJson(content);
             if (fileName === 'index.json' && typeof dictionaryName === 'string') {
-                json.title = dictionaryName;
+                /** @type {import('dictionary-data').Index} */ (json).title = dictionaryName;
             }
             archive.file(fileName, JSON.stringify(json, null, 0));
 

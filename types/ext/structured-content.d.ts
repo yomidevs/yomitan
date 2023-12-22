@@ -165,14 +165,6 @@ export type ImageElementBase = {
      * Whether or not the image can be collapsed.
      */
     collapsible?: boolean;
-    /**
-     * This property is not defined on the base class.
-     */
-    verticalAlign?: undefined;
-    /**
-     * This property is not defined on the base class.
-     */
-    sizeUnits?: undefined;
 };
 
 export type ImageElement = ImageElementBase & {

@@ -28,7 +28,11 @@ export type FindKanjiOptions = {
      * The mapping of dictionaries to search for kanji in.
      * The key is the dictionary name.
      */
-    enabledDictionaryMap: Map<string, FindKanjiDictionary>;
+    enabledDictionaryMap: KanjiEnabledDictionaryMap;
+    /**
+     * Whether or not non-Japanese characters should be searched.
+     */
+    removeNonJapaneseCharacters: boolean;
 };
 
 /**

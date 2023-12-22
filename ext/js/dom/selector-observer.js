@@ -18,14 +18,14 @@
 
 /**
  * Class which is used to observe elements matching a selector in specific element.
- * @template T
+ * @template [T=unknown]
  */
 export class SelectorObserver {
     /**
      * Creates a new instance.
      * @param {import('selector-observer').ConstructorDetails<T>} details The configuration for the object.
      */
-    constructor({selector, ignoreSelector=null, onAdded=null, onRemoved=null, onChildrenUpdated=null, isStale=null}) {
+    constructor({selector, ignoreSelector = null, onAdded = null, onRemoved = null, onChildrenUpdated = null, isStale = null}) {
         /** @type {string} */
         this._selector = selector;
         /** @type {?string} */
@@ -65,7 +65,7 @@ export class SelectorObserver {
      * @throws {Error} An error if element is null.
      * @throws {Error} An error if an element is already being observed.
      */
-    observe(element, attributes=false) {
+    observe(element, attributes = false) {
         if (element === null) {
             throw new Error('Invalid element');
         }

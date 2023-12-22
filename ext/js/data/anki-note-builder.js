@@ -18,21 +18,22 @@
 
 import {deferPromise} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
 import {yomitan} from '../yomitan.js';
 import {AnkiUtil} from './anki-util.js';
 
 export class AnkiNoteBuilder {
     /**
-     * @param {{japaneseUtil: import('../language/sandbox/japanese-util.js').JapaneseUtil}} details
+     * Initiate an instance of AnkiNoteBuilder.
+     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
+     * @param {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} templateRenderer
      */
-    constructor({japaneseUtil}) {
+    constructor(japaneseUtil, templateRenderer) {
         /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {RegExp} */
         this._markerPattern = AnkiUtil.cloneFieldMarkerPattern(true);
-        /** @type {TemplateRendererProxy} */
-        this._templateRenderer = new TemplateRendererProxy();
+        /** @type {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} */
+        this._templateRenderer = templateRenderer;
         /** @type {import('anki-note-builder').BatchedRequestGroup[]} */
         this._batchedRequests = [];
         /** @type {boolean} */
@@ -51,15 +52,15 @@ export class AnkiNoteBuilder {
         deckName,
         modelName,
         fields,
-        tags=[],
-        requirements=[],
-        checkForDuplicates=true,
-        duplicateScope='collection',
-        duplicateScopeCheckAllModels=false,
-        resultOutputMode='split',
-        glossaryLayoutMode='default',
-        compactTags=false,
-        mediaOptions=null
+        tags = [],
+        requirements = [],
+        checkForDuplicates = true,
+        duplicateScope = 'collection',
+        duplicateScopeCheckAllModels = false,
+        resultOutputMode = 'split',
+        glossaryLayoutMode = 'default',
+        compactTags = false,
+        mediaOptions = null
     }) {
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
@@ -130,9 +131,9 @@ export class AnkiNoteBuilder {
         dictionaryEntry,
         mode,
         context,
-        resultOutputMode='split',
-        glossaryLayoutMode='default',
-        compactTags=false,
+        resultOutputMode = 'split',
+        glossaryLayoutMode = 'default',
+        compactTags = false,
         marker
     }) {
         const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0);

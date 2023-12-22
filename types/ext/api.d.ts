@@ -34,7 +34,7 @@ import type * as Translator from './translator';
 
 // Generic
 
-export type Handler<TDetails, TResult, THasSender extends boolean = false> = (
+export type Handler<TDetails = unknown, TResult = unknown, THasSender extends boolean = false> = (
     details: TDetails,
     sender: (THasSender extends true ? chrome.runtime.MessageSender : void)
 ) => (TResult | Promise<TResult>);
@@ -461,12 +461,3 @@ export type OpenCrossFramePortResult = {
 export type RequestBackendReadySignalDetails = Record<string, never>;
 
 export type RequestBackendReadySignalResult = boolean;
-
-// createActionPort
-
-export type CreateActionPortDetails = Record<string, never>;
-
-export type CreateActionPortResult = {
-    name: string;
-    id: string;
-};

@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
 export class StorageController {
@@ -53,7 +54,8 @@ export class StorageController {
         this._storageUseInfiniteNodes = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.storage-use-infinite'));
         this._storageUseValidNodes = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.storage-use-valid'));
         this._storageUseInvalidNodes = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.storage-use-invalid'));
-        const storageRefreshButton = /** @type {HTMLButtonElement} */ (document.querySelector('#storage-refresh'));
+        /** @type {HTMLButtonElement} */
+        const storageRefreshButton = querySelectorNotNull(document, '#storage-refresh');
 
         storageRefreshButton.addEventListener('click', this._onStorageRefreshButtonClick.bind(this), false);
         yomitan.on('storageChanged', this._onStorageChanged.bind(this));

@@ -19,9 +19,12 @@
 import {AnkiTemplateRenderer} from './anki-template-renderer.js';
 import {TemplateRendererFrameApi} from './template-renderer-frame-api.js';
 
-(async () => {
+/** Entry point. */
+async function main() {
     const ankiTemplateRenderer = new AnkiTemplateRenderer();
     await ankiTemplateRenderer.prepare();
     const templateRendererFrameApi = new TemplateRendererFrameApi(ankiTemplateRenderer.templateRenderer);
     templateRendererFrameApi.prepare();
-})();
+}
+
+await main();

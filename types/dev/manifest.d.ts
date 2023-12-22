@@ -30,7 +30,7 @@ export type ManifestVariant = {
     fileName?: string;
     fileCopies?: string[];
     excludeFiles?: string[];
-    modifications: Modification[];
+    modifications?: Modification[];
 };
 
 export type Modification = (

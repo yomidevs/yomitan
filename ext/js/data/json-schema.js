@@ -22,47 +22,47 @@ import {CacheMap} from '../general/cache-map.js';
 export class JsonSchemaError extends Error {
     /**
      * @param {string} message
-     * @param {import('json-schema').ValueStackItem[]} valueStack
-     * @param {import('json-schema').SchemaStackItem[]} schemaStack
+     * @param {import('ext/json-schema').ValueStackItem[]} valueStack
+     * @param {import('ext/json-schema').SchemaStackItem[]} schemaStack
      */
     constructor(message, valueStack, schemaStack) {
         super(message);
-        /** @type {import('json-schema').ValueStackItem[]} */
+        /** @type {import('ext/json-schema').ValueStackItem[]} */
         this._valueStack = valueStack;
-        /** @type {import('json-schema').SchemaStackItem[]} */
+        /** @type {import('ext/json-schema').SchemaStackItem[]} */
         this._schemaStack = schemaStack;
     }
 
     /** @type {unknown|undefined} */
     get value() { return this._valueStack.length > 0 ? this._valueStack[this._valueStack.length - 1].value : void 0; }
 
-    /** @type {import('json-schema').Schema|import('json-schema').Schema[]|undefined} */
+    /** @type {import('ext/json-schema').Schema|import('ext/json-schema').Schema[]|undefined} */
     get schema() { return this._schemaStack.length > 0 ? this._schemaStack[this._schemaStack.length - 1].schema : void 0; }
 
-    /** @type {import('json-schema').ValueStackItem[]} */
+    /** @type {import('ext/json-schema').ValueStackItem[]} */
     get valueStack() { return this._valueStack; }
 
-    /** @type {import('json-schema').SchemaStackItem[]} */
+    /** @type {import('ext/json-schema').SchemaStackItem[]} */
     get schemaStack() { return this._schemaStack; }
 }
 
 export class JsonSchema {
     /**
-     * @param {import('json-schema').Schema} schema
-     * @param {import('json-schema').Schema} [rootSchema]
+     * @param {import('ext/json-schema').Schema} schema
+     * @param {import('ext/json-schema').Schema} [rootSchema]
      */
     constructor(schema, rootSchema) {
-        /** @type {import('json-schema').Schema} */
+        /** @type {import('ext/json-schema').Schema} */
         this._startSchema = schema;
-        /** @type {import('json-schema').Schema} */
+        /** @type {import('ext/json-schema').Schema} */
         this._rootSchema = typeof rootSchema !== 'undefined' ? rootSchema : schema;
         /** @type {?CacheMap<string, RegExp>} */
         this._regexCache = null;
-        /** @type {?Map<string, {schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}>} */
+        /** @type {?Map<string, {schema: import('ext/json-schema').Schema, stack: import('ext/json-schema').SchemaStackItem[]}>} */
         this._refCache = null;
-        /** @type {import('json-schema').ValueStackItem[]} */
+        /** @type {import('ext/json-schema').ValueStackItem[]} */
         this._valueStack = [];
-        /** @type {import('json-schema').SchemaStackItem[]} */
+        /** @type {import('ext/json-schema').SchemaStackItem[]} */
         this._schemaStack = [];
         /** @type {?(jsonSchema: JsonSchema) => void} */
         this._progress = null;
@@ -72,12 +72,12 @@ export class JsonSchema {
         this._progressInterval = 1;
     }
 
-    /** @type {import('json-schema').Schema} */
+    /** @type {import('ext/json-schema').Schema} */
     get schema() {
         return this._startSchema;
     }
 
-    /** @type {import('json-schema').Schema} */
+    /** @type {import('ext/json-schema').Schema} */
     get rootSchema() {
         return this._rootSchema;
     }
@@ -101,8 +101,8 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').Value} value
-     * @returns {import('json-schema').Value}
+     * @param {import('ext/json-schema').Value} value
+     * @returns {import('ext/json-schema').Value}
      */
     createProxy(value) {
         return (
@@ -142,7 +142,7 @@ export class JsonSchema {
 
     /**
      * @param {unknown} [value]
-     * @returns {import('json-schema').Value}
+     * @returns {import('ext/json-schema').Value}
      */
     getValidValueOrDefault(value) {
         const schema = this._startSchema;
@@ -195,7 +195,7 @@ export class JsonSchema {
     // Internal state functions for error construction and progress callback
 
     /**
-     * @returns {import('json-schema').ValueStackItem[]}
+     * @returns {import('ext/json-schema').ValueStackItem[]}
      */
     getValueStack() {
         const result = [];
@@ -206,7 +206,7 @@ export class JsonSchema {
     }
 
     /**
-     * @returns {import('json-schema').SchemaStackItem[]}
+     * @returns {import('ext/json-schema').SchemaStackItem[]}
      */
     getSchemaStack() {
         const result = [];
@@ -225,7 +225,7 @@ export class JsonSchema {
 
     /**
      * @param {number} index
-     * @returns {import('json-schema').ValueStackItem}
+     * @returns {import('ext/json-schema').ValueStackItem}
      */
     getValueStackItem(index) {
         const {value, path} = this._valueStack[index + 1];
@@ -241,7 +241,7 @@ export class JsonSchema {
 
     /**
      * @param {number} index
-     * @returns {import('json-schema').SchemaStackItem}
+     * @returns {import('ext/json-schema').SchemaStackItem}
      */
     getSchemaStackItem(index) {
         const {schema, path} = this._schemaStack[index + 1];
@@ -249,7 +249,7 @@ export class JsonSchema {
     }
 
     /**
-     * @template T
+     * @template [T=unknown]
      * @param {T} value
      * @returns {T}
      */
@@ -275,7 +275,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').Schema|import('json-schema').Schema[]} schema
+     * @param {import('ext/json-schema').Schema|import('ext/json-schema').Schema[]} schema
      * @param {string|number|null} path
      */
     _schemaPush(schema, path) {
@@ -283,7 +283,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaStackItem[]} items
+     * @param {import('ext/json-schema').SchemaStackItem[]} items
      */
     _schemaPushMultiple(items) {
         this._schemaStack.push(...items);
@@ -337,9 +337,9 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').Schema} schema
+     * @param {import('ext/json-schema').Schema} schema
      * @param {string} property
-     * @returns {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}}
+     * @returns {{schema: import('ext/json-schema').Schema, stack: import('ext/json-schema').SchemaStackItem[]}}
      */
     _getObjectPropertySchemaInfo(schema, property) {
         if (typeof schema === 'boolean') {
@@ -362,9 +362,9 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').Schema} schema
+     * @param {import('ext/json-schema').Schema} schema
      * @param {number} index
-     * @returns {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}}
+     * @returns {{schema: import('ext/json-schema').Schema, stack: import('ext/json-schema').SchemaStackItem[]}}
      */
     _getArrayItemSchemaInfo(schema, index) {
         if (typeof schema === 'boolean') {
@@ -411,9 +411,9 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').Schema|undefined} schema
+     * @param {import('ext/json-schema').Schema|undefined} schema
      * @param {string|number|null} path
-     * @returns {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}}
+     * @returns {{schema: import('ext/json-schema').Schema, stack: import('ext/json-schema').SchemaStackItem[]}}
      */
     _getOptionalSchemaInfo(schema, path) {
         switch (typeof schema) {
@@ -430,7 +430,7 @@ export class JsonSchema {
 
     /**
      * @param {unknown} value
-     * @returns {?import('json-schema').Type}
+     * @returns {?import('ext/json-schema').Type}
      * @throws {Error}
      */
     _getValueType(value) {
@@ -451,8 +451,8 @@ export class JsonSchema {
 
     /**
      * @param {unknown} value
-     * @param {?import('json-schema').Type} type
-     * @param {import('json-schema').Type|import('json-schema').Type[]|undefined} schemaTypes
+     * @param {?import('ext/json-schema').Type} type
+     * @param {import('ext/json-schema').Type|import('ext/json-schema').Type[]|undefined} schemaTypes
      * @returns {boolean}
      */
     _isValueTypeAny(value, type, schemaTypes) {
@@ -471,8 +471,8 @@ export class JsonSchema {
 
     /**
      * @param {unknown} value
-     * @param {?import('json-schema').Type} type
-     * @param {import('json-schema').Type} schemaType
+     * @param {?import('ext/json-schema').Type} type
+     * @param {import('ext/json-schema').Type} schemaType
      * @returns {boolean}
      */
     _isValueType(value, type, schemaType) {
@@ -484,7 +484,7 @@ export class JsonSchema {
 
     /**
      * @param {unknown} value1
-     * @param {import('json-schema').Value[]} valueList
+     * @param {import('ext/json-schema').Value[]} valueList
      * @returns {boolean}
      */
     _valuesAreEqualAny(value1, valueList) {
@@ -498,7 +498,7 @@ export class JsonSchema {
 
     /**
      * @param {unknown} value1
-     * @param {import('json-schema').Value} value2
+     * @param {import('ext/json-schema').Value} value2
      * @returns {boolean}
      */
     _valuesAreEqual(value1, value2) {
@@ -506,9 +506,9 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').Schema} schema
-     * @param {import('json-schema').SchemaStackItem[]} stack
-     * @returns {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}}
+     * @param {import('ext/json-schema').Schema} schema
+     * @param {import('ext/json-schema').SchemaStackItem[]} stack
+     * @returns {{schema: import('ext/json-schema').Schema, stack: import('ext/json-schema').SchemaStackItem[]}}
      */
     _getResolvedSchemaInfo(schema, stack) {
         if (typeof schema !== 'boolean') {
@@ -526,7 +526,7 @@ export class JsonSchema {
 
     /**
      * @param {string} ref
-     * @returns {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}}
+     * @returns {{schema: import('ext/json-schema').Schema, stack: import('ext/json-schema').SchemaStackItem[]}}
      * @throws {Error}
      */
     _getReference(ref) {
@@ -534,7 +534,7 @@ export class JsonSchema {
             throw this._createError(`Unsupported reference path: ${ref}`);
         }
 
-        /** @type {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}|undefined} */
+        /** @type {{schema: import('ext/json-schema').Schema, stack: import('ext/json-schema').SchemaStackItem[]}|undefined} */
         let info;
         if (this._refCache !== null) {
             info = this._refCache.get(ref);
@@ -553,13 +553,13 @@ export class JsonSchema {
 
     /**
      * @param {string} ref
-     * @returns {{schema: import('json-schema').Schema, stack: import('json-schema').SchemaStackItem[]}}
+     * @returns {{schema: import('ext/json-schema').Schema, stack: import('ext/json-schema').SchemaStackItem[]}}
      * @throws {Error}
      */
     _getReferenceUncached(ref) {
         /** @type {Set<string>} */
         const visited = new Set();
-        /** @type {import('json-schema').SchemaStackItem[]} */
+        /** @type {import('ext/json-schema').SchemaStackItem[]} */
         const stack = [];
         while (true) {
             if (visited.has(ref)) {
@@ -594,11 +594,11 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaStackItem[]} schemaStack
-     * @returns {import('json-schema').SchemaStackItem[]}
+     * @param {import('ext/json-schema').SchemaStackItem[]} schemaStack
+     * @returns {import('ext/json-schema').SchemaStackItem[]}
      */
     _copySchemaStack(schemaStack) {
-        /** @type {import('json-schema').SchemaStackItem[]} */
+        /** @type {import('ext/json-schema').SchemaStackItem[]} */
         const results = [];
         for (const {schema, path} of schemaStack) {
             results.push({schema, path});
@@ -609,7 +609,7 @@ export class JsonSchema {
     // Validation
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').SchemaObject} schema
      * @param {unknown} value
      * @returns {boolean}
      */
@@ -623,7 +623,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').Schema} schema
+     * @param {import('ext/json-schema').Schema} schema
      * @param {unknown} value
      */
     _validate(schema, value) {
@@ -643,7 +643,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').Schema} schema
+     * @param {import('ext/json-schema').Schema} schema
      * @param {unknown} value
      * @throws {Error}
      */
@@ -659,7 +659,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').SchemaObject} schema
      * @param {unknown} value
      */
     _validateConditional(schema, value) {
@@ -688,7 +688,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').SchemaObject} schema
      * @param {unknown} value
      */
     _validateAllOf(schema, value) {
@@ -712,7 +712,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').SchemaObject} schema
      * @param {unknown} value
      */
     _validateAnyOf(schema, value) {
@@ -741,7 +741,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').SchemaObject} schema
      * @param {unknown} value
      */
     _validateOneOf(schema, value) {
@@ -773,7 +773,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').SchemaObject} schema
      * @param {unknown} value
      * @throws {Error}
      */
@@ -797,7 +797,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').SchemaObject} schema
      * @param {unknown} value
      * @throws {Error}
      */
@@ -824,16 +824,16 @@ export class JsonSchema {
                 this._validateString(schema, /** @type {string} */ (value));
                 break;
             case 'array':
-                this._validateArray(schema, /** @type {import('json-schema').Value[]} */ (value));
+                this._validateArray(schema, /** @type {import('ext/json-schema').Value[]} */ (value));
                 break;
             case 'object':
-                this._validateObject(schema, /** @type {import('json-schema').ValueObject} */ (value));
+                this._validateObject(schema, /** @type {import('ext/json-schema').ValueObject} */ (value));
                 break;
         }
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').SchemaObject} schema
      * @param {number} value
      * @throws {Error}
      */
@@ -861,7 +861,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').SchemaObject} schema
      * @param {string} value
      * @throws {Error}
      */
@@ -893,7 +893,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').SchemaObject} schema
      * @param {unknown[]} value
      * @throws {Error}
      */
@@ -931,7 +931,7 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').SchemaObject} schema
      * @param {unknown[]} value
      * @throws {Error}
      */
@@ -960,8 +960,8 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
-     * @param {import('json-schema').ValueObject} value
+     * @param {import('ext/json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').ValueObject} value
      * @throws {Error}
      */
     _validateObject(schema, value) {
@@ -1008,8 +1008,8 @@ export class JsonSchema {
     // Creation
 
     /**
-     * @param {import('json-schema').Type|import('json-schema').Type[]|undefined} type
-     * @returns {import('json-schema').Value}
+     * @param {import('ext/json-schema').Type|import('ext/json-schema').Type[]|undefined} type
+     * @returns {import('ext/json-schema').Value}
      */
     _getDefaultTypeValue(type) {
         if (Array.isArray(type)) { type = type[0]; }
@@ -1034,8 +1034,8 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
-     * @returns {import('json-schema').Value}
+     * @param {import('ext/json-schema').SchemaObject} schema
+     * @returns {import('ext/json-schema').Value}
      */
     _getDefaultSchemaValue(schema) {
         const {type: schemaType, default: schemaDefault} = schema;
@@ -1048,11 +1048,11 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').Schema} schema
+     * @param {import('ext/json-schema').Schema} schema
      * @param {string|number|null} path
      * @param {unknown} value
-     * @param {import('json-schema').SchemaStackItem[]} stack
-     * @returns {import('json-schema').Value}
+     * @param {import('ext/json-schema').SchemaStackItem[]} stack
+     * @returns {import('ext/json-schema').Value}
      */
     _getValidValueOrDefault(schema, path, value, stack) {
         ({schema, stack} = this._getResolvedSchemaInfo(schema, stack));
@@ -1067,14 +1067,14 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').Schema} schema
+     * @param {import('ext/json-schema').Schema} schema
      * @param {unknown} value
-     * @returns {import('json-schema').Value}
+     * @returns {import('ext/json-schema').Value}
      */
     _getValidValueOrDefaultInner(schema, value) {
         let type = this._getValueType(value);
         if (typeof schema === 'boolean') {
-            return type !== null ? /** @type {import('json-schema').ValueObject} */ (value) : null;
+            return type !== null ? /** @type {import('ext/json-schema').ValueObject} */ (value) : null;
         }
         if (typeof value === 'undefined' || !this._isValueTypeAny(value, type, schema.type)) {
             value = this._getDefaultSchemaValue(schema);
@@ -1083,9 +1083,9 @@ export class JsonSchema {
 
         switch (type) {
             case 'object':
-                return this._populateObjectDefaults(schema, /** @type {import('json-schema').ValueObject} */ (value));
+                return this._populateObjectDefaults(schema, /** @type {import('ext/json-schema').ValueObject} */ (value));
             case 'array':
-                return this._populateArrayDefaults(schema, /** @type {import('json-schema').Value[]} */ (value));
+                return this._populateArrayDefaults(schema, /** @type {import('ext/json-schema').Value[]} */ (value));
             default:
                 if (!this._isValidCurrent(schema, value)) {
                     const schemaDefault = this._getDefaultSchemaValue(schema);
@@ -1096,13 +1096,13 @@ export class JsonSchema {
                 break;
         }
 
-        return /** @type {import('json-schema').ValueObject} */ (value);
+        return /** @type {import('ext/json-schema').ValueObject} */ (value);
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
-     * @param {import('json-schema').ValueObject} value
-     * @returns {import('json-schema').ValueObject}
+     * @param {import('ext/json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').ValueObject} value
+     * @returns {import('ext/json-schema').ValueObject}
      */
     _populateObjectDefaults(schema, value) {
         const properties = new Set(Object.getOwnPropertyNames(value));
@@ -1131,9 +1131,9 @@ export class JsonSchema {
     }
 
     /**
-     * @param {import('json-schema').SchemaObject} schema
-     * @param {import('json-schema').Value[]} value
-     * @returns {import('json-schema').Value[]}
+     * @param {import('ext/json-schema').SchemaObject} schema
+     * @param {import('ext/json-schema').Value[]} value
+     * @returns {import('ext/json-schema').Value[]}
      */
     _populateArrayDefaults(schema, value) {
         for (let i = 0, ii = value.length; i < ii; ++i) {
@@ -1162,7 +1162,7 @@ export class JsonSchema {
 }
 
 /**
- * @implements {ProxyHandler<import('json-schema').ValueObjectOrArray>}
+ * @implements {ProxyHandler<import('ext/json-schema').ValueObjectOrArray>}
  */
 class JsonSchemaProxyHandler {
     /**
@@ -1176,7 +1176,7 @@ class JsonSchemaProxyHandler {
     }
 
     /**
-     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {import('ext/json-schema').ValueObjectOrArray} target
      * @returns {?import('core').UnknownObject}
      */
     getPrototypeOf(target) {
@@ -1184,14 +1184,14 @@ class JsonSchemaProxyHandler {
     }
 
     /**
-     * @type {(target: import('json-schema').ValueObjectOrArray, newPrototype: ?unknown) => boolean}
+     * @type {(target: import('ext/json-schema').ValueObjectOrArray, newPrototype: ?unknown) => boolean}
      */
     setPrototypeOf() {
         throw new Error('setPrototypeOf not supported');
     }
 
     /**
-     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {import('ext/json-schema').ValueObjectOrArray} target
      * @returns {boolean}
      */
     isExtensible(target) {
@@ -1199,7 +1199,7 @@ class JsonSchemaProxyHandler {
     }
 
     /**
-     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {import('ext/json-schema').ValueObjectOrArray} target
      * @returns {boolean}
      */
     preventExtensions(target) {
@@ -1208,7 +1208,7 @@ class JsonSchemaProxyHandler {
     }
 
     /**
-     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {import('ext/json-schema').ValueObjectOrArray} target
      * @param {string|symbol} property
      * @returns {PropertyDescriptor|undefined}
      */
@@ -1217,14 +1217,14 @@ class JsonSchemaProxyHandler {
     }
 
     /**
-     * @type {(target: import('json-schema').ValueObjectOrArray, property: string|symbol, attributes: PropertyDescriptor) => boolean}
+     * @type {(target: import('ext/json-schema').ValueObjectOrArray, property: string|symbol, attributes: PropertyDescriptor) => boolean}
      */
     defineProperty() {
         throw new Error('defineProperty not supported');
     }
 
     /**
-     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {import('ext/json-schema').ValueObjectOrArray} target
      * @param {string|symbol} property
      * @returns {boolean}
      */
@@ -1233,7 +1233,7 @@ class JsonSchemaProxyHandler {
     }
 
     /**
-     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {import('ext/json-schema').ValueObjectOrArray} target
      * @param {string|symbol} property
      * @param {import('core').SafeAny} _receiver
      * @returns {import('core').SafeAny}
@@ -1257,11 +1257,11 @@ class JsonSchemaProxyHandler {
         if (propertySchema === null) { return void 0; }
 
         const value = /** @type {import('core').UnknownObject} */ (target)[property];
-        return value !== null && typeof value === 'object' ? propertySchema.createProxy(/** @type {import('json-schema').Value} */ (value)) : value;
+        return value !== null && typeof value === 'object' ? propertySchema.createProxy(/** @type {import('ext/json-schema').Value} */ (value)) : value;
     }
 
     /**
-     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {import('ext/json-schema').ValueObjectOrArray} target
      * @param {string|number|symbol} property
      * @param {import('core').SafeAny} value
      * @returns {boolean}
@@ -1297,7 +1297,7 @@ class JsonSchemaProxyHandler {
     }
 
     /**
-     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {import('ext/json-schema').ValueObjectOrArray} target
      * @param {string|symbol} property
      * @returns {boolean}
      * @throws {Error}
@@ -1315,7 +1315,7 @@ class JsonSchemaProxyHandler {
     }
 
     /**
-     * @param {import('json-schema').ValueObjectOrArray} target
+     * @param {import('ext/json-schema').ValueObjectOrArray} target
      * @returns {ArrayLike<string|symbol>}
      */
     ownKeys(target) {
@@ -1323,14 +1323,14 @@ class JsonSchemaProxyHandler {
     }
 
     /**
-     * @type {(target: import('json-schema').ValueObjectOrArray, thisArg: import('core').SafeAny, argArray: import('core').SafeAny[]) => import('core').SafeAny}
+     * @type {(target: import('ext/json-schema').ValueObjectOrArray, thisArg: import('core').SafeAny, argArray: import('core').SafeAny[]) => import('core').SafeAny}
      */
     apply() {
         throw new Error('apply not supported');
     }
 
     /**
-     * @type {(target: import('json-schema').ValueObjectOrArray, argArray: import('core').SafeAny[], newTarget: import('core').SafeFunction) => import('json-schema').ValueObjectOrArray}
+     * @type {(target: import('ext/json-schema').ValueObjectOrArray, argArray: import('core').SafeAny[], newTarget: import('core').SafeFunction) => import('ext/json-schema').ValueObjectOrArray}
      */
     construct() {
         throw new Error('construct not supported');

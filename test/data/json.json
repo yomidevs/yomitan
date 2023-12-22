@@ -1,0 +1,175 @@
+{
+    "files": [
+        {"path": "package.json", "ignore": true},
+        {"path": "package-lock.json", "ignore": true},
+        {"path": "jsconfig.json", "ignore": true},
+        {"path": ".stylelintrc.json", "ignore": true},
+        {"path": ".htmlvalidate.json", "ignore": true},
+        {"path": ".eslintrc.json", "ignore": true},
+        {"path": ".vscode/settings.json", "ignore": true},
+        {"path": ".vscode/extensions.json", "ignore": true},
+        {"path": "dev/jsconfig.json", "ignore": true},
+        {"path": "ext/manifest.json", "ignore": true},
+        {"path": "test/data/dictionaries/invalid-dictionary1/index.json", "ignore": true},
+        {"path": "test/data/dictionaries/invalid-dictionary2/kanji_bank_1.json", "ignore": true},
+        {"path": "test/data/dictionaries/invalid-dictionary2/index.json", "ignore": true},
+        {"path": "test/data/dictionaries/invalid-dictionary3/kanji_meta_bank_1.json", "ignore": true},
+        {"path": "test/data/dictionaries/invalid-dictionary3/index.json", "ignore": true},
+        {"path": "test/data/dictionaries/invalid-dictionary4/tag_bank_1.json", "ignore": true},
+        {"path": "test/data/dictionaries/invalid-dictionary4/index.json", "ignore": true},
+        {"path": "test/data/dictionaries/invalid-dictionary5/term_bank_1.json", "ignore": true},
+        {"path": "test/data/dictionaries/invalid-dictionary5/index.json", "ignore": true},
+        {"path": "test/data/dictionaries/invalid-dictionary6/term_meta_bank_1.json", "ignore": true},
+        {"path": "test/data/dictionaries/invalid-dictionary6/index.json", "ignore": true},
+        {"path": "test/jsconfig.json", "ignore": true},
+        {"path": "test/data/vitest.write.config.json", "ignore": true},
+
+        {
+            "path": "dev/data/manifest-variants.json",
+            "typeFile": "types/dev/manifest.d.ts",
+            "type": "ManifestConfig"
+        },
+        {
+            "path": "ext/data/deinflect.json",
+            "typeFile": "types/ext/deinflector.d.ts",
+            "type": "ReasonsRaw"
+        },
+        {
+            "path": "ext/data/pronunciation-style.json",
+            "typeFile": "types/ext/css-style-applier.d.ts",
+            "type": "RawStyleData"
+        },
+        {
+            "path": "ext/data/structured-content-style.json",
+            "typeFile": "types/ext/css-style-applier.d.ts",
+            "type": "RawStyleData"
+        },
+        {
+            "path": "ext/data/schemas/dictionary-index-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/schemas/dictionary-kanji-bank-v1-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/schemas/dictionary-kanji-bank-v3-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/schemas/dictionary-kanji-meta-bank-v3-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/schemas/dictionary-tag-bank-v3-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/schemas/dictionary-term-bank-v1-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/schemas/dictionary-term-bank-v3-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/schemas/dictionary-term-meta-bank-v3-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/schemas/custom-audio-list-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/schemas/options-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "test/data/translator-test-inputs.json",
+            "typeFile": "types/test/translator.d.ts",
+            "type": "TranslatorTestInputs",
+            "jsconfig": "test"
+        },
+        {
+            "path": "test/data/translator-test-results.json",
+            "typeFile": "types/test/translator.d.ts",
+            "type": "TranslatorTestResults",
+            "jsconfig": "test"
+        },
+        {
+            "path": "test/data/translator-test-results-note-data1.json",
+            "typeFile": "types/test/translator.d.ts",
+            "type": "TranslatorTestNoteDataResults",
+            "jsconfig": "test"
+        },
+        {
+            "path": "test/data/anki-note-builder-test-results.json",
+            "typeFile": "types/test/translator.d.ts",
+            "type": "AnkiNoteBuilderTestResults",
+            "jsconfig": "test"
+        },
+        {
+            "path": "test/data/json.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "JsonInfo"
+        },
+        {
+            "path": "test/data/dictionaries/valid-dictionary1/index.json",
+            "typeFile": "types/ext/dictionary-data.d.ts",
+            "type": "Index",
+            "schema": "ext/data/schemas/dictionary-index-schema.json"
+        },
+        {
+            "path": "test/data/dictionaries/valid-dictionary1/kanji_bank_1.json",
+            "typeFile": "types/ext/dictionary-data.d.ts",
+            "type": "KanjiV3Array",
+            "schema": "ext/data/schemas/dictionary-kanji-bank-v3-schema.json"
+        },
+        {
+            "path": "test/data/dictionaries/valid-dictionary1/kanji_meta_bank_1.json",
+            "typeFile": "types/ext/dictionary-data.d.ts",
+            "type": "KanjiMetaArray",
+            "schema": "ext/data/schemas/dictionary-kanji-meta-bank-v3-schema.json"
+        },
+        {
+            "path": "test/data/dictionaries/valid-dictionary1/tag_bank_1.json",
+            "typeFile": "types/ext/dictionary-data.d.ts",
+            "type": "TagArray",
+            "schema": "ext/data/schemas/dictionary-tag-bank-v3-schema.json"
+        },
+        {
+            "path": "test/data/dictionaries/valid-dictionary1/tag_bank_2.json",
+            "typeFile": "types/ext/dictionary-data.d.ts",
+            "type": "TagArray",
+            "schema": "ext/data/schemas/dictionary-tag-bank-v3-schema.json"
+        },
+        {
+            "path": "test/data/dictionaries/valid-dictionary1/tag_bank_3.json",
+            "typeFile": "types/ext/dictionary-data.d.ts",
+            "type": "TagArray",
+            "schema": "ext/data/schemas/dictionary-tag-bank-v3-schema.json"
+        },
+        {
+            "path": "test/data/dictionaries/valid-dictionary1/term_bank_1.json",
+            "typeFile": "types/ext/dictionary-data.d.ts",
+            "type": "TermV3Array",
+            "schema": "ext/data/schemas/dictionary-term-bank-v3-schema.json"
+        },
+        {
+            "path": "test/data/dictionaries/valid-dictionary1/term_meta_bank_1.json",
+            "typeFile": "types/ext/dictionary-data.d.ts",
+            "type": "TermMetaArray",
+            "schema": "ext/data/schemas/dictionary-term-meta-bank-v3-schema.json"
+        }
+    ]
+}

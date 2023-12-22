@@ -22,7 +22,8 @@ import {HotkeyHandler} from '../../input/hotkey-handler.js';
 import {yomitan} from '../../yomitan.js';
 import {PopupPreviewFrame} from './popup-preview-frame.js';
 
-(async () => {
+/** Entry point. */
+async function main() {
     try {
         await yomitan.prepare();
 
@@ -47,4 +48,6 @@ import {PopupPreviewFrame} from './popup-preview-frame.js';
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+await main();

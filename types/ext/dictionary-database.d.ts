@@ -230,11 +230,11 @@ export type FindMultiBulkData<TItem = unknown> = {
     indexIndex: number;
 };
 
-export type CreateQuery<TItem> = (item: TItem) => (IDBValidKey | IDBKeyRange | null);
+export type CreateQuery<TItem = unknown> = (item: TItem) => (IDBValidKey | IDBKeyRange | null);
 
-export type FindPredicate<TItem, TRow> = (row: TRow, item: TItem) => boolean;
+export type FindPredicate<TItem = unknown, TRow = unknown> = (row: TRow, item: TItem) => boolean;
 
-export type CreateResult<TItem, TRow, TResult> = (row: TRow, data: FindMultiBulkData<TItem>) => TResult;
+export type CreateResult<TItem = unknown, TRow = unknown, TResult = unknown> = (row: TRow, data: FindMultiBulkData<TItem>) => TResult;
 
 export type DictionarySet = {
     has(value: string): boolean;

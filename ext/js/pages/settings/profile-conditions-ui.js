@@ -18,6 +18,7 @@
 
 import {EventDispatcher, EventListenerCollection} from '../../core.js';
 import {DocumentUtil} from '../../dom/document-util.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
 /**
@@ -33,10 +34,10 @@ export class ProfileConditionsUI extends EventDispatcher {
         this._settingsController = settingsController;
         /** @type {?import('environment').OperatingSystem} */
         this._os = null;
-        /** @type {?HTMLElement} */
-        this._conditionGroupsContainer = null;
-        /** @type {?HTMLElement} */
-        this._addConditionGroupButton = null;
+        /** @type {HTMLElement} */
+        this._conditionGroupsContainer = querySelectorNotNull(document, '#profile-condition-groups');
+        /** @type {HTMLElement} */
+        this._addConditionGroupButton = querySelectorNotNull(document, '#profile-add-condition-group');
         /** @type {ProfileConditionGroupUI[]} */
         this._children = [];
         /** @type {EventListenerCollection} */
@@ -49,6 +50,7 @@ export class ProfileConditionsUI extends EventDispatcher {
         const normalizeInteger = this._normalizeInteger.bind(this);
         const validateFlags = this._validateFlags.bind(this);
         const normalizeFlags = this._normalizeFlags.bind(this);
+        /* eslint-disable no-multi-spaces */
         /** @type {Map<import('profile-conditions-ui').DescriptorType, import('profile-conditions-ui').Descriptor>} */
         this._descriptors = new Map([
             [
@@ -104,6 +106,7 @@ export class ProfileConditionsUI extends EventDispatcher {
                 }
             ]
         ]);
+        /* eslint-enable no-multi-spaces */
         /** @type {Set<string>} */
         this._validFlags = new Set([
             'clipboard'
@@ -139,8 +142,6 @@ export class ProfileConditionsUI extends EventDispatcher {
         const {conditionGroups} = profiles[profileIndex];
 
         this._profileIndex = profileIndex;
-        this._conditionGroupsContainer = /** @type {HTMLElement} */ (document.querySelector('#profile-condition-groups'));
-        this._addConditionGroupButton = /** @type {HTMLElement} */ (document.querySelector('#profile-add-condition-group'));
 
         for (let i = 0, ii = conditionGroups.length; i < ii; ++i) {
             this._addConditionGroup(conditionGroups[i], i);
@@ -157,9 +158,6 @@ export class ProfileConditionsUI extends EventDispatcher {
             child.cleanup();
         }
         this._children = [];
-
-        this._conditionGroupsContainer = null;
-        this._addConditionGroupButton = null;
     }
 
     /**
@@ -221,12 +219,12 @@ export class ProfileConditionsUI extends EventDispatcher {
         const info = this._getOperatorDetails(type, operator);
 
         const {
-            displayName=operator,
-            type: type2='string',
-            defaultValue='',
-            resetDefaultOnChange=false,
-            validate=null,
-            normalize=null
+            displayName = operator,
+            type: type2 = 'string',
+            defaultValue = '',
+            resetDefaultOnChange = false,
+            validate = null,
+            normalize = null
         } = (typeof info === 'undefined' ? {} : info);
 
         return {
@@ -354,7 +352,7 @@ export class ProfileConditionsUI extends EventDispatcher {
         const child = new ProfileConditionGroupUI(this, index);
         child.prepare(conditionGroup);
         this._children.push(child);
-        /** @type {HTMLElement} */ (this._conditionGroupsContainer).appendChild(child.node);
+        this._conditionGroupsContainer.appendChild(child.node);
         return child;
     }
 
@@ -391,6 +389,7 @@ export class ProfileConditionsUI extends EventDispatcher {
      */
     _validateRegExp(value) {
         try {
+            // eslint-disable-next-line no-new
             new RegExp(value, 'i');
             return true;
         } catch (e) {
@@ -460,9 +459,9 @@ class ProfileConditionGroupUI {
         /** @type {HTMLElement} */
         this._node = /** @type {HTMLElement} */ (this._parent.instantiateTemplate('profile-condition-group'));
         /** @type {HTMLElement} */
-        this._conditionContainer = /** @type {HTMLElement} */ (this._node.querySelector('.profile-condition-list'));
+        this._conditionContainer = querySelectorNotNull(this._node, '.profile-condition-list');
         /** @type {HTMLElement} */
-        this._addConditionButton = /** @type {HTMLElement} */ (this._node.querySelector('.profile-condition-add-button'));
+        this._addConditionButton = querySelectorNotNull(this._node, '.profile-condition-add-button');
         /** @type {ProfileConditionUI[]} */
         this._children = [];
         /** @type {EventListenerCollection} */
@@ -601,9 +600,7 @@ class ProfileConditionGroupUI {
         const child = new ProfileConditionUI(this, index);
         child.prepare(condition);
         this._children.push(child);
-        if (this._conditionContainer !== null) {
-            this._conditionContainer.appendChild(child.node);
-        }
+        this._conditionContainer.appendChild(child.node);
         return child;
     }
 }
@@ -621,23 +618,21 @@ class ProfileConditionUI {
         /** @type {HTMLElement} */
         this._node = this._parent.parent.instantiateTemplate('profile-condition');
         /** @type {HTMLSelectElement} */
-        this._typeInput = /** @type {HTMLSelectElement} */ (this._node.querySelector('.profile-condition-type'));
+        this._typeInput = querySelectorNotNull(this._node, '.profile-condition-type');
         /** @type {HTMLSelectElement} */
-        this._operatorInput = /** @type {HTMLSelectElement} */ (this._node.querySelector('.profile-condition-operator'));
+        this._operatorInput = querySelectorNotNull(this._node, '.profile-condition-operator');
         /** @type {HTMLButtonElement} */
-        this._removeButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.profile-condition-remove'));
+        this._mouseButton = querySelectorNotNull(this._node, '.mouse-button');
+        /** @type {HTMLElement} */
+        this._mouseButtonContainer = querySelectorNotNull(this._node, '.mouse-button-container');
         /** @type {HTMLButtonElement} */
-        this._mouseButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.mouse-button'));
+        this._menuButton = querySelectorNotNull(this._node, '.profile-condition-menu-button');
         /** @type {HTMLElement} */
-        this._mouseButtonContainer = /** @type {HTMLElement} */ (this._node.querySelector('.mouse-button-container'));
-        /** @type {HTMLButtonElement} */
-        this._menuButton = /** @type {HTMLButtonElement} */ (this._node.querySelector('.profile-condition-menu-button'));
+        this._typeOptionContainer = querySelectorNotNull(this._typeInput, 'optgroup');
         /** @type {HTMLElement} */
-        this._typeOptionContainer = /** @type {HTMLElement} */ (this._typeInput.querySelector('optgroup'));
-        /** @type {HTMLElement} */
-        this._operatorOptionContainer = /** @type {HTMLElement} */ (this._operatorInput.querySelector('optgroup'));
+        this._operatorOptionContainer = querySelectorNotNull(this._operatorInput, 'optgroup');
         /** @type {HTMLInputElement} */
-        this._valueInput = /** @type {HTMLInputElement} */ (this._node.querySelector('.profile-condition-input'));
+        this._valueInput = querySelectorNotNull(this._node, '.profile-condition-input');
         /** @type {string} */
         this._value = '';
         /** @type {?KeyboardMouseInputField} */
@@ -685,11 +680,8 @@ class ProfileConditionUI {
 
         this._eventListeners.addEventListener(this._typeInput, 'change', this._onTypeChange.bind(this), false);
         this._eventListeners.addEventListener(this._operatorInput, 'change', this._onOperatorChange.bind(this), false);
-        if (this._removeButton !== null) { this._eventListeners.addEventListener(this._removeButton, 'click', this._onRemoveButtonClick.bind(this), false); }
-        if (this._menuButton !== null) {
-            this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
-            this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
-        }
+        this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
+        this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
     }
 
     /** */
@@ -767,16 +759,12 @@ class ProfileConditionUI {
         }
     }
 
-    /** */
-    _onRemoveButtonClick() {
-        this._removeSelf();
-    }
-
     /**
      * @param {import('popup-menu').MenuOpenEvent} e
      */
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
+        /** @type {HTMLElement} */
         const deleteGroup = /** @type {HTMLElement} */ (bodyNode.querySelector('.popup-menu-item[data-menu-action="deleteGroup"]'));
         if (deleteGroup !== null) {
             deleteGroup.hidden = (this._parent.childCount <= 1);

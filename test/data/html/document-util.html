@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>Yomitan Tests</title>
-        <link rel="icon" type="image/gif" href="data:image/gif;base64,R0lGODlhEAAQAKEBAAAAAP///////////yH5BAEKAAIALAAAAAAQABAAAAImFI6Zpt0B4YkS0TCpq07xbmEgcGVRUpLaI46ZG7ppalY0jDCwUAAAOw==">
-        <link rel="stylesheet" href="test-stylesheet.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>DocumentUtil Tests</title>
+    <link rel="icon" type="image/gif" href="data:image/gif;base64,R0lGODdhAQABAIABAAAAAP///ywAAAAAAQABAAACAkQBADs=">
+    <link rel="stylesheet" href="test-stylesheet.css">
+</head>
 <body>
 
-    <h1>Yomitan Tests</h1>
+    <h1>DocumentUtil Tests</h1>
 
-    <div
-        class="test"
+    <test-description>Automated test cases for DocumentUtil.</test-description>
+
+    <test-case
         data-test-type="scan"
         data-element-from-point-selector="span"
         data-caret-range-from-point-selector="span"
@@ -25,10 +26,9 @@
         data-sentence="真白「心配してくださって、ありがとございます」"
     >
         <span>真白「心配してくださって、ありがとございます」</span>
-    </div>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="scan"
         data-element-from-point-selector="span"
         data-caret-range-from-point-selector="span"
@@ -41,10 +41,9 @@
         data-sentence="心配してくださって、ありがとございます"
     >
         <span>真白「心配してくださって、ありがとございます」</span>
-    </div>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="scan"
         data-element-from-point-selector="span"
         data-caret-range-from-point-selector="span"
@@ -57,10 +56,9 @@
         data-sentence="心配して「くださって」、ありがと「ございます」"
     >
         <span>真白「心配して「くださって」、ありがと「ございます」」</span>
-    </div>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="scan"
         data-element-from-point-selector="span"
         data-caret-range-from-point-selector="span"
@@ -73,10 +71,9 @@
         data-sentence="ありがとございます。"
     >
         <span>ありがとございます。ありがとございます。</span>
-    </div>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="scan"
         data-element-from-point-selector="span"
         data-caret-range-from-point-selector="span"
@@ -89,10 +86,39 @@
         data-sentence="ありがとございます。"
     >
         <span>ありがとございます。ありがとございます。</span>
-    </div>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
+        data-test-type="scan"
+        data-element-from-point-selector="span"
+        data-caret-range-from-point-selector="span"
+        data-start-node-selector="span"
+        data-start-offset="4"
+        data-end-node-selector="span"
+        data-end-offset="4"
+        data-result-type="TextSourceRange"
+        data-sentence-scan-extent="100"
+        data-sentence="ありがとございます。！？"
+    >
+        <span>ありがとございます。！？ありがとございます。！？</span>
+    </test-case>
+
+    <test-case
+        data-test-type="scan"
+        data-element-from-point-selector="span"
+        data-caret-range-from-point-selector="span"
+        data-start-node-selector="span"
+        data-start-offset="4"
+        data-end-node-selector="span"
+        data-end-offset="4"
+        data-result-type="TextSourceRange"
+        data-sentence-scan-extent="100"
+        data-sentence="ありがとございます！！！"
+    >
+        <span>ありがとございます！！！ありがとございます！！！</span>
+    </test-case>
+
+    <test-case
         data-test-type="scan"
         data-element-from-point-selector="input"
         data-caret-range-from-point-selector="input"
@@ -106,10 +132,9 @@
         data-has-imposter="true"
     >
         <input type="text" value="真白「心配してくださって、ありがとございます」" style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: inherit; border: 1px solid #d8d8d8; padding: 0.2em;">
-    </div>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="scan"
         data-element-from-point-selector="textarea"
         data-caret-range-from-point-selector="textarea"
@@ -123,10 +148,9 @@
         data-has-imposter="true"
     >
         <textarea style="width: 100%; height: 3em; box-sizing: border-box; font-family: inherit; font-size: inherit; border: 1px solid #d8d8d8; padding: 0.2em;">真白「心配してくださって、ありがとございます」</textarea>
-    </div>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="scan"
         data-element-from-point-selector="button"
         data-caret-range-from-point-selector="button"
@@ -136,13 +160,12 @@
         data-end-offset="0"
         data-result-type="TextSourceElement"
         data-sentence-scan-extent="100"
-        data-sentence="よみちゃん"
+        data-sentence="よみたん"
     >
-        <button type="button" style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: inherit; border: 1px solid #d8d8d8; background-color: #f0f0f0; padding: 0.2em;">よみちゃん</button>
-    </div>
+        <button type="button" style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: inherit; border: 1px solid #d8d8d8; background-color: #f0f0f0; padding: 0.2em;">よみたん</button>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="scan"
         data-element-from-point-selector="img"
         data-caret-range-from-point-selector="img"
@@ -152,13 +175,12 @@
         data-end-offset="0"
         data-result-type="TextSourceElement"
         data-sentence-scan-extent="100"
-        data-sentence="よみちゃん"
+        data-sentence="よみたん"
     >
-        <img src="data:image/gif;base64,R0lGODdhBwAHAIABAAAAAP///ywAAAAABwAHAAACDIRvEaC32FpCbEkKCgA7" alt="よみちゃん" title="よみちゃん" style="width: 70px; height: 70px; image-rendering: crisp-edges; image-rendering: pixelated; display: block;">
-    </div>
+        <img src="data:image/gif;base64,R0lGODdhAQABAIABAAAAAP///ywAAAAAAQABAAACAkQBADs=" alt="よみたん" title="よみたん" style="width: 70px; height: 70px; image-rendering: crisp-edges; image-rendering: pixelated; display: block;">
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="scan"
         data-element-from-point-selector="span:nth-of-type(3)"
         data-caret-range-from-point-selector="span:nth-of-type(3)"
@@ -176,10 +198,9 @@
 <span>ありがとございます3</span>
 <span>ありがとございます4</span>
 <span>ありがとございます5</span>
-    </div>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="scan"
         data-element-from-point-selector="span:nth-of-type(3)"
         data-caret-range-from-point-selector="span:nth-of-type(3)"
@@ -197,10 +218,9 @@
 <span>ありがとございます3</span>
 <span>ありがとございます4</span>
 <span>ありがとございます5</span>
-    </div>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="text-source-range-seek"
         data-seek-node-selector="span:nth-of-type(1)"
         data-seek-node-is-text="true"
@@ -235,10 +255,9 @@
         らりるれろ
         わゐ&#x3000;ゑを
         </span><span>trailing content</span>
-    </div>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="text-source-range-seek"
         data-seek-node-selector="span:nth-of-type(1)"
         data-seek-node-is-text="true"
@@ -273,10 +292,9 @@
         らりるれろ
         わゐ&#x3000;ゑを
         </span><span>trailing content</span>
-    </div>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="text-source-range-seek"
         data-seek-node-selector="span:nth-of-type(1)"
         data-seek-node-is-text="true"
@@ -311,10 +329,9 @@
         らりるれろ
         わゐ&#x3000;ゑを
         </span><span>trailing content</span>
-    </div>
+    </test-case>
 
-    <div
-        class="test"
+    <test-case
         data-test-type="text-source-range-seek"
         data-seek-node-selector="span:nth-of-type(2)"
         data-seek-node-is-text="true"
@@ -349,7 +366,7 @@
         らりるれろ
         わゐ&#x3000;ゑを
         </span><span>trailing content</span>
-    </div>
+    </test-case>
 
 </body>
 </html>

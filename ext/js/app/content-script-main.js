@@ -22,7 +22,8 @@ import {yomitan} from '../yomitan.js';
 import {Frontend} from './frontend.js';
 import {PopupFactory} from './popup-factory.js';
 
-(async () => {
+/** Entry point. */
+async function main() {
     try {
         await yomitan.prepare();
 
@@ -57,4 +58,6 @@ import {PopupFactory} from './popup-factory.js';
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+await main();

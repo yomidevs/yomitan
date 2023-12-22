@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Performance Tests</title>
+    <link rel="icon" type="image/gif" href="data:image/gif;base64,R0lGODdhAQABAIABAAAAAP///ywAAAAAAQABAAACAkQBADs=">
+    <link rel="stylesheet" href="test-stylesheet.css">
+</head>
+<body>
+
+    <h1>Performance Tests</h1>
+
+    <test-description>Testing performance with artificially demanding cases in a real browser</test-description>
+
+    <test-case>
+        <test-description>&lt;iframe&gt; element.</test-description>
+        <iframe src="performance-frame1.html" allowfullscreen="true" style="width: 100%; height: 200px; border: 1px solid #d8d8d8;"></iframe>
+    </test-case>
+
+    <test-case>
+        <test-description>&lt;iframe&gt; element containing an &lt;iframe&gt; element inside of an open shadow DOM.</test-description>
+        <iframe src="performance-frame2.html" allowfullscreen="true" style="width: 100%; height: 200px; border: 1px solid #d8d8d8;"></iframe>
+    </test-case>
+
+</body>
+</html>

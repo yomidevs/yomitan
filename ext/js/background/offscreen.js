@@ -19,6 +19,7 @@
 import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {invokeMessageHandler} from '../core.js';
+import {createApiMap, getApiMapHandler} from '../core/api-map.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../language/dictionary-database.js';
 import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
@@ -50,47 +51,52 @@ export class Offscreen {
             richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
         });
 
-        /** @type {import('offscreen').MessageHandlerMap} */
-        const messageHandlers = new Map([
-            ['clipboardGetTextOffscreen',    {async: true,  handler: this._getTextHandler.bind(this)}],
-            ['clipboardGetImageOffscreen',   {async: true,  handler: this._getImageHandler.bind(this)}],
-            ['clipboardSetBrowserOffscreen', {async: false, handler: this._setClipboardBrowser.bind(this)}],
-            ['databasePrepareOffscreen',     {async: true,  handler: this._prepareDatabaseHandler.bind(this)}],
-            ['getDictionaryInfoOffscreen',   {async: true,  handler: this._getDictionaryInfoHandler.bind(this)}],
-            ['databasePurgeOffscreen',       {async: true,  handler: this._purgeDatabaseHandler.bind(this)}],
-            ['databaseGetMediaOffscreen',    {async: true,  handler: this._getMediaHandler.bind(this)}],
-            ['translatorPrepareOffscreen',   {async: false, handler: this._prepareTranslatorHandler.bind(this)}],
-            ['findKanjiOffscreen',           {async: true,  handler: this._findKanjiHandler.bind(this)}],
-            ['findTermsOffscreen',           {async: true,  handler: this._findTermsHandler.bind(this)}],
-            ['getTermFrequenciesOffscreen',  {async: true,  handler: this._getTermFrequenciesHandler.bind(this)}],
-            ['clearDatabaseCachesOffscreen', {async: false, handler: this._clearDatabaseCachesHandler.bind(this)}]
-        ]);
-        /** @type {import('offscreen').MessageHandlerMap<string>} */
-        this._messageHandlers = messageHandlers;
 
-        const onMessage = this._onMessage.bind(this);
-        chrome.runtime.onMessage.addListener(onMessage);
+        /* eslint-disable no-multi-spaces */
+        /** @type {import('offscreen').OffscreenApiMapInit} */
+        const messageHandlersInit = [
+            ['clipboardGetTextOffscreen',    this._getTextHandler.bind(this)],
+            ['clipboardGetImageOffscreen',   this._getImageHandler.bind(this)],
+            ['clipboardSetBrowserOffscreen', this._setClipboardBrowser.bind(this)],
+            ['databasePrepareOffscreen',     this._prepareDatabaseHandler.bind(this)],
+            ['getDictionaryInfoOffscreen',   this._getDictionaryInfoHandler.bind(this)],
+            ['databasePurgeOffscreen',       this._purgeDatabaseHandler.bind(this)],
+            ['databaseGetMediaOffscreen',    this._getMediaHandler.bind(this)],
+            ['translatorPrepareOffscreen',   this._prepareTranslatorHandler.bind(this)],
+            ['findKanjiOffscreen',           this._findKanjiHandler.bind(this)],
+            ['findTermsOffscreen',           this._findTermsHandler.bind(this)],
+            ['getTermFrequenciesOffscreen',  this._getTermFrequenciesHandler.bind(this)],
+            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)]
+        ];
+
+        /** @type {import('offscreen').OffscreenApiMap} */
+        this._messageHandlers = createApiMap(messageHandlersInit);
 
         /** @type {?Promise<void>} */
         this._prepareDatabasePromise = null;
     }
 
-    /** @type {import('offscreen').MessageHandler<'clipboardGetTextOffscreen', true>} */
+    /** */
+    prepare() {
+        chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
+    }
+
+    /** @type {import('offscreen').OffscreenApiHandler<'clipboardGetTextOffscreen'>} */
     async _getTextHandler({useRichText}) {
         return await this._clipboardReader.getText(useRichText);
     }
 
-    /** @type {import('offscreen').MessageHandler<'clipboardGetImageOffscreen', true>} */
+    /** @type {import('offscreen').OffscreenApiHandler<'clipboardGetImageOffscreen'>} */
     async _getImageHandler() {
         return await this._clipboardReader.getImage();
     }
 
-    /** @type {import('offscreen').MessageHandler<'clipboardSetBrowserOffscreen', false>} */
+    /** @type {import('offscreen').OffscreenApiHandler<'clipboardSetBrowserOffscreen'>} */
     _setClipboardBrowser({value}) {
         this._clipboardReader.browser = value;
     }
 
-    /** @type {import('offscreen').MessageHandler<'databasePrepareOffscreen', true>} */
+    /** @type {import('offscreen').OffscreenApiHandler<'databasePrepareOffscreen'>} */
     _prepareDatabaseHandler() {
         if (this._prepareDatabasePromise !== null) {
             return this._prepareDatabasePromise;
@@ -99,29 +105,29 @@ export class Offscreen {
         return this._prepareDatabasePromise;
     }
 
-    /** @type {import('offscreen').MessageHandler<'getDictionaryInfoOffscreen', true>} */
+    /** @type {import('offscreen').OffscreenApiHandler<'getDictionaryInfoOffscreen'>} */
     async _getDictionaryInfoHandler() {
         return await this._dictionaryDatabase.getDictionaryInfo();
     }
 
-    /** @type {import('offscreen').MessageHandler<'databasePurgeOffscreen', true>} */
+    /** @type {import('offscreen').OffscreenApiHandler<'databasePurgeOffscreen'>} */
     async _purgeDatabaseHandler() {
         return await this._dictionaryDatabase.purge();
     }
 
-    /** @type {import('offscreen').MessageHandler<'databaseGetMediaOffscreen', true>} */
+    /** @type {import('offscreen').OffscreenApiHandler<'databaseGetMediaOffscreen'>} */
     async _getMediaHandler({targets}) {
         const media = await this._dictionaryDatabase.getMedia(targets);
         const serializedMedia = media.map((m) => ({...m, content: ArrayBufferUtil.arrayBufferToBase64(m.content)}));
         return serializedMedia;
     }
 
-    /** @type {import('offscreen').MessageHandler<'translatorPrepareOffscreen', false>} */
+    /** @type {import('offscreen').OffscreenApiHandler<'translatorPrepareOffscreen'>} */
     _prepareTranslatorHandler({deinflectionReasons}) {
         this._translator.prepare(deinflectionReasons);
     }
 
-    /** @type {import('offscreen').MessageHandler<'findKanjiOffscreen', true>} */
+    /** @type {import('offscreen').OffscreenApiHandler<'findKanjiOffscreen'>} */
     async _findKanjiHandler({text, options}) {
         /** @type {import('translation').FindKanjiOptions} */
         const modifiedOptions = {
@@ -131,8 +137,8 @@ export class Offscreen {
         return await this._translator.findKanji(text, modifiedOptions);
     }
 
-    /** @type {import('offscreen').MessageHandler<'findTermsOffscreen', true>} */
-    _findTermsHandler({mode, text, options}) {
+    /** @type {import('offscreen').OffscreenApiHandler<'findTermsOffscreen'>} */
+    async _findTermsHandler({mode, text, options}) {
         const enabledDictionaryMap = new Map(options.enabledDictionaryMap);
         const excludeDictionaryDefinitions = (
             options.excludeDictionaryDefinitions !== null ?
@@ -158,19 +164,19 @@ export class Offscreen {
         return this._translator.findTerms(mode, text, modifiedOptions);
     }
 
-    /** @type {import('offscreen').MessageHandler<'getTermFrequenciesOffscreen', true>} */
+    /** @type {import('offscreen').OffscreenApiHandler<'getTermFrequenciesOffscreen'>} */
     _getTermFrequenciesHandler({termReadingList, dictionaries}) {
         return this._translator.getTermFrequencies(termReadingList, dictionaries);
     }
 
-    /** @type {import('offscreen').MessageHandler<'clearDatabaseCachesOffscreen', false>} */
+    /** @type {import('offscreen').OffscreenApiHandler<'clearDatabaseCachesOffscreen'>} */
     _clearDatabaseCachesHandler() {
         this._translator.clearDatabaseCaches();
     }
 
     /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
     _onMessage({action, params}, sender, callback) {
-        const messageHandler = this._messageHandlers.get(action);
+        const messageHandler = getApiMapHandler(this._messageHandlers, action);
         if (typeof messageHandler === 'undefined') { return false; }
         return invokeMessageHandler(messageHandler, params, callback, sender);
     }

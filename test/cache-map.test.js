@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable no-multi-spaces */
+
 import {expect, test} from 'vitest';
 import {CacheMap} from '../ext/js/general/cache-map.js';
 

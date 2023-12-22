@@ -18,8 +18,10 @@
 
 import {Dexie} from '../../../lib/dexie.js';
 import {isObject, log} from '../../core.js';
+import {parseJson} from '../../core/json.js';
 import {OptionsUtil} from '../../data/options-util.js';
 import {ArrayBufferUtil} from '../../data/sandbox/array-buffer-util.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 import {DictionaryController} from './dictionary-controller.js';
 
@@ -48,13 +50,9 @@ export class BackupController {
         /** @type {?OptionsUtil} */
         this._optionsUtil = null;
 
-        /**
-         *
-         */
+        /** @type {string} */
         this._dictionariesDatabaseName = 'dict';
-        /**
-         *
-         */
+        /** @type {?import('core').TokenObject} */
         this._settingsExportDatabaseToken = null;
 
         try {
@@ -243,7 +241,8 @@ export class BackupController {
      */
     _showSettingsImportError(error) {
         log.error(error);
-        const element = /** @type {HTMLElement} */ (document.querySelector('#settings-import-error-message'));
+        /** @type {HTMLElement} */
+        const element = querySelectorNotNull(document, '#settings-import-error-message');
         element.textContent = `${error}`;
         if (this._settingsImportErrorModal !== null) {
             this._settingsImportErrorModal.setVisible(true);
@@ -425,7 +424,8 @@ export class BackupController {
         if (this._optionsUtil === null) { throw new Error('OptionsUtil invalid'); }
 
         const dataString = ArrayBufferUtil.arrayBufferUtf8Decode(await this._readFileArrayBuffer(file));
-        const data = JSON.parse(dataString);
+        /** @type {import('backup-controller').BackupData} */
+        const data = parseJson(dataString);
 
         // Type check
         if (!isObject(data)) {
@@ -480,7 +480,8 @@ export class BackupController {
 
     /** */
     _onSettingsImportClick() {
-        const element = /** @type {HTMLElement} */ (document.querySelector('#settings-import-file'));
+        /** @type {HTMLElement} */
+        const element = querySelectorNotNull(document, '#settings-import-file');
         element.click();
     }
 
@@ -537,8 +538,9 @@ export class BackupController {
      * @param {string} message
      * @param {boolean} [isWarning]
      */
-    _databaseExportImportErrorMessage(message, isWarning=false) {
-        const errorMessageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-error-report'));
+    _databaseExportImportErrorMessage(message, isWarning = false) {
+        /** @type {HTMLElement} */
+        const errorMessageContainer = querySelectorNotNull(document, '#db-ops-error-report');
         errorMessageContainer.style.display = 'block';
         errorMessageContainer.textContent = message;
 
@@ -557,7 +559,8 @@ export class BackupController {
     _databaseExportProgressCallback({totalRows, completedRows, done}) {
         // eslint-disable-next-line no-console
         console.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
-        const messageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-progress-report'));
+        /** @type {HTMLElement} */
+        const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
         messageContainer.style.display = 'block';
         messageContainer.textContent = `Export Progress: ${completedRows} of ${totalRows} rows completed`;
 
@@ -579,9 +582,7 @@ export class BackupController {
         return blob;
     }
 
-    /**
-     *
-     */
+    /** */
     async _onSettingsExportDatabaseClick() {
         if (this._settingsExportDatabaseToken !== null) {
             // An existing import or export is in progress.
@@ -589,12 +590,14 @@ export class BackupController {
             return;
         }
 
-        const errorMessageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-error-report'));
+        /** @type {HTMLElement} */
+        const errorMessageContainer = querySelectorNotNull(document, '#db-ops-error-report');
         errorMessageContainer.style.display = 'none';
 
         const date = new Date(Date.now());
         const pageExitPrevention = this._settingsController.preventPageExit();
         try {
+            /** @type {import('core').TokenObject} */
             const token = {};
             this._settingsExportDatabaseToken = token;
             const fileName = `yomitan-dictionaries-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
@@ -619,7 +622,8 @@ export class BackupController {
     _databaseImportProgressCallback({totalRows, completedRows, done}) {
         // eslint-disable-next-line no-console
         console.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
-        const messageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-progress-report'));
+        /** @type {HTMLElement} */
+        const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
         messageContainer.style.display = 'block';
         messageContainer.style.color = '#4169e1';
         messageContainer.textContent = `Import Progress: ${completedRows} of ${totalRows} rows completed`;
@@ -645,7 +649,9 @@ export class BackupController {
 
     /** */
     _onSettingsImportDatabaseClick() {
-        /** @type {HTMLElement} */ (document.querySelector('#settings-import-db')).click();
+        /** @type {HTMLElement} */
+        const element = querySelectorNotNull(document, '#settings-import-db');
+        element.click();
     }
 
     /**
@@ -658,7 +664,8 @@ export class BackupController {
             return;
         }
 
-        const errorMessageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-error-report'));
+        /** @type {HTMLElement} */
+        const errorMessageContainer = querySelectorNotNull(document, '#db-ops-error-report');
         errorMessageContainer.style.display = 'none';
 
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
@@ -669,13 +676,15 @@ export class BackupController {
         const file = files[0];
         element.value = '';
         try {
+            /** @type {import('core').TokenObject} */
             const token = {};
             this._settingsExportDatabaseToken = token;
             await this._importDatabase(this._dictionariesDatabaseName, file);
         } catch (error) {
             // eslint-disable-next-line no-console
             console.log(error);
-            const messageContainer = /** @type {HTMLElement} */ (document.querySelector('#db-ops-progress-report'));
+            /** @type {HTMLElement} */
+            const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
             messageContainer.style.color = 'red';
             this._databaseExportImportErrorMessage('Encountered errors when importing. Please restart the browser and try again. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.');
         } finally {

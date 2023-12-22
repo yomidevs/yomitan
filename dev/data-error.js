@@ -15,6 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * Schema validation error type.
+ */
 class DataError extends Error {
     /**
      * @param {string} message

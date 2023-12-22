@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class TranslationTextReplacementsController {
     /**
@@ -25,16 +26,16 @@ export class TranslationTextReplacementsController {
     constructor(settingsController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {?HTMLElement} */
-        this._entryContainer = null;
+        /** @type {HTMLElement} */
+        this._entryContainer = querySelectorNotNull(document, '#translation-text-replacement-list');
         /** @type {TranslationTextReplacementsEntry[]} */
         this._entries = [];
     }
 
     /** */
     async prepare() {
-        this._entryContainer = /** @type {HTMLElement} */ (document.querySelector('#translation-text-replacement-list'));
-        const addButton = /** @type {HTMLButtonElement} */ (document.querySelector('#translation-text-replacement-add'));
+        /** @type {HTMLButtonElement} */
+        const addButton = querySelectorNotNull(document, '#translation-text-replacement-add');
 
         addButton.addEventListener('click', this._onAdd.bind(this), false);
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
@@ -179,12 +180,18 @@ class TranslationTextReplacementsEntry {
 
     /** */
     prepare() {
-        const patternInput = /** @type {HTMLInputElement} */ (this._node.querySelector('.translation-text-replacement-pattern'));
-        const replacementInput = /** @type {HTMLInputElement} */ (this._node.querySelector('.translation-text-replacement-replacement'));
-        const ignoreCaseToggle = /** @type {HTMLInputElement} */ (this._node.querySelector('.translation-text-replacement-pattern-ignore-case'));
-        const menuButton = /** @type {HTMLInputElement} */ (this._node.querySelector('.translation-text-replacement-button'));
-        const testInput = /** @type {HTMLInputElement} */ (this._node.querySelector('.translation-text-replacement-test-input'));
-        const testOutput = /** @type {HTMLInputElement} */ (this._node.querySelector('.translation-text-replacement-test-output'));
+        /** @type {HTMLInputElement} */
+        const patternInput = querySelectorNotNull(this._node, '.translation-text-replacement-pattern');
+        /** @type {HTMLInputElement} */
+        const replacementInput = querySelectorNotNull(this._node, '.translation-text-replacement-replacement');
+        /** @type {HTMLInputElement} */
+        const ignoreCaseToggle = querySelectorNotNull(this._node, '.translation-text-replacement-pattern-ignore-case');
+        /** @type {HTMLInputElement} */
+        const menuButton = querySelectorNotNull(this._node, '.translation-text-replacement-button');
+        /** @type {HTMLInputElement} */
+        const testInput = querySelectorNotNull(this._node, '.translation-text-replacement-test-input');
+        /** @type {HTMLInputElement} */
+        const testOutput = querySelectorNotNull(this._node, '.translation-text-replacement-test-output');
 
         this._patternInput = patternInput;
         this._replacementInput = replacementInput;
@@ -221,8 +228,12 @@ class TranslationTextReplacementsEntry {
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
         const testVisible = this._isTestVisible();
-        /** @type {HTMLElement} */ (bodyNode.querySelector('[data-menu-action=showTest]')).hidden = testVisible;
-        /** @type {HTMLElement} */ (bodyNode.querySelector('[data-menu-action=hideTest]')).hidden = !testVisible;
+        /** @type {HTMLElement} */
+        const element1 = querySelectorNotNull(bodyNode, '[data-menu-action=showTest]');
+        /** @type {HTMLElement} */
+        const element2 = querySelectorNotNull(bodyNode, '[data-menu-action=hideTest]');
+        element1.hidden = testVisible;
+        element2.hidden = !testVisible;
     }
 
     /**
@@ -257,6 +268,7 @@ class TranslationTextReplacementsEntry {
         let okay = false;
         try {
             if (typeof value === 'string') {
+                // eslint-disable-next-line no-new
                 new RegExp(value, 'g');
                 okay = true;
             }

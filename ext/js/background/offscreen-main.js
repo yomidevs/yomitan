@@ -18,6 +18,10 @@
 
 import {Offscreen} from './offscreen.js';
 
-(() => {
-    new Offscreen();
-})();
+/** Entry point. */
+function main() {
+    const offscreen = new Offscreen();
+    offscreen.prepare();
+}
+
+main();

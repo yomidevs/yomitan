@@ -20,23 +20,24 @@ import childProcess from 'child_process';
 import fs from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
+import {parseJson} from './json.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * @template T
+ * @template [T=unknown]
  * @param {T} value
  * @returns {T}
  */
 function clone(value) {
-    return JSON.parse(JSON.stringify(value));
+    return parseJson(JSON.stringify(value));
 }
 
 
 export class ManifestUtil {
     constructor() {
         const fileName = path.join(dirname, 'data', 'manifest-variants.json');
-        const {manifest, variants, defaultVariant} = /** @type {import('dev/manifest').ManifestConfig} */ (JSON.parse(fs.readFileSync(fileName, {encoding: 'utf8'})));
+        const {manifest, variants, defaultVariant} = /** @type {import('dev/manifest').ManifestConfig} */ (parseJson(fs.readFileSync(fileName, {encoding: 'utf8'})));
         /** @type {import('dev/manifest').Manifest} */
         this._manifest = manifest;
         /** @type {import('dev/manifest').ManifestVariant[]} */
@@ -120,12 +121,13 @@ export class ManifestUtil {
 
     /**
      * @param {import('dev/manifest').Manifest} manifest
-     * @param {import('dev/manifest').Modification[]} modifications
+     * @param {import('dev/manifest').Modification[]|undefined} modifications
      * @returns {import('dev/manifest').Manifest}
      */
     _applyModifications(manifest, modifications) {
         if (Array.isArray(modifications)) {
             for (const modification of modifications) {
+                // rename to path2 to avoid clashing with imported `node:path` module.
                 const {action, path: path2} = modification;
                 switch (action) {
                     case 'set':
@@ -239,7 +241,7 @@ export class ManifestUtil {
     }
 
     /**
-     * @template T
+     * @template [T=unknown]
      * @param {T[]} array1
      * @param {T[]} array2
      * @param {number} lengthOffset

@@ -42,3 +42,13 @@ export type AudioBinaryBase64 = {
     data: string;
     contentType: string | null;
 };
+
+export type CustomAudioList = {
+    type: 'audioSourceList';
+    audioSources: CustomAudioListSource[];
+};
+
+export type CustomAudioListSource = {
+    url: string;
+    name?: string;
+};

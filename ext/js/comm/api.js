@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deferPromise} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
 
 export class API {
@@ -426,135 +425,12 @@ export class API {
     // Utilities
 
     /**
-     * @param {number} timeout
-     * @returns {Promise<chrome.runtime.Port>}
-     */
-    _createActionPort(timeout) {
-        return new Promise((resolve, reject) => {
-            /** @type {?import('core').Timeout} */
-            let timer = null;
-            const portDetails = deferPromise();
-
-            /**
-             * @param {chrome.runtime.Port} port
-             */
-            const onConnect = async (port) => {
-                try {
-                    const {name: expectedName, id: expectedId} = await portDetails.promise;
-                    const {name, id} = JSON.parse(port.name);
-                    if (name !== expectedName || id !== expectedId || timer === null) { return; }
-                } catch (e) {
-                    return;
-                }
-
-                clearTimeout(timer);
-                timer = null;
-
-                chrome.runtime.onConnect.removeListener(onConnect);
-                resolve(port);
-            };
-
-            /**
-             * @param {Error} e
-             */
-            const onError = (e) => {
-                if (timer !== null) {
-                    clearTimeout(timer);
-                    timer = null;
-                }
-                chrome.runtime.onConnect.removeListener(onConnect);
-                portDetails.reject(e);
-                reject(e);
-            };
-
-            timer = setTimeout(() => onError(new Error('Timeout')), timeout);
-
-            chrome.runtime.onConnect.addListener(onConnect);
-            this._invoke('createActionPort').then(portDetails.resolve, onError);
-        });
-    }
-
-    /**
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
-     * @param {?(...args: unknown[]) => void} onProgress0
-     * @param {number} [timeout]
-     * @returns {Promise<TReturn>}
-     */
-    _invokeWithProgress(action, params, onProgress0, timeout=5000) {
-        return new Promise((resolve, reject) => {
-            /** @type {?chrome.runtime.Port} */
-            let port = null;
-
-            const onProgress = typeof onProgress0 === 'function' ? onProgress0 : () => {};
-
-            /**
-             * @param {import('backend').InvokeWithProgressResponseMessage<TReturn>} message
-             */
-            const onMessage = (message) => {
-                switch (message.type) {
-                    case 'progress':
-                        try {
-                            onProgress(...message.data);
-                        } catch (e) {
-                            // NOP
-                        }
-                        break;
-                    case 'complete':
-                        cleanup();
-                        resolve(message.data);
-                        break;
-                    case 'error':
-                        cleanup();
-                        reject(ExtensionError.deserialize(message.data));
-                        break;
-                }
-            };
-
-            const onDisconnect = () => {
-                cleanup();
-                reject(new Error('Disconnected'));
-            };
-
-            const cleanup = () => {
-                if (port !== null) {
-                    port.onMessage.removeListener(onMessage);
-                    port.onDisconnect.removeListener(onDisconnect);
-                    port.disconnect();
-                    port = null;
-                }
-            };
-
-            (async () => {
-                try {
-                    port = await this._createActionPort(timeout);
-                    port.onMessage.addListener(onMessage);
-                    port.onDisconnect.addListener(onDisconnect);
-
-                    // Chrome has a maximum message size that can be sent, so longer messages must be fragmented.
-                    const messageString = JSON.stringify({action, params});
-                    const fragmentSize = 1e7; // 10 MB
-                    for (let i = 0, ii = messageString.length; i < ii; i += fragmentSize) {
-                        const data = messageString.substring(i, i + fragmentSize);
-                        port.postMessage(/** @type {import('backend').InvokeWithProgressRequestFragmentMessage} */ ({action: 'fragment', data}));
-                    }
-                    port.postMessage(/** @type {import('backend').InvokeWithProgressRequestInvokeMessage} */ ({action: 'invoke'}));
-                } catch (e) {
-                    cleanup();
-                    reject(e);
-                }
-            })();
-        });
-    }
-
-    /**
      * @template [TReturn=unknown]
      * @param {string} action
      * @param {import('core').SerializableObject} [params]
      * @returns {Promise<TReturn>}
      */
-    _invoke(action, params={}) {
+    _invoke(action, params = {}) {
         const data = {action, params};
         return new Promise((resolve, reject) => {
             try {

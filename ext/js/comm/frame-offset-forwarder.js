@@ -36,7 +36,7 @@ export class FrameOffsetForwarder {
     prepare() {
         this._frameAncestryHandler.prepare();
         yomitan.crossFrame.registerHandlers([
-            ['FrameOffsetForwarder.getChildFrameRect', {async: false, handler: this._onMessageGetChildFrameRect.bind(this)}]
+            ['FrameOffsetForwarder.getChildFrameRect', this._onMessageGetChildFrameRect.bind(this)]
         ]);
     }
 

@@ -24,18 +24,18 @@ import {fileURLToPath} from 'url';
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * @returns {{cssFile: string, overridesCssFile: string, outputPath: string}[]}
+ * @returns {{cssFilePath: string, overridesCssFilePath: string, outputPath: string}[]}
  */
 export function getTargets() {
     return [
         {
-            cssFile: path.join(dirname, '..', 'ext/css/structured-content.css'),
-            overridesCssFile: path.join(dirname, 'data/structured-content-overrides.css'),
+            cssFilePath: path.join(dirname, '..', 'ext/css/structured-content.css'),
+            overridesCssFilePath: path.join(dirname, 'data/structured-content-overrides.css'),
             outputPath: path.join(dirname, '..', 'ext/data/structured-content-style.json')
         },
         {
-            cssFile: path.join(dirname, '..', 'ext/css/display-pronunciation.css'),
-            overridesCssFile: path.join(dirname, 'data/display-pronunciation-overrides.css'),
+            cssFilePath: path.join(dirname, '..', 'ext/css/display-pronunciation.css'),
+            overridesCssFilePath: path.join(dirname, 'data/display-pronunciation-overrides.css'),
             outputPath: path.join(dirname, '..', 'ext/data/pronunciation-style.json')
         }
     ];
@@ -86,20 +86,20 @@ function removeProperty(styles, property, removedProperties) {
 }
 
 /**
- * @param {import('css-style-applier').RawStyleData} rules
+ * Manually formats JSON for easier CSS parseability.
+ * @param {import('css-style-applier').RawStyleData} rules CSS ruleset.
  * @returns {string}
  */
 export function formatRulesJson(rules) {
-    // Manually format JSON, for improved compactness
     // return JSON.stringify(rules, null, 4);
     const indent1 = '    ';
     const indent2 = indent1.repeat(2);
     const indent3 = indent1.repeat(3);
     let result = '';
     result += '[';
-    let index1 = 0;
+    let ruleIndex = 0;
     for (const {selectors, styles} of rules) {
-        if (index1 > 0) { result += ','; }
+        if (ruleIndex > 0) { result += ','; }
         result += `\n${indent1}{\n${indent2}"selectors": `;
         if (selectors.length === 1) {
             result += `[${JSON.stringify(selectors[0], null, 4)}]`;
@@ -107,32 +107,33 @@ export function formatRulesJson(rules) {
             result += JSON.stringify(selectors, null, 4).replace(/\n/g, '\n' + indent2);
         }
         result += `,\n${indent2}"styles": [`;
-        let index2 = 0;
+        let styleIndex = 0;
         for (const [key, value] of styles) {
-            if (index2 > 0) { result += ','; }
+            if (styleIndex > 0) { result += ','; }
             result += `\n${indent3}[${JSON.stringify(key)}, ${JSON.stringify(value)}]`;
-            ++index2;
+            ++styleIndex;
         }
-        if (index2 > 0) { result += `\n${indent2}`; }
+        if (styleIndex > 0) { result += `\n${indent2}`; }
         result += `]\n${indent1}}`;
-        ++index1;
+        ++ruleIndex;
     }
-    if (index1 > 0) { result += '\n'; }
+    if (ruleIndex > 0) { result += '\n'; }
     result += ']';
     return result;
 }
 
 /**
- * @param {string} cssFile
- * @param {string} overridesCssFile
+ * Generates a CSS ruleset.
+ * @param {string} cssFilePath
+ * @param {string} overridesCssFilePath
  * @returns {import('css-style-applier').RawStyleData}
  * @throws {Error}
  */
-export function generateRules(cssFile, overridesCssFile) {
-    const content1 = fs.readFileSync(cssFile, {encoding: 'utf8'});
-    const content2 = fs.readFileSync(overridesCssFile, {encoding: 'utf8'});
-    const stylesheet1 = /** @type {css.StyleRules} */ (css.parse(content1, {}).stylesheet);
-    const stylesheet2 = /** @type {css.StyleRules} */ (css.parse(content2, {}).stylesheet);
+export function generateRules(cssFilePath, overridesCssFilePath) {
+    const cssFileContent = fs.readFileSync(cssFilePath, {encoding: 'utf8'});
+    const overridesCssFileContent = fs.readFileSync(overridesCssFilePath, {encoding: 'utf8'});
+    const defaultStylesheet = /** @type {css.StyleRules} */ (css.parse(cssFileContent, {}).stylesheet);
+    const overridesStylesheet = /** @type {css.StyleRules} */ (css.parse(overridesCssFileContent, {}).stylesheet);
 
     const removePropertyPattern = /^remove-property\s+([\w\W]+)$/;
     const removeRulePattern = /^remove-rule$/;
@@ -141,8 +142,7 @@ export function generateRules(cssFile, overridesCssFile) {
     /** @type {import('css-style-applier').RawStyleData} */
     const rules = [];
 
-    // Default stylesheet
-    for (const rule of stylesheet1.rules) {
+    for (const rule of defaultStylesheet.rules) {
         if (rule.type !== 'rule') { continue; }
         const {selectors, declarations} = /** @type {css.Rule} */ (rule);
         if (typeof selectors === 'undefined') { continue; }
@@ -161,8 +161,7 @@ export function generateRules(cssFile, overridesCssFile) {
         }
     }
 
-    // Overrides
-    for (const rule of stylesheet2.rules) {
+    for (const rule of overridesStylesheet.rules) {
         if (rule.type !== 'rule') { continue; }
         const {selectors, declarations} = /** @type {css.Rule} */ (rule);
         if (typeof selectors === 'undefined' || typeof declarations === 'undefined') { continue; }

@@ -311,7 +311,6 @@
         },
         {
             "name": "safari",
-            "fileName": null,
             "modifications": [
                 {
                     "action": "remove",

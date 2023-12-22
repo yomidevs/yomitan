@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2023  Yomitan Authors
- * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {yomitan} from '../yomitan.js';
+import type {Schema} from 'ajv';
 
-yomitan.trigger('dynamicLoaderSentinel', /** @type {import('dynamic-loader').DynamicLoaderSentinelDetails} */ ({scriptUrl: import.meta.url}));
+export type JsonInfo = {
+    files: JsonFileInfo[];
+};
+
+export type JsonFileInfo = JsonFileIgnoreInfo | JsonFileParseInfo;
+
+export type JsonFileIgnoreInfo = {
+    path: string;
+    ignore: true;
+};
+
+export type JsonFileParseInfo = {
+    path: string;
+    ignore?: undefined;
+    typeFile: string;
+    type: string;
+    schema?: string;
+    jsconfig?: JsconfigType;
+};
+
+export type AjvSchema = Schema;
+
+export type JsconfigType = 'main' | 'dev' | 'test';

@@ -16,16 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Frontend} from '../app/frontend.js';
-import {PopupFactory} from '../app/popup-factory.js';
 import {ThemeController} from '../app/theme-controller.js';
 import {FrameEndpoint} from '../comm/frame-endpoint.js';
 import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, log, promiseTimeout} from '../core.js';
 import {PopupMenu} from '../dom/popup-menu.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
 import {ScrollElement} from '../dom/scroll-element.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {TextScanner} from '../language/text-scanner.js';
-import {dynamicLoader} from '../script/dynamic-loader.js';
 import {yomitan} from '../yomitan.js';
 import {DisplayContentManager} from './display-content-manager.js';
 import {DisplayGenerator} from './display-generator.js';
@@ -62,7 +60,7 @@ export class Display extends EventDispatcher {
         /** @type {import('../input/hotkey-handler.js').HotkeyHandler} */
         this._hotkeyHandler = hotkeyHandler;
         /** @type {HTMLElement} */
-        this._container = /** @type {HTMLElement} */ (document.querySelector('#dictionary-entries'));
+        this._container = querySelectorNotNull(document, '#dictionary-entries');
         /** @type {import('dictionary').DictionaryEntry[]} */
         this._dictionaryEntries = [];
         /** @type {HTMLElement[]} */
@@ -116,7 +114,7 @@ export class Display extends EventDispatcher {
         /** @type {number} */
         this._queryOffset = 0;
         /** @type {HTMLElement} */
-        this._progressIndicator = /** @type {HTMLElement} */ (document.querySelector('#progress-indicator'));
+        this._progressIndicator = querySelectorNotNull(document, '#progress-indicator');
         /** @type {?import('core').Timeout} */
         this._progressIndicatorTimer = null;
         /** @type {DynamicProperty<boolean>} */
@@ -126,25 +124,25 @@ export class Display extends EventDispatcher {
         /** @type {?boolean} */
         this._queryParserVisibleOverride = null;
         /** @type {HTMLElement} */
-        this._queryParserContainer = /** @type {HTMLElement} */ (document.querySelector('#query-parser-container'));
+        this._queryParserContainer = querySelectorNotNull(document, '#query-parser-container');
         /** @type {QueryParser} */
         this._queryParser = new QueryParser({
             getSearchContext: this._getSearchContext.bind(this),
             japaneseUtil
         });
         /** @type {HTMLElement} */
-        this._contentScrollElement = /** @type {HTMLElement} */ (document.querySelector('#content-scroll'));
+        this._contentScrollElement = querySelectorNotNull(document, '#content-scroll');
         /** @type {HTMLElement} */
-        this._contentScrollBodyElement = /** @type {HTMLElement} */ (document.querySelector('#content-body'));
+        this._contentScrollBodyElement = querySelectorNotNull(document, '#content-body');
         /** @type {ScrollElement} */
         this._windowScroll = new ScrollElement(this._contentScrollElement);
-        /** @type {HTMLButtonElement} */
-        this._closeButton = /** @type {HTMLButtonElement} */ (document.querySelector('#close-button'));
-        /** @type {HTMLButtonElement} */
-        this._navigationPreviousButton = /** @type {HTMLButtonElement} */ (document.querySelector('#navigate-previous-button'));
-        /** @type {HTMLButtonElement} */
-        this._navigationNextButton = /** @type {HTMLButtonElement} */ (document.querySelector('#navigate-next-button'));
-        /** @type {?Frontend} */
+        /** @type {?HTMLButtonElement} */
+        this._closeButton = document.querySelector('#close-button');
+        /** @type {?HTMLButtonElement} */
+        this._navigationPreviousButton = document.querySelector('#navigate-previous-button');
+        /** @type {?HTMLButtonElement} */
+        this._navigationNextButton = document.querySelector('#navigate-next-button');
+        /** @type {?import('../app/frontend.js').Frontend} */
         this._frontend = null;
         /** @type {?Promise<void>} */
         this._frontendSetupPromise = null;
@@ -171,7 +169,7 @@ export class Display extends EventDispatcher {
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._tagNotification = null;
         /** @type {HTMLElement} */
-        this._footerNotificationContainer = /** @type {HTMLElement} */ (document.querySelector('#content-footer'));
+        this._footerNotificationContainer = querySelectorNotNull(document, '#content-footer');
         /** @type {OptionToggleHotkeyHandler} */
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         /** @type {ElementOverflowController} */
@@ -179,7 +177,7 @@ export class Display extends EventDispatcher {
         /** @type {boolean} */
         this._frameVisible = (pageType === 'search');
         /** @type {HTMLElement} */
-        this._menuContainer = /** @type {HTMLElement} */ (document.querySelector('#popup-menus'));
+        this._menuContainer = querySelectorNotNull(document, '#popup-menus');
         /** @type {(event: MouseEvent) => void} */
         this._onEntryClickBind = this._onEntryClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
@@ -195,6 +193,7 @@ export class Display extends EventDispatcher {
         /** @type {ThemeController} */
         this._themeController = new ThemeController(document.documentElement);
 
+        /* eslint-disable no-multi-spaces */
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
             ['nextEntry',         this._onHotkeyActionMoveRelative.bind(this, 1)],
@@ -208,16 +207,17 @@ export class Display extends EventDispatcher {
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
         ]);
         this.registerDirectMessageHandlers([
-            ['Display.setOptionsContext', {async: true,  handler: this._onMessageSetOptionsContext.bind(this)}],
-            ['Display.setContent',        {async: false, handler: this._onMessageSetContent.bind(this)}],
-            ['Display.setCustomCss',      {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
-            ['Display.setContentScale',   {async: false, handler: this._onMessageSetContentScale.bind(this)}],
-            ['Display.configure',         {async: true,  handler: this._onMessageConfigure.bind(this)}],
-            ['Display.visibilityChanged', {async: false, handler: this._onMessageVisibilityChanged.bind(this)}]
+            ['Display.setOptionsContext', this._onMessageSetOptionsContext.bind(this)],
+            ['Display.setContent',        this._onMessageSetContent.bind(this)],
+            ['Display.setCustomCss',      this._onMessageSetCustomCss.bind(this)],
+            ['Display.setContentScale',   this._onMessageSetContentScale.bind(this)],
+            ['Display.configure',         this._onMessageConfigure.bind(this)],
+            ['Display.visibilityChanged', this._onMessageVisibilityChanged.bind(this)]
         ]);
         this.registerWindowMessageHandlers([
-            ['Display.extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
+            ['Display.extensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
         ]);
+        /* eslint-enable no-multi-spaces */
     }
 
     /** @type {DisplayGenerator} */
@@ -328,7 +328,7 @@ export class Display extends EventDispatcher {
         this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
         yomitan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         yomitan.crossFrame.registerHandlers([
-            ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
+            ['popupMessage', this._onDirectMessage.bind(this)]
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
 
@@ -506,7 +506,7 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {import('core').MessageHandlerArray} handlers
+     * @param {import('core').MessageHandlerMapInit} handlers
      */
     registerDirectMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {
@@ -515,7 +515,7 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {import('core').MessageHandlerArray} handlers
+     * @param {import('core').MessageHandlerMapInit} handlers
      */
     registerWindowMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {
@@ -585,7 +585,7 @@ export class Display extends EventDispatcher {
      * @param {import('core').SerializableObject} [params]
      * @returns {Promise<TReturn>}
      */
-    async invokeContentOrigin(action, params={}) {
+    async invokeContentOrigin(action, params = {}) {
         if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
             throw new Error('Content origin is same page');
         }
@@ -601,7 +601,7 @@ export class Display extends EventDispatcher {
      * @param {import('core').SerializableObject} [params]
      * @returns {Promise<TReturn>}
      */
-    async invokeParentFrame(action, params={}) {
+    async invokeParentFrame(action, params = {}) {
         if (this._parentFrameId === null || this._parentFrameId === this._frameId) {
             throw new Error('Invalid parent frame');
         }
@@ -638,22 +638,17 @@ export class Display extends EventDispatcher {
 
     /**
      * @param {import('frame-client').Message<import('display').MessageDetails>} data
-     * @returns {import('core').MessageHandlerAsyncResult}
+     * @returns {import('core').MessageHandlerResult}
      * @throws {Error}
      */
     _onDirectMessage(data) {
         const {action, params} = this._authenticateMessageData(data);
-        const handlerInfo = this._directMessageHandlers.get(action);
-        if (typeof handlerInfo === 'undefined') {
+        const handler = this._directMessageHandlers.get(action);
+        if (typeof handler === 'undefined') {
             throw new Error(`Invalid action: ${action}`);
         }
 
-        const {async, handler} = handlerInfo;
-        const result = handler(params);
-        return {
-            async: typeof async === 'boolean' && async,
-            result
-        };
+        return handler(params);
     }
 
     /**
@@ -1041,7 +1036,8 @@ export class Display extends EventDispatcher {
         const node = /** @type {HTMLElement} */ (e.currentTarget);
 
         const menuContainerNode = /** @type {HTMLElement} */ (this._displayGenerator.instantiateTemplate('dictionary-entry-popup-menu'));
-        const menuBodyNode = /** @type {HTMLElement} */ (menuContainerNode.querySelector('.popup-menu-body'));
+        /** @type {HTMLElement} */
+        const menuBodyNode = querySelectorNotNull(menuContainerNode, '.popup-menu-body');
 
         /**
          * @param {string} menuAction
@@ -1049,7 +1045,9 @@ export class Display extends EventDispatcher {
          */
         const addItem = (menuAction, label) => {
             const item = /** @type {HTMLElement} */ (this._displayGenerator.instantiateTemplate('dictionary-entry-popup-menu-item'));
-            /** @type {HTMLElement} */ (item.querySelector('.popup-menu-item-label')).textContent = label;
+            /** @type {HTMLElement} */
+            const labelElement = querySelectorNotNull(item, '.popup-menu-item-label');
+            labelElement.textContent = label;
             item.dataset.menuAction = menuAction;
             menuBodyNode.appendChild(item);
         };
@@ -1291,7 +1289,8 @@ export class Display extends EventDispatcher {
 
     /** */
     _setContentExtensionUnloaded() {
-        const errorExtensionUnloaded = /** @type {?HTMLElement} */ (document.querySelector('#error-extension-unloaded'));
+        /** @type {?HTMLElement} */
+        const errorExtensionUnloaded = document.querySelector('#error-extension-unloaded');
 
         if (this._container !== null) {
             this._container.hidden = true;
@@ -1323,7 +1322,8 @@ export class Display extends EventDispatcher {
      * @param {boolean} visible
      */
     _setNoContentVisible(visible) {
-        const noResults = /** @type {?HTMLElement} */ (document.querySelector('#no-results'));
+        /** @type {?HTMLElement} */
+        const noResults = document.querySelector('#no-results');
 
         if (noResults !== null) {
             noResults.hidden = !visible;
@@ -1699,7 +1699,7 @@ export class Display extends EventDispatcher {
             }
         }
 
-        /** @type {Frontend} */ (this._frontend).setDisabledOverride(!isEnabled);
+        /** @type {import('../app/frontend.js').Frontend} */ (this._frontend).setDisabledOverride(!isEnabled);
     }
 
     /** */
@@ -1712,16 +1712,9 @@ export class Display extends EventDispatcher {
         const parentPopupId = this._parentPopupId;
         const parentFrameId = this._parentFrameId;
 
-        await dynamicLoader.loadScripts([
-            '/js/language/text-scanner.js',
-            '/js/comm/frame-client.js',
-            '/js/app/popup.js',
-            '/js/app/popup-proxy.js',
-            '/js/app/popup-window.js',
-            '/js/app/popup-factory.js',
-            '/js/comm/frame-ancestry-handler.js',
-            '/js/comm/frame-offset-forwarder.js',
-            '/js/app/frontend.js'
+        const [{PopupFactory}, {Frontend}] = await Promise.all([
+            import('../app/popup-factory.js'),
+            import('../app/frontend.js')
         ]);
 
         const popupFactory = new PopupFactory(this._frameId);

@@ -88,15 +88,17 @@ export class Yomitan extends EventDispatcher {
         /** @type {?(() => void)} */
         this._isBackendReadyPromiseResolve = resolve;
 
+        /* eslint-disable no-multi-spaces */
         /** @type {import('core').MessageHandlerMap} */
-        this._messageHandlers = new Map(/** @type {import('core').MessageHandlerArray} */ ([
-            ['Yomitan.isReady',         {async: false, handler: this._onMessageIsReady.bind(this)}],
-            ['Yomitan.backendReady',    {async: false, handler: this._onMessageBackendReady.bind(this)}],
-            ['Yomitan.getUrl',          {async: false, handler: this._onMessageGetUrl.bind(this)}],
-            ['Yomitan.optionsUpdated',  {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
-            ['Yomitan.databaseUpdated', {async: false, handler: this._onMessageDatabaseUpdated.bind(this)}],
-            ['Yomitan.zoomChanged',     {async: false, handler: this._onMessageZoomChanged.bind(this)}]
+        this._messageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
+            ['Yomitan.isReady',         this._onMessageIsReady.bind(this)],
+            ['Yomitan.backendReady',    this._onMessageBackendReady.bind(this)],
+            ['Yomitan.getUrl',          this._onMessageGetUrl.bind(this)],
+            ['Yomitan.optionsUpdated',  this._onMessageOptionsUpdated.bind(this)],
+            ['Yomitan.databaseUpdated', this._onMessageDatabaseUpdated.bind(this)],
+            ['Yomitan.zoomChanged',     this._onMessageZoomChanged.bind(this)]
         ]));
+        /* eslint-enable no-multi-spaces */
     }
 
     /**
@@ -140,7 +142,7 @@ export class Yomitan extends EventDispatcher {
      * Prepares the instance for use.
      * @param {boolean} [isBackground=false] Assigns whether this instance is being used from the background page/service worker.
      */
-    async prepare(isBackground=false) {
+    async prepare(isBackground = false) {
         this._isBackground = isBackground;
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
 

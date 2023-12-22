@@ -28,7 +28,7 @@ export class DisplayGenerator {
     /**
      * @param {import('display').DisplayGeneratorConstructorDetails} details
      */
-    constructor({japaneseUtil, contentManager, hotkeyHelpController=null}) {
+    constructor({japaneseUtil, contentManager, hotkeyHelpController = null}) {
         /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
         /** @type {import('./display-content-manager.js').DisplayContentManager} */
@@ -845,7 +845,7 @@ export class DisplayGenerator {
     }
 
     /**
-     * @template TItem
+     * @template [TItem=unknown]
      * @template [TExtraArg=void]
      * @param {HTMLElement} container
      * @param {(item: TItem, arg: TExtraArg) => ?Node} createItem
@@ -882,13 +882,13 @@ export class DisplayGenerator {
     _appendFurigana(container, term, reading, addText) {
         container.lang = 'ja';
         const segments = this._japaneseUtil.distributeFurigana(term, reading);
-        for (const {text, reading: reading2} of segments) {
-            if (reading2) {
+        for (const {text, reading: furigana} of segments) {
+            if (furigana) {
                 const ruby = document.createElement('ruby');
                 const rt = document.createElement('rt');
                 addText(ruby, text);
                 ruby.appendChild(rt);
-                rt.appendChild(document.createTextNode(reading2));
+                rt.appendChild(document.createTextNode(furigana));
                 container.appendChild(ruby);
             } else {
                 addText(container, text);

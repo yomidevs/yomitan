@@ -20,16 +20,15 @@ import {IDBFactory, IDBKeyRange} from 'fake-indexeddb';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {createDictionaryArchive} from '../dev/util.js';
 import {DictionaryDatabase} from '../ext/js/language/dictionary-database.js';
-import {DictionaryImporterMediaLoader} from '../ext/js/language/dictionary-importer-media-loader.js';
 import {DictionaryImporter} from '../ext/js/language/dictionary-importer.js';
+import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
-
-vi.mock('../ext/js/language/dictionary-importer-media-loader.js');
 
 /**
  * @param {string} dictionary
@@ -107,10 +106,12 @@ function countKanjiWithCharacter(kanji, character) {
 
 /** */
 async function testDatabase1() {
-    test('Database1', async () => {    // Load dictionary data
+    test('Database1', async () => {
+        // Load dictionary data
         const testDictionary = createTestDictionaryArchive('valid-dictionary1');
         const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
-        const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
+        /** @type {import('dictionary-data').Index} */
+        const testDictionaryIndex = parseJson(await testDictionary.files['index.json'].async('string'));
 
         const title = testDictionaryIndex.title;
         const titles = new Map([
@@ -849,10 +850,12 @@ async function testFindTagForTitle1(database, title) {
 
 /** */
 async function testDatabase2() {
-    test('Database2', async () => {    // Load dictionary data
+    test('Database2', async () => {
+        // Load dictionary data
         const testDictionary = createTestDictionaryArchive('valid-dictionary1');
         const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
-        const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
+        /** @type {import('dictionary-data').Index} */
+        const testDictionaryIndex = parseJson(await testDictionary.files['index.json'].async('string'));
 
         const title = testDictionaryIndex.title;
         const titles = new Map([

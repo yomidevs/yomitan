@@ -15,6 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type DynamicLoaderSentinelDetails = {
-    scriptUrl: string;
+export type TestData = {
+    node: string;
+    offset: number;
+    length: number;
+    forcePreserveWhitespace?: boolean;
+    generateLayoutContent?: boolean;
+    reversible?: boolean;
+    expected: {
+        node: string;
+        offset: number;
+        content: string;
+        remainder?: number;
+    };
 };
+

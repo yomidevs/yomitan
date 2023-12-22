@@ -29,7 +29,7 @@ export type InvokeDetails<TResponseRaw = unknown, TResponse = unknown> = {
     formatResult: ((result: TResponseRaw) => TResponse) | null;
 };
 
-export type MessageCompleteData<TResponseRaw> = {
+export type MessageCompleteData<TResponseRaw = unknown> = {
     action: 'complete';
     params: MessageCompleteParams<TResponseRaw>;
 };
@@ -44,7 +44,7 @@ export type MessageGetImageDetailsData = {
     params: MessageGetImageDetailsParams;
 };
 
-export type MessageCompleteParams<TResponseRaw> = Core.Response<TResponseRaw>;
+export type MessageCompleteParams<TResponseRaw = unknown> = Core.Response<TResponseRaw>;
 
 export type MessageProgressParams = {
     args: unknown[];
@@ -56,7 +56,7 @@ export type MessageGetImageDetailsParams = {
     mediaType: string;
 };
 
-export type MessageData<TResponseRaw> = MessageCompleteData<TResponseRaw> | MessageProgressData | MessageGetImageDetailsData;
+export type MessageData<TResponseRaw = unknown> = MessageCompleteData<TResponseRaw> | MessageProgressData | MessageGetImageDetailsData;
 
 export type MessageCompleteResultSerialized = {
     result: DictionaryImporter.Summary;

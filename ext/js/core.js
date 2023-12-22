@@ -47,107 +47,97 @@ export function stringReverse(string) {
 }
 
 /**
- * Creates a deep clone of an object or value. This is similar to `JSON.parse(JSON.stringify(value))`.
- * @template T
+ * Creates a deep clone of an object or value. This is similar to `parseJson(JSON.stringify(value))`.
+ * @template [T=unknown]
  * @param {T} value The value to clone.
  * @returns {T} A new clone of the value.
  * @throws An error if the value is circular and cannot be cloned.
  */
-export const clone = (() => {
-    /**
-     * @template T
-     * @param {T} value
-     * @returns {T}
-     */
-    // eslint-disable-next-line no-shadow, @typescript-eslint/no-shadow
-    function clone(value) {
-        if (value === null) { return /** @type {T} */ (null); }
-        switch (typeof value) {
-            case 'boolean':
-            case 'number':
-            case 'string':
-            case 'bigint':
-            case 'symbol':
-            case 'undefined':
-                return value;
-            default:
-                return cloneInternal(value, new Set());
-        }
+export function clone(value) {
+    if (value === null) { return /** @type {T} */ (null); }
+    switch (typeof value) {
+        case 'boolean':
+        case 'number':
+        case 'string':
+        case 'bigint':
+        case 'symbol':
+        case 'undefined':
+            return value;
+        default:
+            return cloneInternal(value, new Set());
     }
+}
 
-    /**
-     * @template [T=unknown]
-     * @param {T} value
-     * @param {Set<unknown>} visited
-     * @returns {T}
-     * @throws {Error}
-     */
-    function cloneInternal(value, visited) {
-        if (value === null) { return /** @type {T} */ (null); }
-        switch (typeof value) {
-            case 'boolean':
-            case 'number':
-            case 'string':
-            case 'bigint':
-            case 'symbol':
-            case 'undefined':
-                return value;
-            case 'object':
-                return /** @type {T} */ (
+/**
+ * @template [T=unknown]
+ * @param {T} value
+ * @param {Set<unknown>} visited
+ * @returns {T}
+ * @throws {Error}
+ */
+function cloneInternal(value, visited) {
+    if (value === null) { return /** @type {T} */ (null); }
+    switch (typeof value) {
+        case 'boolean':
+        case 'number':
+        case 'string':
+        case 'bigint':
+        case 'symbol':
+        case 'undefined':
+            return value;
+        case 'object':
+            return /** @type {T} */ (
                     Array.isArray(value) ?
                     cloneArray(value, visited) :
                     cloneObject(/** @type {import('core').SerializableObject} */ (value), visited)
-                );
-            default:
-                throw new Error(`Cannot clone object of type ${typeof value}`);
-        }
+            );
+        default:
+            throw new Error(`Cannot clone object of type ${typeof value}`);
     }
+}
 
-    /**
-     * @param {unknown[]} value
-     * @param {Set<unknown>} visited
-     * @returns {unknown[]}
-     * @throws {Error}
-     */
-    function cloneArray(value, visited) {
-        if (visited.has(value)) { throw new Error('Circular'); }
-        try {
-            visited.add(value);
-            const result = [];
-            for (const item of value) {
-                result.push(cloneInternal(item, visited));
+/**
+ * @param {unknown[]} value
+ * @param {Set<unknown>} visited
+ * @returns {unknown[]}
+ * @throws {Error}
+ */
+function cloneArray(value, visited) {
+    if (visited.has(value)) { throw new Error('Circular'); }
+    try {
+        visited.add(value);
+        const result = [];
+        for (const item of value) {
+            result.push(cloneInternal(item, visited));
+        }
+        return result;
+    } finally {
+        visited.delete(value);
+    }
+}
+
+/**
+ * @param {import('core').SerializableObject} value
+ * @param {Set<unknown>} visited
+ * @returns {import('core').SerializableObject}
+ * @throws {Error}
+ */
+function cloneObject(value, visited) {
+    if (visited.has(value)) { throw new Error('Circular'); }
+    try {
+        visited.add(value);
+        /** @type {import('core').SerializableObject} */
+        const result = {};
+        for (const key in value) {
+            if (Object.prototype.hasOwnProperty.call(value, key)) {
+                result[key] = cloneInternal(value[key], visited);
             }
-            return result;
-        } finally {
-            visited.delete(value);
         }
+        return result;
+    } finally {
+        visited.delete(value);
     }
-
-    /**
-     * @param {import('core').SerializableObject} value
-     * @param {Set<unknown>} visited
-     * @returns {import('core').SerializableObject}
-     * @throws {Error}
-     */
-    function cloneObject(value, visited) {
-        if (visited.has(value)) { throw new Error('Circular'); }
-        try {
-            visited.add(value);
-            /** @type {import('core').SerializableObject} */
-            const result = {};
-            for (const key in value) {
-                if (Object.prototype.hasOwnProperty.call(value, key)) {
-                    result[key] = cloneInternal(value[key], visited);
-                }
-            }
-            return result;
-        } finally {
-            visited.delete(value);
-        }
-    }
-
-    return clone;
-})();
+}
 
 /**
  * Checks if an object or value is deeply equal to another object or value.
@@ -155,98 +145,88 @@ export const clone = (() => {
  * @param {unknown} value2 The second value to check.
  * @returns {boolean} `true` if the values are the same object, or deeply equal without cycles. `false` otherwise.
  */
-export const deepEqual = (() => {
-    /**
-     * @param {unknown} value1
-     * @param {unknown} value2
-     * @returns {boolean}
-     */
-    // eslint-disable-next-line no-shadow, @typescript-eslint/no-shadow
-    function deepEqual(value1, value2) {
-        if (value1 === value2) { return true; }
+export function deepEqual(value1, value2) {
+    if (value1 === value2) { return true; }
 
-        const type = typeof value1;
-        if (typeof value2 !== type) { return false; }
+    const type = typeof value1;
+    if (typeof value2 !== type) { return false; }
 
-        switch (type) {
-            case 'object':
-            case 'function':
-                return deepEqualInternal(value1, value2, new Set());
-            default:
-                return false;
-        }
+    switch (type) {
+        case 'object':
+        case 'function':
+            return deepEqualInternal(value1, value2, new Set());
+        default:
+            return false;
     }
+}
 
-    /**
-     * @param {unknown} value1
-     * @param {unknown} value2
-     * @param {Set<unknown>} visited1
-     * @returns {boolean}
-     */
-    function deepEqualInternal(value1, value2, visited1) {
-        if (value1 === value2) { return true; }
+/**
+ * @param {unknown} value1
+ * @param {unknown} value2
+ * @param {Set<unknown>} visited1
+ * @returns {boolean}
+ */
+function deepEqualInternal(value1, value2, visited1) {
+    if (value1 === value2) { return true; }
 
-        const type = typeof value1;
-        if (typeof value2 !== type) { return false; }
+    const type = typeof value1;
+    if (typeof value2 !== type) { return false; }
 
-        switch (type) {
-            case 'object':
-            case 'function':
-            {
-                if (value1 === null || value2 === null) { return false; }
-                const array = Array.isArray(value1);
-                if (array !== Array.isArray(value2)) { return false; }
-                if (visited1.has(value1)) { return false; }
-                visited1.add(value1);
-                return (
+    switch (type) {
+        case 'object':
+        case 'function':
+        {
+            if (value1 === null || value2 === null) { return false; }
+            const array = Array.isArray(value1);
+            if (array !== Array.isArray(value2)) { return false; }
+            if (visited1.has(value1)) { return false; }
+            visited1.add(value1);
+            return (
                     array ?
                     areArraysEqual(/** @type {unknown[]} */ (value1), /** @type {unknown[]} */ (value2), visited1) :
                     areObjectsEqual(/** @type {import('core').UnknownObject} */ (value1), /** @type {import('core').UnknownObject} */ (value2), visited1)
-                );
-            }
-            default:
-                return false;
+            );
         }
+        default:
+            return false;
+    }
+}
+
+/**
+ * @param {import('core').UnknownObject} value1
+ * @param {import('core').UnknownObject} value2
+ * @param {Set<unknown>} visited1
+ * @returns {boolean}
+ */
+function areObjectsEqual(value1, value2, visited1) {
+    const keys1 = Object.keys(value1);
+    const keys2 = Object.keys(value2);
+    if (keys1.length !== keys2.length) { return false; }
+
+    const keys1Set = new Set(keys1);
+    for (const key of keys2) {
+        if (!keys1Set.has(key) || !deepEqualInternal(value1[key], value2[key], visited1)) { return false; }
     }
 
-    /**
-     * @param {import('core').UnknownObject} value1
-     * @param {import('core').UnknownObject} value2
-     * @param {Set<unknown>} visited1
-     * @returns {boolean}
-     */
-    function areObjectsEqual(value1, value2, visited1) {
-        const keys1 = Object.keys(value1);
-        const keys2 = Object.keys(value2);
-        if (keys1.length !== keys2.length) { return false; }
+    return true;
+}
 
-        const keys1Set = new Set(keys1);
-        for (const key of keys2) {
-            if (!keys1Set.has(key) || !deepEqualInternal(value1[key], value2[key], visited1)) { return false; }
-        }
+/**
+ * @param {unknown[]} value1
+ * @param {unknown[]} value2
+ * @param {Set<unknown>} visited1
+ * @returns {boolean}
+ */
+function areArraysEqual(value1, value2, visited1) {
+    const length = value1.length;
+    if (length !== value2.length) { return false; }
 
-        return true;
+    for (let i = 0; i < length; ++i) {
+        if (!deepEqualInternal(value1[i], value2[i], visited1)) { return false; }
     }
 
-    /**
-     * @param {unknown[]} value1
-     * @param {unknown[]} value2
-     * @param {Set<unknown>} visited1
-     * @returns {boolean}
-     */
-    function areArraysEqual(value1, value2, visited1) {
-        const length = value1.length;
-        if (length !== value2.length) { return false; }
-
-        for (let i = 0; i < length; ++i) {
-            if (!deepEqualInternal(value1[i], value2[i], visited1)) { return false; }
-        }
-
-        return true;
-    }
-
-    return deepEqual;
-})();
+    return true;
+}
 
 /**
  * Creates a new base-16 (lower case) string of a sequence of random bytes of the given length.
@@ -265,7 +245,7 @@ export function generateId(length) {
 
 /**
  * Creates an unresolved promise that can be resolved later, outside the promise's executor function.
- * @template T
+ * @template [T=unknown]
  * @returns {import('core').DeferredPromiseDetails<T>} An object `{promise, resolve, reject}`, containing the promise and the resolve/reject functions.
  */
 export function deferPromise() {
@@ -344,7 +324,7 @@ export function promiseAnimationFrame(timeout) {
  * Invokes a standard message handler. This function is used to react and respond
  * to communication messages within the extension.
  * @template {import('core').SafeAny} TParams
- * @param {import('core').MessageHandlerDetails} details Details about how to handle messages.
+ * @param {import('core').MessageHandler} handler The message handler function.
  * @param {TParams} params Information which was passed with the original message.
  * @param {(response: import('core').Response) => void} callback A callback function which is invoked after the handler has completed. The value passed
  *   to the function is in the format:
@@ -353,13 +333,10 @@ export function promiseAnimationFrame(timeout) {
  * @param {...*} extraArgs Additional arguments which are passed to the `handler` function.
  * @returns {boolean} `true` if the function is invoked asynchronously, `false` otherwise.
  */
-export function invokeMessageHandler({handler, async}, params, callback, ...extraArgs) {
+export function invokeMessageHandler(handler, params, callback, ...extraArgs) {
     try {
-        let promiseOrResult = handler(params, ...extraArgs);
-        if (async === 'dynamic') {
-            ({async, result: promiseOrResult} = promiseOrResult);
-        }
-        if (async) {
+        const promiseOrResult = handler(params, ...extraArgs);
+        if (promiseOrResult instanceof Promise) {
             /** @type {Promise<any>} */ (promiseOrResult).then(
                 (result) => { callback({result}); },
                 (error) => { callback({error: ExtensionError.serialize(error)}); }
@@ -534,7 +511,7 @@ export class EventListenerCollection {
 /**
  * Class representing a generic value with an override stack.
  * Changes can be observed by listening to the 'change' event.
- * @template T
+ * @template [T=unknown]
  * @augments EventDispatcher<import('dynamic-property').EventType>
  */
 export class DynamicProperty extends EventDispatcher {
@@ -600,7 +577,7 @@ export class DynamicProperty extends EventDispatcher {
      * @returns {import('core').TokenString} A string token which can be passed to the clearOverride function
      *   to remove the override.
      */
-    setOverride(value, priority=0) {
+    setOverride(value, priority = 0) {
         const overridesCount = this._overrides.length;
         let i = 0;
         for (; i < overridesCount; ++i) {
@@ -670,7 +647,7 @@ export class Logger extends EventDispatcher {
      *   Other values will be logged at a non-error level.
      * @param {?import('log').LogContext} [context] An optional context object for the error which should typically include a `url` field.
      */
-    log(error, level, context=null) {
+    log(error, level, context = null) {
         if (typeof context !== 'object' || context === null) {
             context = {url: location.href};
         }
@@ -745,7 +722,7 @@ export class Logger extends EventDispatcher {
      * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
      * @param {?import('log').LogContext} context An optional context object for the error which should typically include a `url` field.
      */
-    warn(error, context=null) {
+    warn(error, context = null) {
         this.log(error, 'warn', context);
     }
 
@@ -754,7 +731,7 @@ export class Logger extends EventDispatcher {
      * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
      * @param {?import('log').LogContext} context An optional context object for the error which should typically include a `url` field.
      */
-    error(error, context=null) {
+    error(error, context = null) {
         this.log(error, 'error', context);
     }
 }

@@ -26,6 +26,7 @@ import {
 } from '../../lib/zip.js';
 import {stringReverse} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {parseJson} from '../core/json.js';
 import {MediaUtil} from '../media/media-util.js';
 
 const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
@@ -89,7 +90,7 @@ export class DictionaryImporter {
         const indexFile2 = /** @type {import('@zip.js/zip.js').Entry} */ (indexFile);
 
         const indexContent = await this._getData(indexFile2, new TextWriter());
-        const index = /** @type {import('dictionary-data').Index} */ (JSON.parse(indexContent));
+        const index = /** @type {import('dictionary-data').Index} */ (parseJson(indexContent));
 
         if (!ajvSchemas.dictionaryIndex(index)) {
             throw this._formatAjvSchemaError(ajvSchemas.dictionaryIndex, indexFileName);
@@ -112,11 +113,15 @@ export class DictionaryImporter {
         const dataBankSchemas = this._getDataBankSchemas(version);
 
         // Files
-        const termFiles      = this._getArchiveFiles(fileMap, 'term_bank_?.json');
-        const termMetaFiles  = this._getArchiveFiles(fileMap, 'term_meta_bank_?.json');
-        const kanjiFiles     = this._getArchiveFiles(fileMap, 'kanji_bank_?.json');
-        const kanjiMetaFiles = this._getArchiveFiles(fileMap, 'kanji_meta_bank_?.json');
-        const tagFiles       = this._getArchiveFiles(fileMap, 'tag_bank_?.json');
+        /** @type {import('dictionary-importer').QueryDetails} */
+        const queryDetails = new Map([
+            ['termFiles', /^term_bank_(\d+)\.json$/],
+            ['termMetaFiles', /^term_meta_bank_(\d+)\.json$/],
+            ['kanjiFiles', /^kanji_bank_(\d+)\.json$/],
+            ['kanjiMetaFiles', /^kanji_meta_bank_(\d+)\.json$/],
+            ['tagFiles', /^tag_bank_(\d+)\.json$/]
+        ]);
+        const {termFiles, termMetaFiles, kanjiFiles, kanjiMetaFiles, tagFiles} = Object.fromEntries(this._getArchiveFiles(fileMap, queryDetails));
 
         // Load data
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
@@ -540,7 +545,7 @@ export class DictionaryImporter {
          */
         const createError = (message) => {
             const {expression, reading} = entry;
-            const readingSource = reading.length > 0 ? ` (${reading})`: '';
+            const readingSource = reading.length > 0 ? ` (${reading})` : '';
             return new Error(`${message} at path ${JSON.stringify(path)} for ${expression}${readingSource} in ${dictionary}`);
         };
 
@@ -588,25 +593,6 @@ export class DictionaryImporter {
         media.set(path, mediaData);
 
         return mediaData;
-    }
-
-    /**
-     * @param {string} url
-     * @returns {Promise<unknown>}
-     */
-    async _fetchJsonAsset(url) {
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.status}`);
-        }
-        return await response.json();
     }
 
     /**
@@ -699,18 +685,24 @@ export class DictionaryImporter {
 
     /**
      * @param {import('dictionary-importer').ArchiveFileMap} fileMap
-     * @param {string} fileNameFormat
-     * @returns {import('@zip.js/zip.js').Entry[]}
+     * @param {import('dictionary-importer').QueryDetails} queryDetails
+     * @returns {import('dictionary-importer').QueryResult}
      */
-    _getArchiveFiles(fileMap, fileNameFormat) {
-        const indexPosition = fileNameFormat.indexOf('?');
-        const prefix = fileNameFormat.substring(0, indexPosition);
-        const suffix = fileNameFormat.substring(indexPosition + 1);
-        /** @type {import('@zip.js/zip.js').Entry[]} */
-        const results = [];
+    _getArchiveFiles(fileMap, queryDetails) {
+        /** @type {import('dictionary-importer').QueryResult} */
+        const results = new Map();
         for (const [name, value] of fileMap.entries()) {
-            if (name.startsWith(prefix) && name.endsWith(suffix)) {
-                results.push(value);
+            for (const [fileType, fileNameFormat] of queryDetails.entries()) {
+                let entries = results.get(fileType);
+                if (typeof entries === 'undefined') {
+                    entries = [];
+                    results.set(fileType, entries);
+                }
+
+                if (fileNameFormat.test(name)) {
+                    entries.push(value);
+                    break;
+                }
             }
         }
         return results;
@@ -732,7 +724,7 @@ export class DictionaryImporter {
         const results = [];
         for (const file of files) {
             const content = await this._getData(file, new TextWriter());
-            const entries = /** @type {unknown} */ (JSON.parse(content));
+            const entries = /** @type {unknown} */ (parseJson(content));
 
             startIndex = progressData.index;
             this._progress();
@@ -781,7 +773,7 @@ export class DictionaryImporter {
      */
     _normalizeTermOrReading(text) {
         // Note: this function should not perform String.normalize on the text,
-        // as it will characters in an undesirable way.
+        // as it will normalize characters in an undesirable way.
         // Thus, this function is currently a no-op.
         // Example:
         // - '\u9038'.normalize('NFC') => '\u9038' (逸)

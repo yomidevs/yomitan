@@ -109,7 +109,7 @@ export class FrameAncestryHandler {
      * @param {number} [timeout]
      * @returns {Promise<number[]>}
      */
-    _getFrameAncestryInfo(timeout=5000) {
+    _getFrameAncestryInfo(timeout = 5000) {
         return new Promise((resolve, reject) => {
             const targetWindow = window.parent;
             if (window === targetWindow) {
@@ -164,7 +164,9 @@ export class FrameAncestryHandler {
             };
 
             // Start
-            yomitan.crossFrame.registerHandlers([[responseMessageId, {async: false, handler: onMessage}]]);
+            yomitan.crossFrame.registerHandlers([
+                [responseMessageId, onMessage]
+            ]);
             resetTimeout();
             const frameId = this._frameId;
             this._requestFrameInfo(targetWindow, frameId, frameId, uniqueId, nonce);

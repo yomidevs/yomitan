@@ -22,8 +22,9 @@ import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
-import {clone, deferPromise, generateId, invokeMessageHandler, isObject, log, promiseTimeout} from '../core.js';
+import {clone, deferPromise, invokeMessageHandler, isObject, log, promiseTimeout} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {readResponseJson} from '../core/json.js';
 import {AnkiUtil} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {PermissionsUtil} from '../data/permissions-util.js';
@@ -35,7 +36,6 @@ import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {MediaUtil} from '../media/media-util.js';
-import {yomitan} from '../yomitan.js';
 import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
 import {ProfileConditionsUtil} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
@@ -54,9 +54,7 @@ export class Backend {
         this._japaneseUtil = new JapaneseUtil(wanakana);
         /** @type {Environment} */
         this._environment = new Environment();
-        /**
-         *
-         */
+        /** @type {AnkiConnect} */
         this._anki = new AnkiConnect();
         /** @type {Mecab} */
         this._mecab = new Mecab();
@@ -147,64 +145,61 @@ export class Backend {
         /** @type {PermissionsUtil} */
         this._permissionsUtil = new PermissionsUtil();
 
-        /** @type {import('backend').MessageHandlerMap} */
-        this._messageHandlers = new Map(/** @type {import('backend').MessageHandlerMapInit} */ ([
-            ['requestBackendReadySignal',    {async: false, contentScript: true,  handler: this._onApiRequestBackendReadySignal.bind(this)}],
-            ['optionsGet',                   {async: false, contentScript: true,  handler: this._onApiOptionsGet.bind(this)}],
-            ['optionsGetFull',               {async: false, contentScript: true,  handler: this._onApiOptionsGetFull.bind(this)}],
-            ['kanjiFind',                    {async: true,  contentScript: true,  handler: this._onApiKanjiFind.bind(this)}],
-            ['termsFind',                    {async: true,  contentScript: true,  handler: this._onApiTermsFind.bind(this)}],
-            ['parseText',                    {async: true,  contentScript: true,  handler: this._onApiParseText.bind(this)}],
-            ['getAnkiConnectVersion',        {async: true,  contentScript: true,  handler: this._onApiGetAnkiConnectVersion.bind(this)}],
-            ['isAnkiConnected',              {async: true,  contentScript: true,  handler: this._onApiIsAnkiConnected.bind(this)}],
-            ['addAnkiNote',                  {async: true,  contentScript: true,  handler: this._onApiAddAnkiNote.bind(this)}],
-            ['getAnkiNoteInfo',              {async: true,  contentScript: true,  handler: this._onApiGetAnkiNoteInfo.bind(this)}],
-            ['injectAnkiNoteMedia',          {async: true,  contentScript: true,  handler: this._onApiInjectAnkiNoteMedia.bind(this)}],
-            ['noteView',                     {async: true,  contentScript: true,  handler: this._onApiNoteView.bind(this)}],
-            ['suspendAnkiCardsForNote',      {async: true,  contentScript: true,  handler: this._onApiSuspendAnkiCardsForNote.bind(this)}],
-            ['commandExec',                  {async: false, contentScript: true,  handler: this._onApiCommandExec.bind(this)}],
-            ['getTermAudioInfoList',         {async: true,  contentScript: true,  handler: this._onApiGetTermAudioInfoList.bind(this)}],
-            ['sendMessageToFrame',           {async: false, contentScript: true,  handler: this._onApiSendMessageToFrame.bind(this)}],
-            ['broadcastTab',                 {async: false, contentScript: true,  handler: this._onApiBroadcastTab.bind(this)}],
-            ['frameInformationGet',          {async: true,  contentScript: true,  handler: this._onApiFrameInformationGet.bind(this)}],
-            ['injectStylesheet',             {async: true,  contentScript: true,  handler: this._onApiInjectStylesheet.bind(this)}],
-            ['getStylesheetContent',         {async: true,  contentScript: true,  handler: this._onApiGetStylesheetContent.bind(this)}],
-            ['getEnvironmentInfo',           {async: false, contentScript: true,  handler: this._onApiGetEnvironmentInfo.bind(this)}],
-            ['clipboardGet',                 {async: true,  contentScript: true,  handler: this._onApiClipboardGet.bind(this)}],
-            ['getDisplayTemplatesHtml',      {async: true,  contentScript: true,  handler: this._onApiGetDisplayTemplatesHtml.bind(this)}],
-            ['getZoom',                      {async: true,  contentScript: true,  handler: this._onApiGetZoom.bind(this)}],
-            ['getDefaultAnkiFieldTemplates', {async: false, contentScript: true,  handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this)}],
-            ['getDictionaryInfo',            {async: true,  contentScript: true,  handler: this._onApiGetDictionaryInfo.bind(this)}],
-            ['purgeDatabase',                {async: true,  contentScript: false, handler: this._onApiPurgeDatabase.bind(this)}],
-            ['getMedia',                     {async: true,  contentScript: true,  handler: this._onApiGetMedia.bind(this)}],
-            ['log',                          {async: false, contentScript: true,  handler: this._onApiLog.bind(this)}],
-            ['logIndicatorClear',            {async: false, contentScript: true,  handler: this._onApiLogIndicatorClear.bind(this)}],
-            ['createActionPort',             {async: false, contentScript: true,  handler: this._onApiCreateActionPort.bind(this)}],
-            ['modifySettings',               {async: true,  contentScript: true,  handler: this._onApiModifySettings.bind(this)}],
-            ['getSettings',                  {async: false, contentScript: true,  handler: this._onApiGetSettings.bind(this)}],
-            ['setAllSettings',               {async: true,  contentScript: false, handler: this._onApiSetAllSettings.bind(this)}],
-            ['getOrCreateSearchPopup',       {async: true,  contentScript: true,  handler: this._onApiGetOrCreateSearchPopup.bind(this)}],
-            ['isTabSearchPopup',             {async: true,  contentScript: true,  handler: this._onApiIsTabSearchPopup.bind(this)}],
-            ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}],
-            ['testMecab',                    {async: true,  contentScript: true,  handler: this._onApiTestMecab.bind(this)}],
-            ['textHasJapaneseCharacters',    {async: false, contentScript: true,  handler: this._onApiTextHasJapaneseCharacters.bind(this)}],
-            ['getTermFrequencies',           {async: true,  contentScript: true,  handler: this._onApiGetTermFrequencies.bind(this)}],
-            ['findAnkiNotes',                {async: true,  contentScript: true,  handler: this._onApiFindAnkiNotes.bind(this)}],
-            ['loadExtensionScripts',         {async: true,  contentScript: true,  handler: this._onApiLoadExtensionScripts.bind(this)}],
-            ['openCrossFramePort',           {async: false, contentScript: true,  handler: this._onApiOpenCrossFramePort.bind(this)}]
+        /* eslint-disable no-multi-spaces */
+        /** @type {import('core').MessageHandlerMap} */
+        this._messageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
+            ['requestBackendReadySignal',    this._onApiRequestBackendReadySignal.bind(this)],
+            ['optionsGet',                   this._onApiOptionsGet.bind(this)],
+            ['optionsGetFull',               this._onApiOptionsGetFull.bind(this)],
+            ['kanjiFind',                    this._onApiKanjiFind.bind(this)],
+            ['termsFind',                    this._onApiTermsFind.bind(this)],
+            ['parseText',                    this._onApiParseText.bind(this)],
+            ['getAnkiConnectVersion',        this._onApiGetAnkiConnectVersion.bind(this)],
+            ['isAnkiConnected',              this._onApiIsAnkiConnected.bind(this)],
+            ['addAnkiNote',                  this._onApiAddAnkiNote.bind(this)],
+            ['getAnkiNoteInfo',              this._onApiGetAnkiNoteInfo.bind(this)],
+            ['injectAnkiNoteMedia',          this._onApiInjectAnkiNoteMedia.bind(this)],
+            ['noteView',                     this._onApiNoteView.bind(this)],
+            ['suspendAnkiCardsForNote',      this._onApiSuspendAnkiCardsForNote.bind(this)],
+            ['commandExec',                  this._onApiCommandExec.bind(this)],
+            ['getTermAudioInfoList',         this._onApiGetTermAudioInfoList.bind(this)],
+            ['sendMessageToFrame',           this._onApiSendMessageToFrame.bind(this)],
+            ['broadcastTab',                 this._onApiBroadcastTab.bind(this)],
+            ['frameInformationGet',          this._onApiFrameInformationGet.bind(this)],
+            ['injectStylesheet',             this._onApiInjectStylesheet.bind(this)],
+            ['getStylesheetContent',         this._onApiGetStylesheetContent.bind(this)],
+            ['getEnvironmentInfo',           this._onApiGetEnvironmentInfo.bind(this)],
+            ['clipboardGet',                 this._onApiClipboardGet.bind(this)],
+            ['getDisplayTemplatesHtml',      this._onApiGetDisplayTemplatesHtml.bind(this)],
+            ['getZoom',                      this._onApiGetZoom.bind(this)],
+            ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)],
+            ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
+            ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
+            ['getMedia',                     this._onApiGetMedia.bind(this)],
+            ['log',                          this._onApiLog.bind(this)],
+            ['logIndicatorClear',            this._onApiLogIndicatorClear.bind(this)],
+            ['modifySettings',               this._onApiModifySettings.bind(this)],
+            ['getSettings',                  this._onApiGetSettings.bind(this)],
+            ['setAllSettings',               this._onApiSetAllSettings.bind(this)],
+            ['getOrCreateSearchPopup',       this._onApiGetOrCreateSearchPopup.bind(this)],
+            ['isTabSearchPopup',             this._onApiIsTabSearchPopup.bind(this)],
+            ['triggerDatabaseUpdated',       this._onApiTriggerDatabaseUpdated.bind(this)],
+            ['testMecab',                    this._onApiTestMecab.bind(this)],
+            ['textHasJapaneseCharacters',    this._onApiTextHasJapaneseCharacters.bind(this)],
+            ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
+            ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
+            ['loadExtensionScripts',         this._onApiLoadExtensionScripts.bind(this)],
+            ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)]
         ]));
-        /** @type {import('backend').MessageHandlerWithProgressMap} */
-        this._messageHandlersWithProgress = new Map(/** @type {import('backend').MessageHandlerWithProgressMapInit} */ ([
-            // Empty
-        ]));
+        /* eslint-enable no-multi-spaces */
 
         /** @type {Map<string, (params?: import('core').SerializableObject) => void>} */
         this._commandHandlers = new Map(/** @type {[name: string, handler: (params?: import('core').SerializableObject) => void][]} */ ([
             ['toggleTextScanning', this._onCommandToggleTextScanning.bind(this)],
-            ['openInfoPage',       this._onCommandOpenInfoPage.bind(this)],
-            ['openSettingsPage',   this._onCommandOpenSettingsPage.bind(this)],
-            ['openSearchPage',     this._onCommandOpenSearchPage.bind(this)],
-            ['openPopupWindow',    this._onCommandOpenPopupWindow.bind(this)]
+            ['openInfoPage', this._onCommandOpenInfoPage.bind(this)],
+            ['openSettingsPage', this._onCommandOpenSettingsPage.bind(this)],
+            ['openSearchPage', this._onCommandOpenSearchPage.bind(this)],
+            ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)]
         ]));
     }
 
@@ -289,7 +284,8 @@ export class Backend {
                 log.error(e);
             }
 
-            const deinflectionReasons = /** @type {import('deinflector').ReasonsRaw} */ (await this._fetchJson('/data/deinflect.json'));
+            /** @type {import('deinflector').ReasonsRaw} */
+            const deinflectionReasons = await this._fetchJson('/data/deinflect.json');
             this._translator.prepare(deinflectionReasons);
 
             await this._optionsUtil.prepare();
@@ -329,7 +325,7 @@ export class Backend {
             text = text.substring(0, maximumSearchLength);
         }
         try {
-            const {tab, created} = await this._getOrCreateSearchPopup();
+            const {tab, created} = await this._getOrCreateSearchPopupWrapper();
             const {id} = tab;
             if (typeof id !== 'number') {
                 throw new Error('Tab does not have an id');
@@ -404,16 +400,6 @@ export class Backend {
     _onMessage({action, params}, sender, callback) {
         const messageHandler = this._messageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return false; }
-
-        if (!messageHandler.contentScript) {
-            try {
-                this._validatePrivilegedMessageSender(sender);
-            } catch (error) {
-                callback({error: ExtensionError.serialize(error)});
-                return false;
-            }
-        }
-
         return invokeMessageHandler(messageHandler, params, callback, sender);
     }
 
@@ -754,30 +740,6 @@ export class Backend {
         this._updateBadge();
     }
 
-    /** @type {import('api').Handler<import('api').CreateActionPortDetails, import('api').CreateActionPortResult, true>} */
-    _onApiCreateActionPort(_params, sender) {
-        if (!sender || !sender.tab) { throw new Error('Invalid sender'); }
-        const tabId = sender.tab.id;
-        if (typeof tabId !== 'number') { throw new Error('Sender has invalid tab ID'); }
-
-        const frameId = sender.frameId;
-        const id = generateId(16);
-        const details = {
-            name: 'action-port',
-            id
-        };
-
-        const port = chrome.tabs.connect(tabId, {name: JSON.stringify(details), frameId});
-        try {
-            this._createActionListenerPort(port, sender, this._messageHandlersWithProgress);
-        } catch (e) {
-            port.disconnect();
-            throw e;
-        }
-
-        return details;
-    }
-
     /** @type {import('api').Handler<import('api').ModifySettingsDetails, import('api').ModifySettingsResult>} */
     _onApiModifySettings({targets, source}) {
         return this._modifySettings(targets, source);
@@ -805,8 +767,8 @@ export class Backend {
     }
 
     /** @type {import('api').Handler<import('api').GetOrCreateSearchPopupDetails, import('api').GetOrCreateSearchPopupResult>} */
-    async _onApiGetOrCreateSearchPopup({focus=false, text}) {
-        const {tab, created} = await this._getOrCreateSearchPopup();
+    async _onApiGetOrCreateSearchPopup({focus = false, text}) {
+        const {tab, created} = await this._getOrCreateSearchPopupWrapper();
         if (focus === true || (focus === 'ifCreated' && created)) {
             await this._focusTab(tab);
         }
@@ -906,11 +868,13 @@ export class Backend {
             throw new Error('Port does not have an associated frame ID');
         }
 
+        /** @type {import('cross-frame-api').CrossFrameCommunicationPortDetails} */
         const sourceDetails = {
             name: 'cross-frame-communication-port',
             otherTabId: targetTabId,
             otherFrameId: targetFrameId
         };
+        /** @type {import('cross-frame-api').CrossFrameCommunicationPortDetails} */
         const targetDetails = {
             name: 'cross-frame-communication-port',
             otherTabId: sourceTabId,
@@ -965,18 +929,18 @@ export class Backend {
         const queryParams = {};
         if (query.length > 0) { queryParams.query = query; }
         const queryString = new URLSearchParams(queryParams).toString();
-        let url = baseUrl;
+        let queryUrl = baseUrl;
         if (queryString.length > 0) {
-            url += `?${queryString}`;
+            queryUrl += `?${queryString}`;
         }
 
         /** @type {import('backend').FindTabsPredicate} */
-        const predicate = ({url: url2}) => {
-            if (url2 === null || !url2.startsWith(baseUrl)) { return false; }
-            const parsedUrl = new URL(url2);
-            const baseUrl2 = `${parsedUrl.origin}${parsedUrl.pathname}`;
-            const mode2 = parsedUrl.searchParams.get('mode');
-            return baseUrl2 === baseUrl && (mode2 === mode || (!mode2 && mode === 'existingOrNewTab'));
+        const predicate = ({url}) => {
+            if (url === null || !url.startsWith(baseUrl)) { return false; }
+            const parsedUrl = new URL(url);
+            const parsedBaseUrl = `${parsedUrl.origin}${parsedUrl.pathname}`;
+            const parsedMode = parsedUrl.searchParams.get('mode');
+            return parsedBaseUrl === baseUrl && (parsedMode === mode || (!parsedMode && mode === 'existingOrNewTab'));
         };
 
         const openInTab = async () => {
@@ -1002,10 +966,10 @@ export class Backend {
                 } catch (e) {
                     // NOP
                 }
-                await this._createTab(url);
+                await this._createTab(queryUrl);
                 return;
             case 'newTab':
-                await this._createTab(url);
+                await this._createTab(queryUrl);
                 return;
         }
     }
@@ -1077,9 +1041,9 @@ export class Backend {
     /**
      * @returns {Promise<{tab: chrome.tabs.Tab, created: boolean}>}
      */
-    _getOrCreateSearchPopup() {
+    _getOrCreateSearchPopupWrapper() {
         if (this._searchPopupTabCreatePromise === null) {
-            const promise = this._getOrCreateSearchPopup2();
+            const promise = this._getOrCreateSearchPopup();
             this._searchPopupTabCreatePromise = promise;
             promise.then(() => { this._searchPopupTabCreatePromise = null; });
         }
@@ -1089,7 +1053,7 @@ export class Backend {
     /**
      * @returns {Promise<{tab: chrome.tabs.Tab, created: boolean}>}
      */
-    async _getOrCreateSearchPopup2() {
+    async _getOrCreateSearchPopup() {
         // Use existing tab
         const baseUrl = chrome.runtime.getURL('/search.html');
         /**
@@ -1489,106 +1453,6 @@ export class Backend {
     }
 
     /**
-     * @param {chrome.runtime.Port} port
-     * @param {chrome.runtime.MessageSender} sender
-     * @param {import('backend').MessageHandlerWithProgressMap} handlers
-     */
-    _createActionListenerPort(port, sender, handlers) {
-        let done = false;
-        let hasStarted = false;
-        /** @type {?string} */
-        let messageString = '';
-
-        /**
-         * @param {...unknown} data
-         */
-        const onProgress = (...data) => {
-            try {
-                if (done) { return; }
-                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseProgressMessage} */ ({type: 'progress', data}));
-            } catch (e) {
-                // NOP
-            }
-        };
-
-        /**
-         * @param {import('backend').InvokeWithProgressRequestMessage} message
-         */
-        const onMessage = (message) => {
-            if (hasStarted) { return; }
-
-            try {
-                const {action} = message;
-                switch (action) {
-                    case 'fragment':
-                        messageString += message.data;
-                        break;
-                    case 'invoke':
-                        if (messageString !== null) {
-                            hasStarted = true;
-                            port.onMessage.removeListener(onMessage);
-
-                            const messageData = JSON.parse(messageString);
-                            messageString = null;
-                            onMessageComplete(messageData);
-                        }
-                        break;
-                }
-            } catch (e) {
-                cleanup(e);
-            }
-        };
-
-        /**
-         * @param {{action: string, params?: import('core').SerializableObject}} message
-         */
-        const onMessageComplete = async (message) => {
-            try {
-                const {action, params} = message;
-                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseAcknowledgeMessage} */ ({type: 'ack'}));
-
-                const messageHandler = handlers.get(action);
-                if (typeof messageHandler === 'undefined') {
-                    throw new Error('Invalid action');
-                }
-                const {handler, async, contentScript} = messageHandler;
-
-                if (!contentScript) {
-                    this._validatePrivilegedMessageSender(sender);
-                }
-
-                const promiseOrResult = handler(params, sender, onProgress);
-                const result = async ? await promiseOrResult : promiseOrResult;
-                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseCompleteMessage} */ ({type: 'complete', data: result}));
-            } catch (e) {
-                cleanup(e);
-            }
-        };
-
-        const onDisconnect = () => {
-            cleanup(null);
-        };
-
-        /**
-         * @param {unknown} error
-         */
-        const cleanup = (error) => {
-            if (done) { return; }
-            if (error !== null) {
-                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseErrorMessage} */ ({type: 'error', data: ExtensionError.serialize(error)}));
-            }
-            if (!hasStarted) {
-                port.onMessage.removeListener(onMessage);
-            }
-            port.onDisconnect.removeListener(onDisconnect);
-            done = true;
-        };
-
-        port.onMessage.addListener(onMessage);
-        port.onDisconnect.addListener(onDisconnect);
-    }
-
-    /**
      * @param {?import('log').LogLevel} errorLevel
      * @returns {number}
      */
@@ -1694,21 +1558,6 @@ export class Backend {
             default:
                 throw new Error(`Unknown action: ${action}`);
         }
-    }
-
-    /**
-     * @param {chrome.runtime.MessageSender} sender
-     * @throws {Error}
-     */
-    _validatePrivilegedMessageSender(sender) {
-        let {url} = sender;
-        if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
-        const {tab} = sender;
-        if (typeof tab === 'object' && tab !== null) {
-            ({url} = tab);
-            if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
-        }
-        throw new Error('Invalid message sender');
     }
 
     /**
@@ -1979,7 +1828,7 @@ export class Backend {
      * @param {?number} [timeout=null]
      * @returns {Promise<void>}
      */
-    _waitUntilTabFrameIsReady(tabId, frameId, timeout=null) {
+    _waitUntilTabFrameIsReady(tabId, frameId, timeout = null) {
         return new Promise((resolve, reject) => {
             /** @type {?import('core').Timeout} */
             let timer = null;
@@ -2060,12 +1909,13 @@ export class Backend {
     }
 
     /**
+     * @template [T=unknown]
      * @param {string} url
-     * @returns {Promise<unknown>}
+     * @returns {Promise<T>}
      */
     async _fetchJson(url) {
         const response = await this._fetchAsset(url);
-        return await response.json();
+        return await readResponseJson(response);
     }
 
     /**
@@ -2421,13 +2271,13 @@ export class Backend {
         if (error instanceof ExtensionError && typeof error.data === 'object' && error.data !== null) {
             const {errors} = /** @type {import('core').SerializableObject} */ (error.data);
             if (Array.isArray(errors)) {
-                for (const error2 of errors) {
-                    if (!(error2 instanceof Error)) { continue; }
-                    if (error2.name === 'AbortError') {
+                for (const errorDetail of errors) {
+                    if (!(errorDetail instanceof Error)) { continue; }
+                    if (errorDetail.name === 'AbortError') {
                         return this._createAudioDownloadError('Audio download was cancelled due to an idle timeout', 'audio-download-idle-timeout', errors);
                     }
-                    if (!(error2 instanceof ExtensionError)) { continue; }
-                    const {data} = error2;
+                    if (!(errorDetail instanceof ExtensionError)) { continue; }
+                    const {data} = errorDetail;
                     if (!(typeof data === 'object' && data !== null)) { continue; }
                     const {details} = /** @type {import('core').SerializableObject} */ (data);
                     if (!(typeof details === 'object' && details !== null)) { continue; }
@@ -2633,7 +2483,10 @@ export class Backend {
      */
     _getTranslatorFindKanjiOptions(options) {
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
-        return {enabledDictionaryMap};
+        return {
+            enabledDictionaryMap,
+            removeNonJapaneseCharacters: !options.scanning.alphanumeric
+        };
     }
 
     /**

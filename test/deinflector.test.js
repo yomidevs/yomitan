@@ -16,10 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable no-multi-spaces */
+
 import fs from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {describe, expect, test} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {Deinflector} from '../ext/js/language/deinflector.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -559,6 +562,8 @@ function testDeinflections() {
                 {term: 'する', source: 'した',           rule: 'vs', reasons: ['past']},
                 {term: 'する', source: 'しました',       rule: 'vs', reasons: ['polite past']},
                 {term: 'する', source: 'して',           rule: 'vs', reasons: ['-te']},
+                {term: 'する', source: 'できる',         rule: 'vs', reasons: ['potential']},
+                {term: 'する', source: '出来る',         rule: 'vs', reasons: ['potential']},
                 {term: 'する', source: 'せられる',       rule: 'vs', reasons: ['potential or passive']},
                 {term: 'する', source: 'される',         rule: 'vs', reasons: ['passive']},
                 {term: 'する', source: 'させる',         rule: 'vs', reasons: ['causative']},
@@ -927,7 +932,8 @@ function testDeinflections() {
         }
     ];
 
-    const deinflectionReasons = JSON.parse(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/deinflect.json'), {encoding: 'utf8'}));
+    /** @type {import('deinflector').ReasonsRaw} */
+    const deinflectionReasons = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/deinflect.json'), {encoding: 'utf8'}));
     const deinflector = new Deinflector(deinflectionReasons);
 
     describe('deinflections', () => {

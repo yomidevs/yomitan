@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Performance Tests</title>
+    <link rel="stylesheet" href="test-stylesheet.css">
+    <script src="js/html-test-utilities.js"></script>
+    <script src="js/performance-frames.js"></script>
+</head>
+<body><div class="content">
+
+    <test-description>&lt;iframe&gt; element inside of an open shadow DOM.</test-description>
+
+    <div id="shadow-iframe-container-open"></div>
+    <template id="shadow-iframe-container-open-content-template">
+        <iframe src="popup-tests-frame1.html" allowfullscreen="true" style="width: 100%; height: 50px; border: 1px solid #d8d8d8;"></iframe>
+    </template>
+
+    <test-description>Add elements</test-description>
+
+    <div>
+        <a href="#" class="add-elements" data-count="1000">1000</a>
+        <a href="#" class="add-elements" data-count="10000">10000</a>
+        <a href="#" class="add-elements" data-count="100000">100000</a>
+        <a href="#" class="add-elements" data-count="1000000">1000000</a>
+    </div>
+
+    <div id="counter"></div>
+    <div id="container"></div>
+
+</div></body>
+</html>

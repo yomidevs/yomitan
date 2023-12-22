@@ -47,23 +47,25 @@ export class PopupFactory {
      */
     prepare() {
         this._frameOffsetForwarder.prepare();
+        /* eslint-disable no-multi-spaces */
         yomitan.crossFrame.registerHandlers([
-            ['PopupFactory.getOrCreatePopup',     {async: true,  handler: this._onApiGetOrCreatePopup.bind(this)}],
-            ['PopupFactory.setOptionsContext',    {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
-            ['PopupFactory.hide',                 {async: true,  handler: this._onApiHide.bind(this)}],
-            ['PopupFactory.isVisible',            {async: true,  handler: this._onApiIsVisibleAsync.bind(this)}],
-            ['PopupFactory.setVisibleOverride',   {async: true,  handler: this._onApiSetVisibleOverride.bind(this)}],
-            ['PopupFactory.clearVisibleOverride', {async: true,  handler: this._onApiClearVisibleOverride.bind(this)}],
-            ['PopupFactory.containsPoint',        {async: true,  handler: this._onApiContainsPoint.bind(this)}],
-            ['PopupFactory.showContent',          {async: true,  handler: this._onApiShowContent.bind(this)}],
-            ['PopupFactory.setCustomCss',         {async: true,  handler: this._onApiSetCustomCss.bind(this)}],
-            ['PopupFactory.clearAutoPlayTimer',   {async: true,  handler: this._onApiClearAutoPlayTimer.bind(this)}],
-            ['PopupFactory.setContentScale',      {async: true,  handler: this._onApiSetContentScale.bind(this)}],
-            ['PopupFactory.updateTheme',          {async: true,  handler: this._onApiUpdateTheme.bind(this)}],
-            ['PopupFactory.setCustomOuterCss',    {async: true,  handler: this._onApiSetCustomOuterCss.bind(this)}],
-            ['PopupFactory.getFrameSize',         {async: true,  handler: this._onApiGetFrameSize.bind(this)}],
-            ['PopupFactory.setFrameSize',         {async: true,  handler: this._onApiSetFrameSize.bind(this)}]
+            ['PopupFactory.getOrCreatePopup',     this._onApiGetOrCreatePopup.bind(this)],
+            ['PopupFactory.setOptionsContext',    this._onApiSetOptionsContext.bind(this)],
+            ['PopupFactory.hide',                 this._onApiHide.bind(this)],
+            ['PopupFactory.isVisible',            this._onApiIsVisibleAsync.bind(this)],
+            ['PopupFactory.setVisibleOverride',   this._onApiSetVisibleOverride.bind(this)],
+            ['PopupFactory.clearVisibleOverride', this._onApiClearVisibleOverride.bind(this)],
+            ['PopupFactory.containsPoint',        this._onApiContainsPoint.bind(this)],
+            ['PopupFactory.showContent',          this._onApiShowContent.bind(this)],
+            ['PopupFactory.setCustomCss',         this._onApiSetCustomCss.bind(this)],
+            ['PopupFactory.clearAutoPlayTimer',   this._onApiClearAutoPlayTimer.bind(this)],
+            ['PopupFactory.setContentScale',      this._onApiSetContentScale.bind(this)],
+            ['PopupFactory.updateTheme',          this._onApiUpdateTheme.bind(this)],
+            ['PopupFactory.setCustomOuterCss',    this._onApiSetCustomOuterCss.bind(this)],
+            ['PopupFactory.getFrameSize',         this._onApiGetFrameSize.bind(this)],
+            ['PopupFactory.setFrameSize',         this._onApiSetFrameSize.bind(this)]
         ]);
+        /* eslint-enable no-multi-spaces */
     }
 
     /**
@@ -72,12 +74,12 @@ export class PopupFactory {
      * @returns {Promise<import('popup').PopupAny>}
      */
     async getOrCreatePopup({
-        frameId=null,
-        id=null,
-        parentPopupId=null,
-        depth=null,
-        popupWindow=false,
-        childrenSupported=false
+        frameId = null,
+        id = null,
+        parentPopupId = null,
+        depth = null,
+        popupWindow = false,
+        childrenSupported = false
     }) {
         // Find by existing id
         if (id !== null) {

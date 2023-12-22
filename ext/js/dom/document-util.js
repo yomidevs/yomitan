@@ -24,6 +24,13 @@ import {TextSourceRange} from './text-source-range.js';
  * This class contains utility functions related to the HTML document.
  */
 export class DocumentUtil {
+    /** @type {RegExp} @readonly */
+    static _transparentColorPattern = /rgba\s*\([^)]*,\s*0(?:\.0+)?\s*\)/;
+    /** @type {?boolean} */
+    static _cssZoomSupported = null;
+    /** @type {import('document-util').GetRangeFromPointHandler[]} @readonly */
+    static _getRangeFromPointHandlers = [];
+
     /**
      * Scans the document for text or elements with text information at the given coordinate.
      * Coordinates are provided in [client space](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems).
@@ -113,19 +120,30 @@ export class DocumentUtil {
         const text = source.text();
         const textLength = text.length;
         const textEndAnchor = textLength - endLength;
-        let pos1 = startLength;
-        let pos2 = textEndAnchor;
+
+        /** Relative start position of the sentence (inclusive). */
+        let cursorStart = startLength;
+        /** Relative end position of the sentence (exclusive). */
+        let cursorEnd = textEndAnchor;
 
         // Move backward
         let quoteStack = [];
-        for (; pos1 > 0; --pos1) {
-            const c = text[pos1 - 1];
+        for (; cursorStart > 0; --cursorStart) {
+            // Check if the previous character should be included.
+            let c = text[cursorStart - 1];
             if (c === '\n' && terminateAtNewlines) { break; }
 
             if (quoteStack.length === 0) {
-                const terminatorInfo = terminatorMap.get(c);
+                let terminatorInfo = terminatorMap.get(c);
                 if (typeof terminatorInfo !== 'undefined') {
-                    if (terminatorInfo[0]) { --pos1; }
+                    // Include the previous character while it is a terminator character and is included at start.
+                    while (terminatorInfo[0] && cursorStart > 0) {
+                        --cursorStart;
+                        if (cursorStart === 0) { break; }
+                        c = text[cursorStart - 1];
+                        terminatorInfo = terminatorMap.get(c);
+                        if (typeof terminatorInfo === 'undefined') { break; }
+                    }
                     break;
                 }
             }
@@ -133,7 +151,14 @@ export class DocumentUtil {
             let quoteInfo = forwardQuoteMap.get(c);
             if (typeof quoteInfo !== 'undefined') {
                 if (quoteStack.length === 0) {
-                    if (quoteInfo[1]) { --pos1; }
+                    // Include the previous character while it is a quote character and is included at start.
+                    while (quoteInfo[1] && cursorStart > 0) {
+                        --cursorStart;
+                        if (cursorStart === 0) { break; }
+                        c = text[cursorStart - 1];
+                        quoteInfo = forwardQuoteMap.get(c);
+                        if (typeof quoteInfo === 'undefined') { break; }
+                    }
                     break;
                 } else if (quoteStack[0] === c) {
                     quoteStack.pop();
@@ -149,14 +174,22 @@ export class DocumentUtil {
 
         // Move forward
         quoteStack = [];
-        for (; pos2 < textLength; ++pos2) {
-            const c = text[pos2];
+        for (; cursorEnd < textLength; ++cursorEnd) {
+            // Check if the following character should be included.
+            let c = text[cursorEnd];
             if (c === '\n' && terminateAtNewlines) { break; }
 
             if (quoteStack.length === 0) {
-                const terminatorInfo = terminatorMap.get(c);
+                let terminatorInfo = terminatorMap.get(c);
                 if (typeof terminatorInfo !== 'undefined') {
-                    if (terminatorInfo[1]) { ++pos2; }
+                    // Include the following character while it is a terminator character and is included at end.
+                    while (terminatorInfo[1] && cursorEnd < textLength) {
+                        ++cursorEnd;
+                        if (cursorEnd === textLength) { break; }
+                        c = text[cursorEnd];
+                        terminatorInfo = terminatorMap.get(c);
+                        if (typeof terminatorInfo === 'undefined') { break; }
+                    }
                     break;
                 }
             }
@@ -164,7 +197,14 @@ export class DocumentUtil {
             let quoteInfo = backwardQuoteMap.get(c);
             if (typeof quoteInfo !== 'undefined') {
                 if (quoteStack.length === 0) {
-                    if (quoteInfo[1]) { ++pos2; }
+                    // Include the following character while it is a quote character and is included at end.
+                    while (quoteInfo[1] && cursorEnd < textLength) {
+                        ++cursorEnd;
+                        if (cursorEnd === textLength) { break; }
+                        c = text[cursorEnd];
+                        quoteInfo = forwardQuoteMap.get(c);
+                        if (typeof quoteInfo === 'undefined') { break; }
+                    }
                     break;
                 } else if (quoteStack[0] === c) {
                     quoteStack.pop();
@@ -179,13 +219,13 @@ export class DocumentUtil {
         }
 
         // Trim whitespace
-        for (; pos1 < startLength && this._isWhitespace(text[pos1]); ++pos1) { /* NOP */ }
-        for (; pos2 > textEndAnchor && this._isWhitespace(text[pos2 - 1]); --pos2) { /* NOP */ }
+        for (; cursorStart < startLength && this._isWhitespace(text[cursorStart]); ++cursorStart) { /* NOP */ }
+        for (; cursorEnd > textEndAnchor && this._isWhitespace(text[cursorEnd - 1]); --cursorEnd) { /* NOP */ }
 
         // Result
         return {
-            text: text.substring(pos1, pos2),
-            offset: startLength - pos1
+            text: text.substring(cursorStart, cursorEnd),
+            offset: startLength - cursorStart
         };
     }
 
@@ -197,8 +237,7 @@ export class DocumentUtil {
      */
     static computeZoomScale(node) {
         if (this._cssZoomSupported === null) {
-            // @ts-expect-error - zoom is a non-standard property that exists in Chromium-based browsers
-            this._cssZoomSupported = (typeof document.createElement('div').style.zoom === 'string');
+            this._cssZoomSupported = this._computeCssZoomSupported();
         }
         if (!this._cssZoomSupported) { return 1; }
         // documentElement must be excluded because the computer style of its zoom property is inconsistent.
@@ -349,7 +388,7 @@ export class DocumentUtil {
      * @param {EventListener} onFullscreenChanged The event callback.
      * @param {?import('../core.js').EventListenerCollection} eventListenerCollection An optional `EventListenerCollection` to add the registration to.
      */
-    static addFullscreenChangeEventListener(onFullscreenChanged, eventListenerCollection=null) {
+    static addFullscreenChangeEventListener(onFullscreenChanged, eventListenerCollection = null) {
         const target = document;
         const options = false;
         const fullscreenEventNames = [
@@ -1042,13 +1081,15 @@ export class DocumentUtil {
         }
         return !Number.isNaN(value) ? value : null;
     }
+
+    /**
+     * Computes whether or not this browser and document supports CSS zoom, which is primarily a legacy Chromium feature.
+     * @returns {boolean}
+     */
+    static _computeCssZoomSupported() {
+        // 'style' can be undefined in certain contexts, such as when document is an SVG document.
+        const {style} = document.createElement('div');
+        // @ts-expect-error - zoom is a non-standard property.
+        return (typeof style === 'object' && style !== null && typeof style.zoom === 'string');
+    }
 }
-/** @type {RegExp} */
-// eslint-disable-next-line no-underscore-dangle
-DocumentUtil._transparentColorPattern = /rgba\s*\([^)]*,\s*0(?:\.0+)?\s*\)/;
-/** @type {?boolean} */
-// eslint-disable-next-line no-underscore-dangle
-DocumentUtil._cssZoomSupported = null;
-/** @type {import('document-util').GetRangeFromPointHandler[]} */
-// eslint-disable-next-line no-underscore-dangle
-DocumentUtil._getRangeFromPointHandlers = [];

@@ -18,6 +18,7 @@
 
 import {log} from '../../core.js';
 import {DocumentFocusController} from '../../dom/document-focus-controller.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 import {ExtensionContentController} from '../common/extension-content-controller.js';
 import {AnkiController} from './anki-controller.js';
@@ -57,7 +58,8 @@ async function setupGenericSettingsController(genericSettingController) {
     await genericSettingController.refresh();
 }
 
-(async () => {
+/** Entry point. */
+async function main() {
     try {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
@@ -65,7 +67,9 @@ async function setupGenericSettingsController(genericSettingController) {
         const extensionContentController = new ExtensionContentController();
         extensionContentController.prepare();
 
-        const statusFooter = new StatusFooter(/** @type {HTMLElement} */ (document.querySelector('.status-footer-container')));
+        /** @type {HTMLElement} */
+        const statusFooterElement = querySelectorNotNull(document, '.status-footer-container');
+        const statusFooter = new StatusFooter(statusFooterElement);
         statusFooter.prepare();
 
         /** @type {?number} */
@@ -171,4 +175,6 @@ async function setupGenericSettingsController(genericSettingController) {
     } catch (e) {
         log.error(e);
     }
-})();
+}
+
+await main();

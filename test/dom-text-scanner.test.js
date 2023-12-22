@@ -16,23 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import fs from 'fs';
-import {JSDOM} from 'jsdom';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import {expect, test} from 'vitest';
+import {describe, expect} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {DOMTextScanner} from '../ext/js/dom/dom-text-scanner.js';
+import {createDomTest} from './fixtures/dom-test.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
-
-/**
- * @param {string} fileName
- * @returns {JSDOM}
- */
-function createJSDOM(fileName) {
-    const domSource = fs.readFileSync(fileName, {encoding: 'utf8'});
-    return new JSDOM(domSource);
-}
 
 /**
  * @param {Element} element
@@ -111,36 +102,41 @@ function createAbsoluteGetComputedStyle(window) {
 }
 
 
-/**
- * @param {JSDOM} dom
- */
-async function testDomTextScanner(dom) {
-    const document = dom.window.document;
+const test = createDomTest(path.join(dirname, 'data/html/dom-text-scanner.html'));
 
-    test('DomTextScanner', () => {
-        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('y-test'))) {
-            let testData = JSON.parse(/** @type {string} */ (testElement.dataset.testData));
+describe('DOMTextScanner', () => {
+    test('Seek tests', ({window}) => {
+        const {document} = window;
+        window.getComputedStyle = createAbsoluteGetComputedStyle(window);
+
+        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case'))) {
+            /** @type {import('test/dom-text-scanner').TestData|import('test/dom-text-scanner').TestData[]} */
+            let testData = parseJson(/** @type {string} */ (testElement.dataset.testData));
             if (!Array.isArray(testData)) {
                 testData = [testData];
             }
             for (const testDataItem of testData) {
-                let {
-                    node,
+                const {
+                    node: nodeSelector,
                     offset,
                     length,
                     forcePreserveWhitespace,
                     generateLayoutContent,
                     reversible,
                     expected: {
-                        node: expectedNode,
+                        node: expectedNodeSelector,
                         offset: expectedOffset,
                         content: expectedContent,
                         remainder: expectedRemainder
                     }
                 } = testDataItem;
 
-                node = querySelectorTextNode(testElement, node);
-                expectedNode = querySelectorTextNode(testElement, expectedNode);
+                const node = querySelectorTextNode(testElement, nodeSelector);
+                const expectedNode = querySelectorTextNode(testElement, expectedNodeSelector);
+
+                expect(node).not.toEqual(null);
+                expect(expectedNode).not.toEqual(null);
+                if (node === null || expectedNode === null) { continue; }
 
                 // Standard test
                 {
@@ -185,26 +181,4 @@ async function testDomTextScanner(dom) {
             }
         }
     });
-}
-
-
-/** */
-async function testDocument1() {
-    const dom = createJSDOM(path.join(dirname, 'data', 'html', 'test-dom-text-scanner.html'));
-    const window = dom.window;
-    try {
-        window.getComputedStyle = createAbsoluteGetComputedStyle(window);
-
-        await testDomTextScanner(dom);
-    } finally {
-        window.close();
-    }
-}
-
-
-/** */
-async function main() {
-    await testDocument1();
-}
-
-await main();
+});

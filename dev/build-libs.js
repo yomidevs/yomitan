@@ -22,6 +22,7 @@ import esbuild from 'esbuild';
 import fs from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
+import {parseJson} from './json.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const extDir = path.join(dirname, '..', 'ext');
@@ -45,7 +46,9 @@ async function buildLib(scriptPath) {
     });
 }
 
-/** */
+/**
+ * Bundles libraries.
+ */
 export async function buildLibs() {
     const devLibPath = path.join(dirname, 'lib');
     const files = await fs.promises.readdir(devLibPath, {
@@ -59,7 +62,11 @@ export async function buildLibs() {
 
     const schemaDir = path.join(extDir, 'data/schemas/');
     const schemaFileNames = fs.readdirSync(schemaDir);
-    const schemas = schemaFileNames.map((schemaFileName) => JSON.parse(fs.readFileSync(path.join(schemaDir, schemaFileName), {encoding: 'utf8'})));
+    const schemas = schemaFileNames.map((schemaFileName) => {
+        /** @type {import('ajv').AnySchema} */
+        const result = parseJson(fs.readFileSync(path.join(schemaDir, schemaFileName), {encoding: 'utf8'}));
+        return result;
+    });
     const ajv = new Ajv({
         schemas,
         code: {source: true, esm: true},

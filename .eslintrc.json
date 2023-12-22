@@ -62,6 +62,7 @@
         "no-const-assign": "error",
         "no-constant-condition": "off",
         "no-global-assign": "error",
+        "no-new": "error",
         "no-param-reassign": "off",
         "no-prototype-builtins": "error",
         "no-shadow": [
@@ -192,6 +193,7 @@
             }
         ],
         "no-implicit-globals": "error",
+        "no-multi-spaces": "error",
         "no-trailing-spaces": "error",
         "no-whitespace-before-property": "error",
         "object-curly-spacing": [
@@ -220,6 +222,12 @@
         "space-in-parens": [
             "error",
             "never"
+        ],
+        "space-infix-ops": [
+            "error",
+            {
+                "int32Hint": false
+            }
         ],
         "space-unary-ops": "error",
         "spaced-comment": [
@@ -515,7 +523,10 @@
             "files": [
                 "*.json"
             ],
-            "parser": "jsonc-eslint-parser"
+            "parser": "jsonc-eslint-parser",
+            "rules": {
+                "no-multi-spaces": "off"
+            }
         },
         {
             "files": [
@@ -651,7 +662,7 @@
         },
         {
             "files": [
-                "test/data/html/*.js"
+                "test/data/html/**/*.js"
             ],
             "parserOptions": {
                 "sourceType": "script"
@@ -660,9 +671,17 @@
                 "browser": true,
                 "node": false,
                 "webextensions": false
-            },
-            "rules": {
-                "no-implicit-globals": "off"
+            }
+        },
+        {
+            "files": [
+                "test/data/html/**/*.js"
+            ],
+            "excludedFiles": [
+                "test/data/html/js/html-test-utilities.js"
+            ],
+            "globals": {
+                "HtmlTestUtilities": "readonly"
             }
         },
         {
@@ -765,7 +784,7 @@
         },
         {
             "files": [
-                "test/**"
+                "test/**/*.test.js"
             ],
             "plugins": [
                 "vitest"

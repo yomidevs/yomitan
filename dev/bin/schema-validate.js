@@ -18,6 +18,7 @@
 
 import fs from 'fs';
 import {performance} from 'perf_hooks';
+import {parseJson} from '../../ext/js/core/json.js';
 import {createJsonSchema} from '../schema-validate.js';
 
 /** */
@@ -39,14 +40,14 @@ function main() {
     }
 
     const schemaSource = fs.readFileSync(args[0], {encoding: 'utf8'});
-    const schema = JSON.parse(schemaSource);
+    const schema = parseJson(schemaSource);
 
     for (const dataFileName of args.slice(1)) {
         const start = performance.now();
         try {
             console.log(`Validating ${dataFileName}...`);
             const dataSource = fs.readFileSync(dataFileName, {encoding: 'utf8'});
-            const data = JSON.parse(dataSource);
+            const data = parseJson(dataSource);
             createJsonSchema(mode, schema).validate(data);
             const end = performance.now();
             console.log(`No issues detected (${((end - start) / 1000).toFixed(2)}s)`);
