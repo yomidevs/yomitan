@@ -16,15 +16,6 @@
  */
 
 import type * as Api from './api';
-import type * as Core from './core';
-
-export type MessageHandlerWithProgressDetails = {
-    async: boolean;
-    contentScript: boolean;
-    handler: (params: Core.SerializableObject | undefined, sender: chrome.runtime.MessageSender, onProgress: (...data: unknown[]) => void) => (Promise<unknown> | unknown);
-};
-export type MessageHandlerWithProgressMap = Map<string, MessageHandlerWithProgressDetails>;
-export type MessageHandlerWithProgressMapInit = [key: string, handlerDetails: MessageHandlerWithProgressDetails][];
 
 export type DatabaseUpdateType = 'dictionary';
 export type DatabaseUpdateCause = 'purge' | 'delete' | 'import';
@@ -40,43 +31,3 @@ export type TabInfo = {
 };
 
 export type FindTabsPredicate = (tabInfo: TabInfo) => boolean | Promise<boolean>;
-
-export type InvokeWithProgressRequestMessage = (
-    InvokeWithProgressRequestFragmentMessage |
-    InvokeWithProgressRequestInvokeMessage
-);
-
-export type InvokeWithProgressRequestFragmentMessage = {
-    action: 'fragment';
-    data: string;
-};
-
-export type InvokeWithProgressRequestInvokeMessage = {
-    action: 'invoke';
-};
-
-export type InvokeWithProgressResponseMessage<TReturn = unknown> = (
-    InvokeWithProgressResponseProgressMessage |
-    InvokeWithProgressResponseCompleteMessage<TReturn> |
-    InvokeWithProgressResponseErrorMessage |
-    InvokeWithProgressResponseAcknowledgeMessage
-);
-
-export type InvokeWithProgressResponseProgressMessage = {
-    type: 'progress';
-    data: unknown[];
-};
-
-export type InvokeWithProgressResponseCompleteMessage<TReturn = unknown> = {
-    type: 'complete';
-    data: TReturn;
-};
-
-export type InvokeWithProgressResponseErrorMessage = {
-    type: 'error';
-    data: Core.SerializedError;
-};
-
-export type InvokeWithProgressResponseAcknowledgeMessage = {
-    type: 'ack';
-};

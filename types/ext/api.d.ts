@@ -461,12 +461,3 @@ export type OpenCrossFramePortResult = {
 export type RequestBackendReadySignalDetails = Record<string, never>;
 
 export type RequestBackendReadySignalResult = boolean;
-
-// createActionPort
-
-export type CreateActionPortDetails = Record<string, never>;
-
-export type CreateActionPortResult = {
-    name: 'action-port';
-    id: string;
-};

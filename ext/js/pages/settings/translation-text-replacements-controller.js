@@ -268,6 +268,7 @@ class TranslationTextReplacementsEntry {
         let okay = false;
         try {
             if (typeof value === 'string') {
+                // eslint-disable-next-line no-new
                 new RegExp(value, 'g');
                 okay = true;
             }

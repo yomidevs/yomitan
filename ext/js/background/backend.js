@@ -22,9 +22,8 @@ import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
-import {clone, deferPromise, generateId, invokeMessageHandler, isObject, log, promiseTimeout} from '../core.js';
+import {clone, deferPromise, invokeMessageHandler, isObject, log, promiseTimeout} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {parseJson} from '../core/json.js';
 import {AnkiUtil} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {PermissionsUtil} from '../data/permissions-util.js';
@@ -38,7 +37,6 @@ import {JapaneseUtil} from '../language/languages/ja/japanese-util.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {MediaUtil} from '../media/media-util.js';
-import {yomitan} from '../yomitan.js';
 import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
 import {ProfileConditionsUtil} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
@@ -53,6 +51,9 @@ export class Backend {
      * Creates a new instance.
      */
     constructor() {
+        /**
+         *
+         */
         this._languageUtil = new LanguageUtil();
         /** @type {JapaneseUtil} */
         this._japaneseUtil = new JapaneseUtil(wanakana);
@@ -183,7 +184,6 @@ export class Backend {
             ['getMedia',                     this._onApiGetMedia.bind(this)],
             ['log',                          this._onApiLog.bind(this)],
             ['logIndicatorClear',            this._onApiLogIndicatorClear.bind(this)],
-            ['createActionPort',             this._onApiCreateActionPort.bind(this)],
             ['modifySettings',               this._onApiModifySettings.bind(this)],
             ['getSettings',                  this._onApiGetSettings.bind(this)],
             ['setAllSettings',               this._onApiSetAllSettings.bind(this)],
@@ -203,10 +203,6 @@ export class Backend {
             ['getTranslations',              this._onApiGetTranslations.bind(this)]
         ]));
         /* eslint-enable no-multi-spaces */
-        /** @type {import('backend').MessageHandlerWithProgressMap} */
-        this._messageHandlersWithProgress = new Map(/** @type {import('backend').MessageHandlerWithProgressMapInit} */ ([
-            // Empty
-        ]));
 
         /** @type {Map<string, (params?: import('core').SerializableObject) => void>} */
         this._commandHandlers = new Map(/** @type {[name: string, handler: (params?: import('core').SerializableObject) => void][]} */ ([
@@ -755,31 +751,6 @@ export class Backend {
         this._updateBadge();
     }
 
-    /** @type {import('api').Handler<import('api').CreateActionPortDetails, import('api').CreateActionPortResult, true>} */
-    _onApiCreateActionPort(_params, sender) {
-        if (!sender || !sender.tab) { throw new Error('Invalid sender'); }
-        const tabId = sender.tab.id;
-        if (typeof tabId !== 'number') { throw new Error('Sender has invalid tab ID'); }
-
-        const frameId = sender.frameId;
-        const id = generateId(16);
-        /** @type {import('cross-frame-api').ActionPortDetails} */
-        const details = {
-            name: 'action-port',
-            id
-        };
-
-        const port = chrome.tabs.connect(tabId, {name: JSON.stringify(details), frameId});
-        try {
-            this._createActionListenerPort(port, sender, this._messageHandlersWithProgress);
-        } catch (e) {
-            port.disconnect();
-            throw e;
-        }
-
-        return details;
-    }
-
     /** @type {import('api').Handler<import('api').ModifySettingsDetails, import('api').ModifySettingsResult>} */
     _onApiModifySettings({targets, source}) {
         return this._modifySettings(targets, source);
@@ -949,19 +920,35 @@ export class Backend {
         return {targetTabId, targetFrameId};
     }
 
+    /**
+     *
+     */
     async _onApiGetLanguages() {
         return await this._languageUtil.getLanguages();
     }
 
+    /**
+     *
+     */
     async _onApiGetLocales(){
         return await this._languageUtil.getLocales();
     }
 
+    /**
+     *
+     * @param root0
+     * @param root0.language
+     */
     async _onApiGetTextTransformations({language}){
         const result = await this._languageUtil.getTextTransformations(language);
         return result;
     }
 
+    /**
+     *
+     * @param root0
+     * @param root0.language
+     */
     async _onApiGetTranslations({language}){
         return await this._languageUtil.getTranslations(language);
     }
@@ -1305,6 +1292,10 @@ export class Backend {
         this._sendMessageAllTabsIgnoreResponse('Yomitan.optionsUpdated', {source});
     }
 
+    /**
+     *
+     * @param options
+     */
     _onChangedLanguage(options) {
         const {language} = options.general;
         if (!options.languages[language]) {
@@ -1341,7 +1332,12 @@ export class Backend {
     }
 
 
-    _getProfileLanguage(optionsContext, useSchema=false) {
+    /**
+     *
+     * @param optionsContext
+     * @param useSchema
+     */
+    _getProfileLanguage(optionsContext, useSchema = false) {
         return this._getProfileOptions(optionsContext, useSchema).general.language;
     }
 
@@ -1539,107 +1535,6 @@ export class Backend {
     }
 
     /**
-     * @param {chrome.runtime.Port} port
-     * @param {chrome.runtime.MessageSender} sender
-     * @param {import('backend').MessageHandlerWithProgressMap} handlers
-     */
-    _createActionListenerPort(port, sender, handlers) {
-        let done = false;
-        let hasStarted = false;
-        /** @type {?string} */
-        let messageString = '';
-
-        /**
-         * @param {...unknown} data
-         */
-        const onProgress = (...data) => {
-            try {
-                if (done) { return; }
-                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseProgressMessage} */ ({type: 'progress', data}));
-            } catch (e) {
-                // NOP
-            }
-        };
-
-        /**
-         * @param {import('backend').InvokeWithProgressRequestMessage} message
-         */
-        const onMessage = (message) => {
-            if (hasStarted) { return; }
-
-            try {
-                const {action} = message;
-                switch (action) {
-                    case 'fragment':
-                        messageString += message.data;
-                        break;
-                    case 'invoke':
-                        if (messageString !== null) {
-                            hasStarted = true;
-                            port.onMessage.removeListener(onMessage);
-
-                            /** @type {{action: string, params?: import('core').SerializableObject}} */
-                            const messageData = parseJson(messageString);
-                            messageString = null;
-                            onMessageComplete(messageData);
-                        }
-                        break;
-                }
-            } catch (e) {
-                cleanup(e);
-            }
-        };
-
-        /**
-         * @param {{action: string, params?: import('core').SerializableObject}} message
-         */
-        const onMessageComplete = async (message) => {
-            try {
-                const {action, params} = message;
-                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseAcknowledgeMessage} */ ({type: 'ack'}));
-
-                const messageHandler = handlers.get(action);
-                if (typeof messageHandler === 'undefined') {
-                    throw new Error('Invalid action');
-                }
-                const {handler, async, contentScript} = messageHandler;
-
-                if (!contentScript) {
-                    this._validatePrivilegedMessageSender(sender);
-                }
-
-                const promiseOrResult = handler(params, sender, onProgress);
-                const result = async ? await promiseOrResult : promiseOrResult;
-                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseCompleteMessage} */ ({type: 'complete', data: result}));
-            } catch (e) {
-                cleanup(e);
-            }
-        };
-
-        const onDisconnect = () => {
-            cleanup(null);
-        };
-
-        /**
-         * @param {unknown} error
-         */
-        const cleanup = (error) => {
-            if (done) { return; }
-            if (error !== null) {
-                port.postMessage(/** @type {import('backend').InvokeWithProgressResponseErrorMessage} */ ({type: 'error', data: ExtensionError.serialize(error)}));
-            }
-            if (!hasStarted) {
-                port.onMessage.removeListener(onMessage);
-            }
-            port.onDisconnect.removeListener(onDisconnect);
-            done = true;
-        };
-
-        port.onMessage.addListener(onMessage);
-        port.onDisconnect.addListener(onDisconnect);
-    }
-
-    /**
      * @param {?import('log').LogLevel} errorLevel
      * @returns {number}
      */
@@ -1748,21 +1643,6 @@ export class Backend {
             default:
                 throw new Error(`Unknown action: ${action}`);
         }
-    }
-
-    /**
-     * @param {chrome.runtime.MessageSender} sender
-     * @throws {Error}
-     */
-    _validatePrivilegedMessageSender(sender) {
-        let {url} = sender;
-        if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
-        const {tab} = sender;
-        if (typeof tab === 'object' && tab !== null) {
-            ({url} = tab);
-            if (typeof url === 'string' && yomitan.isExtensionUrl(url)) { return; }
-        }
-        throw new Error('Invalid message sender');
     }
 
     /**
@@ -2712,6 +2592,11 @@ export class Backend {
         return textReplacements;
     }
 
+    /**
+     *
+     * @param options
+     * @param language
+     */
     async _getTranslatorTextTransformations(options, language) {
         const textTransformationsOptions = options?.languages?.[language]?.textTransformations || {};
         // const textTransformations = await this._languageUtil.getTextTransformations(language);
