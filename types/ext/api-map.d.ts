@@ -54,8 +54,10 @@ type ApiMapInitItem<TSurface extends ApiSurface, TExtraParams extends ApiTExtraP
  */
 type ApiMapInitItemAny<TSurface extends ApiSurface, TExtraParams extends ApiTExtraParams> = {[key in ApiNames<TSurface>]: ApiMapInitItem<TSurface, TExtraParams, key>}[ApiNames<TSurface>];
 
+/** Base type for extra params, which is just a generic array. */
 type ApiTExtraParams = unknown[];
 
+/** Default type for extra params, which is an empty array. */
 type ApiExtraParamsDefault = [];
 
 /** Type alias for the params member of an descriptor. */
