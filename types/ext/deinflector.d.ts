@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {SafeFunction} from 'core';
 import type * as TranslationInternal from './translation-internal';
 
 export type ReasonTypeRaw = 'v1' | 'v5' | 'vs' | 'vk' | 'vz' | 'adj-i' | 'iru';
@@ -22,15 +23,15 @@ export type ReasonTypeRaw = 'v1' | 'v5' | 'vs' | 'vk' | 'vz' | 'adj-i' | 'iru';
 export type ReasonsRaw = {
     [reason: string]: {
         inflected: RegExp;
-        uninflect: Function;
+        uninflect: SafeFunction;
         rulesIn: ReasonTypeRaw[];
         rulesOut: ReasonTypeRaw[];
     }[];
 };
 
 export type ReasonVariant = [
-    kanaIn: string,
-    kanaOut: string,
+    inflected: RegExp,
+    uninflect: SafeFunction,
     rulesIn: TranslationInternal.DeinflectionRuleFlags,
     rulesOut: TranslationInternal.DeinflectionRuleFlags,
 ];

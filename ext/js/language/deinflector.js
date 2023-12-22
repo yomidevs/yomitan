@@ -30,7 +30,7 @@ export class Deinflector {
         ['vz',      /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0000010000)], // Verb zuru
         ['adj',     /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0000100000)], // Adjective
         ['adj-i',   /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0000100000)], // Adjective i
-        ['iru',     /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0001000000)], // Intermediate -iru endings for progressive or perfect tens
+        ['iru',     /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0001000000)], // Intermediate -iru endings for progressive or perfect tense
         ['n',       /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0010000000)], // Noun
         ['noun',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0010000000)], // Noun'
         ['pn',      /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b0100000000)] // Pronoun

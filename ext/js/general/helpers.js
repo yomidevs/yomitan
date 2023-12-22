@@ -22,11 +22,6 @@ import {readResponseJson} from '../core/json.js';
  * @param {string} url
  * @returns {Promise<Response|string>}
  */
-
-/**
- *
- * @param url
- */
 export async function fetchAsset(url) {
     if (typeof global !== 'undefined') {
         const fs = require('fs');
