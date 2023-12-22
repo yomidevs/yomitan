@@ -16,7 +16,7 @@
  */
 
 import {AnkiNoteBuilder} from '../../ext/js/data/anki-note-builder.js';
-import {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util.js';
+import {JapaneseUtil} from '../../ext/js/language/languages/ja/japanese-util.js';
 import {AnkiTemplateRenderer} from '../../ext/js/templates/sandbox/anki-template-renderer.js';
 
 /**
