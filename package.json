@@ -18,6 +18,7 @@
         "test-ts-dev": "npx tsc --noEmit --project dev/jsconfig.json",
         "test-ts-test": "npx tsc --noEmit --project test/jsconfig.json",
         "test-code": "vitest run",
+        "test-code-write": "vitest run --config test/data/vitest.write.config.json",
         "test-build": "node ./dev/bin/build.js --dry-run --all",
         "license-report": "license-report --output=html --only=prod --fields=name --fields=installedVersion --fields=licenseType --fields=link --html.cssFile=dev/data/legal-npm.css > ext/legal-npm.html",
         "license-report-markdown": "license-report --output=markdown --only=prod --fields=name --fields=installedVersion --fields=licenseType --fields=link"

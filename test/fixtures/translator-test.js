@@ -90,8 +90,12 @@ export async function createTranslatorTest(htmlFilePath, dictionaryDirectory, di
         window: async ({window}, use) => { await use(window); },
         // eslint-disable-next-line no-empty-pattern
         translator: async ({}, use) => { await use(translator); },
-        // eslint-disable-next-line no-empty-pattern
-        ankiNoteDataCreator: async ({}, use) => { await use(ankiNoteDataCreator); }
+        ankiNoteDataCreator: async ({window}, use) => {
+            // The window property needs to be referenced for it to be initialized.
+            // It is needed for DOM access for structured content.
+            void window;
+            await use(ankiNoteDataCreator);
+        }
     });
     return result;
 }
