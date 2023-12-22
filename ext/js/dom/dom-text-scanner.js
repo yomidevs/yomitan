@@ -177,54 +177,57 @@ export class DOMTextScanner {
         let remainder = this._remainder;
         let newlines = this._newlines;
 
-        while (offset < nodeValueLength) {
+        probeForward: while (offset < nodeValueLength) {
             const char = StringUtil.readCodePointsForward(nodeValue, offset, 1);
             offset += char.length;
             const charAttributes = DOMTextScanner.getCharacterAttributes(char, preserveNewlines, preserveWhitespace);
 
-            if (charAttributes === 0) {
-                // Character should be ignored
-                continue;
-            } else if (charAttributes === 1) {
-                // Character is collapsible whitespace
-                lineHasWhitespace = true;
-            } else {
-                // Character should be added to the content
-                if (newlines > 0) {
-                    if (content.length > 0) {
-                        const useNewlineCount = Math.min(remainder, newlines);
-                        content += '\n'.repeat(useNewlineCount);
-                        remainder -= useNewlineCount;
-                        newlines -= useNewlineCount;
-                    } else {
-                        newlines = 0;
-                    }
-                    lineHasContent = false;
-                    lineHasWhitespace = false;
-                    if (remainder <= 0) {
-                        offset -= char.length; // Revert character offset
-                        break;
-                    }
-                }
-
-                lineHasContent = (charAttributes === 2); // 3 = character is a newline
-
-                if (lineHasWhitespace) {
-                    if (lineHasContent) {
-                        content += ' ';
-                        lineHasWhitespace = false;
-                        if (--remainder <= 0) {
-                            offset -= char.length; // Revert character offset
-                            break;
+            matchCharAttributes: switch (charAttributes) {
+                case 0:
+                    // Character should be ignored
+                    continue probeForward;
+                case 1:
+                    // Character is collapsible whitespace
+                    lineHasWhitespace = true;
+                    break matchCharAttributes;
+                case 2:
+                case 3:
+                    // Character should be added to the content
+                    if (newlines > 0) {
+                        if (content.length > 0) {
+                            const useNewlineCount = Math.min(remainder, newlines);
+                            content += '\n'.repeat(useNewlineCount);
+                            remainder -= useNewlineCount;
+                            newlines -= useNewlineCount;
+                        } else {
+                            newlines = 0;
                         }
-                    } else {
+                        lineHasContent = false;
                         lineHasWhitespace = false;
+                        if (remainder <= 0) {
+                            offset -= char.length; // Revert character offset
+                            break probeForward;
+                        }
                     }
-                }
 
-                content += char;
+                    lineHasContent = (charAttributes === 2); // 3 = character is a newline
 
-                if (--remainder <= 0) { break; }
+                    if (lineHasWhitespace) {
+                        if (lineHasContent) {
+                            content += ' ';
+                            lineHasWhitespace = false;
+                            if (--remainder <= 0) {
+                                offset -= char.length; // Revert character offset
+                                break probeForward;
+                            }
+                        } else {
+                            lineHasWhitespace = false;
+                        }
+                    }
+
+                    content += char;
+
+                    if (--remainder <= 0) { break probeForward; }
             }
         }
 
@@ -263,54 +266,57 @@ export class DOMTextScanner {
         let remainder = this._remainder;
         let newlines = this._newlines;
 
-        while (offset > 0) {
+        probeBackward: while (offset > 0) {
             const char = StringUtil.readCodePointsBackward(nodeValue, offset - 1, 1);
             offset -= char.length;
             const charAttributes = DOMTextScanner.getCharacterAttributes(char, preserveNewlines, preserveWhitespace);
 
-            if (charAttributes === 0) {
-                // Character should be ignored
-                continue;
-            } else if (charAttributes === 1) {
-                // Character is collapsible whitespace
-                lineHasWhitespace = true;
-            } else {
-                // Character should be added to the content
-                if (newlines > 0) {
-                    if (content.length > 0) {
-                        const useNewlineCount = Math.min(remainder, newlines);
-                        content = '\n'.repeat(useNewlineCount) + content;
-                        remainder -= useNewlineCount;
-                        newlines -= useNewlineCount;
-                    } else {
-                        newlines = 0;
-                    }
-                    lineHasContent = false;
-                    lineHasWhitespace = false;
-                    if (remainder <= 0) {
-                        offset += char.length; // Revert character offset
-                        break;
-                    }
-                }
-
-                lineHasContent = (charAttributes === 2); // 3 = character is a newline
-
-                if (lineHasWhitespace) {
-                    if (lineHasContent) {
-                        content = ' ' + content;
-                        lineHasWhitespace = false;
-                        if (--remainder <= 0) {
-                            offset += char.length; // Revert character offset
-                            break;
+            matchCharAttributes: switch (charAttributes) {
+                case 0:
+                    // Character should be ignored
+                    continue probeBackward;
+                case 1:
+                    // Character is collapsible whitespace
+                    lineHasWhitespace = true;
+                    break matchCharAttributes;
+                case 2:
+                case 3:
+                    // Character should be added to the content
+                    if (newlines > 0) {
+                        if (content.length > 0) {
+                            const useNewlineCount = Math.min(remainder, newlines);
+                            content = '\n'.repeat(useNewlineCount) + content;
+                            remainder -= useNewlineCount;
+                            newlines -= useNewlineCount;
+                        } else {
+                            newlines = 0;
                         }
-                    } else {
+                        lineHasContent = false;
                         lineHasWhitespace = false;
+                        if (remainder <= 0) {
+                            offset += char.length; // Revert character offset
+                            break probeBackward;
+                        }
                     }
-                }
 
-                content = char + content;
+                    lineHasContent = (charAttributes === 2); // 3 = character is a newline
 
-                if (--remainder <= 0) { break; }
+                    if (lineHasWhitespace) {
+                        if (lineHasContent) {
+                            content = ' ' + content;
+                            lineHasWhitespace = false;
+                            if (--remainder <= 0) {
+                                offset += char.length; // Revert character offset
+                                break probeBackward;
+                            }
+                        } else {
+                            lineHasWhitespace = false;
+                        }
+                    }
+
+                    content = char + content;
+
+                    if (--remainder <= 0) { break probeBackward; }
             }
         }
 
@@ -468,11 +474,7 @@ export class DOMTextScanner {
      * @param {string} character A string containing a single character.
      * @param {boolean} preserveNewlines Whether or not newlines should be preserved.
      * @param {boolean} preserveWhitespace Whether or not whitespace should be preserved.
-     * @returns {number} An integer representing the attributes of the character.
-     *   0: Character should be ignored.
-     *   1: Character is collapsible whitespace.
-     *   2: Character should be added to the content.
-     *   3: Character should be added to the content and is a newline.
+     * @returns {import('dom-text-scanner').CharacterAttributesEnum} An enum representing the attributes of the character.
      */
     static getCharacterAttributes(character, preserveNewlines, preserveWhitespace) {
         switch (character.charCodeAt(0)) {
