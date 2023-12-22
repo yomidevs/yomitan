@@ -600,9 +600,7 @@ class ProfileConditionGroupUI {
         const child = new ProfileConditionUI(this, index);
         child.prepare(condition);
         this._children.push(child);
-        if (this._conditionContainer !== null) {
-            this._conditionContainer.appendChild(child.node);
-        }
+        this._conditionContainer.appendChild(child.node);
         return child;
     }
 }
@@ -623,8 +621,6 @@ class ProfileConditionUI {
         this._typeInput = querySelectorNotNull(this._node, '.profile-condition-type');
         /** @type {HTMLSelectElement} */
         this._operatorInput = querySelectorNotNull(this._node, '.profile-condition-operator');
-        /** @type {HTMLButtonElement} */
-        this._removeButton = querySelectorNotNull(this._node, '.profile-condition-remove');
         /** @type {HTMLButtonElement} */
         this._mouseButton = querySelectorNotNull(this._node, '.mouse-button');
         /** @type {HTMLElement} */
@@ -684,11 +680,8 @@ class ProfileConditionUI {
 
         this._eventListeners.addEventListener(this._typeInput, 'change', this._onTypeChange.bind(this), false);
         this._eventListeners.addEventListener(this._operatorInput, 'change', this._onOperatorChange.bind(this), false);
-        if (this._removeButton !== null) { this._eventListeners.addEventListener(this._removeButton, 'click', this._onRemoveButtonClick.bind(this), false); }
-        if (this._menuButton !== null) {
-            this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
-            this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
-        }
+        this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
+        this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
     }
 
     /** */
@@ -766,18 +759,13 @@ class ProfileConditionUI {
         }
     }
 
-    /** */
-    _onRemoveButtonClick() {
-        this._removeSelf();
-    }
-
     /**
      * @param {import('popup-menu').MenuOpenEvent} e
      */
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
         /** @type {HTMLElement} */
-        const deleteGroup = querySelectorNotNull(bodyNode, '.popup-menu-item[data-menu-action="deleteGroup"]');
+        const deleteGroup = /** @type {HTMLElement} */ (bodyNode.querySelector('.popup-menu-item[data-menu-action="deleteGroup"]'));
         if (deleteGroup !== null) {
             deleteGroup.hidden = (this._parent.childCount <= 1);
         }
