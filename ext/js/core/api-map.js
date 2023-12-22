@@ -15,10 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ExtensionError} from './extension-error.js';
+
 /**
  * @template {import('api-map').ApiSurface} [TApiSurface=never]
- * @param {import('api-map').ApiMapInit<TApiSurface>} init
- * @returns {import('api-map').ApiMap<TApiSurface>}
+ * @template {unknown[]} [TExtraParams=[]]
+ * @param {import('api-map').ApiMapInit<TApiSurface, TExtraParams>} init
+ * @returns {import('api-map').ApiMap<TApiSurface, TExtraParams>}
  */
 export function createApiMap(init) {
     return new Map(init);
@@ -26,8 +29,9 @@ export function createApiMap(init) {
 
 /**
  * @template {import('api-map').ApiSurface} [TApiSurface=never]
- * @param {import('api-map').ApiMap<TApiSurface>} map
- * @param {import('api-map').ApiMapInit<TApiSurface>} init
+ * @template {unknown[]} [TExtraParams=[]]
+ * @param {import('api-map').ApiMap<TApiSurface, TExtraParams>} map
+ * @param {import('api-map').ApiMapInit<TApiSurface, TExtraParams>} init
  * @throws {Error}
  */
 export function extendApiMap(map, init) {
@@ -39,10 +43,52 @@ export function extendApiMap(map, init) {
 
 /**
  * @template {import('api-map').ApiSurface} [TApiSurface=never]
- * @param {import('api-map').ApiMap<TApiSurface>} map
+ * @template {unknown[]} [TExtraParams=[]]
+ * @param {import('api-map').ApiMap<TApiSurface, TExtraParams>} map
  * @param {string} name
- * @returns {import('api-map').ApiHandlerAny<TApiSurface>|undefined}
+ * @returns {import('api-map').ApiHandlerAny<TApiSurface, TExtraParams>|undefined}
  */
 export function getApiMapHandler(map, name) {
     return map.get(/** @type {import('api-map').ApiNames<TApiSurface>} */ (name));
+}
+
+/**
+ * @template {import('api-map').ApiSurface} [TApiSurface=never]
+ * @template {unknown[]} [TExtraParams=[]]
+ * @param {import('api-map').ApiMap<TApiSurface, TExtraParams>} map
+ * @param {string} name
+ * @param {import('api-map').ApiParamsAny<TApiSurface>} params
+ * @param {TExtraParams} extraParams
+ * @param {(response: import('core').Response<import('api-map').ApiReturnAny<TApiSurface>>) => void} callback
+ * @param {() => void} [handlerNotFoundCallback]
+ * @returns {boolean} `true` if async, `false` otherwise.
+ */
+export function invokeApiMapHandler(map, name, params, extraParams, callback, handlerNotFoundCallback) {
+    const handler = getApiMapHandler(map, name);
+    if (typeof handler === 'undefined') {
+        if (typeof handlerNotFoundCallback === 'function') {
+            try {
+                handlerNotFoundCallback();
+            } catch (error) {
+                // NOP
+            }
+        }
+        return false;
+    }
+    try {
+        const promiseOrResult = handler(/** @type {import('core').SafeAny} */ (params), ...extraParams);
+        if (promiseOrResult instanceof Promise) {
+            /** @type {Promise<unknown>} */ (promiseOrResult).then(
+                (result) => { callback({result}); },
+                (error) => { callback({error: ExtensionError.serialize(error)}); }
+            );
+            return true;
+        } else {
+            callback({result: promiseOrResult});
+            return false;
+        }
+    } catch (error) {
+        callback({error: ExtensionError.serialize(error)});
+        return false;
+    }
 }

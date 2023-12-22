@@ -138,7 +138,7 @@ export class Offscreen {
     }
 
     /** @type {import('offscreen').OffscreenApiHandler<'findTermsOffscreen'>} */
-    _findTermsHandler({mode, text, options}) {
+    async _findTermsHandler({mode, text, options}) {
         const enabledDictionaryMap = new Map(options.enabledDictionaryMap);
         const excludeDictionaryDefinitions = (
             options.excludeDictionaryDefinitions !== null ?
