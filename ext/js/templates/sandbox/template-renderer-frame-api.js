@@ -26,14 +26,12 @@ export class TemplateRendererFrameApi {
     constructor(templateRenderer) {
         /** @type {import('./template-renderer.js').TemplateRenderer} */
         this._templateRenderer = templateRenderer;
-        /** @type {import('template-renderer-proxy').FrontendApiMapInit} */
-        const apiMapInit = [
+        /** @type {import('template-renderer-proxy').FrontendApiMap} */
+        this._windowMessageHandlers = createApiMap([
             ['render', this._onRender.bind(this)],
             ['renderMulti', this._onRenderMulti.bind(this)],
             ['getModifiedData', this._onGetModifiedData.bind(this)]
-        ];
-        /** @type {import('template-renderer-proxy').FrontendApiMap} */
-        this._windowMessageHandlers = createApiMap(apiMapInit);
+        ]);
     }
 
     /**
