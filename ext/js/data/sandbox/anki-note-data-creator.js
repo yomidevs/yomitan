@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {DictionaryDataUtil} from '../../language/sandbox/dictionary-data-util.js';
+import {DictionaryDataUtil} from '../../dictionary/dictionary-data-util.js';
 
 /**
  * This class is used to convert the internal dictionary entry format to the

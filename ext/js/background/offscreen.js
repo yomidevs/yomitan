@@ -20,7 +20,7 @@ import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
-import {DictionaryDatabase} from '../language/dictionary-database.js';
+import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
 import {Translator} from '../language/translator.js';
 

@@ -18,8 +18,8 @@
 
 import {isObject} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {DictionaryDataUtil} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
-import {DictionaryDataUtil} from '../language/sandbox/dictionary-data-util.js';
 import {yomitan} from '../yomitan.js';
 import {PronunciationGenerator} from './sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';

@@ -31,7 +31,7 @@ export class Translator {
     constructor({japaneseUtil, database}) {
         /** @type {import('./sandbox/japanese-util.js').JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
-        /** @type {import('./dictionary-database.js').DictionaryDatabase} */
+        /** @type {import('../dictionary/dictionary-database.js').DictionaryDatabase} */
         this._database = database;
         /** @type {?Deinflector} */
         this._deinflector = null;

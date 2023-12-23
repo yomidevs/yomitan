@@ -22,8 +22,8 @@ import path from 'path';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {parseJson} from '../dev/json.js';
 import {createDictionaryArchive} from '../dev/util.js';
-import {DictionaryDatabase} from '../ext/js/language/dictionary-database.js';
-import {DictionaryImporter} from '../ext/js/language/dictionary-importer.js';
+import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
+import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
 import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));

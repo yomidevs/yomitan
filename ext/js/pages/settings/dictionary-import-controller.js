@@ -18,8 +18,8 @@
 
 import {log} from '../../core.js';
 import {ExtensionError} from '../../core/extension-error.js';
+import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {DictionaryWorker} from '../../language/dictionary-worker.js';
 import {yomitan} from '../../yomitan.js';
 import {DictionaryController} from './dictionary-controller.js';
 
