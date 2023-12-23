@@ -413,6 +413,10 @@ export type PhoneticTranscription = {
     tags: Tag[];
 };
 
+export type PronunciationType = Pronunciation['type'];
+
+export type PronunciationGeneric<T extends PronunciationType> = Extract<Pronunciation, {type: T}>;
+
 /**
  * Frequency information corresponds to how frequently a term appears in a corpus,
  * which can be a number of occurrences or an overall rank.

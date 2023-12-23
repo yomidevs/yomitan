@@ -640,61 +640,75 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createPronunciation(details) {
-        const jp = this._japaneseUtil;
-
         switch (details.type) {
-            case 'pitch-accent': {
-                const {reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} = details;
-                const morae = jp.getKanaMorae(reading);
-
-                const node = this._instantiate('pronunciation');
-
-                node.dataset.pitchAccentDownstepPosition = `${position}`;
-                if (nasalPositions.length > 0) { node.dataset.nasalMoraPosition = nasalPositions.join(' '); }
-                if (devoicePositions.length > 0) { node.dataset.devoiceMoraPosition = devoicePositions.join(' '); }
-                node.dataset.tagCount = `${tags.length}`;
-
-                let n = this._querySelector(node, '.pronunciation-tag-list');
-                this._appendMultiple(n, this._createTag.bind(this), tags);
-
-                n = this._querySelector(node, '.pronunciation-disambiguation-list');
-                this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
-
-                n = this._querySelector(node, '.pronunciation-downstep-notation-container');
-                n.appendChild(this._pronunciationGenerator.createPronunciationDownstepPosition(position));
-
-                n = this._querySelector(node, '.pronunciation-text-container');
-
-                n.lang = 'ja';
-                n.appendChild(this._pronunciationGenerator.createPronunciationText(morae, position, nasalPositions, devoicePositions));
-
-                n = this._querySelector(node, '.pronunciation-graph-container');
-                n.appendChild(this._pronunciationGenerator.createPronunciationGraph(morae, position));
-
-                return node;
-            }
-            case 'phonetic-transcription': {
-                const {ipa, tags, exclusiveTerms, exclusiveReadings} = details;
-
-                const node = this._instantiate('pronunciation');
-
-                node.dataset.tagCount = `${tags.length}`;
-
-                let n = this._querySelector(node, '.pronunciation-tag-list');
-                this._appendMultiple(n, this._createTag.bind(this), tags);
-
-                n = this._querySelector(node, '.pronunciation-disambiguation-list');
-                this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
-
-                n = this._querySelector(node, '.pronunciation-text-container');
-
-                this._setTextContent(n, ipa);
-
-                return node;
-            }
+            case 'pitch-accent':
+                return this._createPronunciationPitchAccent(details);
+            case 'phonetic-transcription':
+                return this._createPronunciationPhoneticTranscription(details);
         }
     }
 
+
+    /**
+     * @param {import('dictionary-data-util').GroupedPhoneticTranscription} details
+     * @returns {HTMLElement}
+     */
+    _createPronunciationPhoneticTranscription(details) {
+        const {ipa, tags, exclusiveTerms, exclusiveReadings} = details;
+
+        const node = this._instantiate('pronunciation');
+
+        node.dataset.tagCount = `${tags.length}`;
+
+        let n = this._querySelector(node, '.pronunciation-tag-list');
+        this._appendMultiple(n, this._createTag.bind(this), tags);
+
+        n = this._querySelector(node, '.pronunciation-disambiguation-list');
+        this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
+
+        n = this._querySelector(node, '.pronunciation-text-container');
+
+        this._setTextContent(n, ipa);
+
+        return node;
+    }
+
+    /**
+     * @param {import('dictionary-data-util').GroupedPitchAccent} details
+     * @returns {HTMLElement}
+     */
+    _createPronunciationPitchAccent(details) {
+        const jp = this._japaneseUtil;
+
+        const {reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} = details;
+        const morae = jp.getKanaMorae(reading);
+
+        const node = this._instantiate('pronunciation');
+
+        node.dataset.pitchAccentDownstepPosition = `${position}`;
+        if (nasalPositions.length > 0) { node.dataset.nasalMoraPosition = nasalPositions.join(' '); }
+        if (devoicePositions.length > 0) { node.dataset.devoiceMoraPosition = devoicePositions.join(' '); }
+        node.dataset.tagCount = `${tags.length}`;
+
+        let n = this._querySelector(node, '.pronunciation-tag-list');
+        this._appendMultiple(n, this._createTag.bind(this), tags);
+
+        n = this._querySelector(node, '.pronunciation-disambiguation-list');
+        this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
+
+        n = this._querySelector(node, '.pronunciation-downstep-notation-container');
+        n.appendChild(this._pronunciationGenerator.createPronunciationDownstepPosition(position));
+
+        n = this._querySelector(node, '.pronunciation-text-container');
+
+        n.lang = 'ja';
+        n.appendChild(this._pronunciationGenerator.createPronunciationText(morae, position, nasalPositions, devoicePositions));
+
+        n = this._querySelector(node, '.pronunciation-graph-container');
+        n.appendChild(this._pronunciationGenerator.createPronunciationGraph(morae, position));
+
+        return node;
+    }
 
     /**
      * @param {HTMLElement} container

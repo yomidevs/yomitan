@@ -528,8 +528,7 @@ export class AnkiNoteDataCreator {
         const {headwords} = dictionaryEntry;
         for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pronunciations} of dictionaryEntry.pronunciations) {
             const {term, reading} = headwords[headwordIndex];
-            /** @type {import('dictionary').PitchAccent[]} */
-            const pitches = pronunciations.filter((v) => v.type === 'pitch-accent');
+            const pitches = this._getPronunciationsOfType(pronunciations, 'pitch-accent');
             const cachedPitches = this.createCachedValue(this._getTermPitchesInner.bind(this, pitches));
             results.push({
                 index: results.length,
@@ -574,7 +573,7 @@ export class AnkiNoteDataCreator {
         const {headwords} = dictionaryEntry;
         for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pronunciations} of dictionaryEntry.pronunciations) {
             const {term, reading} = headwords[headwordIndex];
-            const phoneticTranscriptions = pronunciations.filter((v) => v.type === 'phonetic-transcription');
+            const phoneticTranscriptions = this._getPronunciationsOfType(pronunciations, 'phonetic-transcription');
             const termPhoneticTranscriptions = this._getTermPhoneticTranscriptionsInner(phoneticTranscriptions);
             results.push({
                 index: results.length,
@@ -684,7 +683,7 @@ export class AnkiNoteDataCreator {
         for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pronunciations} of termPronunciations) {
             if (headwordIndex !== i) { continue; }
             const {term, reading} = headwords[headwordIndex];
-            const pitches = pronunciations.filter((v) => v.type === 'pitch-accent');
+            const pitches = this._getPronunciationsOfType(pronunciations, 'pitch-accent');
             const cachedPitches = this.createCachedValue(this._getTermPitchesInner.bind(this, pitches));
             results.push({
                 index: results.length,
@@ -698,6 +697,23 @@ export class AnkiNoteDataCreator {
                 reading,
                 get pitches() { return self.getCachedValue(cachedPitches); }
             });
+        }
+        return results;
+    }
+
+    /**
+     * @template {import('dictionary').PronunciationType} T
+     * @param {import('dictionary').Pronunciation[]} pronunciations
+     * @param {T} type
+     * @returns {import('dictionary').PronunciationGeneric<T>[]}
+     */
+    _getPronunciationsOfType(pronunciations, type) {
+        /** @type {import('dictionary').PronunciationGeneric<T>[]} */
+        const results = [];
+        for (const pronunciation of pronunciations) {
+            if (pronunciation.type !== type) { continue; }
+            // This is type safe, but for some reason the cast is needed.
+            results.push(/** @type {import('dictionary').PronunciationGeneric<T>} */ (pronunciation));
         }
         return results;
     }
