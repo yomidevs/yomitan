@@ -1388,7 +1388,7 @@ export class TextScanner extends EventDispatcher {
                 return input.scanOnPenMove;
             case 3: // hovering after touching
                 return input.scanOnPenReleaseHover;
-            default: // not active
+            case 0: // not active
                 return false;
         }
     }
