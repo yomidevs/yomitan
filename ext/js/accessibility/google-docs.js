@@ -24,10 +24,11 @@
     self.googleDocsAccessibilitySetup = true;
 
     /**
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
-     * @returns {Promise<TReturn>}
+     * @template {import('api').ApiNames} TAction
+     * @template {import('api').ApiParams<TAction>} TParams
+     * @param {TAction} action
+     * @param {TParams} params
+     * @returns {Promise<import('api').ApiReturn<TAction>>}
      */
     const invokeApi = (action, params) => {
         return new Promise((resolve, reject) => {
@@ -45,7 +46,7 @@
     };
 
     const optionsContext = {depth: 0, url: location.href};
-    /** @type {import('api').OptionsGetResult} */
+    /** @type {import('api').ApiReturn<'optionsGet'>} */
     let options;
     try {
         options = await invokeApi('optionsGet', {optionsContext});
