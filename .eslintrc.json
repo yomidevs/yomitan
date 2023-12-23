@@ -589,68 +589,6 @@
         },
         {
             "files": [
-                "ext/**/*.js"
-            ],
-            "excludedFiles": [
-                "ext/js/core/extension-error.js"
-            ],
-            "globals": {
-                "ExtensionError": "readonly"
-            }
-        },
-        {
-            "files": [
-                "ext/**/*.js"
-            ],
-            "excludedFiles": [
-                "ext/js/core.js",
-                "ext/js/core/extension-error.js",
-                "ext/js/accessibility/google-docs.js",
-                "ext/js/**/sandbox/**/*.js"
-            ],
-            "globals": {
-                "isObject": "readonly",
-                "stringReverse": "readonly",
-                "promiseTimeout": "readonly",
-                "escapeRegExp": "readonly",
-                "deferPromise": "readonly",
-                "clone": "readonly",
-                "deepEqual": "readonly",
-                "generateId": "readonly",
-                "promiseAnimationFrame": "readonly",
-                "invokeMessageHandler": "readonly",
-                "log": "readonly",
-                "DynamicProperty": "readonly",
-                "EventDispatcher": "readonly",
-                "EventListenerCollection": "readonly",
-                "Logger": "readonly"
-            }
-        },
-        {
-            "files": [
-                "ext/**/*.js"
-            ],
-            "excludedFiles": [
-                "ext/js/core.js",
-                "ext/js/core/extension-error.js",
-                "ext/js/accessibility/google-docs.js",
-                "ext/js/yomitan.js",
-                "ext/js/**/sandbox/**/*.js"
-            ],
-            "globals": {
-                "yomitan": "readonly"
-            }
-        },
-        {
-            "files": [
-                "ext/js/yomitan.js"
-            ],
-            "globals": {
-                "chrome": "writable"
-            }
-        },
-        {
-            "files": [
                 "test/**/*.js",
                 "dev/**/*.js"
             ],

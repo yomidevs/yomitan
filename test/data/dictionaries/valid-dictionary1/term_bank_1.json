@@ -66,7 +66,7 @@
                 "莢\n"
             ]},
             {"type": "structured-content", "content": [
-                "Imgae aspect ratio tests:\nあ",
+                "Image aspect ratio tests:\nあ",
                 {"tag": "img", "path": "character2.gif", "height": 1.1, "imageRendering": "crisp-edges", "appearance": "monochrome", "background": false, "sizeUnits": "em", "collapsed": false, "collapsible": false},
                 "あ\nあ",
                 {"tag": "img", "path": "character2.gif", "width": 0.4125, "imageRendering": "crisp-edges", "appearance": "monochrome", "background": false, "sizeUnits": "em", "collapsed": false, "collapsible": false},
@@ -75,6 +75,13 @@
                 "あ\nあ",
                 {"tag": "img", "path": "character3.gif", "height": 0.4125, "imageRendering": "crisp-edges", "appearance": "monochrome", "background": false, "sizeUnits": "em", "collapsed": false, "collapsible": false},
                 "あ"
+            ]},
+            {"type": "structured-content", "content": [
+                "Image alt text tests.\n𬵪 = Unicode character\n",
+                {"tag": "img", "alt": "𬵪", "path": "aosaba_mono.png", "height": 1.0, "width": 1.0, "background": false, "sizeUnits": "em", "collapsed": false, "collapsible": false, "appearance": "monochrome"},
+                " = monochrome PNG\n",
+                {"tag": "img", "alt": "𬵪", "path": "aosaba_auto.png", "height": 1.0, "width": 1.0, "background": false, "sizeUnits": "em", "collapsed": false, "collapsible": false, "appearance": "auto"},
+                " = color PNG"
             ]},
             {"type": "structured-content", "content": [
                 {"tag": "div", "style": {"fontStyle": "normal"}, "content": "fontStyle:normal"},

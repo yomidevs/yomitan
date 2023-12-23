@@ -131,3 +131,5 @@ export type OffscreenApiHandler<TName extends MessageType> = ApiHandler<Offscree
 export type OffscreenApiParams<TName extends MessageType> = ApiParams<OffscreenApiSurface[TName]>;
 
 export type OffscreenApiReturn<TName extends MessageType> = ApiReturn<OffscreenApiSurface[TName]>;
+
+export type MessageAny = Message<MessageType>;

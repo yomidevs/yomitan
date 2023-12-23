@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {ExtensionError} from '../../core/extension-error.js';
+import {createApiMap, invokeApiMapHandler} from '../../core/api-map.js';
 import {parseJson} from '../../core/json.js';
 
 export class TemplateRendererFrameApi {
@@ -26,12 +26,12 @@ export class TemplateRendererFrameApi {
     constructor(templateRenderer) {
         /** @type {import('./template-renderer.js').TemplateRenderer} */
         this._templateRenderer = templateRenderer;
-        /** @type {import('core').MessageHandlerMap} */
-        this._windowMessageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
+        /** @type {import('template-renderer-proxy').FrontendApiMap} */
+        this._windowMessageHandlers = createApiMap([
             ['render', this._onRender.bind(this)],
             ['renderMulti', this._onRenderMulti.bind(this)],
             ['getModifiedData', this._onGetModifiedData.bind(this)]
-        ]));
+        ]);
     }
 
     /**
@@ -39,43 +39,19 @@ export class TemplateRendererFrameApi {
      */
     prepare() {
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
-        this._postMessage(window.parent, 'ready', {}, null);
+        this._postMessage(window.parent, 'ready', void 0, null);
     }
 
     // Private
 
     /**
-     * @param {MessageEvent<import('template-renderer-frame-api').MessageData>} e
+     * @param {MessageEvent<import('template-renderer-proxy').FrontendMessageAny>} e
      */
     _onWindowMessage(e) {
         const {source, data: {action, params, id}} = e;
-        const messageHandler = this._windowMessageHandlers.get(action);
-        if (typeof messageHandler === 'undefined') { return; }
-
-        this._onWindowMessageInner(messageHandler, action, params, /** @type {Window} */ (source), id);
-    }
-
-    /**
-     * @param {import('core').MessageHandler} handler
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
-     * @param {Window} source
-     * @param {?string} id
-     */
-    async _onWindowMessageInner(handler, action, params, source, id) {
-        let response;
-        try {
-            let result = handler(params);
-            if (result instanceof Promise) {
-                result = await result;
-            }
-            response = {result};
-        } catch (error) {
-            response = {error: ExtensionError.serialize(error)};
-        }
-
-        if (typeof id === 'undefined') { return; }
-        this._postMessage(source, `${action}.response`, response, id);
+        invokeApiMapHandler(this._windowMessageHandlers, action, params, [], (response) => {
+            this._postMessage(/** @type {Window} */ (source), 'response', response, id);
+        });
     }
 
     /**
@@ -113,12 +89,15 @@ export class TemplateRendererFrameApi {
     }
 
     /**
+     * @template {import('template-renderer-proxy').BackendApiNames} TName
      * @param {Window} target
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
+     * @param {TName} action
+     * @param {import('template-renderer-proxy').BackendApiParams<TName>} params
      * @param {?string} id
      */
     _postMessage(target, action, params, id) {
-        target.postMessage(/** @type {import('template-renderer-frame-api').MessageData} */ ({action, params, id}), '*');
+        /** @type {import('template-renderer-proxy').BackendMessageAny} */
+        const data = {action, params, id};
+        target.postMessage(data, '*');
     }
 }

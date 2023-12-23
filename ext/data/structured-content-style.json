@@ -169,7 +169,7 @@
     {
         "selectors": [".gloss-image-link[data-appearance=monochrome] .gloss-image"],
         "styles": [
-            ["visibility", "hidden"]
+            ["opacity", "0"]
         ]
     },
     {

@@ -28,395 +28,344 @@ export class API {
     }
 
     /**
-     * @param {import('api').OptionsGetDetails['optionsContext']} optionsContext
-     * @returns {Promise<import('api').OptionsGetResult>}
+     * @param {import('api').ApiParam<'optionsGet', 'optionsContext'>} optionsContext
+     * @returns {Promise<import('api').ApiReturn<'optionsGet'>>}
      */
     optionsGet(optionsContext) {
-        /** @type {import('api').OptionsGetDetails} */
-        const details = {optionsContext};
-        return this._invoke('optionsGet', details);
+        return this._invoke('optionsGet', {optionsContext});
     }
 
     /**
-     * @returns {Promise<import('api').OptionsGetFullResult>}
+     * @returns {Promise<import('api').ApiReturn<'optionsGetFull'>>}
      */
     optionsGetFull() {
-        return this._invoke('optionsGetFull');
+        return this._invoke('optionsGetFull', void 0);
     }
 
     /**
-     * @param {import('api').TermsFindDetails['text']} text
-     * @param {import('api').TermsFindDetails['details']} details
-     * @param {import('api').TermsFindDetails['optionsContext']} optionsContext
-     * @returns {Promise<import('api').TermsFindResult>}
+     * @param {import('api').ApiParam<'termsFind', 'text'>} text
+     * @param {import('api').ApiParam<'termsFind', 'details'>} details
+     * @param {import('api').ApiParam<'termsFind', 'optionsContext'>} optionsContext
+     * @returns {Promise<import('api').ApiReturn<'termsFind'>>}
      */
     termsFind(text, details, optionsContext) {
-        /** @type {import('api').TermsFindDetails} */
-        const details2 = {text, details, optionsContext};
-        return this._invoke('termsFind', details2);
+        return this._invoke('termsFind', {text, details, optionsContext});
     }
 
     /**
-     * @param {import('api').ParseTextDetails['text']} text
-     * @param {import('api').ParseTextDetails['optionsContext']} optionsContext
-     * @param {import('api').ParseTextDetails['scanLength']} scanLength
-     * @param {import('api').ParseTextDetails['useInternalParser']} useInternalParser
-     * @param {import('api').ParseTextDetails['useMecabParser']} useMecabParser
-     * @returns {Promise<import('api').ParseTextResult>}
+     * @param {import('api').ApiParam<'parseText', 'text'>} text
+     * @param {import('api').ApiParam<'parseText', 'optionsContext'>} optionsContext
+     * @param {import('api').ApiParam<'parseText', 'scanLength'>} scanLength
+     * @param {import('api').ApiParam<'parseText', 'useInternalParser'>} useInternalParser
+     * @param {import('api').ApiParam<'parseText', 'useMecabParser'>} useMecabParser
+     * @returns {Promise<import('api').ApiReturn<'parseText'>>}
      */
     parseText(text, optionsContext, scanLength, useInternalParser, useMecabParser) {
-        /** @type {import('api').ParseTextDetails} */
-        const details = {text, optionsContext, scanLength, useInternalParser, useMecabParser};
-        return this._invoke('parseText', details);
+        return this._invoke('parseText', {text, optionsContext, scanLength, useInternalParser, useMecabParser});
     }
 
     /**
-     * @param {import('api').KanjiFindDetails['text']} text
-     * @param {import('api').KanjiFindDetails['optionsContext']} optionsContext
-     * @returns {Promise<import('api').KanjiFindResult>}
+     * @param {import('api').ApiParam<'kanjiFind', 'text'>} text
+     * @param {import('api').ApiParam<'kanjiFind', 'optionsContext'>} optionsContext
+     * @returns {Promise<import('api').ApiReturn<'kanjiFind'>>}
      */
     kanjiFind(text, optionsContext) {
-        /** @type {import('api').KanjiFindDetails} */
-        const details = {text, optionsContext};
-        return this._invoke('kanjiFind', details);
+        return this._invoke('kanjiFind', {text, optionsContext});
     }
 
     /**
-     * @returns {Promise<import('api').IsAnkiConnectedResult>}
+     * @returns {Promise<import('api').ApiReturn<'isAnkiConnected'>>}
      */
     isAnkiConnected() {
-        return this._invoke('isAnkiConnected');
+        return this._invoke('isAnkiConnected', void 0);
     }
 
     /**
-     * @returns {Promise<import('api').GetAnkiConnectVersionResult>}
+     * @returns {Promise<import('api').ApiReturn<'getAnkiConnectVersion'>>}
      */
     getAnkiConnectVersion() {
-        return this._invoke('getAnkiConnectVersion');
+        return this._invoke('getAnkiConnectVersion', void 0);
     }
 
     /**
-     * @param {import('api').AddAnkiNoteDetails['note']} note
-     * @returns {Promise<import('api').AddAnkiNoteResult>}
+     * @param {import('api').ApiParam<'addAnkiNote', 'note'>} note
+     * @returns {Promise<import('api').ApiReturn<'addAnkiNote'>>}
      */
     addAnkiNote(note) {
-        /** @type {import('api').AddAnkiNoteDetails} */
-        const details = {note};
-        return this._invoke('addAnkiNote', details);
+        return this._invoke('addAnkiNote', {note});
     }
 
     /**
-     * @param {import('api').GetAnkiNoteInfoDetails['notes']} notes
-     * @param {import('api').GetAnkiNoteInfoDetails['fetchAdditionalInfo']} fetchAdditionalInfo
-     * @returns {Promise<import('api').GetAnkiNoteInfoResult>}
+     * @param {import('api').ApiParam<'getAnkiNoteInfo', 'notes'>} notes
+     * @param {import('api').ApiParam<'getAnkiNoteInfo', 'fetchAdditionalInfo'>} fetchAdditionalInfo
+     * @returns {Promise<import('api').ApiReturn<'getAnkiNoteInfo'>>}
      */
     getAnkiNoteInfo(notes, fetchAdditionalInfo) {
-        /** @type {import('api').GetAnkiNoteInfoDetails} */
-        const details = {notes, fetchAdditionalInfo};
-        return this._invoke('getAnkiNoteInfo', details);
+        return this._invoke('getAnkiNoteInfo', {notes, fetchAdditionalInfo});
     }
 
     /**
-     * @param {import('api').InjectAnkiNoteMediaDetails['timestamp']} timestamp
-     * @param {import('api').InjectAnkiNoteMediaDetails['definitionDetails']} definitionDetails
-     * @param {import('api').InjectAnkiNoteMediaDetails['audioDetails']} audioDetails
-     * @param {import('api').InjectAnkiNoteMediaDetails['screenshotDetails']} screenshotDetails
-     * @param {import('api').InjectAnkiNoteMediaDetails['clipboardDetails']} clipboardDetails
-     * @param {import('api').InjectAnkiNoteMediaDetails['dictionaryMediaDetails']} dictionaryMediaDetails
-     * @returns {Promise<import('api').InjectAnkiNoteMediaResult>}
+     * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'timestamp'>} timestamp
+     * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'definitionDetails'>} definitionDetails
+     * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'audioDetails'>} audioDetails
+     * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'screenshotDetails'>} screenshotDetails
+     * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'clipboardDetails'>} clipboardDetails
+     * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'dictionaryMediaDetails'>} dictionaryMediaDetails
+     * @returns {Promise<import('api').ApiReturn<'injectAnkiNoteMedia'>>}
      */
     injectAnkiNoteMedia(timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails) {
-        /** @type {import('api').InjectAnkiNoteMediaDetails} */
-        const details = {timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails};
-        return this._invoke('injectAnkiNoteMedia', details);
+        return this._invoke('injectAnkiNoteMedia', {timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails});
     }
 
     /**
-     * @param {import('api').NoteViewDetails['noteId']} noteId
-     * @param {import('api').NoteViewDetails['mode']} mode
-     * @param {import('api').NoteViewDetails['allowFallback']} allowFallback
-     * @returns {Promise<import('api').NoteViewResult>}
+     * @param {import('api').ApiParam<'noteView', 'noteId'>} noteId
+     * @param {import('api').ApiParam<'noteView', 'mode'>} mode
+     * @param {import('api').ApiParam<'noteView', 'allowFallback'>} allowFallback
+     * @returns {Promise<import('api').ApiReturn<'noteView'>>}
      */
     noteView(noteId, mode, allowFallback) {
-        /** @type {import('api').NoteViewDetails} */
-        const details = {noteId, mode, allowFallback};
-        return this._invoke('noteView', details);
+        return this._invoke('noteView', {noteId, mode, allowFallback});
     }
 
     /**
-     * @param {import('api').SuspendAnkiCardsForNoteDetails['noteId']} noteId
-     * @returns {Promise<import('api').SuspendAnkiCardsForNoteResult>}
+     * @param {import('api').ApiParam<'suspendAnkiCardsForNote', 'noteId'>} noteId
+     * @returns {Promise<import('api').ApiReturn<'suspendAnkiCardsForNote'>>}
      */
     suspendAnkiCardsForNote(noteId) {
-        /** @type {import('api').SuspendAnkiCardsForNoteDetails} */
-        const details = {noteId};
-        return this._invoke('suspendAnkiCardsForNote', details);
+        return this._invoke('suspendAnkiCardsForNote', {noteId});
     }
 
     /**
-     * @param {import('api').GetTermAudioInfoListDetails['source']} source
-     * @param {import('api').GetTermAudioInfoListDetails['term']} term
-     * @param {import('api').GetTermAudioInfoListDetails['reading']} reading
-     * @returns {Promise<import('api').GetTermAudioInfoListResult>}
+     * @param {import('api').ApiParam<'getTermAudioInfoList', 'source'>} source
+     * @param {import('api').ApiParam<'getTermAudioInfoList', 'term'>} term
+     * @param {import('api').ApiParam<'getTermAudioInfoList', 'reading'>} reading
+     * @returns {Promise<import('api').ApiReturn<'getTermAudioInfoList'>>}
      */
     getTermAudioInfoList(source, term, reading) {
-        /** @type {import('api').GetTermAudioInfoListDetails} */
-        const details = {source, term, reading};
-        return this._invoke('getTermAudioInfoList', details);
+        return this._invoke('getTermAudioInfoList', {source, term, reading});
     }
 
     /**
-     * @param {import('api').CommandExecDetails['command']} command
-     * @param {import('api').CommandExecDetails['params']} [params]
-     * @returns {Promise<import('api').CommandExecResult>}
+     * @param {import('api').ApiParam<'commandExec', 'command'>} command
+     * @param {import('api').ApiParam<'commandExec', 'params'>} [params]
+     * @returns {Promise<import('api').ApiReturn<'commandExec'>>}
      */
     commandExec(command, params) {
-        /** @type {import('api').CommandExecDetails} */
-        const details = {command, params};
-        return this._invoke('commandExec', details);
+        return this._invoke('commandExec', {command, params});
     }
 
     /**
-     * @param {import('api').SendMessageToFrameDetails['frameId']} frameId
-     * @param {import('api').SendMessageToFrameDetails['action']} action
-     * @param {import('api').SendMessageToFrameDetails['params']} [params]
-     * @returns {Promise<import('api').SendMessageToFrameResult>}
+     * @param {import('api').ApiParam<'sendMessageToFrame', 'frameId'>} frameId
+     * @param {import('api').ApiParam<'sendMessageToFrame', 'action'>} action
+     * @param {import('api').ApiParam<'sendMessageToFrame', 'params'>} [params]
+     * @returns {Promise<import('api').ApiReturn<'sendMessageToFrame'>>}
      */
     sendMessageToFrame(frameId, action, params) {
-        /** @type {import('api').SendMessageToFrameDetails} */
-        const details = {frameId, action, params};
-        return this._invoke('sendMessageToFrame', details);
+        return this._invoke('sendMessageToFrame', {frameId, action, params});
     }
 
     /**
-     * @param {import('api').BroadcastTabDetails['action']} action
-     * @param {import('api').BroadcastTabDetails['params']} params
-     * @returns {Promise<import('api').BroadcastTabResult>}
+     * @param {import('api').ApiParam<'broadcastTab', 'action'>} action
+     * @param {import('api').ApiParam<'broadcastTab', 'params'>} params
+     * @returns {Promise<import('api').ApiReturn<'broadcastTab'>>}
      */
     broadcastTab(action, params) {
-        /** @type {import('api').BroadcastTabDetails} */
-        const details = {action, params};
-        return this._invoke('broadcastTab', details);
+        return this._invoke('broadcastTab', {action, params});
     }
 
     /**
-     * @returns {Promise<import('api').FrameInformationGetResult>}
+     * @returns {Promise<import('api').ApiReturn<'frameInformationGet'>>}
      */
     frameInformationGet() {
-        return this._invoke('frameInformationGet');
+        return this._invoke('frameInformationGet', void 0);
     }
 
     /**
-     * @param {import('api').InjectStylesheetDetails['type']} type
-     * @param {import('api').InjectStylesheetDetails['value']} value
-     * @returns {Promise<import('api').InjectStylesheetResult>}
+     * @param {import('api').ApiParam<'injectStylesheet', 'type'>} type
+     * @param {import('api').ApiParam<'injectStylesheet', 'value'>} value
+     * @returns {Promise<import('api').ApiReturn<'injectStylesheet'>>}
      */
     injectStylesheet(type, value) {
-        /** @type {import('api').InjectStylesheetDetails} */
-        const details = {type, value};
-        return this._invoke('injectStylesheet', details);
+        return this._invoke('injectStylesheet', {type, value});
     }
 
     /**
-     * @param {import('api').GetStylesheetContentDetails['url']} url
-     * @returns {Promise<import('api').GetStylesheetContentResult>}
+     * @param {import('api').ApiParam<'getStylesheetContent', 'url'>} url
+     * @returns {Promise<import('api').ApiReturn<'getStylesheetContent'>>}
      */
     getStylesheetContent(url) {
-        /** @type {import('api').GetStylesheetContentDetails} */
-        const details = {url};
-        return this._invoke('getStylesheetContent', details);
+        return this._invoke('getStylesheetContent', {url});
     }
 
     /**
-     * @returns {Promise<import('api').GetEnvironmentInfoResult>}
+     * @returns {Promise<import('api').ApiReturn<'getEnvironmentInfo'>>}
      */
     getEnvironmentInfo() {
-        return this._invoke('getEnvironmentInfo');
+        return this._invoke('getEnvironmentInfo', void 0);
     }
 
     /**
-     * @returns {Promise<import('api').ClipboardGetResult>}
+     * @returns {Promise<import('api').ApiReturn<'clipboardGet'>>}
      */
     clipboardGet() {
-        return this._invoke('clipboardGet');
+        return this._invoke('clipboardGet', void 0);
     }
 
     /**
-     * @returns {Promise<import('api').GetDisplayTemplatesHtmlResult>}
+     * @returns {Promise<import('api').ApiReturn<'getDisplayTemplatesHtml'>>}
      */
     getDisplayTemplatesHtml() {
-        return this._invoke('getDisplayTemplatesHtml');
+        return this._invoke('getDisplayTemplatesHtml', void 0);
     }
 
     /**
-     * @returns {Promise<import('api').GetZoomResult>}
+     * @returns {Promise<import('api').ApiReturn<'getZoom'>>}
      */
     getZoom() {
-        return this._invoke('getZoom');
+        return this._invoke('getZoom', void 0);
     }
 
     /**
-     * @returns {Promise<import('api').GetDefaultAnkiFieldTemplatesResult>}
+     * @returns {Promise<import('api').ApiReturn<'getDefaultAnkiFieldTemplates'>>}
      */
     getDefaultAnkiFieldTemplates() {
-        return this._invoke('getDefaultAnkiFieldTemplates');
+        return this._invoke('getDefaultAnkiFieldTemplates', void 0);
     }
 
     /**
-     * @returns {Promise<import('api').GetDictionaryInfoResult>}
+     * @returns {Promise<import('api').ApiReturn<'getDictionaryInfo'>>}
      */
     getDictionaryInfo() {
-        return this._invoke('getDictionaryInfo');
+        return this._invoke('getDictionaryInfo', void 0);
     }
 
     /**
-     * @returns {Promise<import('api').PurgeDatabaseResult>}
+     * @returns {Promise<import('api').ApiReturn<'purgeDatabase'>>}
      */
     purgeDatabase() {
-        return this._invoke('purgeDatabase');
+        return this._invoke('purgeDatabase', void 0);
     }
 
     /**
-     * @param {import('api').GetMediaDetails['targets']} targets
-     * @returns {Promise<import('api').GetMediaResult>}
+     * @param {import('api').ApiParam<'getMedia', 'targets'>} targets
+     * @returns {Promise<import('api').ApiReturn<'getMedia'>>}
      */
     getMedia(targets) {
-        /** @type {import('api').GetMediaDetails} */
-        const details = {targets};
-        return this._invoke('getMedia', details);
+        return this._invoke('getMedia', {targets});
     }
 
     /**
-     * @param {import('api').LogDetails['error']} error
-     * @param {import('api').LogDetails['level']} level
-     * @param {import('api').LogDetails['context']} context
-     * @returns {Promise<import('api').LogResult>}
+     * @param {import('api').ApiParam<'log', 'error'>} error
+     * @param {import('api').ApiParam<'log', 'level'>} level
+     * @param {import('api').ApiParam<'log', 'context'>} context
+     * @returns {Promise<import('api').ApiReturn<'log'>>}
      */
     log(error, level, context) {
-        /** @type {import('api').LogDetails} */
-        const details = {error, level, context};
-        return this._invoke('log', details);
+        return this._invoke('log', {error, level, context});
     }
 
     /**
-     * @returns {Promise<import('api').LogIndicatorClearResult>}
+     * @returns {Promise<import('api').ApiReturn<'logIndicatorClear'>>}
      */
     logIndicatorClear() {
-        return this._invoke('logIndicatorClear');
+        return this._invoke('logIndicatorClear', void 0);
     }
 
     /**
-     * @param {import('api').ModifySettingsDetails['targets']} targets
-     * @param {import('api').ModifySettingsDetails['source']} source
-     * @returns {Promise<import('api').ModifySettingsResult>}
+     * @param {import('api').ApiParam<'modifySettings', 'targets'>} targets
+     * @param {import('api').ApiParam<'modifySettings', 'source'>} source
+     * @returns {Promise<import('api').ApiReturn<'modifySettings'>>}
      */
     modifySettings(targets, source) {
-        const details = {targets, source};
-        return this._invoke('modifySettings', details);
+        return this._invoke('modifySettings', {targets, source});
     }
 
     /**
-     * @param {import('api').GetSettingsDetails['targets']} targets
-     * @returns {Promise<import('api').GetSettingsResult>}
+     * @param {import('api').ApiParam<'getSettings', 'targets'>} targets
+     * @returns {Promise<import('api').ApiReturn<'getSettings'>>}
      */
     getSettings(targets) {
-        /** @type {import('api').GetSettingsDetails} */
-        const details = {targets};
-        return this._invoke('getSettings', details);
+        return this._invoke('getSettings', {targets});
     }
 
     /**
-     * @param {import('api').SetAllSettingsDetails['value']} value
-     * @param {import('api').SetAllSettingsDetails['source']} source
-     * @returns {Promise<import('api').SetAllSettingsResult>}
+     * @param {import('api').ApiParam<'setAllSettings', 'value'>} value
+     * @param {import('api').ApiParam<'setAllSettings', 'source'>} source
+     * @returns {Promise<import('api').ApiReturn<'setAllSettings'>>}
      */
     setAllSettings(value, source) {
-        /** @type {import('api').SetAllSettingsDetails} */
-        const details = {value, source};
-        return this._invoke('setAllSettings', details);
+        return this._invoke('setAllSettings', {value, source});
     }
 
     /**
-     * @param {import('api').GetOrCreateSearchPopupDetails} details
-     * @returns {Promise<import('api').GetOrCreateSearchPopupResult>}
+     * @param {import('api').ApiParams<'getOrCreateSearchPopup'>} details
+     * @returns {Promise<import('api').ApiReturn<'getOrCreateSearchPopup'>>}
      */
     getOrCreateSearchPopup(details) {
         return this._invoke('getOrCreateSearchPopup', details);
     }
 
     /**
-     * @param {import('api').IsTabSearchPopupDetails['tabId']} tabId
-     * @returns {Promise<import('api').IsTabSearchPopupResult>}
+     * @param {import('api').ApiParam<'isTabSearchPopup', 'tabId'>} tabId
+     * @returns {Promise<import('api').ApiReturn<'isTabSearchPopup'>>}
      */
     isTabSearchPopup(tabId) {
-        /** @type {import('api').IsTabSearchPopupDetails} */
-        const details = {tabId};
-        return this._invoke('isTabSearchPopup', details);
+        return this._invoke('isTabSearchPopup', {tabId});
     }
 
     /**
-     * @param {import('api').TriggerDatabaseUpdatedDetails['type']} type
-     * @param {import('api').TriggerDatabaseUpdatedDetails['cause']} cause
-     * @returns {Promise<import('api').TriggerDatabaseUpdatedResult>}
+     * @param {import('api').ApiParam<'triggerDatabaseUpdated', 'type'>} type
+     * @param {import('api').ApiParam<'triggerDatabaseUpdated', 'cause'>} cause
+     * @returns {Promise<import('api').ApiReturn<'triggerDatabaseUpdated'>>}
      */
     triggerDatabaseUpdated(type, cause) {
-        /** @type {import('api').TriggerDatabaseUpdatedDetails} */
-        const details = {type, cause};
-        return this._invoke('triggerDatabaseUpdated', details);
+        return this._invoke('triggerDatabaseUpdated', {type, cause});
     }
 
     /**
-     * @returns {Promise<import('api').TestMecabResult>}
+     * @returns {Promise<import('api').ApiReturn<'testMecab'>>}
      */
     testMecab() {
-        return this._invoke('testMecab');
+        return this._invoke('testMecab', void 0);
     }
 
     /**
-     * @param {import('api').TextHasJapaneseCharactersDetails['text']} text
-     * @returns {Promise<import('api').TextHasJapaneseCharactersResult>}
+     * @param {import('api').ApiParam<'textHasJapaneseCharacters', 'text'>} text
+     * @returns {Promise<import('api').ApiReturn<'textHasJapaneseCharacters'>>}
      */
     textHasJapaneseCharacters(text) {
-        /** @type {import('api').TextHasJapaneseCharactersDetails} */
-        const details = {text};
-        return this._invoke('textHasJapaneseCharacters', details);
+        return this._invoke('textHasJapaneseCharacters', {text});
     }
 
     /**
-     * @param {import('api').GetTermFrequenciesDetails['termReadingList']} termReadingList
-     * @param {import('api').GetTermFrequenciesDetails['dictionaries']} dictionaries
-     * @returns {Promise<import('api').GetTermFrequenciesResult>}
+     * @param {import('api').ApiParam<'getTermFrequencies', 'termReadingList'>} termReadingList
+     * @param {import('api').ApiParam<'getTermFrequencies', 'dictionaries'>} dictionaries
+     * @returns {Promise<import('api').ApiReturn<'getTermFrequencies'>>}
      */
     getTermFrequencies(termReadingList, dictionaries) {
-        /** @type {import('api').GetTermFrequenciesDetails} */
-        const details = {termReadingList, dictionaries};
-        return this._invoke('getTermFrequencies', details);
+        return this._invoke('getTermFrequencies', {termReadingList, dictionaries});
     }
 
     /**
-     * @param {import('api').FindAnkiNotesDetails['query']} query
-     * @returns {Promise<import('api').FindAnkiNotesResult>}
+     * @param {import('api').ApiParam<'findAnkiNotes', 'query'>} query
+     * @returns {Promise<import('api').ApiReturn<'findAnkiNotes'>>}
      */
     findAnkiNotes(query) {
-        /** @type {import('api').FindAnkiNotesDetails} */
-        const details = {query};
-        return this._invoke('findAnkiNotes', details);
+        return this._invoke('findAnkiNotes', {query});
     }
 
     /**
-     * @param {import('api').LoadExtensionScriptsDetails['files']} files
-     * @returns {Promise<import('api').LoadExtensionScriptsResult>}
+     * @param {import('api').ApiParam<'loadExtensionScripts', 'files'>} files
+     * @returns {Promise<import('api').ApiReturn<'loadExtensionScripts'>>}
      */
     loadExtensionScripts(files) {
-        /** @type {import('api').LoadExtensionScriptsDetails} */
-        const details = {files};
-        return this._invoke('loadExtensionScripts', details);
+        return this._invoke('loadExtensionScripts', {files});
     }
 
     /**
-     * @param {import('api').OpenCrossFramePortDetails['targetTabId']} targetTabId
-     * @param {import('api').OpenCrossFramePortDetails['targetFrameId']} targetFrameId
-     * @returns {Promise<import('api').OpenCrossFramePortResult>}
+     * @param {import('api').ApiParam<'openCrossFramePort', 'targetTabId'>} targetTabId
+     * @param {import('api').ApiParam<'openCrossFramePort', 'targetFrameId'>} targetFrameId
+     * @returns {Promise<import('api').ApiReturn<'openCrossFramePort'>>}
      */
     openCrossFramePort(targetTabId, targetFrameId) {
         return this._invoke('openCrossFramePort', {targetTabId, targetFrameId});
@@ -425,12 +374,14 @@ export class API {
     // Utilities
 
     /**
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {import('core').SerializableObject} [params]
-     * @returns {Promise<TReturn>}
+     * @template {import('api').ApiNames} TAction
+     * @template {import('api').ApiParams<TAction>} TParams
+     * @param {TAction} action
+     * @param {TParams} params
+     * @returns {Promise<import('api').ApiReturn<TAction>>}
      */
-    _invoke(action, params = {}) {
+    _invoke(action, params) {
+        /** @type {import('api').MessageAny} */
         const data = {action, params};
         return new Promise((resolve, reject) => {
             try {

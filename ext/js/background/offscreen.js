@@ -18,8 +18,7 @@
 
 import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
-import {invokeMessageHandler} from '../core.js';
-import {createApiMap, getApiMapHandler} from '../core/api-map.js';
+import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
@@ -53,8 +52,8 @@ export class Offscreen {
 
 
         /* eslint-disable no-multi-spaces */
-        /** @type {import('offscreen').OffscreenApiMapInit} */
-        const messageHandlersInit = [
+        /** @type {import('offscreen').OffscreenApiMap} */
+        this._apiMap = createApiMap([
             ['clipboardGetTextOffscreen',    this._getTextHandler.bind(this)],
             ['clipboardGetImageOffscreen',   this._getImageHandler.bind(this)],
             ['clipboardSetBrowserOffscreen', this._setClipboardBrowser.bind(this)],
@@ -67,10 +66,8 @@ export class Offscreen {
             ['findTermsOffscreen',           this._findTermsHandler.bind(this)],
             ['getTermFrequenciesOffscreen',  this._getTermFrequenciesHandler.bind(this)],
             ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)]
-        ];
-
-        /** @type {import('offscreen').OffscreenApiMap} */
-        this._messageHandlers = createApiMap(messageHandlersInit);
+        ]);
+        /* eslint-enable no-multi-spaces */
 
         /** @type {?Promise<void>} */
         this._prepareDatabasePromise = null;
@@ -174,10 +171,8 @@ export class Offscreen {
         this._translator.clearDatabaseCaches();
     }
 
-    /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
-    _onMessage({action, params}, sender, callback) {
-        const messageHandler = getApiMapHandler(this._messageHandlers, action);
-        if (typeof messageHandler === 'undefined') { return false; }
-        return invokeMessageHandler(messageHandler, params, callback, sender);
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('offscreen').MessageAny>} */
+    _onMessage({action, params}, _sender, callback) {
+        return invokeApiMapHandler(this._apiMap, action, params, [], callback);
     }
 }
