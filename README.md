@@ -9,22 +9,25 @@
 :wave: **This project is a community fork of Yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023).
 
 We have made a number of foundational changes to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**:
-* Completed the Manifest V2 → Manifest V3 transition, which is required to submit a new extension to the Chrome webstore. It will also be long-term required for usage of the extension, as [Manifest V2 extensions will start being disabled as early as June 2024](https://developer.chrome.com/blog/resuming-the-transition-to-mv3/).
-* Switched to using ECMAScript modules and npm-sourced dependencies to make for a more modern coding and packaging experience.
-* Implemented an end-to-end CI/CD pipeline to make it easy to rapidly iterate and deploy new versions.
-* Switched to standard testing frameworks, vitest and playwright, to make it easier to develop more comprehensive tests, and detect regressions.
+
+- Completed the Manifest V2 → Manifest V3 transition, which is required to submit a new extension to the Chrome webstore. It will also be long-term required for usage of the extension, as [Manifest V2 extensions will start being disabled as early as June 2024](https://developer.chrome.com/blog/resuming-the-transition-to-mv3/).
+- Switched to using ECMAScript modules and npm-sourced dependencies to make for a more modern coding and packaging experience.
+- Implemented an end-to-end CI/CD pipeline to make it easy to rapidly iterate and deploy new versions.
+- Switched to standard testing frameworks, vitest and playwright, to make it easier to develop more comprehensive tests, and detect regressions.
 
 In addition, we are beginning to make important bug fixes and minor enhancements:
-* Improve dictionary import speed by 2x~10x or more (depending on the dictionary)
-* Fix UI regressions on modern browser versions, like [the popup being too small](https://github.com/themoeway/yomitan/pull/228)
-* Add functionality to import/export multiple dictionaries, to make your data more portable across machines
-* And [more](https://github.com/themoeway/yomitan/pulls?q=is%3Apr+is%3Amerged+-label%3Aarea%2Fdependencies+-label%3Akind%2Fmeta)
+
+- Improve dictionary import speed by 2x~10x or more (depending on the dictionary)
+- Fix UI regressions on modern browser versions, like [the popup being too small](https://github.com/themoeway/yomitan/pull/228)
+- Add functionality to import/export multiple dictionaries, to make your data more portable across machines
+- And [more](https://github.com/themoeway/yomitan/pulls?q=is%3Apr+is%3Amerged+-label%3Aarea%2Fdependencies+-label%3Akind%2Fmeta)
 
 Since the owner requested forks be uniquely named, we have chosen a new name, _yomitan_. (_-tan_ is an honorific used for anthropomorphic moe characters.) While we've made some substantial changes, the majority of the extension's functionality is thanks to hard work of foosoft and numerous other open source contributors from 2016-2023.
 
 Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the issue tracker, and you can find us on [TheMoeWay Discord](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
 
 ## Tool Introduction
+
 Yomitan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
 which would be otherwise too difficult tackle. This extension is similar to
 [10ten Japanese Reader (formerly Rikaichamp)](https://addons.mozilla.org/en-US/firefox/addon/10ten-ja-reader/) for Firefox and
@@ -48,6 +51,8 @@ Yomitan provides advanced features not available in other browser-based dictiona
 
 ## Table of Contents<!-- omit from toc -->
 
+- [Project Introduction](#project-introduction)
+- [Tool Introduction](#tool-introduction)
 - [Installation](#installation)
 - [Migrating from Yomichan](#migrating-from-yomichan)
   - [Exporting Data](#exporting-data)
@@ -344,6 +349,11 @@ In order for Yomitan to use it, both MeCab and a native messaging component must
 A setup guide can be found [here](https://github.com/themoeway/yomitan-mecab-installer/blob/master/README.md).
 
 ## Frequently Asked Questions
+
+**I can't scan text in Firefox!**
+
+In Firefox's Manifest V3, host permissions are treated as opt-in. For Yomitan to work properly, the recommended permissions
+must be explicitly set. In the Yomitan welcome page, go to the `Recommended Permissions (Important)` section and check `Enable recommended permissions`.
 
 **I'm having problems importing dictionaries in Firefox, what do I do?**
 
