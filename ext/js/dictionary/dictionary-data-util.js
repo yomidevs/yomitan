@@ -216,6 +216,23 @@ export class DictionaryDataUtil {
     }
 
     /**
+     * @template {import('dictionary').PronunciationType} T
+     * @param {import('dictionary').Pronunciation[]} pronunciations
+     * @param {T} type
+     * @returns {import('dictionary').PronunciationGeneric<T>[]}
+     */
+    static getPronunciationsOfType(pronunciations, type) {
+        /** @type {import('dictionary').PronunciationGeneric<T>[]} */
+        const results = [];
+        for (const pronunciation of pronunciations) {
+            if (pronunciation.type !== type) { continue; }
+            // This is type safe, but for some reason the cast is needed.
+            results.push(/** @type {import('dictionary').PronunciationGeneric<T>} */ (pronunciation));
+        }
+        return results;
+    }
+
+    /**
      * @param {import('dictionary').Tag[]|import('anki-templates').Tag[]} termTags
      * @returns {import('dictionary-data-util').TermFrequencyType}
      */

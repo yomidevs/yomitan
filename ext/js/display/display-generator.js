@@ -989,17 +989,17 @@ export class DisplayGenerator {
 
     /**
      * @param {string} reading
-     * @param {import('dictionary').TermPronunciation[]} termPronounciations
+     * @param {import('dictionary').TermPronunciation[]} termPronunciations
      * @param {string[]} wordClasses
      * @param {number} headwordIndex
      * @returns {?string}
      */
-    _getPronunciationCategories(reading, termPronounciations, wordClasses, headwordIndex) {
-        if (termPronounciations.length === 0) { return null; }
+    _getPronunciationCategories(reading, termPronunciations, wordClasses, headwordIndex) {
+        if (termPronunciations.length === 0) { return null; }
         const isVerbOrAdjective = DictionaryDataUtil.isNonNounVerbOrAdjective(wordClasses);
         /** @type {Set<import('japanese-util').PitchCategory>} */
         const categories = new Set();
-        for (const termPronunciation of termPronounciations) {
+        for (const termPronunciation of termPronunciations) {
             if (termPronunciation.headwordIndex !== headwordIndex) { continue; }
             for (const pronunciation of termPronunciation.pronunciations) {
                 if (pronunciation.type !== 'pitch-accent'){ continue; }
