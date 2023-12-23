@@ -1,6 +1,38 @@
-# Yomitan 👅
+# Yomitan <!-- omit from toc -->
 
-Yomitan is a fork of yomichan meant to work with languages other than Japanese. It turns your web browser into a tool for building language proficiency by helping you to decipher texts which would be otherwise too difficult to tackle. 
+[![Chrome Release (Stable)](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&logoColor=lightblue&color=lightblue&label=chrome%20release%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn) [![Firefox Release (Stable)](<https://img.shields.io/amo/v/yomitan?logo=Firefox&color=orange&label=firefox%20release%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)  
+[![Chrome Release (Testing)](<https://img.shields.io/chrome-web-store/v/glnaenfapkkecknnmginabpmgkenenml?logo=Google%20Chrome&logoColor=lightblue&color=lightblue&label=chrome%20release%20(testing)>)](https://chrome.google.com/webstore/detail/yomitan-development-build/glnaenfapkkecknnmginabpmgkenenml) [![Firefox Release (Testing)](<https://img.shields.io/github/v/release/themoeway/yomitan?logo=Firefox&color=orange&filter=*&label=firefox%20release%20(testing)>)](https://github.com/themoeway/yomitan/releases)  
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan) [![Discord Server](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC)
+
+## Project Introduction
+
+:wave: **This project is a community fork of Yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023).
+
+We have made a number of foundational changes to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**:
+
+- Completed the Manifest V2 → Manifest V3 transition, which is required to submit a new extension to the Chrome webstore. It will also be long-term required for usage of the extension, as [Manifest V2 extensions will start being disabled as early as June 2024](https://developer.chrome.com/blog/resuming-the-transition-to-mv3/).
+- Switched to using ECMAScript modules and npm-sourced dependencies to make for a more modern coding and packaging experience.
+- Implemented an end-to-end CI/CD pipeline to make it easy to rapidly iterate and deploy new versions.
+- Switched to standard testing frameworks, vitest and playwright, to make it easier to develop more comprehensive tests, and detect regressions.
+
+In addition, we are beginning to make important bug fixes and minor enhancements:
+
+- Improve dictionary import speed by 2x~10x or more (depending on the dictionary)
+- Fix UI regressions on modern browser versions, like [the popup being too small](https://github.com/themoeway/yomitan/pull/228)
+- Add functionality to import/export multiple dictionaries, to make your data more portable across machines
+- And [more](https://github.com/themoeway/yomitan/pulls?q=is%3Apr+is%3Amerged+-label%3Aarea%2Fdependencies+-label%3Akind%2Fmeta)
+
+Since the owner requested forks be uniquely named, we have chosen a new name, _yomitan_. (_-tan_ is an honorific used for anthropomorphic moe characters.) While we've made some substantial changes, the majority of the extension's functionality is thanks to hard work of foosoft and numerous other open source contributors from 2016-2023.
+
+Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the issue tracker, and you can find us on [TheMoeWay Discord](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
+
+## Tool Introduction
+
+Yomitan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
+which would be otherwise too difficult tackle. This extension is similar to
+[10ten Japanese Reader (formerly Rikaichamp)](https://addons.mozilla.org/en-US/firefox/addon/10ten-ja-reader/) for Firefox and
+[Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp?hl=en) for Chrome, but it
+stands apart in its goal of being an all-encompassing learning tool as opposed to a mere browser-based dictionary.
 
 Yomitan provides advanced features not available in other browser-based dictionaries:
 
@@ -15,24 +47,28 @@ Yomitan provides advanced features not available in other browser-based dictiona
 [![Dictionary options](img/ss-dictionaries-thumb.png)](img/ss-dictionaries.png)
 [![Anki options](img/ss-anki-thumb.png)](img/ss-anki.png)
 
-## Table of Contents
+## Table of Contents<!-- omit from toc -->
 
-*   [Installation](#installation)
-    *  [Get the code](#get-the-code)
-        *   [Using Git](#install-git-and-clone-the-repository-recommended)
-        *   [No git](#or-download-the-zip-file)
-    *   [Load the extension](#load-the-ext-folder-as-an-unpacked-extension)
-*   [Dictionaries](#dictionaries)
-*   [Basic Usage](#basic-usage)
-    *   [Audio](#audio)
-*   [Custom Dictionaries](#custom-dictionaries)
-*   [Anki Integration](#anki-integration)
-    *   [Flashcard Configuration](#flashcard-configuration)
-    *   [Flashcard Creation](#flashcard-creation)
-*   [Keyboard Shortcuts](#keyboard-shortcuts)
-*   [Frequently Asked Questions](#frequently-asked-questions)
-*   [Licenses](#licenses)
-*   [Third-Party Libraries](#third-party-libraries)
+- [Project Introduction](#project-introduction)
+- [Tool Introduction](#tool-introduction)
+- [Installation](#installation)
+- [Migrating from Yomichan](#migrating-from-yomichan)
+  - [Exporting Data](#exporting-data)
+  - [Custom Templates](#custom-templates)
+- [Dictionaries](#dictionaries)
+- [Basic Usage](#basic-usage)
+  - [Importing Dictionaries](#importing-dictionaries)
+  - [Importing and Exporting Personal Configuration](#importing-and-exporting-personal-configuration)
+- [Custom Dictionaries](#custom-dictionaries)
+- [Anki Integration](#anki-integration)
+  - [Flashcard Configuration](#flashcard-configuration)
+  - [Flashcard Creation](#flashcard-creation)
+- [Keyboard Shortcuts](#keyboard-shortcuts)
+- [Advanced Options](#advanced-options)
+  - [Parse sentences using MeCab](#parse-sentences-using-mecab)
+- [Frequently Asked Questions](#frequently-asked-questions)
+- [Licenses](#licenses)
+- [Third-Party Libraries](#third-party-libraries)
 
 ## Installation
 
@@ -196,6 +232,11 @@ Shortcut | Action
 <kbd>Alt</kbd> + <kbd>k</kbd> | Add current kanji to Anki.
 
 ## Frequently Asked Questions
+
+**I can't scan text in Firefox!**
+
+In Firefox's Manifest V3, host permissions are treated as opt-in. For Yomitan to work properly, the recommended permissions
+must be explicitly set. In the Yomitan welcome page, go to the `Recommended Permissions (Important)` section and check `Enable recommended permissions`.
 
 **I'm having problems importing dictionaries in Firefox, what do I do?**
 

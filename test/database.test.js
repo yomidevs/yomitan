@@ -163,7 +163,7 @@ async function testDatabase1() {
                 counts: {
                     kanji: {total: 2},
                     kanjiMeta: {total: 6, freq: 6},
-                    media: {total: 4},
+                    media: {total: 6},
                     tagMeta: {total: 15},
                     termMeta: {total: 38, freq: 31, pitch: 7},
                     terms: {total: 21}
@@ -193,13 +193,13 @@ async function testDatabase1() {
                 true
             );
             expect(counts).toStrictEqual({
-                counts: [{kanji: 2, kanjiMeta: 6, terms: 21, termMeta: 38, tagMeta: 15, media: 4}],
-                total: {kanji: 2, kanjiMeta: 6, terms: 21, termMeta: 38, tagMeta: 15, media: 4}
+                counts: [{kanji: 2, kanjiMeta: 6, terms: 21, termMeta: 38, tagMeta: 15, media: 6}],
+                total: {kanji: 2, kanjiMeta: 6, terms: 21, termMeta: 38, tagMeta: 15, media: 6}
             });
 
             // Test find* functions
             await testFindTermsBulkTest1(dictionaryDatabase, titles);
-            await testTindTermsExactBulk1(dictionaryDatabase, titles);
+            await testFindTermsExactBulk1(dictionaryDatabase, titles);
             await testFindTermsBySequenceBulk1(dictionaryDatabase, title);
             await testFindTermMetaBulk1(dictionaryDatabase, titles);
             await testFindKanjiBulk1(dictionaryDatabase, titles);
@@ -335,8 +335,8 @@ async function testFindTermsBulkTest1(database, titles) {
  * @param {DictionaryDatabase} database
  * @param {import('dictionary-database').DictionarySet} titles
  */
-async function testTindTermsExactBulk1(database, titles) {
-    test('TindTermsExactBulk1', async () => {
+async function testFindTermsExactBulk1(database, titles) {
+    test('FindTermsExactBulk1', async () => {
         /** @type {{inputs: {termList: {term: string, reading: string}[]}[], expectedResults: {total: number, terms: [key: string, count: number][], readings: [key: string, count: number][]}}[]} */
         const data = [
             {

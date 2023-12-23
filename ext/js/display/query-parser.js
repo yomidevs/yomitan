@@ -48,7 +48,7 @@ export class QueryParser extends EventDispatcher {
         this._useInternalParser = true;
         /** @type {boolean} */
         this._useMecabParser = false;
-        /** @type {import('api').ParseTextResult} */
+        /** @type {import('api').ParseTextResultItem[]} */
         this._parseResults = [];
         /** @type {HTMLElement} */
         this._queryParser = querySelectorNotNull(document, '#query-parser-content');
@@ -252,7 +252,7 @@ export class QueryParser extends EventDispatcher {
 
     /**
      * @param {HTMLSelectElement} select
-     * @param {import('api').ParseTextResult} parseResults
+     * @param {import('api').ParseTextResultItem[]} parseResults
      * @param {?string} selectedParser
      */
     _updateParserModeSelect(select, parseResults, selectedParser) {

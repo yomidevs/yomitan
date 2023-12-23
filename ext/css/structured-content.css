@@ -147,7 +147,7 @@
 }
 
 .gloss-image-link[data-appearance=monochrome] .gloss-image {
-    visibility: hidden;
+    opacity: 0;
 }
 .gloss-image-link:not([data-appearance=monochrome]) .gloss-image-background {
     display: none;

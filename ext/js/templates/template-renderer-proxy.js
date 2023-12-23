@@ -43,7 +43,7 @@ export class TemplateRendererProxy {
      */
     async render(template, data, type) {
         await this._prepareFrame();
-        return /** @type {import('template-renderer').RenderResult} */ (await this._invoke('render', {template, data, type}));
+        return await this._invoke('render', {template, data, type});
     }
 
     /**
@@ -52,7 +52,7 @@ export class TemplateRendererProxy {
      */
     async renderMulti(items) {
         await this._prepareFrame();
-        return /** @type {import('core').Response<import('template-renderer').RenderResult>[]} */ (await this._invoke('renderMulti', {items}));
+        return await this._invoke('renderMulti', {items});
     }
 
     /**
@@ -62,7 +62,7 @@ export class TemplateRendererProxy {
      */
     async getModifiedData(data, type) {
         await this._prepareFrame();
-        return /** @type {import('anki-templates').NoteData} */ (await this._invoke('getModifiedData', {data, type}));
+        return await this._invoke('getModifiedData', {data, type});
     }
 
     // Private
@@ -124,14 +124,14 @@ export class TemplateRendererProxy {
                 updateState(0x2);
             };
             /**
-             * @param {MessageEvent<unknown>} e
+             * @param {MessageEvent<import('template-renderer-proxy').BackendMessageAny>} e
              */
             const onWindowMessage = (e) => {
                 if ((state & 0x5) !== 0x1) { return; }
                 const frameWindow = frame.contentWindow;
                 if (frameWindow === null || frameWindow !== e.source) { return; }
                 const {data} = e;
-                if (!(typeof data === 'object' && data !== null && /** @type {import('core').SerializableObject} */ (data).action === 'ready')) { return; }
+                if (!(typeof data === 'object' && data !== null && data.action === 'ready')) { return; }
                 updateState(0x4);
             };
 
@@ -160,10 +160,11 @@ export class TemplateRendererProxy {
     }
 
     /**
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
+     * @template {import('template-renderer-proxy').FrontendApiNames} TName
+     * @param {TName} action
+     * @param {import('template-renderer-proxy').FrontendApiParams<TName>} params
      * @param {?number} [timeout]
-     * @returns {Promise<unknown>}
+     * @returns {Promise<import('template-renderer-proxy').FrontendApiReturn<TName>>}
      */
     _invoke(action, params, timeout = null) {
         return new Promise((resolve, reject) => {
@@ -189,8 +190,9 @@ export class TemplateRendererProxy {
                     timer = null;
                 }
             };
+
             /**
-             * @param {MessageEvent<unknown>} event
+             * @param {MessageEvent<import('template-renderer-proxy').BackendMessageAny>} event
              */
             const onMessage = (event) => {
                 if (event.source !== frameWindow) { return; }
@@ -198,21 +200,23 @@ export class TemplateRendererProxy {
                 if (
                     typeof data !== 'object' ||
                     data === null ||
-                    /** @type {import('core').SerializableObject} */ (data).id !== id ||
-                    /** @type {import('core').SerializableObject} */ (data).action !== `${action}.response`
+                    data.id !== id ||
+                    data.action !== 'response'
                 ) {
                     return;
                 }
 
-                const response = /** @type {import('core').SerializableObject} */ (data).params;
+                // This type should probably be able to be inferred without a cast, but for some reason it isn't.
+                const responseData = /** @type {import('template-renderer-proxy').BackendMessage<'response'>} */ (data);
+                const response = responseData.params;
                 if (typeof response !== 'object' || response === null) { return; }
 
                 cleanup();
-                const {error} = /** @type {import('core').Response} */ (response);
+                const {error} = response;
                 if (error) {
                     reject(ExtensionError.deserialize(error));
                 } else {
-                    resolve(/** @type {import('core').Response} */ (response).result);
+                    resolve(/** @type {import('template-renderer-proxy').FrontendApiReturn<TName>} */ (response.result));
                 }
             };
 
@@ -224,7 +228,9 @@ export class TemplateRendererProxy {
             this._invocations.add(invocation);
 
             window.addEventListener('message', onMessage, false);
-            frameWindow.postMessage({action, params, id}, '*');
+            /** @type {import('template-renderer-proxy').FrontendMessage<TName>} */
+            const requestMessage = {action, params, id};
+            frameWindow.postMessage(requestMessage, '*');
         });
     }
 
