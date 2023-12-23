@@ -154,7 +154,7 @@ export type TermMetaPitch = [
     data: TermMetaPitchData,
 ];
 
-export type TermMetaIpaData = {
+export type TermMetaPhonetic = {
     reading: string;
     transcriptions: {
         ipa: string;

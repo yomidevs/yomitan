@@ -102,7 +102,7 @@ export type Tag = {
     dictionary: string;
 };
 
-export type DatabaseTermMeta = DatabaseTermMetaFrequency | DatabaseTermMetaPitch | DatabaseTermMetaIpa;
+export type DatabaseTermMeta = DatabaseTermMetaFrequency | DatabaseTermMetaPitch | DatabaseTermMetaPhonetic;
 
 export type DatabaseTermMetaFrequency = {
     expression: string;
@@ -118,10 +118,10 @@ export type DatabaseTermMetaPitch = {
     dictionary: string;
 };
 
-export type DatabaseTermMetaIpa = {
+export type DatabaseTermMetaPhonetic = {
     expression: string;
     mode: 'ipa';
-    data: DictionaryData.TermMetaIpaData;
+    data: DictionaryData.TermMetaPhonetic;
     dictionary: string;
 };
 
@@ -130,7 +130,7 @@ export type TermMetaFrequencyDataWithReading = {
     frequency: DictionaryData.GenericFrequencyData;
 };
 
-export type TermMeta = TermMetaFrequency | TermMetaPitch | TermMetaIPA;
+export type TermMeta = TermMetaFrequency | TermMetaPitch | TermMetaPhonetic;
 
 export type TermMetaType = TermMeta['mode'];
 
@@ -143,18 +143,18 @@ export type TermMetaFrequency = {
 };
 
 export type TermMetaPitch = {
+    mode: 'pitch';
     index: number;
     term: string;
-    mode: 'pitch';
     data: DictionaryData.TermMetaPitchData;
     dictionary: string;
 };
 
-export type TermMetaIPA = {
+export type TermMetaPhonetic = {
+    mode: 'ipa';
     index: number;
     term: string;
-    mode: 'ipa';
-    data: DictionaryData.TermMetaIpaData;
+    data: DictionaryData.TermMetaPhonetic;
     dictionary: string;
 };
 

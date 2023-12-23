@@ -73,7 +73,7 @@ export type GroupedPitchAccentInternal = {
     tags: Dictionary.Tag[];
 };
 
-export type GroupedIpaInternal = {
+export type GroupedPhoneticTranscriptionInternal = {
     type: 'phonetic-transcription';
     terms: Set<string>;
     reading: string;
@@ -81,7 +81,7 @@ export type GroupedIpaInternal = {
     ipa: string;
 };
 
-export type GroupedPronunciationInternal = GroupedPitchAccentInternal | GroupedIpaInternal;
+export type GroupedPronunciationInternal = GroupedPitchAccentInternal | GroupedPhoneticTranscriptionInternal;
 
 export type GroupedPitchAccent = {
     type: 'pitch-accent';
@@ -95,7 +95,7 @@ export type GroupedPitchAccent = {
     exclusiveReadings: string[];
 };
 
-export type GroupedIpa = {
+export type GroupedPhoneticTranscription = {
     type: 'phonetic-transcription';
     terms: string[];
     reading: string;
@@ -106,7 +106,7 @@ export type GroupedIpa = {
 };
 
 
-export type GroupedPronunciation = GroupedPitchAccent | GroupedIpa;
+export type GroupedPronunciation = GroupedPitchAccent | GroupedPhoneticTranscription;
 
 export type DictionaryGroupedPronunciations = {
     dictionary: string;

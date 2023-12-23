@@ -997,7 +997,7 @@ export class Translator {
                     case 'ipa':
                     {
                         if (data.reading !== reading) { continue; }
-                        /** @type {import('dictionary').IpaTranscription[]} */
+                        /** @type {import('dictionary').PhoneticTranscription[]} */
                         const phoneticTranscriptions = [];
                         for (const {ipa, tags} of data.transcriptions) {
                             /** @type {import('dictionary').Tag[]} */

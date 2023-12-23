@@ -370,12 +370,15 @@ export type TermPronunciation = {
     pronunciations: Pronunciation[];
 };
 
-export type Pronunciation = PitchAccent | IpaTranscription;
+export type Pronunciation = PitchAccent | PhoneticTranscription;
 
 /**
  * Pitch accent information for a term, represented as the position of the downstep.
  */
 export type PitchAccent = {
+    /**
+     * Type of the pronunciation, for disambiguation between union type members.
+     */
     type: 'pitch-accent';
     /**
      * Position of the downstep, as a number of mora.
@@ -395,7 +398,10 @@ export type PitchAccent = {
     tags: Tag[];
 };
 
-export type IpaTranscription = {
+export type PhoneticTranscription = {
+    /**
+     * Type of the pronunciation, for disambiguation between union type members.
+     */
     type: 'phonetic-transcription';
     /**
      * An IPA transcription.

@@ -100,7 +100,7 @@ export type Pitch = {
 
 export type TranscriptionGroup = {
     dictionary: string;
-    transcriptions: Transcription[];
+    phoneticTranscriptions: Transcription[];
 };
 
 export type Transcription = {
@@ -191,7 +191,7 @@ export type TermDictionaryEntry = {
     readonly definitions?: TermDefinition[];
     readonly frequencies: TermFrequency[];
     readonly pitches: TermPitchAccent[];
-    readonly transcriptions: TermIpaTranscription[];
+    readonly phoneticTranscriptions: TermPhoneticTranscription[];
     sourceTermExactMatchCount: number;
     url: string;
     readonly cloze: Cloze;
@@ -259,7 +259,7 @@ export type PitchAccent = {
     tags: Tag[];
 };
 
-export type TermIpaTranscription = {
+export type TermPhoneticTranscription = {
     index: number;
     expressionIndex: number;
     dictionary: string;
@@ -269,10 +269,10 @@ export type TermIpaTranscription = {
     };
     expression: string;
     reading: string;
-    readonly transcriptions: IpaTranscription[];
+    readonly phoneticTranscriptions: PhoneticTranscription[];
 };
 
-export type IpaTranscription = {
+export type PhoneticTranscription = {
     ipa: string;
     tags: Tag[];
 };
