@@ -341,8 +341,8 @@ export class Backend {
      * @param {{level: import('log').LogLevel}} params
      */
     _onLog({level}) {
-        const levelValue = this._getErrorLevelValue(level);
-        if (levelValue <= this._getErrorLevelValue(this._logErrorLevel)) { return; }
+        const levelValue = log.getLogErrorLevelValue(level);
+        if (levelValue <= log.getLogErrorLevelValue(this._logErrorLevel)) { return; }
 
         this._logErrorLevel = level;
         this._updateBadge();
@@ -1450,20 +1450,6 @@ export class Backend {
             results.push([name, result]);
         }
         return results;
-    }
-
-    /**
-     * @param {?import('log').LogLevel} errorLevel
-     * @returns {number}
-     */
-    _getErrorLevelValue(errorLevel) {
-        switch (errorLevel) {
-            case 'info': return 0;
-            case 'debug': return 0;
-            case 'warn': return 1;
-            case 'error': return 2;
-            default: return 0;
-        }
     }
 
     /**

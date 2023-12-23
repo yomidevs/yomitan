@@ -734,6 +734,20 @@ export class Logger extends EventDispatcher {
     error(error, context = null) {
         this.log(error, 'error', context);
     }
+
+    /**
+     * @param {?import('log').LogLevel} errorLevel
+     * @returns {number}
+     */
+    getLogErrorLevelValue(errorLevel) {
+        switch (errorLevel) {
+            case 'info': return 0;
+            case 'debug': return 0;
+            case 'warn': return 1;
+            case 'error': return 2;
+            default: return 0;
+        }
+    }
 }
 
 /**
