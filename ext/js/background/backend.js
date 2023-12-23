@@ -342,7 +342,8 @@ export class Backend {
      */
     _onLog({level}) {
         const levelValue = log.getLogErrorLevelValue(level);
-        if (levelValue <= log.getLogErrorLevelValue(this._logErrorLevel)) { return; }
+        const currentLogErrorLevel = this._logErrorLevel !== null ? log.getLogErrorLevelValue(this._logErrorLevel) : 0;
+        if (levelValue <= currentLogErrorLevel) { return; }
 
         this._logErrorLevel = level;
         this._updateBadge();

@@ -736,16 +736,17 @@ export class Logger extends EventDispatcher {
     }
 
     /**
-     * @param {?import('log').LogLevel} errorLevel
-     * @returns {number}
+     * @param {import('log').LogLevel} errorLevel
+     * @returns {import('log').LogErrorLevelValue}
      */
     getLogErrorLevelValue(errorLevel) {
         switch (errorLevel) {
-            case 'info': return 0;
-            case 'debug': return 0;
+            case 'log':
+            case 'info':
+            case 'debug':
+                return 0;
             case 'warn': return 1;
             case 'error': return 2;
-            default: return 0;
         }
     }
 }
