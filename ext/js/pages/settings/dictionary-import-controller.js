@@ -216,7 +216,7 @@ export class DictionaryImportController {
      */
     _getImportLabel(stepIndex) {
         switch (stepIndex) {
-            case -2:
+            case -2: return '';
             case -1:
             case 0: return 'Loading dictionary';
             case 1: return 'Loading schemas';
