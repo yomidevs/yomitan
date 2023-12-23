@@ -179,8 +179,8 @@ export class DictionaryImportController {
                 for (const label of statusLabels) { label.textContent = statusString; }
 
                 switch (stepIndex2) {
-                    case -2: // Initialize
-                    case 5: // Data import
+                    case -2:
+                    case 5:
                         this._triggerStorageChanged();
                         break;
                 }

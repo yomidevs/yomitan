@@ -184,15 +184,12 @@ export class DOMTextScanner {
 
             matchCharAttributes: switch (charAttributes) {
                 case 0:
-                    // Character should be ignored
                     continue probeForward;
                 case 1:
-                    // Character is collapsible whitespace
                     lineHasWhitespace = true;
                     break matchCharAttributes;
                 case 2:
                 case 3:
-                    // Character should be added to the content
                     if (newlines > 0) {
                         if (content.length > 0) {
                             const useNewlineCount = Math.min(remainder, newlines);
@@ -273,15 +270,12 @@ export class DOMTextScanner {
 
             matchCharAttributes: switch (charAttributes) {
                 case 0:
-                    // Character should be ignored
                     continue probeBackward;
                 case 1:
-                    // Character is collapsible whitespace
                     lineHasWhitespace = true;
                     break matchCharAttributes;
                 case 2:
                 case 3:
-                    // Character should be added to the content
                     if (newlines > 0) {
                         if (content.length > 0) {
                             const useNewlineCount = Math.min(remainder, newlines);
