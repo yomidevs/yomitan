@@ -365,19 +365,18 @@ export type TermPronunciation = {
      */
     dictionaryPriority: number;
     /**
-     * The pitch accent representations for the term.
+     * The pronunciations for the term.
      */
-    pitches: TermPitch[];
-    /**
-     * The phonetic transcriptions for the term.
-     */
-    transcriptions: TermIPA[];
+    pronunciations: Pronunciation[];
 };
+
+export type Pronunciation = PitchAccent | IpaTranscription;
 
 /**
  * Pitch accent information for a term, represented as the position of the downstep.
  */
-export type TermPitch = {
+export type PitchAccent = {
+    type: 'pitch-accent';
     /**
      * Position of the downstep, as a number of mora.
      */
@@ -396,7 +395,8 @@ export type TermPitch = {
     tags: Tag[];
 };
 
-export type TermIPA = {
+export type IpaTranscription = {
+    type: 'phonetic-transcription';
     /**
      * An IPA transcription.
      */

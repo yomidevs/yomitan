@@ -135,7 +135,7 @@ export class DictionaryDataUtil {
      * @returns {import('dictionary-data-util').DictionaryGroupedPronunciations[]}
      */
     static getGroupedPronunciations(dictionaryEntry) {
-        const {headwords, pronunciations} = dictionaryEntry;
+        const {headwords, pronunciations: termPronunciations} = dictionaryEntry;
 
         const allTerms = new Set();
         const allReadings = new Set();
@@ -146,38 +146,20 @@ export class DictionaryDataUtil {
 
         /** @type {Map<string, import('dictionary-data-util').GroupedPronunciationInternal[]>} */
         const groupedPronunciationsMap = new Map();
-        for (const {headwordIndex, dictionary, pitches, transcriptions} of pronunciations) {
+        for (const {headwordIndex, dictionary, pronunciations} of termPronunciations) {
             const {term, reading} = headwords[headwordIndex];
             let dictionaryGroupedPronunciationList = groupedPronunciationsMap.get(dictionary);
             if (typeof dictionaryGroupedPronunciationList === 'undefined') {
                 dictionaryGroupedPronunciationList = [];
                 groupedPronunciationsMap.set(dictionary, dictionaryGroupedPronunciationList);
             }
-            for (const {position, nasalPositions, devoicePositions, tags} of pitches) {
-                let groupedPronunciation = this._findExistingGroupedPronunciation(reading, position, nasalPositions, devoicePositions, tags, dictionaryGroupedPronunciationList);
+            for (const pronunciation of pronunciations) {
+                let groupedPronunciation = this._findExistingGroupedPronunciation(reading, pronunciation, dictionaryGroupedPronunciationList);
                 if (groupedPronunciation === null) {
                     groupedPronunciation = {
-                        type: 'pitch-accent',
+                        ...pronunciation,
                         terms: new Set(),
-                        reading,
-                        position,
-                        nasalPositions,
-                        devoicePositions,
-                        tags
-                    };
-                    dictionaryGroupedPronunciationList.push(groupedPronunciation);
-                }
-                groupedPronunciation.terms.add(term);
-            }
-            for (const {ipa, tags = []} of transcriptions) {
-                let groupedPronunciation = this._findExistingGroupedPronunciation(reading, ipa, null, null, null, tags, dictionaryGroupedPronunciationList);
-                if (groupedPronunciation === null) {
-                    groupedPronunciation = {
-                        type: 'phonetic-transcription',
-                        terms: new Set(),
-                        reading,
-                        ipa,
-                        tags
+                        reading
                     };
                     dictionaryGroupedPronunciationList.push(groupedPronunciation);
                 }
@@ -192,22 +174,41 @@ export class DictionaryDataUtil {
             /** @type {import('dictionary-data-util').GroupedPronunciation[]} */
             const pronunciations2 = [];
             for (const groupedPronunciation of dictionaryGroupedPronunciationList) {
-                const {terms, reading, position, nasalPositions, devoicePositions, tags} = groupedPronunciation;
+                const {terms, reading} = groupedPronunciation;
                 const exclusiveTerms = !this._areSetsEqual(terms, allTerms) ? this._getSetIntersection(terms, allTerms) : [];
                 const exclusiveReadings = [];
                 if (multipleReadings) {
                     exclusiveReadings.push(reading);
                 }
-                pronunciations2.push({
-                    terms: [...terms],
-                    reading,
-                    position,
-                    nasalPositions,
-                    devoicePositions,
-                    tags,
-                    exclusiveTerms,
-                    exclusiveReadings
-                });
+                switch (groupedPronunciation.type) {
+                    case 'pitch-accent': {
+                        const {position, nasalPositions, devoicePositions, tags} = groupedPronunciation;
+                        pronunciations2.push({
+                            type: 'pitch-accent',
+                            terms: [...terms],
+                            reading,
+                            position,
+                            nasalPositions,
+                            devoicePositions,
+                            tags,
+                            exclusiveTerms,
+                            exclusiveReadings
+                        });
+                        break;
+                    } case 'phonetic-transcription': {
+                        const {ipa, tags} = groupedPronunciation;
+                        pronunciations2.push({
+                            type: 'phonetic-transcription',
+                            terms: [...terms],
+                            reading,
+                            ipa,
+                            tags,
+                            exclusiveTerms,
+                            exclusiveReadings
+                        });
+                        break;
+                    }
+                }
             }
             results2.push({dictionary, pronunciations: pronunciations2});
         }
@@ -303,23 +304,28 @@ export class DictionaryDataUtil {
 
     /**
      * @param {string} reading
-     * @param {number} position
-     * @param {number[]} nasalPositions
-     * @param {number[]} devoicePositions
-     * @param {import('dictionary').Tag[]} tags
+     * @param {import('dictionary').Pronunciation} pronunciation
      * @param {import('dictionary-data-util').GroupedPronunciationInternal[]} groupedPronunciationList
      * @returns {?import('dictionary-data-util').GroupedPronunciationInternal}
      */
-    static _findExistingGroupedPronunciation(reading, position, nasalPositions, devoicePositions, tags, groupedPronunciationList) {
-        for (const pitchInfo of groupedPronunciationList) {
+    static _findExistingGroupedPronunciation(reading, pronunciation, groupedPronunciationList) {
+        for (const groupedPronunciation of groupedPronunciationList) {
             if (
-                pitchInfo.reading === reading &&
-                pitchInfo.position === position &&
-                this._areArraysEqual(pitchInfo.nasalPositions, nasalPositions) &&
-                this._areArraysEqual(pitchInfo.devoicePositions, devoicePositions) &&
-                this._areTagListsEqual(pitchInfo.tags, tags)
+                groupedPronunciation.reading === reading &&
+                this._areTagListsEqual(groupedPronunciation.tags, pronunciation.tags) &&
+                (
+                    pronunciation.type === 'pitch-accent' &&
+                    groupedPronunciation.type === 'pitch-accent' &&
+                    groupedPronunciation.position === pronunciation.position &&
+                    this._areArraysEqual(groupedPronunciation.nasalPositions, pronunciation.nasalPositions) &&
+                    this._areArraysEqual(groupedPronunciation.devoicePositions, pronunciation.devoicePositions)
+                    ||
+                    pronunciation.type === 'phonetic-transcription' &&
+                    groupedPronunciation.type === 'phonetic-transcription' &&
+                    groupedPronunciation.ipa === pronunciation.ipa
+                )
             ) {
-                return pitchInfo;
+                return groupedPronunciation;
             }
         }
         return null;

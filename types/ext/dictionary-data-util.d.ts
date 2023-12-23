@@ -85,7 +85,7 @@ export type GroupedPronunciationInternal = GroupedPitchAccentInternal | GroupedI
 
 export type GroupedPitchAccent = {
     type: 'pitch-accent';
-    terms: Set<string>;
+    terms: string[];
     reading: string;
     position: number;
     nasalPositions: number[];
@@ -97,7 +97,7 @@ export type GroupedPitchAccent = {
 
 export type GroupedIpa = {
     type: 'phonetic-transcription';
-    terms: Set<string>;
+    terms: string[];
     reading: string;
     tags: Dictionary.Tag[];
     ipa: string;

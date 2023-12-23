@@ -964,7 +964,7 @@ export class Translator {
                     case 'pitch':
                         {
                             if (data.reading !== reading) { continue; }
-                            /** @type {import('dictionary').TermPitch[]} */
+                            /** @type {import('dictionary').PitchAccent[]} */
                             const pitches = [];
                             for (const {position, tags, nasal, devoice} of data.pitches) {
                                 /** @type {import('dictionary').Tag[]} */
@@ -974,7 +974,13 @@ export class Translator {
                                 }
                                 const nasalPositions = this._toNumberArray(nasal);
                                 const devoicePositions = this._toNumberArray(devoice);
-                                pitches.push({position, nasalPositions, devoicePositions, tags: tags2});
+                                pitches.push({
+                                    type: 'pitch-accent',
+                                    position,
+                                    nasalPositions,
+                                    devoicePositions,
+                                    tags: tags2
+                                });
                             }
                             for (const {pronunciations, headwordIndex} of targets) {
                                 pronunciations.push(this._createTermPronunciation(
@@ -991,7 +997,7 @@ export class Translator {
                     case 'ipa':
                     {
                         if (data.reading !== reading) { continue; }
-                        /** @type {import('dictionary').TermIPA[]} */
+                        /** @type {import('dictionary').IpaTranscription[]} */
                         const phoneticTranscriptions = [];
                         for (const {ipa, tags} of data.transcriptions) {
                             /** @type {import('dictionary').Tag[]} */
@@ -999,7 +1005,11 @@ export class Translator {
                             if (Array.isArray(tags)) {
                                 tagAggregator.addTags(tags2, dictionary, tags);
                             }
-                            phoneticTranscriptions.push({ipa, tags: tags2});
+                            phoneticTranscriptions.push({
+                                type: 'phonetic-transcription',
+                                ipa,
+                                tags: tags2
+                            });
                         }
                         for (const {pronunciations, headwordIndex} of targets) {
                             pronunciations.push(this._createTermPronunciation(
@@ -1008,7 +1018,6 @@ export class Translator {
                                 dictionary,
                                 dictionaryIndex,
                                 dictionaryPriority,
-                                [],
                                 phoneticTranscriptions
                             ));
                         }
@@ -1366,12 +1375,11 @@ export class Translator {
      * @param {string} dictionary
      * @param {number} dictionaryIndex
      * @param {number} dictionaryPriority
-     * @param {import('dictionary').TermPitch[]} pitches
-     * @param {import('dictionary').TermIPA[]} transcriptions
+     * @param {import('dictionary').Pronunciation[]} pronunciations
      * @returns {import('dictionary').TermPronunciation}
      */
-    _createTermPronunciation(index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches, transcriptions) {
-        return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches, transcriptions};
+    _createTermPronunciation(index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pronunciations) {
+        return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pronunciations};
     }
 
     /**
