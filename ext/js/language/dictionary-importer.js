@@ -503,6 +503,7 @@ export class DictionaryImporter {
             width: preferredWidth,
             height: preferredHeight,
             title,
+            alt,
             description,
             pixelated,
             imageRendering,
@@ -518,6 +519,7 @@ export class DictionaryImporter {
         if (typeof preferredWidth === 'number') { target.preferredWidth = preferredWidth; }
         if (typeof preferredHeight === 'number') { target.preferredHeight = preferredHeight; }
         if (typeof title === 'string') { target.title = title; }
+        if (typeof alt === 'string') { target.alt = alt; }
         if (typeof description === 'string') { target.description = description; }
         if (typeof pixelated === 'boolean') { target.pixelated = pixelated; }
         if (typeof imageRendering === 'string') { target.imageRendering = imageRendering; }
