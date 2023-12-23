@@ -368,6 +368,10 @@ export type TermPronunciation = {
      * The pitch accent representations for the term.
      */
     pitches: TermPitch[];
+    /**
+     * The phonetic transcriptions for the term.
+     */
+    transcriptions: TermIPA[];
 };
 
 /**
@@ -388,6 +392,17 @@ export type TermPitch = {
     devoicePositions: number[];
     /**
      * Tags for the pitch accent.
+     */
+    tags: Tag[];
+};
+
+export type TermIPA = {
+    /**
+     * An IPA transcription.
+     */
+    ipa: string;
+    /**
+     * Tags for the IPA transcription.
      */
     tags: Tag[];
 };

@@ -63,7 +63,8 @@ export type KanjiFrequency = {
 
 export type TermFrequencyType = 'popular' | 'rare' | 'normal';
 
-export type GroupedPronunciationInternal = {
+export type GroupedPitchAccentInternal = {
+    type: 'pitch-accent';
     terms: Set<string>;
     reading: string;
     position: number;
@@ -72,8 +73,19 @@ export type GroupedPronunciationInternal = {
     tags: Dictionary.Tag[];
 };
 
-export type GroupedPronunciation = {
-    terms: string[];
+export type GroupedIpaInternal = {
+    type: 'phonetic-transcription';
+    terms: Set<string>;
+    reading: string;
+    tags: Dictionary.Tag[];
+    ipa: string;
+};
+
+export type GroupedPronunciationInternal = GroupedPitchAccentInternal | GroupedIpaInternal;
+
+export type GroupedPitchAccent = {
+    type: 'pitch-accent';
+    terms: Set<string>;
     reading: string;
     position: number;
     nasalPositions: number[];
@@ -82,6 +94,19 @@ export type GroupedPronunciation = {
     exclusiveTerms: string[];
     exclusiveReadings: string[];
 };
+
+export type GroupedIpa = {
+    type: 'phonetic-transcription';
+    terms: Set<string>;
+    reading: string;
+    tags: Dictionary.Tag[];
+    ipa: string;
+    exclusiveTerms: string[];
+    exclusiveReadings: string[];
+};
+
+
+export type GroupedPronunciation = GroupedPitchAccent | GroupedIpa;
 
 export type DictionaryGroupedPronunciations = {
     dictionary: string;

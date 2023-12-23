@@ -988,6 +988,31 @@ export class Translator {
                             }
                         }
                         break;
+                    case 'ipa':
+                    {
+                        if (data.reading !== reading) { continue; }
+                        /** @type {import('dictionary').TermIPA[]} */
+                        const phoneticTranscriptions = [];
+                        for (const {ipa, tags} of data.transcriptions) {
+                            /** @type {import('dictionary').Tag[]} */
+                            const tags2 = [];
+                            if (Array.isArray(tags)) {
+                                tagAggregator.addTags(tags2, dictionary, tags);
+                            }
+                            phoneticTranscriptions.push({ipa, tags: tags2});
+                        }
+                        for (const {pronunciations, headwordIndex} of targets) {
+                            pronunciations.push(this._createTermPronunciation(
+                                pronunciations.length,
+                                headwordIndex,
+                                dictionary,
+                                dictionaryIndex,
+                                dictionaryPriority,
+                                [],
+                                phoneticTranscriptions
+                            ));
+                        }
+                    }
                 }
             }
         }
@@ -1342,10 +1367,11 @@ export class Translator {
      * @param {number} dictionaryIndex
      * @param {number} dictionaryPriority
      * @param {import('dictionary').TermPitch[]} pitches
+     * @param {import('dictionary').TermIPA[]} transcriptions
      * @returns {import('dictionary').TermPronunciation}
      */
-    _createTermPronunciation(index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches) {
-        return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches};
+    _createTermPronunciation(index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches, transcriptions) {
+        return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pitches, transcriptions};
     }
 
     /**

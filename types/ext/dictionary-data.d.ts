@@ -154,6 +154,14 @@ export type TermMetaPitch = [
     data: TermMetaPitchData,
 ];
 
+export type TermMetaIpaData = {
+    reading: string;
+    transcriptions: {
+        ipa: string;
+        tags?: string[];
+    }[];
+};
+
 export type KanjiMetaArray = KanjiMeta[];
 
 export type KanjiMeta = KanjiMetaFrequency;
