@@ -1382,13 +1382,13 @@ export class TextScanner extends EventDispatcher {
                 return input.scanOnPenRelease;
         }
         switch (this._penPointerState) {
-            case 1: // hovering
+            case 1:
                 return input.scanOnPenHover;
-            case 2: // touching
+            case 2:
                 return input.scanOnPenMove;
-            case 3: // hovering after touching
+            case 3:
                 return input.scanOnPenReleaseHover;
-            case 0: // not active
+            case 0:
                 return false;
         }
     }
