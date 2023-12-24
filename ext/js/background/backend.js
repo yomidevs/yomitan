@@ -2442,7 +2442,8 @@ export class Backend {
                 convertHiraganaToKatakana,
                 convertKatakanaToHiragana,
                 collapseEmphaticSequences,
-                textReplacements: textReplacementsOptions
+                textReplacements: textReplacementsOptions,
+                partsOfSpeechFilter
             }
         } = options;
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
@@ -2456,7 +2457,7 @@ export class Backend {
             excludeDictionaryDefinitions = new Set();
             excludeDictionaryDefinitions.add(mainDictionary);
         }
-        return {
+        const findTermsOptions = {
             matchType,
             deinflect,
             mainDictionary,
@@ -2471,8 +2472,13 @@ export class Backend {
             collapseEmphaticSequences,
             textReplacements,
             enabledDictionaryMap,
-            excludeDictionaryDefinitions
+            excludeDictionaryDefinitions,
+            partsOfSpeechFilter
         };
+
+        console.log('findTermsOptions', findTermsOptions);
+
+        return findTermsOptions;
     }
 
     /**

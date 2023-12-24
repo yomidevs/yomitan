@@ -68,6 +68,7 @@ export class Translator {
      * @returns {Promise<{dictionaryEntries: import('dictionary').TermDictionaryEntry[], originalTextLength: number}>} An object containing dictionary entries and the length of the original source text.
      */
     async findTerms(mode, text, options) {
+        console.log('findTerms', mode, text, options);
         const {enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder} = options;
         const tagAggregator = new TranslatorTagAggregator();
         let {dictionaryEntries, originalTextLength} = await this._findTermsInternalWrapper(text, enabledDictionaryMap, options, tagAggregator);
@@ -265,14 +266,15 @@ export class Translator {
             deinflectionArray.push(deinflection);
         }
 
-        const {matchType} = options;
+        const {matchType, partsOfSpeechFilter} = options;
+
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
 
         for (const databaseEntry of databaseEntries) {
             const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
                 const deinflectionRules = deinflection.rules;
-                if (deinflectionRules === 0 || (definitionRules & deinflectionRules) !== 0) {
+                if (Deinflector.rulesCheck(partsOfSpeechFilter, deinflectionRules, definitionRules)) {
                     deinflection.databaseEntries.push(databaseEntry);
                 }
             }
@@ -334,7 +336,7 @@ export class Translator {
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                for (const {term, rules, reasons} of /** @type {Deinflector} */ (this._deinflector).deinflect(source)) {
+                for (const {term, rules, reasons} of /** @type {Deinflector} */ (this._deinflector).deinflect(source, options)) {
                     deinflections.push(this._createDeinflection(rawSource, source, term, rules, reasons));
                 }
             }
