@@ -157,7 +157,7 @@ export class DictionaryDataUtil {
                 let groupedPronunciation = this._findExistingGroupedPronunciation(reading, pronunciation, dictionaryGroupedPronunciationList);
                 if (groupedPronunciation === null) {
                     groupedPronunciation = {
-                        ...pronunciation,
+                        pronunciation,
                         terms: new Set(),
                         reading
                     };
@@ -174,42 +174,21 @@ export class DictionaryDataUtil {
             /** @type {import('dictionary-data-util').GroupedPronunciation[]} */
             const pronunciations2 = [];
             for (const groupedPronunciation of dictionaryGroupedPronunciationList) {
-                const {terms, reading} = groupedPronunciation;
+                const {pronunciation, terms, reading} = groupedPronunciation;
                 const exclusiveTerms = !this._areSetsEqual(terms, allTerms) ? this._getSetIntersection(terms, allTerms) : [];
                 const exclusiveReadings = [];
                 if (multipleReadings) {
                     exclusiveReadings.push(reading);
                 }
-                switch (groupedPronunciation.type) {
-                    case 'pitch-accent': {
-                        const {position, nasalPositions, devoicePositions, tags} = groupedPronunciation;
-                        pronunciations2.push({
-                            type: 'pitch-accent',
-                            terms: [...terms],
-                            reading,
-                            position,
-                            nasalPositions,
-                            devoicePositions,
-                            tags,
-                            exclusiveTerms,
-                            exclusiveReadings
-                        });
-                        break;
-                    } case 'phonetic-transcription': {
-                        const {ipa, tags} = groupedPronunciation;
-                        pronunciations2.push({
-                            type: 'phonetic-transcription',
-                            terms: [...terms],
-                            reading,
-                            ipa,
-                            tags,
-                            exclusiveTerms,
-                            exclusiveReadings
-                        });
-                        break;
-                    }
-                }
+                pronunciations2.push({
+                    pronunciation,
+                    terms: [...terms],
+                    reading,
+                    exclusiveTerms,
+                    exclusiveReadings
+                });
             }
+
             results2.push({dictionary, pronunciations: pronunciations2});
         }
         return results2;
@@ -335,22 +314,23 @@ export class DictionaryDataUtil {
 
     /**
      * @param {import('dictionary-data-util').GroupedPronunciationInternal} groupedPronunciation
-     * @param {import('dictionary').Pronunciation} pronunciation
+     * @param {import('dictionary').Pronunciation} pronunciation2
      * @returns {boolean}
      */
-    static _arePronunciationsEquivalent(groupedPronunciation, pronunciation) {
-        if (!this._areTagListsEqual(groupedPronunciation.tags, pronunciation.tags)) {
+    static _arePronunciationsEquivalent({pronunciation: pronunciation1}, pronunciation2) {
+        if (!this._areTagListsEqual(pronunciation1.tags, pronunciation2.tags)) {
             return false;
         }
+        if (pronunciation1.type !== pronunciation2.type) { return false; }
 
-        if (pronunciation.type === 'pitch-accent' && groupedPronunciation.type === 'pitch-accent') {
-            if (groupedPronunciation.position !== pronunciation.position ||
-                !this._areArraysEqual(groupedPronunciation.nasalPositions, pronunciation.nasalPositions) ||
-                !this._areArraysEqual(groupedPronunciation.devoicePositions, pronunciation.devoicePositions)) {
+        if (pronunciation1.type === 'pitch-accent' && pronunciation2.type === 'pitch-accent') {
+            if (pronunciation1.position !== pronunciation2.position ||
+                !this._areArraysEqual(pronunciation1.nasalPositions, pronunciation2.nasalPositions) ||
+                !this._areArraysEqual(pronunciation1.devoicePositions, pronunciation2.devoicePositions)) {
                 return false;
             }
-        } else if (pronunciation.type === 'phonetic-transcription' && groupedPronunciation.type === 'phonetic-transcription') {
-            if (groupedPronunciation.ipa !== pronunciation.ipa) {
+        } else if (pronunciation2.type === 'phonetic-transcription' && pronunciation1.type === 'phonetic-transcription') {
+            if (pronunciation1.ipa !== pronunciation2.ipa) {
                 return false;
             }
         } else {

@@ -621,7 +621,7 @@ export class DisplayGenerator {
         n1.appendChild(tag);
 
         let hasTags = false;
-        for (const {tags} of pronunciations) {
+        for (const {pronunciation: {tags}} of pronunciations) {
             if (tags.length > 0) {
                 hasTags = true;
                 break;
@@ -640,21 +640,24 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createPronunciation(details) {
-        switch (details.type) {
+        const {pronunciation} = details;
+        switch (pronunciation.type) {
             case 'pitch-accent':
-                return this._createPronunciationPitchAccent(details);
+                return this._createPronunciationPitchAccent(pronunciation, details);
             case 'phonetic-transcription':
-                return this._createPronunciationPhoneticTranscription(details);
+                return this._createPronunciationPhoneticTranscription(pronunciation, details);
         }
     }
 
 
     /**
-     * @param {import('dictionary-data-util').GroupedPhoneticTranscription} details
+     * @param {import('dictionary').PhoneticTranscription} pronunciation
+     * @param {import('dictionary-data-util').GroupedPronunciation} details
      * @returns {HTMLElement}
      */
-    _createPronunciationPhoneticTranscription(details) {
-        const {ipa, tags, exclusiveTerms, exclusiveReadings} = details;
+    _createPronunciationPhoneticTranscription(pronunciation, details) {
+        const {ipa, tags} = pronunciation;
+        const {exclusiveTerms, exclusiveReadings} = details;
 
         const node = this._instantiate('pronunciation');
 
@@ -674,13 +677,15 @@ export class DisplayGenerator {
     }
 
     /**
-     * @param {import('dictionary-data-util').GroupedPitchAccent} details
+     * @param {import('dictionary').PitchAccent} pitchAccent
+     * @param {import('dictionary-data-util').GroupedPronunciation} details
      * @returns {HTMLElement}
      */
-    _createPronunciationPitchAccent(details) {
+    _createPronunciationPitchAccent(pitchAccent, details) {
         const jp = this._japaneseUtil;
 
-        const {reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} = details;
+        const {position, nasalPositions, devoicePositions, tags} = pitchAccent;
+        const {reading, exclusiveTerms, exclusiveReadings} = details;
         const morae = jp.getKanaMorae(reading);
 
         const node = this._instantiate('pronunciation');

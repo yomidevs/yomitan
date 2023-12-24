@@ -5,6 +5,7 @@ node_modules/
 builds/
 
 dictionaries/
+dict/
 
 /test-results/
 /playwright-report/
