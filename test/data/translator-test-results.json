@@ -1740,14 +1740,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -1927,14 +1929,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -2114,14 +2118,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -2301,14 +2307,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -4637,14 +4645,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -4824,14 +4834,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -5351,14 +5363,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -5538,14 +5552,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -6820,14 +6836,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -7055,14 +7073,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -8194,14 +8214,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -8215,14 +8237,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -9227,14 +9251,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -9418,14 +9444,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -9609,14 +9637,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -9800,14 +9830,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -11000,14 +11032,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -11187,14 +11221,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -11374,14 +11410,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -11561,14 +11599,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -12761,14 +12801,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -12948,14 +12990,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -13135,14 +13179,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -13322,14 +13368,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -15012,14 +15060,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -15033,14 +15083,16 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
               },
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -15674,8 +15726,9 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 2,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -15696,6 +15749,7 @@
                 ]
               },
               {
+                "type": "pitch-accent",
                 "position": 2,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -15716,6 +15770,7 @@
                 ]
               },
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [],
                 "devoicePositions": [],
@@ -15820,8 +15875,9 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 3,
                 "nasalPositions": [
                   3
@@ -15914,8 +15970,9 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [
                   3
@@ -16008,8 +16065,9 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 0,
                 "nasalPositions": [
                   2
@@ -16102,8 +16160,9 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "pitches": [
+            "pronunciations": [
               {
+                "type": "pitch-accent",
                 "position": 4,
                 "nasalPositions": [],
                 "devoicePositions": [
