@@ -116,6 +116,10 @@ export type FindTermsOptions = {
      * A set of dictionary names which should have definitions removed.
      */
     excludeDictionaryDefinitions: Set<string> | null;
+    /**
+     * Whether algorithm deinflections should be filtered using parts of speech.
+     */
+    partsOfSpeechFilter: boolean;
 };
 
 /**

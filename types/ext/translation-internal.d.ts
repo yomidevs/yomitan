@@ -63,3 +63,10 @@ export type DatabaseDeinflection = {
     reasons: string[];
     databaseEntries: DictionaryDatabase.TermEntry[];
 };
+
+export type DeinflectionOptions = {
+    /**
+     * Whether algorithm deinflections should be filtered using parts of speech.
+     */
+    partsOfSpeechFilter: boolean;
+};

@@ -728,7 +728,8 @@
                                     "convertHiraganaToKatakana",
                                     "convertKatakanaToHiragana",
                                     "collapseEmphaticSequences",
-                                    "textReplacements"
+                                    "textReplacements",
+                                    "partsOfSpeechFilter"
                                 ],
                                 "properties": {
                                     "convertHalfWidthCharacters": {
@@ -801,6 +802,10 @@
                                                 }
                                             }
                                         }
+                                    },
+                                    "partsOfSpeechFilter": {
+                                        "type": "boolean",
+                                        "default": true
                                     }
                                 }
                             },

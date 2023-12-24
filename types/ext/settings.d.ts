@@ -234,6 +234,7 @@ export type TranslationOptions = {
     convertKatakanaToHiragana: TranslationConvertType;
     collapseEmphaticSequences: TranslationCollapseEmphaticSequences;
     textReplacements: TranslationTextReplacementOptions;
+    partsOfSpeechFilter: boolean;
 };
 
 export type TranslationTextReplacementOptions = {
