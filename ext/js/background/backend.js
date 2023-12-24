@@ -2442,7 +2442,8 @@ export class Backend {
                 convertHiraganaToKatakana,
                 convertKatakanaToHiragana,
                 collapseEmphaticSequences,
-                textReplacements: textReplacementsOptions
+                textReplacements: textReplacementsOptions,
+                searchResolution
             }
         } = options;
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
@@ -2469,6 +2470,7 @@ export class Backend {
             convertHiraganaToKatakana,
             convertKatakanaToHiragana,
             collapseEmphaticSequences,
+            searchResolution,
             textReplacements,
             enabledDictionaryMap,
             excludeDictionaryDefinitions

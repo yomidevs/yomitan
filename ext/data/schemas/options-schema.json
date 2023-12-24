@@ -728,9 +728,18 @@
                                     "convertHiraganaToKatakana",
                                     "convertKatakanaToHiragana",
                                     "collapseEmphaticSequences",
-                                    "textReplacements"
+                                    "textReplacements",
+                                    "searchResolution"
                                 ],
                                 "properties": {
+                                    "searchResolution": {
+                                        "type": "string",
+                                        "enum": [
+                                            "letter",
+                                            "word"
+                                        ],
+                                        "default": "letter"
+                                    },
                                     "convertHalfWidthCharacters": {
                                         "type": "string",
                                         "enum": ["false", "true", "variant"],

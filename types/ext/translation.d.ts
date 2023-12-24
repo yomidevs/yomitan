@@ -116,6 +116,10 @@ export type FindTermsOptions = {
      * A set of dictionary names which should have definitions removed.
      */
     excludeDictionaryDefinitions: Set<string> | null;
+    /**
+     * Whether every substring should be searched for, or only whole words.
+     */
+    searchResolution: 'letter' | 'word';
 };
 
 /**

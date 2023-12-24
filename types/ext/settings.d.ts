@@ -234,6 +234,7 @@ export type TranslationOptions = {
     convertKatakanaToHiragana: TranslationConvertType;
     collapseEmphaticSequences: TranslationCollapseEmphaticSequences;
     textReplacements: TranslationTextReplacementOptions;
+    searchResolution: 'letter' | 'word';
 };
 
 export type TranslationTextReplacementOptions = {
