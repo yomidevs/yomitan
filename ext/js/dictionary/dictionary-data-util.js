@@ -318,33 +318,30 @@ export class DictionaryDataUtil {
      * @returns {boolean}
      */
     static _arePronunciationsEquivalent({pronunciation: pronunciation1}, pronunciation2) {
-        if (pronunciation1.type !== pronunciation2.type) {
-            return false;
-        }
-        if (!this._areTagListsEqual(pronunciation1.tags, pronunciation2.tags)) {
+        if (
+            pronunciation1.type !== pronunciation2.type ||
+            !this._areTagListsEqual(pronunciation1.tags, pronunciation2.tags)
+        ) {
             return false;
         }
         switch (pronunciation1.type) {
             case 'pitch-accent':
-                if (
-                    pronunciation2.type === 'pitch-accent' &&
-                    (pronunciation1.position !== pronunciation2.position ||
-                     !this._areArraysEqual(pronunciation1.nasalPositions, pronunciation2.nasalPositions) ||
-                     !this._areArraysEqual(pronunciation1.devoicePositions, pronunciation2.devoicePositions))
-                ) {
-                    return false;
-                }
-                break;
+            {
+                // This cast is valid based on the type check at the start of the function.
+                const pitchAccent2 = /** @type {import('dictionary').PitchAccent} */ (pronunciation2);
+                return (
+                    pronunciation1.position === pitchAccent2.position &&
+                    this._areArraysEqual(pronunciation1.nasalPositions, pitchAccent2.nasalPositions) &&
+                    this._areArraysEqual(pronunciation1.devoicePositions, pitchAccent2.devoicePositions)
+                );
+            }
             case 'phonetic-transcription':
-                if (
-                    pronunciation2.type === 'phonetic-transcription' &&
-                    pronunciation1.ipa !== pronunciation2.ipa
-                ) {
-                    return false;
-                }
-                break;
+            {
+                // This cast is valid based on the type check at the start of the function.
+                const phoneticTranscription2 = /** @type {import('dictionary').PhoneticTranscription} */ (pronunciation2);
+                return pronunciation1.ipa === phoneticTranscription2.ipa;
+            }
         }
-
         return true;
     }
 
