@@ -19,6 +19,7 @@
 import {Handlebars} from '../../../lib/handlebars.js';
 import {AnkiNoteDataCreator} from '../../data/sandbox/anki-note-data-creator.js';
 import {DictionaryDataUtil} from '../../dictionary/dictionary-data-util.js';
+import {DictionaryDataUtil} from '../../dictionary/dictionary-data-util.js';
 import {PronunciationGenerator} from '../../display/sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';
 import {CssStyleApplier} from '../../dom/sandbox/css-style-applier.js';

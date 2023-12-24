@@ -36,7 +36,7 @@ export class Translator {
         this._languageUtil = languageUtil;
         /** @type {JapaneseUtil} */
         this._japaneseUtil = japaneseUtil;
-        /** @type {DictionaryDatabase} */
+        /** @type {import('../dictionary/dictionary-database.js').DictionaryDatabase} */
         this._database = database;
         /** @type {?Deinflector} */
         this._deinflector = null;

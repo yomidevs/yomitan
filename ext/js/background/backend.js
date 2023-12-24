@@ -30,6 +30,7 @@ import {OptionsUtil} from '../data/options-util.js';
 import {PermissionsUtil} from '../data/permissions-util.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
+import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {fetchText} from '../general/helpers.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
