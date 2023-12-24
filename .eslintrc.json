@@ -402,6 +402,12 @@
                 "*.ts"
             ],
             "rules": {
+                "no-multiple-empty-lines": [
+                    "error",
+                    {
+                        "max": 1
+                    }
+                ],
                 "no-undef": "off",
                 "unused-imports/no-unused-imports": "error",
                 "@typescript-eslint/no-unused-vars": [

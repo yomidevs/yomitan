@@ -108,7 +108,6 @@ export type FindKanjiOptionsOffscreen = Omit<Translation.FindKanjiOptions, 'enab
     ][];
 };
 
-
 export type FindTermsOptionsOffscreen = Omit<Translation.FindTermsOptions, 'enabledDictionaryMap' | 'excludeDictionaryDefinitions' | 'textReplacements'> & {
     enabledDictionaryMap: [
         key: string,
