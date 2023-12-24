@@ -329,24 +329,35 @@ export class Translator {
                 text2 = jp.collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
             }
 
-            let i = text2.length;
-            while (i > 0){
-                const source = text2.substring(0, i);
+            for (
+                let source = text2, i = text2.length;
+                i > 0;
+                i = this._getNextSubstringLength(options.searchResolution, i, source)
+            ) {
+                source = text2.substring(0, i);
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
                 for (const {term, rules, reasons} of /** @type {Deinflector} */ (this._deinflector).deinflect(source)) {
                     deinflections.push(this._createDeinflection(rawSource, source, term, rules, reasons));
                 }
-
-                if (options.searchResolution === 'word') {
-                    i = source.search(new RegExp('[^\\p{Letter}]([\\p{Letter}\\p{Number}]*)$', 'u'));
-                } else {
-                    --i;
-                }
             }
         }
         return deinflections;
+    }
+
+    /**
+     * @param {string} searchResolution
+     * @param {number} i
+     * @param {string} source
+     * @returns {number}
+     */
+    _getNextSubstringLength(searchResolution, i, source) {
+        if (searchResolution === 'word') {
+            return source.search(new RegExp('[^\\p{Letter}]([\\p{Letter}\\p{Number}]*)$', 'u'));
+        } else {
+            return i - 1;
+        }
     }
 
     /**
