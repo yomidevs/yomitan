@@ -196,9 +196,11 @@ export class AnkiNoteDataCreator {
             for (const {dictionary, pronunciations} of DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry)) {
                 /** @type {import('anki-templates').Pitch[]} */
                 const pitches = [];
-                for (const pronunciation of pronunciations) {
+                for (const groupedPronunciation of pronunciations) {
+                    const {pronunciation} = groupedPronunciation;
                     if (pronunciation.type !== 'pitch-accent') { continue; }
-                    const {terms, reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} = pronunciation;
+                    const {position, nasalPositions, devoicePositions, tags} = pronunciation;
+                    const {terms, reading, exclusiveTerms, exclusiveReadings} = groupedPronunciation;
                     pitches.push({
                         expressions: terms,
                         reading,
@@ -225,9 +227,11 @@ export class AnkiNoteDataCreator {
         if (dictionaryEntry.type === 'term') {
             for (const {dictionary, pronunciations} of DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry)) {
                 const phoneticTranscriptions = [];
-                for (const pronunciation of pronunciations) {
+                for (const groupedPronunciation of pronunciations) {
+                    const {pronunciation} = groupedPronunciation;
                     if (pronunciation.type !== 'phonetic-transcription') { continue; }
-                    const {terms, reading, ipa, tags, exclusiveTerms, exclusiveReadings} = pronunciation;
+                    const {ipa, tags} = pronunciation;
+                    const {terms, reading, exclusiveTerms, exclusiveReadings} = groupedPronunciation;
                     phoneticTranscriptions.push({
                         expressions: terms,
                         reading,
