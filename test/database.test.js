@@ -103,7 +103,6 @@ function countKanjiWithCharacter(kanji, character) {
 }
 
 
-
 /** */
 async function testDatabase1() {
     test('Database1', async () => {
