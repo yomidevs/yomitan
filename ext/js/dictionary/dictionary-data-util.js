@@ -318,23 +318,31 @@ export class DictionaryDataUtil {
      * @returns {boolean}
      */
     static _arePronunciationsEquivalent({pronunciation: pronunciation1}, pronunciation2) {
+        if (pronunciation1.type !== pronunciation2.type) {
+            return false;
+        }
         if (!this._areTagListsEqual(pronunciation1.tags, pronunciation2.tags)) {
             return false;
         }
-        if (pronunciation1.type !== pronunciation2.type) { return false; }
-
-        if (pronunciation1.type === 'pitch-accent' && pronunciation2.type === 'pitch-accent') {
-            if (pronunciation1.position !== pronunciation2.position ||
-                !this._areArraysEqual(pronunciation1.nasalPositions, pronunciation2.nasalPositions) ||
-                !this._areArraysEqual(pronunciation1.devoicePositions, pronunciation2.devoicePositions)) {
-                return false;
-            }
-        } else if (pronunciation2.type === 'phonetic-transcription' && pronunciation1.type === 'phonetic-transcription') {
-            if (pronunciation1.ipa !== pronunciation2.ipa) {
-                return false;
-            }
-        } else {
-            return false;
+        switch (pronunciation1.type) {
+            case 'pitch-accent':
+                if (
+                    pronunciation2.type === 'pitch-accent' &&
+                    (pronunciation1.position !== pronunciation2.position ||
+                     !this._areArraysEqual(pronunciation1.nasalPositions, pronunciation2.nasalPositions) ||
+                     !this._areArraysEqual(pronunciation1.devoicePositions, pronunciation2.devoicePositions))
+                ) {
+                    return false;
+                }
+                break;
+            case 'phonetic-transcription':
+                if (
+                    pronunciation2.type === 'phonetic-transcription' &&
+                    pronunciation1.ipa !== pronunciation2.ipa
+                ) {
+                    return false;
+                }
+                break;
         }
 
         return true;
