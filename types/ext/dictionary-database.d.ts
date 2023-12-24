@@ -158,7 +158,6 @@ export type TermMetaPhonetic = {
     dictionary: string;
 };
 
-
 export type DatabaseKanjiMeta = DatabaseKanjiMetaFrequency;
 
 export type DatabaseKanjiMetaFrequency = {

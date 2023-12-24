@@ -1007,7 +1007,7 @@ export class DisplayGenerator {
         for (const termPronunciation of termPronunciations) {
             if (termPronunciation.headwordIndex !== headwordIndex) { continue; }
             for (const pronunciation of termPronunciation.pronunciations) {
-                if (pronunciation.type !== 'pitch-accent'){ continue; }
+                if (pronunciation.type !== 'pitch-accent') { continue; }
                 const category = this._japaneseUtil.getPitchCategory(reading, pronunciation.position, isVerbOrAdjective);
                 if (category !== null) {
                     categories.add(category);
