@@ -2457,7 +2457,7 @@ export class Backend {
             excludeDictionaryDefinitions = new Set();
             excludeDictionaryDefinitions.add(mainDictionary);
         }
-        const findTermsOptions = {
+        return {
             matchType,
             deinflect,
             mainDictionary,
@@ -2475,10 +2475,6 @@ export class Backend {
             excludeDictionaryDefinitions,
             partsOfSpeechFilter
         };
-
-        console.log('findTermsOptions', findTermsOptions);
-
-        return findTermsOptions;
     }
 
     /**
