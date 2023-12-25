@@ -106,7 +106,7 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
         }
         return container.lookupProperty(obj, name);
       },
-      // This function is lifted from the handlebars source and slightly modified (lib/handlebars/runtime.js)
+      // this function is lifted from the handlebars source and slightly modified (lib/handlebars/runtime.js)
       lookupProperty(parent, propertyName) {
         const result = parent[propertyName];
         if (result == null) {
@@ -121,7 +121,7 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
         }
         return undefined;
       },
-      // This function is lifted from the handlebars source and slightly modified (lib/handlebars/runtime.js)
+      // this function is lifted from the handlebars source and slightly modified (lib/handlebars/runtime.js)
       lambda(current, context) {
         return typeof current === 'function' ? current.call(context) : current;
       },
@@ -343,7 +343,7 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
     }
   }
 
-  // Lifted from lib/handlebars/compiler/compiler.js (original name: classifySexpr)
+  // Liftet from lib/handlebars/compiler/compiler.js (original name: classifySexpr)
   private classifyNode(node: { path: hbs.AST.PathExpression }): NodeType {
     const isSimple = AST.helpers.simpleId(node.path);
     const isBlockParam = isSimple && !!this.blockParamIndex(node.path.parts[0]);
@@ -378,7 +378,7 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
     }
   }
 
-  // Lifted from lib/handlebars/compiler/compiler.js
+  // Liftet from lib/handlebars/compiler/compiler.js
   private blockParamIndex(name: string): [number, any] | undefined {
     for (let depth = 0, len = this.blockParamNames.length; depth < len; depth++) {
       const blockParams = this.blockParamNames[depth];
