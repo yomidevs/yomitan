@@ -61,6 +61,12 @@
         "no-case-declarations": "error",
         "no-const-assign": "error",
         "no-constant-condition": "off",
+        "no-multiple-empty-lines": [
+            "error",
+            {
+                "max": 2
+            }
+        ],
         "no-global-assign": "error",
         "no-new": "error",
         "no-param-reassign": "off",
@@ -210,6 +216,10 @@
                 "before": false,
                 "after": true
             }
+        ],
+        "space-before-blocks": [
+            "error",
+            "always"
         ],
         "space-before-function-paren": [
             "error",
@@ -392,6 +402,12 @@
                 "*.ts"
             ],
             "rules": {
+                "no-multiple-empty-lines": [
+                    "error",
+                    {
+                        "max": 1
+                    }
+                ],
                 "no-undef": "off",
                 "unused-imports/no-unused-imports": "error",
                 "@typescript-eslint/no-unused-vars": [

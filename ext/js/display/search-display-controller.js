@@ -279,7 +279,7 @@ export class SearchDisplayController {
 
     /** */
     _onCopy() {
-        // ignore copy from search page
+        // Ignore copy from search page
         const selection = window.getSelection();
         this._clipboardMonitor.setPreviousText(selection !== null ? selection.toString().trim() : '');
     }

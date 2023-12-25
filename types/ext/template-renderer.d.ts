@@ -55,8 +55,8 @@ export type DataType = {
 export type HelperOptionsFunction<TResult = unknown> = (context: unknown) => TResult;
 
 export type HelperOptions = {
-    fn: HelperOptionsFunction;
-    inverse: HelperOptionsFunction;
+    fn?: HelperOptionsFunction;
+    inverse?: HelperOptionsFunction;
     hash: Core.SafeAny;
     data?: Core.SafeAny;
 };
