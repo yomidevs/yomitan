@@ -210,7 +210,7 @@ export type TermDictionaryEntry = {
     /**
      * A list of inflections that was applied to get the term.
      */
-    inflections: string[];
+    inflectionHypotheses: DictionaryData.InflectionHypothesis[];
     /**
      * A score for the dictionary entry.
      */

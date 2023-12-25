@@ -70,7 +70,7 @@ export class Translator {
     async findTerms(mode, text, options) {
         const {enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder} = options;
         const tagAggregator = new TranslatorTagAggregator();
-        let {dictionaryEntries, originalTextLength} = await this._findTermsInternalWrapper(text, enabledDictionaryMap, options, tagAggregator);
+        let {dictionaryEntries, originalTextLength} = await this._findTermsInternal(text, enabledDictionaryMap, options, tagAggregator);
 
         switch (mode) {
             case 'group':
@@ -208,7 +208,7 @@ export class Translator {
      * @param {TranslatorTagAggregator} tagAggregator
      * @returns {Promise<import('translator').FindTermsResult>}
      */
-    async _findTermsInternalWrapper(text, enabledDictionaryMap, options, tagAggregator) {
+    async _findTermsInternal(text, enabledDictionaryMap, options, tagAggregator) {
         if (options.removeNonJapaneseCharacters) {
             text = this._getJapaneseOnlyText(text);
         }
@@ -216,9 +216,10 @@ export class Translator {
             return {dictionaryEntries: [], originalTextLength: 0};
         }
 
-        const deinflections = await this._findTermsInternal(text, enabledDictionaryMap, options);
+        const deinflections = await this._getDeinflections(text, enabledDictionaryMap, options);
 
         let originalTextLength = 0;
+        /** @type {import('dictionary').TermDictionaryEntry[]} */
         const dictionaryEntries = [];
         const ids = new Set();
         for (const {databaseEntries, originalText, transformedText, deinflectedText, reasons} of deinflections) {
@@ -226,8 +227,23 @@ export class Translator {
             originalTextLength = Math.max(originalTextLength, originalText.length);
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
-                if (ids.has(id)) { continue; }
-                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, true, enabledDictionaryMap, tagAggregator);
+                if (ids.has(id)) {
+                    const existingEntry = dictionaryEntries.find((entry) => {
+                        return entry.definitions.some((definition) => definition.id === id);
+                    });
+                    if (existingEntry) {
+                        if (
+                            !this._isHypothesisInHypotheses(existingEntry, reasons) &&
+                            existingEntry.headwords[0].sources[0].transformedText.length <= transformedText.length
+                        ) {
+                            existingEntry.inflectionHypotheses.push(reasons);
+                        }
+                        continue;
+                    }
+                    // TODO: make configurable
+                    if (databaseEntry.formOf) { continue; }
+                }
+                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, [reasons], true, enabledDictionaryMap, tagAggregator);
                 dictionaryEntries.push(dictionaryEntry);
                 ids.add(id);
             }
@@ -237,12 +253,36 @@ export class Translator {
     }
 
     /**
+     * @param {import('dictionary').TermDictionaryEntry} existingEntry
+     * @param {import('dictionary-data').InflectionHypothesis} hypothesis
+     * @returns {boolean}
+     */
+    _isHypothesisInHypotheses({inflectionHypotheses}, hypothesis) {
+        return inflectionHypotheses.some((h) => Translator.areArraysEqual(h, hypothesis));
+    }
+
+    /**
+     * @template [T=unknown]
+     * @param {T[]} array1
+     * @param {T[]} array2
+     * @returns {boolean}
+     */
+    static areArraysEqual(array1, array2) {
+        const ii = array1.length;
+        if (ii !== array2.length) { return false; }
+        for (let i = 0; i < ii; ++i) {
+            if (array1[i] !== array2[i]) { return false; }
+        }
+        return true;
+    }
+
+    /**
      * @param {string} text
      * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
      * @param {import('translation').FindTermsOptions} options
      * @returns {Promise<import('translation-internal').DatabaseDeinflection[]>}
      */
-    async _findTermsInternal(text, enabledDictionaryMap, options) {
+    async _getDeinflections(text, enabledDictionaryMap, options) {
         const deinflections = (
             options.deinflect ?
             this._getAllDeinflections(text, options) :

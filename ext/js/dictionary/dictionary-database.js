@@ -578,21 +578,23 @@ export class DictionaryDatabase {
      * @returns {import('dictionary-database').TermEntry}
      */
     _createTerm(matchSource, matchType, row, index) {
-        const {sequence} = row;
+        const {sequence, reading, score, dictionary, formOf, inflectionHypotheses} = row;
         return {
             index,
             matchType,
             matchSource,
             term: row.expression,
-            reading: row.reading,
+            reading,
             definitionTags: this._splitField(row.definitionTags || row.tags),
             termTags: this._splitField(row.termTags),
             rules: this._splitField(row.rules),
             definitions: row.glossary,
-            score: row.score,
-            dictionary: row.dictionary,
+            score,
+            dictionary,
             id: row.id,
-            sequence: typeof sequence === 'number' ? sequence : -1
+            sequence: typeof sequence === 'number' ? sequence : -1,
+            formOf,
+            inflectionHypotheses
         };
     }
 

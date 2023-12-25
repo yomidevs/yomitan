@@ -1,5 +1,5 @@
 {
-    "$id": "dictionaryTermBankV3",
+    "$id": "dictionaryTermBankV4",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
         "structuredContent": {
@@ -319,7 +319,7 @@
         "type": "array",
         "description": "Information about a single term.",
         "minItems": 8,
-        "maxItems": 8,
+        "maxItems": 10,
         "additionalItems": false,
         "items": [
             {
@@ -336,7 +336,7 @@
             },
             {
                 "type": "string",
-                "description": "String of space-separated rule identifiers for the definition which is used to validate delinflection. Valid rule identifiers are: v1: ichidan verb; v5: godan verb; vs: suru verb; vk: kuru verb; adj-i: i-adjective. An empty string corresponds to words which aren't inflected, such as nouns."
+                "description": "String of space-separated rule identifiers for the definition which is used to validate deinflection. An empty string should be used for words which aren't inflected."
             },
             {
                 "type": "number",
@@ -482,6 +482,22 @@
             {
                 "type": "string",
                 "description": "String of space-separated tags for the term. An empty string is treated as no tags."
+            },
+            {
+                "type": ["string"],
+                "description": "Lemma (uninflected) form of the term. Empty for lemmas."
+            },
+            {
+                "type": ["array"],
+                "description": "Array of possible inflection combinations that produce the term. Empty for lemmas.",
+                "items": {
+                    "type": "array",
+                    "description": "An inflection combination.",
+                    "items": {
+                        "type": "string",
+                        "description": "An inflection."
+                    }
+                }
             }
         ]
     }

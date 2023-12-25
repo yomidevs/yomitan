@@ -613,10 +613,10 @@ export class DictionaryImporter {
      * @returns {import('dictionary-database').DatabaseTermEntry}
      */
     _convertTermBankEntryV3(entry, dictionary) {
-        let [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
+        let [expression, reading, definitionTags, rules, score, glossary, sequence, termTags, formOf, inflectionHypotheses] = entry;
         expression = this._normalizeTermOrReading(expression);
         reading = this._normalizeTermOrReading(reading.length > 0 ? reading : expression);
-        return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, dictionary};
+        return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, formOf, inflectionHypotheses, dictionary};
     }
 
     /**

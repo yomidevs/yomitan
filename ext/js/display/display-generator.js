@@ -67,13 +67,13 @@ export class DisplayGenerator {
         const node = this._instantiate('term-entry');
 
         const headwordsContainer = this._querySelector(node, '.headword-list');
-        const inflectionsContainer = this._querySelector(node, '.inflection-list');
+        const inflectionHypothesesContainer = this._querySelector(node, '.inflection-hypotheses');
         const groupedPronunciationsContainer = this._querySelector(node, '.pronunciation-group-list');
         const frequencyGroupListContainer = this._querySelector(node, '.frequency-group-list');
         const definitionsContainer = this._querySelector(node, '.definition-list');
         const headwordTagsContainer = this._querySelector(node, '.headword-list-tag-list');
 
-        const {headwords, type, inflections, definitions, frequencies, pronunciations} = dictionaryEntry;
+        const {headwords, type, inflectionHypotheses, definitions, frequencies, pronunciations} = dictionaryEntry;
         const groupedPronunciations = DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry);
         const pronunciationCount = groupedPronunciations.reduce((i, v) => i + v.pronunciations.length, 0);
         const groupedFrequencies = DictionaryDataUtil.groupTermFrequencies(dictionaryEntry);
@@ -112,7 +112,7 @@ export class DisplayGenerator {
         }
         headwordsContainer.dataset.count = `${headwords.length}`;
 
-        this._appendMultiple(inflectionsContainer, this._createTermInflection.bind(this), inflections);
+        this._appendMultiple(inflectionHypothesesContainer, this._createInflectionHypothesis.bind(this), inflectionHypotheses);
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations);
         this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length);
@@ -354,6 +354,17 @@ export class DisplayGenerator {
         this._appendFurigana(termContainer, term, reading, this._appendKanjiLinks.bind(this));
 
         return node;
+    }
+
+    /**
+     * @param {import('dictionary-data').InflectionHypothesis} inflectionHypothesis
+     * @returns {DocumentFragment}
+     */
+    _createInflectionHypothesis(inflectionHypothesis) {
+        const fragment = this._templates.instantiateFragment('inflection-hypothesis');
+        const node = this._querySelector(fragment, '.inflection-hypothesis');
+        this._appendMultiple(node, this._createTermInflection.bind(this), inflectionHypothesis);
+        return fragment;
     }
 
     /**

@@ -66,7 +66,12 @@ export type TermV3 = [
     glossary: TermGlossary[],
     sequence: number,
     termTags: string,
+    formOf: string,
+    inflectionHypotheses: InflectionHypothesis[],
 ];
+
+export type InflectionHypothesis = string[];
+
 
 export type KanjiV1Array = KanjiV1[];
 
