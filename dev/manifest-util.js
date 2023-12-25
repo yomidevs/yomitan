@@ -127,7 +127,7 @@ export class ManifestUtil {
     _applyModifications(manifest, modifications) {
         if (Array.isArray(modifications)) {
             for (const modification of modifications) {
-                // rename to path2 to avoid clashing with imported `node:path` module.
+                // Rename to path2 to avoid clashing with imported `node:path` module.
                 const {action, path: path2} = modification;
                 switch (action) {
                     case 'set':
