@@ -160,129 +160,6 @@ export class DOMTextScanner {
     // Private
 
     /**
-     * @param {string} char
-     * @param {import('dom-text-scanner').CharacterAttributesEnum} charAttributes
-     * @param {import('dom-text-scanner').SeekTextNoteDetails} seekTextNoteDetails
-     * @returns {import('dom-text-scanner').SeekTextNoteDetails}
-     */
-    _checkCharacterForward(char, charAttributes, seekTextNoteDetails) {
-        let {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines} = seekTextNoteDetails;
-
-        switch (charAttributes) {
-            case 0:
-                break;
-            case 1:
-                lineHasWhitespace = true;
-                break;
-            case 2:
-            case 3:
-                if (newlines > 0) {
-                    if (content.length > 0) {
-                        const useNewlineCount = Math.min(remainder, newlines);
-                        content += '\n'.repeat(useNewlineCount);
-                        remainder -= useNewlineCount;
-                        newlines -= useNewlineCount;
-                    } else {
-                        newlines = 0;
-                    }
-                    lineHasContent = false;
-                    lineHasWhitespace = false;
-                    if (remainder <= 0) {
-                        offset -= char.length; // Revert character offset
-                        done = true;
-                        break;
-                    }
-                }
-
-                lineHasContent = (charAttributes === 2); // 3 = character is a newline
-
-                if (lineHasWhitespace) {
-                    if (lineHasContent) {
-                        content += ' ';
-                        lineHasWhitespace = false;
-                        if (--remainder <= 0) {
-                            offset -= char.length; // Revert character offset
-                            done = true;
-                            break;
-                        }
-                    } else {
-                        lineHasWhitespace = false;
-                    }
-                }
-
-                content += char;
-
-                if (--remainder <= 0) {
-                    done = true;
-                    break;
-                }
-        }
-
-        return {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines};
-    }
-    /**
-     * @param {string} char
-     * @param {import('dom-text-scanner').CharacterAttributesEnum} charAttributes
-     * @param {import('dom-text-scanner').SeekTextNoteDetails} seekTextNoteDetails
-     * @returns {import('dom-text-scanner').SeekTextNoteDetails}
-     */
-    _checkCharacterBackward(char, charAttributes, seekTextNoteDetails) {
-        let {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines} = seekTextNoteDetails;
-
-        switch (charAttributes) {
-            case 0:
-                break;
-            case 1:
-                lineHasWhitespace = true;
-                break;
-            case 2:
-            case 3:
-                if (newlines > 0) {
-                    if (content.length > 0) {
-                        const useNewlineCount = Math.min(remainder, newlines);
-                        content = '\n'.repeat(useNewlineCount) + content;
-                        remainder -= useNewlineCount;
-                        newlines -= useNewlineCount;
-                    } else {
-                        newlines = 0;
-                    }
-                    lineHasContent = false;
-                    lineHasWhitespace = false;
-                    if (remainder <= 0) {
-                        offset += char.length; // Revert character offset
-                        done = true;
-                        break;
-                    }
-                }
-
-                lineHasContent = (charAttributes === 2); // 3 = character is a newline
-
-                if (lineHasWhitespace) {
-                    if (lineHasContent) {
-                        content = ' ' + content;
-                        lineHasWhitespace = false;
-                        if (--remainder <= 0) {
-                            offset += char.length; // Revert character offset
-                            done = true;
-                            break;
-                        }
-                    } else {
-                        lineHasWhitespace = false;
-                    }
-                }
-
-                content = char + content;
-
-                if (--remainder <= 0) {
-                    done = true;
-                    break;
-                }
-        }
-
-        return {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines};
-    }
-
-    /**
      * Seeks forward in a text node.
      * @param {Text} textNode The text node to use.
      * @param {boolean} resetOffset Whether or not the text offset should be reset.
@@ -394,6 +271,130 @@ export class DOMTextScanner {
             }
         }
         return {preserveNewlines: false, preserveWhitespace: false};
+    }
+
+    /**
+     * @param {string} char
+     * @param {import('dom-text-scanner').CharacterAttributesEnum} charAttributes
+     * @param {import('dom-text-scanner').SeekTextNoteDetails} seekTextNoteDetails
+     * @returns {import('dom-text-scanner').SeekTextNoteDetails}
+     */
+    _checkCharacterForward(char, charAttributes, seekTextNoteDetails) {
+        let {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines} = seekTextNoteDetails;
+
+        switch (charAttributes) {
+            case 0:
+                break;
+            case 1:
+                lineHasWhitespace = true;
+                break;
+            case 2:
+            case 3:
+                if (newlines > 0) {
+                    if (content.length > 0) {
+                        const useNewlineCount = Math.min(remainder, newlines);
+                        content += '\n'.repeat(useNewlineCount);
+                        remainder -= useNewlineCount;
+                        newlines -= useNewlineCount;
+                    } else {
+                        newlines = 0;
+                    }
+                    lineHasContent = false;
+                    lineHasWhitespace = false;
+                    if (remainder <= 0) {
+                        offset -= char.length; // Revert character offset
+                        done = true;
+                        break;
+                    }
+                }
+
+                lineHasContent = (charAttributes === 2); // 3 = character is a newline
+
+                if (lineHasWhitespace) {
+                    if (lineHasContent) {
+                        content += ' ';
+                        lineHasWhitespace = false;
+                        if (--remainder <= 0) {
+                            offset -= char.length; // Revert character offset
+                            done = true;
+                            break;
+                        }
+                    } else {
+                        lineHasWhitespace = false;
+                    }
+                }
+
+                content += char;
+
+                if (--remainder <= 0) {
+                    done = true;
+                    break;
+                }
+        }
+
+        return {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines};
+    }
+
+    /**
+     * @param {string} char
+     * @param {import('dom-text-scanner').CharacterAttributesEnum} charAttributes
+     * @param {import('dom-text-scanner').SeekTextNoteDetails} seekTextNoteDetails
+     * @returns {import('dom-text-scanner').SeekTextNoteDetails}
+     */
+    _checkCharacterBackward(char, charAttributes, seekTextNoteDetails) {
+        let {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines} = seekTextNoteDetails;
+
+        switch (charAttributes) {
+            case 0:
+                break;
+            case 1:
+                lineHasWhitespace = true;
+                break;
+            case 2:
+            case 3:
+                if (newlines > 0) {
+                    if (content.length > 0) {
+                        const useNewlineCount = Math.min(remainder, newlines);
+                        content = '\n'.repeat(useNewlineCount) + content;
+                        remainder -= useNewlineCount;
+                        newlines -= useNewlineCount;
+                    } else {
+                        newlines = 0;
+                    }
+                    lineHasContent = false;
+                    lineHasWhitespace = false;
+                    if (remainder <= 0) {
+                        offset += char.length; // Revert character offset
+                        done = true;
+                        break;
+                    }
+                }
+
+                lineHasContent = (charAttributes === 2); // 3 = character is a newline
+
+                if (lineHasWhitespace) {
+                    if (lineHasContent) {
+                        content = ' ' + content;
+                        lineHasWhitespace = false;
+                        if (--remainder <= 0) {
+                            offset += char.length; // Revert character offset
+                            done = true;
+                            break;
+                        }
+                    } else {
+                        lineHasWhitespace = false;
+                    }
+                }
+
+                content = char + content;
+
+                if (--remainder <= 0) {
+                    done = true;
+                    break;
+                }
+        }
+
+        return {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines};
     }
 
     // Static helpers
