@@ -103,7 +103,7 @@ export interface RuntimeOptions extends Pick<Handlebars.RuntimeOptions, 'data' |
 }
 
 /**
- * The last argument being passed to a helper function is an {@link https://handlebarsjs.com/api-reference/helpers.html#the-options-parameter options object}.
+ * The last argument being passed to a helper function is a an {@link https://handlebarsjs.com/api-reference/helpers.html#the-options-parameter options object}.
  */
 export interface HelperOptions extends Omit<Handlebars.HelperOptions, 'fn' | 'inverse'> {
   name: string;

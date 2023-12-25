@@ -348,16 +348,16 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
     const isSimple = AST.helpers.simpleId(node.path);
     const isBlockParam = isSimple && !!this.blockParamIndex(node.path.parts[0]);
 
-    // A mustache is an eligible helper if:
+    // a mustache is an eligible helper if:
     // * its id is simple (a single part, not `this` or `..`)
     let isHelper = !isBlockParam && AST.helpers.helperExpression(node);
 
-    // If a mustache is an eligible helper but not a definite
+    // if a mustache is an eligible helper but not a definite
     // helper, it is ambiguous, and will be resolved in a later
     // pass or at runtime.
     let isEligible = !isBlockParam && (isHelper || isSimple);
 
-    // If ambiguous, we can possibly resolve the ambiguity now
+    // if ambiguous, we can possibly resolve the ambiguity now
     // An eligible helper is one that does not have a complex path, i.e. `this.foo`, `../foo` etc.
     if (isEligible && !isHelper) {
       const name = node.path.parts[0];
@@ -683,7 +683,7 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
     const prog: TemplateDelegate = (nextContext: any, runtimeOptions: RuntimeOptions = {}) => {
       runtimeOptions = { ...runtimeOptions };
 
-      // Inherit data in blockParams from parent program
+      // inherit data in blockParams from parent program
       runtimeOptions.data = runtimeOptions.data || this.runtimeOptions!.data;
       if (runtimeOptions.blockParams) {
         runtimeOptions.blockParams = runtimeOptions.blockParams.concat(
@@ -691,25 +691,25 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
         );
       }
 
-      // Inherit partials from parent program
+      // inherit partials from parent program
       runtimeOptions.partials = runtimeOptions.partials || this.runtimeOptions!.partials;
 
-      // Stash parent program data
+      // stash parent program data
       const tmpRuntimeOptions = this.runtimeOptions;
       this.runtimeOptions = runtimeOptions;
       const shiftContext = nextContext !== this.context;
       if (shiftContext) this.contexts.unshift(nextContext);
       this.blockParamValues.unshift(runtimeOptions.blockParams || []);
 
-      // Execute child program
+      // execute child program
       const result = this.resolveNodes(program).join('');
 
-      // Unstash parent program data
+      // unstash parent program data
       this.blockParamValues.shift();
       if (shiftContext) this.contexts.shift();
       this.runtimeOptions = tmpRuntimeOptions;
 
-      // Return result of child program
+      // return result of child program
       return result;
     };
 
