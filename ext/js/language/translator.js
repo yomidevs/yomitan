@@ -354,7 +354,7 @@ export class Translator {
      */
     _getNextSubstringLength(searchResolution, i, source) {
         if (searchResolution === 'word') {
-            return source.search(new RegExp('[^\\p{Letter}]([\\p{Letter}\\p{Number}]*)$', 'u'));
+            return source.search(/[^\p{Letter}]([\p{Letter}\p{Number}]*)$/u);
         } else {
             return i - 1;
         }
