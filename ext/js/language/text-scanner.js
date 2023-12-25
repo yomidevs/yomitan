@@ -137,8 +137,8 @@ export class TextScanner extends EventDispatcher {
         this._preventNextClick = false;
         /** @type {boolean} */
         this._preventScroll = false;
-        /** @type {0|1|2|3} */
-        this._penPointerState = 0; // 0 = not active; 1 = hovering; 2 = touching; 3 = hovering after touching
+        /** @type {import('text-scanner').PenPointerState} */
+        this._penPointerState = 0;
         /** @type {Map<number, string>} */
         this._pointerIdTypeMap = new Map();
 
@@ -1382,13 +1382,13 @@ export class TextScanner extends EventDispatcher {
                 return input.scanOnPenRelease;
         }
         switch (this._penPointerState) {
-            case 1: // hovering
+            case 1:
                 return input.scanOnPenHover;
-            case 2: // touching
+            case 2:
                 return input.scanOnPenMove;
-            case 3: // hovering after touching
+            case 3:
                 return input.scanOnPenReleaseHover;
-            default: // not active
+            case 0:
                 return false;
         }
     }
