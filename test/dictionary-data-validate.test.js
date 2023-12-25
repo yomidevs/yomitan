@@ -18,7 +18,7 @@
 
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import {describe, test} from 'vitest';
+import {describe, it} from 'vitest';
 import * as dictionaryValidate from '../dev/dictionary-validate.js';
 import {createDictionaryArchive} from '../dev/util.js';
 
@@ -46,7 +46,7 @@ describe('Dictionary validation', () => {
     ];
     const schemas = dictionaryValidate.getSchemas();
     describe.each(testCases)('Test dictionary $name', ({name, valid}) => {
-        test(`Should be ${valid ? 'valid' : 'invalid'}`, async ({expect}) => {
+        it(`should be ${valid ? 'valid' : 'invalid'}`, async ({expect}) => {
             const archive = createTestDictionaryArchive(name);
             if (valid) {
                 await expect(dictionaryValidate.validateDictionary(null, archive, schemas)).resolves.not.toThrow();

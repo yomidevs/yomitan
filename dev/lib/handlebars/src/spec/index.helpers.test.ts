@@ -247,8 +247,8 @@ describe('helpers', () => {
       }
     }
 
-    // the meaning here may be kind of hard to catch, but list.not is always called,
-    // so we should see the output of both
+    // The meaning here may be kind of hard to catch, but list.not is always called,
+    // so we should see the output of both.
     expectTemplate(string)
       .withInput({ people: [{ name: 'Alan' }, { name: 'Yehuda' }] })
       .withHelpers({ list })

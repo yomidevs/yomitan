@@ -669,7 +669,7 @@ export class AnkiTemplateRenderer {
     /**
      * @type {import('template-renderer').HelperFunction<string>}
      */
-    _formatGlossary(args, context, options) {
+    _formatGlossary(args, _context, options) {
         const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossary]} */ (args);
         const data = options.data.root;
         if (typeof content === 'string') { return this._stringToMultiLineHtml(this._escape(content)); }

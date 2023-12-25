@@ -509,7 +509,7 @@ describe('blocks', () => {
       let progCall = 0;
       expectTemplate('{{*decorator}}con{{*decorator}}tent', {
         beforeRender() {
-          // ensure the counters are reset between EVAL/AST render calls
+          // Ensure the counters are reset between EVAL/AST render calls
           decoratorCall = 0;
           progCall = 0;
         },

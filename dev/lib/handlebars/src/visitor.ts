@@ -106,7 +106,7 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
         }
         return container.lookupProperty(obj, name);
       },
-      // this function is lifted from the handlebars source and slightly modified (lib/handlebars/runtime.js)
+      // This function is lifted from the handlebars source and slightly modified (lib/handlebars/runtime.js)
       lookupProperty(parent, propertyName) {
         const result = parent[propertyName];
         if (result == null) {
@@ -121,7 +121,7 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
         }
         return undefined;
       },
-      // this function is lifted from the handlebars source and slightly modified (lib/handlebars/runtime.js)
+      // This function is lifted from the handlebars source and slightly modified (lib/handlebars/runtime.js)
       lambda(current, context) {
         return typeof current === 'function' ? current.call(context) : current;
       },
@@ -343,21 +343,21 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
     }
   }
 
-  // Liftet from lib/handlebars/compiler/compiler.js (original name: classifySexpr)
+  // Lifted from lib/handlebars/compiler/compiler.js (original name: classifySexpr)
   private classifyNode(node: { path: hbs.AST.PathExpression }): NodeType {
     const isSimple = AST.helpers.simpleId(node.path);
     const isBlockParam = isSimple && !!this.blockParamIndex(node.path.parts[0]);
 
-    // a mustache is an eligible helper if:
+    // A mustache is an eligible helper if:
     // * its id is simple (a single part, not `this` or `..`)
     let isHelper = !isBlockParam && AST.helpers.helperExpression(node);
 
-    // if a mustache is an eligible helper but not a definite
+    // If a mustache is an eligible helper but not a definite
     // helper, it is ambiguous, and will be resolved in a later
     // pass or at runtime.
     let isEligible = !isBlockParam && (isHelper || isSimple);
 
-    // if ambiguous, we can possibly resolve the ambiguity now
+    // If ambiguous, we can possibly resolve the ambiguity now
     // An eligible helper is one that does not have a complex path, i.e. `this.foo`, `../foo` etc.
     if (isEligible && !isHelper) {
       const name = node.path.parts[0];
@@ -378,7 +378,7 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
     }
   }
 
-  // Liftet from lib/handlebars/compiler/compiler.js
+  // Lifted from lib/handlebars/compiler/compiler.js
   private blockParamIndex(name: string): [number, any] | undefined {
     for (let depth = 0, len = this.blockParamNames.length; depth < len; depth++) {
       const blockParams = this.blockParamNames[depth];
@@ -683,7 +683,7 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
     const prog: TemplateDelegate = (nextContext: any, runtimeOptions: RuntimeOptions = {}) => {
       runtimeOptions = { ...runtimeOptions };
 
-      // inherit data in blockParams from parent program
+      // Inherit data in blockParams from parent program
       runtimeOptions.data = runtimeOptions.data || this.runtimeOptions!.data;
       if (runtimeOptions.blockParams) {
         runtimeOptions.blockParams = runtimeOptions.blockParams.concat(
@@ -691,25 +691,25 @@ export class ElasticHandlebarsVisitor extends Handlebars.Visitor {
         );
       }
 
-      // inherit partials from parent program
+      // Inherit partials from parent program
       runtimeOptions.partials = runtimeOptions.partials || this.runtimeOptions!.partials;
 
-      // stash parent program data
+      // Stash parent program data
       const tmpRuntimeOptions = this.runtimeOptions;
       this.runtimeOptions = runtimeOptions;
       const shiftContext = nextContext !== this.context;
       if (shiftContext) this.contexts.unshift(nextContext);
       this.blockParamValues.unshift(runtimeOptions.blockParams || []);
 
-      // execute child program
+      // Execute child program
       const result = this.resolveNodes(program).join('');
 
-      // unstash parent program data
+      // Unstash parent program data
       this.blockParamValues.shift();
       if (shiftContext) this.contexts.shift();
       this.runtimeOptions = tmpRuntimeOptions;
 
-      // return result of child program
+      // Return result of child program
       return result;
     };
 
