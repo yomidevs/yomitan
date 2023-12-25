@@ -166,6 +166,12 @@
             "schema": "ext/data/schemas/dictionary-term-bank-v3-schema.json"
         },
         {
+            "path": "test/data/dictionaries/valid-dictionary1/term_bank_2.json",
+            "typeFile": "types/ext/dictionary-data.d.ts",
+            "type": "TermV3Array",
+            "schema": "ext/data/schemas/dictionary-term-bank-v3-schema.json"
+        },
+        {
             "path": "test/data/dictionaries/valid-dictionary1/term_meta_bank_1.json",
             "typeFile": "types/ext/dictionary-data.d.ts",
             "type": "TermMetaArray",

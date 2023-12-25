@@ -115,6 +115,10 @@
                                 "style": {
                                     "$ref": "#/definitions/structuredContentStyle"
                                 },
+                                "title": {
+                                    "type": "string",
+                                    "description": "Hover text for the element."
+                                },
                                 "lang": {
                                     "type": "string",
                                     "description": "Defines the language of an element in the format defined by RFC 5646."
@@ -263,6 +267,14 @@
                     "type": "string",
                     "default": "medium"
                 },
+                "color": {
+                    "type": "string",
+                    "default": "unset"
+                },
+                "backgroundColor": {
+                    "type": "string",
+                    "default": "unset"
+                },
                 "textDecorationLine": {
                     "oneOf": [
                         {
@@ -280,6 +292,31 @@
                         }
                     ]
                 },
+                "textDecorationStyle": {
+                    "type": "string",
+                    "enum": ["solid", "double", "dotted", "dashed", "wavy"],
+                    "default": "solid"
+                },
+                "textDecorationColor": {
+                    "type": "string",
+                    "default": "unset"
+                },
+                "borderColor": {
+                    "type": "string",
+                    "default": "unset"
+                },
+                "borderStyle": {
+                    "type": "string",
+                    "default": "unset"
+                },
+                "borderRadius": {
+                    "type": "string",
+                    "default": "unset"
+                },
+                "borderWidth": {
+                    "type": "string",
+                    "default": "unset"
+                },
                 "verticalAlign": {
                     "type": "string",
                     "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"],
@@ -289,6 +326,10 @@
                     "type": "string",
                     "enum": ["start", "end", "left", "right", "center", "justify", "justify-all", "match-parent"],
                     "default": "start"
+                },
+                "margin": {
+                    "type": "string",
+                    "default": "unset"
                 },
                 "marginTop": {
                     "type": "number",
@@ -305,6 +346,39 @@
                 "marginBottom": {
                     "type": "number",
                     "default": 0
+                },
+                "padding": {
+                    "type": "string",
+                    "default": "unset"
+                },
+                "paddingTop": {
+                    "type": "number",
+                    "default": 0
+                },
+                "paddingLeft": {
+                    "type": "number",
+                    "default": 0
+                },
+                "paddingRight": {
+                    "type": "number",
+                    "default": 0
+                },
+                "paddingBottom": {
+                    "type": "number",
+                    "default": 0
+                },
+                "wordBreak": {
+                    "type": "string",
+                    "enum": ["normal", "break-all", "keep-all"],
+                    "default": "normal"
+                },
+                "whiteSpace": {
+                    "type": "string",
+                    "default": "normal"
+                },
+                "cursor": {
+                    "type": "string",
+                    "default": "auto"
                 },
                 "listStyleType": {
                     "type": "string",
