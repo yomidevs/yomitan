@@ -29,7 +29,7 @@ export function noop() {
   return '';
 }
 
-// lifted from handlebars lib/handlebars/runtime.js
+// Lifted from handlebars lib/handlebars/runtime.js
 export function initData(context: any, data: any) {
   if (!data || !('root' in data)) {
     data = data ? createFrame(data) : {};
@@ -38,7 +38,7 @@ export function initData(context: any, data: any) {
   return data;
 }
 
-// lifted from handlebars lib/handlebars/compiler/compiler.js
+// Lifted from handlebars lib/handlebars/compiler/compiler.js
 export function transformLiteralToPath(node: { path: hbs.AST.PathExpression | hbs.AST.Literal }) {
   const pathIsLiteral = 'parts' in node.path === false;
 
