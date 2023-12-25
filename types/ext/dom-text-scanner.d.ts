@@ -15,21 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type LogLevel = 'log' | 'info' | 'debug' | 'warn' | 'error';
-
-export type LoggerEventType = 'log';
-
-export type LogContext = {
-    url: string;
-};
-
 /**
- * An enum representing the log error level.
+ * An enum representing the attributes of the character.
  *
- * `0` _log_, _info_, _debug_ level.
+ * `0` Character should be ignored.
  *
- * `1` _warn_ level.
+ * `1` Character is collapsible whitespace.
  *
- * `2` _error_ level.
+ * `2` Character should be added to the content.
+ *
+ * `3` Character should be added to the content and is a newline.
  */
-export type LogErrorLevelValue = 0 | 1 | 2;
+export type CharacterAttributesEnum = 0 | 1 | 2 | 3;
+
+export type SeekTextNoteDetails = {
+    done: boolean;
+    lineHasWhitespace: boolean;
+    lineHasContent: boolean;
+    content: string;
+    offset: number;
+    remainder: number;
+    newlines: number;
+};
