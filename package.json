@@ -5,6 +5,9 @@
     "directories": {
         "test": "test"
     },
+    "engines": {
+        "node": ">=20.0.0"
+    },
     "type": "module",
     "scripts": {
         "build": "node ./dev/bin/build.js",
