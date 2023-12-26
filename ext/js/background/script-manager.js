@@ -183,7 +183,7 @@ export class ScriptManager {
      * @returns {chrome.scripting.RegisteredContentScript}
      */
     _createContentScriptRegistrationOptionsChrome(details, id) {
-        const {css, js, allFrames, excludeMatches, matches, runAt} = details;
+        const {css, js, allFrames, matches, runAt} = details;
         /** @type {chrome.scripting.RegisteredContentScript} */
         const options = {
             id: id,
@@ -197,9 +197,6 @@ export class ScriptManager {
         }
         if (typeof allFrames !== 'undefined') {
             options.allFrames = allFrames;
-        }
-        if (Array.isArray(excludeMatches)) {
-            options.excludeMatches = [...excludeMatches];
         }
         if (Array.isArray(matches)) {
             options.matches = [...matches];
