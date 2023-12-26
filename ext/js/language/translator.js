@@ -348,15 +348,15 @@ export class Translator {
 
     /**
      * @param {string} searchResolution
-     * @param {number} i
+     * @param {number} currentLength
      * @param {string} source
      * @returns {number}
      */
-    _getNextSubstringLength(searchResolution, i, source) {
+    _getNextSubstringLength(searchResolution, currentLength, source) {
         if (searchResolution === 'word') {
-            return source.search(/[^\p{Letter}]([\p{Letter}\p{Number}]*)$/u);
+            return source.search(/[^\p{Letter}][\p{Letter}\p{Number}]*$/u);
         } else {
-            return i - 1;
+            return currentLength - 1;
         }
     }
 
