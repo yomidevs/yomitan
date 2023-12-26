@@ -183,7 +183,7 @@ export class ScriptManager {
      * @returns {chrome.scripting.RegisteredContentScript}
      */
     _createContentScriptRegistrationOptionsChrome(details, id) {
-        const {css, js} = details;
+        const {css, js, allFrames, excludeMatches, matches, runAt} = details;
         /** @type {chrome.scripting.RegisteredContentScript} */
         const options = {
             id: id,
@@ -195,16 +195,6 @@ export class ScriptManager {
         if (Array.isArray(js)) {
             options.js = [...js];
         }
-        this._initializeContentScriptRegistrationOptionsGeneric(details, options);
-        return options;
-    }
-
-    /**
-     * @param {import('script-manager').RegistrationDetails} details
-     * @param {chrome.scripting.RegisteredContentScript|browser.contentScripts.RegisteredContentScriptOptions} options
-     */
-    _initializeContentScriptRegistrationOptionsGeneric(details, options) {
-        const {allFrames, excludeMatches, matches, runAt} = details;
         if (typeof allFrames !== 'undefined') {
             options.allFrames = allFrames;
         }
@@ -217,5 +207,6 @@ export class ScriptManager {
         if (typeof runAt !== 'undefined') {
             options.runAt = runAt;
         }
+        return options;
     }
 }
