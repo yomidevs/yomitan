@@ -17,6 +17,7 @@
  */
 
 import type * as Dictionary from './dictionary';
+import type {SearchResolution} from 'settings';
 
 // Kanji
 
@@ -119,7 +120,7 @@ export type FindTermsOptions = {
     /**
      * Whether every substring should be searched for, or only whole words.
      */
-    searchResolution: 'letter' | 'word';
+    searchResolution: SearchResolution;
 };
 
 /**
