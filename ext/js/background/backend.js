@@ -1096,7 +1096,7 @@ export class Backend {
 
         await this._sendMessageTabPromise(
             id,
-            {action: 'SearchDisplayController.setMode', params: {mode: 'popup'}},
+            {action: 'searchDisplayControllerSetMode', params: {mode: 'popup'}},
             {frameId: 0}
         );
 
@@ -1116,7 +1116,7 @@ export class Backend {
             try {
                 const mode = await this._sendMessageTabPromise(
                     id,
-                    {action: 'SearchDisplayController.getMode', params: {}},
+                    {action: 'searchDisplayControllerGetMode', params: {}},
                     {frameId: 0}
                 );
                 return mode === 'popup';
@@ -1196,7 +1196,7 @@ export class Backend {
     async _updateSearchQuery(tabId, text, animate) {
         await this._sendMessageTabPromise(
             tabId,
-            {action: 'SearchDisplayController.updateSearchQuery', params: {text, animate}},
+            {action: 'searchDisplayControllerUpdateSearchQuery', params: {text, animate}},
             {frameId: 0}
         );
     }
