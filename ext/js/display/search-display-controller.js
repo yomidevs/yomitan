@@ -150,7 +150,7 @@ export class SearchDisplayController {
 
     // Private
 
-    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('display-search').MessageAny>} */
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('display-search').ApiMessageAny>} */
     _onMessage({action, params}, _sender, callback) {
         return invokeApiMapHandler(this._apiMap, action, params, [], callback);
     }

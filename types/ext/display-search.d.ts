@@ -21,9 +21,10 @@ import type {
     ApiHandler as BaseApiHandler,
     ApiParams as BaseApiParams,
     ApiNames as BaseApiNames,
+    ApiReturn as BaseApiReturn,
 } from './api-map';
 
-type ApiSurface = {
+export type ApiSurface = {
     searchDisplayControllerGetMode: {
         params: void;
         return: SearchMode;
@@ -43,17 +44,20 @@ type ApiSurface = {
     };
 };
 
-type ApiParams<TName extends ApiNames> = BaseApiParams<ApiSurface[TName]>;
+export type ApiParams<TName extends ApiNames> = BaseApiParams<ApiSurface[TName]>;
 
-type Message<TName extends ApiNames> = {
-    action: TName;
-    params: ApiParams<TName>;
-};
+export type ApiNames = BaseApiNames<ApiSurface>;
 
-type ApiNames = BaseApiNames<ApiSurface>;
+export type ApiMessage<TName extends ApiNames> = (
+    ApiParams<TName> extends void ?
+        {action: TName} :
+        {action: TName, params: ApiParams<TName>}
+);
 
-export type MessageAny = Message<ApiNames>;
+export type ApiMessageAny = ApiMessage<ApiNames>;
 
 export type ApiMap = BaseApiMap<ApiSurface>;
 
 export type ApiHandler<TName extends ApiNames> = BaseApiHandler<ApiSurface[TName]>;
+
+export type ApiReturn<TName extends ApiNames> = BaseApiReturn<ApiSurface[TName]>;
