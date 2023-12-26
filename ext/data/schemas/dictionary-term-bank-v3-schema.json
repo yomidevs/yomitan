@@ -268,12 +268,10 @@
                     "default": "medium"
                 },
                 "color": {
-                    "type": "string",
-                    "default": "unset"
+                    "type": "string"
                 },
                 "backgroundColor": {
-                    "type": "string",
-                    "default": "unset"
+                    "type": "string"
                 },
                 "textDecorationLine": {
                     "oneOf": [
@@ -298,24 +296,19 @@
                     "default": "solid"
                 },
                 "textDecorationColor": {
-                    "type": "string",
-                    "default": "unset"
+                    "type": "string"
                 },
                 "borderColor": {
-                    "type": "string",
-                    "default": "unset"
+                    "type": "string"
                 },
                 "borderStyle": {
-                    "type": "string",
-                    "default": "unset"
+                    "type": "string"
                 },
                 "borderRadius": {
-                    "type": "string",
-                    "default": "unset"
+                    "type": "string"
                 },
                 "borderWidth": {
-                    "type": "string",
-                    "default": "unset"
+                    "type": "string"
                 },
                 "verticalAlign": {
                     "type": "string",
@@ -328,8 +321,7 @@
                     "default": "start"
                 },
                 "margin": {
-                    "type": "string",
-                    "default": "unset"
+                    "type": "string"
                 },
                 "marginTop": {
                     "type": ["number", "string"],
@@ -348,8 +340,7 @@
                     "default": 0
                 },
                 "padding": {
-                    "type": "string",
-                    "default": "unset"
+                    "type": "string"
                 },
                 "paddingTop": {
                     "type": "string"
