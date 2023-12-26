@@ -23,14 +23,6 @@ import {isObject} from '../core.js';
  */
 export class ScriptManager {
     /**
-     * Creates a new instance of the class.
-     */
-    constructor() {
-        /** @type {Map<string, ?browser.contentScripts.RegisteredContentScript>} */
-        this._contentScriptRegistrations = new Map();
-    }
-
-    /**
      * Injects a stylesheet into a tab.
      * @param {'file'|'code'} type The type of content to inject; either 'file' or 'code'.
      * @param {string} content The content to inject.
@@ -71,24 +63,19 @@ export class ScriptManager {
      * @returns {Promise<boolean>} `true` if a script is registered, `false` otherwise.
      */
     async isContentScriptRegistered(id) {
-        if (this._contentScriptRegistrations.has(id)) {
-            return true;
-        }
-        if (isObject(chrome.scripting) && typeof chrome.scripting.getRegisteredContentScripts === 'function') {
-            const scripts = await new Promise((resolve, reject) => {
-                chrome.scripting.getRegisteredContentScripts({ids: [id]}, (result) => {
-                    const e = chrome.runtime.lastError;
-                    if (e) {
-                        reject(new Error(e.message));
-                    } else {
-                        resolve(result);
-                    }
-                });
-            });
-            for (const script of scripts) {
-                if (script.id === id) {
-                    return true;
+        const scripts = await new Promise((resolve, reject) => {
+            chrome.scripting.getRegisteredContentScripts({ids: [id]}, (result) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(result);
                 }
+            });
+        });
+        for (const script of scripts) {
+            if (script.id === id) {
+                return true;
             }
         }
         return false;
@@ -108,24 +95,17 @@ export class ScriptManager {
             throw new Error('Registration already exists');
         }
 
-        if (isObject(chrome.scripting) && typeof chrome.scripting.registerContentScripts === 'function') {
-            const details2 = this._createContentScriptRegistrationOptionsChrome(details, id);
-            await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
-                chrome.scripting.registerContentScripts([details2], () => {
-                    const e = chrome.runtime.lastError;
-                    if (e) {
-                        reject(new Error(e.message));
-                    } else {
-                        resolve();
-                    }
-                });
-            }));
-            this._contentScriptRegistrations.set(id, null);
-            return;
-        }
-
-        // Fallback
-        this._registerContentScriptFallback(id, details);
+        const details2 = this._createContentScriptRegistrationOptionsChrome(details, id);
+        await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
+            chrome.scripting.registerContentScripts([details2], () => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve();
+                }
+            });
+        }));
     }
 
     /**
@@ -134,24 +114,12 @@ export class ScriptManager {
      * @returns {Promise<boolean>} `true` if the content script was unregistered, `false` otherwise.
      */
     async unregisterContentScript(id) {
-        if (isObject(chrome.scripting) && typeof chrome.scripting.unregisterContentScripts === 'function') {
-            this._contentScriptRegistrations.delete(id);
-            try {
-                await this._unregisterContentScriptMV3(id);
-                return true;
-            } catch (e) {
-                return false;
-            }
+        try {
+            await this._unregisterContentScriptMV3(id);
+            return true;
+        } catch (e) {
+            return false;
         }
-
-        // Fallback
-        const registration = this._contentScriptRegistrations.get(id);
-        if (typeof registration === 'undefined') { return false; }
-        this._contentScriptRegistrations.delete(id);
-        if (registration !== null && typeof registration.unregister === 'function') {
-            await registration.unregister();
-        }
-        return true;
     }
 
     // Private
@@ -278,114 +246,5 @@ export class ScriptManager {
         if (typeof runAt !== 'undefined') {
             options.runAt = runAt;
         }
-    }
-
-    /**
-     * @param {string} id
-     * @param {import('script-manager').RegistrationDetails} details
-     */
-    _registerContentScriptFallback(id, details) {
-        const {allFrames, css, js, matchAboutBlank, runAt, urlMatches} = details;
-        /** @type {import('script-manager').ContentScriptInjectionDetails} */
-        const details2 = {allFrames, css, js, matchAboutBlank, runAt, urlRegex: /** @type {?RegExp} */ (null)};
-        /** @type {() => Promise<void>} */
-        let unregister;
-        const webNavigationEvent = this._getWebNavigationEvent(runAt);
-        if (typeof webNavigationEvent === 'object' && webNavigationEvent !== null) {
-            /**
-             * @param {chrome.webNavigation.WebNavigationFramedCallbackDetails} details
-             */
-            const onTabCommitted = ({url, tabId, frameId}) => {
-                this._injectContentScript(true, details2, null, url, tabId, frameId);
-            };
-            const filter = {url: [{urlMatches}]};
-            webNavigationEvent.addListener(onTabCommitted, filter);
-            unregister = async () => webNavigationEvent.removeListener(onTabCommitted);
-        } else {
-            /**
-             * @param {number} tabId
-             * @param {chrome.tabs.TabChangeInfo} changeInfo
-             * @param {chrome.tabs.Tab} tab
-             */
-            const onTabUpdated = (tabId, {status}, {url}) => {
-                if (typeof status === 'string' && typeof url === 'string') {
-                    this._injectContentScript(false, details2, status, url, tabId, void 0);
-                }
-            };
-            try {
-                // Firefox
-                /** @type {browser.tabs.UpdateFilter} */
-                const extraParameters = {urls: [urlMatches], properties: ['status']};
-                browser.tabs.onUpdated.addListener(
-                    /** @type {(tabId: number, changeInfo: browser.tabs._OnUpdatedChangeInfo, tab: browser.tabs.Tab) => void} */ (onTabUpdated),
-                    extraParameters
-                );
-            } catch (e) {
-                // Chrome
-                details2.urlRegex = new RegExp(urlMatches);
-                chrome.tabs.onUpdated.addListener(onTabUpdated);
-            }
-            unregister = async () => chrome.tabs.onUpdated.removeListener(onTabUpdated);
-        }
-        this._contentScriptRegistrations.set(id, {unregister});
-    }
-
-    /**
-     * @param {import('script-manager').RunAt} runAt
-     * @returns {?(chrome.webNavigation.WebNavigationFramedEvent|chrome.webNavigation.WebNavigationTransitionalEvent)}
-     */
-    _getWebNavigationEvent(runAt) {
-        const {webNavigation} = chrome;
-        if (!isObject(webNavigation)) { return null; }
-        switch (runAt) {
-            case 'document_start':
-                return webNavigation.onCommitted;
-            case 'document_end':
-                return webNavigation.onDOMContentLoaded;
-            default: // 'document_idle':
-                return webNavigation.onCompleted;
-        }
-    }
-
-    /**
-     * @param {boolean} isWebNavigation
-     * @param {import('script-manager').ContentScriptInjectionDetails} details
-     * @param {?string} status
-     * @param {string} url
-     * @param {number} tabId
-     * @param {number|undefined} frameId
-     */
-    async _injectContentScript(isWebNavigation, details, status, url, tabId, frameId) {
-        const {urlRegex} = details;
-        if (urlRegex !== null && !urlRegex.test(url)) { return; }
-
-        let {allFrames, css, js, runAt} = details;
-
-        if (isWebNavigation) {
-            if (allFrames) {
-                allFrames = false;
-            } else {
-                if (frameId !== 0) { return; }
-            }
-        } else {
-            if (runAt === 'document_start') {
-                if (status !== 'loading') { return; }
-            } else { // 'document_end', 'document_idle'
-                if (status !== 'complete') { return; }
-            }
-        }
-
-        const promises = [];
-        if (Array.isArray(css)) {
-            for (const file of css) {
-                promises.push(this.injectStylesheet('file', file, tabId, frameId, allFrames));
-            }
-        }
-        if (Array.isArray(js)) {
-            for (const file of js) {
-                promises.push(this.injectScript(file, tabId, frameId, allFrames));
-            }
-        }
-        await Promise.all(promises);
     }
 }
