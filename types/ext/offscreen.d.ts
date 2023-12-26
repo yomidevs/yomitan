@@ -93,7 +93,7 @@ type OffscreenApiSurface = {
     };
 };
 
-export type Message<TName extends MessageType> = (
+export type ApiMessage<TName extends MessageType> = (
     OffscreenApiParams<TName> extends void ?
         {action: TName} :
         {action: TName, params: OffscreenApiParams<TName>}
@@ -131,4 +131,4 @@ export type OffscreenApiParams<TName extends MessageType> = ApiParams<OffscreenA
 
 export type OffscreenApiReturn<TName extends MessageType> = ApiReturn<OffscreenApiSurface[TName]>;
 
-export type MessageAny = Message<MessageType>;
+export type ApiMessageAny = ApiMessage<MessageType>;

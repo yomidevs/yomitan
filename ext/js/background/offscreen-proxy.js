@@ -73,7 +73,7 @@ export class OffscreenProxy {
 
     /**
      * @template {import('offscreen').MessageType} TMessageType
-     * @param {import('offscreen').Message<TMessageType>} message
+     * @param {import('offscreen').ApiMessage<TMessageType>} message
      * @returns {Promise<import('offscreen').OffscreenApiReturn<TMessageType>>}
      */
     sendMessagePromise(message) {

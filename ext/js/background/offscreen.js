@@ -171,7 +171,7 @@ export class Offscreen {
         this._translator.clearDatabaseCaches();
     }
 
-    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('offscreen').MessageAny>} */
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('offscreen').ApiMessageAny>} */
     _onMessage({action, params}, _sender, callback) {
         return invokeApiMapHandler(this._apiMap, action, params, [], callback);
     }
