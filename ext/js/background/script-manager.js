@@ -34,11 +34,30 @@ export class ScriptManager {
      * @returns {Promise<void>}
      */
     injectStylesheet(type, content, tabId, frameId, allFrames) {
-        if (isObject(chrome.scripting) && typeof chrome.scripting.insertCSS === 'function') {
-            return this._injectStylesheetMV3(type, content, tabId, frameId, allFrames);
-        } else {
-            return Promise.reject(new Error('Stylesheet injection not supported'));
-        }
+        return new Promise((resolve, reject) => {
+            /** @type {chrome.scripting.InjectionTarget} */
+            const target = {
+                tabId,
+                allFrames
+            };
+            /** @type {chrome.scripting.CSSInjection} */
+            const details = (
+                type === 'file' ?
+                {origin: 'AUTHOR', files: [content], target} :
+                {origin: 'USER', css: content, target}
+            );
+            if (!allFrames && typeof frameId === 'number') {
+                details.target.frameIds = [frameId];
+            }
+            chrome.scripting.insertCSS(details, () => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve();
+                }
+            });
+        });
     }
 
     /**
@@ -123,41 +142,6 @@ export class ScriptManager {
     }
 
     // Private
-
-    /**
-     * @param {'file'|'code'} type
-     * @param {string} content
-     * @param {number} tabId
-     * @param {number|undefined} frameId
-     * @param {boolean} allFrames
-     * @returns {Promise<void>}
-     */
-    _injectStylesheetMV3(type, content, tabId, frameId, allFrames) {
-        return new Promise((resolve, reject) => {
-            /** @type {chrome.scripting.InjectionTarget} */
-            const target = {
-                tabId,
-                allFrames
-            };
-            /** @type {chrome.scripting.CSSInjection} */
-            const details = (
-                type === 'file' ?
-                {origin: 'AUTHOR', files: [content], target} :
-                {origin: 'USER', css: content, target}
-            );
-            if (!allFrames && typeof frameId === 'number') {
-                details.target.frameIds = [frameId];
-            }
-            chrome.scripting.insertCSS(details, () => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    resolve();
-                }
-            });
-        });
-    }
 
     /**
      * @param {string} file
