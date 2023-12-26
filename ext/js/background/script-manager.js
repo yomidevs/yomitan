@@ -130,15 +130,19 @@ export class ScriptManager {
     /**
      * Unregisters a previously registered content script.
      * @param {string} id The identifier passed to a previous call to `registerContentScript`.
-     * @returns {Promise<boolean>} `true` if the content script was unregistered, `false` otherwise.
+     * @returns {Promise<void>}
      */
     async unregisterContentScript(id) {
-        try {
-            await this._unregisterContentScriptMV3(id);
-            return true;
-        } catch (e) {
-            return false;
-        }
+        return new Promise((resolve, reject) => {
+            chrome.scripting.unregisterContentScripts({ids: [id]}, () => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve();
+                }
+            });
+        });
     }
 
     // Private
@@ -168,23 +172,6 @@ export class ScriptManager {
                 } else {
                     const {frameId: frameId2, result} = results[0];
                     resolve({frameId: frameId2, result});
-                }
-            });
-        });
-    }
-
-    /**
-     * @param {string} id
-     * @returns {Promise<void>}
-     */
-    _unregisterContentScriptMV3(id) {
-        return new Promise((resolve, reject) => {
-            chrome.scripting.unregisterContentScripts({ids: [id]}, () => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    resolve();
                 }
             });
         });
