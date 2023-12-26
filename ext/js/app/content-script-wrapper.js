@@ -16,8 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-(async () => {
+/** */
+async function main() {
     const src = chrome.runtime.getURL('js/app/content-script-main.js');
     // eslint-disable-next-line no-unsanitized/method
     await import(src);
-})();
+}
+
+await main();
+
+// Empty export to enable top-level await
+export {};
