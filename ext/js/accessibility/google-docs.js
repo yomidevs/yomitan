@@ -16,8 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** */
-async function main() {
+(async () => {
     // Reentrant check
     // @ts-expect-error - Checking a property to the global object
     if (self.googleDocsAccessibilitySetup) { return; }
@@ -72,9 +71,4 @@ async function main() {
     script.textContent = `(${inject.toString()})();`;
     parent.appendChild(script);
     parent.removeChild(script);
-}
-
-await main();
-
-// Empty export to enable top level await
-export {};
+})();
