@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type {TokenString} from './core';
 import type {SearchMode} from './display';
 import type {
     ApiMap as BaseApiMap,
@@ -75,6 +76,26 @@ export type ApiSurface = {
             newZoomFactor: number;
         };
         return: void;
+    };
+    frontendRequestReadyBroadcast: {
+        params: {
+            frameId: number;
+        };
+        return: void;
+    };
+    frontendSetAllVisibleOverride: {
+        params: {
+            value: boolean;
+            priority: number;
+            awaitFrame: boolean;
+        };
+        return: TokenString;
+    };
+    frontendClearAllVisibleOverride: {
+        params: {
+            token: TokenString;
+        };
+        return: boolean;
     };
 };
 

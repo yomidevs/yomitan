@@ -301,8 +301,8 @@ export class Backend {
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
 
-            this._sendMessageAllTabsIgnoreResponse({action: 'applicationBackendReady', params: {}});
-            this._sendMessageIgnoreResponse({action: 'applicationBackendReady', params: {}});
+            this._sendMessageAllTabsIgnoreResponse({action: 'applicationBackendReady'});
+            this._sendMessageIgnoreResponse({action: 'applicationBackendReady'});
         } catch (e) {
             log.error(e);
             throw e;
@@ -429,7 +429,8 @@ export class Backend {
     /** @type {import('api').ApiHandler<'requestBackendReadySignal'>} */
     _onApiRequestBackendReadySignal(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
-        const data = {action: 'applicationBackendReady', params: {}};
+        /** @type {import('application').ApiMessage<'applicationBackendReady'>} */
+        const data = {action: 'applicationBackendReady'};
         if (typeof sender.tab === 'undefined') {
             this._sendMessageIgnoreResponse(data);
             return false;
@@ -1635,7 +1636,7 @@ export class Backend {
         try {
             const response = await this._sendMessageTabPromise(
                 tabId,
-                {action: 'applicationGetUrl', params: {}},
+                {action: 'applicationGetUrl'},
                 {frameId: 0}
             );
             const url = typeof response === 'object' && response !== null ? /** @type {import('core').SerializableObject} */ (response).url : void 0;
@@ -2003,7 +2004,7 @@ export class Backend {
         let token = null;
         try {
             if (typeof tabId === 'number' && typeof frameId === 'number') {
-                const action = 'Frontend.setAllVisibleOverride';
+                const action = 'frontendSetAllVisibleOverride';
                 const params = {value: false, priority: 0, awaitFrame: true};
                 token = await this._sendMessageTabPromise(tabId, {action, params}, {frameId});
             }
@@ -2020,7 +2021,7 @@ export class Backend {
             });
         } finally {
             if (token !== null) {
-                const action = 'Frontend.clearAllVisibleOverride';
+                const action = 'frontendClearAllVisibleOverride';
                 const params = {token};
                 try {
                     await this._sendMessageTabPromise(tabId, {action, params}, {frameId});

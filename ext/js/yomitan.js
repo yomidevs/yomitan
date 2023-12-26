@@ -222,48 +222,36 @@ export class Yomitan extends EventDispatcher {
         return invokeApiMapHandler(this._apiMap, action, params, [], callback);
     }
 
-    /**
-     * @returns {boolean}
-     */
+    /** @type {import('application').ApiHandler<'applicationIsReady'>} */
     _onMessageIsReady() {
         return this._isReady;
     }
 
-    /**
-     * @returns {void}
-     */
+    /** @type {import('application').ApiHandler<'applicationBackendReady'>} */
     _onMessageBackendReady() {
         if (this._isBackendReadyPromiseResolve === null) { return; }
         this._isBackendReadyPromiseResolve();
         this._isBackendReadyPromiseResolve = null;
     }
 
-    /**
-     * @returns {{url: string}}
-     */
+    /** @type {import('application').ApiHandler<'applicationGetUrl'>} */
     _onMessageGetUrl() {
         return {url: this._getUrl()};
     }
 
-    /**
-     * @param {{source: string}} params
-     */
+    /** @type {import('application').ApiHandler<'applicationOptionsUpdated'>} */
     _onMessageOptionsUpdated({source}) {
         if (source !== 'background') {
             this.trigger('optionsUpdated', {source});
         }
     }
 
-    /**
-     * @param {{type: string, cause: string}} params
-     */
+    /** @type {import('application').ApiHandler<'applicationDatabaseUpdated'>} */
     _onMessageDatabaseUpdated({type, cause}) {
         this.trigger('databaseUpdated', {type, cause});
     }
 
-    /**
-     * @param {{oldZoomFactor: number, newZoomFactor: number}} params
-     */
+    /** @type {import('application').ApiHandler<'applicationZoomChanged'>} */
     _onMessageZoomChanged({oldZoomFactor, newZoomFactor}) {
         this.trigger('zoomChanged', {oldZoomFactor, newZoomFactor});
     }
