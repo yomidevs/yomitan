@@ -22,9 +22,16 @@ import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
-import type {ApiMap, ApiMapInit, ApiHandler, ApiParams, ApiReturn, ApiNames} from './api-map';
+import type {
+    ApiMap as BaseApiMap,
+    ApiMapInit as BaseApiMapInit,
+    ApiHandler as BaseApiHandler,
+    ApiParams as BaseApiParams,
+    ApiReturn as BaseApiReturn,
+    ApiNames as BaseApiNames,
+} from './api-map';
 
-type OffscreenApiSurface = {
+type ApiSurface = {
     databasePrepareOffscreen: {
         params: void;
         return: void;
@@ -93,13 +100,13 @@ type OffscreenApiSurface = {
     };
 };
 
-export type ApiMessage<TName extends MessageType> = (
-    OffscreenApiParams<TName> extends void ?
+export type ApiMessage<TName extends ApiNames> = (
+    ApiParams<TName> extends void ?
         {action: TName, params?: never} :
-        {action: TName, params: OffscreenApiParams<TName>}
+        {action: TName, params: ApiParams<TName>}
 );
 
-export type MessageType = ApiNames<OffscreenApiSurface>;
+export type ApiNames = BaseApiNames<ApiSurface>;
 
 export type FindKanjiOptionsOffscreen = Omit<Translation.FindKanjiOptions, 'enabledDictionaryMap'> & {
     enabledDictionaryMap: [
@@ -121,14 +128,14 @@ export type FindTermsTextReplacementOffscreen = Omit<Translation.FindTermsTextRe
     pattern: string;
 };
 
-export type OffscreenApiMap = ApiMap<OffscreenApiSurface>;
+export type ApiMap = BaseApiMap<ApiSurface>;
 
-export type OffscreenApiMapInit = ApiMapInit<OffscreenApiSurface>;
+export type ApiMapInit = BaseApiMapInit<ApiSurface>;
 
-export type OffscreenApiHandler<TName extends MessageType> = ApiHandler<OffscreenApiSurface[TName]>;
+export type ApiHandler<TName extends ApiNames> = BaseApiHandler<ApiSurface[TName]>;
 
-export type OffscreenApiParams<TName extends MessageType> = ApiParams<OffscreenApiSurface[TName]>;
+export type ApiParams<TName extends ApiNames> = BaseApiParams<ApiSurface[TName]>;
 
-export type OffscreenApiReturn<TName extends MessageType> = ApiReturn<OffscreenApiSurface[TName]>;
+export type ApiReturn<TName extends ApiNames> = BaseApiReturn<ApiSurface[TName]>;
 
-export type ApiMessageAny = {[name in MessageType]: ApiMessage<name>}[MessageType];
+export type ApiMessageAny = {[name in ApiNames]: ApiMessage<name>}[ApiNames];

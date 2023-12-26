@@ -52,7 +52,7 @@ export class Offscreen {
 
 
         /* eslint-disable no-multi-spaces */
-        /** @type {import('offscreen').OffscreenApiMap} */
+        /** @type {import('offscreen').ApiMap} */
         this._apiMap = createApiMap([
             ['clipboardGetTextOffscreen',    this._getTextHandler.bind(this)],
             ['clipboardGetImageOffscreen',   this._getImageHandler.bind(this)],
@@ -78,22 +78,22 @@ export class Offscreen {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
     }
 
-    /** @type {import('offscreen').OffscreenApiHandler<'clipboardGetTextOffscreen'>} */
+    /** @type {import('offscreen').ApiHandler<'clipboardGetTextOffscreen'>} */
     async _getTextHandler({useRichText}) {
         return await this._clipboardReader.getText(useRichText);
     }
 
-    /** @type {import('offscreen').OffscreenApiHandler<'clipboardGetImageOffscreen'>} */
+    /** @type {import('offscreen').ApiHandler<'clipboardGetImageOffscreen'>} */
     async _getImageHandler() {
         return await this._clipboardReader.getImage();
     }
 
-    /** @type {import('offscreen').OffscreenApiHandler<'clipboardSetBrowserOffscreen'>} */
+    /** @type {import('offscreen').ApiHandler<'clipboardSetBrowserOffscreen'>} */
     _setClipboardBrowser({value}) {
         this._clipboardReader.browser = value;
     }
 
-    /** @type {import('offscreen').OffscreenApiHandler<'databasePrepareOffscreen'>} */
+    /** @type {import('offscreen').ApiHandler<'databasePrepareOffscreen'>} */
     _prepareDatabaseHandler() {
         if (this._prepareDatabasePromise !== null) {
             return this._prepareDatabasePromise;
@@ -102,29 +102,29 @@ export class Offscreen {
         return this._prepareDatabasePromise;
     }
 
-    /** @type {import('offscreen').OffscreenApiHandler<'getDictionaryInfoOffscreen'>} */
+    /** @type {import('offscreen').ApiHandler<'getDictionaryInfoOffscreen'>} */
     async _getDictionaryInfoHandler() {
         return await this._dictionaryDatabase.getDictionaryInfo();
     }
 
-    /** @type {import('offscreen').OffscreenApiHandler<'databasePurgeOffscreen'>} */
+    /** @type {import('offscreen').ApiHandler<'databasePurgeOffscreen'>} */
     async _purgeDatabaseHandler() {
         return await this._dictionaryDatabase.purge();
     }
 
-    /** @type {import('offscreen').OffscreenApiHandler<'databaseGetMediaOffscreen'>} */
+    /** @type {import('offscreen').ApiHandler<'databaseGetMediaOffscreen'>} */
     async _getMediaHandler({targets}) {
         const media = await this._dictionaryDatabase.getMedia(targets);
         const serializedMedia = media.map((m) => ({...m, content: ArrayBufferUtil.arrayBufferToBase64(m.content)}));
         return serializedMedia;
     }
 
-    /** @type {import('offscreen').OffscreenApiHandler<'translatorPrepareOffscreen'>} */
+    /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */
     _prepareTranslatorHandler({deinflectionReasons}) {
         this._translator.prepare(deinflectionReasons);
     }
 
-    /** @type {import('offscreen').OffscreenApiHandler<'findKanjiOffscreen'>} */
+    /** @type {import('offscreen').ApiHandler<'findKanjiOffscreen'>} */
     async _findKanjiHandler({text, options}) {
         /** @type {import('translation').FindKanjiOptions} */
         const modifiedOptions = {
@@ -134,7 +134,7 @@ export class Offscreen {
         return await this._translator.findKanji(text, modifiedOptions);
     }
 
-    /** @type {import('offscreen').OffscreenApiHandler<'findTermsOffscreen'>} */
+    /** @type {import('offscreen').ApiHandler<'findTermsOffscreen'>} */
     async _findTermsHandler({mode, text, options}) {
         const enabledDictionaryMap = new Map(options.enabledDictionaryMap);
         const excludeDictionaryDefinitions = (
@@ -161,12 +161,12 @@ export class Offscreen {
         return this._translator.findTerms(mode, text, modifiedOptions);
     }
 
-    /** @type {import('offscreen').OffscreenApiHandler<'getTermFrequenciesOffscreen'>} */
+    /** @type {import('offscreen').ApiHandler<'getTermFrequenciesOffscreen'>} */
     _getTermFrequenciesHandler({termReadingList, dictionaries}) {
         return this._translator.getTermFrequencies(termReadingList, dictionaries);
     }
 
-    /** @type {import('offscreen').OffscreenApiHandler<'clearDatabaseCachesOffscreen'>} */
+    /** @type {import('offscreen').ApiHandler<'clearDatabaseCachesOffscreen'>} */
     _clearDatabaseCachesHandler() {
         this._translator.clearDatabaseCaches();
     }
