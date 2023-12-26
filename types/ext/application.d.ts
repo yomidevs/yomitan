@@ -124,15 +124,21 @@ export type ApiNames = BaseApiNames<ApiSurface>;
 
 export type ApiMessageNoFrameId<TName extends ApiNames> = (
     ApiParams<TName> extends void ?
-        {action: TName} :
+        {action: TName, params?: never} :
         {action: TName, params: ApiParams<TName>}
 );
 
-export type ApiMessage<TName extends ApiNames> = ApiMessageNoFrameId<TName> & {frameId?: number};
+export type ApiMessage<TName extends ApiNames> = ApiMessageNoFrameId<TName> & {
+    /**
+     * The origin frameId that sent this message.
+     * If sent from the backend, this value will be undefined.
+     */
+    frameId?: number;
+};
 
-export type ApiMessageNoFrameIdAny = ApiMessageNoFrameId<ApiNames>;
+export type ApiMessageNoFrameIdAny = {[name in ApiNames]: ApiMessageNoFrameId<name>}[ApiNames];
 
-export type ApiMessageAny = ApiMessage<ApiNames>;
+export type ApiMessageAny = {[name in ApiNames]: ApiMessage<name>}[ApiNames];
 
 export type ApiMap = BaseApiMap<ApiSurface>;
 
