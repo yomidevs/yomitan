@@ -332,19 +332,19 @@
                     "default": "unset"
                 },
                 "marginTop": {
-                    "type": "number",
+                    "type": ["number", "string"],
                     "default": 0
                 },
                 "marginLeft": {
-                    "type": "number",
+                    "type": ["number", "string"],
                     "default": 0
                 },
                 "marginRight": {
-                    "type": "number",
+                    "type": ["number", "string"],
                     "default": 0
                 },
                 "marginBottom": {
-                    "type": "number",
+                    "type": ["number", "string"],
                     "default": 0
                 },
                 "padding": {
@@ -352,20 +352,16 @@
                     "default": "unset"
                 },
                 "paddingTop": {
-                    "type": "number",
-                    "default": 0
+                    "type": "string"
                 },
                 "paddingLeft": {
-                    "type": "number",
-                    "default": 0
+                    "type": "string"
                 },
                 "paddingRight": {
-                    "type": "number",
-                    "default": 0
+                    "type": "string"
                 },
                 "paddingBottom": {
-                    "type": "number",
-                    "default": 0
+                    "type": "string"
                 },
                 "wordBreak": {
                     "type": "string",

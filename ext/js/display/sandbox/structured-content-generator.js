@@ -393,14 +393,18 @@ export class StructuredContentGenerator {
         if (typeof borderWidth === 'string') { style.borderWidth = borderWidth; }
         if (typeof margin === 'string') { style.margin = margin; }
         if (typeof marginTop === 'number') { style.marginTop = `${marginTop}em`; }
+        if (typeof marginTop === 'string') { style.marginTop = marginTop; }
         if (typeof marginLeft === 'number') { style.marginLeft = `${marginLeft}em`; }
+        if (typeof marginLeft === 'string') { style.marginLeft = marginLeft; }
         if (typeof marginRight === 'number') { style.marginRight = `${marginRight}em`; }
+        if (typeof marginRight === 'string') { style.marginRight = marginRight; }
         if (typeof marginBottom === 'number') { style.marginBottom = `${marginBottom}em`; }
+        if (typeof marginBottom === 'string') { style.marginBottom = marginBottom; }
         if (typeof padding === 'string') { style.padding = padding; }
-        if (typeof paddingTop === 'number') { style.paddingTop = `${paddingTop}em`; }
-        if (typeof paddingLeft === 'number') { style.paddingLeft = `${paddingLeft}em`; }
-        if (typeof paddingRight === 'number') { style.paddingRight = `${paddingRight}em`; }
-        if (typeof paddingBottom === 'number') { style.paddingBottom = `${paddingBottom}em`; }
+        if (typeof paddingTop === 'string') { style.paddingTop = paddingTop; }
+        if (typeof paddingLeft === 'string') { style.paddingLeft = paddingLeft; }
+        if (typeof paddingRight === 'string') { style.paddingRight = paddingRight; }
+        if (typeof paddingBottom === 'string') { style.paddingBottom = paddingBottom; }
         if (typeof wordBreak === 'string') { style.wordBreak = wordBreak; }
         if (typeof whiteSpace === 'string') { style.whiteSpace = whiteSpace; }
         if (typeof cursor === 'string') { style.cursor = cursor; }

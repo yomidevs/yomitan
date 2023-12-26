@@ -44,17 +44,17 @@
                                     "style": {
                                         "fontSize": "0.7em",
                                         "fontWeight": "bold",
-                                        "paddingTop": 0.15,
-                                        "paddingRight": 0.3,
-                                        "paddingBottom": 0.3,
-                                        "paddingLeft": 0.3,
+                                        "paddingTop": "0.15em",
+                                        "paddingRight": "0.3em",
+                                        "paddingBottom": "0.3em",
+                                        "paddingLeft": "0.3em",
                                         "wordBreak": "keep-all",
                                         "borderRadius": "0.3em",
                                         "verticalAlign": "text-bottom",
                                         "backgroundColor": "brown",
                                         "color": "white",
                                         "cursor": "help",
-                                        "marginRight": 0.25
+                                        "marginRight": "0.25em"
                                     },
                                     "data": {
                                         "code": "uk"
