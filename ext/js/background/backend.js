@@ -1807,14 +1807,14 @@ export class Backend {
         return new Promise((resolve, reject) => {
             /** @type {?import('core').Timeout} */
             let timer = null;
-            /** @type {?import('extension').ChromeRuntimeOnMessageCallback} */
+            /** @type {?import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
             let onMessage = (message, sender) => {
                 if (
                     !sender.tab ||
                     sender.tab.id !== tabId ||
                     sender.frameId !== frameId ||
                     !(typeof message === 'object' && message !== null) ||
-                    /** @type {import('application').ApiMessageAny} */ (message).action !== 'applicationReady'
+                    message.action !== 'applicationReady'
                 ) {
                     return;
                 }
@@ -1903,9 +1903,8 @@ export class Backend {
     }
 
     /**
-     * @template {import('application').ApiNames} TName
      * @param {number} tabId
-     * @param {import('application').ApiMessage<TName>} message
+     * @param {import('application').ApiMessageAny} message
      * @param {chrome.tabs.MessageSendOptions} options
      */
     _sendMessageTabIgnoreResponse(tabId, message, options) {
@@ -1914,8 +1913,7 @@ export class Backend {
     }
 
     /**
-     * @template {import('application').ApiNames} TName
-     * @param {import('application').ApiMessage<TName>} message
+     * @param {import('application').ApiMessageAny} message
      */
     _sendMessageAllTabsIgnoreResponse(message) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);

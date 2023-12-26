@@ -844,11 +844,11 @@ export class Frontend {
                 }
                 chrome.runtime.onMessage.removeListener(onMessage);
             };
-            /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
+            /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
             const onMessage = (message, _sender, sendResponse) => {
                 try {
-                    const {action, params} = message;
-                    if (action === 'frontendReady' && /** @type {import('application').ApiParams<'frontendReady'>} */ (params).frameId === frameId) {
+                    const {action} = message;
+                    if (action === 'frontendReady' && message.params.frameId === frameId) {
                         cleanup();
                         resolve();
                         sendResponse();
