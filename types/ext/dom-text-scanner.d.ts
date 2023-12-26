@@ -17,16 +17,13 @@
 
 /**
  * An enum representing the attributes of the character.
- *
- * `0` Character should be ignored.
- *
- * `1` Character is collapsible whitespace.
- *
- * `2` Character should be added to the content.
- *
- * `3` Character should be added to the content and is a newline.
+ * This enum is a number enum for more efficient usage in a highly-traversed code path.
+ * - `0` - Character should be ignored.
+ * - `1` - Character is collapsible whitespace.
+ * - `2` - Character should be added to the content.
+ * - `3` - Character should be added to the content and is a newline.
  */
-export type CharacterAttributesEnum = 0 | 1 | 2 | 3;
+export type CharacterAttributes = 0 | 1 | 2 | 3;
 
 export type SeekTextNoteDetails = {
     done: boolean;

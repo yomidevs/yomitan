@@ -275,7 +275,7 @@ export class DOMTextScanner {
 
     /**
      * @param {string} char
-     * @param {import('dom-text-scanner').CharacterAttributesEnum} charAttributes
+     * @param {import('dom-text-scanner').CharacterAttributes} charAttributes
      * @param {import('dom-text-scanner').SeekTextNoteDetails} seekTextNoteDetails
      * @returns {import('dom-text-scanner').SeekTextNoteDetails}
      */
@@ -337,7 +337,7 @@ export class DOMTextScanner {
 
     /**
      * @param {string} char
-     * @param {import('dom-text-scanner').CharacterAttributesEnum} charAttributes
+     * @param {import('dom-text-scanner').CharacterAttributes} charAttributes
      * @param {import('dom-text-scanner').SeekTextNoteDetails} seekTextNoteDetails
      * @returns {import('dom-text-scanner').SeekTextNoteDetails}
      */
@@ -515,7 +515,7 @@ export class DOMTextScanner {
      * @param {string} character A string containing a single character.
      * @param {boolean} preserveNewlines Whether or not newlines should be preserved.
      * @param {boolean} preserveWhitespace Whether or not whitespace should be preserved.
-     * @returns {import('dom-text-scanner').CharacterAttributesEnum} An enum representing the attributes of the character.
+     * @returns {import('dom-text-scanner').CharacterAttributes} An enum representing the attributes of the character.
      */
     static getCharacterAttributes(character, preserveNewlines, preserveWhitespace) {
         switch (character.charCodeAt(0)) {
