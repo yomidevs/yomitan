@@ -16,19 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {isContentScriptRegistered, registerContentScript, unregisterContentScript} from '../background/script-manager.js';
 import {log} from '../core.js';
 
 /**
  * This class controls the registration of accessibility handlers.
  */
 export class AccessibilityController {
-    /**
-     * Creates a new instance.
-     * @param {import('../background/script-manager.js').ScriptManager} scriptManager An instance of the `ScriptManager` class.
-     */
-    constructor(scriptManager) {
-        /** @type {import('../background/script-manager.js').ScriptManager} */
-        this._scriptManager = scriptManager;
+    constructor() {
         /** @type {?import('core').TokenObject} */
         this._updateGoogleDocsAccessibilityToken = null;
         /** @type {?Promise<void>} */
@@ -90,7 +85,7 @@ export class AccessibilityController {
         const id = 'googleDocsAccessibility';
         try {
             if (forceGoogleDocsHtmlRenderingAny) {
-                if (await this._scriptManager.isContentScriptRegistered(id)) { return; }
+                if (await isContentScriptRegistered(id)) { return; }
                 /** @type {import('script-manager').RegistrationDetails} */
                 const details = {
                     allFrames: true,
@@ -98,9 +93,9 @@ export class AccessibilityController {
                     runAt: 'document_start',
                     js: ['js/accessibility/google-docs.js']
                 };
-                await this._scriptManager.registerContentScript(id, details);
+                await registerContentScript(id, details);
             } else {
-                await this._scriptManager.unregisterContentScript(id);
+                await unregisterContentScript(id);
             }
         } catch (e) {
             log.error(e);

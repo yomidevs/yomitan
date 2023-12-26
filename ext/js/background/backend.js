@@ -40,7 +40,7 @@ import {MediaUtil} from '../media/media-util.js';
 import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
 import {ProfileConditionsUtil} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
-import {ScriptManager} from './script-manager.js';
+import {injectStylesheet} from './script-manager.js';
 
 /**
  * This class controls the core logic of the extension, including API calls
@@ -110,10 +110,8 @@ export class Backend {
         });
         /** @type {OptionsUtil} */
         this._optionsUtil = new OptionsUtil();
-        /** @type {ScriptManager} */
-        this._scriptManager = new ScriptManager();
         /** @type {AccessibilityController} */
-        this._accessibilityController = new AccessibilityController(this._scriptManager);
+        this._accessibilityController = new AccessibilityController();
 
         /** @type {?number} */
         this._searchPopupTabId = null;
@@ -650,7 +648,7 @@ export class Backend {
     async _onApiInjectStylesheet({type, value}, sender) {
         const {frameId, tab} = sender;
         if (typeof tab !== 'object' || tab === null || typeof tab.id !== 'number') { throw new Error('Invalid tab'); }
-        return await this._scriptManager.injectStylesheet(type, value, tab.id, frameId, false);
+        return await injectStylesheet(type, value, tab.id, frameId, false);
     }
 
     /** @type {import('api').ApiHandler<'getStylesheetContent'>} */
