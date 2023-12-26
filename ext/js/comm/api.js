@@ -156,21 +156,19 @@ export class API {
 
     /**
      * @param {import('api').ApiParam<'sendMessageToFrame', 'frameId'>} frameId
-     * @param {import('api').ApiParam<'sendMessageToFrame', 'action'>} action
-     * @param {import('api').ApiParam<'sendMessageToFrame', 'params'>} [params]
+     * @param {import('api').ApiParam<'sendMessageToFrame', 'message'>} message
      * @returns {Promise<import('api').ApiReturn<'sendMessageToFrame'>>}
      */
-    sendMessageToFrame(frameId, action, params) {
-        return this._invoke('sendMessageToFrame', {frameId, action, params});
+    sendMessageToFrame(frameId, message) {
+        return this._invoke('sendMessageToFrame', {frameId, message});
     }
 
     /**
-     * @param {import('api').ApiParam<'broadcastTab', 'action'>} action
-     * @param {import('api').ApiParam<'broadcastTab', 'params'>} params
+     * @param {import('api').ApiParam<'broadcastTab', 'message'>} message
      * @returns {Promise<import('api').ApiReturn<'broadcastTab'>>}
      */
-    broadcastTab(action, params) {
-        return this._invoke('broadcastTab', {action, params});
+    broadcastTab(message) {
+        return this._invoke('broadcastTab', {message});
     }
 
     /**

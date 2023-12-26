@@ -612,30 +612,30 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'sendMessageToFrame'>} */
-    _onApiSendMessageToFrame({frameId: targetFrameId, action, params}, sender) {
+    _onApiSendMessageToFrame({frameId: targetFrameId, message}, sender) {
         if (!sender) { return false; }
         const {tab} = sender;
         if (!tab) { return false; }
         const {id} = tab;
         if (typeof id !== 'number') { return false; }
         const {frameId} = sender;
-        /** @type {import('extension').ChromeRuntimeMessageWithFrameId} */
-        const message = {action, params, frameId};
-        this._sendMessageTabIgnoreResponse(id, message, {frameId: targetFrameId});
+        /** @type {import('application').ApiMessageAny} */
+        const message2 = {...message, frameId};
+        this._sendMessageTabIgnoreResponse(id, message2, {frameId: targetFrameId});
         return true;
     }
 
     /** @type {import('api').ApiHandler<'broadcastTab'>} */
-    _onApiBroadcastTab({action, params}, sender) {
+    _onApiBroadcastTab({message}, sender) {
         if (!sender) { return false; }
         const {tab} = sender;
         if (!tab) { return false; }
         const {id} = tab;
         if (typeof id !== 'number') { return false; }
         const {frameId} = sender;
-        /** @type {import('extension').ChromeRuntimeMessageWithFrameId} */
-        const message = {action, params, frameId};
-        this._sendMessageTabIgnoreResponse(id, message, {});
+        /** @type {import('application').ApiMessageAny} */
+        const message2 = {...message, frameId};
+        this._sendMessageTabIgnoreResponse(id, message2, {});
         return true;
     }
 

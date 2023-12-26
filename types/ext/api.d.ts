@@ -31,6 +31,7 @@ import type * as Settings from './settings';
 import type * as SettingsModifications from './settings-modifications';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
+import type {ApiMessageNoFrameIdAny as ApplicationApiMessageNoFrameIdAny} from './application';
 import type {
     ApiMap as BaseApiMap,
     ApiMapInit as BaseApiMapInit,
@@ -220,15 +221,13 @@ type ApiSurface = {
     sendMessageToFrame: {
         params: {
             frameId: number;
-            action: string;
-            params?: Core.SerializableObject;
+            message: ApplicationApiMessageNoFrameIdAny;
         };
         return: boolean;
     };
     broadcastTab: {
         params: {
-            action: string;
-            params?: Core.SerializableObject;
+            message: ApplicationApiMessageNoFrameIdAny;
         };
         return: boolean;
     };

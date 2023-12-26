@@ -818,12 +818,12 @@ export class Frontend {
      * @param {?number} targetFrameId
      */
     _signalFrontendReady(targetFrameId) {
-        /** @type {import('frontend').FrontendReadyDetails} */
-        const params = {frameId: this._frameId};
+        /** @type {import('application').ApiMessageNoFrameId<'frontendReady'>} */
+        const message = {action: 'frontendReady', params: {frameId: this._frameId}};
         if (targetFrameId === null) {
-            yomitan.api.broadcastTab('frontendReady', params);
+            yomitan.api.broadcastTab(message);
         } else {
-            yomitan.api.sendMessageToFrame(targetFrameId, 'frontendReady', params);
+            yomitan.api.sendMessageToFrame(targetFrameId, message);
         }
     }
 
@@ -848,7 +848,7 @@ export class Frontend {
             const onMessage = (message, _sender, sendResponse) => {
                 try {
                     const {action, params} = message;
-                    if (action === 'frontendReady' && /** @type {import('frontend').FrontendReadyDetails} */ (params).frameId === frameId) {
+                    if (action === 'frontendReady' && /** @type {import('application').ApiParams<'frontendReady'>} */ (params).frameId === frameId) {
                         cleanup();
                         resolve();
                         sendResponse();
@@ -867,7 +867,7 @@ export class Frontend {
             }
 
             chrome.runtime.onMessage.addListener(onMessage);
-            yomitan.api.broadcastTab('frontendRequestReadyBroadcast', {frameId: this._frameId});
+            yomitan.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._frameId}});
         });
     }
 

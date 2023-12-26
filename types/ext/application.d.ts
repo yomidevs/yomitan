@@ -17,6 +17,7 @@
 
 import type {TokenString} from './core';
 import type {SearchMode} from './display';
+import type {FrameEndpointReadyDetails, FrameEndpointConnectedDetails} from './frame-client';
 import type {
     ApiMap as BaseApiMap,
     ApiHandler as BaseApiHandler,
@@ -97,17 +98,35 @@ export type ApiSurface = {
         };
         return: boolean;
     };
+    frontendReady: {
+        params: {
+            frameId: number;
+        };
+        return: void;
+    };
+    frameEndpointReady: {
+        params: FrameEndpointReadyDetails;
+        return: void;
+    };
+    frameEndpointConnected: {
+        params: FrameEndpointConnectedDetails;
+        return: void;
+    };
 };
 
 export type ApiParams<TName extends ApiNames> = BaseApiParams<ApiSurface[TName]>;
 
 export type ApiNames = BaseApiNames<ApiSurface>;
 
-export type ApiMessage<TName extends ApiNames> = (
+export type ApiMessageNoFrameId<TName extends ApiNames> = (
     ApiParams<TName> extends void ?
-        {action: TName, frameId?: number} :
-        {action: TName, params: ApiParams<TName>, frameId?: number}
+        {action: TName} :
+        {action: TName, params: ApiParams<TName>}
 );
+
+export type ApiMessage<TName extends ApiNames> = ApiMessageNoFrameId<TName> & {frameId?: number};
+
+export type ApiMessageNoFrameIdAny = ApiMessageNoFrameId<ApiNames>;
 
 export type ApiMessageAny = ApiMessage<ApiNames>;
 

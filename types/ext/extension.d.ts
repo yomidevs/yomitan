@@ -56,11 +56,13 @@ export type ContentOrigin = {
     frameId?: number;
 };
 
+// TODO : Remove
 export type ChromeRuntimeMessage = {
     action: string;
     params?: Core.SerializableObject;
 };
 
+// TODO : Remove
 export type ChromeRuntimeMessageWithFrameId = ChromeRuntimeMessage & {
     frameId?: number;
 };
