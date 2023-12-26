@@ -154,19 +154,6 @@ export class ScriptManager {
         return true;
     }
 
-    /**
-     * Gets the optional permissions required to register a content script.
-     * @returns {string[]} An array of the required permissions, which may be empty.
-     */
-    getRequiredContentScriptRegistrationPermissions() {
-        if (isObject(chrome.scripting) && typeof chrome.scripting.registerContentScripts === 'function') {
-            return [];
-        }
-
-        // Fallback
-        return ['webNavigation'];
-    }
-
     // Private
 
     /**
@@ -253,27 +240,6 @@ export class ScriptManager {
 
     /**
      * @param {import('script-manager').RegistrationDetails} details
-     * @returns {browser.contentScripts.RegisteredContentScriptOptions}
-     */
-    _createContentScriptRegistrationOptionsFirefox(details) {
-        const {css, js, matchAboutBlank} = details;
-        /** @type {browser.contentScripts.RegisteredContentScriptOptions} */
-        const options = {};
-        if (typeof matchAboutBlank !== 'undefined') {
-            options.matchAboutBlank = matchAboutBlank;
-        }
-        if (Array.isArray(css)) {
-            options.css = css.map((file) => ({file}));
-        }
-        if (Array.isArray(js)) {
-            options.js = js.map((file) => ({file}));
-        }
-        this._initializeContentScriptRegistrationOptionsGeneric(details, options);
-        return options;
-    }
-
-    /**
-     * @param {import('script-manager').RegistrationDetails} details
      * @param {string} id
      * @returns {chrome.scripting.RegisteredContentScript}
      */
@@ -312,15 +278,6 @@ export class ScriptManager {
         if (typeof runAt !== 'undefined') {
             options.runAt = runAt;
         }
-    }
-
-    /**
-     * @param {string[]} array
-     * @param {boolean} firefoxConvention
-     * @returns {string[]|browser.extensionTypes.ExtensionFileOrCode[]}
-     */
-    _convertFileArray(array, firefoxConvention) {
-        return firefoxConvention ? array.map((file) => ({file})) : [...array];
     }
 
     /**
