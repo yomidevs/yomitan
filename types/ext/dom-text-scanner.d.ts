@@ -24,13 +24,3 @@
  * - `3` - Character should be added to the content and is a newline.
  */
 export type CharacterAttributes = 0 | 1 | 2 | 3;
-
-export type SeekTextNoteDetails = {
-    done: boolean;
-    lineHasWhitespace: boolean;
-    lineHasContent: boolean;
-    content: string;
-    offset: number;
-    remainder: number;
-    newlines: number;
-};
