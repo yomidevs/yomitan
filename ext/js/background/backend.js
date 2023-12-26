@@ -618,7 +618,7 @@ export class Backend {
         if (!tab) { return false; }
         const {id} = tab;
         if (typeof id !== 'number') { return false; }
-        const frameId = sender.frameId;
+        const {frameId} = sender;
         /** @type {import('extension').ChromeRuntimeMessageWithFrameId} */
         const message = {action, params, frameId};
         this._sendMessageTabIgnoreResponse(id, message, {frameId: targetFrameId});
@@ -632,7 +632,7 @@ export class Backend {
         if (!tab) { return false; }
         const {id} = tab;
         if (typeof id !== 'number') { return false; }
-        const frameId = sender.frameId;
+        const {frameId} = sender;
         /** @type {import('extension').ChromeRuntimeMessageWithFrameId} */
         const message = {action, params, frameId};
         this._sendMessageTabIgnoreResponse(id, message, {});
