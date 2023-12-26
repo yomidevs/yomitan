@@ -363,12 +363,6 @@ type ApiSurface = {
         };
         return: Anki.NoteId[];
     };
-    loadExtensionScripts: {
-        params: {
-            files: string[];
-        };
-        return: void;
-    };
     openCrossFramePort: {
         params: {
             targetTabId: number;
