@@ -1814,7 +1814,7 @@ export class Backend {
                     sender.tab.id !== tabId ||
                     sender.frameId !== frameId ||
                     !(typeof message === 'object' && message !== null) ||
-                    /** @type {import('core').SerializableObject} */ (message).action !== 'yomitanReady'
+                    /** @type {import('application').ApiMessageAny} */ (message).action !== 'applicationReady'
                 ) {
                     return;
                 }

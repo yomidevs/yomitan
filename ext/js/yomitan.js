@@ -167,7 +167,7 @@ export class Yomitan extends EventDispatcher {
      */
     ready() {
         this._isReady = true;
-        this.sendMessage({action: 'yomitanReady'});
+        this.sendMessage({action: 'applicationReady'});
     }
 
     /**
@@ -179,6 +179,7 @@ export class Yomitan extends EventDispatcher {
         return this._extensionUrlBase !== null && url.startsWith(this._extensionUrlBase);
     }
 
+    // TODO : this function needs type safety
     /**
      * Runs `chrome.runtime.sendMessage()` with additional exception handling events.
      * @param {import('extension').ChromeRuntimeSendMessageArgs} args The arguments to be passed to `chrome.runtime.sendMessage()`.

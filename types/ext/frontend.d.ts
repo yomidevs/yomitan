@@ -48,17 +48,6 @@ export type ConstructorDetails = {
 
 export type PageType = 'web' | 'popup' | 'search';
 
-// TODO : Remove
-export type FrontendRequestReadyBroadcastParams = {
-    frameId: number;
-};
-
-// TODO : Remove
 export type GetPopupInfoResult = {
     popupId: string | null;
-};
-
-// TODO : Remove
-export type FrontendReadyDetails = {
-    frameId: number;
 };
