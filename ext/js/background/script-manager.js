@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core.js';
-
 /**
  * This class is used to manage script injection into content tabs.
  */
@@ -69,11 +67,26 @@ export class ScriptManager {
      * @returns {Promise<{frameId: number|undefined, result: unknown}>} The id of the frame and the result of the script injection.
      */
     injectScript(file, tabId, frameId, allFrames) {
-        if (isObject(chrome.scripting) && typeof chrome.scripting.executeScript === 'function') {
-            return this._injectScriptMV3(file, tabId, frameId, allFrames);
-        } else {
-            return Promise.reject(new Error('Script injection not supported'));
-        }
+        return new Promise((resolve, reject) => {
+            /** @type {chrome.scripting.ScriptInjection<unknown[], unknown>} */
+            const details = {
+                injectImmediately: true,
+                files: [file],
+                target: {tabId, allFrames}
+            };
+            if (!allFrames && typeof frameId === 'number') {
+                details.target.frameIds = [frameId];
+            }
+            chrome.scripting.executeScript(details, (results) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    const {frameId: frameId2, result} = results[0];
+                    resolve({frameId: frameId2, result});
+                }
+            });
+        });
     }
 
     /**
@@ -146,36 +159,6 @@ export class ScriptManager {
     }
 
     // Private
-
-    /**
-     * @param {string} file
-     * @param {number} tabId
-     * @param {number|undefined} frameId
-     * @param {boolean} allFrames
-     * @returns {Promise<{frameId: number|undefined, result: unknown}>} The id of the frame and the result of the script injection.
-     */
-    _injectScriptMV3(file, tabId, frameId, allFrames) {
-        return new Promise((resolve, reject) => {
-            /** @type {chrome.scripting.ScriptInjection<unknown[], unknown>} */
-            const details = {
-                injectImmediately: true,
-                files: [file],
-                target: {tabId, allFrames}
-            };
-            if (!allFrames && typeof frameId === 'number') {
-                details.target.frameIds = [frameId];
-            }
-            chrome.scripting.executeScript(details, (results) => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    const {frameId: frameId2, result} = results[0];
-                    resolve({frameId: frameId2, result});
-                }
-            });
-        });
-    }
 
     /**
      * @param {import('script-manager').RegistrationDetails} details
