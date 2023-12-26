@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** */
+/** Entry point. */
 async function main() {
     const src = chrome.runtime.getURL('js/app/content-script-main.js');
     // eslint-disable-next-line no-unsanitized/method
