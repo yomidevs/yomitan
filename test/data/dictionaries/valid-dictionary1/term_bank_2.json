@@ -31,7 +31,7 @@
                                         "backgroundColor": "#565656",
                                         "color": "white",
                                         "cursor": "help",
-                                        "marginRight": 0.25
+                                        "margin": "0em 0.25em 0em 0em"
                                     },
                                     "data": {
                                         "code": "n"
