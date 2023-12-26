@@ -42,6 +42,40 @@ export type ApiSurface = {
         };
         return: void;
     };
+    applicationIsReady: {
+        params: void;
+        return: boolean;
+    };
+    applicationBackendReady: {
+        params: void;
+        return: void;
+    };
+    applicationGetUrl: {
+        params: void;
+        return: {
+            url: string;
+        };
+    };
+    applicationOptionsUpdated: {
+        params: {
+            source: string;
+        };
+        return: void;
+    };
+    applicationDatabaseUpdated: {
+        params: {
+            type: string; // TODO : Enum?
+            cause: string; // TODO : Enum?
+        };
+        return: void;
+    };
+    applicationZoomChanged: {
+        params: {
+            oldZoomFactor: number;
+            newZoomFactor: number;
+        };
+        return: void;
+    };
 };
 
 export type ApiParams<TName extends ApiNames> = BaseApiParams<ApiSurface[TName]>;
@@ -50,8 +84,8 @@ export type ApiNames = BaseApiNames<ApiSurface>;
 
 export type ApiMessage<TName extends ApiNames> = (
     ApiParams<TName> extends void ?
-        {action: TName} :
-        {action: TName, params: ApiParams<TName>}
+        {action: TName, frameId?: number} :
+        {action: TName, params: ApiParams<TName>, frameId?: number}
 );
 
 export type ApiMessageAny = ApiMessage<ApiNames>;

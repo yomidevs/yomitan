@@ -301,8 +301,8 @@ export class Backend {
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
 
-            this._sendMessageAllTabsIgnoreResponse('Yomitan.backendReady', {});
-            this._sendMessageIgnoreResponse({action: 'Yomitan.backendReady', params: {}});
+            this._sendMessageAllTabsIgnoreResponse({action: 'applicationBackendReady', params: {}});
+            this._sendMessageIgnoreResponse({action: 'applicationBackendReady', params: {}});
         } catch (e) {
             log.error(e);
             throw e;
@@ -406,7 +406,7 @@ export class Backend {
      * @param {chrome.tabs.ZoomChangeInfo} event
      */
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
-        this._sendMessageTabIgnoreResponse(tabId, {action: 'Yomitan.zoomChanged', params: {oldZoomFactor, newZoomFactor}}, {});
+        this._sendMessageTabIgnoreResponse(tabId, {action: 'applicationZoomChanged', params: {oldZoomFactor, newZoomFactor}}, {});
     }
 
     /**
@@ -429,7 +429,7 @@ export class Backend {
     /** @type {import('api').ApiHandler<'requestBackendReadySignal'>} */
     _onApiRequestBackendReadySignal(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
-        const data = {action: 'Yomitan.backendReady', params: {}};
+        const data = {action: 'applicationBackendReady', params: {}};
         if (typeof sender.tab === 'undefined') {
             this._sendMessageIgnoreResponse(data);
             return false;
@@ -1116,7 +1116,7 @@ export class Backend {
             try {
                 const mode = await this._sendMessageTabPromise(
                     id,
-                    {action: 'searchDisplayControllerGetMode', params: {}},
+                    {action: 'searchDisplayControllerGetMode'},
                     {frameId: 0}
                 );
                 return mode === 'popup';
@@ -1227,7 +1227,7 @@ export class Backend {
 
         this._accessibilityController.update(this._getOptionsFull(false));
 
-        this._sendMessageAllTabsIgnoreResponse('Yomitan.optionsUpdated', {source});
+        this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
     }
 
     /**
@@ -1635,7 +1635,7 @@ export class Backend {
         try {
             const response = await this._sendMessageTabPromise(
                 tabId,
-                {action: 'Yomitan.getUrl', params: {}},
+                {action: 'applicationGetUrl', params: {}},
                 {frameId: 0}
             );
             const url = typeof response === 'object' && response !== null ? /** @type {import('core').SerializableObject} */ (response).url : void 0;
@@ -1834,7 +1834,7 @@ export class Backend {
 
             chrome.runtime.onMessage.addListener(onMessage);
 
-            this._sendMessageTabPromise(tabId, {action: 'Yomitan.isReady'}, {frameId})
+            this._sendMessageTabPromise(tabId, {action: 'applicationIsReady'}, {frameId})
                 .then(
                     (value) => {
                         if (!value) { return; }
@@ -1893,7 +1893,8 @@ export class Backend {
     }
 
     /**
-     * @param {{action: string, params: import('core').SerializableObject}} message
+     * @template {import('application').ApiNames} TName
+     * @param {import('application').ApiMessage<TName>} message
      */
     _sendMessageIgnoreResponse(message) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
@@ -1901,8 +1902,9 @@ export class Backend {
     }
 
     /**
+     * @template {import('application').ApiNames} TName
      * @param {number} tabId
-     * @param {{action: string, params?: import('core').SerializableObject, frameId?: number}} message
+     * @param {import('application').ApiMessage<TName>} message
      * @param {chrome.tabs.MessageSendOptions} options
      */
     _sendMessageTabIgnoreResponse(tabId, message, options) {
@@ -1911,25 +1913,26 @@ export class Backend {
     }
 
     /**
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
+     * @template {import('application').ApiNames} TName
+     * @param {import('application').ApiMessage<TName>} message
      */
-    _sendMessageAllTabsIgnoreResponse(action, params) {
+    _sendMessageAllTabsIgnoreResponse(message) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, (tabs) => {
             for (const tab of tabs) {
                 const {id} = tab;
                 if (typeof id !== 'number') { continue; }
-                chrome.tabs.sendMessage(id, {action, params}, callback);
+                chrome.tabs.sendMessage(id, message, callback);
             }
         });
     }
 
     /**
+     * @template {import('application').ApiNames} TName
      * @param {number} tabId
-     * @param {{action: string, params?: import('core').SerializableObject}} message
+     * @param {import('application').ApiMessage<TName>} message
      * @param {chrome.tabs.MessageSendOptions} options
-     * @returns {Promise<unknown>}
+     * @returns {Promise<import('application').ApiReturn<TName>>}
      */
     _sendMessageTabPromise(tabId, message, options) {
         return new Promise((resolve, reject) => {
@@ -1938,7 +1941,7 @@ export class Backend {
              */
             const callback = (response) => {
                 try {
-                    resolve(this._getMessageResponseResult(response));
+                    resolve(/** @type {import('application').ApiReturn<TName>} */ (this._getMessageResponseResult(response)));
                 } catch (error) {
                     reject(error);
                 }
@@ -1961,11 +1964,11 @@ export class Backend {
         if (typeof response !== 'object' || response === null) {
             throw new Error('Tab did not respond');
         }
-        const responseError = /** @type {import('core').SerializedError|undefined} */ (/** @type {import('core').SerializableObject} */ (response).error);
+        const responseError = /** @type {import('core').Response<unknown>} */ (response).error;
         if (typeof responseError === 'object' && responseError !== null) {
             throw ExtensionError.deserialize(responseError);
         }
-        return /** @type {import('core').SerializableObject} */ (response).result;
+        return /** @type {import('core').Response<unknown>} */ (response).result;
     }
 
     /**
@@ -2382,7 +2385,7 @@ export class Backend {
      */
     _triggerDatabaseUpdated(type, cause) {
         this._translator.clearDatabaseCaches();
-        this._sendMessageAllTabsIgnoreResponse('Yomitan.databaseUpdated', {type, cause});
+        this._sendMessageAllTabsIgnoreResponse({action: 'applicationDatabaseUpdated', params: {type, cause}});
     }
 
     /**

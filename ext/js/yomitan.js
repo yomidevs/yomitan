@@ -18,7 +18,8 @@
 
 import {API} from './comm/api.js';
 import {CrossFrameAPI} from './comm/cross-frame-api.js';
-import {EventDispatcher, deferPromise, invokeMessageHandler, log} from './core.js';
+import {EventDispatcher, deferPromise, log} from './core.js';
+import {createApiMap, invokeApiMapHandler} from './core/api-map.js';
 import {ExtensionError} from './core/extension-error.js';
 
 // Set up chrome alias if it's not available (Edge Legacy)
@@ -90,15 +91,15 @@ export class Yomitan extends EventDispatcher {
         this._isBackendReadyPromiseResolve = resolve;
 
         /* eslint-disable no-multi-spaces */
-        /** @type {import('core').MessageHandlerMap} */
-        this._messageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
-            ['Yomitan.isReady',         this._onMessageIsReady.bind(this)],
-            ['Yomitan.backendReady',    this._onMessageBackendReady.bind(this)],
-            ['Yomitan.getUrl',          this._onMessageGetUrl.bind(this)],
-            ['Yomitan.optionsUpdated',  this._onMessageOptionsUpdated.bind(this)],
-            ['Yomitan.databaseUpdated', this._onMessageDatabaseUpdated.bind(this)],
-            ['Yomitan.zoomChanged',     this._onMessageZoomChanged.bind(this)]
-        ]));
+        /** @type {import('application').ApiMap} */
+        this._apiMap = createApiMap([
+            ['applicationIsReady',         this._onMessageIsReady.bind(this)],
+            ['applicationBackendReady',    this._onMessageBackendReady.bind(this)],
+            ['applicationGetUrl',          this._onMessageGetUrl.bind(this)],
+            ['applicationOptionsUpdated',  this._onMessageOptionsUpdated.bind(this)],
+            ['applicationDatabaseUpdated', this._onMessageDatabaseUpdated.bind(this)],
+            ['applicationZoomChanged',     this._onMessageZoomChanged.bind(this)]
+        ]);
         /* eslint-enable no-multi-spaces */
     }
 
@@ -216,11 +217,9 @@ export class Yomitan extends EventDispatcher {
         return location.href;
     }
 
-    /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
-    _onMessage({action, params}, sender, callback) {
-        const messageHandler = this._messageHandlers.get(action);
-        if (typeof messageHandler === 'undefined') { return false; }
-        return invokeMessageHandler(messageHandler, params, callback, sender);
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
+    _onMessage({action, params}, _sender, callback) {
+        return invokeApiMapHandler(this._apiMap, action, params, [], callback);
     }
 
     /**

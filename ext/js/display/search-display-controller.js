@@ -76,7 +76,7 @@ export class SearchDisplayController {
                 getText: yomitan.api.clipboardGet.bind(yomitan.api)
             }
         });
-        /** @type {import('display-search').ApiMap} */
+        /** @type {import('application').ApiMap} */
         this._apiMap = createApiMap([
             ['searchDisplayControllerGetMode', this._onMessageGetMode.bind(this)],
             ['searchDisplayControllerSetMode', this._onMessageSetMode.bind(this)],
@@ -138,19 +138,19 @@ export class SearchDisplayController {
 
     // Messages
 
-    /** @type {import('display-search').ApiHandler<'searchDisplayControllerSetMode'>} */
+    /** @type {import('application').ApiHandler<'searchDisplayControllerSetMode'>} */
     _onMessageSetMode({mode}) {
         this.setMode(mode);
     }
 
-    /** @type {import('display-search').ApiHandler<'searchDisplayControllerGetMode'>} */
+    /** @type {import('application').ApiHandler<'searchDisplayControllerGetMode'>} */
     _onMessageGetMode() {
         return this._searchPersistentStateController.mode;
     }
 
     // Private
 
-    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('display-search').ApiMessageAny>} */
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
     _onMessage({action, params}, _sender, callback) {
         return invokeApiMapHandler(this._apiMap, action, params, [], callback);
     }
@@ -271,7 +271,7 @@ export class SearchDisplayController {
         this._clipboardMonitor.setPreviousText(selection !== null ? selection.toString().trim() : '');
     }
 
-    /** @type {import('display-search').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
+    /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
     _onExternalSearchUpdate({text, animate = true}) {
         const options = this._display.getOptions();
         if (options === null) { return; }
