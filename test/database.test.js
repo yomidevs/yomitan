@@ -165,7 +165,7 @@ async function testDatabase1() {
                     media: {total: 6},
                     tagMeta: {total: 15},
                     termMeta: {total: 38, freq: 31, pitch: 7},
-                    terms: {total: 21}
+                    terms: {total: 22}
                 }
             };
 
@@ -192,8 +192,8 @@ async function testDatabase1() {
                 true
             );
             expect(counts).toStrictEqual({
-                counts: [{kanji: 2, kanjiMeta: 6, terms: 21, termMeta: 38, tagMeta: 15, media: 6}],
-                total: {kanji: 2, kanjiMeta: 6, terms: 21, termMeta: 38, tagMeta: 15, media: 6}
+                counts: [{kanji: 2, kanjiMeta: 6, terms: 22, termMeta: 38, tagMeta: 15, media: 6}],
+                total: {kanji: 2, kanjiMeta: 6, terms: 22, termMeta: 38, tagMeta: 15, media: 6}
             });
 
             // Test find* functions
@@ -553,6 +553,22 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
                     ],
                     readings: [
                         ['がぞう', 1]
+                    ]
+                }
+            },
+            {
+                inputs: [
+                    {
+                        sequenceList: [1099490]
+                    }
+                ],
+                expectedResults: {
+                    total: 1,
+                    terms: [
+                        ['発条', 1]
+                    ],
+                    readings: [
+                        ['ばね', 1]
                     ]
                 }
             },

@@ -23,9 +23,13 @@ export type TextDecorationLine = 'underline' | 'overline' | 'line-through';
 
 export type TextDecorationLineOrNone = 'none' | TextDecorationLine;
 
+export type TextDecorationStyle = 'solid' | 'double' | 'dotted' | 'dashed' | 'wavy';
+
 export type FontStyle = 'normal' | 'italic';
 
 export type FontWeight = 'normal' | 'bold';
+
+export type WordBreak = 'normal' | 'break-all' | 'keep-all';
 
 export type TextAlign = 'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'justify-all' | 'match-parent';
 
@@ -48,13 +52,30 @@ export type StructuredContentStyle = {
     fontStyle?: FontStyle;
     fontWeight?: FontWeight;
     fontSize?: string;
+    color?: string;
+    backgroundColor?: string;
     textDecorationLine?: TextDecorationLineOrNone | TextDecorationLine[];
+    textDecorationStyle?: TextDecorationStyle;
+    textDecorationColor?: string;
+    borderColor?: string;
+    borderStyle?: string;
+    borderRadius?: string;
+    borderWidth?: string;
     verticalAlign?: VerticalAlign;
     textAlign?: TextAlign;
-    marginTop?: number;
-    marginLeft?: number;
-    marginRight?: number;
-    marginBottom?: number;
+    margin?: string;
+    marginTop?: number | string;
+    marginLeft?: number | string;
+    marginRight?: number | string;
+    marginBottom?: number | string;
+    padding?: string;
+    paddingTop?: string;
+    paddingLeft?: string;
+    paddingRight?: string;
+    paddingBottom?: string;
+    wordBreak?: WordBreak;
+    whiteSpace?: string;
+    cursor?: string;
     listStyleType?: string;
 };
 
@@ -99,6 +120,10 @@ export type StyledElement = {
     content?: Content;
     data?: Data;
     style?: StructuredContentStyle;
+    /**
+     * Hover text for the element.
+     */
+    title?: string;
     /**
      * Defines the language of an element in the format defined by RFC 5646.
      */

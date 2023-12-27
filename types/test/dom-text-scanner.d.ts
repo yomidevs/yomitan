@@ -29,4 +29,3 @@ export type TestData = {
         remainder?: number;
     };
 };
-
