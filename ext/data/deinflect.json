@@ -292,6 +292,24 @@
         {"kanaIn": "来ざる", "kanaOut": "来る", "rulesIn": [], "rulesOut": ["vk"]},
         {"kanaIn": "來ざる", "kanaOut": "來る", "rulesIn": [], "rulesOut": ["vk"]}
     ],
+    "-neba": [
+        {"kanaIn": "ねば", "kanaOut": "る", "rulesIn": [], "rulesOut": ["v1"]},
+        {"kanaIn": "かねば", "kanaOut": "く", "rulesIn": [], "rulesOut": ["v5"]},
+        {"kanaIn": "がねば", "kanaOut": "ぐ", "rulesIn": [], "rulesOut": ["v5"]},
+        {"kanaIn": "さねば", "kanaOut": "す", "rulesIn": [], "rulesOut": ["v5"]},
+        {"kanaIn": "たねば", "kanaOut": "つ", "rulesIn": [], "rulesOut": ["v5"]},
+        {"kanaIn": "なねば", "kanaOut": "ぬ", "rulesIn": [], "rulesOut": ["v5"]},
+        {"kanaIn": "ばねば", "kanaOut": "ぶ", "rulesIn": [], "rulesOut": ["v5"]},
+        {"kanaIn": "まねば", "kanaOut": "む", "rulesIn": [], "rulesOut": ["v5"]},
+        {"kanaIn": "らねば", "kanaOut": "る", "rulesIn": [], "rulesOut": ["v5"]},
+        {"kanaIn": "わねば", "kanaOut": "う", "rulesIn": [], "rulesOut": ["v5"]},
+        {"kanaIn": "ぜねば", "kanaOut": "ずる", "rulesIn": [], "rulesOut": ["vz"]},
+        {"kanaIn": "せねば", "kanaOut": "する", "rulesIn": [], "rulesOut": ["vs"]},
+        {"kanaIn": "為ねば", "kanaOut": "為る", "rulesIn": [], "rulesOut": ["vs"]},
+        {"kanaIn": "こねば", "kanaOut": "くる", "rulesIn": [], "rulesOut": ["vk"]},
+        {"kanaIn": "来ねば", "kanaOut": "来る", "rulesIn": [], "rulesOut": ["vk"]},
+        {"kanaIn": "來ねば", "kanaOut": "來る", "rulesIn": [], "rulesOut": ["vk"]}
+    ],
     "adv": [
         {"kanaIn": "く", "kanaOut": "い", "rulesIn": [], "rulesOut": ["adj-i"]}
     ],
