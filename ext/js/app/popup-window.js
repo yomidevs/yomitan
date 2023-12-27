@@ -21,7 +21,7 @@ import {yomitan} from '../yomitan.js';
 
 /**
  * This class represents a popup that is hosted in a new native window.
- * @augments EventDispatcher<import('popup').PopupAnyEventType>
+ * @augments EventDispatcher<import('popup').Events>
  */
 export class PopupWindow extends EventDispatcher {
     /**

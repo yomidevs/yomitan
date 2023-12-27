@@ -26,7 +26,7 @@ import {ThemeController} from './theme-controller.js';
 
 /**
  * This class is the container which hosts the display of search results.
- * @augments EventDispatcher<import('popup').PopupAnyEventType>
+ * @augments EventDispatcher<import('popup').Events>
  */
 export class Popup extends EventDispatcher {
     /**
@@ -360,9 +360,7 @@ export class Popup extends EventDispatcher {
             parentNode = this._shadow;
         }
         const node = await loadStyle('yomitan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
-        /** @type {import('popup').CustomOuterCssChangedEvent} */
-        const event = {node, useWebExtensionApi, inShadow};
-        this.trigger('customOuterCssChanged', event);
+        this.trigger('customOuterCssChanged', {node, useWebExtensionApi, inShadow});
     }
 
     /**
@@ -653,7 +651,7 @@ export class Popup extends EventDispatcher {
     }
 
     /**
-     * @param {import('dynamic-property').ChangeEventDetails<boolean>} event
+     * @param {import('dynamic-property').EventArgument<boolean, 'change'>} event
      */
     _onVisibleChange({value}) {
         if (this._visibleValue === value) { return; }
