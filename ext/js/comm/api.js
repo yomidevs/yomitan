@@ -373,7 +373,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<TAction>>}
      */
     _invoke(action, params) {
-        /** @type {import('api').MessageAny} */
+        /** @type {import('api').ApiMessage<TAction>} */
         const data = {action, params};
         return new Promise((resolve, reject) => {
             try {
