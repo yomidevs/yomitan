@@ -55,37 +55,6 @@ export function injectStylesheet(type, content, tabId, frameId, allFrames) {
 }
 
 /**
- * Injects a script into a tab.
- * @param {string} file The path to a file to inject.
- * @param {number} tabId The id of the tab to inject into.
- * @param {number|undefined} frameId The id of the frame to inject into.
- * @param {boolean} allFrames Whether or not the script should be injected into all frames.
- * @returns {Promise<{frameId: number|undefined, result: unknown}>} The id of the frame and the result of the script injection.
- */
-export function injectScript(file, tabId, frameId, allFrames) {
-    return new Promise((resolve, reject) => {
-        /** @type {chrome.scripting.ScriptInjection<unknown[], unknown>} */
-        const details = {
-            injectImmediately: true,
-            files: [file],
-            target: {tabId, allFrames}
-        };
-        if (!allFrames && typeof frameId === 'number') {
-            details.target.frameIds = [frameId];
-        }
-        chrome.scripting.executeScript(details, (results) => {
-            const e = chrome.runtime.lastError;
-            if (e) {
-                reject(new Error(e.message));
-            } else {
-                const {frameId: frameId2, result} = results[0];
-                resolve({frameId: frameId2, result});
-            }
-        });
-    });
-}
-
-/**
  * Checks whether or not a content script is registered.
  * @param {string} id The identifier used with a call to `registerContentScript`.
  * @returns {Promise<boolean>} `true` if a script is registered, `false` otherwise.
