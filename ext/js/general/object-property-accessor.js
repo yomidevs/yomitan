@@ -258,7 +258,7 @@ export class ObjectPropertyAccessor {
                         throw new Error(`Unexpected character: ${c}`);
                     }
                     break;
-                case 'close-bracket': { // Expecting closing bracket after quoted string
+                case 'close-bracket': // Expecting closing bracket after quoted string
                     if (v === 0x5d) { // ']'
                         pathArray.push(value);
                         value = '';
@@ -267,7 +267,6 @@ export class ObjectPropertyAccessor {
                         throw new Error(`Unexpected character: ${c}`);
                     }
                     break;
-                }
                 case 'next': { // Expecting . or [
                     switch (v) {
                         case 0x5b: // '['
