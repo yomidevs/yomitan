@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {GoogleDocsUtil} from '../accessibility/google-docs-util.js';
 import {EventListenerCollection, invokeMessageHandler, log, promiseAnimationFrame} from '../core.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
@@ -964,7 +963,7 @@ export class Frontend {
     _prepareSiteSpecific() {
         switch (location.hostname.toLowerCase()) {
             case 'docs.google.com':
-                this._prepareGoogleDocsWrapper();
+                this._prepareGoogleDocs();
                 break;
         }
     }
@@ -972,19 +971,8 @@ export class Frontend {
     /**
      * @returns {Promise<void>}
      */
-    async _prepareGoogleDocsWrapper() {
-        if (typeof GoogleDocsUtil !== 'undefined') { return; }
-        await yomitan.api.loadExtensionScripts([
-            '/js/accessibility/google-docs-util.js'
-        ]);
-        this._prepareGoogleDocs();
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
     async _prepareGoogleDocs() {
-        if (typeof GoogleDocsUtil === 'undefined') { return; }
+        const {GoogleDocsUtil} = await import('../accessibility/google-docs-util.js');
         DocumentUtil.registerGetRangeFromPointHandler(GoogleDocsUtil.getRangeFromPoint.bind(GoogleDocsUtil));
     }
 }

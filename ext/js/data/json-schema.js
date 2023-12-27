@@ -1343,12 +1343,18 @@ class JsonSchemaProxyHandler {
      * @returns {?number}
      */
     _getArrayIndex(property) {
-        if (typeof property === 'string' && this._numberPattern.test(property)) {
-            return Number.parseInt(property, 10);
-        } else if (typeof property === 'number' && Math.floor(property) === property && property >= 0) {
-            return property;
-        } else {
-            return null;
+        switch (typeof property) {
+            case 'string':
+                if (this._numberPattern.test(property)) {
+                    return Number.parseInt(property, 10);
+                }
+                break;
+            case 'number':
+                if (Math.floor(property) === property && property >= 0) {
+                    return property;
+                }
+                break;
         }
+        return null;
     }
 }

@@ -405,7 +405,8 @@
                 "no-multiple-empty-lines": [
                     "error",
                     {
-                        "max": 1
+                        "max": 1,
+                        "maxEOF": 0
                     }
                 ],
                 "no-undef": "off",
@@ -559,7 +560,8 @@
         },
         {
             "files": [
-                "test/data/dictionaries/valid-dictionary1/term_bank_1.json"
+                "test/data/dictionaries/valid-dictionary1/term_bank_1.json",
+                "test/data/dictionaries/valid-dictionary1/term_bank_2.json"
             ],
             "rules": {
                 "jsonc/array-element-newline": [

@@ -401,14 +401,19 @@ export class DisplayGenerator {
      * @returns {?HTMLElement}
      */
     _createTermDefinitionEntry(entry, dictionary) {
-        if (typeof entry === 'string') {
-            return this._createTermDefinitionEntryText(entry);
-        } else if (typeof entry === 'object' && entry !== null) {
-            switch (entry.type) {
-                case 'image':
-                    return this._createTermDefinitionEntryImage(entry, dictionary);
-                case 'structured-content':
-                    return this._createTermDefinitionEntryStructuredContent(entry.content, dictionary);
+        switch (typeof entry) {
+            case 'string':
+                return this._createTermDefinitionEntryText(entry);
+            case 'object': {
+                switch (entry.type) {
+                    case 'image':
+                        return this._createTermDefinitionEntryImage(entry, dictionary);
+                    case 'structured-content':
+                        return this._createTermDefinitionEntryStructuredContent(entry.content, dictionary);
+                    case 'text':
+                        break;
+                }
+                break;
             }
         }
 

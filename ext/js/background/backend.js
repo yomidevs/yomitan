@@ -189,7 +189,6 @@ export class Backend {
             ['textHasJapaneseCharacters',    this._onApiTextHasJapaneseCharacters.bind(this)],
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
-            ['loadExtensionScripts',         this._onApiLoadExtensionScripts.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
@@ -371,7 +370,7 @@ export class Backend {
         });
     }
 
-    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('api').MessageAny>} */
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('api').ApiMessageAny>} */
     _onMessageWrapper(message, sender, sendResponse) {
         if (this._isPrepared) {
             return this._onMessage(message, sender, sendResponse);
@@ -394,7 +393,7 @@ export class Backend {
     }
 
     /**
-     * @param {import('api').MessageAny} message
+     * @param {import('api').ApiMessageAny} message
      * @param {chrome.runtime.MessageSender} sender
      * @param {(response?: unknown) => void} callback
      * @returns {boolean}
@@ -844,17 +843,6 @@ export class Backend {
     /** @type {import('api').ApiHandler<'findAnkiNotes'>} */
     async _onApiFindAnkiNotes({query}) {
         return await this._anki.findNotes(query);
-    }
-
-    /** @type {import('api').ApiHandler<'loadExtensionScripts'>} */
-    async _onApiLoadExtensionScripts({files}, sender) {
-        if (!sender || !sender.tab) { throw new Error('Invalid sender'); }
-        const tabId = sender.tab.id;
-        if (typeof tabId !== 'number') { throw new Error('Sender has invalid tab ID'); }
-        const {frameId} = sender;
-        for (const file of files) {
-            await this._scriptManager.injectScript(file, tabId, frameId, false);
-        }
     }
 
     /** @type {import('api').ApiHandler<'openCrossFramePort'>} */

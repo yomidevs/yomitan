@@ -355,14 +355,6 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'loadExtensionScripts', 'files'>} files
-     * @returns {Promise<import('api').ApiReturn<'loadExtensionScripts'>>}
-     */
-    loadExtensionScripts(files) {
-        return this._invoke('loadExtensionScripts', {files});
-    }
-
-    /**
      * @param {import('api').ApiParam<'openCrossFramePort', 'targetTabId'>} targetTabId
      * @param {import('api').ApiParam<'openCrossFramePort', 'targetFrameId'>} targetFrameId
      * @returns {Promise<import('api').ApiReturn<'openCrossFramePort'>>}
@@ -381,7 +373,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<TAction>>}
      */
     _invoke(action, params) {
-        /** @type {import('api').MessageAny} */
+        /** @type {import('api').ApiMessage<TAction>} */
         const data = {action, params};
         return new Promise((resolve, reject) => {
             try {
