@@ -164,8 +164,8 @@ async function testDatabase1() {
                     kanjiMeta: {total: 6, freq: 6},
                     media: {total: 6},
                     tagMeta: {total: 15},
-                    termMeta: {total: 38, freq: 31, pitch: 7},
-                    terms: {total: 22}
+                    termMeta: {total: 39, freq: 31, pitch: 7, ipa: 1},
+                    terms: {total: 23}
                 }
             };
 
@@ -192,8 +192,8 @@ async function testDatabase1() {
                 true
             );
             expect(counts).toStrictEqual({
-                counts: [{kanji: 2, kanjiMeta: 6, terms: 22, termMeta: 38, tagMeta: 15, media: 6}],
-                total: {kanji: 2, kanjiMeta: 6, terms: 22, termMeta: 38, tagMeta: 15, media: 6}
+                counts: [{kanji: 2, kanjiMeta: 6, terms: 23, termMeta: 39, tagMeta: 15, media: 6}],
+                total: {kanji: 2, kanjiMeta: 6, terms: 23, termMeta: 39, tagMeta: 15, media: 6}
             });
 
             // Test find* functions
