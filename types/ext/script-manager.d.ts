@@ -53,4 +53,3 @@ export type ContentScriptInjectionDetails = {
     js?: string[];
     urlRegex: RegExp | null;
 };
-
