@@ -19,6 +19,7 @@ import type {TokenString} from './core';
 import type {SearchMode} from './display';
 import type {FrameEndpointReadyDetails, FrameEndpointConnectedDetails} from './frame-client';
 import type {DatabaseUpdateType, DatabaseUpdateCause} from './backend';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 import type {
     ApiMap as BaseApiMap,
     ApiHandler as BaseApiHandler,
@@ -146,3 +147,22 @@ export type ApiMap = BaseApiMap<ApiSurface>;
 export type ApiHandler<TName extends ApiNames> = BaseApiHandler<ApiSurface[TName]>;
 
 export type ApiReturn<TName extends ApiNames> = BaseApiReturn<ApiSurface[TName]>;
+
+export type Events = {
+    extensionUnloaded: Record<string, never>;
+    optionsUpdated: {
+        source: string;
+    };
+    databaseUpdated: {
+        type: DatabaseUpdateType;
+        cause: DatabaseUpdateCause;
+    };
+    zoomChanged: {
+        oldZoomFactor: number;
+        newZoomFactor: number;
+    };
+    closePopups: Record<string, never>;
+    storageChanged: Record<string, never>;
+};
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;

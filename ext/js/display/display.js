@@ -1646,7 +1646,7 @@ export class Display extends EventDispatcher {
 
     /** */
     _closePopups() {
-        yomitan.trigger('closePopups');
+        yomitan.triggerClosePopups();
     }
 
     /**

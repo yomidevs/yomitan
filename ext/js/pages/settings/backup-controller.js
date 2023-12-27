@@ -644,7 +644,7 @@ export class BackupController {
         await yomitan.api.purgeDatabase();
         await Dexie.import(file, {progressCallback: this._databaseImportProgressCallback});
         yomitan.api.triggerDatabaseUpdated('dictionary', 'import');
-        yomitan.trigger('storageChanged');
+        yomitan.triggerStorageChanged();
     }
 
     /** */

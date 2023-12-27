@@ -930,7 +930,7 @@ export class DictionaryController {
 
     /** */
     _triggerStorageChanged() {
-        yomitan.trigger('storageChanged');
+        yomitan.triggerStorageChanged();
     }
 
     /** */

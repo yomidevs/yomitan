@@ -47,8 +47,6 @@ export type ChromeRuntimeSendMessageArgs5 = [
 
 export type ChromeRuntimeSendMessageArgs = ChromeRuntimeSendMessageArgs1 | ChromeRuntimeSendMessageArgs2 | ChromeRuntimeSendMessageArgs3 | ChromeRuntimeSendMessageArgs4 | ChromeRuntimeSendMessageArgs5;
 
-export type ExtensionEventType = 'extensionUnloaded' | 'optionsUpdated' | 'databaseUpdated' | 'zoomChanged' | 'closePopups' | 'dynamicLoaderSentinel' | 'storageChanged';
-
 export type HtmlElementWithContentWindow = HTMLIFrameElement | HTMLFrameElement | HTMLObjectElement;
 
 export type ContentOrigin = {

@@ -398,6 +398,6 @@ export class DictionaryImportController {
 
     /** */
     _triggerStorageChanged() {
-        yomitan.trigger('storageChanged');
+        yomitan.triggerStorageChanged();
     }
 }

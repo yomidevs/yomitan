@@ -82,7 +82,7 @@ export class PersistentStorageController {
         const node = document.querySelector('#storage-persistent-fail-warning');
         if (node !== null) { node.hidden = isStoragePeristent; }
 
-        yomitan.trigger('storageChanged');
+        yomitan.triggerStorageChanged();
     }
 
     /**
