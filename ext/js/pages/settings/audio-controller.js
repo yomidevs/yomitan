@@ -117,7 +117,7 @@ export class AudioController extends EventDispatcher {
     // Private
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         for (const entry of this._audioSourceEntries) {

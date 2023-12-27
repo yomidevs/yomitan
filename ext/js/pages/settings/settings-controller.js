@@ -23,7 +23,7 @@ import {HtmlTemplateCollection} from '../../dom/html-template-collection.js';
 import {yomitan} from '../../yomitan.js';
 
 /**
- * @augments EventDispatcher<import('settings-controller').EventType>
+ * @augments EventDispatcher<import('settings-controller').Events>
  */
 export class SettingsController extends EventDispatcher {
     constructor() {
@@ -234,7 +234,7 @@ export class SettingsController extends EventDispatcher {
      */
     _setProfileIndex(value, canUpdateProfileIndex) {
         this._profileIndex = value;
-        this.trigger('optionsContextChanged');
+        this.trigger('optionsContextChanged', {});
         this._onOptionsUpdatedInternal(canUpdateProfileIndex);
     }
 
@@ -253,9 +253,7 @@ export class SettingsController extends EventDispatcher {
         const optionsContext = this.getOptionsContext();
         try {
             const options = await this.getOptions();
-            /** @type {import('settings-controller').OptionsChangedEvent} */
-            const event = {options, optionsContext};
-            this.trigger('optionsChanged', event);
+            this.trigger('optionsChanged', {options, optionsContext});
         } catch (e) {
             if (canUpdateProfileIndex) {
                 this._setProfileIndex(0, false);
@@ -339,9 +337,7 @@ export class SettingsController extends EventDispatcher {
         if (!this.hasListeners(eventName)) { return; }
 
         const permissions = await this._permissionsUtil.getAllPermissions();
-        /** @type {import('settings-controller').PermissionsChangedEvent} */
-        const event = {permissions};
-        this.trigger(eventName, event);
+        this.trigger(eventName, {permissions});
     }
 
     /**
