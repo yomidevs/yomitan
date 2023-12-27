@@ -22,7 +22,7 @@ import {TextScanner} from '../language/text-scanner.js';
 import {yomitan} from '../yomitan.js';
 
 /**
- * @augments EventDispatcher<import('display').QueryParserEventType>
+ * @augments EventDispatcher<import('query-parser').Events>
  */
 export class QueryParser extends EventDispatcher {
     /**
@@ -160,8 +160,7 @@ export class QueryParser extends EventDispatcher {
         } = e;
         if (type === null || dictionaryEntries === null || sentence === null || optionsContext === null) { return; }
 
-        /** @type {import('display').QueryParserSearchedEvent} */
-        const event2 = {
+        this.trigger('searched', {
             textScanner,
             type,
             dictionaryEntries,
@@ -170,8 +169,7 @@ export class QueryParser extends EventDispatcher {
             textSource,
             optionsContext,
             sentenceOffset: this._getSentenceOffset(e.textSource)
-        };
-        this.trigger('searched', event2);
+        });
     }
 
     /**

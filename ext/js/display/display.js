@@ -792,7 +792,7 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {import('display').QueryParserSearchedEvent} details
+     * @param {import('query-parser').EventArgument<'searched'>} details
      */
     _onQueryParserSearch({type, dictionaryEntries, sentence, inputInfo: {eventType}, textSource, optionsContext, sentenceOffset}) {
         const query = textSource.text();
