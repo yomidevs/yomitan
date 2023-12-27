@@ -368,7 +368,7 @@ export class EventDispatcher {
      * Creates a new instance.
      */
     constructor() {
-        /** @type {Map<import('core').EventNames<TSurface>, ((details: import('core').SafeAny) => void)[]>} */
+        /** @type {Map<import('core').EventNames<TSurface>, import('core').EventHandlerAny[]>} */
         this._eventMap = new Map();
     }
 
@@ -393,7 +393,7 @@ export class EventDispatcher {
      * Adds a single event listener to a specific event.
      * @template {import('core').EventNames<TSurface>} TName
      * @param {TName} eventName The string representing the event's name.
-     * @param {(details: import('core').EventArgument<TSurface, TName>) => void} callback The event listener callback to add.
+     * @param {import('core').EventHandler<TSurface, TName>} callback The event listener callback to add.
      */
     on(eventName, callback) {
         let callbacks = this._eventMap.get(eventName);
@@ -408,7 +408,7 @@ export class EventDispatcher {
      * Removes a single event listener from a specific event.
      * @template {import('core').EventNames<TSurface>} TName
      * @param {TName} eventName The string representing the event's name.
-     * @param {(details: import('core').EventArgument<TSurface, TName>) => void} callback The event listener callback to add.
+     * @param {import('core').EventHandler<TSurface, TName>} callback The event listener callback to add.
      * @returns {boolean} `true` if the callback was removed, `false` otherwise.
      */
     off(eventName, callback) {
@@ -491,7 +491,7 @@ export class EventListenerCollection {
      * @template {import('core').EventNames<TSurface>} TName
      * @param {EventDispatcher<TSurface>} target The object to add the event listener to.
      * @param {TName} eventName The string representing the event's name.
-     * @param {(details: import('core').EventArgument<TSurface, TName>) => void} callback The event listener callback to add.
+     * @param {import('core').EventHandler<TSurface, TName>} callback The event listener callback to add.
      */
     on(target, eventName, callback) {
         target.on(eventName, callback);

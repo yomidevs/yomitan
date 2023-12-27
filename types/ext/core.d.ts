@@ -98,3 +98,7 @@ export type EventArgument<TSurface extends EventSurface, TName extends EventName
 export type EventDispatcherOffGeneric = {
     off(eventName: string, callback: (...args: SafeAny) => void): boolean;
 };
+
+export type EventHandler<TSurface extends EventSurface, TName extends EventNames<TSurface>> = (details: EventArgument<TSurface, TName>) => void;
+
+export type EventHandlerAny = (details: SafeAny) => void;
