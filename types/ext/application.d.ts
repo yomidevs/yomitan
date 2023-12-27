@@ -18,6 +18,7 @@
 import type {TokenString} from './core';
 import type {SearchMode} from './display';
 import type {FrameEndpointReadyDetails, FrameEndpointConnectedDetails} from './frame-client';
+import type {DatabaseUpdateType, DatabaseUpdateCause} from './backend';
 import type {
     ApiMap as BaseApiMap,
     ApiHandler as BaseApiHandler,
@@ -70,8 +71,8 @@ export type ApiSurface = {
     };
     applicationDatabaseUpdated: {
         params: {
-            type: string; // TODO : Enum?
-            cause: string; // TODO : Enum?
+            type: DatabaseUpdateType;
+            cause: DatabaseUpdateCause;
         };
         return: void;
     };
