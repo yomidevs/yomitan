@@ -779,7 +779,7 @@ export class DisplayAudio {
     }
 
     /**
-     * @param {import('popup-menu').MenuCloseEventDetails} details
+     * @param {import('popup-menu').EventArgument<'close'>} details
      */
     _onPopupMenuClose({menu}) {
         this._openMenus.delete(menu);

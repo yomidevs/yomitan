@@ -16,8 +16,22 @@
  */
 
 import type {PopupMenu} from '../../ext/js/dom/popup-menu';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
-export type EventType = 'close';
+export type Events = {
+    close: {
+        menu: PopupMenu;
+        item: HTMLElement | null;
+        action: string | null;
+        cause: CloseReason;
+        altKey: boolean;
+        ctrlKey: boolean;
+        metaKey: boolean;
+        shiftKey: boolean;
+    };
+};
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
 export type CloseReason = 'close' | 'outside' | 'item' | 'resize';
 
@@ -25,17 +39,6 @@ export type MenuOpenEventDetails = {
     menu: PopupMenu;
 };
 
-export type MenuCloseEventDetails = {
-    menu: PopupMenu;
-    item: HTMLElement | null;
-    action: string | null;
-    cause: CloseReason;
-    altKey: boolean;
-    ctrlKey: boolean;
-    metaKey: boolean;
-    shiftKey: boolean;
-};
-
 export type MenuOpenEvent = CustomEvent<MenuOpenEventDetails>;
 
-export type MenuCloseEvent = CustomEvent<MenuCloseEventDetails>;
+export type MenuCloseEvent = CustomEvent<EventArgument<'close'>>;
