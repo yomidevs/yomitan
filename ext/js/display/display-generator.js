@@ -415,8 +415,6 @@ export class DisplayGenerator {
                 }
                 break;
             }
-            default:
-                break;
         }
 
         return null;

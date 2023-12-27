@@ -1354,8 +1354,6 @@ class JsonSchemaProxyHandler {
                     return property;
                 }
                 break;
-            default:
-                break;
         }
         return null;
     }
