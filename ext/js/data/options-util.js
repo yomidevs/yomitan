@@ -1174,6 +1174,18 @@ export class OptionsUtil {
     }
 
     /**
+     * @type {import('options-util').ModernUpdateFunctionAsync}
+     */
+    async _updateVersion22(options) {
+        //  Added translation.searchResolution
+        for (const {options: profileOptions} of options.profiles) {
+            profileOptions.translation.searchResolution = 'letter';
+        }
+
+        return options;
+    }
+
+    /**
      * @param {string} url
      * @returns {Promise<chrome.tabs.Tab>}
      */
