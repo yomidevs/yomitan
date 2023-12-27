@@ -21,8 +21,10 @@ import {CrossFrameAPI} from './comm/cross-frame-api.js';
 import {EventDispatcher, deferPromise, invokeMessageHandler, log} from './core.js';
 import {ExtensionError} from './core/extension-error.js';
 
-// Set up chrome alias if it's not available (Edge Legacy)
-if ((() => {
+/**
+ * @returns {boolean}
+ */
+function checkChromeNotAvailable() {
     let hasChrome = false;
     let hasBrowser = false;
     try {
@@ -36,7 +38,10 @@ if ((() => {
         // NOP
     }
     return (hasBrowser && !hasChrome);
-})()) {
+}
+
+// Set up chrome alias if it's not available (Edge Legacy)
+if (checkChromeNotAvailable()) {
     // @ts-expect-error - objects should have roughly the same interface
     // eslint-disable-next-line no-global-assign
     chrome = browser;

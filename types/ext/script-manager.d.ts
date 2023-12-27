@@ -21,26 +21,12 @@ export type RunAt = 'document_start' | 'document_end' | 'document_idle';
 export type RegistrationDetails = {
     /** Same as `matches` in the `content_scripts` manifest key. */
     matches: string[];
-
-    /** Regex match pattern to use as a fallback when native content script registration isn't supported. */
-    /** Should be equivalent to `matches`. */
-    urlMatches: string;
-
     /** Same as `run_at` in the `content_scripts` manifest key. */
     runAt: RunAt;
-
-    /** Same as `exclude_matches` in the `content_scripts` manifest key. */
-    excludeMatches?: string[];
-
-    /** Same as `match_about_blank` in the `content_scripts` manifest key. */
-    matchAboutBlank: boolean;
-
     /** Same as `all_frames` in the `content_scripts` manifest key. */
     allFrames: boolean;
-
     /** List of CSS paths. */
     css?: string[];
-
     /** List of script paths. */
     js?: string[];
 };
