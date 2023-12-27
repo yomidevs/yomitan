@@ -113,8 +113,6 @@ export type HistoryContent = {
     contentOrigin?: Extension.ContentOrigin;
 };
 
-export type SearchPersistentStateControllerEventType = 'modeChange';
-
 export type SearchMode = null | 'popup' | 'action-popup';
 
 export type GetSearchContextCallback = TextScannerTypes.GetSearchContextCallbackSync;
