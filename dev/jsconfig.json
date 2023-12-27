@@ -37,7 +37,8 @@
             "translation": ["../types/ext/translation"],
             "translation-internal": ["../types/ext/translation-internal"],
             "dev/*": ["../types/dev/*"],
-            "rollup/parseAst": ["../types/other/rollup-parse-ast"]
+            "rollup/parseAst": ["../types/other/rollup-parse-ast"],
+            "chai": ["../node_modules/@vitest/expect/dist/chai.d.cts"]
         },
         "types": [
             "node",
