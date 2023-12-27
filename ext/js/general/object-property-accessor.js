@@ -259,14 +259,12 @@ export class ObjectPropertyAccessor {
                     }
                     break;
                 case 'close-bracket': { // Expecting closing bracket after quoted string
-                    switch (v) {
-                        case 0x5d: // ']'
-                            pathArray.push(value);
-                            value = '';
-                            state = 'next';
-                            break;
-                        default:
-                            throw new Error(`Unexpected character: ${c}`);
+                    if (v === 0x5d) { // ']'
+                        pathArray.push(value);
+                        value = '';
+                        state = 'next';
+                    } else {
+                        throw new Error(`Unexpected character: ${c}`);
                     }
                     break;
                 }
