@@ -19,7 +19,7 @@
 import {EventDispatcher} from '../core.js';
 
 /**
- * @augments EventDispatcher<import('panel-element').EventType>
+ * @augments EventDispatcher<import('panel-element').Events>
  */
 export class PanelElement extends EventDispatcher {
     /**
@@ -84,9 +84,9 @@ export class PanelElement extends EventDispatcher {
     }
 
     /**
-     * @param {import('panel-element').EventType} eventName
-     * @param {(details: import('core').SafeAny) => void} callback
-     * @returns {void}
+     * @template {import('core').EventNames<import('panel-element').Events>} TName
+     * @param {TName} eventName
+     * @param {(details: import('core').EventArgument<import('panel-element').Events, TName>) => void} callback
      */
     on(eventName, callback) {
         if (eventName === 'visibilityChanged') {
@@ -100,12 +100,13 @@ export class PanelElement extends EventDispatcher {
                 });
             }
         }
-        return super.on(eventName, callback);
+        super.on(eventName, callback);
     }
 
     /**
-     * @param {import('panel-element').EventType} eventName
-     * @param {(details: import('core').SafeAny) => void} callback
+     * @template {import('core').EventNames<import('panel-element').Events>} TName
+     * @param {TName} eventName
+     * @param {(details: import('core').EventArgument<import('panel-element').Events, TName>) => void} callback
      * @returns {boolean}
      */
     off(eventName, callback) {
