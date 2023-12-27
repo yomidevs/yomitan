@@ -912,45 +912,34 @@ async function testDatabase2() {
 
 
 /** */
-async function testDatabase3() {
-    const invalidDictionaries = [
-        'invalid-dictionary1',
-        'invalid-dictionary2',
-        'invalid-dictionary3',
-        'invalid-dictionary4',
-        'invalid-dictionary5',
-        'invalid-dictionary6'
-    ];
-
-
-    describe('Database3', () => {
-        for (const invalidDictionary of invalidDictionaries) {
-            test(`${invalidDictionary}`, async () => {
-                // Setup database
-                const dictionaryDatabase = new DictionaryDatabase();
-                /** @type {import('dictionary-importer').ImportDetails} */
-                const detaultImportDetails = {prefixWildcardsSupported: false};
-                await dictionaryDatabase.prepare();
-
-                const testDictionary = createTestDictionaryArchive(invalidDictionary);
-                const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
-
-                await expect(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary has invalid data');
-                await dictionaryDatabase.close();
-            });
-        }
-    });
-}
-
-
-/** */
-async function main() {
+describe('Database', () => {
     beforeEach(async () => {
         globalThis.indexedDB = new IDBFactory();
     });
     await testDatabase1();
     await testDatabase2();
-    await testDatabase3();
-}
+    describe('Invalid dictionaries', () => {
+        const invalidDictionaries = [
+            {name: 'invalid-dictionary1'},
+            {name: 'invalid-dictionary2'},
+            {name: 'invalid-dictionary3'},
+            {name: 'invalid-dictionary4'},
+            {name: 'invalid-dictionary5'},
+            {name: 'invalid-dictionary6'}
+        ];
+        describe.each(invalidDictionaries)('Invalid dictionary: $name', ({name}) => {
+            test('has invalid data', async ({expect}) => {
+                const dictionaryDatabase = new DictionaryDatabase();
+                await dictionaryDatabase.prepare();
 
-await main();
+                const testDictionary = createTestDictionaryArchive(name);
+                const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
+
+                /** @type {import('dictionary-importer').ImportDetails} */
+                const detaultImportDetails = {prefixWildcardsSupported: false};
+                await expect.soft(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary has invalid data');
+                await dictionaryDatabase.close();
+            });
+        });
+    });
+});
