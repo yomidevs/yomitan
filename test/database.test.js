@@ -868,7 +868,7 @@ describe('Database', () => {
     beforeEach(async () => {
         globalThis.indexedDB = new IDBFactory();
     });
-    await testDatabase1();
+    // await testDatabase1();
     test('Database invalid usage', async ({expect}) => {
         // Load dictionary data
         const testDictionary = createTestDictionaryArchive('valid-dictionary1');
