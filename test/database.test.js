@@ -19,7 +19,7 @@
 import {IDBFactory, IDBKeyRange} from 'fake-indexeddb';
 import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
-import path from 'path';
+import {join, dirname as pathDirname} from 'path';
 import {beforeEach, describe, test, vi} from 'vitest';
 import {parseJson} from '../dev/json.js';
 import {createDictionaryArchive} from '../dev/util.js';
@@ -27,7 +27,7 @@ import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
 import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
 
-const dirname = path.dirname(fileURLToPath(import.meta.url));
+const dirname = pathDirname(fileURLToPath(import.meta.url));
 
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
 
@@ -37,7 +37,7 @@ vi.stubGlobal('IDBKeyRange', IDBKeyRange);
  * @returns {import('jszip')}
  */
 function createTestDictionaryArchive(dictionary, dictionaryName) {
-    const dictionaryDirectory = path.join(dirname, 'data', 'dictionaries', dictionary);
+    const dictionaryDirectory = join(dirname, 'data', 'dictionaries', dictionary);
     return createDictionaryArchive(dictionaryDirectory, dictionaryName);
 }
 
@@ -176,7 +176,7 @@ describe('Database', () => {
         });
     });
     describe('Database valid usage', () => {
-        const testDataFilePath = path.join(dirname, 'data/database-test-cases.json');
+        const testDataFilePath = join(dirname, 'data/database-test-cases.json');
         /** @type {import('test/database').DatabaseTestData} */
         const testData = parseJson(readFileSync(testDataFilePath, {encoding: 'utf8'}));
         /** @type {{clearMethod: 'purge'|'delete'|'none'}[]} */
