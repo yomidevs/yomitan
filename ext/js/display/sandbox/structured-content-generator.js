@@ -321,10 +321,11 @@ export class StructuredContentGenerator {
                 break;
         }
         if (hasStyle) {
-            const {style} = /** @type {import('structured-content').StyledElement} */ (content);
+            const {style, title} = /** @type {import('structured-content').StyledElement} */ (content);
             if (typeof style === 'object' && style !== null) {
                 this._setStructuredContentElementStyle(node, style);
             }
+            if (typeof title === 'string') { node.title = title; }
         }
         if (hasChildren) {
             this._appendStructuredContent(node, content.content, dictionary, language);
@@ -342,18 +343,37 @@ export class StructuredContentGenerator {
             fontStyle,
             fontWeight,
             fontSize,
+            color,
+            backgroundColor,
             textDecorationLine,
+            textDecorationStyle,
+            textDecorationColor,
+            borderColor,
+            borderStyle,
+            borderRadius,
+            borderWidth,
             verticalAlign,
             textAlign,
+            margin,
             marginTop,
             marginLeft,
             marginRight,
             marginBottom,
+            padding,
+            paddingTop,
+            paddingLeft,
+            paddingRight,
+            paddingBottom,
+            wordBreak,
+            whiteSpace,
+            cursor,
             listStyleType
         } = contentStyle;
         if (typeof fontStyle === 'string') { style.fontStyle = fontStyle; }
         if (typeof fontWeight === 'string') { style.fontWeight = fontWeight; }
         if (typeof fontSize === 'string') { style.fontSize = fontSize; }
+        if (typeof color === 'string') { style.color = color; }
+        if (typeof backgroundColor === 'string') { style.backgroundColor = backgroundColor; }
         if (typeof verticalAlign === 'string') { style.verticalAlign = verticalAlign; }
         if (typeof textAlign === 'string') { style.textAlign = textAlign; }
         if (typeof textDecorationLine === 'string') {
@@ -361,10 +381,33 @@ export class StructuredContentGenerator {
         } else if (Array.isArray(textDecorationLine)) {
             style.textDecoration = textDecorationLine.join(' ');
         }
+        if (typeof textDecorationStyle === 'string') {
+            style.textDecorationStyle = textDecorationStyle;
+        }
+        if (typeof textDecorationColor === 'string') {
+            style.textDecorationColor = textDecorationColor;
+        }
+        if (typeof borderColor === 'string') { style.borderColor = borderColor; }
+        if (typeof borderStyle === 'string') { style.borderStyle = borderStyle; }
+        if (typeof borderRadius === 'string') { style.borderRadius = borderRadius; }
+        if (typeof borderWidth === 'string') { style.borderWidth = borderWidth; }
+        if (typeof margin === 'string') { style.margin = margin; }
         if (typeof marginTop === 'number') { style.marginTop = `${marginTop}em`; }
+        if (typeof marginTop === 'string') { style.marginTop = marginTop; }
         if (typeof marginLeft === 'number') { style.marginLeft = `${marginLeft}em`; }
+        if (typeof marginLeft === 'string') { style.marginLeft = marginLeft; }
         if (typeof marginRight === 'number') { style.marginRight = `${marginRight}em`; }
+        if (typeof marginRight === 'string') { style.marginRight = marginRight; }
         if (typeof marginBottom === 'number') { style.marginBottom = `${marginBottom}em`; }
+        if (typeof marginBottom === 'string') { style.marginBottom = marginBottom; }
+        if (typeof padding === 'string') { style.padding = padding; }
+        if (typeof paddingTop === 'string') { style.paddingTop = paddingTop; }
+        if (typeof paddingLeft === 'string') { style.paddingLeft = paddingLeft; }
+        if (typeof paddingRight === 'string') { style.paddingRight = paddingRight; }
+        if (typeof paddingBottom === 'string') { style.paddingBottom = paddingBottom; }
+        if (typeof wordBreak === 'string') { style.wordBreak = wordBreak; }
+        if (typeof whiteSpace === 'string') { style.whiteSpace = whiteSpace; }
+        if (typeof cursor === 'string') { style.cursor = cursor; }
         if (typeof listStyleType === 'string') { style.listStyleType = listStyleType; }
     }
 

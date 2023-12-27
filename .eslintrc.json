@@ -559,7 +559,8 @@
         },
         {
             "files": [
-                "test/data/dictionaries/valid-dictionary1/term_bank_1.json"
+                "test/data/dictionaries/valid-dictionary1/term_bank_1.json",
+                "test/data/dictionaries/valid-dictionary1/term_bank_2.json"
             ],
             "rules": {
                 "jsonc/array-element-newline": [
