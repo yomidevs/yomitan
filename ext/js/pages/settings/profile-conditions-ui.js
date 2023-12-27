@@ -22,7 +22,7 @@ import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
 /**
- * @augments EventDispatcher<import('profile-conditions-ui').EventType>
+ * @augments EventDispatcher<import('profile-conditions-ui').Events>
  */
 export class ProfileConditionsUI extends EventDispatcher {
     /**
@@ -440,9 +440,7 @@ export class ProfileConditionsUI extends EventDispatcher {
      * @param {number} count
      */
     _triggerConditionGroupCountChanged(count) {
-        /** @type {import('profile-conditions-ui').ConditionGroupCountChangedEvent} */
-        const event = {count, profileIndex: this._profileIndex};
-        this.trigger('conditionGroupCountChanged', event);
+        this.trigger('conditionGroupCountChanged', {count, profileIndex: this._profileIndex});
     }
 }
 
@@ -747,7 +745,7 @@ class ProfileConditionUI {
 
     /**
      * @param {import('profile-conditions-ui').InputData} details
-     * @param {import('keyboard-mouse-input-field').ChangeEvent} event
+     * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} event
      */
     _onModifierInputChange({validate, normalize}, event) {
         const modifiers = this._joinModifiers(event.modifiers);
