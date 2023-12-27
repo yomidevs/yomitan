@@ -349,4 +349,61 @@ describe('Database', () => {
             });
         });
     });
+    describe('Database cleanup', () => {
+        /** @type {{clearMethod: 'purge'|'delete'}[]} */
+        const cleanupTestCases = [
+            {clearMethod: 'purge'},
+            {clearMethod: 'delete'}
+        ];
+        describe.each(cleanupTestCases)('Testing cleanup method $clearMethod', ({clearMethod}) => {
+            test('Import data and test', async ({expect}) => {
+                // Load dictionary data
+                const testDictionary = createTestDictionaryArchive('valid-dictionary1');
+                const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
+                /** @type {import('dictionary-data').Index} */
+                const testDictionaryIndex = parseJson(await testDictionary.files['index.json'].async('string'));
+
+                // Setup database
+                const dictionaryDatabase = new DictionaryDatabase();
+                await dictionaryDatabase.prepare();
+
+                // Import data
+                const dictionaryImporter = createDictionaryImporter(expect);
+                await dictionaryImporter.importDictionary(dictionaryDatabase, testDictionarySource, {prefixWildcardsSupported: true});
+
+                // Clear
+                switch (clearMethod) {
+                    case 'purge':
+                        await dictionaryDatabase.purge();
+                        break;
+                    case 'delete':
+                        {
+                            let progressEvent2 = false;
+                            await dictionaryDatabase.deleteDictionary(
+                                testDictionaryIndex.title,
+                                1000,
+                                () => { progressEvent2 = true; }
+                            );
+                            expect(progressEvent2).toBe(true);
+                        }
+                        break;
+                }
+
+                // Test empty
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                expect.soft(info).toStrictEqual([]);
+
+                const counts = await dictionaryDatabase.getDictionaryCounts([], true);
+                /** @type {import('dictionary-database').DictionaryCounts} */
+                const countsExpected = {
+                    counts: [],
+                    total: {kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0}
+                };
+                expect.soft(counts).toStrictEqual(countsExpected);
+
+                // Close
+                await dictionaryDatabase.close();
+            });
+        });
+    });
 });
