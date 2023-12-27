@@ -25,6 +25,7 @@ import type * as Extension from './extension';
 import type * as Settings from './settings';
 import type * as TextScannerTypes from './text-scanner';
 import type * as TextSource from './text-source';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type HistoryMode = 'clear' | 'overwrite' | 'new';
 
@@ -147,43 +148,33 @@ export type QueryParserSearchedEvent = {
     sentenceOffset: number | null;
 };
 
-export type DisplayEventType = (
-    'optionsUpdated' |
-    'frameVisibilityChange' |
-    'logDictionaryEntryData' |
-    'contentClear' |
-    'contentUpdateStart' |
-    'contentUpdateEntry' |
-    'contentUpdateComplete'
-);
-
-export type OptionsUpdatedEvent = {
-    options: Settings.ProfileOptions;
+export type Events = {
+    optionsUpdated: {
+        options: Settings.ProfileOptions;
+    };
+    frameVisibilityChange: {
+        value: boolean;
+    };
+    logDictionaryEntryData: {
+        dictionaryEntry: Dictionary.DictionaryEntry;
+        promises: Promise<unknown>[];
+    };
+    contentClear: Record<string, never>;
+    contentUpdateStart: {
+        type: PageType;
+        query: string;
+    };
+    contentUpdateEntry: {
+        dictionaryEntry: Dictionary.DictionaryEntry;
+        element: Element;
+        index: number;
+    };
+    contentUpdateComplete: {
+        type: PageType;
+    };
 };
 
-export type FrameVisibilityChangeEvent = {
-    value: boolean;
-};
-
-export type LogDictionaryEntryDataEvent = {
-    dictionaryEntry: Dictionary.DictionaryEntry;
-    promises: Promise<unknown>[];
-};
-
-export type ContentUpdateStartEvent = {
-    type: PageType;
-    query: string;
-};
-
-export type ContentUpdateEntryEvent = {
-    dictionaryEntry: Dictionary.DictionaryEntry;
-    element: Element;
-    index: number;
-};
-
-export type ContentUpdateCompleteEvent = {
-    type: PageType;
-};
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
 export type ConfigureMessageDetails = {
     depth: number;

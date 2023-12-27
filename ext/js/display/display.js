@@ -34,7 +34,7 @@ import {OptionToggleHotkeyHandler} from './option-toggle-hotkey-handler.js';
 import {QueryParser} from './query-parser.js';
 
 /**
- * @augments EventDispatcher<import('display').DisplayEventType>
+ * @augments EventDispatcher<import('display').Events>
  */
 export class Display extends EventDispatcher {
     /**
@@ -449,9 +449,7 @@ export class Display extends EventDispatcher {
         this._updateNestedFrontend(options);
         this._updateContentTextScanner(options);
 
-        /** @type {import('display').OptionsUpdatedEvent} */
-        const event = {options};
-        this.trigger('optionsUpdated', event);
+        this.trigger('optionsUpdated', {options});
     }
 
     /**
@@ -716,9 +714,7 @@ export class Display extends EventDispatcher {
      */
     _onMessageVisibilityChanged({value}) {
         this._frameVisible = value;
-        /** @type {import('display').FrameVisibilityChangeEvent} */
-        const event = {value};
-        this.trigger('frameVisibilityChange', event);
+        this.trigger('frameVisibilityChange', {value});
     }
 
     /** */
@@ -869,7 +865,7 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {import('dynamic-property').ChangeEventDetails<boolean>} details
+     * @param {import('dynamic-property').EventArgument<boolean, 'change'>} details
      */
     _onProgressIndicatorVisibleChanged({value}) {
         if (this._progressIndicatorTimer !== null) {
@@ -2011,9 +2007,7 @@ export class Display extends EventDispatcher {
 
         /** @type {Promise<unknown>[]} */
         const promises = [];
-        /** @type {import('display').LogDictionaryEntryDataEvent} */
-        const event = {dictionaryEntry, promises};
-        this.trigger('logDictionaryEntryData', event);
+        this.trigger('logDictionaryEntryData', {dictionaryEntry, promises});
         if (promises.length > 0) {
             for (const result2 of await Promise.all(promises)) {
                 Object.assign(result, result2);
@@ -2031,9 +2025,7 @@ export class Display extends EventDispatcher {
 
     /** */
     _triggerContentUpdateStart() {
-        /** @type {import('display').ContentUpdateStartEvent} */
-        const event = {type: this._contentType, query: this._query};
-        this.trigger('contentUpdateStart', event);
+        this.trigger('contentUpdateStart', {type: this._contentType, query: this._query});
     }
 
     /**
@@ -2042,15 +2034,11 @@ export class Display extends EventDispatcher {
      * @param {number} index
      */
     _triggerContentUpdateEntry(dictionaryEntry, element, index) {
-        /** @type {import('display').ContentUpdateEntryEvent} */
-        const event = {dictionaryEntry, element, index};
-        this.trigger('contentUpdateEntry', event);
+        this.trigger('contentUpdateEntry', {dictionaryEntry, element, index});
     }
 
     /** */
     _triggerContentUpdateComplete() {
-        /** @type {import('display').ContentUpdateCompleteEvent} */
-        const event = {type: this._contentType};
-        this.trigger('contentUpdateComplete', event);
+        this.trigger('contentUpdateComplete', {type: this._contentType});
     }
 }
