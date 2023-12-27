@@ -28931,13 +28931,221 @@
     ]
   },
   {
+    "name": "Test pronunciations 6 - phonetic transcriptions",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 20,
+          "source": "好き",
+          "rawSource": "好き",
+          "sourceTerm": "好き",
+          "reasons": [],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 14,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "好き",
+          "reading": "すき",
+          "expressions": [
+            {
+              "sourceTerm": "好き",
+              "expression": "好き",
+              "reading": "すき",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "好き",
+                  "reading": "すき",
+                  "pitches": []
+                }
+              ],
+              "furiganaSegments": [
+                {
+                  "text": "好",
+                  "furigana": "す"
+                },
+                {
+                  "text": "き",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": []
+            }
+          ],
+          "glossary": [
+            "suki definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "adj-na",
+              "category": "default",
+              "notes": "",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            },
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "好き",
+              "reading": "すき",
+              "pitches": []
+            }
+          ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "好き",
+              "reading": "すき",
+              "phoneticTranscriptions": [
+                {
+                  "ipa": "[sɨᵝkʲi]",
+                  "tags": [
+                    {
+                      "name": "東京",
+                      "category": "default",
+                      "notes": "",
+                      "order": 0,
+                      "score": 0,
+                      "dictionary": "Test Dictionary 2",
+                      "redundant": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "好",
+              "furigana": "す"
+            },
+            {
+              "text": "き",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "好き"
+        ],
+        "uniqueReadings": [
+          "すき"
+        ],
+        "pitches": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "pitches": []
+          }
+        ],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": [
+              {
+                "expressions": [
+                  "好き"
+                ],
+                "reading": "すき",
+                "ipa": "[sɨᵝkʲi]",
+                "tags": [
+                  {
+                    "name": "東京",
+                    "category": "default",
+                    "order": 0,
+                    "score": 0,
+                    "content": [],
+                    "dictionaries": [
+                      "Test Dictionary 2"
+                    ],
+                    "redundant": false
+                  }
+                ],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              }
+            ]
+          }
+        ],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
     "name": "Structured content test",
     "noteDataList": [
       {
         "marker": "{marker}",
         "definition": {
           "type": "term",
-          "id": 21,
+          "id": 22,
           "source": "構造",
           "rawSource": "構造",
           "sourceTerm": "構造",

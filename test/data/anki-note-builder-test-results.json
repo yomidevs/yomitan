@@ -2797,6 +2797,42 @@
     ]
   },
   {
+    "name": "Test pronunciations 6 - phonetic transcriptions",
+    "results": [
+      {
+        "audio": "",
+        "clipboard-image": "",
+        "clipboard-text": "",
+        "cloze-body": "好き",
+        "cloze-prefix": "cloze-prefix",
+        "cloze-suffix": "cloze-suffix",
+        "conjugation": "",
+        "dictionary": "Test Dictionary 2",
+        "document-title": "title",
+        "expression": "好き",
+        "frequencies": "",
+        "furigana": "<ruby>好<rt>す</rt></ruby>き",
+        "furigana-plain": "好[す]き",
+        "glossary": "<div style=\"text-align: left;\"><i>(adj-na, n, Test Dictionary 2)</i> suki definition</div>",
+        "glossary-brief": "<div style=\"text-align: left;\">suki definition</div>",
+        "glossary-no-dictionary": "<div style=\"text-align: left;\"><i>(adj-na, n)</i> suki definition</div>",
+        "part-of-speech": "Unknown",
+        "pitch-accents": "No pitch accent data",
+        "pitch-accent-graphs": "No pitch accent data",
+        "pitch-accent-positions": "No pitch accent data",
+        "phonetic-transcriptions": "<ul><li><i>(東京)</i> [sɨᵝkʲi]</li></ul>",
+        "reading": "すき",
+        "screenshot": "",
+        "search-query": "fullQuery",
+        "selection-text": "",
+        "sentence": "cloze-prefix好きcloze-suffix",
+        "sentence-furigana": "cloze-prefix好きcloze-suffix",
+        "tags": "adj-na, n",
+        "url": "<a href=\"url:\">url:</a>"
+      }
+    ]
+  },
+  {
     "name": "Structured content test",
     "results": [
       {

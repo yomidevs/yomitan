@@ -331,6 +331,13 @@
             "options": "default"
         },
         {
+            "name": "Test pronunciations 6 - phonetic transcriptions",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "好き",
+            "options": "default"
+        },
+        {
             "name": "Structured content test",
             "func": "findTerms",
             "mode": "split",

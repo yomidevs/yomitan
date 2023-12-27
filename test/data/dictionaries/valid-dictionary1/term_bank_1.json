@@ -18,6 +18,7 @@
     ["中腰", "ちゅうごし", "n", "n", 1, ["chuugoshi definition"], 11, ""],
     ["所業", "しょぎょう", "n", "n", 1, ["shogyouu definition"], 12, ""],
     ["土木工事", "どぼくこうじ", "n", "n", 1, ["dobokukouji definition"], 13, ""],
+    ["好き", "すき", "adj-na n", "", 1, ["suki definition"], 14, ""],
     [
         "内容", "ないよう", "n", "n", 35,
         [

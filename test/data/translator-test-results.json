@@ -16178,6 +16178,118 @@
     ]
   },
   {
+    "name": "Test pronunciations 6 - phonetic transcriptions",
+    "originalTextLength": 2,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflections": [],
+        "score": 1,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxTransformedTextLength": 2,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "好き",
+            "reading": "すき",
+            "sources": [
+              {
+                "originalText": "好き",
+                "transformedText": "好き",
+                "deinflectedText": "好き",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": []
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 20,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              14
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "adj-na",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              },
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "suki definition"
+            ]
+          }
+        ],
+        "pronunciations": [
+          {
+            "index": 0,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "pronunciations": [
+              {
+                "type": "phonetic-transcription",
+                "ipa": "[sɨᵝkʲi]",
+                "tags": [
+                  {
+                    "name": "東京",
+                    "category": "default",
+                    "order": 0,
+                    "score": 0,
+                    "content": [],
+                    "dictionaries": [
+                      "Test Dictionary 2"
+                    ],
+                    "redundant": false
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frequencies": []
+      }
+    ]
+  },
+  {
     "name": "Structured content test",
     "originalTextLength": 2,
     "dictionaryEntries": [
@@ -16248,7 +16360,7 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "id": 21,
+            "id": 22,
             "score": 35,
             "frequencyOrder": 0,
             "sequences": [
