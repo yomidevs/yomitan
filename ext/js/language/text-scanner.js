@@ -22,7 +22,7 @@ import {TextSourceElement} from '../dom/text-source-element.js';
 import {yomitan} from '../yomitan.js';
 
 /**
- * @augments EventDispatcher<import('text-scanner').EventType>
+ * @augments EventDispatcher<import('text-scanner').Events>
  */
 export class TextScanner extends EventDispatcher {
     /**
@@ -1597,7 +1597,7 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
-     * @param {string} reason
+     * @param {import('text-scanner').ClearReaspon} reason
      */
     _triggerClear(reason) {
         this.trigger('clear', {reason});
