@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {EventDispatcher} from '../../ext/js/core';
 import type * as Core from './core';
 
 export type EventListenerFunction = (...args: Core.SafeAny[]) => unknown;
@@ -55,7 +54,7 @@ export type ExtensionEventDetails = {
 
 export type EventDispatcherDetails = {
     type: 'off';
-    target: EventDispatcher<string>;
+    target: Core.EventDispatcherOffGeneric;
     eventName: string;
     callback: EventListenerFunction;
 };
@@ -70,7 +69,7 @@ export type AddEventListenerArgs = [
 ];
 
 export type OnArgs = [
-    target: EventDispatcher<string>,
+    target: Core.EventDispatcherOffGeneric,
     eventName: string,
     callback: (details: Core.SafeAny) => void,
 ];

@@ -524,7 +524,7 @@ export class EventListenerCollection {
  * Class representing a generic value with an override stack.
  * Changes can be observed by listening to the 'change' event.
  * @template [T=unknown]
- * @augments EventDispatcher<import('dynamic-property').EventType>
+ * @augments EventDispatcher<import('dynamic-property').Events<T>>
  */
 export class DynamicProperty extends EventDispatcher {
     /**
@@ -627,14 +627,14 @@ export class DynamicProperty extends EventDispatcher {
         const value = this._overrides.length > 0 ? this._overrides[0].value : this._defaultValue;
         if (this._value === value) { return; }
         this._value = value;
-        this.trigger('change', /** @type {import('dynamic-property').ChangeEventDetails<T>} */ ({value}));
+        this.trigger('change', {value});
     }
 }
 
 /**
  * This class handles logging of messages to the console and triggering
  * an event for log calls.
- * @augments EventDispatcher<import('log').LoggerEventType>
+ * @augments EventDispatcher<import('log').Events>
  */
 export class Logger extends EventDispatcher {
     /**
