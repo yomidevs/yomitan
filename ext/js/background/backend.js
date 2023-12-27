@@ -315,7 +315,7 @@ export class Backend {
     // Event handlers
 
     /**
-     * @param {{text: string}} params
+     * @param {import('clipboard-monitor').EventArgument<'change'>} details
      */
     async _onClipboardTextChange({text}) {
         const {clipboard: {maximumSearchLength}} = this._getProfileOptions({current: true}, false);
