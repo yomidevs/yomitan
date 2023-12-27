@@ -140,7 +140,7 @@ export class PopupPreviewFrame {
     }
 
     /**
-     * @param {import('popup').CustomOuterCssChangedEvent} details
+     * @param {import('popup').EventArgument<'customOuterCssChanged'>} details
      */
     _onCustomOuterCssChanged({node, inShadow}) {
         if (node === null || inShadow) { return; }

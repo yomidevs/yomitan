@@ -290,7 +290,7 @@ export class BackupController {
                 modal.setVisible(false);
             };
             /**
-             * @param {import('panel-element').VisibilityChangedEvent} details
+             * @param {import('panel-element').EventArgument<'visibilityChanged'>} details
              */
             const onModalVisibilityChanged = ({visible}) => {
                 if (visible) { return; }
