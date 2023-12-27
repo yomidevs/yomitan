@@ -67,9 +67,3 @@ export type AddEventListenerArgs = [
     listener: EventListener | EventListenerObject | EventListenerFunction,
     options?: AddEventListenerOptions | boolean,
 ];
-
-export type OnArgs = [
-    target: Core.EventDispatcherOffGeneric,
-    eventName: string,
-    callback: (details: Core.SafeAny) => void,
-];
