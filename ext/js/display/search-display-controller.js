@@ -183,7 +183,7 @@ export class SearchDisplayController {
     }
 
     /**
-     * @param {import('display').OptionsUpdatedEvent} details
+     * @param {import('display').EventArgument<'optionsUpdated'>} details
      */
     _onDisplayOptionsUpdated({options}) {
         this._clipboardMonitorEnabled = options.clipboard.enableSearchPageMonitor;
@@ -195,7 +195,7 @@ export class SearchDisplayController {
     }
 
     /**
-     * @param {import('display').ContentUpdateStartEvent} details
+     * @param {import('display').EventArgument<'contentUpdateStart'>} details
      */
     _onContentUpdateStart({type, query}) {
         let animate = false;

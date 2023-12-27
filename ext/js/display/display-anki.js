@@ -182,7 +182,7 @@ export class DisplayAnki {
     // Private
 
     /**
-     * @param {import('display').OptionsUpdatedEvent} details
+     * @param {import('display').EventArgument<'optionsUpdated'>} details
      */
     _onOptionsUpdated({options}) {
         const {
@@ -238,7 +238,7 @@ export class DisplayAnki {
     }
 
     /**
-     * @param {import('display').ContentUpdateEntryEvent} details
+     * @param {import('display').EventArgument<'contentUpdateEntry'>} details
      */
     _onContentUpdateEntry({element}) {
         const eventListeners = this._eventListeners;
@@ -261,7 +261,7 @@ export class DisplayAnki {
     }
 
     /**
-     * @param {import('display').LogDictionaryEntryDataEvent} details
+     * @param {import('display').EventArgument<'logDictionaryEntryData'>} details
      */
     _onLogDictionaryEntryData({dictionaryEntry, promises}) {
         promises.push(this.getLogData(dictionaryEntry));
