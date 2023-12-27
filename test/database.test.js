@@ -864,8 +864,12 @@ async function testFindTagForTitle1(database, title) {
 
 
 /** */
-async function testDatabase2() {
-    test('Database2', async () => {
+describe('Database', () => {
+    beforeEach(async () => {
+        globalThis.indexedDB = new IDBFactory();
+    });
+    await testDatabase1();
+    test('Database invalid usage', async ({expect}) => {
         // Load dictionary data
         const testDictionary = createTestDictionaryArchive('valid-dictionary1');
         const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
@@ -883,41 +887,31 @@ async function testDatabase2() {
         const detaultImportDetails = {prefixWildcardsSupported: false};
 
         // Database not open
-        await expect(dictionaryDatabase.deleteDictionary(title, 1000, () => {})).rejects.toThrow('Database not open');
-        await expect(dictionaryDatabase.findTermsBulk(['?'], titles, 'exact')).rejects.toThrow('Database not open');
-        await expect(dictionaryDatabase.findTermsExactBulk([{term: '?', reading: '?'}], titles)).rejects.toThrow('Database not open');
-        await expect(dictionaryDatabase.findTermsBySequenceBulk([{query: 1, dictionary: title}])).rejects.toThrow('Database not open');
-        await expect(dictionaryDatabase.findTermMetaBulk(['?'], titles)).rejects.toThrow('Database not open');
-        await expect(dictionaryDatabase.findTermMetaBulk(['?'], titles)).rejects.toThrow('Database not open');
-        await expect(dictionaryDatabase.findKanjiBulk(['?'], titles)).rejects.toThrow('Database not open');
-        await expect(dictionaryDatabase.findKanjiMetaBulk(['?'], titles)).rejects.toThrow('Database not open');
-        await expect(dictionaryDatabase.findTagForTitle('tag', title)).rejects.toThrow('Database not open');
-        await expect(dictionaryDatabase.getDictionaryInfo()).rejects.toThrow('Database not open');
-        await expect(dictionaryDatabase.getDictionaryCounts([...titles.keys()], true)).rejects.toThrow('Database not open');
-        await expect(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Database is not ready');
+        await expect.soft(dictionaryDatabase.deleteDictionary(title, 1000, () => {})).rejects.toThrow('Database not open');
+        await expect.soft(dictionaryDatabase.findTermsBulk(['?'], titles, 'exact')).rejects.toThrow('Database not open');
+        await expect.soft(dictionaryDatabase.findTermsExactBulk([{term: '?', reading: '?'}], titles)).rejects.toThrow('Database not open');
+        await expect.soft(dictionaryDatabase.findTermsBySequenceBulk([{query: 1, dictionary: title}])).rejects.toThrow('Database not open');
+        await expect.soft(dictionaryDatabase.findTermMetaBulk(['?'], titles)).rejects.toThrow('Database not open');
+        await expect.soft(dictionaryDatabase.findTermMetaBulk(['?'], titles)).rejects.toThrow('Database not open');
+        await expect.soft(dictionaryDatabase.findKanjiBulk(['?'], titles)).rejects.toThrow('Database not open');
+        await expect.soft(dictionaryDatabase.findKanjiMetaBulk(['?'], titles)).rejects.toThrow('Database not open');
+        await expect.soft(dictionaryDatabase.findTagForTitle('tag', title)).rejects.toThrow('Database not open');
+        await expect.soft(dictionaryDatabase.getDictionaryInfo()).rejects.toThrow('Database not open');
+        await expect.soft(dictionaryDatabase.getDictionaryCounts([...titles.keys()], true)).rejects.toThrow('Database not open');
+        await expect.soft(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Database is not ready');
 
         await dictionaryDatabase.prepare();
 
-        // already prepared
-        await expect(dictionaryDatabase.prepare()).rejects.toThrow('Database already open');
+        // Already prepared
+        await expect.soft(dictionaryDatabase.prepare()).rejects.toThrow('Database already open');
 
         await createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails);
 
-        // dictionary already imported
-        await expect(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary is already imported');
+        // Dictionary already imported
+        await expect.soft(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary is already imported');
 
         await dictionaryDatabase.close();
     });
-}
-
-
-/** */
-describe('Database', () => {
-    beforeEach(async () => {
-        globalThis.indexedDB = new IDBFactory();
-    });
-    await testDatabase1();
-    await testDatabase2();
     describe('Invalid dictionaries', () => {
         const invalidDictionaries = [
             {name: 'invalid-dictionary1'},
@@ -928,7 +922,7 @@ describe('Database', () => {
             {name: 'invalid-dictionary6'}
         ];
         describe.each(invalidDictionaries)('Invalid dictionary: $name', ({name}) => {
-            test('has invalid data', async ({expect}) => {
+            test('Has invalid data', async ({expect}) => {
                 const dictionaryDatabase = new DictionaryDatabase();
                 await dictionaryDatabase.prepare();
 
