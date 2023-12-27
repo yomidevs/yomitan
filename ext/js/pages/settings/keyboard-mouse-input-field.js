@@ -21,7 +21,7 @@ import {DocumentUtil} from '../../dom/document-util.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
 
 /**
- * @augments EventDispatcher<import('keyboard-mouse-input-field').EventType>
+ * @augments EventDispatcher<import('keyboard-mouse-input-field').Events>
  */
 export class KeyboardMouseInputField extends EventDispatcher {
     /**
@@ -308,9 +308,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
 
         this._updateDisplayString();
         if (changed) {
-            /** @type {import('keyboard-mouse-input-field').ChangeEvent} */
-            const event = {modifiers: this._modifiers, key: this._key};
-            this.trigger('change', event);
+            this.trigger('change', {modifiers: this._modifiers, key: this._key});
         }
     }
 

@@ -395,7 +395,7 @@ class KeyboardShortcutHotkeyEntry {
     }
 
     /**
-     * @param {import('keyboard-mouse-input-field').ChangeEvent} details
+     * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} details
      */
     _onInputFieldChange({key, modifiers}) {
         /** @type {import('input').ModifierKey[]} */

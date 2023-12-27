@@ -312,7 +312,7 @@ class ScanInputField {
     // Private
 
     /**
-     * @param {import('keyboard-mouse-input-field').ChangeEvent} details
+     * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} details
      */
     _onIncludeValueChange({modifiers}) {
         const modifiers2 = this._joinModifiers(modifiers);
@@ -320,7 +320,7 @@ class ScanInputField {
     }
 
     /**
-     * @param {import('keyboard-mouse-input-field').ChangeEvent} details
+     * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} details
      */
     _onExcludeValueChange({modifiers}) {
         const modifiers2 = this._joinModifiers(modifiers);
