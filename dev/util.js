@@ -45,25 +45,44 @@ export function getArgs(args, argMap) {
         }
 
         const target = argMap.get(key);
-        if (typeof target === 'boolean') {
-            argMap.set(key, true);
-            key = null;
-        } else if (typeof target === 'number') {
-            argMap.set(key, target + 1);
-            key = null;
-        } else if (target === null || typeof target === 'string') {
-            if (!onKey) {
-                argMap.set(key, arg);
+
+        switch (typeof target) {
+            case 'boolean':
+                argMap.set(key, true);
                 key = null;
-            }
-        } else if (Array.isArray(target)) {
-            if (!onKey) {
-                target.push(arg);
+                break;
+            case 'number':
+                argMap.set(key, target + 1);
                 key = null;
-            }
-        } else {
-            console.error(`Unknown argument: ${arg}`);
-            key = null;
+                break;
+            case 'string':
+                if (!onKey) {
+                    argMap.set(key, arg);
+                    key = null;
+                }
+                break;
+            case 'object':
+                if (target === null) {
+                    if (!onKey) {
+                        argMap.set(key, arg);
+                        key = null;
+                    }
+                    return argMap;
+                } else if (Array.isArray(target)) {
+                    if (!onKey) {
+                        target.push(arg);
+                        key = null;
+                    }
+                    return argMap;
+                } else {
+                    console.error(`Unknown argument: ${arg}`);
+                    key = null;
+                }
+                break;
+            default:
+                console.error(`Unknown argument: ${arg}`);
+                key = null;
+                break;
         }
     }
 
