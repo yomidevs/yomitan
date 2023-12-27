@@ -17,6 +17,7 @@
  */
 
 import {IDBFactory, IDBKeyRange} from 'fake-indexeddb';
+import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
@@ -152,6 +153,7 @@ async function testDatabase1() {
         await dictionaryDatabase.prepare();
 
         for (const {cleanup} of iterations) {
+            /** @type {import('dictionary-importer').Summary} */
             const expectedSummary = {
                 title,
                 revision: 'test',
@@ -868,7 +870,6 @@ describe('Database', () => {
     beforeEach(async () => {
         globalThis.indexedDB = new IDBFactory();
     });
-    // await testDatabase1();
     test('Database invalid usage', async ({expect}) => {
         // Load dictionary data
         const testDictionary = createTestDictionaryArchive('valid-dictionary1');
@@ -932,6 +933,180 @@ describe('Database', () => {
                 /** @type {import('dictionary-importer').ImportDetails} */
                 const detaultImportDetails = {prefixWildcardsSupported: false};
                 await expect.soft(createDictionaryImporter().importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary has invalid data');
+                await dictionaryDatabase.close();
+            });
+        });
+    });
+    describe('Database valid usage', () => {
+        const testDataFilePath = path.join(dirname, 'data/database-test-cases.json');
+        /** @type {import('test/database').DatabaseTestData} */
+        const testData = parseJson(readFileSync(testDataFilePath, {encoding: 'utf8'}));
+        /** @type {{clearMethod: 'purge'|'delete'|'none'}[]} */
+        const cleanupTestCases = [
+            {clearMethod: 'purge'},
+            {clearMethod: 'delete'},
+            {clearMethod: 'none'}
+        ];
+        describe.each(cleanupTestCases)('Testing with cleanup method $cleanupMethod', ({clearMethod}) => {
+            test('Import data and test', async ({expect}) => {
+                const fakeImportDate = testData.expectedSummary.importDate;
+
+                // Load dictionary data
+                const testDictionary = createTestDictionaryArchive('valid-dictionary1');
+                const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
+                /** @type {import('dictionary-data').Index} */
+                const testDictionaryIndex = parseJson(await testDictionary.files['index.json'].async('string'));
+
+                const title = testDictionaryIndex.title;
+                const titles = new Map([
+                    [title, {priority: 0, allowSecondarySearches: false}]
+                ]);
+
+                // Setup database
+                const dictionaryDatabase = new DictionaryDatabase();
+                await dictionaryDatabase.prepare();
+
+                // Import data
+                let progressEvent1 = false;
+                const dictionaryImporter = createDictionaryImporter(() => { progressEvent1 = true; });
+                const {result: importDictionaryResult, errors: importDictionaryErrors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true}
+                );
+                importDictionaryResult.importDate = fakeImportDate;
+                expect.soft(importDictionaryErrors).toStrictEqual([]);
+                expect.soft(importDictionaryResult).toStrictEqual(testData.expectedSummary);
+                expect.soft(progressEvent1).toBe(true);
+
+                // Get info summary
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                for (const item of info) { item.importDate = fakeImportDate; }
+                expect.soft(info).toStrictEqual([testData.expectedSummary]);
+
+                // Get counts
+                const counts = await dictionaryDatabase.getDictionaryCounts(info.map((v) => v.title), true);
+                expect.soft(counts).toStrictEqual(testData.expectedCounts);
+
+                // Test findTermsBulk
+                for (const {inputs, expectedResults} of testData.tests.findTermsBulk) {
+                    for (const {termList, matchType} of inputs) {
+                        const results = await dictionaryDatabase.findTermsBulk(termList, titles, matchType);
+                        expect.soft(results.length).toStrictEqual(expectedResults.total);
+                        for (const [term, count] of expectedResults.terms) {
+                            expect.soft(countDictionaryDatabaseEntriesWithTerm(results, term)).toStrictEqual(count);
+                        }
+                        for (const [reading, count] of expectedResults.readings) {
+                            expect.soft(countDictionaryDatabaseEntriesWithReading(results, reading)).toStrictEqual(count);
+                        }
+                    }
+                }
+
+                // Test findTermsExactBulk
+                for (const {inputs, expectedResults} of testData.tests.findTermsExactBulk) {
+                    for (const {termList} of inputs) {
+                        const results = await dictionaryDatabase.findTermsExactBulk(termList, titles);
+                        expect.soft(results.length).toStrictEqual(expectedResults.total);
+                        for (const [term, count] of expectedResults.terms) {
+                            expect.soft(countDictionaryDatabaseEntriesWithTerm(results, term)).toStrictEqual(count);
+                        }
+                        for (const [reading, count] of expectedResults.readings) {
+                            expect.soft(countDictionaryDatabaseEntriesWithReading(results, reading)).toStrictEqual(count);
+                        }
+                    }
+                }
+
+                // Test findTermsBySequenceBulk
+                for (const {inputs, expectedResults} of testData.tests.findTermsBySequenceBulk) {
+                    for (const {sequenceList} of inputs) {
+                        const results = await dictionaryDatabase.findTermsBySequenceBulk(sequenceList.map((query) => ({query, dictionary: title})));
+                        expect.soft(results.length).toStrictEqual(expectedResults.total);
+                        for (const [term, count] of expectedResults.terms) {
+                            expect.soft(countDictionaryDatabaseEntriesWithTerm(results, term)).toStrictEqual(count);
+                        }
+                        for (const [reading, count] of expectedResults.readings) {
+                            expect.soft(countDictionaryDatabaseEntriesWithReading(results, reading)).toStrictEqual(count);
+                        }
+                    }
+                }
+
+                // Test findTermMetaBulk
+                for (const {inputs, expectedResults} of testData.tests.findTermMetaBulk) {
+                    for (const {termList} of inputs) {
+                        const results = await dictionaryDatabase.findTermMetaBulk(termList, titles);
+                        expect.soft(results.length).toStrictEqual(expectedResults.total);
+                        for (const [mode, count] of expectedResults.modes) {
+                            expect.soft(countMetasWithMode(results, mode)).toStrictEqual(count);
+                        }
+                    }
+                }
+
+                // Test findKanjiBulk
+                for (const {inputs, expectedResults} of testData.tests.findKanjiBulk) {
+                    for (const {kanjiList} of inputs) {
+                        const results = await dictionaryDatabase.findKanjiBulk(kanjiList, titles);
+                        expect.soft(results.length).toStrictEqual(expectedResults.total);
+                        for (const [kanji, count] of expectedResults.kanji) {
+                            expect.soft(countKanjiWithCharacter(results, kanji)).toStrictEqual(count);
+                        }
+                    }
+                }
+
+                // Test findKanjiBulk
+                for (const {inputs, expectedResults} of testData.tests.findKanjiMetaBulk) {
+                    for (const {kanjiList} of inputs) {
+                        const results = await dictionaryDatabase.findKanjiMetaBulk(kanjiList, titles);
+                        expect.soft(results.length).toStrictEqual(expectedResults.total);
+                        for (const [mode, count] of expectedResults.modes) {
+                            expect.soft(countMetasWithMode(results, mode)).toStrictEqual(count);
+                        }
+                    }
+                }
+
+                // Test findTagForTitle
+                for (const {inputs, expectedResults} of testData.tests.findTagForTitle) {
+                    for (const {name} of inputs) {
+                        const result = await dictionaryDatabase.findTagForTitle(name, title);
+                        expect.soft(result).toStrictEqual(expectedResults.value);
+                    }
+                }
+
+                // Clear
+                let cleared = false;
+                switch (clearMethod) {
+                    case 'purge':
+                        await dictionaryDatabase.purge();
+                        cleared = true;
+                        break;
+                    case 'delete':
+                        {
+                            let progressEvent2 = false;
+                            await dictionaryDatabase.deleteDictionary(
+                                title,
+                                1000,
+                                () => { progressEvent2 = true; }
+                            );
+                            expect(progressEvent2).toBe(true);
+                            cleared = true;
+                        }
+                        break;
+                }
+
+                // Test empty
+                if (cleared) {
+                    const info2 = await dictionaryDatabase.getDictionaryInfo();
+                    for (const item of info2) { item.importDate = fakeImportDate; }
+                    expect.soft(info2).toStrictEqual([]);
+
+                    const counts2 = await dictionaryDatabase.getDictionaryCounts([], true);
+                    /** @type {import('dictionary-database').DictionaryCounts} */
+                    const counts2Expected = {
+                        counts: [],
+                        total: {kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0}
+                    };
+                    expect.soft(counts2).toStrictEqual(counts2Expected);
+                }
+
                 await dictionaryDatabase.close();
             });
         });
