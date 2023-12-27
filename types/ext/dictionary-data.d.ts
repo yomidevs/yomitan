@@ -125,7 +125,7 @@ export type GenericFrequencyData = string | number | {
 
 export type TermMetaArray = TermMeta[];
 
-export type TermMeta = TermMetaFrequency | TermMetaPitch;
+export type TermMeta = TermMetaFrequency | TermMetaPitch | TermMetaPhonetic;
 
 export type TermMetaFrequencyDataWithReading = {
     reading: string;
@@ -154,7 +154,13 @@ export type TermMetaPitch = [
     data: TermMetaPitchData,
 ];
 
-export type TermMetaPhonetic = {
+export type TermMetaPhonetic = [
+    expression: string,
+    mode: 'ipa',
+    data: TermMetaPhoneticData,
+];
+
+export type TermMetaPhoneticData = {
     reading: string;
     transcriptions: {
         ipa: string;
