@@ -166,15 +166,6 @@ export type Events = {
 
 export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
-export type ConfigureMessageDetails = {
-    depth: number;
-    parentPopupId: string;
-    parentFrameId: number;
-    childrenSupported: boolean;
-    scale: number;
-    optionsContext: Settings.OptionsContext;
-};
-
 export type DisplayGeneratorConstructorDetails = {
     japaneseUtil: JapaneseUtil;
     contentManager: DisplayContentManager;
@@ -213,7 +204,14 @@ export type DirectApiSurface = {
         return: void;
     };
     displayConfigure: {
-        params: ConfigureMessageDetails;
+        params: {
+            depth: number;
+            parentPopupId: string;
+            parentFrameId: number;
+            childrenSupported: boolean;
+            scale: number;
+            optionsContext: Settings.OptionsContext;
+        };
         return: void;
     };
     displayVisibilityChanged: {
