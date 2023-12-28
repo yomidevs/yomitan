@@ -225,26 +225,26 @@ function ensureFilesExist(directory, files) {
 export async function main(argv) {
     /** @type {import('util').ParseArgsConfig['options']} */
     const parseArgsConfigOptions = {
-        'all': {
+        all: {
             type: 'boolean',
             default: false
         },
-        'default': {
+        default: {
             type: 'boolean',
             default: false
         },
-        'manifest': {
+        manifest: {
             type: 'string'
         },
-        'dry-run': {
+        dryRun: {
             type: 'boolean',
             default: false
         },
-        'dry-run-build-zip': {
+        dryRunBuildZip: {
             type: 'boolean',
             default: false
         },
-        'yomitan-version': {
+        version: {
             type: 'string',
             default: '0.0.0.0'
         }
@@ -252,9 +252,9 @@ export async function main(argv) {
 
     const {values: args} = parseArgs({args: argv, options: parseArgsConfigOptions});
 
-    const dryRun = /** @type {boolean} */ (args['dry-run']);
-    const dryRunBuildZip = /** @type {boolean} */ (args['dry-run-build-zip']);
-    const yomitanVersion = /** @type {string} */ (args['yomitan-version']);
+    const dryRun = /** @type {boolean} */ (args.dryRun);
+    const dryRunBuildZip = /** @type {boolean} */ (args.dryRunBuildZip);
+    const yomitanVersion = /** @type {string} */ (args.version);
 
     const manifestUtil = new ManifestUtil();
 
@@ -266,15 +266,13 @@ export async function main(argv) {
     try {
         await buildLibs();
         const variantNames = /** @type {string[]} */ ((
-            // eslint-disable-next-line dot-notation
-            argv.length === 0 || args['all'] ?
+            argv.length === 0 || args.all ?
             manifestUtil.getVariants().filter(({buildable}) => buildable !== false).map(({name}) => name) : []
         ));
         await build(buildDir, extDir, manifestUtil, variantNames, manifestPath, dryRun, dryRunBuildZip, yomitanVersion);
     } finally {
         // Restore manifest
-        // eslint-disable-next-line dot-notation
-        const manifestName = /** @type {?string} */ ((!args['default'] && typeof args['manifest'] !== 'undefined') ? args['manifest'] : null);
+        const manifestName = /** @type {?string} */ ((!args.default && typeof args.manifest !== 'undefined') ? args.manifest : null);
         const restoreManifest = manifestUtil.getManifest(manifestName);
         process.stdout.write('Restoring manifest...\n');
         if (!dryRun) {
