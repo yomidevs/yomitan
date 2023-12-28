@@ -480,7 +480,7 @@ export class Popup extends EventDispatcher {
         this._frameConnected = true;
 
         // Configure
-        /** @type {import('display').ConfigureMessageDetails} */
+        /** @type {import('display').DirectApiParams<'displayConfigure'>} */
         const configureParams = {
             depth: this._depth,
             parentPopupId: this._id,
