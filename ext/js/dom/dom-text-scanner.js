@@ -115,25 +115,28 @@ export class DOMTextScanner {
         let newlines = 0;
         while (node !== null) {
             let enterable = false;
-            const nodeType = node.nodeType;
-
-            if (nodeType === TEXT_NODE) {
-                lastNode = node;
-                if (!(
-                    forward ?
-                    this._seekTextNodeForward(/** @type {Text} */ (node), resetOffset) :
-                    this._seekTextNodeBackward(/** @type {Text} */ (node), resetOffset)
-                )) {
-                    // Length reached
+            let lengthReached = false;
+            switch (node.nodeType) {
+                case TEXT_NODE:
+                    if (!(
+                        forward ?
+                        this._seekTextNodeForward(/** @type {Text} */ (node), resetOffset) :
+                        this._seekTextNodeBackward(/** @type {Text} */ (node), resetOffset)
+                    )) {
+                        lengthReached = true;
+                    }
                     break;
-                }
-            } else if (nodeType === ELEMENT_NODE) {
-                lastNode = node;
-                this._offset = 0;
-                ({enterable, newlines} = DOMTextScanner.getElementSeekInfo(/** @type {Element} */ (node)));
-                if (newlines > this._newlines && generateLayoutContent) {
-                    this._newlines = newlines;
-                }
+                case ELEMENT_NODE:
+                    lastNode = node;
+                    this._offset = 0;
+                    ({enterable, newlines} = DOMTextScanner.getElementSeekInfo(/** @type {Element} */ (node)));
+                    if (newlines > this._newlines && generateLayoutContent) {
+                        this._newlines = newlines;
+                    }
+                    break;
+            }
+            if (lengthReached) {
+                break;
             }
 
             /** @type {Node[]} */
