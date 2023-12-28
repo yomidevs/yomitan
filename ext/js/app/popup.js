@@ -730,7 +730,7 @@ export class Popup extends EventDispatcher {
      * @returns {void}
      */
     _onExtensionUnloaded() {
-        this._invokeWindow('Display.extensionUnloaded');
+        this._invokeWindow('displayExtensionUnloaded');
     }
 
     /**

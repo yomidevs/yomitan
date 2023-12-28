@@ -18,7 +18,7 @@
 
 import {ThemeController} from '../app/theme-controller.js';
 import {FrameEndpoint} from '../comm/frame-endpoint.js';
-import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, log, promiseTimeout} from '../core.js';
+import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, log, promiseTimeout} from '../core.js';
 import {invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {PopupMenu} from '../dom/popup-menu.js';
@@ -91,8 +91,8 @@ export class Display extends EventDispatcher {
         });
         /** @type {import('display').DirectApiMap} */
         this._directApiMap = new Map();
-        /** @type {import('core').MessageHandlerMap} */
-        this._windowMessageHandlers = new Map();
+        /** @type {import('display').WindowApiMap} */
+        this._windowApiMap = new Map();
         /** @type {DisplayHistory} */
         this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
         /** @type {boolean} */
@@ -215,7 +215,7 @@ export class Display extends EventDispatcher {
             ['displayVisibilityChanged', this._onMessageVisibilityChanged.bind(this)]
         ]);
         this.registerWindowMessageHandlers([
-            ['Display.extensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
+            ['displayExtensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
     }
@@ -513,11 +513,11 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {import('core').MessageHandlerMapInit} handlers
+     * @param {import('display').WindowApiMapInit} handlers
      */
     registerWindowMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {
-            this._windowMessageHandlers.set(name, handlerInfo);
+            this._windowApiMap.set(name, handlerInfo);
         }
     }
 
@@ -663,7 +663,7 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {MessageEvent<import('frame-client').Message<import('display').MessageDetails>>} details
+     * @param {MessageEvent<import('frame-client').Message<import('display').WindowApiMessageAny>>} details
      */
     _onWindowMessage({data}) {
         let data2;
@@ -673,12 +673,13 @@ export class Display extends EventDispatcher {
             return;
         }
 
-        const {action, params} = data2;
-        const messageHandler = this._windowMessageHandlers.get(action);
-        if (typeof messageHandler === 'undefined') { return; }
-
-        const callback = () => {}; // NOP
-        invokeMessageHandler(messageHandler, params, callback);
+        try {
+            const {action, params} = data2;
+            const callback = () => {}; // NOP
+            invokeApiMapHandler(this._directApiMap, action, params, [], callback);
+        } catch (e) {
+            // NOP
+        }
     }
 
     /** @type {import('display').DirectApiHandler<'displaySetOptionsContext'>} */
@@ -718,7 +719,7 @@ export class Display extends EventDispatcher {
         this.trigger('frameVisibilityChange', {value});
     }
 
-    /** */
+    /** @type {import('display').WindowApiHandler<'displayExtensionUnloaded'>} */
     _onMessageExtensionUnloaded() {
         if (yomitan.isExtensionUnloaded) { return; }
         yomitan.triggerExtensionUnloaded();

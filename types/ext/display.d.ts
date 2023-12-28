@@ -231,7 +231,7 @@ export type DirectApiSurface = {
     };
 };
 
-export type DirectApiNames = BaseApiNames<DirectApiSurface>;
+type DirectApiNames = BaseApiNames<DirectApiSurface>;
 
 export type DirectApiMapInit = BaseApiMapInit<DirectApiSurface>;
 
@@ -239,7 +239,7 @@ export type DirectApiMap = BaseApiMap<DirectApiSurface, []>;
 
 export type DirectApiHandler<TName extends DirectApiNames> = BaseApiHandler<DirectApiSurface[TName]>;
 
-export type DirectApiParams<TName extends DirectApiNames> = BaseApiParams<DirectApiSurface[TName]>;
+type DirectApiParams<TName extends DirectApiNames> = BaseApiParams<DirectApiSurface[TName]>;
 
 export type DirectApiMessageAny = {[name in DirectApiNames]: DirectApiMessage<name>}[DirectApiNames];
 
@@ -248,4 +248,30 @@ export type DirectApiReturnAny = BaseApiParamsAny<DirectApiSurface>;
 type DirectApiMessage<TName extends DirectApiNames> = {
     action: TName;
     params: DirectApiParams<TName>;
+};
+
+// Window API
+
+export type WindowApiSurface = {
+    'displayExtensionUnloaded': {
+        params: void;
+        return: void;
+    };
+};
+
+type WindowApiNames = BaseApiNames<WindowApiSurface>;
+
+export type WindowApiMapInit = BaseApiMapInit<WindowApiSurface>;
+
+export type WindowApiMap = BaseApiMap<WindowApiSurface, []>;
+
+export type WindowApiHandler<TName extends WindowApiNames> = BaseApiHandler<WindowApiSurface[TName]>;
+
+type WindowApiParams<TName extends WindowApiNames> = BaseApiParams<WindowApiSurface[TName]>;
+
+export type WindowApiMessageAny = {[name in WindowApiNames]: WindowApiMessage<name>}[WindowApiNames];
+
+type WindowApiMessage<TName extends WindowApiNames> = {
+    action: TName;
+    params: WindowApiParams<TName>;
 };
