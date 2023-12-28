@@ -707,10 +707,29 @@
         {"kanaIn": "神ってる", "kanaOut": "神がかっている", "rulesIn": [], "rulesOut": ["v5"]},
         {"kanaIn": "じわる", "kanaOut": "じわじわ来る", "rulesIn": [], "rulesOut": ["v5"]},
         {"kanaIn": "おさしみ", "kanaOut": "おやすみ", "rulesIn": [], "rulesOut": []},
-        {"kanaIn": "おやさい", "kanaOut": "おやすみ", "rulesIn": [], "rulesOut": []}
+        {"kanaIn": "おやさい", "kanaOut": "おやすみ", "rulesIn": [], "rulesOut": []},
+        {"kanaIn": "わろた", "kanaOut": "笑った", "rulesIn": [], "rulesOut": []},
+        {"kanaIn": "わろた", "kanaOut": "わらった", "rulesIn": [], "rulesOut": []}
     ],
     "kansaiben": [
+        {"kanaIn": "へん", "kanaOut": "ない", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "ひん", "kanaOut": "ない", "rulesIn": [], "rulesOut": ["adj-i"]},
+        {"kanaIn": "へんかった", "kanaOut": "なかった", "rulesIn": [], "rulesOut": []},
+        {"kanaIn": "ひんかった", "kanaOut": "なかった", "rulesIn": [], "rulesOut": []},
         {"kanaIn": "こうた", "kanaOut": "かった", "rulesIn": [], "rulesOut": []},
-        {"kanaIn": "こた", "kanaOut": "かった", "rulesIn": [], "rulesOut": []}
+        {"kanaIn": "こた", "kanaOut": "かった", "rulesIn": [], "rulesOut": []},
+        {"kanaIn": "もうた", "kanaOut": "まった", "rulesIn": [], "rulesOut": []},
+        {"kanaIn": "うた", "kanaOut": "った", "rulesIn": [], "rulesOut": []},
+        
+        {"kanaIn": "うない", "kanaOut": "くない", "rulesIn": [], "rulesOut": []},
+        {"kanaIn": "しゅうない", "kanaOut": "しくない", "rulesIn": [], "rulesOut": []},
+        
+        {"kanaIn": "う", "kanaOut": "く", "rulesIn": [], "rulesOut": []},
+        {"kanaIn": "うて", "kanaOut": "くて", "rulesIn": [], "rulesOut": []},
+        {"kanaIn": "しゅうて", "kanaOut": "くて", "rulesIn": [], "rulesOut": []},
+        
+        
+        {"kanaIn": "ゆうた", "kanaOut": "言った", "rulesIn": [], "rulesOut": []},
+        {"kanaIn": "もろた", "kanaOut": "貰った", "rulesIn": [], "rulesOut": []}
     ]
 }
