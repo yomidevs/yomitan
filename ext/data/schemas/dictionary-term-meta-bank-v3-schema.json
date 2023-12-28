@@ -61,7 +61,7 @@
                                 "description": "Frequency information for the term."
                             },
                             {
-                                "type": ["object"],
+                                "type": "object",
                                 "required": [
                                     "reading",
                                     "frequency"
@@ -89,7 +89,7 @@
                     {},
                     {"const": "pitch"},
                     {
-                        "type": ["object"],
+                        "type": "object",
                         "description": "Pitch accent information for the term.",
                         "required": [
                             "reading",
