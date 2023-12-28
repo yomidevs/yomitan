@@ -1111,6 +1111,8 @@ export class OptionsUtil {
     }
 
     /**
+     * - Converted Handlebars templates to new format.
+     * - Assigned flag to show users a warning about template changes.
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion21(options) {
