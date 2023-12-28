@@ -126,7 +126,7 @@ export class PopupWindow extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async setOptionsContext(optionsContext) {
-        await this._invoke(false, 'Display.setOptionsContext', {id: this._id, optionsContext});
+        await this._invoke(false, 'displaySetOptionsContext', {id: this._id, optionsContext});
     }
 
     /**
@@ -183,7 +183,7 @@ export class PopupWindow extends EventDispatcher {
      */
     async showContent(_details, displayDetails) {
         if (displayDetails === null) { return; }
-        await this._invoke(true, 'Display.setContent', {id: this._id, details: displayDetails});
+        await this._invoke(true, 'displaySetContent', {id: this._id, details: displayDetails});
     }
 
     /**
@@ -192,7 +192,7 @@ export class PopupWindow extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async setCustomCss(css) {
-        await this._invoke(false, 'Display.setCustomCss', {id: this._id, css});
+        await this._invoke(false, 'displaySetCustomCss', {id: this._id, css});
     }
 
     /**

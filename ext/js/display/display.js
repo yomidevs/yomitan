@@ -207,12 +207,12 @@ export class Display extends EventDispatcher {
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
         ]);
         this.registerDirectMessageHandlers([
-            ['Display.setOptionsContext', this._onMessageSetOptionsContext.bind(this)],
-            ['Display.setContent',        this._onMessageSetContent.bind(this)],
-            ['Display.setCustomCss',      this._onMessageSetCustomCss.bind(this)],
-            ['Display.setContentScale',   this._onMessageSetContentScale.bind(this)],
-            ['Display.configure',         this._onMessageConfigure.bind(this)],
-            ['Display.visibilityChanged', this._onMessageVisibilityChanged.bind(this)]
+            ['displaySetOptionsContext', this._onMessageSetOptionsContext.bind(this)],
+            ['displaySetContent',        this._onMessageSetContent.bind(this)],
+            ['displaySetCustomCss',      this._onMessageSetCustomCss.bind(this)],
+            ['displaySetContentScale',   this._onMessageSetContentScale.bind(this)],
+            ['displayConfigure',         this._onMessageConfigure.bind(this)],
+            ['displayVisibilityChanged', this._onMessageVisibilityChanged.bind(this)]
         ]);
         this.registerWindowMessageHandlers([
             ['Display.extensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
@@ -681,28 +681,28 @@ export class Display extends EventDispatcher {
         invokeMessageHandler(messageHandler, params, callback);
     }
 
-    /** @type {import('display').DirectApiHandler<'Display.setOptionsContext'>} */
+    /** @type {import('display').DirectApiHandler<'displaySetOptionsContext'>} */
     async _onMessageSetOptionsContext({optionsContext}) {
         await this.setOptionsContext(optionsContext);
         this.searchLast(true);
     }
 
-    /** @type {import('display').DirectApiHandler<'Display.setContent'>} */
+    /** @type {import('display').DirectApiHandler<'displaySetContent'>} */
     _onMessageSetContent({details}) {
         this.setContent(details);
     }
 
-    /** @type {import('display').DirectApiHandler<'Display.setCustomCss'>} */
+    /** @type {import('display').DirectApiHandler<'displaySetCustomCss'>} */
     _onMessageSetCustomCss({css}) {
         this.setCustomCss(css);
     }
 
-    /** @type {import('display').DirectApiHandler<'Display.setContentScale'>} */
+    /** @type {import('display').DirectApiHandler<'displaySetContentScale'>} */
     _onMessageSetContentScale({scale}) {
         this._setContentScale(scale);
     }
 
-    /** @type {import('display').DirectApiHandler<'Display.configure'>} */
+    /** @type {import('display').DirectApiHandler<'displayConfigure'>} */
     async _onMessageConfigure({depth, parentPopupId, parentFrameId, childrenSupported, scale, optionsContext}) {
         this._depth = depth;
         this._parentPopupId = parentPopupId;
@@ -712,7 +712,7 @@ export class Display extends EventDispatcher {
         await this.setOptionsContext(optionsContext);
     }
 
-    /** @type {import('display').DirectApiHandler<'Display.visibilityChanged'>} */
+    /** @type {import('display').DirectApiHandler<'displayVisibilityChanged'>} */
     _onMessageVisibilityChanged({value}) {
         this._frameVisible = value;
         this.trigger('frameVisibilityChange', {value});

@@ -195,35 +195,35 @@ export type DirectApiSurface = {
         params: void;
         return: void;
     };
-    'Display.setOptionsContext': {
+    displaySetOptionsContext: {
         params: {
             optionsContext: Settings.OptionsContext;
         };
         return: void;
     };
-    'Display.setContent': {
+    displaySetContent: {
         params: {
             details: ContentDetails;
         };
         return: void;
     };
-    'Display.setCustomCss': {
+    displaySetCustomCss: {
         params: {
             css: string;
         };
         return: void;
     };
-    'Display.setContentScale': {
+    displaySetContentScale: {
         params: {
             scale: number;
         };
         return: void;
     };
-    'Display.configure': {
+    displayConfigure: {
         params: ConfigureMessageDetails;
         return: void;
     };
-    'Display.visibilityChanged': {
+    displayVisibilityChanged: {
         params: {
             value: boolean;
         };
