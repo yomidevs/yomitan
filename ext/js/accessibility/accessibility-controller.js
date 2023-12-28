@@ -87,22 +87,11 @@ export class AccessibilityController {
             if (forceGoogleDocsHtmlRenderingAny) {
                 if (await isContentScriptRegistered(id)) { return; }
                 try {
-                    await registerContentScript(id, {
-                        allFrames: true,
-                        matches: ['*://docs.google.com/*'],
-                        runAt: 'document_start',
-                        js: ['js/accessibility/google-docs.js'],
-                        world: 'MAIN'
-                    });
+                    await this._registerGoogleDocsContentScript(id, false);
                 } catch (e) {
                     // Firefox doesn't support `world` field and will throw an error.
                     // In this case, use the xray vision version.
-                    await registerContentScript(id, {
-                        allFrames: true,
-                        matches: ['*://docs.google.com/*'],
-                        runAt: 'document_start',
-                        js: ['js/accessibility/google-docs-xray.js']
-                    });
+                    await this._registerGoogleDocsContentScript(id, true);
                 }
             } else {
                 await unregisterContentScript(id);
@@ -111,5 +100,25 @@ export class AccessibilityController {
             log.error(e);
         }
     }
-}
 
+    /**
+     * @param {string} id
+     * @param {boolean} xray
+     * @returns {Promise<void>}
+     */
+    _registerGoogleDocsContentScript(id, xray) {
+        /** @type {import('script-manager').RegistrationDetails} */
+        const details = {
+            allFrames: true,
+            matches: ['*://docs.google.com/*'],
+            runAt: 'document_start',
+            js: [
+                xray ?
+                'js/accessibility/google-docs-xray.js' :
+                'js/accessibility/google-docs.js'
+            ]
+        };
+        if (!xray) { details.world = 'MAIN'; }
+        return registerContentScript(id, details);
+    }
+}
