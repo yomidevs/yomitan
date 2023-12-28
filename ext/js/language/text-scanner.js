@@ -1597,7 +1597,7 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
-     * @param {import('text-scanner').ClearReaspon} reason
+     * @param {import('text-scanner').ClearReason} reason
      */
     _triggerClear(reason) {
         this.trigger('clear', {reason});

@@ -122,11 +122,11 @@ export type InputInfoDetail = {
 export type Events = {
     searched: SearchedEventDetails;
     clear: {
-        reason: ClearReaspon;
+        reason: ClearReason;
     };
 };
 
-export type ClearReaspon = 'mousedown';
+export type ClearReason = 'mousedown';
 
 export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
