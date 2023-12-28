@@ -129,7 +129,7 @@ export async function unregisterContentScript(id) {
  * @returns {chrome.scripting.RegisteredContentScript}
  */
 function createContentScriptRegistrationOptions(details, id) {
-    const {css, js, allFrames, matches, runAt} = details;
+    const {css, js, allFrames, matches, runAt, world} = details;
     /** @type {chrome.scripting.RegisteredContentScript} */
     const options = {
         id: id,
@@ -149,6 +149,9 @@ function createContentScriptRegistrationOptions(details, id) {
     }
     if (typeof runAt !== 'undefined') {
         options.runAt = runAt;
+    }
+    if (typeof world !== 'undefined') {
+        options.world = world;
     }
     return options;
 }
