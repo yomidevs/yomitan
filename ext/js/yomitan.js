@@ -264,7 +264,6 @@ export class Yomitan extends EventDispatcher {
 
     /** @type {import('application').ApiHandler<'applicationDatabaseUpdated'>} */
     _onMessageDatabaseUpdated({type, cause}) {
-        // @ts-expect-error - TODO : remove this comment, will be fixed later
         this.trigger('databaseUpdated', {type, cause});
     }
 
