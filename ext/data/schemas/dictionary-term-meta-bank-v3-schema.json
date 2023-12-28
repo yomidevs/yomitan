@@ -40,8 +40,8 @@
             },
             {
                 "type": "string",
-                "enum": ["freq", "pitch"],
-                "description": "Type of data. \"freq\" corresponds to frequency information; \"pitch\" corresponds to pitch information."
+                "enum": ["freq", "pitch", "ipa"],
+                "description": "Type of data. \"freq\" corresponds to frequency information; \"pitch\" corresponds to pitch information. \"ipa\" corresponds to IPA transcription."
             },
             {
                 "description": "Data for the term."
@@ -156,6 +156,54 @@
                                             "items": {
                                                 "type": "string",
                                                 "description": "Tag for this pitch accent. This typically corresponds to a certain type of part of speech."
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "minItems": 3,
+                "maxItems": 3,
+                "items": [
+                    {},
+                    {"const": "ipa"},
+                    {
+                        "type": ["object"],
+                        "description": "IPA transcription information for the term.",
+                        "required": [
+                            "reading",
+                            "transcriptions"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "reading": {
+                                "type": "string",
+                                "description": "Reading for the term."
+                            },
+                            "transcriptions": {
+                                "type": "array",
+                                "description": "List of different IPA transcription information for the term and reading combination.",
+                                "items": {
+                                    "type": "object",
+                                    "required": [
+                                        "ipa"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "ipa": {
+                                            "type": "string",
+                                            "description": "IPA transcription for the term."
+                                        },
+                                        "tags": {
+                                            "type": "array",
+                                            "description": "List of tags for this IPA transcription.",
+                                            "items": {
+                                                "type": "string",
+                                                "description": "Tag for this IPA transcription."
                                             }
                                         }
                                     }

@@ -135,7 +135,7 @@ export class DictionaryDataUtil {
      * @returns {import('dictionary-data-util').DictionaryGroupedPronunciations[]}
      */
     static getGroupedPronunciations(dictionaryEntry) {
-        const {headwords, pronunciations} = dictionaryEntry;
+        const {headwords, pronunciations: termPronunciations} = dictionaryEntry;
 
         const allTerms = new Set();
         const allReadings = new Set();
@@ -146,23 +146,20 @@ export class DictionaryDataUtil {
 
         /** @type {Map<string, import('dictionary-data-util').GroupedPronunciationInternal[]>} */
         const groupedPronunciationsMap = new Map();
-        for (const {headwordIndex, dictionary, pitches} of pronunciations) {
+        for (const {headwordIndex, dictionary, pronunciations} of termPronunciations) {
             const {term, reading} = headwords[headwordIndex];
             let dictionaryGroupedPronunciationList = groupedPronunciationsMap.get(dictionary);
             if (typeof dictionaryGroupedPronunciationList === 'undefined') {
                 dictionaryGroupedPronunciationList = [];
                 groupedPronunciationsMap.set(dictionary, dictionaryGroupedPronunciationList);
             }
-            for (const {position, nasalPositions, devoicePositions, tags} of pitches) {
-                let groupedPronunciation = this._findExistingGroupedPronunciation(reading, position, nasalPositions, devoicePositions, tags, dictionaryGroupedPronunciationList);
+            for (const pronunciation of pronunciations) {
+                let groupedPronunciation = this._findExistingGroupedPronunciation(reading, pronunciation, dictionaryGroupedPronunciationList);
                 if (groupedPronunciation === null) {
                     groupedPronunciation = {
+                        pronunciation,
                         terms: new Set(),
-                        reading,
-                        position,
-                        nasalPositions,
-                        devoicePositions,
-                        tags
+                        reading
                     };
                     dictionaryGroupedPronunciationList.push(groupedPronunciation);
                 }
@@ -177,26 +174,41 @@ export class DictionaryDataUtil {
             /** @type {import('dictionary-data-util').GroupedPronunciation[]} */
             const pronunciations2 = [];
             for (const groupedPronunciation of dictionaryGroupedPronunciationList) {
-                const {terms, reading, position, nasalPositions, devoicePositions, tags} = groupedPronunciation;
+                const {pronunciation, terms, reading} = groupedPronunciation;
                 const exclusiveTerms = !this._areSetsEqual(terms, allTerms) ? this._getSetIntersection(terms, allTerms) : [];
                 const exclusiveReadings = [];
                 if (multipleReadings) {
                     exclusiveReadings.push(reading);
                 }
                 pronunciations2.push({
+                    pronunciation,
                     terms: [...terms],
                     reading,
-                    position,
-                    nasalPositions,
-                    devoicePositions,
-                    tags,
                     exclusiveTerms,
                     exclusiveReadings
                 });
             }
+
             results2.push({dictionary, pronunciations: pronunciations2});
         }
         return results2;
+    }
+
+    /**
+     * @template {import('dictionary').PronunciationType} T
+     * @param {import('dictionary').Pronunciation[]} pronunciations
+     * @param {T} type
+     * @returns {import('dictionary').PronunciationGeneric<T>[]}
+     */
+    static getPronunciationsOfType(pronunciations, type) {
+        /** @type {import('dictionary').PronunciationGeneric<T>[]} */
+        const results = [];
+        for (const pronunciation of pronunciations) {
+            if (pronunciation.type !== type) { continue; }
+            // This is type safe, but for some reason the cast is needed.
+            results.push(/** @type {import('dictionary').PronunciationGeneric<T>} */ (pronunciation));
+        }
+        return results;
     }
 
     /**
@@ -288,26 +300,49 @@ export class DictionaryDataUtil {
 
     /**
      * @param {string} reading
-     * @param {number} position
-     * @param {number[]} nasalPositions
-     * @param {number[]} devoicePositions
-     * @param {import('dictionary').Tag[]} tags
+     * @param {import('dictionary').Pronunciation} pronunciation
      * @param {import('dictionary-data-util').GroupedPronunciationInternal[]} groupedPronunciationList
      * @returns {?import('dictionary-data-util').GroupedPronunciationInternal}
      */
-    static _findExistingGroupedPronunciation(reading, position, nasalPositions, devoicePositions, tags, groupedPronunciationList) {
-        for (const pitchInfo of groupedPronunciationList) {
-            if (
-                pitchInfo.reading === reading &&
-                pitchInfo.position === position &&
-                this._areArraysEqual(pitchInfo.nasalPositions, nasalPositions) &&
-                this._areArraysEqual(pitchInfo.devoicePositions, devoicePositions) &&
-                this._areTagListsEqual(pitchInfo.tags, tags)
-            ) {
-                return pitchInfo;
+    static _findExistingGroupedPronunciation(reading, pronunciation, groupedPronunciationList) {
+        const existingGroupedPronunciation = groupedPronunciationList.find((groupedPronunciation) => {
+            return groupedPronunciation.reading === reading && this._arePronunciationsEquivalent(groupedPronunciation, pronunciation);
+        });
+
+        return existingGroupedPronunciation || null;
+    }
+
+    /**
+     * @param {import('dictionary-data-util').GroupedPronunciationInternal} groupedPronunciation
+     * @param {import('dictionary').Pronunciation} pronunciation2
+     * @returns {boolean}
+     */
+    static _arePronunciationsEquivalent({pronunciation: pronunciation1}, pronunciation2) {
+        if (
+            pronunciation1.type !== pronunciation2.type ||
+            !this._areTagListsEqual(pronunciation1.tags, pronunciation2.tags)
+        ) {
+            return false;
+        }
+        switch (pronunciation1.type) {
+            case 'pitch-accent':
+            {
+                // This cast is valid based on the type check at the start of the function.
+                const pitchAccent2 = /** @type {import('dictionary').PitchAccent} */ (pronunciation2);
+                return (
+                    pronunciation1.position === pitchAccent2.position &&
+                    this._areArraysEqual(pronunciation1.nasalPositions, pitchAccent2.nasalPositions) &&
+                    this._areArraysEqual(pronunciation1.devoicePositions, pitchAccent2.devoicePositions)
+                );
+            }
+            case 'phonetic-transcription':
+            {
+                // This cast is valid based on the type check at the start of the function.
+                const phoneticTranscription2 = /** @type {import('dictionary').PhoneticTranscription} */ (pronunciation2);
+                return pronunciation1.ipa === phoneticTranscription2.ipa;
             }
         }
-        return null;
+        return true;
     }
 
     /**

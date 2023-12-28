@@ -543,12 +543,13 @@ export class AnkiTemplateRenderer {
         const [data] = /** @type {[data: import('anki-templates').NoteData]} */ (args);
         const {dictionaryEntry} = data;
         if (dictionaryEntry.type !== 'term') { return []; }
-        const {pronunciations, headwords} = dictionaryEntry;
+        const {pronunciations: termPronunciations, headwords} = dictionaryEntry;
         /** @type {Set<string>} */
         const categories = new Set();
-        for (const {headwordIndex, pitches} of pronunciations) {
+        for (const {headwordIndex, pronunciations} of termPronunciations) {
             const {reading, wordClasses} = headwords[headwordIndex];
             const isVerbOrAdjective = DictionaryDataUtil.isNonNounVerbOrAdjective(wordClasses);
+            const pitches = DictionaryDataUtil.getPronunciationsOfType(pronunciations, 'pitch-accent');
             for (const {position} of pitches) {
                 const category = this._japaneseUtil.getPitchCategory(reading, position, isVerbOrAdjective);
                 if (category !== null) {

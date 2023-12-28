@@ -365,15 +365,21 @@ export type TermPronunciation = {
      */
     dictionaryPriority: number;
     /**
-     * The pitch accent representations for the term.
+     * The pronunciations for the term.
      */
-    pitches: TermPitch[];
+    pronunciations: Pronunciation[];
 };
+
+export type Pronunciation = PitchAccent | PhoneticTranscription;
 
 /**
  * Pitch accent information for a term, represented as the position of the downstep.
  */
-export type TermPitch = {
+export type PitchAccent = {
+    /**
+     * Type of the pronunciation, for disambiguation between union type members.
+     */
+    type: 'pitch-accent';
     /**
      * Position of the downstep, as a number of mora.
      */
@@ -391,6 +397,25 @@ export type TermPitch = {
      */
     tags: Tag[];
 };
+
+export type PhoneticTranscription = {
+    /**
+     * Type of the pronunciation, for disambiguation between union type members.
+     */
+    type: 'phonetic-transcription';
+    /**
+     * An IPA transcription.
+     */
+    ipa: string;
+    /**
+     * Tags for the IPA transcription.
+     */
+    tags: Tag[];
+};
+
+export type PronunciationType = Pronunciation['type'];
+
+export type PronunciationGeneric<T extends PronunciationType> = Extract<Pronunciation, {type: T}>;
 
 /**
  * Frequency information corresponds to how frequently a term appears in a corpus,

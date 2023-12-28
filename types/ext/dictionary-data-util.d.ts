@@ -64,21 +64,15 @@ export type KanjiFrequency = {
 export type TermFrequencyType = 'popular' | 'rare' | 'normal';
 
 export type GroupedPronunciationInternal = {
+    pronunciation: Dictionary.Pronunciation;
     terms: Set<string>;
     reading: string;
-    position: number;
-    nasalPositions: number[];
-    devoicePositions: number[];
-    tags: Dictionary.Tag[];
 };
 
 export type GroupedPronunciation = {
+    pronunciation: Dictionary.Pronunciation;
     terms: string[];
     reading: string;
-    position: number;
-    nasalPositions: number[];
-    devoicePositions: number[];
-    tags: Dictionary.Tag[];
     exclusiveTerms: string[];
     exclusiveReadings: string[];
 };

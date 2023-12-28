@@ -75,6 +75,7 @@ function getFieldMarkers(type) {
                 'pitch-accents',
                 'pitch-accent-graphs',
                 'pitch-accent-positions',
+                'phonetic-transcriptions',
                 'reading',
                 'screenshot',
                 'search-query',

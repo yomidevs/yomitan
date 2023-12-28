@@ -229,6 +229,27 @@
 {{/inline}}
 {{! End Pitch Accents }}
 
+{{#*inline "phonetic-transcriptions"}}
+    {{~#if (op ">" definition.phoneticTranscriptions.length 0)~}}
+        <ul>
+            {{~#each definition.phoneticTranscriptions~}}
+                {{~#each phoneticTranscriptions~}}
+                    <li>
+                        {{~set "any" false~}}   
+                        {{~#each tags~}}
+                            {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                            {{name}}
+                            {{~set "any" true~}}
+                        {{~/each~}}
+                        {{~#if (get "any")}})</i> {{/if~}}
+                        {{ipa~}}
+                    </li>
+                {{~/each~}}
+            {{~/each~}}
+        </ul>
+    {{~/if~}}
+{{/inline}}
+
 {{#*inline "clipboard-image"}}
     {{~#if (hasMedia "clipboardImage")~}}
         <img src="{{getMedia "clipboardImage"}}" />
