@@ -18,7 +18,6 @@
 import type {DisplayContentManager} from '../../ext/js/display/display-content-manager';
 import type {HotkeyHelpController} from '../../ext/js/input/hotkey-help-controller';
 import type {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util';
-import type * as Core from './core';
 import type * as Dictionary from './dictionary';
 import type * as Extension from './extension';
 import type * as Settings from './settings';
@@ -174,12 +173,6 @@ export type ConfigureMessageDetails = {
     childrenSupported: boolean;
     scale: number;
     optionsContext: Settings.OptionsContext;
-};
-
-// TODO : Remove
-export type MessageDetails = {
-    action: string;
-    params: Core.SerializableObject;
 };
 
 export type DisplayGeneratorConstructorDetails = {
