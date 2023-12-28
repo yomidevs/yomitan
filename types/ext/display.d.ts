@@ -24,6 +24,13 @@ import type * as Extension from './extension';
 import type * as Settings from './settings';
 import type * as TextScannerTypes from './text-scanner';
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
+import type {
+    ApiMap as BaseApiMap,
+    ApiParams as BaseApiParams,
+    ApiNames as BaseApiNames,
+    ApiMapInit as BaseApiMapInit,
+    ApiParamsAny as BaseApiParamsAny,
+} from './api-map';
 
 export type HistoryMode = 'clear' | 'overwrite' | 'new';
 
@@ -168,6 +175,7 @@ export type ConfigureMessageDetails = {
     optionsContext: Settings.OptionsContext;
 };
 
+// TODO : Remove
 export type MessageDetails = {
     action: string;
     params: Core.SerializableObject;
@@ -177,4 +185,30 @@ export type DisplayGeneratorConstructorDetails = {
     japaneseUtil: JapaneseUtil;
     contentManager: DisplayContentManager;
     hotkeyHelpController?: HotkeyHelpController | null;
+};
+
+// Direct API
+
+export type DirectApiSurface = {
+    displayAudioClearAutoPlayTimer: {
+        params: void;
+        return: void;
+    };
+};
+
+export type DirectApiNames = BaseApiNames<DirectApiSurface>;
+
+export type DirectApiMapInit = BaseApiMapInit<DirectApiSurface>;
+
+export type DirectApiMap = BaseApiMap<DirectApiSurface, []>;
+
+export type DirectApiParams<TName extends DirectApiNames> = BaseApiParams<DirectApiSurface[TName]>;
+
+export type DirectApiMessageAny = {[name in DirectApiNames]: DirectApiMessage<name>}[DirectApiNames];
+
+export type DirectApiReturnAny = BaseApiParamsAny<DirectApiSurface>;
+
+type DirectApiMessage<TName extends DirectApiNames> = {
+    action: TName;
+    params: DirectApiParams<TName>;
 };

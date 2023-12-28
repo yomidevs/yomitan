@@ -19,6 +19,8 @@
 import {ThemeController} from '../app/theme-controller.js';
 import {FrameEndpoint} from '../comm/frame-endpoint.js';
 import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, log, promiseTimeout} from '../core.js';
+import {invokeApiMapHandler} from '../core/api-map.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {ScrollElement} from '../dom/scroll-element.js';
@@ -87,8 +89,9 @@ export class Display extends EventDispatcher {
             contentManager: this._contentManager,
             hotkeyHelpController: this._hotkeyHelpController
         });
-        /** @type {import('core').MessageHandlerMap} */
-        this._directMessageHandlers = new Map();
+        // /** @type {import('display').DirectApiMap} */
+        /** @type {import('api-map').ApiMap<import('display').DirectApiSurface>} */
+        this._directApiMap = new Map();
         /** @type {import('core').MessageHandlerMap} */
         this._windowMessageHandlers = new Map();
         /** @type {DisplayHistory} */
@@ -502,11 +505,11 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {import('core').MessageHandlerMapInit} handlers
+     * @param {import('display').DirectApiMapInit} handlers
      */
     registerDirectMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {
-            this._directMessageHandlers.set(name, handlerInfo);
+            this._directApiMap.set(name, handlerInfo);
         }
     }
 
@@ -633,18 +636,31 @@ export class Display extends EventDispatcher {
     // Message handlers
 
     /**
-     * @param {import('frame-client').Message<import('display').MessageDetails>} data
-     * @returns {import('core').MessageHandlerResult}
+     * @param {import('frame-client').Message<import('display').DirectApiMessageAny>} data
+     * @returns {Promise<import('display').DirectApiReturnAny>}
      * @throws {Error}
      */
     _onDirectMessage(data) {
-        const {action, params} = this._authenticateMessageData(data);
-        const handler = this._directMessageHandlers.get(action);
-        if (typeof handler === 'undefined') {
-            throw new Error(`Invalid action: ${action}`);
-        }
-
-        return handler(params);
+        return new Promise((resolve, reject) => {
+            const {action, params} = this._authenticateMessageData(data);
+            invokeApiMapHandler(
+                this._directApiMap,
+                action,
+                params,
+                [],
+                (result) => {
+                    const {error} = result;
+                    if (typeof error !== 'undefined') {
+                        reject(ExtensionError.deserialize(error));
+                    } else {
+                        resolve(result.result);
+                    }
+                },
+                () => {
+                    reject(new Error(`Invalid action: ${action}`));
+                }
+            );
+        });
     }
 
     /**
