@@ -555,7 +555,8 @@ export class OptionsUtil {
             {async: false, update: this._updateVersion18.bind(this)},
             {async: false, update: this._updateVersion19.bind(this)},
             {async: false, update: this._updateVersion20.bind(this)},
-            {async: true,  update: this._updateVersion21.bind(this)}
+            {async: true,  update: this._updateVersion21.bind(this)},
+            {async: false, update: this._updateVersion22.bind(this)}
         ];
         /* eslint-enable no-multi-spaces */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1176,7 +1177,7 @@ export class OptionsUtil {
     /**
      * @type {import('options-util').ModernUpdateFunctionAsync}
      */
-    async _updateVersion22(options) {
+    _updateVersion22(options) {
         //  Added translation.searchResolution
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.translation.searchResolution = 'letter';
