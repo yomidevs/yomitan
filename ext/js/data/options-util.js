@@ -507,7 +507,7 @@ export class OptionsUtil {
 
     /**
      * @param {import('options-util').IntermediateOptions} options
-     * @param {import('options-util').ModernUpdate[]} updates
+     * @param {import('options-util').UpdateFunction[]} updates
      * @returns {Promise<import('settings').Options>}
      */
     async _applyUpdates(options, updates) {
@@ -519,9 +519,9 @@ export class OptionsUtil {
         }
 
         for (let i = Math.max(0, Math.floor(currentVersion)); i < targetVersion; ++i) {
-            const {update, async} = updates[i];
-            const result = update(options);
-            options = (async ? await result : result);
+            const update = updates[i];
+            const result = update.call(this, options);
+            if (result instanceof Promise) { await result; }
         }
 
         options.version = targetVersion;
@@ -530,35 +530,33 @@ export class OptionsUtil {
 
     /**
      * @param {?number} targetVersion
-     * @returns {import('options-util').ModernUpdate[]}
+     * @returns {import('options-util').UpdateFunction[]}
      */
     _getVersionUpdates(targetVersion) {
-        /* eslint-disable no-multi-spaces */
         const result = [
-            {async: false, update: this._updateVersion1.bind(this)},
-            {async: false, update: this._updateVersion2.bind(this)},
-            {async: true,  update: this._updateVersion3.bind(this)},
-            {async: true,  update: this._updateVersion4.bind(this)},
-            {async: false, update: this._updateVersion5.bind(this)},
-            {async: true,  update: this._updateVersion6.bind(this)},
-            {async: false, update: this._updateVersion7.bind(this)},
-            {async: true,  update: this._updateVersion8.bind(this)},
-            {async: false, update: this._updateVersion9.bind(this)},
-            {async: true,  update: this._updateVersion10.bind(this)},
-            {async: false, update: this._updateVersion11.bind(this)},
-            {async: true,  update: this._updateVersion12.bind(this)},
-            {async: true,  update: this._updateVersion13.bind(this)},
-            {async: false, update: this._updateVersion14.bind(this)},
-            {async: false, update: this._updateVersion15.bind(this)},
-            {async: false, update: this._updateVersion16.bind(this)},
-            {async: false, update: this._updateVersion17.bind(this)},
-            {async: false, update: this._updateVersion18.bind(this)},
-            {async: false, update: this._updateVersion19.bind(this)},
-            {async: false, update: this._updateVersion20.bind(this)},
-            {async: true,  update: this._updateVersion21.bind(this)},
-            {async: false, update: this._updateVersion22.bind(this)}
+            this._updateVersion1,
+            this._updateVersion2,
+            this._updateVersion3,
+            this._updateVersion4,
+            this._updateVersion5,
+            this._updateVersion6,
+            this._updateVersion7,
+            this._updateVersion8,
+            this._updateVersion9,
+            this._updateVersion10,
+            this._updateVersion11,
+            this._updateVersion12,
+            this._updateVersion13,
+            this._updateVersion14,
+            this._updateVersion15,
+            this._updateVersion16,
+            this._updateVersion17,
+            this._updateVersion18,
+            this._updateVersion19,
+            this._updateVersion20,
+            this._updateVersion21,
+            this._updateVersion22
         ];
-        /* eslint-enable no-multi-spaces */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
         }
@@ -566,7 +564,7 @@ export class OptionsUtil {
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion1(options) {
         // Version 1 changes:
@@ -576,11 +574,10 @@ export class OptionsUtil {
                 prefixWildcardsSupported: false
             }
         };
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion2(options) {
         // Version 2 changes:
@@ -591,21 +588,19 @@ export class OptionsUtil {
             }
             profile.options = this._legacyProfileUpdateUpdateVersion(profile.options);
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionAsync}
+     * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion3(options) {
         // Version 3 changes:
         //  Pitch accent Anki field templates added.
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v2.handlebars');
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionAsync}
+     * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion4(options) {
         // Version 4 changes:
@@ -689,11 +684,10 @@ export class OptionsUtil {
             profileOptions.scanning.inputs = scanningInputs;
         }
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v4.handlebars');
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion5(options) {
         // Version 5 changes:
@@ -701,11 +695,10 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             delete profile.options.version;
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionAsync}
+     * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion6(options) {
         // Version 6 changes:
@@ -726,7 +719,6 @@ export class OptionsUtil {
                 profile.options.anki.fieldTemplates = this._updateVersion6AnkiTemplatesCompactTags(fieldTemplates);
             }
         }
-        return options;
     }
 
     /**
@@ -758,7 +750,7 @@ export class OptionsUtil {
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion7(options) {
         // Version 7 changes:
@@ -774,11 +766,10 @@ export class OptionsUtil {
             profile.options.general.popupActionBarVisibility = 'auto';
             profile.options.general.popupActionBarLocation = 'right';
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionAsync}
+     * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion8(options) {
         // Version 8 changes:
@@ -868,11 +859,10 @@ export class OptionsUtil {
             delete profile.options.general.enableClipboardMonitor;
             delete profile.options.general.maximumClipboardSearchLength;
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion9(options) {
         // Version 9 changes:
@@ -882,11 +872,10 @@ export class OptionsUtil {
             profile.options.general.frequencyDisplayMode = 'split-tags-grouped';
             profile.options.general.termDisplayMode = 'ruby';
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionAsync}
+     * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion10(options) {
         // Version 10 changes:
@@ -922,11 +911,10 @@ export class OptionsUtil {
                 }
             }
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion11(options) {
         // Version 11 changes:
@@ -949,11 +937,10 @@ export class OptionsUtil {
 
             profile.options.anki.displayTags = 'never';
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionAsync}
+     * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion12(options) {
         // Version 12 changes:
@@ -984,11 +971,10 @@ export class OptionsUtil {
             delete audio.customSourceUrl;
             delete audio.textToSpeechVoice;
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionAsync}
+     * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion13(options) {
         // Version 13 changes:
@@ -1002,11 +988,10 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             profile.options.anki.duplicateScopeCheckAllModels = false;
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion14(options) {
         // Version 14 changes:
@@ -1016,11 +1001,10 @@ export class OptionsUtil {
                 forceGoogleDocsHtmlRendering: false
             };
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion15(options) {
         // Version 15 changes:
@@ -1030,11 +1014,10 @@ export class OptionsUtil {
             profile.options.general.sortFrequencyDictionary = null;
             profile.options.general.sortFrequencyDictionaryOrder = 'descending';
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion16(options) {
         // Version 16 changes:
@@ -1042,11 +1025,10 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             profile.options.scanning.matchTypePrefix = false;
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion17(options) {
         // Version 17 changes:
@@ -1071,11 +1053,10 @@ export class OptionsUtil {
                 });
             }
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion18(options) {
         // Version 18 changes:
@@ -1096,11 +1077,10 @@ export class OptionsUtil {
             profile.options.scanning.hidePopupOnCursorExit = false;
             profile.options.scanning.hidePopupOnCursorExitDelay = profile.options.scanning.hideDelay;
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion19(options) {
         // Version 19 changes:
@@ -1126,11 +1106,10 @@ export class OptionsUtil {
                 input.options.preventPenScrolling = input.options.preventTouchScrolling;
             }
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionSync}
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion20(options) {
         // Version 20 changes:
@@ -1149,11 +1128,10 @@ export class OptionsUtil {
                 general.popupOuterTheme = 'light';
             }
         }
-        return options;
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionAsync}
+     * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion21(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v21.handlebars');
@@ -1170,8 +1148,6 @@ export class OptionsUtil {
             await this._createTab(chrome.runtime.getURL('/welcome.html'));
             chrome.storage.session.set({'openedWelcomePage': true});
         }
-
-        return options;
     }
 
     /**
