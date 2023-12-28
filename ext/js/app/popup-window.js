@@ -200,7 +200,7 @@ export class PopupWindow extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async clearAutoPlayTimer() {
-        await this._invoke(false, 'Display.clearAutoPlayTimer', {id: this._id});
+        await this._invoke(false, 'displayAudioClearAutoPlayTimer', {id: this._id});
     }
 
     /**

@@ -316,7 +316,7 @@ export class Popup extends EventDispatcher {
      */
     async clearAutoPlayTimer() {
         if (this._frameConnected) {
-            await this._invokeSafe('Display.clearAutoPlayTimer', {});
+            await this._invokeSafe('displayAudioClearAutoPlayTimer', {});
         }
     }
 

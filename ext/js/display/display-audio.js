@@ -89,7 +89,7 @@ export class DisplayAudio {
             ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)]
         ]);
         this._display.registerDirectMessageHandlers([
-            ['Display.clearAutoPlayTimer', this._onMessageClearAutoPlayTimer.bind(this)]
+            ['displayAudioClearAutoPlayTimer', this._onMessageClearAutoPlayTimer.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
