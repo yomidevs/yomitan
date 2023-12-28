@@ -89,8 +89,7 @@ export class Display extends EventDispatcher {
             contentManager: this._contentManager,
             hotkeyHelpController: this._hotkeyHelpController
         });
-        // /** @type {import('display').DirectApiMap} */
-        /** @type {import('api-map').ApiMap<import('display').DirectApiSurface>} */
+        /** @type {import('display').DirectApiMap} */
         this._directApiMap = new Map();
         /** @type {import('core').MessageHandlerMap} */
         this._windowMessageHandlers = new Map();
@@ -682,38 +681,28 @@ export class Display extends EventDispatcher {
         invokeMessageHandler(messageHandler, params, callback);
     }
 
-    /**
-     * @param {{optionsContext: import('settings').OptionsContext}} details
-     */
+    /** @type {import('display').DirectApiHandler<'Display.setOptionsContext'>} */
     async _onMessageSetOptionsContext({optionsContext}) {
         await this.setOptionsContext(optionsContext);
         this.searchLast(true);
     }
 
-    /**
-     * @param {{details: import('display').ContentDetails}} details
-     */
+    /** @type {import('display').DirectApiHandler<'Display.setContent'>} */
     _onMessageSetContent({details}) {
         this.setContent(details);
     }
 
-    /**
-     * @param {{css: string}} details
-     */
+    /** @type {import('display').DirectApiHandler<'Display.setCustomCss'>} */
     _onMessageSetCustomCss({css}) {
         this.setCustomCss(css);
     }
 
-    /**
-     * @param {{scale: number}} details
-     */
+    /** @type {import('display').DirectApiHandler<'Display.setContentScale'>} */
     _onMessageSetContentScale({scale}) {
         this._setContentScale(scale);
     }
 
-    /**
-     * @param {import('display').ConfigureMessageDetails} details
-     */
+    /** @type {import('display').DirectApiHandler<'Display.configure'>} */
     async _onMessageConfigure({depth, parentPopupId, parentFrameId, childrenSupported, scale, optionsContext}) {
         this._depth = depth;
         this._parentPopupId = parentPopupId;
@@ -723,9 +712,7 @@ export class Display extends EventDispatcher {
         await this.setOptionsContext(optionsContext);
     }
 
-    /**
-     * @param {{value: boolean}} details
-     */
+    /** @type {import('display').DirectApiHandler<'Display.visibilityChanged'>} */
     _onMessageVisibilityChanged({value}) {
         this._frameVisible = value;
         this.trigger('frameVisibilityChange', {value});

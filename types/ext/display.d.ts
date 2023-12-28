@@ -30,6 +30,7 @@ import type {
     ApiNames as BaseApiNames,
     ApiMapInit as BaseApiMapInit,
     ApiParamsAny as BaseApiParamsAny,
+    ApiHandler as BaseApiHandler,
 } from './api-map';
 
 export type HistoryMode = 'clear' | 'overwrite' | 'new';
@@ -194,6 +195,40 @@ export type DirectApiSurface = {
         params: void;
         return: void;
     };
+    'Display.setOptionsContext': {
+        params: {
+            optionsContext: Settings.OptionsContext;
+        };
+        return: void;
+    };
+    'Display.setContent': {
+        params: {
+            details: ContentDetails;
+        };
+        return: void;
+    };
+    'Display.setCustomCss': {
+        params: {
+            css: string;
+        };
+        return: void;
+    };
+    'Display.setContentScale': {
+        params: {
+            scale: number;
+        };
+        return: void;
+    };
+    'Display.configure': {
+        params: ConfigureMessageDetails;
+        return: void;
+    };
+    'Display.visibilityChanged': {
+        params: {
+            value: boolean;
+        };
+        return: void;
+    };
 };
 
 export type DirectApiNames = BaseApiNames<DirectApiSurface>;
@@ -201,6 +236,8 @@ export type DirectApiNames = BaseApiNames<DirectApiSurface>;
 export type DirectApiMapInit = BaseApiMapInit<DirectApiSurface>;
 
 export type DirectApiMap = BaseApiMap<DirectApiSurface, []>;
+
+export type DirectApiHandler<TName extends DirectApiNames> = BaseApiHandler<DirectApiSurface[TName]>;
 
 export type DirectApiParams<TName extends DirectApiNames> = BaseApiParams<DirectApiSurface[TName]>;
 

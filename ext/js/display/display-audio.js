@@ -260,7 +260,7 @@ export class DisplayAudio {
         this.playAudio(this._display.selectedIndex, 0, source);
     }
 
-    /** */
+    /** @type {import('display').DirectApiHandler<'displayAudioClearAutoPlayTimer'>} */
     _onMessageClearAutoPlayTimer() {
         this.clearAutoPlayTimer();
     }
