@@ -15,7 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// The extension ID below is on an allow-list that is used on the Google Docs webpage.
-// @ts-expect-error - Adding a property to the global object
-// eslint-disable-next-line no-underscore-dangle
-window._docs_annotate_canvas_by_ext = 'ogmnaimimemjmbakcfefmnahgdfhfami';
+/** Entry point. */
+function main() {
+    /** @type {Window} */
+    // @ts-expect-error - Firefox Xray vision
+    const window2 = window.wrappedJSObject;
+    if (!(typeof window2 === 'object' && window2 !== null)) { return; }
+    // The extension ID below is on an allow-list that is used on the Google Docs webpage.
+    // @ts-expect-error - Adding a property to the global object
+    // eslint-disable-next-line no-underscore-dangle
+    window2._docs_annotate_canvas_by_ext = 'ogmnaimimemjmbakcfefmnahgdfhfami';
+}
+
+main();

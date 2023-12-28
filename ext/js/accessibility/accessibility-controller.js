@@ -86,14 +86,24 @@ export class AccessibilityController {
         try {
             if (forceGoogleDocsHtmlRenderingAny) {
                 if (await isContentScriptRegistered(id)) { return; }
-                /** @type {import('script-manager').RegistrationDetails} */
-                const details = {
-                    allFrames: true,
-                    matches: ['*://docs.google.com/*'],
-                    runAt: 'document_start',
-                    js: ['js/accessibility/google-docs.js']
-                };
-                await registerContentScript(id, details);
+                try {
+                    await registerContentScript(id, {
+                        allFrames: true,
+                        matches: ['*://docs.google.com/*'],
+                        runAt: 'document_start',
+                        js: ['js/accessibility/google-docs.js'],
+                        world: 'MAIN'
+                    });
+                } catch (e) {
+                    // Firefox doesn't support `world` field and will throw an error.
+                    // In this case, use the xray vision version.
+                    await registerContentScript(id, {
+                        allFrames: true,
+                        matches: ['*://docs.google.com/*'],
+                        runAt: 'document_start',
+                        js: ['js/accessibility/google-docs-xray.js']
+                    });
+                }
             } else {
                 await unregisterContentScript(id);
             }
