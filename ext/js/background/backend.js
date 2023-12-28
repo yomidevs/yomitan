@@ -299,8 +299,8 @@ export class Backend {
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
 
-            this._sendMessageAllTabsIgnoreResponse('Yomitan.backendReady', {});
-            this._sendMessageIgnoreResponse({action: 'Yomitan.backendReady', params: {}});
+            this._sendMessageAllTabsIgnoreResponse({action: 'applicationBackendReady'});
+            this._sendMessageIgnoreResponse({action: 'applicationBackendReady'});
         } catch (e) {
             log.error(e);
             throw e;
@@ -404,7 +404,7 @@ export class Backend {
      * @param {chrome.tabs.ZoomChangeInfo} event
      */
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
-        this._sendMessageTabIgnoreResponse(tabId, {action: 'Yomitan.zoomChanged', params: {oldZoomFactor, newZoomFactor}}, {});
+        this._sendMessageTabIgnoreResponse(tabId, {action: 'applicationZoomChanged', params: {oldZoomFactor, newZoomFactor}}, {});
     }
 
     /**
@@ -427,7 +427,8 @@ export class Backend {
     /** @type {import('api').ApiHandler<'requestBackendReadySignal'>} */
     _onApiRequestBackendReadySignal(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
-        const data = {action: 'Yomitan.backendReady', params: {}};
+        /** @type {import('application').ApiMessage<'applicationBackendReady'>} */
+        const data = {action: 'applicationBackendReady'};
         if (typeof sender.tab === 'undefined') {
             this._sendMessageIgnoreResponse(data);
             return false;
@@ -609,30 +610,30 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'sendMessageToFrame'>} */
-    _onApiSendMessageToFrame({frameId: targetFrameId, action, params}, sender) {
+    _onApiSendMessageToFrame({frameId: targetFrameId, message}, sender) {
         if (!sender) { return false; }
         const {tab} = sender;
         if (!tab) { return false; }
         const {id} = tab;
         if (typeof id !== 'number') { return false; }
-        const frameId = sender.frameId;
-        /** @type {import('extension').ChromeRuntimeMessageWithFrameId} */
-        const message = {action, params, frameId};
-        this._sendMessageTabIgnoreResponse(id, message, {frameId: targetFrameId});
+        const {frameId} = sender;
+        /** @type {import('application').ApiMessageAny} */
+        const message2 = {...message, frameId};
+        this._sendMessageTabIgnoreResponse(id, message2, {frameId: targetFrameId});
         return true;
     }
 
     /** @type {import('api').ApiHandler<'broadcastTab'>} */
-    _onApiBroadcastTab({action, params}, sender) {
+    _onApiBroadcastTab({message}, sender) {
         if (!sender) { return false; }
         const {tab} = sender;
         if (!tab) { return false; }
         const {id} = tab;
         if (typeof id !== 'number') { return false; }
-        const frameId = sender.frameId;
-        /** @type {import('extension').ChromeRuntimeMessageWithFrameId} */
-        const message = {action, params, frameId};
-        this._sendMessageTabIgnoreResponse(id, message, {});
+        const {frameId} = sender;
+        /** @type {import('application').ApiMessageAny} */
+        const message2 = {...message, frameId};
+        this._sendMessageTabIgnoreResponse(id, message2, {});
         return true;
     }
 
@@ -1094,7 +1095,7 @@ export class Backend {
 
         await this._sendMessageTabPromise(
             id,
-            {action: 'SearchDisplayController.setMode', params: {mode: 'popup'}},
+            {action: 'searchDisplayControllerSetMode', params: {mode: 'popup'}},
             {frameId: 0}
         );
 
@@ -1114,7 +1115,7 @@ export class Backend {
             try {
                 const mode = await this._sendMessageTabPromise(
                     id,
-                    {action: 'SearchDisplayController.getMode', params: {}},
+                    {action: 'searchDisplayControllerGetMode'},
                     {frameId: 0}
                 );
                 return mode === 'popup';
@@ -1194,7 +1195,7 @@ export class Backend {
     async _updateSearchQuery(tabId, text, animate) {
         await this._sendMessageTabPromise(
             tabId,
-            {action: 'SearchDisplayController.updateSearchQuery', params: {text, animate}},
+            {action: 'searchDisplayControllerUpdateSearchQuery', params: {text, animate}},
             {frameId: 0}
         );
     }
@@ -1225,7 +1226,7 @@ export class Backend {
 
         this._accessibilityController.update(this._getOptionsFull(false));
 
-        this._sendMessageAllTabsIgnoreResponse('Yomitan.optionsUpdated', {source});
+        this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
     }
 
     /**
@@ -1633,7 +1634,7 @@ export class Backend {
         try {
             const response = await this._sendMessageTabPromise(
                 tabId,
-                {action: 'Yomitan.getUrl', params: {}},
+                {action: 'applicationGetUrl'},
                 {frameId: 0}
             );
             const url = typeof response === 'object' && response !== null ? /** @type {import('core').SerializableObject} */ (response).url : void 0;
@@ -1804,14 +1805,14 @@ export class Backend {
         return new Promise((resolve, reject) => {
             /** @type {?import('core').Timeout} */
             let timer = null;
-            /** @type {?import('extension').ChromeRuntimeOnMessageCallback} */
+            /** @type {?import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
             let onMessage = (message, sender) => {
                 if (
                     !sender.tab ||
                     sender.tab.id !== tabId ||
                     sender.frameId !== frameId ||
                     !(typeof message === 'object' && message !== null) ||
-                    /** @type {import('core').SerializableObject} */ (message).action !== 'yomitanReady'
+                    message.action !== 'applicationReady'
                 ) {
                     return;
                 }
@@ -1832,7 +1833,7 @@ export class Backend {
 
             chrome.runtime.onMessage.addListener(onMessage);
 
-            this._sendMessageTabPromise(tabId, {action: 'Yomitan.isReady'}, {frameId})
+            this._sendMessageTabPromise(tabId, {action: 'applicationIsReady'}, {frameId})
                 .then(
                     (value) => {
                         if (!value) { return; }
@@ -1891,7 +1892,8 @@ export class Backend {
     }
 
     /**
-     * @param {{action: string, params: import('core').SerializableObject}} message
+     * @template {import('application').ApiNames} TName
+     * @param {import('application').ApiMessage<TName>} message
      */
     _sendMessageIgnoreResponse(message) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
@@ -1900,7 +1902,7 @@ export class Backend {
 
     /**
      * @param {number} tabId
-     * @param {{action: string, params?: import('core').SerializableObject, frameId?: number}} message
+     * @param {import('application').ApiMessageAny} message
      * @param {chrome.tabs.MessageSendOptions} options
      */
     _sendMessageTabIgnoreResponse(tabId, message, options) {
@@ -1909,25 +1911,25 @@ export class Backend {
     }
 
     /**
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
+     * @param {import('application').ApiMessageAny} message
      */
-    _sendMessageAllTabsIgnoreResponse(action, params) {
+    _sendMessageAllTabsIgnoreResponse(message) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, (tabs) => {
             for (const tab of tabs) {
                 const {id} = tab;
                 if (typeof id !== 'number') { continue; }
-                chrome.tabs.sendMessage(id, {action, params}, callback);
+                chrome.tabs.sendMessage(id, message, callback);
             }
         });
     }
 
     /**
+     * @template {import('application').ApiNames} TName
      * @param {number} tabId
-     * @param {{action: string, params?: import('core').SerializableObject}} message
+     * @param {import('application').ApiMessage<TName>} message
      * @param {chrome.tabs.MessageSendOptions} options
-     * @returns {Promise<unknown>}
+     * @returns {Promise<import('application').ApiReturn<TName>>}
      */
     _sendMessageTabPromise(tabId, message, options) {
         return new Promise((resolve, reject) => {
@@ -1936,7 +1938,7 @@ export class Backend {
              */
             const callback = (response) => {
                 try {
-                    resolve(this._getMessageResponseResult(response));
+                    resolve(/** @type {import('application').ApiReturn<TName>} */ (this._getMessageResponseResult(response)));
                 } catch (error) {
                     reject(error);
                 }
@@ -1959,11 +1961,11 @@ export class Backend {
         if (typeof response !== 'object' || response === null) {
             throw new Error('Tab did not respond');
         }
-        const responseError = /** @type {import('core').SerializedError|undefined} */ (/** @type {import('core').SerializableObject} */ (response).error);
+        const responseError = /** @type {import('core').Response<unknown>} */ (response).error;
         if (typeof responseError === 'object' && responseError !== null) {
             throw ExtensionError.deserialize(responseError);
         }
-        return /** @type {import('core').SerializableObject} */ (response).result;
+        return /** @type {import('core').Response<unknown>} */ (response).result;
     }
 
     /**
@@ -1998,7 +2000,7 @@ export class Backend {
         let token = null;
         try {
             if (typeof tabId === 'number' && typeof frameId === 'number') {
-                const action = 'Frontend.setAllVisibleOverride';
+                const action = 'frontendSetAllVisibleOverride';
                 const params = {value: false, priority: 0, awaitFrame: true};
                 token = await this._sendMessageTabPromise(tabId, {action, params}, {frameId});
             }
@@ -2015,7 +2017,7 @@ export class Backend {
             });
         } finally {
             if (token !== null) {
-                const action = 'Frontend.clearAllVisibleOverride';
+                const action = 'frontendClearAllVisibleOverride';
                 const params = {token};
                 try {
                     await this._sendMessageTabPromise(tabId, {action, params}, {frameId});
@@ -2380,7 +2382,7 @@ export class Backend {
      */
     _triggerDatabaseUpdated(type, cause) {
         this._translator.clearDatabaseCaches();
-        this._sendMessageAllTabsIgnoreResponse('Yomitan.databaseUpdated', {type, cause});
+        this._sendMessageAllTabsIgnoreResponse({action: 'applicationDatabaseUpdated', params: {type, cause}});
     }
 
     /**
