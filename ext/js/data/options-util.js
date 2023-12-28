@@ -564,11 +564,10 @@ export class OptionsUtil {
     }
 
     /**
+     * - Added options.global.database.prefixWildcardsSupported = false.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion1(options) {
-        // Version 1 changes:
-        //  Added options.global.database.prefixWildcardsSupported = false.
         options.global = {
             database: {
                 prefixWildcardsSupported: false
@@ -577,11 +576,10 @@ export class OptionsUtil {
     }
 
     /**
+     * - Legacy profile update process moved into this upgrade function.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion2(options) {
-        // Version 2 changes:
-        //  Legacy profile update process moved into this upgrade function.
         for (const profile of options.profiles) {
             if (!Array.isArray(profile.conditionGroups)) {
                 profile.conditionGroups = [];
@@ -591,27 +589,25 @@ export class OptionsUtil {
     }
 
     /**
+     * - Pitch accent Anki field templates added.
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion3(options) {
-        // Version 3 changes:
-        //  Pitch accent Anki field templates added.
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v2.handlebars');
     }
 
     /**
+     * - Options conditions converted to string representations.
+     * - Added usePopupWindow.
+     * - Updated handlebars templates to include "clipboard-image" definition.
+     * - Updated handlebars templates to include "clipboard-text" definition.
+     * - Added hideDelay.
+     * - Added inputs to profileOptions.scanning.
+     * - Added pointerEventsEnabled to profileOptions.scanning.
+     * - Added preventMiddleMouse to profileOptions.scanning.
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion4(options) {
-        // Version 4 changes:
-        //  Options conditions converted to string representations.
-        //  Added usePopupWindow.
-        //  Updated handlebars templates to include "clipboard-image" definition.
-        //  Updated handlebars templates to include "clipboard-text" definition.
-        //  Added hideDelay.
-        //  Added inputs to profileOptions.scanning.
-        //  Added pointerEventsEnabled to profileOptions.scanning.
-        //  Added preventMiddleMouse to profileOptions.scanning.
         for (const {conditionGroups} of options.profiles) {
             for (const {conditions} of conditionGroups) {
                 for (const condition of conditions) {
@@ -687,26 +683,24 @@ export class OptionsUtil {
     }
 
     /**
+     * - Removed legacy version number from profile options.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion5(options) {
-        // Version 5 changes:
-        //  Removed legacy version number from profile options.
         for (const profile of options.profiles) {
             delete profile.options.version;
         }
     }
 
     /**
+     * - Updated handlebars templates to include "conjugation" definition.
+     * - Added global option showPopupPreview.
+     * - Added global option useSettingsV2.
+     * - Added anki.checkForDuplicates.
+     * - Added general.glossaryLayoutMode; removed general.compactGlossaries.
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion6(options) {
-        // Version 6 changes:
-        //  Updated handlebars templates to include "conjugation" definition.
-        //  Added global option showPopupPreview.
-        //  Added global option useSettingsV2.
-        //  Added anki.checkForDuplicates.
-        //  Added general.glossaryLayoutMode; removed general.compactGlossaries.
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v6.handlebars');
         options.global.showPopupPreview = false;
         options.global.useSettingsV2 = false;
@@ -750,15 +744,14 @@ export class OptionsUtil {
     }
 
     /**
+     * - Added general.maximumClipboardSearchLength.
+     * - Added general.popupCurrentIndicatorMode.
+     * - Added general.popupActionBarVisibility.
+     * - Added general.popupActionBarLocation.
+     * - Removed global option showPopupPreview.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion7(options) {
-        // Version 7 changes:
-        //  Added general.maximumClipboardSearchLength.
-        //  Added general.popupCurrentIndicatorMode.
-        //  Added general.popupActionBarVisibility.
-        //  Added general.popupActionBarLocation.
-        //  Removed global option showPopupPreview.
         delete options.global.showPopupPreview;
         for (const profile of options.profiles) {
             profile.options.general.maximumClipboardSearchLength = 1000;
@@ -769,25 +762,24 @@ export class OptionsUtil {
     }
 
     /**
+     * - Added translation.textReplacements.
+     * - Moved anki.sentenceExt to sentenceParsing.scanExtent.
+     * - Added sentenceParsing.enableTerminationCharacters.
+     * - Added sentenceParsing.terminationCharacters.
+     * - Changed general.popupActionBarLocation.
+     * - Added inputs.hotkeys.
+     * - Added anki.suspendNewCards.
+     * - Added popupWindow.
+     * - Updated handlebars templates to include "stroke-count" definition.
+     * - Updated global.useSettingsV2 to be true (opt-out).
+     * - Added audio.customSourceType.
+     * - Moved general.enableClipboardPopups => clipboard.enableBackgroundMonitor.
+     * - Moved general.enableClipboardMonitor => clipboard.enableSearchPageMonitor. Forced value to false due to a bug which caused its value to not be read.
+     * - Moved general.maximumClipboardSearchLength => clipboard.maximumSearchLength.
+     * - Added clipboard.autoSearchContent.
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion8(options) {
-        // Version 8 changes:
-        //  Added translation.textReplacements.
-        //  Moved anki.sentenceExt to sentenceParsing.scanExtent.
-        //  Added sentenceParsing.enableTerminationCharacters.
-        //  Added sentenceParsing.terminationCharacters.
-        //  Changed general.popupActionBarLocation.
-        //  Added inputs.hotkeys.
-        //  Added anki.suspendNewCards.
-        //  Added popupWindow.
-        //  Updated handlebars templates to include "stroke-count" definition.
-        //  Updated global.useSettingsV2 to be true (opt-out).
-        //  Added audio.customSourceType.
-        //  Moved general.enableClipboardPopups => clipboard.enableBackgroundMonitor.
-        //  Moved general.enableClipboardMonitor => clipboard.enableSearchPageMonitor. Forced value to false due to a bug which caused its value to not be read.
-        //  Moved general.maximumClipboardSearchLength => clipboard.maximumSearchLength.
-        //  Added clipboard.autoSearchContent.
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v8.handlebars');
         options.global.useSettingsV2 = true;
         for (const profile of options.profiles) {
@@ -862,12 +854,11 @@ export class OptionsUtil {
     }
 
     /**
+     * - Added general.frequencyDisplayMode.
+     * - Added general.termDisplayMode.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion9(options) {
-        // Version 9 changes:
-        //  Added general.frequencyDisplayMode.
-        //  Added general.termDisplayMode.
         for (const profile of options.profiles) {
             profile.options.general.frequencyDisplayMode = 'split-tags-grouped';
             profile.options.general.termDisplayMode = 'ruby';
@@ -875,14 +866,13 @@ export class OptionsUtil {
     }
 
     /**
+     * - Removed global option useSettingsV2.
+     * - Added part-of-speech field template.
+     * - Added an argument to hotkey inputs.
+     * - Added definitionsCollapsible to dictionary options.
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion10(options) {
-        // Version 10 changes:
-        //  Removed global option useSettingsV2.
-        //  Added part-of-speech field template.
-        //  Added an argument to hotkey inputs.
-        //  Added definitionsCollapsible to dictionary options.
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v10.handlebars');
         delete options.global.useSettingsV2;
         for (const profile of options.profiles) {
@@ -914,13 +904,12 @@ export class OptionsUtil {
     }
 
     /**
+     * - Changed dictionaries to an array.
+     * - Changed audio.customSourceUrl's {expression} marker to {term}.
+     * - Added anki.displayTags.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion11(options) {
-        // Version 11 changes:
-        //  Changed dictionaries to an array.
-        //  Changed audio.customSourceUrl's {expression} marker to {term}.
-        //  Added anki.displayTags.
         const customSourceUrlPattern = /\{expression\}/g;
         for (const profile of options.profiles) {
             const dictionariesNew = [];
@@ -940,14 +929,13 @@ export class OptionsUtil {
     }
 
     /**
+     * - Changed sentenceParsing.enableTerminationCharacters to sentenceParsing.terminationCharacterMode.
+     * - Added {search-query} field marker.
+     * - Updated audio.sources[] to change 'custom' into 'custom-json'.
+     * - Removed audio.customSourceType.
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion12(options) {
-        // Version 12 changes:
-        //  Changed sentenceParsing.enableTerminationCharacters to sentenceParsing.terminationCharacterMode.
-        //  Added {search-query} field marker.
-        //  Updated audio.sources[] to change 'custom' into 'custom-json'.
-        //  Removed audio.customSourceType.
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v12.handlebars');
         for (const profile of options.profiles) {
             const {sentenceParsing, audio} = profile.options;
@@ -974,16 +962,15 @@ export class OptionsUtil {
     }
 
     /**
+     * - Handlebars templates updated to use formatGlossary.
+     * - Handlebars templates updated to use new media format.
+     * - Added {selection-text} field marker.
+     * - Added {sentence-furigana} field marker.
+     * - Added anki.duplicateScopeCheckAllModels.
+     * - Updated pronunciation templates.
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion13(options) {
-        // Version 13 changes:
-        //  Handlebars templates updated to use formatGlossary.
-        //  Handlebars templates updated to use new media format.
-        //  Added {selection-text} field marker.
-        //  Added {sentence-furigana} field marker.
-        //  Added anki.duplicateScopeCheckAllModels.
-        //  Updated pronunciation templates.
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v13.handlebars');
         for (const profile of options.profiles) {
             profile.options.anki.duplicateScopeCheckAllModels = false;
@@ -991,11 +978,10 @@ export class OptionsUtil {
     }
 
     /**
+     * - Added accessibility options.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion14(options) {
-        // Version 14 changes:
-        //  Added accessibility options.
         for (const profile of options.profiles) {
             profile.options.accessibility = {
                 forceGoogleDocsHtmlRendering: false
@@ -1004,12 +990,11 @@ export class OptionsUtil {
     }
 
     /**
+     * - Added general.sortFrequencyDictionary.
+     * - Added general.sortFrequencyDictionaryOrder.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion15(options) {
-        // Version 15 changes:
-        //  Added general.sortFrequencyDictionary.
-        //  Added general.sortFrequencyDictionaryOrder.
         for (const profile of options.profiles) {
             profile.options.general.sortFrequencyDictionary = null;
             profile.options.general.sortFrequencyDictionaryOrder = 'descending';
@@ -1017,22 +1002,20 @@ export class OptionsUtil {
     }
 
     /**
+     * - Added scanning.matchTypePrefix.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion16(options) {
-        // Version 16 changes:
-        //  Added scanning.matchTypePrefix.
         for (const profile of options.profiles) {
             profile.options.scanning.matchTypePrefix = false;
         }
     }
 
     /**
+     * - Added vertical sentence punctuation to terminationCharacters.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion17(options) {
-        // Version 17 changes:
-        //  Added vertical sentence punctuation to terminationCharacters.
         const additions = ['︒', '︕', '︖', '︙'];
         for (const profile of options.profiles) {
             /** @type {import('settings').SentenceParsingTerminationCharacterOption[]} */
@@ -1056,15 +1039,14 @@ export class OptionsUtil {
     }
 
     /**
+     * - general.popupTheme's 'default' value changed to 'light'
+     * - general.popupOuterTheme's 'default' value changed to 'light'
+     * - general.popupOuterTheme's 'auto' value changed to 'site'
+     * - Added scanning.hidePopupOnCursorExit.
+     * - Added scanning.hidePopupOnCursorExitDelay.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion18(options) {
-        // Version 18 changes:
-        //  general.popupTheme's 'default' value changed to 'light'
-        //  general.popupOuterTheme's 'default' value changed to 'light'
-        //  general.popupOuterTheme's 'auto' value changed to 'site'
-        //  Added scanning.hidePopupOnCursorExit.
-        //  Added scanning.hidePopupOnCursorExitDelay.
         for (const profile of options.profiles) {
             const {general} = profile.options;
             if (general.popupTheme === 'default') {
@@ -1080,19 +1062,18 @@ export class OptionsUtil {
     }
 
     /**
+     * - Added anki.noteGuiMode.
+     * - Added anki.apiKey.
+     * - Renamed scanning.inputs[].options.scanOnPenPress to scanOnPenMove.
+     * - Renamed scanning.inputs[].options.scanOnPenRelease to scanOnPenReleaseHover.
+     * - Added scanning.inputs[].options.scanOnTouchPress.
+     * - Added scanning.inputs[].options.scanOnTouchRelease.
+     * - Added scanning.inputs[].options.scanOnPenPress.
+     * - Added scanning.inputs[].options.scanOnPenRelease.
+     * - Added scanning.inputs[].options.preventPenScrolling.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion19(options) {
-        // Version 19 changes:
-        //  Added anki.noteGuiMode.
-        //  Added anki.apiKey.
-        //  Renamed scanning.inputs[].options.scanOnPenPress to scanOnPenMove.
-        //  Renamed scanning.inputs[].options.scanOnPenRelease to scanOnPenReleaseHover.
-        //  Added scanning.inputs[].options.scanOnTouchPress.
-        //  Added scanning.inputs[].options.scanOnTouchRelease.
-        //  Added scanning.inputs[].options.scanOnPenPress.
-        //  Added scanning.inputs[].options.scanOnPenRelease.
-        //  Added scanning.inputs[].options.preventPenScrolling.
         for (const profile of options.profiles) {
             profile.options.anki.noteGuiMode = 'browse';
             profile.options.anki.apiKey = '';
@@ -1109,14 +1090,13 @@ export class OptionsUtil {
     }
 
     /**
+     * - Added anki.downloadTimeout.
+     * - Added scanning.normalizeCssZoom.
+     * - Fixed general.popupTheme invalid default.
+     * - Fixed general.popupOuterTheme invalid default.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion20(options) {
-        // Version 20 changes:
-        //  Added anki.downloadTimeout.
-        //  Added scanning.normalizeCssZoom.
-        //  Fixed general.popupTheme invalid default.
-        //  Fixed general.popupOuterTheme invalid default.
         for (const profile of options.profiles) {
             profile.options.anki.downloadTimeout = 0;
             profile.options.scanning.normalizeCssZoom = true;
