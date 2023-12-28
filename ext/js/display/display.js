@@ -88,8 +88,6 @@ export class Display extends EventDispatcher {
             hotkeyHelpController: this._hotkeyHelpController
         });
         /** @type {import('core').MessageHandlerMap} */
-        this._messageHandlers = new Map();
-        /** @type {import('core').MessageHandlerMap} */
         this._directMessageHandlers = new Map();
         /** @type {import('core').MessageHandlerMap} */
         this._windowMessageHandlers = new Map();
