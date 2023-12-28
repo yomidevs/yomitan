@@ -266,6 +266,7 @@ export class PopupWindow extends EventDispatcher {
 
     // Private
 
+    // TODO : Type safety
     /**
      * @template {import('core').SerializableObject} TParams
      * @template [TReturn=unknown]

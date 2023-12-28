@@ -679,6 +679,7 @@ export class Popup extends EventDispatcher {
         }
     }
 
+    // TODO : Type safety
     /**
      * @template {import('core').SerializableObject} TParams
      * @template [TReturn=unknown]
@@ -696,6 +697,7 @@ export class Popup extends EventDispatcher {
         return await yomitan.crossFrame.invoke(this._frameClient.frameId, 'popupMessage', message);
     }
 
+    // TODO : Type safety
     /**
      * @template {import('core').SerializableObject} TParams
      * @template [TReturn=unknown]
