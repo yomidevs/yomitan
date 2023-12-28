@@ -56,16 +56,7 @@ export type ContentOrigin = {
     frameId?: number;
 };
 
-export type ChromeRuntimeMessage = {
-    action: string;
-    params?: Core.SerializableObject;
-};
-
-export type ChromeRuntimeMessageWithFrameId = ChromeRuntimeMessage & {
-    frameId?: number;
-};
-
-export type ChromeRuntimeOnMessageCallback<TMessage = ChromeRuntimeMessage> = (
+export type ChromeRuntimeOnMessageCallback<TMessage = unknown> = (
     message: TMessage,
     sender: chrome.runtime.MessageSender,
     sendResponse: ChromeRuntimeMessageSendResponseFunction,

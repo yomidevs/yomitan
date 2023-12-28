@@ -151,6 +151,7 @@
         "uniqueReadings": [],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -313,6 +314,7 @@
         "uniqueReadings": [],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -595,6 +597,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -626,6 +629,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -908,6 +912,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -939,6 +944,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -1213,6 +1219,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -1248,6 +1255,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -1517,6 +1525,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -1552,6 +1561,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -1821,6 +1831,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -1856,6 +1867,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -2125,6 +2137,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -2160,6 +2173,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -2433,6 +2447,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -2464,6 +2479,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -2746,6 +2762,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -2777,6 +2794,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -3103,6 +3121,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -3176,6 +3208,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -3497,6 +3535,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -3570,6 +3622,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -3891,6 +3949,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -3964,6 +4036,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -4285,6 +4363,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -4358,6 +4450,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -4629,6 +4727,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -4664,6 +4763,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -4935,6 +5035,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -4970,6 +5071,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -5241,6 +5343,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -5276,6 +5379,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -5547,6 +5651,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -5582,6 +5687,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -5855,6 +5961,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -5886,6 +5993,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -6168,6 +6276,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -6199,6 +6308,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -6320,6 +6430,7 @@
           ],
           "frequencies": [],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -6351,6 +6462,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -6629,6 +6741,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -6660,6 +6773,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -6947,6 +7061,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -6978,6 +7093,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -7252,6 +7368,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -7287,6 +7404,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -7556,6 +7674,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -7591,6 +7710,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -7865,6 +7985,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -7900,6 +8021,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -8169,6 +8291,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -8204,6 +8327,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -8530,6 +8654,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -8603,6 +8741,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -8924,6 +9068,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -8997,6 +9155,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -9268,6 +9432,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -9303,6 +9468,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -9574,6 +9740,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -9609,6 +9776,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -9935,6 +10103,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -10008,6 +10190,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -10329,6 +10517,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -10402,6 +10604,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -10673,6 +10881,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -10708,6 +10917,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -10979,6 +11189,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -11014,6 +11225,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -11135,6 +11347,7 @@
           ],
           "frequencies": [],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -11166,6 +11379,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -11545,6 +11759,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -11600,6 +11828,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -11962,6 +12196,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -12017,6 +12265,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -12329,6 +12583,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -12354,6 +12609,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -12666,6 +12922,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -12691,6 +12948,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -12968,6 +13226,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -12993,6 +13252,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -13279,6 +13539,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -13304,6 +13565,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -13954,6 +14216,32 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
+              "expressionIndex": 1,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 2,
           "url": "url:",
           "cloze": {
@@ -14042,6 +14330,12 @@
           }
         ],
         "pitchCount": 4,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -14586,6 +14880,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 2,
           "url": "url:",
           "cloze": {
@@ -14612,6 +14907,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -14882,6 +15178,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -14907,6 +15204,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -15186,6 +15484,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -15211,6 +15510,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -15541,6 +15841,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -15614,6 +15928,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -15939,6 +16259,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -16012,6 +16346,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -16337,6 +16677,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -16410,6 +16764,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -16735,6 +17095,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -16808,6 +17182,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -17079,6 +17459,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -17114,6 +17495,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -17385,6 +17767,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -17420,6 +17803,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -17691,6 +18075,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -17726,6 +18111,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -17997,6 +18383,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -18032,6 +18419,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -18305,6 +18693,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -18336,6 +18725,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -18618,6 +19008,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -18649,6 +19040,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -18975,6 +19367,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -19048,6 +19454,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -19369,6 +19781,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -19442,6 +19868,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -19763,6 +20195,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -19836,6 +20282,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -20157,6 +20609,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -20230,6 +20696,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -20501,6 +20973,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -20536,6 +21009,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -20807,6 +21281,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -20842,6 +21317,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -21113,6 +21589,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -21148,6 +21625,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -21419,6 +21897,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -21454,6 +21933,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -21727,6 +22207,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -21758,6 +22239,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -22040,6 +22522,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -22071,6 +22554,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -22397,6 +22881,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -22470,6 +22968,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -22791,6 +23295,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -22864,6 +23382,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -23185,6 +23709,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -23258,6 +23796,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -23579,6 +24123,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -23652,6 +24210,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -23923,6 +24487,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -23958,6 +24523,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -24229,6 +24795,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -24264,6 +24831,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -24535,6 +25103,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -24570,6 +25139,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -24841,6 +25411,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -24876,6 +25447,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -25149,6 +25721,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -25180,6 +25753,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -25462,6 +26036,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -25493,6 +26068,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -25610,6 +26186,7 @@
           ],
           "frequencies": [],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -25645,6 +26222,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -25760,6 +26338,7 @@
           ],
           "frequencies": [],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -25795,6 +26374,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -25912,6 +26492,7 @@
           ],
           "frequencies": [],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -25947,6 +26528,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -26597,6 +27179,32 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
+              "expressionIndex": 1,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -26685,6 +27293,12 @@
           }
         ],
         "pitchCount": 4,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -27229,6 +27843,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -27255,6 +27870,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -27444,6 +28060,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "お手前",
+              "reading": "おてまえ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -27563,6 +28193,12 @@
           }
         ],
         "pitchCount": 3,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -27672,6 +28308,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "番号",
+              "reading": "ばんごう",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -27723,6 +28373,12 @@
           }
         ],
         "pitchCount": 1,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -27832,6 +28488,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "中腰",
+              "reading": "ちゅうごし",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -27883,6 +28553,12 @@
           }
         ],
         "pitchCount": 1,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -27992,6 +28668,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "所業",
+              "reading": "しょぎょう",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -28043,6 +28733,12 @@
           }
         ],
         "pitchCount": 1,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -28152,6 +28848,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "土木工事",
+              "reading": "どぼくこうじ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -28203,6 +28913,220 @@
           }
         ],
         "pitchCount": 1,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test pronunciations 6 - phonetic transcriptions",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 20,
+          "source": "好き",
+          "rawSource": "好き",
+          "sourceTerm": "好き",
+          "reasons": [],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 14,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "好き",
+          "reading": "すき",
+          "expressions": [
+            {
+              "sourceTerm": "好き",
+              "expression": "好き",
+              "reading": "すき",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "好き",
+                  "reading": "すき",
+                  "pitches": []
+                }
+              ],
+              "furiganaSegments": [
+                {
+                  "text": "好",
+                  "furigana": "す"
+                },
+                {
+                  "text": "き",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": []
+            }
+          ],
+          "glossary": [
+            "suki definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "adj-na",
+              "category": "default",
+              "notes": "",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            },
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "好き",
+              "reading": "すき",
+              "pitches": []
+            }
+          ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "好き",
+              "reading": "すき",
+              "phoneticTranscriptions": [
+                {
+                  "ipa": "[sɨᵝkʲi]",
+                  "tags": [
+                    {
+                      "name": "東京",
+                      "category": "default",
+                      "notes": "",
+                      "order": 0,
+                      "score": 0,
+                      "dictionary": "Test Dictionary 2",
+                      "redundant": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "好",
+              "furigana": "す"
+            },
+            {
+              "text": "き",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "好き"
+        ],
+        "uniqueReadings": [
+          "すき"
+        ],
+        "pitches": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "pitches": []
+          }
+        ],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": [
+              {
+                "expressions": [
+                  "好き"
+                ],
+                "reading": "すき",
+                "ipa": "[sɨᵝkʲi]",
+                "tags": [
+                  {
+                    "name": "東京",
+                    "category": "default",
+                    "order": 0,
+                    "score": 0,
+                    "content": [],
+                    "dictionaries": [
+                      "Test Dictionary 2"
+                    ],
+                    "redundant": false
+                  }
+                ],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              }
+            ]
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -28221,7 +29145,7 @@
         "marker": "{marker}",
         "definition": {
           "type": "term",
-          "id": 21,
+          "id": 22,
           "source": "構造",
           "rawSource": "構造",
           "sourceTerm": "構造",
@@ -28322,6 +29246,7 @@
           ],
           "frequencies": [],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -28353,6 +29278,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",

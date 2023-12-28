@@ -110,14 +110,14 @@ export class FrameClient {
                 contentWindow.postMessage({action, params}, targetOrigin);
             };
 
-            /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('extension').ChromeRuntimeMessageWithFrameId>} */
+            /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
             const onMessage = (message) => {
                 onMessageInner(message);
                 return false;
             };
 
             /**
-             * @param {import('extension').ChromeRuntimeMessageWithFrameId} message
+             * @param {import('application').ApiMessageAny} message
              */
             const onMessageInner = async (message) => {
                 try {
@@ -130,7 +130,7 @@ export class FrameClient {
                     switch (action) {
                         case 'frameEndpointReady':
                             {
-                                const {secret} = /** @type {import('frame-client').FrameEndpointReadyDetails} */ (params);
+                                const {secret} = params;
                                 const token = generateId(16);
                                 tokenMap.set(secret, token);
                                 postMessage('frameEndpointConnect', {secret, token, hostFrameId});
@@ -138,7 +138,7 @@ export class FrameClient {
                             break;
                         case 'frameEndpointConnected':
                             {
-                                const {secret, token} = /** @type {import('frame-client').FrameEndpointConnectedDetails} */ (params);
+                                const {secret, token} = params;
                                 const frameId = message.frameId;
                                 const token2 = tokenMap.get(secret);
                                 if (typeof token2 !== 'undefined' && token === token2 && typeof frameId === 'number') {

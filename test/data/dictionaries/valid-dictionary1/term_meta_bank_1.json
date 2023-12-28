@@ -108,5 +108,15 @@
                 {"position": 4, "devoice": 3}
             ]
         }
+    ],
+    [
+        "好き",
+        "ipa",
+        {
+            "reading": "すき",
+            "transcriptions": [
+                {"ipa": "[sɨᵝkʲi]", "tags": ["東京"]}
+            ]
+        }
     ]
 ]
