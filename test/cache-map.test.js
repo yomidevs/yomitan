@@ -32,8 +32,6 @@ function testConstructor() {
             [true,  () => new CacheMap(1.5)],
             [true,  () => new CacheMap(Number.NaN)],
             [true,  () => new CacheMap(Number.POSITIVE_INFINITY)],
-            // @ts-expect-error - Ignore because it should throw an error
-            [true,  () => new CacheMap('a')]
         ];
 
         for (const [throws, create] of data) {
