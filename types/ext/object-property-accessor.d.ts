@@ -16,7 +16,7 @@
  */
 
 export type ParsePathStringState = (
-    'empty' // Empty
+    | 'empty' // Empty
     | 'id-start' // Identifier start
     | 'id' // Identifier
     | 'open-bracket' // Open bracket
