@@ -18,7 +18,8 @@
 
 import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
-import {EventListenerCollection, invokeMessageHandler} from '../core.js';
+import {EventListenerCollection} from '../core.js';
+import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {yomitan} from '../yomitan.js';
 
@@ -75,8 +76,12 @@ export class SearchDisplayController {
                 getText: yomitan.api.clipboardGet.bind(yomitan.api)
             }
         });
-        /** @type {import('core').MessageHandlerMap} */
-        this._messageHandlers = new Map();
+        /** @type {import('application').ApiMap} */
+        this._apiMap = createApiMap([
+            ['searchDisplayControllerGetMode', this._onMessageGetMode.bind(this)],
+            ['searchDisplayControllerSetMode', this._onMessageSetMode.bind(this)],
+            ['searchDisplayControllerUpdateSearchQuery', this._onExternalSearchUpdate.bind(this)]
+        ]);
     }
 
     /** */
@@ -94,13 +99,6 @@ export class SearchDisplayController {
         this._display.hotkeyHandler.registerActions([
             ['focusSearchBox', this._onActionFocusSearchBox.bind(this)]
         ]);
-        /* eslint-disable no-multi-spaces */
-        this._registerMessageHandlers([
-            ['SearchDisplayController.getMode',           this._onMessageGetMode.bind(this)],
-            ['SearchDisplayController.setMode',           this._onMessageSetMode.bind(this)],
-            ['SearchDisplayController.updateSearchQuery', this._onExternalSearchUpdate.bind(this)]
-        ]);
-        /* eslint-enable no-multi-spaces */
 
         this._updateClipboardMonitorEnabled();
 
@@ -140,32 +138,21 @@ export class SearchDisplayController {
 
     // Messages
 
-    /**
-     * @param {{mode: import('display').SearchMode}} details
-     */
+    /** @type {import('application').ApiHandler<'searchDisplayControllerSetMode'>} */
     _onMessageSetMode({mode}) {
         this.setMode(mode);
     }
 
-    /**
-     * @returns {import('display').SearchMode}
-     */
+    /** @type {import('application').ApiHandler<'searchDisplayControllerGetMode'>} */
     _onMessageGetMode() {
         return this._searchPersistentStateController.mode;
     }
 
     // Private
 
-    /**
-     * @param {{action: string, params?: import('core').SerializableObject}} message
-     * @param {chrome.runtime.MessageSender} sender
-     * @param {(response?: unknown) => void} callback
-     * @returns {boolean}
-     */
-    _onMessage({action, params}, sender, callback) {
-        const messageHandler = this._messageHandlers.get(action);
-        if (typeof messageHandler === 'undefined') { return false; }
-        return invokeMessageHandler(messageHandler, params, callback, sender);
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
+    _onMessage({action, params}, _sender, callback) {
+        return invokeApiMapHandler(this._apiMap, action, params, [], callback);
     }
 
     /**
@@ -196,7 +183,7 @@ export class SearchDisplayController {
     }
 
     /**
-     * @param {import('display').OptionsUpdatedEvent} details
+     * @param {import('display').EventArgument<'optionsUpdated'>} details
      */
     _onDisplayOptionsUpdated({options}) {
         this._clipboardMonitorEnabled = options.clipboard.enableSearchPageMonitor;
@@ -208,7 +195,7 @@ export class SearchDisplayController {
     }
 
     /**
-     * @param {import('display').ContentUpdateStartEvent} details
+     * @param {import('display').EventArgument<'contentUpdateStart'>} details
      */
     _onContentUpdateStart({type, query}) {
         let animate = false;
@@ -279,14 +266,12 @@ export class SearchDisplayController {
 
     /** */
     _onCopy() {
-        // ignore copy from search page
+        // Ignore copy from search page
         const selection = window.getSelection();
         this._clipboardMonitor.setPreviousText(selection !== null ? selection.toString().trim() : '');
     }
 
-    /**
-     * @param {{text: string, animate?: boolean}} details
-     */
+    /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
     _onExternalSearchUpdate({text, animate = true}) {
         const options = this._display.getOptions();
         if (options === null) { return; }
@@ -545,15 +530,6 @@ export class SearchDisplayController {
         const currentHeight = node.getBoundingClientRect().height;
         if (shrink || scrollHeight >= currentHeight - 1) {
             node.style.height = `${scrollHeight}px`;
-        }
-    }
-
-    /**
-     * @param {import('core').MessageHandlerMapInit} handlers
-     */
-    _registerMessageHandlers(handlers) {
-        for (const [name, handlerInfo] of handlers) {
-            this._messageHandlers.set(name, handlerInfo);
         }
     }
 

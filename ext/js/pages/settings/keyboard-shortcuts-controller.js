@@ -160,7 +160,7 @@ export class KeyboardShortcutController {
     // Private
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         for (const entry of this._entries) {
@@ -395,7 +395,7 @@ class KeyboardShortcutHotkeyEntry {
     }
 
     /**
-     * @param {import('keyboard-mouse-input-field').ChangeEvent} details
+     * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} details
      */
     _onInputFieldChange({key, modifiers}) {
         /** @type {import('input').ModifierKey[]} */

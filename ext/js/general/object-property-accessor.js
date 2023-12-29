@@ -174,6 +174,7 @@ export class ObjectPropertyAccessor {
      */
     static getPathArray(pathString) {
         const pathArray = [];
+        /** @type {import('object-property-accessor').ParsePathStringState} */
         let state = 'empty';
         let quote = 0;
         let value = '';
@@ -207,16 +208,21 @@ export class ObjectPropertyAccessor {
                         v === 0x5f // '_'
                     ) {
                         value += c;
-                    } else if (v === 0x5b) { // '['
-                        pathArray.push(value);
-                        value = '';
-                        state = 'open-bracket';
-                    } else if (v === 0x2e) { // '.'
-                        pathArray.push(value);
-                        value = '';
-                        state = 'id-start';
                     } else {
-                        throw new Error(`Unexpected character: ${c}`);
+                        switch (v) {
+                            case 0x5b: // '['
+                                pathArray.push(value);
+                                value = '';
+                                state = 'open-bracket';
+                                break;
+                            case 0x2e: // '.'
+                                pathArray.push(value);
+                                value = '';
+                                state = 'id-start';
+                                break;
+                            default:
+                                throw new Error(`Unexpected character: ${c}`);
+                        }
                     }
                     break;
                 case 'open-bracket': // Open bracket
@@ -262,15 +268,19 @@ export class ObjectPropertyAccessor {
                         throw new Error(`Unexpected character: ${c}`);
                     }
                     break;
-                case 'next': // Expecting . or [
-                    if (v === 0x5b) { // '['
-                        state = 'open-bracket';
-                    } else if (v === 0x2e) { // '.'
-                        state = 'id-start';
-                    } else {
-                        throw new Error(`Unexpected character: ${c}`);
+                case 'next': { // Expecting . or [
+                    switch (v) {
+                        case 0x5b: // '['
+                            state = 'open-bracket';
+                            break;
+                        case 0x2e: // '.'
+                            state = 'id-start';
+                            break;
+                        default:
+                            throw new Error(`Unexpected character: ${c}`);
                     }
                     break;
+                }
             }
         }
         switch (state) {

@@ -109,7 +109,7 @@ export type ApiFunctionOrdered<TSurface extends ApiSurface, TName extends ApiNam
 ) => Promise<ApiReturn<TSurface[TName]>>;
 
 /** Type alias for a union of all params types. */
-export type ApiParamsAny<TSurface extends ApiSurface> = ApiParams<TSurface[keyof TSurface]>;
+export type ApiParamsAny<TSurface extends ApiSurface> = {[name in ApiNames<TSurface>]: ApiParams<TSurface[name]>}[ApiNames<TSurface>];
 
 /** Type alias for a union of all return types. */
-export type ApiReturnAny<TSurface extends ApiSurface> = ApiReturn<TSurface[keyof TSurface]>;
+export type ApiReturnAny<TSurface extends ApiSurface> = {[name in ApiNames<TSurface>]: ApiReturn<TSurface[name]>}[ApiNames<TSurface>];

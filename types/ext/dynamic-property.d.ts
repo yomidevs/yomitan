@@ -15,8 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type EventType = 'change';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
-export type ChangeEventDetails<T = unknown> = {
-    value: T;
+export type Events<T = unknown> = {
+    change: {
+        value: T;
+    };
 };
+
+export type EventArgument<T, TName extends EventNames<Events<T>>> = BaseEventArgument<Events<T>, TName>;

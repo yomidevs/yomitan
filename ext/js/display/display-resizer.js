@@ -45,7 +45,7 @@ export class DisplayResizer {
         if (this._handle === null) { return; }
 
         this._handle.addEventListener('mousedown', this._onFrameResizerMouseDown.bind(this), false);
-        this._handle.addEventListener('touchstart', this._onFrameResizerTouchStart.bind(this), false);
+        this._handle.addEventListener('touchstart', this._onFrameResizerTouchStart.bind(this), {passive: false, capture: false});
     }
 
     // Private

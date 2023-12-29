@@ -16,19 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {isContentScriptRegistered, registerContentScript, unregisterContentScript} from '../background/script-manager.js';
 import {log} from '../core.js';
 
 /**
  * This class controls the registration of accessibility handlers.
  */
 export class AccessibilityController {
-    /**
-     * Creates a new instance.
-     * @param {import('../background/script-manager.js').ScriptManager} scriptManager An instance of the `ScriptManager` class.
-     */
-    constructor(scriptManager) {
-        /** @type {import('../background/script-manager.js').ScriptManager} */
-        this._scriptManager = scriptManager;
+    constructor() {
         /** @type {?import('core').TokenObject} */
         this._updateGoogleDocsAccessibilityToken = null;
         /** @type {?Promise<void>} */
@@ -90,23 +85,40 @@ export class AccessibilityController {
         const id = 'googleDocsAccessibility';
         try {
             if (forceGoogleDocsHtmlRenderingAny) {
-                if (await this._scriptManager.isContentScriptRegistered(id)) { return; }
-                /** @type {import('script-manager').RegistrationDetails} */
-                const details = {
-                    allFrames: true,
-                    matchAboutBlank: true,
-                    matches: ['*://docs.google.com/*'],
-                    urlMatches: '^[^:]*://docs\\.google\\.com/[\\w\\W]*$',
-                    runAt: 'document_start',
-                    js: ['js/accessibility/google-docs.js']
-                };
-                await this._scriptManager.registerContentScript(id, details);
+                if (await isContentScriptRegistered(id)) { return; }
+                try {
+                    await this._registerGoogleDocsContentScript(id, false);
+                } catch (e) {
+                    // Firefox doesn't support `world` field and will throw an error.
+                    // In this case, use the xray vision version.
+                    await this._registerGoogleDocsContentScript(id, true);
+                }
             } else {
-                await this._scriptManager.unregisterContentScript(id);
+                await unregisterContentScript(id);
             }
         } catch (e) {
             log.error(e);
         }
     }
-}
 
+    /**
+     * @param {string} id
+     * @param {boolean} xray
+     * @returns {Promise<void>}
+     */
+    _registerGoogleDocsContentScript(id, xray) {
+        /** @type {import('script-manager').RegistrationDetails} */
+        const details = {
+            allFrames: true,
+            matches: ['*://docs.google.com/*'],
+            runAt: 'document_start',
+            js: [
+                xray ?
+                'js/accessibility/google-docs-xray.js' :
+                'js/accessibility/google-docs.js'
+            ]
+        };
+        if (!xray) { details.world = 'MAIN'; }
+        return registerContentScript(id, details);
+    }
+}

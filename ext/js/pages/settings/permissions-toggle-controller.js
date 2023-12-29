@@ -47,7 +47,7 @@ export class PermissionsToggleController {
     // Private
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         let accessor = null;
@@ -104,7 +104,7 @@ export class PermissionsToggleController {
     }
 
     /**
-     * @param {import('settings-controller').PermissionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'permissionsChanged'>} details
      */
     _onPermissionsChanged({permissions}) {
         const permissions2 = permissions.permissions;

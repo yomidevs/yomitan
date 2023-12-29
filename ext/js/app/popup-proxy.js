@@ -22,7 +22,7 @@ import {yomitan} from '../yomitan.js';
 /**
  * This class is a proxy for a Popup that is hosted in a different frame.
  * It effectively forwards all API calls to the underlying Popup.
- * @augments EventDispatcher<import('popup').PopupAnyEventType>
+ * @augments EventDispatcher<import('popup').Events>
  */
 export class PopupProxy extends EventDispatcher {
     /**
@@ -297,6 +297,7 @@ export class PopupProxy extends EventDispatcher {
 
     // Private
 
+    // TODO : Type safety
     /**
      * @template {import('core').SerializableObject} TParams
      * @template [TReturn=unknown]
@@ -308,6 +309,7 @@ export class PopupProxy extends EventDispatcher {
         return yomitan.crossFrame.invoke(this._frameId, action, params);
     }
 
+    // TODO : Type safety
     /**
      * @template {import('core').SerializableObject} TParams
      * @template [TReturn=unknown]
@@ -361,7 +363,7 @@ export class PopupProxy extends EventDispatcher {
             } else {
                 this._frameOffsetX = 0;
                 this._frameOffsetY = 0;
-                this.trigger('offsetNotFound');
+                this.trigger('offsetNotFound', {});
                 return;
             }
             this._frameOffsetUpdatedAt = now;

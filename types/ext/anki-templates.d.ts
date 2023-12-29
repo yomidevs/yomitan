@@ -76,6 +76,7 @@ export type NoteData = {
     readonly uniqueReadings: string[];
     readonly pitches: PitchGroup[];
     readonly pitchCount: number;
+    readonly phoneticTranscriptions: TranscriptionGroup[];
     readonly context: Context;
     media: Media;
     readonly dictionaryEntry: Dictionary.DictionaryEntry;
@@ -93,6 +94,20 @@ export type Pitch = {
     nasalPositions: number[];
     devoicePositions: number[];
     tags: PitchTag[];
+    exclusiveExpressions: string[];
+    exclusiveReadings: string[];
+};
+
+export type TranscriptionGroup = {
+    dictionary: string;
+    phoneticTranscriptions: Transcription[];
+};
+
+export type Transcription = {
+    expressions: string[];
+    reading: string;
+    ipa: string;
+    tags: Dictionary.Tag[];
     exclusiveExpressions: string[];
     exclusiveReadings: string[];
 };
@@ -175,7 +190,8 @@ export type TermDictionaryEntry = {
     readonly termTags?: Tag[];
     readonly definitions?: TermDefinition[];
     readonly frequencies: TermFrequency[];
-    readonly pitches: TermPronunciation[];
+    readonly pitches: TermPitchAccent[];
+    readonly phoneticTranscriptions: TermPhoneticTranscription[];
     sourceTermExactMatchCount: number;
     url: string;
     readonly cloze: Cloze;
@@ -225,7 +241,7 @@ export type TermFrequency = {
     frequency: number | string;
 };
 
-export type TermPronunciation = {
+export type TermPitchAccent = {
     index: number;
     expressionIndex: number;
     dictionary: string;
@@ -235,11 +251,29 @@ export type TermPronunciation = {
     };
     expression: string;
     reading: string;
-    readonly pitches: TermPitch[];
+    readonly pitches: PitchAccent[];
 };
 
-export type TermPitch = {
+export type PitchAccent = {
     position: number;
+    tags: Tag[];
+};
+
+export type TermPhoneticTranscription = {
+    index: number;
+    expressionIndex: number;
+    dictionary: string;
+    dictionaryOrder: {
+        index: number;
+        priority: number;
+    };
+    expression: string;
+    reading: string;
+    readonly phoneticTranscriptions: PhoneticTranscription[];
+};
+
+export type PhoneticTranscription = {
+    ipa: string;
     tags: Tag[];
 };
 
@@ -251,7 +285,7 @@ export type TermHeadword = {
     reading: string;
     readonly termTags: Tag[];
     readonly frequencies: TermFrequency[];
-    readonly pitches: TermPronunciation[];
+    readonly pitches: TermPitchAccent[];
     readonly furiganaSegments: FuriganaSegment[];
     readonly termFrequency: TermFrequencyType;
     wordClasses: string[];

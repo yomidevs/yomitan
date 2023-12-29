@@ -20,7 +20,7 @@ import {EventDispatcher, EventListenerCollection} from '../core.js';
 import {querySelectorNotNull} from './query-selector.js';
 
 /**
- * @augments EventDispatcher<import('popup-menu').EventType>
+ * @augments EventDispatcher<import('popup-menu').Events>
  */
 export class PopupMenu extends EventDispatcher {
     /**
@@ -247,7 +247,7 @@ export class PopupMenu extends EventDispatcher {
             {altKey: false, ctrlKey: false, metaKey: false, shiftKey: false}
         );
 
-        /** @type {import('popup-menu').MenuCloseEventDetails} */
+        /** @type {import('popup-menu').EventArgument<'close'>} */
         const detail = {
             menu: this,
             item,

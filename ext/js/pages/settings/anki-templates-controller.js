@@ -94,7 +94,7 @@ export class AnkiTemplatesController {
     // Private
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         let templates = options.anki.fieldTemplates;

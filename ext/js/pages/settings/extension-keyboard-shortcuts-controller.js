@@ -313,7 +313,7 @@ class ExtensionKeyboardShortcutHotkeyEntry {
     // Private
 
     /**
-     * @param {import('keyboard-mouse-input-field').ChangeEvent} e
+     * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} e
      */
     _onInputFieldChange(e) {
         const {key, modifiers} = e;

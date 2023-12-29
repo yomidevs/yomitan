@@ -119,6 +119,12 @@
             "jsconfig": "test"
         },
         {
+            "path": "test/data/database-test-cases.json",
+            "typeFile": "types/test/database.d.ts",
+            "type": "DatabaseTestData",
+            "jsconfig": "test"
+        },
+        {
             "path": "test/data/json.json",
             "typeFile": "types/test/json.d.ts",
             "type": "JsonInfo"
@@ -161,6 +167,12 @@
         },
         {
             "path": "test/data/dictionaries/valid-dictionary1/term_bank_1.json",
+            "typeFile": "types/ext/dictionary-data.d.ts",
+            "type": "TermV3Array",
+            "schema": "ext/data/schemas/dictionary-term-bank-v3-schema.json"
+        },
+        {
+            "path": "test/data/dictionaries/valid-dictionary1/term_bank_2.json",
             "typeFile": "types/ext/dictionary-data.d.ts",
             "type": "TermV3Array",
             "schema": "ext/data/schemas/dictionary-term-bank-v3-schema.json"

@@ -15,4 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type EventType = 'voiceschanged';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
+
+export type Events = {
+    voiceschanged: Event;
+};
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;

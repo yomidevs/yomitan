@@ -401,14 +401,19 @@ export class DisplayGenerator {
      * @returns {?HTMLElement}
      */
     _createTermDefinitionEntry(entry, dictionary) {
-        if (typeof entry === 'string') {
-            return this._createTermDefinitionEntryText(entry);
-        } else if (typeof entry === 'object' && entry !== null) {
-            switch (entry.type) {
-                case 'image':
-                    return this._createTermDefinitionEntryImage(entry, dictionary);
-                case 'structured-content':
-                    return this._createTermDefinitionEntryStructuredContent(entry.content, dictionary);
+        switch (typeof entry) {
+            case 'string':
+                return this._createTermDefinitionEntryText(entry);
+            case 'object': {
+                switch (entry.type) {
+                    case 'image':
+                        return this._createTermDefinitionEntryImage(entry, dictionary);
+                    case 'structured-content':
+                        return this._createTermDefinitionEntryStructuredContent(entry.content, dictionary);
+                    case 'text':
+                        break;
+                }
+                break;
             }
         }
 
@@ -621,7 +626,7 @@ export class DisplayGenerator {
         n1.appendChild(tag);
 
         let hasTags = false;
-        for (const {tags} of pronunciations) {
+        for (const {pronunciation: {tags}} of pronunciations) {
             if (tags.length > 0) {
                 hasTags = true;
                 break;
@@ -640,8 +645,52 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createPronunciation(details) {
+        const {pronunciation} = details;
+        switch (pronunciation.type) {
+            case 'pitch-accent':
+                return this._createPronunciationPitchAccent(pronunciation, details);
+            case 'phonetic-transcription':
+                return this._createPronunciationPhoneticTranscription(pronunciation, details);
+        }
+    }
+
+
+    /**
+     * @param {import('dictionary').PhoneticTranscription} pronunciation
+     * @param {import('dictionary-data-util').GroupedPronunciation} details
+     * @returns {HTMLElement}
+     */
+    _createPronunciationPhoneticTranscription(pronunciation, details) {
+        const {ipa, tags} = pronunciation;
+        const {exclusiveTerms, exclusiveReadings} = details;
+
+        const node = this._instantiate('pronunciation');
+
+        node.dataset.tagCount = `${tags.length}`;
+
+        let n = this._querySelector(node, '.pronunciation-tag-list');
+        this._appendMultiple(n, this._createTag.bind(this), tags);
+
+        n = this._querySelector(node, '.pronunciation-disambiguation-list');
+        this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
+
+        n = this._querySelector(node, '.pronunciation-text-container');
+
+        this._setTextContent(n, ipa);
+
+        return node;
+    }
+
+    /**
+     * @param {import('dictionary').PitchAccent} pitchAccent
+     * @param {import('dictionary-data-util').GroupedPronunciation} details
+     * @returns {HTMLElement}
+     */
+    _createPronunciationPitchAccent(pitchAccent, details) {
         const jp = this._japaneseUtil;
-        const {reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} = details;
+
+        const {position, nasalPositions, devoicePositions, tags} = pitchAccent;
+        const {reading, exclusiveTerms, exclusiveReadings} = details;
         const morae = jp.getKanaMorae(reading);
 
         const node = this._instantiate('pronunciation');
@@ -661,6 +710,7 @@ export class DisplayGenerator {
         n.appendChild(this._pronunciationGenerator.createPronunciationDownstepPosition(position));
 
         n = this._querySelector(node, '.pronunciation-text-container');
+
         n.lang = 'ja';
         n.appendChild(this._pronunciationGenerator.createPronunciationText(morae, position, nasalPositions, devoicePositions));
 
@@ -949,20 +999,21 @@ export class DisplayGenerator {
 
     /**
      * @param {string} reading
-     * @param {import('dictionary').TermPronunciation[]} pronunciations
+     * @param {import('dictionary').TermPronunciation[]} termPronunciations
      * @param {string[]} wordClasses
      * @param {number} headwordIndex
      * @returns {?string}
      */
-    _getPronunciationCategories(reading, pronunciations, wordClasses, headwordIndex) {
-        if (pronunciations.length === 0) { return null; }
+    _getPronunciationCategories(reading, termPronunciations, wordClasses, headwordIndex) {
+        if (termPronunciations.length === 0) { return null; }
         const isVerbOrAdjective = DictionaryDataUtil.isNonNounVerbOrAdjective(wordClasses);
         /** @type {Set<import('japanese-util').PitchCategory>} */
         const categories = new Set();
-        for (const pronunciation of pronunciations) {
-            if (pronunciation.headwordIndex !== headwordIndex) { continue; }
-            for (const {position} of pronunciation.pitches) {
-                const category = this._japaneseUtil.getPitchCategory(reading, position, isVerbOrAdjective);
+        for (const termPronunciation of termPronunciations) {
+            if (termPronunciation.headwordIndex !== headwordIndex) { continue; }
+            for (const pronunciation of termPronunciation.pronunciations) {
+                if (pronunciation.type !== 'pitch-accent') { continue; }
+                const category = this._japaneseUtil.getPitchCategory(reading, pronunciation.position, isVerbOrAdjective);
                 if (category !== null) {
                     categories.add(category);
                 }

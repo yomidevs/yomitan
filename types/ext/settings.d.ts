@@ -234,8 +234,11 @@ export type TranslationOptions = {
     convertKatakanaToHiragana: TranslationConvertType;
     collapseEmphaticSequences: TranslationCollapseEmphaticSequences;
     textReplacements: TranslationTextReplacementOptions;
+    searchResolution: SearchResolution;
     partsOfSpeechFilter: boolean;
 };
+
+export type SearchResolution = 'letter' | 'word';
 
 export type TranslationTextReplacementOptions = {
     searchOriginal: boolean;

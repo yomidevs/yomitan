@@ -145,6 +145,7 @@ export class AnkiController {
                     'pitch-accents',
                     'pitch-accent-graphs',
                     'pitch-accent-positions',
+                    'phonetic-transcriptions',
                     'reading',
                     'screenshot',
                     'search-query',
@@ -220,7 +221,7 @@ export class AnkiController {
     }
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     async _onOptionsChanged({options: {anki}}) {
         /** @type {?string} */
@@ -963,7 +964,7 @@ class AnkiCardController {
     }
 
     /**
-     * @param {import('settings-controller').PermissionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'permissionsChanged'>} details
      */
     _onPermissionsChanged({permissions: {permissions}}) {
         const permissionsSet = new Set(permissions);

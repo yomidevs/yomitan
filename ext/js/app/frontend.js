@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {GoogleDocsUtil} from '../accessibility/google-docs-util.js';
-import {EventListenerCollection, invokeMessageHandler, log, promiseAnimationFrame} from '../core.js';
+import {EventListenerCollection, log, promiseAnimationFrame} from '../core.js';
+import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
@@ -107,12 +107,12 @@ export class Frontend {
         this._optionsContextOverride = null;
 
         /* eslint-disable no-multi-spaces */
-        /** @type {import('core').MessageHandlerMap} */
-        this._runtimeMessageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
-            ['Frontend.requestReadyBroadcast',   this._onMessageRequestFrontendReadyBroadcast.bind(this)],
-            ['Frontend.setAllVisibleOverride',   this._onApiSetAllVisibleOverride.bind(this)],
-            ['Frontend.clearAllVisibleOverride', this._onApiClearAllVisibleOverride.bind(this)]
-        ]));
+        /** @type {import('application').ApiMap} */
+        this._runtimeApiMap = createApiMap([
+            ['frontendRequestReadyBroadcast',   this._onMessageRequestFrontendReadyBroadcast.bind(this)],
+            ['frontendSetAllVisibleOverride',   this._onApiSetAllVisibleOverride.bind(this)],
+            ['frontendClearAllVisibleOverride', this._onApiClearAllVisibleOverride.bind(this)]
+        ]);
 
         this._hotkeyHandler.registerActions([
             ['scanSelectedText', this._onActionScanSelectedText.bind(this)],
@@ -240,9 +240,7 @@ export class Frontend {
 
     // Message handlers
 
-    /**
-     * @param {import('frontend').FrontendRequestReadyBroadcastParams} params
-     */
+    /** @type {import('application').ApiHandler<'frontendRequestReadyBroadcast'>} */
     _onMessageRequestFrontendReadyBroadcast({frameId}) {
         this._signalFrontendReady(frameId);
     }
@@ -314,10 +312,7 @@ export class Frontend {
         };
     }
 
-    /**
-     * @param {{value: boolean, priority: number, awaitFrame: boolean}} params
-     * @returns {Promise<import('core').TokenString>}
-     */
+    /** @type {import('application').ApiHandler<'frontendSetAllVisibleOverride'>} */
     async _onApiSetAllVisibleOverride({value, priority, awaitFrame}) {
         const result = await this._popupFactory.setAllVisibleOverride(value, priority);
         if (awaitFrame) {
@@ -326,10 +321,7 @@ export class Frontend {
         return result;
     }
 
-    /**
-     * @param {{token: import('core').TokenString}} params
-     * @returns {Promise<boolean>}
-     */
+    /** @type {import('application').ApiHandler<'frontendClearAllVisibleOverride'>} */
     async _onApiClearAllVisibleOverride({token}) {
         return await this._popupFactory.clearAllVisibleOverride(token);
     }
@@ -343,11 +335,9 @@ export class Frontend {
         this._updatePopupPosition();
     }
 
-    /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
-    _onRuntimeMessage({action, params}, sender, callback) {
-        const messageHandler = this._runtimeMessageHandlers.get(action);
-        if (typeof messageHandler === 'undefined') { return false; }
-        return invokeMessageHandler(messageHandler, params, callback, sender);
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
+    _onRuntimeMessage({action, params}, _sender, callback) {
+        return invokeApiMapHandler(this._runtimeApiMap, action, params, [], callback);
     }
 
     /**
@@ -562,9 +552,11 @@ export class Frontend {
             }
         }
 
-        // The token below is used as a unique identifier to ensure that a new _updatePopup call
-        // hasn't been started during the await.
-        /** @type {?import('core').TokenObject} */
+        /**
+         * The token below is used as a unique identifier to ensure that a new _updatePopup call
+         * hasn't been started during the await.
+         * @type {?import('core').TokenObject}
+         */
         const token = {};
         this._updatePopupToken = token;
         const popup = await popupPromise;
@@ -828,12 +820,12 @@ export class Frontend {
      * @param {?number} targetFrameId
      */
     _signalFrontendReady(targetFrameId) {
-        /** @type {import('frontend').FrontendReadyDetails} */
-        const params = {frameId: this._frameId};
+        /** @type {import('application').ApiMessageNoFrameId<'frontendReady'>} */
+        const message = {action: 'frontendReady', params: {frameId: this._frameId}};
         if (targetFrameId === null) {
-            yomitan.api.broadcastTab('frontendReady', params);
+            yomitan.api.broadcastTab(message);
         } else {
-            yomitan.api.sendMessageToFrame(targetFrameId, 'frontendReady', params);
+            yomitan.api.sendMessageToFrame(targetFrameId, message);
         }
     }
 
@@ -854,11 +846,11 @@ export class Frontend {
                 }
                 chrome.runtime.onMessage.removeListener(onMessage);
             };
-            /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
+            /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
             const onMessage = (message, _sender, sendResponse) => {
                 try {
-                    const {action, params} = message;
-                    if (action === 'frontendReady' && /** @type {import('frontend').FrontendReadyDetails} */ (params).frameId === frameId) {
+                    const {action} = message;
+                    if (action === 'frontendReady' && message.params.frameId === frameId) {
                         cleanup();
                         resolve();
                         sendResponse();
@@ -877,7 +869,7 @@ export class Frontend {
             }
 
             chrome.runtime.onMessage.addListener(onMessage);
-            yomitan.api.broadcastTab('Frontend.requestReadyBroadcast', {frameId: this._frameId});
+            yomitan.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._frameId}});
         });
     }
 
@@ -964,7 +956,7 @@ export class Frontend {
     _prepareSiteSpecific() {
         switch (location.hostname.toLowerCase()) {
             case 'docs.google.com':
-                this._prepareGoogleDocsWrapper();
+                this._prepareGoogleDocs();
                 break;
         }
     }
@@ -972,19 +964,8 @@ export class Frontend {
     /**
      * @returns {Promise<void>}
      */
-    async _prepareGoogleDocsWrapper() {
-        if (typeof GoogleDocsUtil !== 'undefined') { return; }
-        await yomitan.api.loadExtensionScripts([
-            '/js/accessibility/google-docs-util.js'
-        ]);
-        this._prepareGoogleDocs();
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
     async _prepareGoogleDocs() {
-        if (typeof GoogleDocsUtil === 'undefined') { return; }
+        const {GoogleDocsUtil} = await import('../accessibility/google-docs-util.js');
         DocumentUtil.registerGetRangeFromPointHandler(GoogleDocsUtil.getRangeFromPoint.bind(GoogleDocsUtil));
     }
 }

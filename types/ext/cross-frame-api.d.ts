@@ -15,9 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type {CrossFrameAPIPort} from '../../ext/js/comm/cross-frame-api.js';
 import type * as Core from './core';
 
-export type CrossFrameAPIPortEventType = 'disconnect';
+export type CrossFrameAPIPortEvents = {
+    disconnect: CrossFrameAPIPort;
+};
 
 export type AcknowledgeMessage = {
     type: 'ack';

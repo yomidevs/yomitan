@@ -78,8 +78,8 @@ async function validateDictionaryBanks(mode, zip, fileNameFormat, schema) {
  * @param {import('dev/dictionary-validate').Schemas} schemas
  */
 export async function validateDictionary(mode, archive, schemas) {
-    const fileName = 'index.json';
-    const indexFile = archive.files[fileName];
+    const indexFileName = 'index.json';
+    const indexFile = archive.files[indexFileName];
     if (!indexFile) {
         throw new Error('No dictionary index found in archive');
     }
@@ -93,7 +93,7 @@ export async function validateDictionary(mode, archive, schemas) {
         jsonSchema.validate(index);
     } catch (e) {
         const e2 = e instanceof Error ? e : new Error(`${e}`);
-        e2.message += `\n(in file ${fileName})}`;
+        e2.message += `\n(in file ${indexFileName})}`;
         throw e2;
     }
 

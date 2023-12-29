@@ -29,7 +29,7 @@ import {
 } from './playwright-util';
 
 test.beforeEach(async ({context}) => {
-    // wait for the on-install welcome.html tab to load, which becomes the foreground tab
+    // Wait for the on-install welcome.html tab to load, which becomes the foreground tab
     const welcome = await context.waitForEvent('page');
     await welcome.close(); // close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
 });
@@ -44,7 +44,7 @@ test('search clipboard', async ({page, extensionId}) => {
 });
 
 test('anki add', async ({context, page, extensionId}) => {
-    // mock anki routes
+    // Mock anki routes
     /** @type {?(value: unknown) => void} */
     let resolve = null;
     const addNotePromise = new Promise((res) => {
@@ -58,10 +58,10 @@ test('anki add', async ({context, page, extensionId}) => {
         }
     });
 
-    // open settings
+    // Open settings
     await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
-    // load in test dictionary
+    // Load in test dictionary
     const dictionary = createDictionaryArchive(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1');
     const testDictionarySource = await dictionary.generateAsync({type: 'arraybuffer'});
     await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({
@@ -71,11 +71,11 @@ test('anki add', async ({context, page, extensionId}) => {
     });
     await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
 
-    // connect to anki
+    // Connect to anki
     await page.locator('.toggle', {has: page.locator('[data-setting="anki.enable"]')}).click();
     await expect(page.locator('#anki-error-message')).toHaveText('Connected');
 
-    // prep anki deck
+    // Prep anki deck
     await page.locator('[data-modal-action="show,anki-cards"]').click();
     await page.locator('select.anki-card-deck').selectOption('Mock Deck');
     await page.locator('select.anki-card-model').selectOption('Mock Model');
@@ -85,7 +85,7 @@ test('anki add', async ({context, page, extensionId}) => {
     await page.locator('#anki-cards-modal > div > div.modal-footer > button:nth-child(2)').click();
     await writeToClipboardFromPage(page, '読むの例文');
 
-    // add to anki deck
+    // Add to anki deck
     await page.goto(`chrome-extension://${extensionId}/search.html`);
     await expect(async () => {
         await page.locator('#search-textbox').clear();

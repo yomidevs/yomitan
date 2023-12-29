@@ -15,12 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type EventType = 'change';
-
-export type ChangeEvent = {
-    text: string;
-};
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type ClipboardReaderLike = {
     getText: (useRichText: boolean) => Promise<string>;
 };
+
+export type Events = {
+    change: {
+        text: string;
+    };
+};
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;

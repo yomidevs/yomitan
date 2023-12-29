@@ -5,6 +5,9 @@
     "directories": {
         "test": "test"
     },
+    "engines": {
+        "node": ">=20.0.0"
+    },
     "type": "module",
     "scripts": {
         "build": "node ./dev/bin/build.js",
@@ -19,7 +22,7 @@
         "test-ts-test": "npx tsc --noEmit --project test/jsconfig.json",
         "test-code": "vitest run",
         "test-code-write": "vitest run --config test/data/vitest.write.config.json",
-        "test-build": "node ./dev/bin/build.js --dry-run --all",
+        "test-build": "node ./dev/bin/build.js --dryRun --all",
         "license-report": "license-report --output=html --only=prod --fields=name --fields=installedVersion --fields=licenseType --fields=link --html.cssFile=dev/data/legal-npm.css > ext/legal-npm.html",
         "license-report-markdown": "license-report --output=markdown --only=prod --fields=name --fields=installedVersion --fields=licenseType --fields=link"
     },
@@ -44,20 +47,20 @@
     "devDependencies": {
         "@playwright/test": "^1.39.0",
         "@stylistic/eslint-plugin-ts": "^1.5.0",
+        "@stylistic/stylelint-plugin": "^2.0.0",
         "@types/assert": "^1.5.10",
         "@types/browserify": "^12.0.40",
         "@types/chrome": "^0.0.254",
         "@types/css": "^0.0.37",
         "@types/events": "^3.0.3",
         "@types/firefox-webext-browser": "^120.0.0",
-        "@types/handlebars": "^4.1.0",
         "@types/jsdom": "^21.1.6",
         "@types/node": "^20.10.4",
         "@types/wanakana": "^4.0.6",
         "@types/zip.js": "^2.0.32",
         "@typescript-eslint/eslint-plugin": "^6.12.0",
         "@typescript-eslint/parser": "^6.12.0",
-        "@vitest/coverage-v8": "^0.34.6",
+        "@vitest/coverage-v8": "^1.1.0",
         "ajv": "^8.12.0",
         "css": "^3.0.0",
         "dotenv": "^16.3.1",
@@ -68,18 +71,17 @@
         "eslint-plugin-jsonc": "^2.10.0",
         "eslint-plugin-no-unsanitized": "^4.0.2",
         "eslint-plugin-unused-imports": "^3.0.0",
-        "eslint-plugin-vitest": "^0.3.12",
+        "eslint-plugin-vitest": "^0.3.20",
         "fake-indexeddb": "^5.0.1",
         "html-validate": "^8.7.4",
         "jsdom": "^23.0.1",
         "jszip": "^3.10.1",
         "license-report": "^6.5.0",
-        "stylelint": "^15.11.0",
-        "stylelint-config-recommended": "^13.0.0",
-        "stylelint-stylistic": "^0.4.3",
+        "stylelint": "^16.0.2",
+        "stylelint-config-recommended": "^14.0.0",
         "ts-json-schema-generator": "^1.5.0",
         "typescript": "5.3.3",
-        "vitest": "^0.34.6"
+        "vitest": "^1.1.0"
     },
     "dependencies": {
         "@zip.js/zip.js": "^2.7.31",

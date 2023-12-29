@@ -49,11 +49,13 @@ export class GoogleDocsUtil {
     }
 
     /**
+     * Gets this <style> node, or creates one if it doesn't exist.
+     *
+     * A <style> node is necessary to force the SVG <rect> elements to have a fill,
+     * which allows them to be included in document.elementsFromPoint's return value.
      * @returns {HTMLStyleElement}
      */
     static _getStyleNode() {
-        // This <style> node is necessary to force the SVG <rect> elements to have a fill,
-        // which allows them to be included in document.elementsFromPoint's return value.
         if (typeof this._styleNode === 'undefined') {
             const style = document.createElement('style');
             style.textContent = [

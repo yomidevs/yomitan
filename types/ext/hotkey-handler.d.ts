@@ -15,12 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Input from './input';
-
-export type EventType = 'keydownNonHotkey';
+import type {ModifierKey} from './input';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type HotkeyInfo = {
-    modifiers: Set<Input.ModifierKey>;
+    modifiers: Set<ModifierKey>;
     action: string;
     argument: unknown;
 };
@@ -28,3 +27,9 @@ export type HotkeyInfo = {
 export type HotkeyHandlers = {
     handlers: HotkeyInfo[];
 };
+
+export type Events = {
+    keydownNonHotkey: KeyboardEvent;
+};
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;

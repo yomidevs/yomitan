@@ -21,6 +21,7 @@ import type * as Display from './display';
 import type * as Input from './input';
 import type * as Settings from './settings';
 import type * as TextSource from './text-source';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type SearchResultDetail = {
     documentTitle: string;
@@ -118,7 +119,16 @@ export type InputInfoDetail = {
     restoreSelection: boolean;
 };
 
-export type EventType = 'searched' | 'clear';
+export type Events = {
+    searched: SearchedEventDetails;
+    clear: {
+        reason: ClearReason;
+    };
+};
+
+export type ClearReason = 'mousedown';
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
 export type GetSearchContextCallback = GetSearchContextCallbackSync | GetSearchContextCallbackAsync;
 
@@ -184,6 +194,19 @@ export type PointerEventType = (
     'click' |
     'script'
 );
+
+/**
+ * An enum representing the pen pointer state.
+ *
+ * `0` Not active.
+ *
+ * `1` Hovering.
+ *
+ * `2` Touching.
+ *
+ * `3` Hovering after touching.
+ */
+export type PenPointerState = 0 | 1 | 2 | 3;
 
 export type SentenceTerminatorMap = Map<string, [includeCharacterAtStart: boolean, includeCharacterAtEnd: boolean]>;
 

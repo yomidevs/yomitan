@@ -61,6 +61,12 @@
         "no-case-declarations": "error",
         "no-const-assign": "error",
         "no-constant-condition": "off",
+        "no-multiple-empty-lines": [
+            "error",
+            {
+                "max": 2
+            }
+        ],
         "no-global-assign": "error",
         "no-new": "error",
         "no-param-reassign": "off",
@@ -194,6 +200,17 @@
         ],
         "no-implicit-globals": "error",
         "no-multi-spaces": "error",
+        "no-restricted-syntax": [
+            "error",
+            {
+                "message": "Avoid using JSON.parse(), prefer parseJson.",
+                "selector": "MemberExpression[object.name=JSON][property.name=parse]"
+            },
+            {
+                "message": "Avoid using Response.json(), prefer readResponseJson.",
+                "selector": "MemberExpression[property.name=json]"
+            }
+        ],
         "no-trailing-spaces": "error",
         "no-whitespace-before-property": "error",
         "object-curly-spacing": [
@@ -210,6 +227,10 @@
                 "before": false,
                 "after": true
             }
+        ],
+        "space-before-blocks": [
+            "error",
+            "always"
         ],
         "space-before-function-paren": [
             "error",
@@ -392,6 +413,13 @@
                 "*.ts"
             ],
             "rules": {
+                "no-multiple-empty-lines": [
+                    "error",
+                    {
+                        "max": 1,
+                        "maxEOF": 0
+                    }
+                ],
                 "no-undef": "off",
                 "unused-imports/no-unused-imports": "error",
                 "@typescript-eslint/no-unused-vars": [
@@ -531,6 +559,7 @@
         {
             "files": [
                 "test/data/anki-note-builder-test-results.json",
+                "test/data/database-test-cases.json",
                 "test/data/translator-test-results-note-data1.json",
                 "test/data/translator-test-results.json"
             ],
@@ -543,7 +572,8 @@
         },
         {
             "files": [
-                "test/data/dictionaries/valid-dictionary1/term_bank_1.json"
+                "test/data/dictionaries/valid-dictionary1/term_bank_1.json",
+                "test/data/dictionaries/valid-dictionary1/term_bank_2.json"
             ],
             "rules": {
                 "jsonc/array-element-newline": [
@@ -652,7 +682,7 @@
                 "ext/js/general/text-source-map.js",
                 "ext/js/language/deinflector.js",
                 "ext/js/dictionary/dictionary-database.js",
-                "ext/js/language/sandbox/dictionary-data-util.js",
+                "ext/js/dictionary/dictionary-data-util.js",
                 "ext/js/language/sandbox/japanese-util.js",
                 "ext/js/language/translator.js",
                 "ext/js/media/audio-downloader.js",
