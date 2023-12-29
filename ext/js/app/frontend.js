@@ -263,13 +263,6 @@ export class Frontend {
 
     // API message handlers
 
-    /**
-     * @returns {string}
-     */
-    _onApiGetUrl() {
-        return window.location.href;
-    }
-
     /** @type {import('cross-frame-api').ApiHandler<'Frontend.closePopup'>} */
     _onApiClosePopup() {
         this._clearSelection(false);
