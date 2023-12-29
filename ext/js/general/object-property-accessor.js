@@ -174,6 +174,7 @@ export class ObjectPropertyAccessor {
      */
     static getPathArray(pathString) {
         const pathArray = [];
+        /** @type {import('object-property-accessor').ParsePathStringState} */
         let state = 'empty';
         let quote = 0;
         let value = '';
