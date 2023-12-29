@@ -1133,10 +1133,10 @@ export class OptionsUtil {
     }
 
     /**
-     * @type {import('options-util').ModernUpdateFunctionAsync}
+     * - Added translation.searchResolution.
+     * @type {import('options-util').UpdateFunction}
      */
     _updateVersion22(options) {
-        //  Added translation.searchResolution
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.translation.searchResolution = 'letter';
         }
