@@ -16,7 +16,8 @@
  */
 
 import type {CrossFrameAPIPort} from '../../ext/js/comm/cross-frame-api.js';
-import type * as Core from './core';
+import type {Response, Timeout} from './core';
+import type {ModifierKey} from './input';
 import type {
     ApiMap as BaseApiMap,
     ApiParams as BaseApiParams,
@@ -45,7 +46,7 @@ export type AcknowledgeMessage = {
 export type ResultMessage = {
     type: 'result';
     id: number;
-    data: Core.Response<ApiReturnAny>;
+    data: Response<ApiReturnAny>;
 };
 
 export type InvokeMessage = {
@@ -63,7 +64,7 @@ export type Invocation = {
     responseTimeout: number;
     action: string;
     ack: boolean;
-    timer: Core.Timeout | null;
+    timer: Timeout | null;
 };
 
 export type PortDetails = CrossFrameCommunicationPortDetails;
@@ -113,6 +114,13 @@ type ApiSurface = {
             frameId: number;
         };
         return: ChildFrameRect | null;
+    };
+    'HotkeyHandler.forwardHotkey': {
+        params: {
+            key: string;
+            modifiers: ModifierKey[];
+        };
+        return: boolean;
     };
 };
 
