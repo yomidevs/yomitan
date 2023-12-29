@@ -18,7 +18,9 @@
 
 import {ThemeController} from '../app/theme-controller.js';
 import {FrameEndpoint} from '../comm/frame-endpoint.js';
-import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, log, promiseTimeout} from '../core.js';
+import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, log, promiseTimeout} from '../core.js';
+import {invokeApiMapHandler} from '../core/api-map.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {ScrollElement} from '../dom/scroll-element.js';
@@ -87,12 +89,10 @@ export class Display extends EventDispatcher {
             contentManager: this._contentManager,
             hotkeyHelpController: this._hotkeyHelpController
         });
-        /** @type {import('core').MessageHandlerMap} */
-        this._messageHandlers = new Map();
-        /** @type {import('core').MessageHandlerMap} */
-        this._directMessageHandlers = new Map();
-        /** @type {import('core').MessageHandlerMap} */
-        this._windowMessageHandlers = new Map();
+        /** @type {import('display').DirectApiMap} */
+        this._directApiMap = new Map();
+        /** @type {import('display').WindowApiMap} */
+        this._windowApiMap = new Map();
         /** @type {DisplayHistory} */
         this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
         /** @type {boolean} */
@@ -207,15 +207,15 @@ export class Display extends EventDispatcher {
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
         ]);
         this.registerDirectMessageHandlers([
-            ['Display.setOptionsContext', this._onMessageSetOptionsContext.bind(this)],
-            ['Display.setContent',        this._onMessageSetContent.bind(this)],
-            ['Display.setCustomCss',      this._onMessageSetCustomCss.bind(this)],
-            ['Display.setContentScale',   this._onMessageSetContentScale.bind(this)],
-            ['Display.configure',         this._onMessageConfigure.bind(this)],
-            ['Display.visibilityChanged', this._onMessageVisibilityChanged.bind(this)]
+            ['displaySetOptionsContext', this._onMessageSetOptionsContext.bind(this)],
+            ['displaySetContent',        this._onMessageSetContent.bind(this)],
+            ['displaySetCustomCss',      this._onMessageSetCustomCss.bind(this)],
+            ['displaySetContentScale',   this._onMessageSetContentScale.bind(this)],
+            ['displayConfigure',         this._onMessageConfigure.bind(this)],
+            ['displayVisibilityChanged', this._onMessageVisibilityChanged.bind(this)]
         ]);
         this.registerWindowMessageHandlers([
-            ['Display.extensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
+            ['displayExtensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
     }
@@ -504,20 +504,20 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {import('core').MessageHandlerMapInit} handlers
+     * @param {import('display').DirectApiMapInit} handlers
      */
     registerDirectMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {
-            this._directMessageHandlers.set(name, handlerInfo);
+            this._directApiMap.set(name, handlerInfo);
         }
     }
 
     /**
-     * @param {import('core').MessageHandlerMapInit} handlers
+     * @param {import('display').WindowApiMapInit} handlers
      */
     registerWindowMessageHandlers(handlers) {
         for (const [name, handlerInfo] of handlers) {
-            this._windowMessageHandlers.set(name, handlerInfo);
+            this._windowApiMap.set(name, handlerInfo);
         }
     }
 
@@ -635,22 +635,35 @@ export class Display extends EventDispatcher {
     // Message handlers
 
     /**
-     * @param {import('frame-client').Message<import('display').MessageDetails>} data
-     * @returns {import('core').MessageHandlerResult}
+     * @param {import('frame-client').Message<import('display').DirectApiMessageAny>} data
+     * @returns {Promise<import('display').DirectApiReturnAny>}
      * @throws {Error}
      */
     _onDirectMessage(data) {
-        const {action, params} = this._authenticateMessageData(data);
-        const handler = this._directMessageHandlers.get(action);
-        if (typeof handler === 'undefined') {
-            throw new Error(`Invalid action: ${action}`);
-        }
-
-        return handler(params);
+        return new Promise((resolve, reject) => {
+            const {action, params} = this._authenticateMessageData(data);
+            invokeApiMapHandler(
+                this._directApiMap,
+                action,
+                params,
+                [],
+                (result) => {
+                    const {error} = result;
+                    if (typeof error !== 'undefined') {
+                        reject(ExtensionError.deserialize(error));
+                    } else {
+                        resolve(result.result);
+                    }
+                },
+                () => {
+                    reject(new Error(`Invalid action: ${action}`));
+                }
+            );
+        });
     }
 
     /**
-     * @param {MessageEvent<import('frame-client').Message<import('display').MessageDetails>>} details
+     * @param {MessageEvent<import('frame-client').Message<import('display').WindowApiMessageAny>>} details
      */
     _onWindowMessage({data}) {
         let data2;
@@ -660,46 +673,37 @@ export class Display extends EventDispatcher {
             return;
         }
 
-        const {action, params} = data2;
-        const messageHandler = this._windowMessageHandlers.get(action);
-        if (typeof messageHandler === 'undefined') { return; }
-
-        const callback = () => {}; // NOP
-        invokeMessageHandler(messageHandler, params, callback);
+        try {
+            const {action, params} = data2;
+            const callback = () => {}; // NOP
+            invokeApiMapHandler(this._directApiMap, action, params, [], callback);
+        } catch (e) {
+            // NOP
+        }
     }
 
-    /**
-     * @param {{optionsContext: import('settings').OptionsContext}} details
-     */
+    /** @type {import('display').DirectApiHandler<'displaySetOptionsContext'>} */
     async _onMessageSetOptionsContext({optionsContext}) {
         await this.setOptionsContext(optionsContext);
         this.searchLast(true);
     }
 
-    /**
-     * @param {{details: import('display').ContentDetails}} details
-     */
+    /** @type {import('display').DirectApiHandler<'displaySetContent'>} */
     _onMessageSetContent({details}) {
         this.setContent(details);
     }
 
-    /**
-     * @param {{css: string}} details
-     */
+    /** @type {import('display').DirectApiHandler<'displaySetCustomCss'>} */
     _onMessageSetCustomCss({css}) {
         this.setCustomCss(css);
     }
 
-    /**
-     * @param {{scale: number}} details
-     */
+    /** @type {import('display').DirectApiHandler<'displaySetContentScale'>} */
     _onMessageSetContentScale({scale}) {
         this._setContentScale(scale);
     }
 
-    /**
-     * @param {import('display').ConfigureMessageDetails} details
-     */
+    /** @type {import('display').DirectApiHandler<'displayConfigure'>} */
     async _onMessageConfigure({depth, parentPopupId, parentFrameId, childrenSupported, scale, optionsContext}) {
         this._depth = depth;
         this._parentPopupId = parentPopupId;
@@ -709,15 +713,13 @@ export class Display extends EventDispatcher {
         await this.setOptionsContext(optionsContext);
     }
 
-    /**
-     * @param {{value: boolean}} details
-     */
+    /** @type {import('display').DirectApiHandler<'displayVisibilityChanged'>} */
     _onMessageVisibilityChanged({value}) {
         this._frameVisible = value;
         this.trigger('frameVisibilityChange', {value});
     }
 
-    /** */
+    /** @type {import('display').WindowApiHandler<'displayExtensionUnloaded'>} */
     _onMessageExtensionUnloaded() {
         if (yomitan.isExtensionUnloaded) { return; }
         yomitan.triggerExtensionUnloaded();

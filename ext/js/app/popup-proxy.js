@@ -297,6 +297,7 @@ export class PopupProxy extends EventDispatcher {
 
     // Private
 
+    // TODO : Type safety
     /**
      * @template {import('core').SerializableObject} TParams
      * @template [TReturn=unknown]
@@ -308,6 +309,7 @@ export class PopupProxy extends EventDispatcher {
         return yomitan.crossFrame.invoke(this._frameId, action, params);
     }
 
+    // TODO : Type safety
     /**
      * @template {import('core').SerializableObject} TParams
      * @template [TReturn=unknown]

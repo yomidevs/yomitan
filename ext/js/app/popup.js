@@ -215,7 +215,7 @@ export class Popup extends EventDispatcher {
     async setOptionsContext(optionsContext) {
         await this._setOptionsContext(optionsContext);
         if (this._frameConnected) {
-            await this._invokeSafe('Display.setOptionsContext', {optionsContext});
+            await this._invokeSafe('displaySetOptionsContext', {optionsContext});
         }
     }
 
@@ -299,7 +299,7 @@ export class Popup extends EventDispatcher {
         await this._show(sourceRects, writingMode);
 
         if (displayDetails !== null) {
-            this._invokeSafe('Display.setContent', {details: displayDetails});
+            this._invokeSafe('displaySetContent', {details: displayDetails});
         }
     }
 
@@ -308,7 +308,7 @@ export class Popup extends EventDispatcher {
      * @param {string} css The CSS rules.
      */
     async setCustomCss(css) {
-        await this._invokeSafe('Display.setCustomCss', {css});
+        await this._invokeSafe('displaySetCustomCss', {css});
     }
 
     /**
@@ -316,7 +316,7 @@ export class Popup extends EventDispatcher {
      */
     async clearAutoPlayTimer() {
         if (this._frameConnected) {
-            await this._invokeSafe('Display.clearAutoPlayTimer', {});
+            await this._invokeSafe('displayAudioClearAutoPlayTimer', {});
         }
     }
 
@@ -327,7 +327,7 @@ export class Popup extends EventDispatcher {
     async setContentScale(scale) {
         this._contentScale = scale;
         this._frame.style.fontSize = `${scale}px`;
-        await this._invokeSafe('Display.setContentScale', {scale});
+        await this._invokeSafe('displaySetContentScale', {scale});
     }
 
     /**
@@ -480,7 +480,7 @@ export class Popup extends EventDispatcher {
         this._frameConnected = true;
 
         // Configure
-        /** @type {import('display').ConfigureMessageDetails} */
+        /** @type {import('display').DirectApiParams<'displayConfigure'>} */
         const configureParams = {
             depth: this._depth,
             parentPopupId: this._id,
@@ -489,7 +489,7 @@ export class Popup extends EventDispatcher {
             scale: this._contentScale,
             optionsContext: this._optionsContext
         };
-        await this._invokeSafe('Display.configure', configureParams);
+        await this._invokeSafe('displayConfigure', configureParams);
     }
 
     /**
@@ -657,7 +657,7 @@ export class Popup extends EventDispatcher {
         if (this._visibleValue === value) { return; }
         this._visibleValue = value;
         this._frame.style.setProperty('visibility', value ? 'visible' : 'hidden', 'important');
-        this._invokeSafe('Display.visibilityChanged', {value});
+        this._invokeSafe('displayVisibilityChanged', {value});
     }
 
     /**
@@ -679,6 +679,7 @@ export class Popup extends EventDispatcher {
         }
     }
 
+    // TODO : Type safety
     /**
      * @template {import('core').SerializableObject} TParams
      * @template [TReturn=unknown]
@@ -696,6 +697,7 @@ export class Popup extends EventDispatcher {
         return await yomitan.crossFrame.invoke(this._frameClient.frameId, 'popupMessage', message);
     }
 
+    // TODO : Type safety
     /**
      * @template {import('core').SerializableObject} TParams
      * @template [TReturn=unknown]
@@ -728,7 +730,7 @@ export class Popup extends EventDispatcher {
      * @returns {void}
      */
     _onExtensionUnloaded() {
-        this._invokeWindow('Display.extensionUnloaded');
+        this._invokeWindow('displayExtensionUnloaded');
     }
 
     /**
