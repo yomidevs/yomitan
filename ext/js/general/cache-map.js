@@ -29,7 +29,6 @@ export class CacheMap {
      */
     constructor(maxSize) {
         if (!(
-            typeof maxSize === 'number' &&
             Number.isFinite(maxSize) &&
             maxSize >= 0 &&
             Math.floor(maxSize) === maxSize
