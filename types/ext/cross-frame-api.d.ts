@@ -49,7 +49,7 @@ export type Message = AcknowledgeMessage | ResultMessage | InvokeMessage;
 export type Invocation = {
     id: number;
     resolve: (value: Core.SafeAny) => void;
-    reject: (reason?: unknown) => void;
+    reject: (reason: Error) => void;
     responseTimeout: number;
     action: string;
     ack: boolean;

@@ -217,15 +217,13 @@ export class CrossFrameAPIPort extends EventDispatcher {
 
     /**
      * @param {number} id
-     * @param {unknown} error
+     * @param {unknown} errorOrMessage
      */
-    _onError(id, error) {
+    _onError(id, errorOrMessage) {
         const invocation = this._activeInvocations.get(id);
         if (typeof invocation === 'undefined') { return; }
 
-        if (!(error instanceof Error)) {
-            error = new Error(`${error} (${invocation.action})`);
-        }
+        const error = errorOrMessage instanceof Error ? errorOrMessage : new Error(`${errorOrMessage} (${invocation.action})`);
 
         this._activeInvocations.delete(id);
         if (invocation.timer !== null) {
