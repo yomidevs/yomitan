@@ -31,7 +31,7 @@ function testConstructor() {
             [true,  () => new CacheMap(-1)],
             [true,  () => new CacheMap(1.5)],
             [true,  () => new CacheMap(Number.NaN)],
-            [true,  () => new CacheMap(Number.POSITIVE_INFINITY)],
+            [true,  () => new CacheMap(Number.POSITIVE_INFINITY)]
         ];
 
         for (const [throws, create] of data) {
