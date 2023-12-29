@@ -169,34 +169,16 @@ export class DOMTextScanner {
         const nodeValue = /** @type {string} */ (textNode.nodeValue);
         const nodeValueLength = nodeValue.length;
         const {preserveNewlines, preserveWhitespace} = this._getWhitespaceSettings(textNode);
+        if (resetOffset) { this._offset = 0; }
 
-        let done = false;
-        let lineHasWhitespace = this._lineHasWhitespace;
-        let lineHasContent = this._lineHasContent;
-        let content = this._content;
-        let offset = resetOffset ? 0 : this._offset;
-        let remainder = this._remainder;
-        let newlines = this._newlines;
-
-        while (offset < nodeValueLength) {
-            const char = StringUtil.readCodePointsForward(nodeValue, offset, 1);
-            offset += char.length;
+        while (this._offset < nodeValueLength) {
+            const char = StringUtil.readCodePointsForward(nodeValue, this._offset, 1);
+            this._offset += char.length;
             const charAttributes = DOMTextScanner.getCharacterAttributes(char, preserveNewlines, preserveWhitespace);
-            /** @type {import('dom-text-scanner').SeekTextNoteDetails} */
-            const seekTextNoteDetails = {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines};
-
-            ({done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines} = this._checkCharacterForward(char, charAttributes, seekTextNoteDetails));
-            if (done) { break; }
+            if (this._checkCharacterForward(char, charAttributes)) { break; }
         }
 
-        this._lineHasWhitespace = lineHasWhitespace;
-        this._lineHasContent = lineHasContent;
-        this._content = content;
-        this._offset = offset;
-        this._remainder = remainder;
-        this._newlines = newlines;
-
-        return (remainder > 0);
+        return this._remainder > 0;
     }
 
     /**
@@ -216,35 +198,16 @@ export class DOMTextScanner {
         const nodeValue = /** @type {string} */ (textNode.nodeValue);
         const nodeValueLength = nodeValue.length;
         const {preserveNewlines, preserveWhitespace} = this._getWhitespaceSettings(textNode);
+        if (resetOffset) { this._offset = nodeValueLength; }
 
-        let done = false;
-        let lineHasWhitespace = this._lineHasWhitespace;
-        let lineHasContent = this._lineHasContent;
-        let content = this._content;
-        let offset = resetOffset ? nodeValueLength : this._offset;
-        let remainder = this._remainder;
-        let newlines = this._newlines;
-
-        while (offset > 0) {
-            const char = StringUtil.readCodePointsBackward(nodeValue, offset - 1, 1);
-            offset -= char.length;
+        while (this._offset > 0) {
+            const char = StringUtil.readCodePointsBackward(nodeValue, this._offset - 1, 1);
+            this._offset -= char.length;
             const charAttributes = DOMTextScanner.getCharacterAttributes(char, preserveNewlines, preserveWhitespace);
-
-            /** @type {import('dom-text-scanner').SeekTextNoteDetails} */
-            const seekTextNoteDetails = {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines};
-
-            ({done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines} = this._checkCharacterBackward(char, charAttributes, seekTextNoteDetails));
-            if (done) { break; }
+            if (this._checkCharacterBackward(char, charAttributes)) { break; }
         }
 
-        this._lineHasWhitespace = lineHasWhitespace;
-        this._lineHasContent = lineHasContent;
-        this._content = content;
-        this._offset = offset;
-        this._remainder = remainder;
-        this._newlines = newlines;
-
-        return (remainder > 0);
+        return this._remainder > 0;
     }
 
     /**
@@ -275,126 +238,114 @@ export class DOMTextScanner {
 
     /**
      * @param {string} char
-     * @param {import('dom-text-scanner').CharacterAttributesEnum} charAttributes
-     * @param {import('dom-text-scanner').SeekTextNoteDetails} seekTextNoteDetails
-     * @returns {import('dom-text-scanner').SeekTextNoteDetails}
+     * @param {import('dom-text-scanner').CharacterAttributes} charAttributes
+     * @returns {boolean}
      */
-    _checkCharacterForward(char, charAttributes, seekTextNoteDetails) {
-        let {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines} = seekTextNoteDetails;
-
+    _checkCharacterForward(char, charAttributes) {
         switch (charAttributes) {
-            case 0:
-                break;
+            // case 0: break; // NOP
             case 1:
-                lineHasWhitespace = true;
+                this._lineHasWhitespace = true;
                 break;
             case 2:
             case 3:
-                if (newlines > 0) {
-                    if (content.length > 0) {
-                        const useNewlineCount = Math.min(remainder, newlines);
-                        content += '\n'.repeat(useNewlineCount);
-                        remainder -= useNewlineCount;
-                        newlines -= useNewlineCount;
+                if (this._newlines > 0) {
+                    if (this._content.length > 0) {
+                        const useNewlineCount = Math.min(this._remainder, this._newlines);
+                        this._content += '\n'.repeat(useNewlineCount);
+                        this._remainder -= useNewlineCount;
+                        this._newlines -= useNewlineCount;
                     } else {
-                        newlines = 0;
+                        this._newlines = 0;
                     }
-                    lineHasContent = false;
-                    lineHasWhitespace = false;
-                    if (remainder <= 0) {
-                        offset -= char.length; // Revert character offset
-                        done = true;
-                        break;
+                    this._lineHasContent = false;
+                    this._lineHasWhitespace = false;
+                    if (this._remainder <= 0) {
+                        this._offset -= char.length; // Revert character offset
+                        return true;
                     }
                 }
 
-                lineHasContent = (charAttributes === 2); // 3 = character is a newline
+                this._lineHasContent = (charAttributes === 2); // 3 = character is a newline
 
-                if (lineHasWhitespace) {
-                    if (lineHasContent) {
-                        content += ' ';
-                        lineHasWhitespace = false;
-                        if (--remainder <= 0) {
-                            offset -= char.length; // Revert character offset
-                            done = true;
-                            break;
+                if (this._lineHasWhitespace) {
+                    if (this._lineHasContent) {
+                        this._content += ' ';
+                        this._lineHasWhitespace = false;
+                        if (--this._remainder <= 0) {
+                            this._offset -= char.length; // Revert character offset
+                            return true;
                         }
                     } else {
-                        lineHasWhitespace = false;
+                        this._lineHasWhitespace = false;
                     }
                 }
 
-                content += char;
+                this._content += char;
 
-                if (--remainder <= 0) {
-                    done = true;
-                    break;
+                if (--this._remainder <= 0) {
+                    return true;
                 }
+                break;
         }
 
-        return {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines};
+        return false;
     }
 
     /**
      * @param {string} char
-     * @param {import('dom-text-scanner').CharacterAttributesEnum} charAttributes
-     * @param {import('dom-text-scanner').SeekTextNoteDetails} seekTextNoteDetails
-     * @returns {import('dom-text-scanner').SeekTextNoteDetails}
+     * @param {import('dom-text-scanner').CharacterAttributes} charAttributes
+     * @returns {boolean}
      */
-    _checkCharacterBackward(char, charAttributes, seekTextNoteDetails) {
-        let {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines} = seekTextNoteDetails;
-
+    _checkCharacterBackward(char, charAttributes) {
         switch (charAttributes) {
-            case 0:
-                break;
+            // case 0: break; // NOP
             case 1:
-                lineHasWhitespace = true;
+                this._lineHasWhitespace = true;
                 break;
             case 2:
             case 3:
-                if (newlines > 0) {
-                    if (content.length > 0) {
-                        const useNewlineCount = Math.min(remainder, newlines);
-                        content = '\n'.repeat(useNewlineCount) + content;
-                        remainder -= useNewlineCount;
-                        newlines -= useNewlineCount;
+                if (this._newlines > 0) {
+                    if (this._content.length > 0) {
+                        const useNewlineCount = Math.min(this._remainder, this._newlines);
+                        this._content = '\n'.repeat(useNewlineCount) + this._content;
+                        this._remainder -= useNewlineCount;
+                        this._newlines -= useNewlineCount;
                     } else {
-                        newlines = 0;
+                        this._newlines = 0;
                     }
-                    lineHasContent = false;
-                    lineHasWhitespace = false;
-                    if (remainder <= 0) {
-                        offset += char.length; // Revert character offset
-                        done = true;
-                        break;
+                    this._lineHasContent = false;
+                    this._lineHasWhitespace = false;
+                    if (this._remainder <= 0) {
+                        this._offset += char.length; // Revert character offset
+                        return true;
                     }
                 }
 
-                lineHasContent = (charAttributes === 2); // 3 = character is a newline
+                this._lineHasContent = (charAttributes === 2); // 3 = character is a newline
 
-                if (lineHasWhitespace) {
-                    if (lineHasContent) {
-                        content = ' ' + content;
-                        lineHasWhitespace = false;
-                        if (--remainder <= 0) {
-                            offset += char.length; // Revert character offset
-                            done = true;
-                            break;
+                if (this._lineHasWhitespace) {
+                    if (this._lineHasContent) {
+                        this._content = ' ' + this._content;
+                        this._lineHasWhitespace = false;
+                        if (--this._remainder <= 0) {
+                            this._offset += char.length; // Revert character offset
+                            return true;
                         }
                     } else {
-                        lineHasWhitespace = false;
+                        this._lineHasWhitespace = false;
                     }
                 }
 
-                content = char + content;
+                this._content = char + this._content;
 
-                if (--remainder <= 0) {
-                    done = true;
-                    break;
+                if (--this._remainder <= 0) {
+                    return true;
                 }
+                break;
         }
 
-        return {done, lineHasWhitespace, lineHasContent, content, offset, remainder, newlines};
+        return false;
     }
 
     // Static helpers
@@ -515,7 +466,7 @@ export class DOMTextScanner {
      * @param {string} character A string containing a single character.
      * @param {boolean} preserveNewlines Whether or not newlines should be preserved.
      * @param {boolean} preserveWhitespace Whether or not whitespace should be preserved.
-     * @returns {import('dom-text-scanner').CharacterAttributesEnum} An enum representing the attributes of the character.
+     * @returns {import('dom-text-scanner').CharacterAttributes} An enum representing the attributes of the character.
      */
     static getCharacterAttributes(character, preserveNewlines, preserveWhitespace) {
         switch (character.charCodeAt(0)) {
