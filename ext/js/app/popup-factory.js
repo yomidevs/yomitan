@@ -239,10 +239,7 @@ export class PopupFactory {
 
     // API message handlers
 
-    /**
-     * @param {import('popup-factory').GetOrCreatePopupDetails} details
-     * @returns {Promise<{id: string, depth: number, frameId: number}>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.getOrCreatePopup'>} */
     async _onApiGetOrCreatePopup(details) {
         const popup = await this.getOrCreatePopup(details);
         return {
@@ -252,53 +249,37 @@ export class PopupFactory {
         };
     }
 
-    /**
-     * @param {{id: string, optionsContext: import('settings').OptionsContext}} params
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.setOptionsContext'>} */
     async _onApiSetOptionsContext({id, optionsContext}) {
         const popup = this._getPopup(id);
         await popup.setOptionsContext(optionsContext);
     }
 
-    /**
-     * @param {{id: string, changeFocus: boolean}} params
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.hide'>} */
     async _onApiHide({id, changeFocus}) {
         const popup = this._getPopup(id);
         await popup.hide(changeFocus);
     }
 
-    /**
-     * @param {{id: string}} params
-     * @returns {Promise<boolean>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.isVisible'>} */
     async _onApiIsVisibleAsync({id}) {
         const popup = this._getPopup(id);
         return await popup.isVisible();
     }
 
-    /**
-     * @param {{id: string, value: boolean, priority: number}} params
-     * @returns {Promise<?import('core').TokenString>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.setVisibleOverride'>} */
     async _onApiSetVisibleOverride({id, value, priority}) {
         const popup = this._getPopup(id);
         return await popup.setVisibleOverride(value, priority);
     }
 
-    /**
-     * @param {{id: string, token: import('core').TokenString}} params
-     * @returns {Promise<boolean>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.clearVisibleOverride'>} */
     async _onApiClearVisibleOverride({id, token}) {
         const popup = this._getPopup(id);
         return await popup.clearVisibleOverride(token);
     }
 
-    /**
-     * @param {{id: string, x: number, y: number}} params
-     * @returns {Promise<boolean>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.containsPoint'>} */
     async _onApiContainsPoint({id, x, y}) {
         const popup = this._getPopup(id);
         const offset = this._getPopupOffset(popup);
@@ -307,10 +288,7 @@ export class PopupFactory {
         return await popup.containsPoint(x, y);
     }
 
-    /**
-     * @param {{id: string, details: import('popup').ContentDetails, displayDetails: ?import('display').ContentDetails}} params
-     * @returns {Promise<void>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.showContent'>} */
     async _onApiShowContent({id, details, displayDetails}) {
         const popup = this._getPopup(id);
         if (!this._popupCanShow(popup)) { return; }
@@ -327,64 +305,43 @@ export class PopupFactory {
         return await popup.showContent(details, displayDetails);
     }
 
-    /**
-     * @param {{id: string, css: string}} params
-     * @returns {Promise<void>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.setCustomCss'>} */
     async _onApiSetCustomCss({id, css}) {
         const popup = this._getPopup(id);
         await popup.setCustomCss(css);
     }
 
-    /**
-     * @param {{id: string}} params
-     * @returns {Promise<void>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.clearAutoPlayTimer'>} */
     async _onApiClearAutoPlayTimer({id}) {
         const popup = this._getPopup(id);
         await popup.clearAutoPlayTimer();
     }
 
-    /**
-     * @param {{id: string, scale: number}} params
-     * @returns {Promise<void>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.setContentScale'>} */
     async _onApiSetContentScale({id, scale}) {
         const popup = this._getPopup(id);
         await popup.setContentScale(scale);
     }
 
-    /**
-     * @param {{id: string}} params
-     * @returns {Promise<void>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.updateTheme'>} */
     async _onApiUpdateTheme({id}) {
         const popup = this._getPopup(id);
         await popup.updateTheme();
     }
 
-    /**
-     * @param {{id: string, css: string, useWebExtensionApi: boolean}} params
-     * @returns {Promise<void>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.setCustomOuterCss'>} */
     async _onApiSetCustomOuterCss({id, css, useWebExtensionApi}) {
         const popup = this._getPopup(id);
         await popup.setCustomOuterCss(css, useWebExtensionApi);
     }
 
-    /**
-     * @param {{id: string}} params
-     * @returns {Promise<import('popup').ValidSize>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.getFrameSize'>} */
     async _onApiGetFrameSize({id}) {
         const popup = this._getPopup(id);
         return await popup.getFrameSize();
     }
 
-    /**
-     * @param {{id: string, width: number, height: number}} params
-     * @returns {Promise<boolean>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.setFrameSize'>} */
     async _onApiSetFrameSize({id, width, height}) {
         const popup = this._getPopup(id);
         return await popup.setFrameSize(width, height);

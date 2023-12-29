@@ -16,8 +16,11 @@
  */
 
 import type {CrossFrameAPIPort} from '../../ext/js/comm/cross-frame-api.js';
-import type {Response, Timeout} from './core';
+import type {Response, Timeout, TokenString} from './core';
 import type {ModifierKey} from './input';
+import type {ContentDetails as PopupContentDetails, ValidSize} from './popup';
+import type {GetOrCreatePopupDetails} from './popup-factory';
+import type {OptionsContext} from './settings';
 import type {
     ApiMap as BaseApiMap,
     ApiParams as BaseApiParams,
@@ -31,6 +34,7 @@ import type {
     DirectApiFrameClientMessageAny as DisplayDirectApiFrameClientMessageAny,
     DirectApiMessageAny as DisplayDirectApiMessageAny,
     DirectApiReturnAny as DisplayDirectApiReturnAny,
+    ContentDetails as DisplayContentDetails,
 } from './display';
 import type {ChildFrameRect} from 'frame-offset-forwarder';
 
@@ -119,6 +123,109 @@ type ApiSurface = {
         params: {
             key: string;
             modifiers: ModifierKey[];
+        };
+        return: boolean;
+    };
+    'PopupFactory.getOrCreatePopup': {
+        params: GetOrCreatePopupDetails;
+        return: {id: string, depth: number, frameId: number};
+    };
+    'PopupFactory.setOptionsContext': {
+        params: {
+            id: string;
+            optionsContext: OptionsContext;
+        };
+        return: void;
+    };
+    'PopupFactory.hide': {
+        params: {
+            id: string;
+            changeFocus: boolean;
+        };
+        return: void;
+    };
+    'PopupFactory.isVisible': {
+        params: {
+            id: string;
+        };
+        return: boolean;
+    };
+    'PopupFactory.setVisibleOverride': {
+        params: {
+            id: string;
+            value: boolean;
+            priority: number;
+        };
+        return: TokenString | null;
+    };
+    'PopupFactory.clearVisibleOverride': {
+        params: {
+            id: string;
+            token: TokenString;
+        };
+        return: boolean;
+    };
+    'PopupFactory.containsPoint': {
+        params: {
+            id: string;
+            x: number;
+            y: number;
+        };
+        return: boolean;
+    };
+    'PopupFactory.showContent': {
+        params: {
+            id: string;
+            details: PopupContentDetails;
+            displayDetails: DisplayContentDetails | null;
+        };
+        return: void;
+    };
+    'PopupFactory.setCustomCss': {
+        params: {
+            id: string;
+            css: string;
+        };
+        return: void;
+    };
+    'PopupFactory.clearAutoPlayTimer': {
+        params: {
+            id: string;
+        };
+        return: void;
+    };
+    'PopupFactory.setContentScale': {
+        params: {
+            id: string;
+            scale: number;
+        };
+        return: void;
+    };
+    'PopupFactory.updateTheme': {
+        params: {
+            id: string;
+        };
+        return: void;
+    };
+    'PopupFactory.setCustomOuterCss': {
+        params: {
+            id: string;
+            css: string;
+            useWebExtensionApi: boolean;
+        };
+        return: void;
+    };
+    'PopupFactory.getFrameSize': {
+        params: {
+            id: string;
+        };
+        return: ValidSize;
+    };
+    'PopupFactory.setFrameSize': {
+        params: {
+            id: string;
+            width: number;
+            height: number;
         };
         return: boolean;
     };
