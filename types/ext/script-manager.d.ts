@@ -29,6 +29,8 @@ export type RegistrationDetails = {
     css?: string[];
     /** List of script paths. */
     js?: string[];
+    /** The execution world for the script. */
+    world?: ExecutionWorld;
 };
 
 export type ContentScriptInjectionDetails = {
@@ -39,3 +41,5 @@ export type ContentScriptInjectionDetails = {
     js?: string[];
     urlRegex: RegExp | null;
 };
+
+export type ExecutionWorld = 'MAIN' | 'ISOLATED';
