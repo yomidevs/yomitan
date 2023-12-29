@@ -37,12 +37,12 @@ export class FrameAncestryHandler {
         this._isPrepared = false;
         /** @type {string} */
         this._requestMessageId = 'FrameAncestryHandler.requestFrameInfo';
-        /** @type {string} */
-        this._responseMessageIdBase = `${this._requestMessageId}.response.`;
         /** @type {?Promise<number[]>} */
         this._getFrameAncestryInfoPromise = null;
         /** @type {Map<number, {window: Window, frameElement: ?(undefined|Element)}>} */
         this._childFrameMap = new Map();
+        /** @type {Map<string, import('frame-ancestry-handler').ResponseHandler>} */
+        this._responseHandlers = new Map();
     }
 
     /**
@@ -59,6 +59,9 @@ export class FrameAncestryHandler {
     prepare() {
         if (this._isPrepared) { return; }
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
+        yomitan.crossFrame.registerHandlers([
+            ['frameAncestryHandlerRequestFrameInfoResponse', this._onFrameAncestryHandlerRequestFrameInfoResponse.bind(this)]
+        ]);
         this._isPrepared = true;
     }
 
@@ -119,7 +122,6 @@ export class FrameAncestryHandler {
 
             const uniqueId = generateId(16);
             let nonce = generateId(16);
-            const responseMessageId = `${this._responseMessageIdBase}${uniqueId}`;
             /** @type {number[]} */
             const results = [];
             /** @type {?import('core').Timeout} */
@@ -130,12 +132,9 @@ export class FrameAncestryHandler {
                     clearTimeout(timer);
                     timer = null;
                 }
-                yomitan.crossFrame.unregisterHandler(responseMessageId);
+                this._removeResponseHandler(uniqueId);
             };
-            /**
-             * @param {import('frame-ancestry-handler').RequestFrameInfoResponseParams} params
-             * @returns {?import('frame-ancestry-handler').RequestFrameInfoResponseReturn}
-             */
+            /** @type {import('frame-ancestry-handler').ResponseHandler} */
             const onMessage = (params) => {
                 if (params.nonce !== nonce) { return null; }
 
@@ -164,9 +163,7 @@ export class FrameAncestryHandler {
             };
 
             // Start
-            yomitan.crossFrame.registerHandlers([
-                [responseMessageId, onMessage]
-            ]);
+            this._addResponseHandler(uniqueId, onMessage);
             resetTimeout();
             const frameId = this._frameId;
             this._requestFrameInfo(targetWindow, frameId, frameId, uniqueId, nonce);
@@ -212,13 +209,9 @@ export class FrameAncestryHandler {
             const frameId = this._frameId;
             const {parent} = window;
             const more = (window !== parent);
-            /** @type {import('frame-ancestry-handler').RequestFrameInfoResponseParams} */
-            const responseParams = {frameId, nonce, more};
-            const responseMessageId = `${this._responseMessageIdBase}${uniqueId}`;
 
             try {
-                /** @type {?import('frame-ancestry-handler').RequestFrameInfoResponseReturn} */
-                const response = await yomitan.crossFrame.invoke(originFrameId, responseMessageId, responseParams);
+                const response = await yomitan.crossFrame.invoke(originFrameId, 'frameAncestryHandlerRequestFrameInfoResponse', {uniqueId, frameId, nonce, more});
                 if (response === null) { return; }
                 const nonce2 = response.nonce;
                 if (typeof nonce2 !== 'string') { return; }
@@ -316,5 +309,28 @@ export class FrameAncestryHandler {
 
         // Not found
         return null;
+    }
+
+    /**
+     * @param {string} id
+     * @param {import('frame-ancestry-handler').ResponseHandler} handler
+     * @throws {Error}
+     */
+    _addResponseHandler(id, handler) {
+        if (this._responseHandlers.has(id)) { throw new Error('Identifier already used'); }
+        this._responseHandlers.set(id, handler);
+    }
+
+    /**
+     * @param {string} id
+     */
+    _removeResponseHandler(id) {
+        this._responseHandlers.delete(id);
+    }
+
+    /** @type {import('cross-frame-api').ApiHandler<'frameAncestryHandlerRequestFrameInfoResponse'>} */
+    _onFrameAncestryHandlerRequestFrameInfoResponse(params) {
+        const handler = this._responseHandlers.get(params.uniqueId);
+        return typeof handler !== 'undefined' ? handler(params) : null;
     }
 }

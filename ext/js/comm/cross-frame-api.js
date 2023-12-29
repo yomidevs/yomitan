@@ -348,14 +348,6 @@ export class CrossFrameAPI {
         extendApiMap(this._apiMap, handlers);
     }
 
-    /**
-     * @param {import('cross-frame-api').ApiNames} name
-     * @returns {boolean}
-     */
-    unregisterHandler(name) {
-        return this._apiMap.delete(name);
-    }
-
     // Private
 
     /**
