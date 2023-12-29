@@ -68,6 +68,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
         this._eventListeners.addListener(this._port.onMessage, this._onMessage.bind(this));
     }
 
+    // TODO : Type safety
     /**
      * @template [TParams=import('core').SerializableObject]
      * @template [TReturn=unknown]

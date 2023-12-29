@@ -27,18 +27,21 @@ export type AcknowledgeMessage = {
     id: number;
 };
 
+// TODO : Type safety
 export type ResultMessage = {
     type: 'result';
     id: number;
     data: Core.Response<unknown>;
 };
 
+// TODO : Type safety
 export type InvokeMessage = {
     type: 'invoke';
     id: number;
     data: InvocationData;
 };
 
+// TODO : Type safety
 export type InvocationData = {
     action: string;
     params: Core.SerializableObject;
@@ -46,6 +49,7 @@ export type InvocationData = {
 
 export type Message = AcknowledgeMessage | ResultMessage | InvokeMessage;
 
+// TODO : Type safety
 export type Invocation = {
     id: number;
     resolve: (value: Core.SafeAny) => void;
