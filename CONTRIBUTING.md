@@ -51,9 +51,9 @@ Several command line arguments are available for these scripts:
 - `--all` - Builds all targets specified in [manifest-variants.json](dev/data/manifest-variants.json).
 - `--default` - Restores the default manifest file.
 - `--manifest <target>` - Overwrites `ext/manifest.json` with the manifest variant for the specified build target.
-- `--dry-run` - Runs the full build process (excluding zip building), checking that the configuration is valid.
-- `--dry-run-build-zip` - If `--dry-run` is also specified, zip building will also be performed in memory; no files are created.
-- `--yomitan-version <version>` - Sets the version number in the extension manifest. Defaults to 0.0.0.0 if not set.
+- `--dryRun` - Runs the full build process (excluding zip building), checking that the configuration is valid.
+- `--dryRunBuildZip` - If `--dryRun` is also specified, zip building will also be performed in memory; no files are created.
+- `--version <version>` - Sets the version number in the extension manifest. Defaults to 0.0.0.0 if not set.
 
 If no arguments are specified, the command is equivalent to `build.bat --all`.
 
