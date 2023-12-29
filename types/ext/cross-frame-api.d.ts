@@ -31,6 +31,7 @@ import type {
     DirectApiMessageAny as DisplayDirectApiMessageAny,
     DirectApiReturnAny as DisplayDirectApiReturnAny,
 } from './display';
+import type {ChildFrameRect} from 'frame-offset-forwarder';
 
 export type CrossFrameAPIPortEvents = {
     disconnect: CrossFrameAPIPort;
@@ -106,6 +107,12 @@ type ApiSurface = {
             url: string;
             documentTitle: string;
         };
+    };
+    'FrameOffsetForwarder.getChildFrameRect': {
+        params: {
+            frameId: number;
+        };
+        return: ChildFrameRect | null;
     };
 };
 

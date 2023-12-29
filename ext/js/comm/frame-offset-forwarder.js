@@ -76,10 +76,7 @@ export class FrameOffsetForwarder {
 
     // Private
 
-    /**
-     * @param {{frameId: number}} event
-     * @returns {?import('frame-offset-forwarder').ChildFrameRect}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'FrameOffsetForwarder.getChildFrameRect'>} */
     _onMessageGetChildFrameRect({frameId}) {
         const frameElement = this._frameAncestryHandler.getChildFrameElement(frameId);
         if (frameElement === null) { return null; }
