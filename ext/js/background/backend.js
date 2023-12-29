@@ -1664,6 +1664,7 @@ export class Backend {
     }
 
     /**
+     * This function works around the need to have the "tabs" permission to access tab.url.
      * @param {number} timeout
      * @param {boolean} multiple
      * @param {import('backend').FindTabsPredicate} predicate
@@ -1671,7 +1672,6 @@ export class Backend {
      * @returns {Promise<import('backend').TabInfo[]|(?import('backend').TabInfo)>}
      */
     async _findTabs(timeout, multiple, predicate, predicateIsAsync) {
-        // This function works around the need to have the "tabs" permission to access tab.url.
         const tabs = await this._getAllTabs();
 
         let done = false;
