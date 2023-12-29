@@ -19,7 +19,7 @@
 import {ThemeController} from '../app/theme-controller.js';
 import {FrameEndpoint} from '../comm/frame-endpoint.js';
 import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, log, promiseTimeout} from '../core.js';
-import {invokeApiMapHandler} from '../core/api-map.js';
+import {extendApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
@@ -507,18 +507,14 @@ export class Display extends EventDispatcher {
      * @param {import('display').DirectApiMapInit} handlers
      */
     registerDirectMessageHandlers(handlers) {
-        for (const [name, handlerInfo] of handlers) {
-            this._directApiMap.set(name, handlerInfo);
-        }
+        extendApiMap(this._directApiMap, handlers);
     }
 
     /**
      * @param {import('display').WindowApiMapInit} handlers
      */
     registerWindowMessageHandlers(handlers) {
-        for (const [name, handlerInfo] of handlers) {
-            this._windowApiMap.set(name, handlerInfo);
-        }
+        extendApiMap(this._windowApiMap, handlers);
     }
 
     /** */
