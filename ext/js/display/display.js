@@ -91,7 +91,7 @@ export class Display extends EventDispatcher {
         });
         /** @type {import('display').DirectApiMap} */
         this._directApiMap = new Map();
-        /** @type {import('display').WindowApiMap} */
+        /** @type {import('api-map').ApiMap<import('display').WindowApiSurface>} */ // import('display').WindowApiMap
         this._windowApiMap = new Map();
         /** @type {DisplayHistory} */
         this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
@@ -672,7 +672,7 @@ export class Display extends EventDispatcher {
         try {
             const {action, params} = data2;
             const callback = () => {}; // NOP
-            invokeApiMapHandler(this._directApiMap, action, params, [], callback);
+            invokeApiMapHandler(this._windowApiMap, action, params, [], callback);
         } catch (e) {
             // NOP
         }
