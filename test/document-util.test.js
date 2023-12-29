@@ -244,6 +244,7 @@ describe('DOMTextScanner', () => {
                 expectedResultOffset,
                 expectedResultContent
             } = testElement.dataset;
+
             const seekOffset2 = parseInt(/** @type {string} */ (seekOffset), 10);
             const seekLength2 = parseInt(/** @type {string} */ (seekLength), 10);
             const expectedResultOffset2 = parseInt(/** @type {string} */ (expectedResultOffset), 10);
