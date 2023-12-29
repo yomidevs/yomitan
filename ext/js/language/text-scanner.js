@@ -1099,7 +1099,7 @@ export class TextScanner extends EventDispatcher {
     _getTouchEventListeners(capture) {
         return [
             [this._node, 'auxclick', this._onAuxClick.bind(this), capture],
-            [this._node, 'touchstart', this._onTouchStart.bind(this), capture],
+            [this._node, 'touchstart', this._onTouchStart.bind(this), {passive: true, capture}],
             [this._node, 'touchend', this._onTouchEnd.bind(this), capture],
             [this._node, 'touchcancel', this._onTouchCancel.bind(this), capture],
             [this._node, 'touchmove', this._onTouchMove.bind(this), {passive: false, capture}],
@@ -1130,7 +1130,7 @@ export class TextScanner extends EventDispatcher {
         if (documentElement !== null) {
             entries.push([documentElement, 'mousedown', this._onSearchClickMouseDown.bind(this), capture]);
             if (this._touchInputEnabled) {
-                entries.push([documentElement, 'touchstart', this._onSearchClickTouchStart.bind(this), capture]);
+                entries.push([documentElement, 'touchstart', this._onSearchClickTouchStart.bind(this), {passive: true, capture}]);
             }
         }
         return entries;
