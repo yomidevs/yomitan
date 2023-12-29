@@ -114,7 +114,7 @@ const test = createDomTest(path.join(dirname, 'data/html/document-util.html'));
 describe('DocumentUtil', () => {
     test('Text scanning functions', ({window}) => {
         const {document} = window;
-        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.test[data-test-type=scan]'))) {
+        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case[data-test-type=scan]'))) {
             // Get test parameters
             const {
                 elementFromPointSelector,
@@ -231,7 +231,7 @@ describe('DocumentUtil', () => {
 describe('DOMTextScanner', () => {
     test('Seek functions', async ({window}) => {
         const {document} = window;
-        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.test[data-test-type=text-source-range-seek]'))) {
+        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case[data-test-type=text-source-range-seek]'))) {
             // Get test parameters
             const {
                 seekNodeSelector,
@@ -244,7 +244,6 @@ describe('DOMTextScanner', () => {
                 expectedResultOffset,
                 expectedResultContent
             } = testElement.dataset;
-
             const seekOffset2 = parseInt(/** @type {string} */ (seekOffset), 10);
             const seekLength2 = parseInt(/** @type {string} */ (seekLength), 10);
             const expectedResultOffset2 = parseInt(/** @type {string} */ (expectedResultOffset), 10);
