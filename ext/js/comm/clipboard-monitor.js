@@ -19,7 +19,7 @@
 import {EventDispatcher} from '../core.js';
 
 /**
- * @augments EventDispatcher<import('clipboard-monitor').EventType>
+ * @augments EventDispatcher<import('clipboard-monitor').Events>
  */
 export class ClipboardMonitor extends EventDispatcher {
     /**
@@ -71,7 +71,7 @@ export class ClipboardMonitor extends EventDispatcher {
             ) {
                 this._previousText = text;
                 if (canChange && this._japaneseUtil.isStringPartiallyJapanese(text)) {
-                    this.trigger('change', /** @type {import('clipboard-monitor').ChangeEvent} */ ({text}));
+                    this.trigger('change', {text});
                 }
             }
 

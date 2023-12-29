@@ -19,7 +19,7 @@
 import {EventDispatcher, generateId, isObject} from '../core.js';
 
 /**
- * @augments EventDispatcher<import('display-history').EventType>
+ * @augments EventDispatcher<import('display-history').Events>
  */
 export class DisplayHistory extends EventDispatcher {
     /**
@@ -161,7 +161,7 @@ export class DisplayHistory extends EventDispatcher {
      * @param {boolean} synthetic
      */
     _triggerStateChanged(synthetic) {
-        this.trigger('stateChanged', /** @type {import('display-history').StateChangedEvent} */ ({synthetic}));
+        this.trigger('stateChanged', {synthetic});
     }
 
     /**

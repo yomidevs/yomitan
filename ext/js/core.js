@@ -353,22 +353,30 @@ export function invokeMessageHandler(handler, params, callback, ...extraArgs) {
 }
 
 /**
- * @template {string} TEventName
+ * The following typedef is required because the JSDoc `implements` tag doesn't work with `import()`.
+ * https://github.com/microsoft/TypeScript/issues/49905
+ * @typedef {import('core').EventDispatcherOffGeneric} EventDispatcherOffGeneric
+ */
+
+/**
  * Base class controls basic event dispatching.
+ * @template {import('core').EventSurface} TSurface
+ * @implements {EventDispatcherOffGeneric}
  */
 export class EventDispatcher {
     /**
      * Creates a new instance.
      */
     constructor() {
-        /** @type {Map<string, ((details: import('core').SafeAny) => void)[]>} */
+        /** @type {Map<import('core').EventNames<TSurface>, import('core').EventHandlerAny[]>} */
         this._eventMap = new Map();
     }
 
     /**
      * Triggers an event with the given name and specified argument.
-     * @param {TEventName} eventName The string representing the event's name.
-     * @param {unknown} [details] The argument passed to the callback functions.
+     * @template {import('core').EventNames<TSurface>} TName
+     * @param {TName} eventName The string representing the event's name.
+     * @param {import('core').EventArgument<TSurface, TName>} details The argument passed to the callback functions.
      * @returns {boolean} `true` if any callbacks were registered, `false` otherwise.
      */
     trigger(eventName, details) {
@@ -383,8 +391,9 @@ export class EventDispatcher {
 
     /**
      * Adds a single event listener to a specific event.
-     * @param {TEventName} eventName The string representing the event's name.
-     * @param {(details: import('core').SafeAny) => void} callback The event listener callback to add.
+     * @template {import('core').EventNames<TSurface>} TName
+     * @param {TName} eventName The string representing the event's name.
+     * @param {import('core').EventHandler<TSurface, TName>} callback The event listener callback to add.
      */
     on(eventName, callback) {
         let callbacks = this._eventMap.get(eventName);
@@ -397,8 +406,9 @@ export class EventDispatcher {
 
     /**
      * Removes a single event listener from a specific event.
-     * @param {TEventName} eventName The string representing the event's name.
-     * @param {(details: import('core').SafeAny) => void} callback The event listener callback to add.
+     * @template {import('core').EventNames<TSurface>} TName
+     * @param {TName} eventName The string representing the event's name.
+     * @param {import('core').EventHandler<TSurface, TName>} callback The event listener callback to add.
      * @returns {boolean} `true` if the callback was removed, `false` otherwise.
      */
     off(eventName, callback) {
@@ -420,7 +430,8 @@ export class EventDispatcher {
 
     /**
      * Checks if an event has any listeners.
-     * @param {TEventName} eventName The string representing the event's name.
+     * @template {import('core').EventNames<TSurface>} TName
+     * @param {TName} eventName The string representing the event's name.
      * @returns {boolean} `true` if the event has listeners, `false` otherwise.
      */
     hasListeners(eventName) {
@@ -476,10 +487,11 @@ export class EventListenerCollection {
 
     /**
      * Adds an event listener using `object.on`. The listener will later be removed using `object.off`.
-     * @template {string} TEventName
-     * @param {EventDispatcher<TEventName>} target The object to add the event listener to.
-     * @param {TEventName} eventName The string representing the event's name.
-     * @param {(details: import('core').SafeAny) => void} callback The event listener callback to add.
+     * @template {import('core').EventSurface} TSurface
+     * @template {import('core').EventNames<TSurface>} TName
+     * @param {EventDispatcher<TSurface>} target The object to add the event listener to.
+     * @param {TName} eventName The string representing the event's name.
+     * @param {import('core').EventHandler<TSurface, TName>} callback The event listener callback to add.
      */
     on(target, eventName, callback) {
         target.on(eventName, callback);
@@ -512,7 +524,7 @@ export class EventListenerCollection {
  * Class representing a generic value with an override stack.
  * Changes can be observed by listening to the 'change' event.
  * @template [T=unknown]
- * @augments EventDispatcher<import('dynamic-property').EventType>
+ * @augments EventDispatcher<import('dynamic-property').Events<T>>
  */
 export class DynamicProperty extends EventDispatcher {
     /**
@@ -615,14 +627,14 @@ export class DynamicProperty extends EventDispatcher {
         const value = this._overrides.length > 0 ? this._overrides[0].value : this._defaultValue;
         if (this._value === value) { return; }
         this._value = value;
-        this.trigger('change', /** @type {import('dynamic-property').ChangeEventDetails<T>} */ ({value}));
+        this.trigger('change', {value});
     }
 }
 
 /**
  * This class handles logging of messages to the console and triggering
  * an event for log calls.
- * @augments EventDispatcher<import('log').LoggerEventType>
+ * @augments EventDispatcher<import('log').Events>
  */
 export class Logger extends EventDispatcher {
     /**

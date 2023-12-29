@@ -67,7 +67,7 @@ export class ScanInputsSimpleController {
     // Private
 
     /**
-     * @param {import('settings-controller').ScanInputsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'scanInputsChanged'>} details
      */
     _onScanInputsChanged({source}) {
         if (source === this) { return; }
@@ -75,7 +75,7 @@ export class ScanInputsSimpleController {
     }
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         const {scanning: {inputs}} = options;
@@ -236,7 +236,7 @@ export class ScanInputsSimpleController {
      */
     async _modifyProfileSettings(targets) {
         await this._settingsController.modifyProfileSettings(targets);
-        /** @type {import('settings-controller').ScanInputsChangedEvent} */
+        /** @type {import('settings-controller').EventArgument<'scanInputsChanged'>} */
         const event = {source: this};
         this._settingsController.trigger('scanInputsChanged', event);
     }

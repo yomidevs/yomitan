@@ -50,7 +50,7 @@ if (checkChromeNotAvailable()) {
 
 /**
  * The Yomitan class is a core component through which various APIs are handled and invoked.
- * @augments EventDispatcher<import('extension').ExtensionEventType>
+ * @augments EventDispatcher<import('application').Events>
  */
 export class Yomitan extends EventDispatcher {
     /**
@@ -208,10 +208,20 @@ export class Yomitan extends EventDispatcher {
         if (this._isTriggeringExtensionUnloaded) { return; }
         try {
             this._isTriggeringExtensionUnloaded = true;
-            this.trigger('extensionUnloaded');
+            this.trigger('extensionUnloaded', {});
         } finally {
             this._isTriggeringExtensionUnloaded = false;
         }
+    }
+
+    /** */
+    triggerStorageChanged() {
+        this.trigger('storageChanged', {});
+    }
+
+    /** */
+    triggerClosePopups() {
+        this.trigger('closePopups', {});
     }
 
     // Private

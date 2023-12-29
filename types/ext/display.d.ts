@@ -18,13 +18,12 @@
 import type {DisplayContentManager} from '../../ext/js/display/display-content-manager';
 import type {HotkeyHelpController} from '../../ext/js/input/hotkey-help-controller';
 import type {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util';
-import type {TextScanner} from '../../ext/js/language/text-scanner';
 import type * as Core from './core';
 import type * as Dictionary from './dictionary';
 import type * as Extension from './extension';
 import type * as Settings from './settings';
 import type * as TextScannerTypes from './text-scanner';
-import type * as TextSource from './text-source';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type HistoryMode = 'clear' | 'overwrite' | 'new';
 
@@ -114,8 +113,6 @@ export type HistoryContent = {
     contentOrigin?: Extension.ContentOrigin;
 };
 
-export type SearchPersistentStateControllerEventType = 'modeChange';
-
 export type SearchMode = null | 'popup' | 'action-popup';
 
 export type GetSearchContextCallback = TextScannerTypes.GetSearchContextCallbackSync;
@@ -134,56 +131,33 @@ export type QueryParserOptions = {
     scanning: TextScannerTypes.Options;
 };
 
-export type QueryParserEventType = 'searched';
-
-export type QueryParserSearchedEvent = {
-    textScanner: TextScanner;
-    type: PageType;
-    dictionaryEntries: Dictionary.DictionaryEntry[];
-    sentence: HistoryStateSentence;
-    inputInfo: TextScannerTypes.InputInfo;
-    textSource: TextSource.TextSource;
-    optionsContext: Settings.OptionsContext;
-    sentenceOffset: number | null;
+export type Events = {
+    optionsUpdated: {
+        options: Settings.ProfileOptions;
+    };
+    frameVisibilityChange: {
+        value: boolean;
+    };
+    logDictionaryEntryData: {
+        dictionaryEntry: Dictionary.DictionaryEntry;
+        promises: Promise<unknown>[];
+    };
+    contentClear: Record<string, never>;
+    contentUpdateStart: {
+        type: PageType;
+        query: string;
+    };
+    contentUpdateEntry: {
+        dictionaryEntry: Dictionary.DictionaryEntry;
+        element: Element;
+        index: number;
+    };
+    contentUpdateComplete: {
+        type: PageType;
+    };
 };
 
-export type DisplayEventType = (
-    'optionsUpdated' |
-    'frameVisibilityChange' |
-    'logDictionaryEntryData' |
-    'contentClear' |
-    'contentUpdateStart' |
-    'contentUpdateEntry' |
-    'contentUpdateComplete'
-);
-
-export type OptionsUpdatedEvent = {
-    options: Settings.ProfileOptions;
-};
-
-export type FrameVisibilityChangeEvent = {
-    value: boolean;
-};
-
-export type LogDictionaryEntryDataEvent = {
-    dictionaryEntry: Dictionary.DictionaryEntry;
-    promises: Promise<unknown>[];
-};
-
-export type ContentUpdateStartEvent = {
-    type: PageType;
-    query: string;
-};
-
-export type ContentUpdateEntryEvent = {
-    dictionaryEntry: Dictionary.DictionaryEntry;
-    element: Element;
-    index: number;
-};
-
-export type ContentUpdateCompleteEvent = {
-    type: PageType;
-};
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
 export type ConfigureMessageDetails = {
     depth: number;

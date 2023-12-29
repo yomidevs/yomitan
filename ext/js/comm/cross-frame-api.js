@@ -22,9 +22,9 @@ import {parseJson} from '../core/json.js';
 import {yomitan} from '../yomitan.js';
 
 /**
- * @augments EventDispatcher<import('cross-frame-api').CrossFrameAPIPortEventType>
+ * @augments EventDispatcher<import('cross-frame-api').CrossFrameAPIPortEvents>
  */
-class CrossFrameAPIPort extends EventDispatcher {
+export class CrossFrameAPIPort extends EventDispatcher {
     /**
      * @param {number} otherTabId
      * @param {number} otherFrameId

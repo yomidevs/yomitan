@@ -15,20 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type {SearchMode} from './display';
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type Events = {
-    visibilityChanged: {
-        visible: boolean;
-    };
-    closeCompleted: {
-        reopening: boolean;
+    modeChange: {
+        mode: SearchMode;
     };
 };
 
 export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
-
-export type ConstructorDetails = {
-    node: HTMLElement;
-    closingAnimationDuration: number;
-};

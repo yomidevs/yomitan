@@ -19,7 +19,7 @@
 import {EventDispatcher} from '../core.js';
 
 /**
- * @augments EventDispatcher<import('display').SearchPersistentStateControllerEventType>
+ * @augments EventDispatcher<import('search-persistent-state-controller').Events>
  */
 export class SearchPersistentStateController extends EventDispatcher {
     constructor() {

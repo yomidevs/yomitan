@@ -22,7 +22,7 @@ import {yomitan} from '../yomitan.js';
 
 /**
  * Class which handles hotkey events and actions.
- * @augments EventDispatcher<import('hotkey-handler').EventType>
+ * @augments EventDispatcher<import('hotkey-handler').Events>
  */
 export class HotkeyHandler extends EventDispatcher {
     /**
@@ -120,25 +120,21 @@ export class HotkeyHandler extends EventDispatcher {
     }
 
     /**
-     * Adds a single event listener to a specific event.
-     * @template [TEventDetails=unknown]
-     * @param {import('hotkey-handler').EventType} eventName The string representing the event's name.
-     * @param {(details: TEventDetails) => void} callback The event listener callback to add.
-     * @returns {void}
+     * @template {import('core').EventNames<import('hotkey-handler').Events>} TName
+     * @param {TName} eventName
+     * @param {(details: import('core').EventArgument<import('hotkey-handler').Events, TName>) => void} callback
      */
     on(eventName, callback) {
-        const result = super.on(eventName, callback);
+        super.on(eventName, callback);
         this._updateHasEventListeners();
         this._updateEventHandlers();
-        return result;
     }
 
     /**
-     * Removes a single event listener from a specific event.
-     * @template [TEventDetails=unknown]
-     * @param {import('hotkey-handler').EventType} eventName The string representing the event's name.
-     * @param {(details: TEventDetails) => void} callback The event listener callback to add.
-     * @returns {boolean} `true` if the callback was removed, `false` otherwise.
+     * @template {import('core').EventNames<import('hotkey-handler').Events>} TName
+     * @param {TName} eventName
+     * @param {(details: import('core').EventArgument<import('hotkey-handler').Events, TName>) => void} callback
+     * @returns {boolean}
      */
     off(eventName, callback) {
         const result = super.off(eventName, callback);

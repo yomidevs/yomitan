@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type LogLevel = 'log' | 'info' | 'debug' | 'warn' | 'error';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
-export type LoggerEventType = 'log';
+export type LogLevel = 'log' | 'info' | 'debug' | 'warn' | 'error';
 
 export type LogContext = {
     url: string;
@@ -33,3 +33,13 @@ export type LogContext = {
  * `2` _error_ level.
  */
 export type LogErrorLevelValue = 0 | 1 | 2;
+
+export type Events = {
+    log: {
+        error: unknown;
+        level: LogLevel;
+        context: LogContext;
+    };
+};
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
