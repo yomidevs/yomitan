@@ -413,6 +413,7 @@ function createProfileOptionsUpdatedTestData1() {
             convertHiraganaToKatakana: 'false',
             convertKatakanaToHiragana: 'variant',
             collapseEmphaticSequences: 'false',
+            partsOfSpeechFilter: true,
             searchResolution: 'letter',
             textReplacements: {
                 searchOriginal: true,
@@ -602,7 +603,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 22,
+        version: 23,
         global: {
             database: {
                 prefixWildcardsSupported: false
