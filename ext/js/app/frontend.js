@@ -552,9 +552,11 @@ export class Frontend {
             }
         }
 
-        // The token below is used as a unique identifier to ensure that a new _updatePopup call
-        // hasn't been started during the await.
-        /** @type {?import('core').TokenObject} */
+        /**
+         * The token below is used as a unique identifier to ensure that a new _updatePopup call
+         * hasn't been started during the await.
+         * @type {?import('core').TokenObject}
+         */
         const token = {};
         this._updatePopupToken = token;
         const popup = await popupPromise;

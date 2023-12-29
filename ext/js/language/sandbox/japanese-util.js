@@ -66,8 +66,10 @@ const CJK_IDEOGRAPH_RANGES = [
     CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT_RANGE
 ];
 
-// Japanese character ranges, roughly ordered in order of expected frequency
-/** @type {import('japanese-util').CodepointRange[]} */
+/**
+ * Japanese character ranges, roughly ordered in order of expected frequency.
+ * @type {import('japanese-util').CodepointRange[]}
+ */
 const JAPANESE_RANGES = [
     HIRAGANA_RANGE,
     KATAKANA_RANGE,
