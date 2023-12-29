@@ -15,11 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type ParsePathStringState = 'empty' | // Empty
-                                   'id-start' | // Identifier start
-                                   'id' | // Identifier
-                                   'open-bracket' | // Open bracket
-                                   'string' | // Quoted string
-                                   'number' | // Number
-                                   'close-bracket' | // Closing bracket after quoted string
-                                   'next'; // . or [
+export type ParsePathStringState = (
+    'empty' // Empty
+    | 'id-start' // Identifier start
+    | 'id' // Identifier
+    | 'open-bracket' // Open bracket
+    | 'string' // Quoted string
+    | 'number' // Number
+    | 'close-bracket' // Closing bracket after quoted string
+    | 'next' // . or [
+);
