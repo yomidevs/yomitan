@@ -17,6 +17,14 @@
 
 import type {CrossFrameAPIPort} from '../../ext/js/comm/cross-frame-api.js';
 import type * as Core from './core';
+import type {
+    ApiMap as BaseApiMap,
+    ApiParams as BaseApiParams,
+    ApiNames as BaseApiNames,
+    ApiMapInit as BaseApiMapInit,
+    ApiHandler as BaseApiHandler,
+    ApiReturnAny as BaseApiReturnAny,
+} from './api-map';
 
 export type CrossFrameAPIPortEvents = {
     disconnect: CrossFrameAPIPort;
@@ -27,24 +35,16 @@ export type AcknowledgeMessage = {
     id: number;
 };
 
-// TODO : Type safety
 export type ResultMessage = {
     type: 'result';
     id: number;
-    data: Core.Response<unknown>;
+    data: Core.Response<ApiReturnAny>;
 };
 
-// TODO : Type safety
 export type InvokeMessage = {
     type: 'invoke';
     id: number;
-    data: InvocationData;
-};
-
-// TODO : Type safety
-export type InvocationData = {
-    action: string;
-    params: Core.SerializableObject;
+    data: ApiMessageAny;
 };
 
 export type Message = AcknowledgeMessage | ResultMessage | InvokeMessage;
@@ -66,4 +66,30 @@ export type CrossFrameCommunicationPortDetails = {
     name: 'cross-frame-communication-port';
     otherTabId: number;
     otherFrameId: number;
+};
+
+export type ApiSurface = {
+    displayExtensionUnloaded: {
+        params: void;
+        return: void;
+    };
+};
+
+export type ApiNames = BaseApiNames<ApiSurface>;
+
+export type ApiMapInit = BaseApiMapInit<ApiSurface>;
+
+export type ApiMap = BaseApiMap<ApiSurface, []>;
+
+export type ApiHandler<TName extends ApiNames> = BaseApiHandler<ApiSurface[TName]>;
+
+type ApiParams<TName extends ApiNames> = BaseApiParams<ApiSurface[TName]>;
+
+export type ApiReturnAny = BaseApiReturnAny<ApiSurface>;
+
+export type ApiMessageAny = {[name in ApiNames]: ApiMessage<name>}[ApiNames];
+
+type ApiMessage<TName extends ApiNames> = {
+    action: TName;
+    params: ApiParams<TName>;
 };
