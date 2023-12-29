@@ -70,15 +70,13 @@ export class CrossFrameAPIPort extends EventDispatcher {
         this._eventListeners.addListener(this._port.onMessage, this._onMessage.bind(this));
     }
 
-    // TODO : Type safety
     /**
-     * @template [TParams=import('core').SerializableObject]
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {TParams} params
+     * @template {import('cross-frame-api').ApiNames} TName
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
      * @param {number} ackTimeout
      * @param {number} responseTimeout
-     * @returns {Promise<TReturn>}
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
     invoke(action, params, ackTimeout, responseTimeout) {
         return new Promise((resolve, reject) => {
@@ -189,7 +187,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
 
     /**
      * @param {number} id
-     * @param {import('core').Response<unknown>} data
+     * @param {import('core').Response<import('cross-frame-api').ApiReturnAny>} data
      */
     _onResult(id, data) {
         const invocation = this._activeInvocations.get(id);
@@ -315,25 +313,23 @@ export class CrossFrameAPI {
     }
 
     /**
-     * @template [TParams=import('core').SerializableObject]
-     * @template [TReturn=unknown]
+     * @template {import('cross-frame-api').ApiNames} TName
      * @param {number} targetFrameId
-     * @param {string} action
-     * @param {TParams} params
-     * @returns {Promise<TReturn>}
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
     invoke(targetFrameId, action, params) {
         return this.invokeTab(null, targetFrameId, action, params);
     }
 
     /**
-     * @template [TParams=import('core').SerializableObject]
-     * @template [TReturn=unknown]
+     * @template {import('cross-frame-api').ApiNames} TName
      * @param {?number} targetTabId
      * @param {number} targetFrameId
-     * @param {string} action
-     * @param {TParams} params
-     * @returns {Promise<TReturn>}
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
     async invokeTab(targetTabId, targetFrameId, action, params) {
         if (typeof targetTabId !== 'number') {

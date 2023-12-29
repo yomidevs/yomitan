@@ -23,6 +23,7 @@ import type {
     ApiNames as BaseApiNames,
     ApiMapInit as BaseApiMapInit,
     ApiHandler as BaseApiHandler,
+    ApiReturn as BaseApiReturn,
     ApiReturnAny as BaseApiReturnAny,
 } from './api-map';
 
@@ -49,10 +50,9 @@ export type InvokeMessage = {
 
 export type Message = AcknowledgeMessage | ResultMessage | InvokeMessage;
 
-// TODO : Type safety
 export type Invocation = {
     id: number;
-    resolve: (value: Core.SafeAny) => void;
+    resolve: (value: ApiReturnAny) => void;
     reject: (reason: Error) => void;
     responseTimeout: number;
     action: string;
@@ -83,7 +83,9 @@ export type ApiMap = BaseApiMap<ApiSurface, []>;
 
 export type ApiHandler<TName extends ApiNames> = BaseApiHandler<ApiSurface[TName]>;
 
-type ApiParams<TName extends ApiNames> = BaseApiParams<ApiSurface[TName]>;
+export type ApiParams<TName extends ApiNames> = BaseApiParams<ApiSurface[TName]>;
+
+export type ApiReturn<TName extends ApiNames> = BaseApiReturn<ApiSurface[TName]>;
 
 export type ApiReturnAny = BaseApiReturnAny<ApiSurface>;
 
