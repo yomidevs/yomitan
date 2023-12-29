@@ -297,27 +297,23 @@ export class PopupProxy extends EventDispatcher {
 
     // Private
 
-    // TODO : Type safety
     /**
-     * @template {import('core').SerializableObject} TParams
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {TParams} params
-     * @returns {Promise<TReturn>}
+     * @template {import('cross-frame-api').ApiNames} TName
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
     _invoke(action, params) {
         return yomitan.crossFrame.invoke(this._frameId, action, params);
     }
 
-    // TODO : Type safety
     /**
-     * @template {import('core').SerializableObject} TParams
-     * @template [TReturn=unknown]
+     * @template {import('cross-frame-api').ApiNames} TName
      * @template [TReturnDefault=unknown]
-     * @param {string} action
-     * @param {TParams} params
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
      * @param {TReturnDefault} defaultReturnValue
-     * @returns {Promise<TReturn|TReturnDefault>}
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>|TReturnDefault>}
      */
     async _invokeSafe(action, params, defaultReturnValue) {
         try {

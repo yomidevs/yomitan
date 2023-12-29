@@ -328,7 +328,8 @@ export class Display extends EventDispatcher {
         this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
         yomitan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         yomitan.crossFrame.registerHandlers([
-            ['popupMessage', this._onDirectMessage.bind(this)]
+            ['displayPopupMessage1', this._onDisplayPopupMessage1.bind(this)],
+            ['displayPopupMessage2', this._onDisplayPopupMessage2.bind(this)]
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
 
@@ -574,12 +575,12 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {import('core').SerializableObject} [params]
-     * @returns {Promise<TReturn>}
+     * @template {import('cross-frame-api').ApiNames} TName
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
-    async invokeContentOrigin(action, params = {}) {
+    async invokeContentOrigin(action, params) {
         if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
             throw new Error('Content origin is same page');
         }
@@ -590,12 +591,12 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {import('core').SerializableObject} [params]
-     * @returns {Promise<TReturn>}
+     * @template {import('cross-frame-api').ApiNames} TName
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
-    async invokeParentFrame(action, params = {}) {
+    async invokeParentFrame(action, params) {
         if (this._parentFrameId === null || this._parentFrameId === this._frameId) {
             throw new Error('Invalid parent frame');
         }
@@ -631,13 +632,22 @@ export class Display extends EventDispatcher {
     // Message handlers
 
     /**
-     * @param {import('frame-client').Message<import('display').DirectApiMessageAny>} data
+     * @param {import('display').DirectApiFrameClientMessageAny} message
      * @returns {Promise<import('display').DirectApiReturnAny>}
-     * @throws {Error}
      */
-    _onDirectMessage(data) {
+    async _onDisplayPopupMessage1(message) {
+        /** @type {import('display').DirectApiMessageAny} */
+        const messageInner = this._authenticateMessageData(message);
+        return await this._onDisplayPopupMessage2(messageInner);
+    }
+
+    /**
+     * @param {import('display').DirectApiMessageAny} message
+     * @returns {Promise<import('display').DirectApiReturnAny>}
+     */
+    _onDisplayPopupMessage2(message) {
         return new Promise((resolve, reject) => {
-            const {action, params} = this._authenticateMessageData(data);
+            const {action, params} = message;
             invokeApiMapHandler(
                 this._directApiMap,
                 action,
@@ -659,9 +669,10 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {MessageEvent<import('frame-client').Message<import('display').WindowApiMessageAny>>} details
+     * @param {MessageEvent<import('display').WindowApiFrameClientMessageAny>} details
      */
     _onWindowMessage({data}) {
+        /** @type {import('display').WindowApiMessageAny} */
         let data2;
         try {
             data2 = this._authenticateMessageData(data);
@@ -725,18 +736,15 @@ export class Display extends EventDispatcher {
 
     /**
      * @template [T=unknown]
-     * @param {T|import('frame-client').Message<T>} data
+     * @param {import('frame-client').Message<unknown>} message
      * @returns {T}
      * @throws {Error}
      */
-    _authenticateMessageData(data) {
-        if (this._frameEndpoint === null) {
-            return /** @type {T} */ (data);
-        }
-        if (!this._frameEndpoint.authenticate(data)) {
+    _authenticateMessageData(message) {
+        if (this._frameEndpoint !== null && !this._frameEndpoint.authenticate(message)) {
             throw new Error('Invalid authentication');
         }
-        return /** @type {import('frame-client').Message<T>} */ (data).data;
+        return /** @type {import('frame-client').Message<T>} */ (message).data;
     }
 
     /** */

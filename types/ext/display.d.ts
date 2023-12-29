@@ -23,6 +23,7 @@ import type * as Extension from './extension';
 import type * as Settings from './settings';
 import type * as TextScannerTypes from './text-scanner';
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
+import type {Message as FrameClientMessage} from './frame-client';
 import type {
     ApiMap as BaseApiMap,
     ApiParams as BaseApiParams,
@@ -30,6 +31,7 @@ import type {
     ApiMapInit as BaseApiMapInit,
     ApiParamsAny as BaseApiParamsAny,
     ApiHandler as BaseApiHandler,
+    ApiReturn as BaseApiReturn,
 } from './api-map';
 
 export type HistoryMode = 'clear' | 'overwrite' | 'new';
@@ -222,7 +224,7 @@ export type DirectApiSurface = {
     };
 };
 
-type DirectApiNames = BaseApiNames<DirectApiSurface>;
+export type DirectApiNames = BaseApiNames<DirectApiSurface>;
 
 export type DirectApiMapInit = BaseApiMapInit<DirectApiSurface>;
 
@@ -230,7 +232,9 @@ export type DirectApiMap = BaseApiMap<DirectApiSurface, []>;
 
 export type DirectApiHandler<TName extends DirectApiNames> = BaseApiHandler<DirectApiSurface[TName]>;
 
-type DirectApiParams<TName extends DirectApiNames> = BaseApiParams<DirectApiSurface[TName]>;
+export type DirectApiParams<TName extends DirectApiNames> = BaseApiParams<DirectApiSurface[TName]>;
+
+export type DirectApiReturn<TName extends DirectApiNames> = BaseApiReturn<DirectApiSurface[TName]>;
 
 export type DirectApiMessageAny = {[name in DirectApiNames]: DirectApiMessage<name>}[DirectApiNames];
 
@@ -241,10 +245,12 @@ type DirectApiMessage<TName extends DirectApiNames> = {
     params: DirectApiParams<TName>;
 };
 
+export type DirectApiFrameClientMessageAny = {[name in DirectApiNames]: FrameClientMessage<DirectApiMessage<name>>}[DirectApiNames];
+
 // Window API
 
 export type WindowApiSurface = {
-    'displayExtensionUnloaded': {
+    displayExtensionUnloaded: {
         params: void;
         return: void;
     };
@@ -266,3 +272,5 @@ type WindowApiMessage<TName extends WindowApiNames> = {
     action: TName;
     params: WindowApiParams<TName>;
 };
+
+export type WindowApiFrameClientMessageAny = {[name in WindowApiNames]: FrameClientMessage<WindowApiMessage<name>>}[WindowApiNames];

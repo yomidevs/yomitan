@@ -26,6 +26,11 @@ import type {
     ApiReturn as BaseApiReturn,
     ApiReturnAny as BaseApiReturnAny,
 } from './api-map';
+import type {
+    DirectApiFrameClientMessageAny as DisplayDirectApiFrameClientMessageAny,
+    DirectApiMessageAny as DisplayDirectApiMessageAny,
+    DirectApiReturnAny as DisplayDirectApiReturnAny,
+} from './display';
 
 export type CrossFrameAPIPortEvents = {
     disconnect: CrossFrameAPIPort;
@@ -69,9 +74,13 @@ export type CrossFrameCommunicationPortDetails = {
 };
 
 export type ApiSurface = {
-    displayExtensionUnloaded: {
-        params: void;
-        return: void;
+    displayPopupMessage1: {
+        params: DisplayDirectApiFrameClientMessageAny;
+        return: DisplayDirectApiReturnAny;
+    };
+    displayPopupMessage2: {
+        params: DisplayDirectApiMessageAny;
+        return: DisplayDirectApiReturnAny;
     };
 };
 
