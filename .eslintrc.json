@@ -200,6 +200,17 @@
         ],
         "no-implicit-globals": "error",
         "no-multi-spaces": "error",
+        "no-restricted-syntax": [
+            "error",
+            {
+                "message": "Avoid using JSON.parse(), prefer parseJson.",
+                "selector": "MemberExpression[object.name=JSON][property.name=parse]"
+            },
+            {
+                "message": "Avoid using Response.json(), prefer readResponseJson.",
+                "selector": "MemberExpression[property.name=json]"
+            }
+        ],
         "no-trailing-spaces": "error",
         "no-whitespace-before-property": "error",
         "object-curly-spacing": [
