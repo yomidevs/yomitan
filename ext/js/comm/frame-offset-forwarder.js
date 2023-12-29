@@ -36,7 +36,7 @@ export class FrameOffsetForwarder {
     prepare() {
         this._frameAncestryHandler.prepare();
         yomitan.crossFrame.registerHandlers([
-            ['FrameOffsetForwarder.getChildFrameRect', this._onMessageGetChildFrameRect.bind(this)]
+            ['frameOffsetForwarderGetChildFrameRect', this._onMessageGetChildFrameRect.bind(this)]
         ]);
     }
 
@@ -55,7 +55,7 @@ export class FrameOffsetForwarder {
             /** @type {Promise<?import('frame-offset-forwarder').ChildFrameRect>[]} */
             const promises = [];
             for (const frameId of ancestorFrameIds) {
-                promises.push(yomitan.crossFrame.invoke(frameId, 'FrameOffsetForwarder.getChildFrameRect', {frameId: childFrameId}));
+                promises.push(yomitan.crossFrame.invoke(frameId, 'frameOffsetForwarderGetChildFrameRect', {frameId: childFrameId}));
                 childFrameId = frameId;
             }
 
@@ -76,7 +76,7 @@ export class FrameOffsetForwarder {
 
     // Private
 
-    /** @type {import('cross-frame-api').ApiHandler<'FrameOffsetForwarder.getChildFrameRect'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'frameOffsetForwarderGetChildFrameRect'>} */
     _onMessageGetChildFrameRect({frameId}) {
         const frameElement = this._frameAncestryHandler.getChildFrameElement(frameId);
         if (frameElement === null) { return null; }

@@ -178,11 +178,11 @@ export class Frontend {
 
         /* eslint-disable no-multi-spaces */
         yomitan.crossFrame.registerHandlers([
-            ['Frontend.closePopup',       this._onApiClosePopup.bind(this)],
-            ['Frontend.copySelection',    this._onApiCopySelection.bind(this)],
-            ['Frontend.getSelectionText', this._onApiGetSelectionText.bind(this)],
-            ['Frontend.getPopupInfo',     this._onApiGetPopupInfo.bind(this)],
-            ['Frontend.getPageInfo',      this._onApiGetPageInfo.bind(this)]
+            ['frontendClosePopup',       this._onApiClosePopup.bind(this)],
+            ['frontendCopySelection',    this._onApiCopySelection.bind(this)],
+            ['frontendGetSelectionText', this._onApiGetSelectionText.bind(this)],
+            ['frontendGetPopupInfo',     this._onApiGetPopupInfo.bind(this)],
+            ['frontendGetPageInfo',      this._onApiGetPageInfo.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
 
@@ -263,31 +263,31 @@ export class Frontend {
 
     // API message handlers
 
-    /** @type {import('cross-frame-api').ApiHandler<'Frontend.closePopup'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'frontendClosePopup'>} */
     _onApiClosePopup() {
         this._clearSelection(false);
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'Frontend.copySelection'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'frontendCopySelection'>} */
     _onApiCopySelection() {
         // This will not work on Firefox if a popup has focus, which is usually the case when this function is called.
         document.execCommand('copy');
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'Frontend.getSelectionText'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'frontendGetSelectionText'>} */
     _onApiGetSelectionText() {
         const selection = document.getSelection();
         return selection !== null ? selection.toString() : '';
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'Frontend.getPopupInfo'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'frontendGetPopupInfo'>} */
     _onApiGetPopupInfo() {
         return {
             popupId: (this._popup !== null ? this._popup.id : null)
         };
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'Frontend.getPageInfo'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'frontendGetPageInfo'>} */
     _onApiGetPageInfo() {
         return {
             url: window.location.href,
@@ -603,7 +603,7 @@ export class Frontend {
             return await this._getDefaultPopup();
         }
 
-        const {popupId} = await yomitan.crossFrame.invoke(targetFrameId, 'Frontend.getPopupInfo', void 0);
+        const {popupId} = await yomitan.crossFrame.invoke(targetFrameId, 'frontendGetPopupInfo', void 0);
         if (popupId === null) {
             return null;
         }
@@ -887,7 +887,7 @@ export class Frontend {
         let documentTitle = document.title;
         if (this._useProxyPopup && this._parentFrameId !== null) {
             try {
-                ({url, documentTitle} = await yomitan.crossFrame.invoke(this._parentFrameId, 'Frontend.getPageInfo', void 0));
+                ({url, documentTitle} = await yomitan.crossFrame.invoke(this._parentFrameId, 'frontendGetPageInfo', void 0));
             } catch (e) {
                 // NOP
             }

@@ -89,69 +89,69 @@ type ApiSurface = {
         params: DisplayDirectApiMessageAny;
         return: DisplayDirectApiReturnAny;
     };
-    'Frontend.closePopup': {
+    frontendClosePopup: {
         params: void;
         return: void;
     };
-    'Frontend.copySelection': {
+    frontendCopySelection: {
         params: void;
         return: void;
     };
-    'Frontend.getSelectionText': {
+    frontendGetSelectionText: {
         params: void;
         return: string;
     };
-    'Frontend.getPopupInfo': {
+    frontendGetPopupInfo: {
         params: void;
         return: {
             popupId: string | null;
         };
     };
-    'Frontend.getPageInfo': {
+    frontendGetPageInfo: {
         params: void;
         return: {
             url: string;
             documentTitle: string;
         };
     };
-    'FrameOffsetForwarder.getChildFrameRect': {
+    frameOffsetForwarderGetChildFrameRect: {
         params: {
             frameId: number;
         };
         return: ChildFrameRect | null;
     };
-    'HotkeyHandler.forwardHotkey': {
+    hotkeyHandlerForwardHotkey: {
         params: {
             key: string;
             modifiers: ModifierKey[];
         };
         return: boolean;
     };
-    'PopupFactory.getOrCreatePopup': {
+    popupFactoryGetOrCreatePopup: {
         params: GetOrCreatePopupDetails;
         return: {id: string, depth: number, frameId: number};
     };
-    'PopupFactory.setOptionsContext': {
+    popupFactorySetOptionsContext: {
         params: {
             id: string;
             optionsContext: OptionsContext;
         };
         return: void;
     };
-    'PopupFactory.hide': {
+    popupFactoryHide: {
         params: {
             id: string;
             changeFocus: boolean;
         };
         return: void;
     };
-    'PopupFactory.isVisible': {
+    popupFactoryIsVisible: {
         params: {
             id: string;
         };
         return: boolean;
     };
-    'PopupFactory.setVisibleOverride': {
+    popupFactorySetVisibleOverride: {
         params: {
             id: string;
             value: boolean;
@@ -159,14 +159,14 @@ type ApiSurface = {
         };
         return: TokenString | null;
     };
-    'PopupFactory.clearVisibleOverride': {
+    popupFactoryClearVisibleOverride: {
         params: {
             id: string;
             token: TokenString;
         };
         return: boolean;
     };
-    'PopupFactory.containsPoint': {
+    popupFactoryContainsPoint: {
         params: {
             id: string;
             x: number;
@@ -174,7 +174,7 @@ type ApiSurface = {
         };
         return: boolean;
     };
-    'PopupFactory.showContent': {
+    popupFactoryShowContent: {
         params: {
             id: string;
             details: PopupContentDetails;
@@ -182,33 +182,33 @@ type ApiSurface = {
         };
         return: void;
     };
-    'PopupFactory.setCustomCss': {
+    popupFactorySetCustomCss: {
         params: {
             id: string;
             css: string;
         };
         return: void;
     };
-    'PopupFactory.clearAutoPlayTimer': {
+    popupFactoryClearAutoPlayTimer: {
         params: {
             id: string;
         };
         return: void;
     };
-    'PopupFactory.setContentScale': {
+    popupFactorySetContentScale: {
         params: {
             id: string;
             scale: number;
         };
         return: void;
     };
-    'PopupFactory.updateTheme': {
+    popupFactoryUpdateTheme: {
         params: {
             id: string;
         };
         return: void;
     };
-    'PopupFactory.setCustomOuterCss': {
+    popupFactorySetCustomOuterCss: {
         params: {
             id: string;
             css: string;
@@ -216,13 +216,13 @@ type ApiSurface = {
         };
         return: void;
     };
-    'PopupFactory.getFrameSize': {
+    popupFactoryGetFrameSize: {
         params: {
             id: string;
         };
         return: ValidSize;
     };
-    'PopupFactory.setFrameSize': {
+    popupFactorySetFrameSize: {
         params: {
             id: string;
             width: number;

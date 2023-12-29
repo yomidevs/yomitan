@@ -49,21 +49,21 @@ export class PopupFactory {
         this._frameOffsetForwarder.prepare();
         /* eslint-disable no-multi-spaces */
         yomitan.crossFrame.registerHandlers([
-            ['PopupFactory.getOrCreatePopup',     this._onApiGetOrCreatePopup.bind(this)],
-            ['PopupFactory.setOptionsContext',    this._onApiSetOptionsContext.bind(this)],
-            ['PopupFactory.hide',                 this._onApiHide.bind(this)],
-            ['PopupFactory.isVisible',            this._onApiIsVisibleAsync.bind(this)],
-            ['PopupFactory.setVisibleOverride',   this._onApiSetVisibleOverride.bind(this)],
-            ['PopupFactory.clearVisibleOverride', this._onApiClearVisibleOverride.bind(this)],
-            ['PopupFactory.containsPoint',        this._onApiContainsPoint.bind(this)],
-            ['PopupFactory.showContent',          this._onApiShowContent.bind(this)],
-            ['PopupFactory.setCustomCss',         this._onApiSetCustomCss.bind(this)],
-            ['PopupFactory.clearAutoPlayTimer',   this._onApiClearAutoPlayTimer.bind(this)],
-            ['PopupFactory.setContentScale',      this._onApiSetContentScale.bind(this)],
-            ['PopupFactory.updateTheme',          this._onApiUpdateTheme.bind(this)],
-            ['PopupFactory.setCustomOuterCss',    this._onApiSetCustomOuterCss.bind(this)],
-            ['PopupFactory.getFrameSize',         this._onApiGetFrameSize.bind(this)],
-            ['PopupFactory.setFrameSize',         this._onApiSetFrameSize.bind(this)]
+            ['popupFactoryGetOrCreatePopup',     this._onApiGetOrCreatePopup.bind(this)],
+            ['popupFactorySetOptionsContext',    this._onApiSetOptionsContext.bind(this)],
+            ['popupFactoryHide',                 this._onApiHide.bind(this)],
+            ['popupFactoryIsVisible',            this._onApiIsVisibleAsync.bind(this)],
+            ['popupFactorySetVisibleOverride',   this._onApiSetVisibleOverride.bind(this)],
+            ['popupFactoryClearVisibleOverride', this._onApiClearVisibleOverride.bind(this)],
+            ['popupFactoryContainsPoint',        this._onApiContainsPoint.bind(this)],
+            ['popupFactoryShowContent',          this._onApiShowContent.bind(this)],
+            ['popupFactorySetCustomCss',         this._onApiSetCustomCss.bind(this)],
+            ['popupFactoryClearAutoPlayTimer',   this._onApiClearAutoPlayTimer.bind(this)],
+            ['popupFactorySetContentScale',      this._onApiSetContentScale.bind(this)],
+            ['popupFactoryUpdateTheme',          this._onApiUpdateTheme.bind(this)],
+            ['popupFactorySetCustomOuterCss',    this._onApiSetCustomOuterCss.bind(this)],
+            ['popupFactoryGetFrameSize',         this._onApiGetFrameSize.bind(this)],
+            ['popupFactorySetFrameSize',         this._onApiSetFrameSize.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
     }
@@ -152,7 +152,7 @@ export class PopupFactory {
             }
             const useFrameOffsetForwarder = (parentPopupId === null);
             /** @type {{id: string, depth: number, frameId: number}} */
-            const info = await yomitan.crossFrame.invoke(frameId, 'PopupFactory.getOrCreatePopup', /** @type {import('popup-factory').GetOrCreatePopupDetails} */ ({
+            const info = await yomitan.crossFrame.invoke(frameId, 'popupFactoryGetOrCreatePopup', /** @type {import('popup-factory').GetOrCreatePopupDetails} */ ({
                 id,
                 parentPopupId,
                 frameId,
@@ -239,7 +239,7 @@ export class PopupFactory {
 
     // API message handlers
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.getOrCreatePopup'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryGetOrCreatePopup'>} */
     async _onApiGetOrCreatePopup(details) {
         const popup = await this.getOrCreatePopup(details);
         return {
@@ -249,37 +249,37 @@ export class PopupFactory {
         };
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.setOptionsContext'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactorySetOptionsContext'>} */
     async _onApiSetOptionsContext({id, optionsContext}) {
         const popup = this._getPopup(id);
         await popup.setOptionsContext(optionsContext);
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.hide'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryHide'>} */
     async _onApiHide({id, changeFocus}) {
         const popup = this._getPopup(id);
         await popup.hide(changeFocus);
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.isVisible'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryIsVisible'>} */
     async _onApiIsVisibleAsync({id}) {
         const popup = this._getPopup(id);
         return await popup.isVisible();
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.setVisibleOverride'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactorySetVisibleOverride'>} */
     async _onApiSetVisibleOverride({id, value, priority}) {
         const popup = this._getPopup(id);
         return await popup.setVisibleOverride(value, priority);
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.clearVisibleOverride'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryClearVisibleOverride'>} */
     async _onApiClearVisibleOverride({id, token}) {
         const popup = this._getPopup(id);
         return await popup.clearVisibleOverride(token);
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.containsPoint'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryContainsPoint'>} */
     async _onApiContainsPoint({id, x, y}) {
         const popup = this._getPopup(id);
         const offset = this._getPopupOffset(popup);
@@ -288,7 +288,7 @@ export class PopupFactory {
         return await popup.containsPoint(x, y);
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.showContent'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryShowContent'>} */
     async _onApiShowContent({id, details, displayDetails}) {
         const popup = this._getPopup(id);
         if (!this._popupCanShow(popup)) { return; }
@@ -305,43 +305,43 @@ export class PopupFactory {
         return await popup.showContent(details, displayDetails);
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.setCustomCss'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactorySetCustomCss'>} */
     async _onApiSetCustomCss({id, css}) {
         const popup = this._getPopup(id);
         await popup.setCustomCss(css);
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.clearAutoPlayTimer'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryClearAutoPlayTimer'>} */
     async _onApiClearAutoPlayTimer({id}) {
         const popup = this._getPopup(id);
         await popup.clearAutoPlayTimer();
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.setContentScale'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactorySetContentScale'>} */
     async _onApiSetContentScale({id, scale}) {
         const popup = this._getPopup(id);
         await popup.setContentScale(scale);
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.updateTheme'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryUpdateTheme'>} */
     async _onApiUpdateTheme({id}) {
         const popup = this._getPopup(id);
         await popup.updateTheme();
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.setCustomOuterCss'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactorySetCustomOuterCss'>} */
     async _onApiSetCustomOuterCss({id, css, useWebExtensionApi}) {
         const popup = this._getPopup(id);
         await popup.setCustomOuterCss(css, useWebExtensionApi);
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.getFrameSize'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryGetFrameSize'>} */
     async _onApiGetFrameSize({id}) {
         const popup = this._getPopup(id);
         return await popup.getFrameSize();
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'PopupFactory.setFrameSize'>} */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactorySetFrameSize'>} */
     async _onApiSetFrameSize({id, width, height}) {
         const popup = this._getPopup(id);
         return await popup.setFrameSize(width, height);
