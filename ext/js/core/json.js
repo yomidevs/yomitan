@@ -25,6 +25,7 @@
  * @returns {T}
  */
 export function parseJson(value) {
+    // eslint-disable-next-line no-restricted-syntax
     return JSON.parse(value);
 }
 
@@ -36,5 +37,6 @@ export function parseJson(value) {
  * @returns {Promise<T>}
  */
 export async function readResponseJson(response) {
+    // eslint-disable-next-line no-restricted-syntax
     return await response.json();
 }
