@@ -1141,8 +1141,6 @@ export class OptionsUtil {
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.translation.searchResolution = 'letter';
         }
-
-        return options;
     }
 
     /**
@@ -1153,8 +1151,6 @@ export class OptionsUtil {
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.translation.partsOfSpeechFilter = true;
         }
-
-        return options;
     }
 
     /**
