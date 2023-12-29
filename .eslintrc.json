@@ -548,6 +548,7 @@
         {
             "files": [
                 "test/data/anki-note-builder-test-results.json",
+                "test/data/database-test-cases.json",
                 "test/data/translator-test-results-note-data1.json",
                 "test/data/translator-test-results.json"
             ],

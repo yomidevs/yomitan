@@ -119,6 +119,12 @@
             "jsconfig": "test"
         },
         {
+            "path": "test/data/database-test-cases.json",
+            "typeFile": "types/test/database.d.ts",
+            "type": "DatabaseTestData",
+            "jsconfig": "test"
+        },
+        {
             "path": "test/data/json.json",
             "typeFile": "types/test/json.d.ts",
             "type": "JsonInfo"

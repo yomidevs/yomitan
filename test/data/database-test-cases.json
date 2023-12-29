@@ -1,0 +1,811 @@
+{
+  "expectedSummary": {
+    "title": "Test Dictionary",
+    "revision": "test",
+    "sequenced": true,
+    "version": 3,
+    "importDate": 0,
+    "prefixWildcardsSupported": true,
+    "counts": {
+      "kanji": {
+        "total": 2
+      },
+      "kanjiMeta": {
+        "total": 6,
+        "freq": 6
+      },
+      "media": {
+        "total": 6
+      },
+      "tagMeta": {
+        "total": 15
+      },
+      "termMeta": {
+        "total": 39,
+        "freq": 31,
+        "pitch": 7,
+        "ipa": 1
+      },
+      "terms": {
+        "total": 23
+      }
+    }
+  },
+  "expectedCounts": {
+    "counts": [
+      {
+        "kanji": 2,
+        "kanjiMeta": 6,
+        "terms": 23,
+        "termMeta": 39,
+        "tagMeta": 15,
+        "media": 6
+      }
+    ],
+    "total": {
+      "kanji": 2,
+      "kanjiMeta": 6,
+      "terms": 23,
+      "termMeta": 39,
+      "tagMeta": 15,
+      "media": 6
+    }
+  },
+  "tests": {
+    "findTermsBulk": [
+      {
+        "inputs": [
+          {
+            "matchType": "exact",
+            "termList": [
+              "打",
+              "打つ",
+              "打ち込む"
+            ]
+          },
+          {
+            "matchType": "exact",
+            "termList": [
+              "だ",
+              "ダース",
+              "うつ",
+              "ぶつ",
+              "うちこむ",
+              "ぶちこむ"
+            ]
+          },
+          {
+            "matchType": "prefix",
+            "termList": [
+              "打"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 10,
+          "terms": [
+            [
+              "打",
+              2
+            ],
+            [
+              "打つ",
+              4
+            ],
+            [
+              "打ち込む",
+              4
+            ]
+          ],
+          "readings": [
+            [
+              "だ",
+              1
+            ],
+            [
+              "ダース",
+              1
+            ],
+            [
+              "うつ",
+              2
+            ],
+            [
+              "ぶつ",
+              2
+            ],
+            [
+              "うちこむ",
+              2
+            ],
+            [
+              "ぶちこむ",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "matchType": "exact",
+            "termList": [
+              "込む"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 0,
+          "terms": [],
+          "readings": []
+        }
+      },
+      {
+        "inputs": [
+          {
+            "matchType": "suffix",
+            "termList": [
+              "込む"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 4,
+          "terms": [
+            [
+              "打ち込む",
+              4
+            ]
+          ],
+          "readings": [
+            [
+              "うちこむ",
+              2
+            ],
+            [
+              "ぶちこむ",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "matchType": "exact",
+            "termList": []
+          }
+        ],
+        "expectedResults": {
+          "total": 0,
+          "terms": [],
+          "readings": []
+        }
+      }
+    ],
+    "findTermsExactBulk": [
+      {
+        "inputs": [
+          {
+            "termList": [
+              {
+                "term": "打",
+                "reading": "だ"
+              },
+              {
+                "term": "打つ",
+                "reading": "うつ"
+              },
+              {
+                "term": "打ち込む",
+                "reading": "うちこむ"
+              }
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 5,
+          "terms": [
+            [
+              "打",
+              1
+            ],
+            [
+              "打つ",
+              2
+            ],
+            [
+              "打ち込む",
+              2
+            ]
+          ],
+          "readings": [
+            [
+              "だ",
+              1
+            ],
+            [
+              "うつ",
+              2
+            ],
+            [
+              "うちこむ",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "termList": [
+              {
+                "term": "打",
+                "reading": "だ?"
+              },
+              {
+                "term": "打つ",
+                "reading": "うつ?"
+              },
+              {
+                "term": "打ち込む",
+                "reading": "うちこむ?"
+              }
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 0,
+          "terms": [],
+          "readings": []
+        }
+      },
+      {
+        "inputs": [
+          {
+            "termList": [
+              {
+                "term": "打つ",
+                "reading": "うつ"
+              },
+              {
+                "term": "打つ",
+                "reading": "ぶつ"
+              }
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 4,
+          "terms": [
+            [
+              "打つ",
+              4
+            ]
+          ],
+          "readings": [
+            [
+              "うつ",
+              2
+            ],
+            [
+              "ぶつ",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "termList": [
+              {
+                "term": "打つ",
+                "reading": "うちこむ"
+              }
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 0,
+          "terms": [],
+          "readings": []
+        }
+      },
+      {
+        "inputs": [
+          {
+            "termList": []
+          }
+        ],
+        "expectedResults": {
+          "total": 0,
+          "terms": [],
+          "readings": []
+        }
+      }
+    ],
+    "findTermsBySequenceBulk": [
+      {
+        "inputs": [
+          {
+            "sequenceList": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 11,
+          "terms": [
+            [
+              "打",
+              2
+            ],
+            [
+              "打つ",
+              4
+            ],
+            [
+              "打ち込む",
+              4
+            ],
+            [
+              "画像",
+              1
+            ]
+          ],
+          "readings": [
+            [
+              "だ",
+              1
+            ],
+            [
+              "ダース",
+              1
+            ],
+            [
+              "うつ",
+              2
+            ],
+            [
+              "ぶつ",
+              2
+            ],
+            [
+              "うちこむ",
+              2
+            ],
+            [
+              "ぶちこむ",
+              2
+            ],
+            [
+              "がぞう",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "sequenceList": [
+              1
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 1,
+          "terms": [
+            [
+              "打",
+              1
+            ]
+          ],
+          "readings": [
+            [
+              "だ",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "sequenceList": [
+              2
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 1,
+          "terms": [
+            [
+              "打",
+              1
+            ]
+          ],
+          "readings": [
+            [
+              "ダース",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "sequenceList": [
+              3
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 4,
+          "terms": [
+            [
+              "打つ",
+              4
+            ]
+          ],
+          "readings": [
+            [
+              "うつ",
+              2
+            ],
+            [
+              "ぶつ",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "sequenceList": [
+              4
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 4,
+          "terms": [
+            [
+              "打ち込む",
+              4
+            ]
+          ],
+          "readings": [
+            [
+              "うちこむ",
+              2
+            ],
+            [
+              "ぶちこむ",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "sequenceList": [
+              5
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 1,
+          "terms": [
+            [
+              "画像",
+              1
+            ]
+          ],
+          "readings": [
+            [
+              "がぞう",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "sequenceList": [
+              1099490
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 1,
+          "terms": [
+            [
+              "発条",
+              1
+            ]
+          ],
+          "readings": [
+            [
+              "ばね",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "sequenceList": [
+              -1
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 0,
+          "terms": [],
+          "readings": []
+        }
+      },
+      {
+        "inputs": [
+          {
+            "sequenceList": []
+          }
+        ],
+        "expectedResults": {
+          "total": 0,
+          "terms": [],
+          "readings": []
+        }
+      }
+    ],
+    "findTermMetaBulk": [
+      {
+        "inputs": [
+          {
+            "termList": [
+              "打"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 11,
+          "modes": [
+            [
+              "freq",
+              11
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "termList": [
+              "打つ"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 10,
+          "modes": [
+            [
+              "freq",
+              10
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "termList": [
+              "打ち込む"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 12,
+          "modes": [
+            [
+              "freq",
+              10
+            ],
+            [
+              "pitch",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "termList": [
+              "?"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 0,
+          "modes": []
+        }
+      }
+    ],
+    "findKanjiBulk": [
+      {
+        "inputs": [
+          {
+            "kanjiList": [
+              "打"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 1,
+          "kanji": [
+            [
+              "打",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "kanjiList": [
+              "込"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 1,
+          "kanji": [
+            [
+              "込",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "kanjiList": [
+              "?"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 0,
+          "kanji": []
+        }
+      }
+    ],
+    "findKanjiMetaBulk": [
+      {
+        "inputs": [
+          {
+            "kanjiList": [
+              "打"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 3,
+          "modes": [
+            [
+              "freq",
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "kanjiList": [
+              "込"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 3,
+          "modes": [
+            [
+              "freq",
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "inputs": [
+          {
+            "kanjiList": [
+              "?"
+            ]
+          }
+        ],
+        "expectedResults": {
+          "total": 0,
+          "modes": []
+        }
+      }
+    ],
+    "findTagForTitle": [
+      {
+        "inputs": [
+          {
+            "name": "E1"
+          }
+        ],
+        "expectedResults": {
+          "value": {
+            "category": "default",
+            "dictionary": "Test Dictionary",
+            "name": "E1",
+            "notes": "example tag 1",
+            "order": 0,
+            "score": 0
+          }
+        }
+      },
+      {
+        "inputs": [
+          {
+            "name": "K1"
+          }
+        ],
+        "expectedResults": {
+          "value": {
+            "category": "default",
+            "dictionary": "Test Dictionary",
+            "name": "K1",
+            "notes": "example kanji tag 1",
+            "order": 0,
+            "score": 0
+          }
+        }
+      },
+      {
+        "inputs": [
+          {
+            "name": "kstat1"
+          }
+        ],
+        "expectedResults": {
+          "value": {
+            "category": "class",
+            "dictionary": "Test Dictionary",
+            "name": "kstat1",
+            "notes": "kanji stat 1",
+            "order": 0,
+            "score": 0
+          }
+        }
+      },
+      {
+        "inputs": [
+          {
+            "name": "invalid"
+          }
+        ],
+        "expectedResults": {
+          "value": null
+        }
+      }
+    ]
+  }
+}
