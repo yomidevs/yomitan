@@ -46,22 +46,20 @@ export class Deinflector {
     /**
      * Deinflects a Japanese term to all of its possible dictionary forms.
      * @param {string} source The source term to deinflect.
-     * @param {import('translation-internal').DeinflectionOptions} options
      * @returns {import('translation-internal').Deinflection[]}
      * @example
      * const deinflector = new Deinflector(deinflectionReasons);
      * // [{ term: '食べた', rules: 0, reasons: [] }, { term: '食べる', rules: 1, reasons: ['past'] }, { term: '食ぶ', rules: 2, reasons: ['potential', 'past'] }]
      * console.log(deinflector.deinflect('食べた'));
      */
-    deinflect(source, options) {
-        const {partsOfSpeechFilter} = options;
+    deinflect(source) {
         const results = [this._createDeinflection(source, 0, [])];
         for (let i = 0; i < results.length; ++i) {
             const {rules, term, reasons} = results[i];
             for (const [reason, variants] of this.reasons) {
                 for (const [kanaIn, kanaOut, rulesIn, rulesOut] of variants) {
                     if (
-                        !Deinflector.rulesCheck(partsOfSpeechFilter, rules, rulesIn) ||
+                        (rules !== 0 && (rules & rulesIn) === 0) ||
                         !term.endsWith(kanaIn) ||
                         (term.length - kanaIn.length + kanaOut.length) <= 0
                     ) {
@@ -77,18 +75,6 @@ export class Deinflector {
             }
         }
         return results;
-    }
-
-    /**
-     *
-     * @param {boolean} checkRules
-     * @param {import('translation-internal').DeinflectionRuleFlags} rules1
-     * @param {import('translation-internal').DeinflectionRuleFlags} rules2
-     * @returns {boolean}
-     */
-    static rulesCheck(checkRules, rules1, rules2){
-        if (!checkRules) { return true; }
-        return rules1 === 0 || (rules1 & rules2) !== 0;
     }
 
     /**

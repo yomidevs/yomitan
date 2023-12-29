@@ -273,7 +273,7 @@ export class Translator {
             const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
                 const deinflectionRules = deinflection.rules;
-                if (Deinflector.rulesCheck(partsOfSpeechFilter, deinflectionRules, definitionRules)) {
+                if (!partsOfSpeechFilter || deinflectionRules === 0 || (definitionRules & deinflectionRules) !== 0) {
                     deinflection.databaseEntries.push(databaseEntry);
                 }
             }
@@ -339,7 +339,7 @@ export class Translator {
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                for (const {term, rules, reasons} of /** @type {Deinflector} */ (this._deinflector).deinflect(source, options)) {
+                for (const {term, rules, reasons} of /** @type {Deinflector} */ (this._deinflector).deinflect(source)) {
                     deinflections.push(this._createDeinflection(rawSource, source, term, rules, reasons));
                 }
             }
