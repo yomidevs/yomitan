@@ -40,8 +40,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
         this._otherFrameId = otherFrameId;
         /** @type {?chrome.runtime.Port} */
         this._port = port;
-        // /** @type {import('cross-frame-api').ApiMap} */ // TODO
-        /** @type {import('api-map').ApiMap<import('cross-frame-api').ApiSurface>} */
+        /** @type {import('cross-frame-api').ApiMap} */
         this._apiMap = apiMap;
         /** @type {Map<number, import('cross-frame-api').Invocation>} */
         this._activeInvocations = new Map();

@@ -631,20 +631,14 @@ export class Display extends EventDispatcher {
 
     // Message handlers
 
-    /**
-     * @param {import('display').DirectApiFrameClientMessageAny} message
-     * @returns {Promise<import('display').DirectApiReturnAny>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'displayPopupMessage1'>} */
     async _onDisplayPopupMessage1(message) {
         /** @type {import('display').DirectApiMessageAny} */
         const messageInner = this._authenticateMessageData(message);
         return await this._onDisplayPopupMessage2(messageInner);
     }
 
-    /**
-     * @param {import('display').DirectApiMessageAny} message
-     * @returns {Promise<import('display').DirectApiReturnAny>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'displayPopupMessage2'>} */
     _onDisplayPopupMessage2(message) {
         return new Promise((resolve, reject) => {
             const {action, params} = message;

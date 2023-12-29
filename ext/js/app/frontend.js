@@ -270,41 +270,31 @@ export class Frontend {
         return window.location.href;
     }
 
-    /**
-     * @returns {void}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'Frontend.closePopup'>} */
     _onApiClosePopup() {
         this._clearSelection(false);
     }
 
-    /**
-     * @returns {void}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'Frontend.copySelection'>} */
     _onApiCopySelection() {
         // This will not work on Firefox if a popup has focus, which is usually the case when this function is called.
         document.execCommand('copy');
     }
 
-    /**
-     * @returns {string}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'Frontend.getSelectionText'>} */
     _onApiGetSelectionText() {
         const selection = document.getSelection();
         return selection !== null ? selection.toString() : '';
     }
 
-    /**
-     * @returns {import('frontend').GetPopupInfoResult}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'Frontend.getPopupInfo'>} */
     _onApiGetPopupInfo() {
         return {
             popupId: (this._popup !== null ? this._popup.id : null)
         };
     }
 
-    /**
-     * @returns {{url: string, documentTitle: string}}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'Frontend.getPageInfo'>} */
     _onApiGetPageInfo() {
         return {
             url: window.location.href,
@@ -620,8 +610,7 @@ export class Frontend {
             return await this._getDefaultPopup();
         }
 
-        /** @type {import('frontend').GetPopupInfoResult} */
-        const {popupId} = await yomitan.crossFrame.invoke(targetFrameId, 'Frontend.getPopupInfo', {});
+        const {popupId} = await yomitan.crossFrame.invoke(targetFrameId, 'Frontend.getPopupInfo', void 0);
         if (popupId === null) {
             return null;
         }
@@ -905,7 +894,7 @@ export class Frontend {
         let documentTitle = document.title;
         if (this._useProxyPopup && this._parentFrameId !== null) {
             try {
-                ({url, documentTitle} = await yomitan.crossFrame.invoke(this._parentFrameId, 'Frontend.getPageInfo', {}));
+                ({url, documentTitle} = await yomitan.crossFrame.invoke(this._parentFrameId, 'Frontend.getPageInfo', void 0));
             } catch (e) {
                 // NOP
             }

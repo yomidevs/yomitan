@@ -73,7 +73,7 @@ export type CrossFrameCommunicationPortDetails = {
     otherFrameId: number;
 };
 
-export type ApiSurface = {
+type ApiSurface = {
     displayPopupMessage1: {
         params: DisplayDirectApiFrameClientMessageAny;
         return: DisplayDirectApiReturnAny;
@@ -81,6 +81,31 @@ export type ApiSurface = {
     displayPopupMessage2: {
         params: DisplayDirectApiMessageAny;
         return: DisplayDirectApiReturnAny;
+    };
+    'Frontend.closePopup': {
+        params: void;
+        return: void;
+    };
+    'Frontend.copySelection': {
+        params: void;
+        return: void;
+    };
+    'Frontend.getSelectionText': {
+        params: void;
+        return: string;
+    };
+    'Frontend.getPopupInfo': {
+        params: void;
+        return: {
+            popupId: string | null;
+        };
+    };
+    'Frontend.getPageInfo': {
+        params: void;
+        return: {
+            url: string;
+            documentTitle: string;
+        };
     };
 };
 
