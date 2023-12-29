@@ -115,7 +115,7 @@ const test = createDomTest(path.join(dirname, 'data/html/document-util.html'));
 describe('DocumentUtil', () => {
     test('Text scanning functions', ({window}) => {
         const {document} = window;
-        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.test[data-test-type=scan]'))) {
+        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case[data-test-type=scan]'))) {
             // Get test parameters
             /** @type {import('test/document-util').DocumentUtilTestData} */
             const {
@@ -137,6 +137,8 @@ describe('DocumentUtil', () => {
             const startNode = getChildTextNodeOrSelf(window, querySelectorChildOrSelf(testElement, startNodeSelector));
             const endNode = getChildTextNodeOrSelf(window, querySelectorChildOrSelf(testElement, endNodeSelector));
 
+            const terminateAtNewlines2 = typeof terminateAtNewlines === 'boolean' ? terminateAtNewlines : true;
+
             expect(elementFromPointValue).not.toStrictEqual(null);
             expect(caretRangeFromPointValue).not.toStrictEqual(null);
             expect(startNode).not.toStrictEqual(null);
@@ -147,7 +149,7 @@ describe('DocumentUtil', () => {
 
             document.caretRangeFromPoint = (x, y) => {
                 const imposter = getChildTextNodeOrSelf(window, findImposterElement(document));
-                expect(!!imposter).toStrictEqual(hasImposter);
+                expect(!!imposter).toStrictEqual(!!hasImposter);
 
                 const range = document.createRange();
                 range.setStart(/** @type {Node} */ (imposter ? imposter : startNode), startOffset);
@@ -212,7 +214,7 @@ describe('DocumentUtil', () => {
                 source,
                 false,
                 sentenceScanExtent,
-                terminateAtNewlines,
+                terminateAtNewlines2,
                 terminatorMap,
                 forwardQuoteMap,
                 backwardQuoteMap
@@ -228,7 +230,7 @@ describe('DocumentUtil', () => {
 describe('DOMTextScanner', () => {
     test('Seek functions', async ({window}) => {
         const {document} = window;
-        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.test[data-test-type=text-source-range-seek]'))) {
+        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case[data-test-type=text-source-range-seek]'))) {
             // Get test parameters
             /** @type {import('test/document-util').DOMTextScannerTestData} */
             const {

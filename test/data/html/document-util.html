@@ -144,7 +144,7 @@
             "resultType": "TextSourceRange",
             "sentenceScanExtent": 100,
             "sentence": "真白「心配してくださって、ありがとございます」",
-            "hasImpostor": true
+            "hasImposter": true
         }'
     >
         <input type="text" value="真白「心配してくださって、ありがとございます」" style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: inherit; border: 1px solid #d8d8d8; padding: 0.2em;">
@@ -162,7 +162,7 @@
             "resultType": "TextSourceRange",
             "sentenceScanExtent": 100,
             "sentence": "真白「心配してくださって、ありがとございます」",
-            "hasImpostor": true
+            "hasImposter": true
         }'
     >
         <textarea style="width: 100%; height: 3em; box-sizing: border-box; font-family: inherit; font-size: inherit; border: 1px solid #d8d8d8; padding: 0.2em;">真白「心配してくださって、ありがとございます」</textarea>
@@ -235,7 +235,7 @@
             "endOffset": 0,
             "resultType": "TextSourceRange",
             "sentenceScanExtent": 22,
-            "sentence": "ありがとございます1&#10;ありがとございます2&#10;ありがとございます3&#10;ありがとございます4",
+            "sentence": "ありがとございます1\nありがとございます2\nありがとございます3\nありがとございます4",
             "terminateAtNewlines": false
         }'
     >
@@ -254,7 +254,7 @@
             "seekOffset": 0,
             "seekLength": 149,
             "seekDirection": "forward",
-            "expectedResultNodeSelector": "span:nth-of-type(1)"",
+            "expectedResultNodeSelector": "span:nth-of-type(1)",
             "expectedResultNodeIsText": true,
             "expectedResultOffset": 149,
             "expectedResultContent": "
@@ -265,9 +265,9 @@
             なにぬねの
             はひふへほ
             まみむめも
-            や&#x3000;ゆ&#x3000;よ
+            や ゆ よ
             らりるれろ
-            わゐ&#x3000;ゑを
+            わゐ ゑを
             "
         }'  
     >
@@ -279,9 +279,9 @@
         なにぬねの
         はひふへほ
         まみむめも
-        や&#x3000;ゆ&#x3000;よ
+        や ゆ よ
         らりるれろ
-        わゐ&#x3000;ゑを
+        わゐ ゑを
         </span><span>trailing content</span>
     </test-case>
 
@@ -293,7 +293,7 @@
             "seekOffset": 149,
             "seekLength": 149,
             "seekDirection": "backward",
-            "expectedResultNodeSelector": "span:nth-of-type(1)"",
+            "expectedResultNodeSelector": "span:nth-of-type(1)",
             "expectedResultNodeIsText": true,
             "expectedResultOffset": 0,
             "expectedResultContent": "
@@ -304,9 +304,9 @@
             なにぬねの
             はひふへほ
             まみむめも
-            や&#x3000;ゆ&#x3000;よ
+            や ゆ よ
             らりるれろ
-            わゐ&#x3000;ゑを
+            わゐ ゑを
             "
         }'
     >
@@ -332,7 +332,7 @@
             "seekOffset": 0,
             "seekLength": 150,
             "seekDirection": "forward",
-            "expectedResultNodeSelector": "span:nth-of-type(2)"",
+            "expectedResultNodeSelector": "span:nth-of-type(2)",
             "expectedResultNodeIsText": true,
             "expectedResultOffset": 1,
             "expectedResultContent": "
@@ -343,9 +343,9 @@
             なにぬねの
             はひふへほ
             まみむめも
-            や&#x3000;ゆ&#x3000;よ
+            や ゆ よ
             らりるれろ
-            わゐ&#x3000;ゑを
+            わゐ ゑを
             t"
         }'  
     >
@@ -371,7 +371,7 @@
             "seekOffset": 1,
             "seekLength": 150,
             "seekDirection": "bacward",
-            "expectedResultNodeSelector": "span:nth-of-type(1)"",
+            "expectedResultNodeSelector": "span:nth-of-type(1)",
             "expectedResultNodeIsText": true,
             "expectedResultOffset": 0,
             "expectedResultContent": "
@@ -382,9 +382,9 @@
             なにぬねの
             はひふへほ
             まみむめも
-            や&#x3000;ゆ&#x3000;よ
+            や ゆ よ
             らりるれろ
-            わゐ&#x3000;ゑを
+            わゐ ゑを
             t"
         }'  
     >
