@@ -37,6 +37,7 @@ import type {
     ContentDetails as DisplayContentDetails,
 } from './display';
 import type {ChildFrameRect} from 'frame-offset-forwarder';
+import type {RequestFrameInfoResponseParams, RequestFrameInfoResponseReturn} from './frame-ancestry-handler';
 
 export type CrossFrameAPIPortEvents = {
     disconnect: CrossFrameAPIPort;
@@ -228,6 +229,10 @@ type ApiSurface = {
             height: number;
         };
         return: boolean;
+    };
+    frameAncestryHandlerRequestFrameInfoResponse: {
+        params: RequestFrameInfoResponseParams;
+        return: RequestFrameInfoResponseReturn;
     };
 };
 
