@@ -137,6 +137,7 @@ describe('DocumentUtil', () => {
             const startNode = getChildTextNodeOrSelf(window, querySelectorChildOrSelf(testElement, startNodeSelector));
             const endNode = getChildTextNodeOrSelf(window, querySelectorChildOrSelf(testElement, endNodeSelector));
 
+            // Defaults to true
             const terminateAtNewlines2 = typeof terminateAtNewlines === 'boolean' ? terminateAtNewlines : true;
 
             expect(elementFromPointValue).not.toStrictEqual(null);

@@ -25,8 +25,8 @@ export type DocumentUtilTestData = {
     resultType: string;
     sentenceScanExtent: number;
     sentence: string;
-    hasImposter: boolean;
-    terminateAtNewlines: boolean;
+    hasImposter: boolean | undefined;
+    terminateAtNewlines: boolean | undefined;
 };
 
 export type DOMTextScannerTestData = {
