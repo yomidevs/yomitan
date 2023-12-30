@@ -251,6 +251,8 @@ describe('DOMTextScanner', () => {
                 seekNode = seekNode.firstChild;
             }
 
+            const expectedResultContent2 = Array.isArray(expectedResultContent) ? expectedResultContent.join('\n') : expectedResultContent;
+
             /** @type {?Node} */
             let expectedResultNode = testElement.querySelector(/** @type {string} */ (expectedResultNodeSelector));
             if (expectedResultNodeIsText && expectedResultNode !== null) {
@@ -265,7 +267,7 @@ describe('DOMTextScanner', () => {
 
             expect(node).toStrictEqual(expectedResultNode);
             expect(offset).toStrictEqual(expectedResultOffset);
-            expect(content).toStrictEqual(expectedResultContent);
+            expect(content).toStrictEqual(expectedResultContent2);
         }
     });
 });
