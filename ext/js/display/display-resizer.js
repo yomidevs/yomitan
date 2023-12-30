@@ -174,7 +174,7 @@ export class DisplayResizer {
         if (parentPopupId === null) { return; }
 
         /** @type {import('popup').ValidSize} */
-        const size = await this._display.invokeParentFrame('PopupFactory.getFrameSize', {id: parentPopupId});
+        const size = await this._display.invokeParentFrame('popupFactoryGetFrameSize', {id: parentPopupId});
         if (this._token !== token) { return; }
         const {width, height} = size;
         this._startSize = {width, height};
@@ -210,7 +210,7 @@ export class DisplayResizer {
         height += y - this._startOffset.y;
         width = Math.max(Math.max(0, handleSize.width), width);
         height = Math.max(Math.max(0, handleSize.height), height);
-        await this._display.invokeParentFrame('PopupFactory.setFrameSize', {id: parentPopupId, width, height});
+        await this._display.invokeParentFrame('popupFactorySetFrameSize', {id: parentPopupId, width, height});
     }
 
     /**

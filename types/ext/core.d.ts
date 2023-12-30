@@ -74,19 +74,6 @@ export type ResponseError = {
 
 export type Response<T = unknown> = ResponseSuccess<T> | ResponseError;
 
-export type MessageHandler = (params: SafeAny, ...extraArgs: SafeAny[]) => (
-    MessageHandlerResult |
-    Promise<MessageHandlerResult>
-);
-
-export type MessageHandlerResult = SafeAny;
-
-export type MessageHandlerMap = Map<string, MessageHandler>;
-
-export type MessageHandlerMapInit = MessageHandlerMapInitItem[];
-
-export type MessageHandlerMapInitItem = [key: string, handlerDetails: MessageHandler];
-
 export type Timeout = number | NodeJS.Timeout;
 
 export type EventSurface = {[name: string]: unknown};

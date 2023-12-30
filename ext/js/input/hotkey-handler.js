@@ -51,7 +51,7 @@ export class HotkeyHandler extends EventDispatcher {
         this._isPrepared = true;
         this._updateEventHandlers();
         yomitan.crossFrame.registerHandlers([
-            ['HotkeyHandler.forwardHotkey', this._onMessageForwardHotkey.bind(this)]
+            ['hotkeyHandlerForwardHotkey', this._onMessageForwardHotkey.bind(this)]
         ]);
     }
 
@@ -159,10 +159,7 @@ export class HotkeyHandler extends EventDispatcher {
 
     // Message handlers
 
-    /**
-     * @param {{key: string, modifiers: import('input').ModifierKey[]}} details
-     * @returns {boolean}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'hotkeyHandlerForwardHotkey'>} */
     _onMessageForwardHotkey({key, modifiers}) {
         return this.simulate(key, modifiers);
     }

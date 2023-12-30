@@ -316,7 +316,7 @@ export class Popup extends EventDispatcher {
      */
     async clearAutoPlayTimer() {
         if (this._frameConnected) {
-            await this._invokeSafe('displayAudioClearAutoPlayTimer', {});
+            await this._invokeSafe('displayAudioClearAutoPlayTimer', void 0);
         }
     }
 
@@ -679,13 +679,11 @@ export class Popup extends EventDispatcher {
         }
     }
 
-    // TODO : Type safety
     /**
-     * @template {import('core').SerializableObject} TParams
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {TParams} params
-     * @returns {Promise<TReturn>}
+     * @template {import('display').DirectApiNames} TName
+     * @param {TName} action
+     * @param {import('display').DirectApiParams<TName>} params
+     * @returns {Promise<import('display').DirectApiReturn<TName>>}
      */
     async _invoke(action, params) {
         const contentWindow = this._frame.contentWindow;
@@ -693,17 +691,21 @@ export class Popup extends EventDispatcher {
             throw new Error(`Failed to invoke action ${action}: frame state invalid`);
         }
 
-        const message = this._frameClient.createMessage({action, params});
-        return await yomitan.crossFrame.invoke(this._frameClient.frameId, 'popupMessage', message);
+        /** @type {import('display').DirectApiMessage<TName>} */
+        const message = {action, params};
+        const wrappedMessage = this._frameClient.createMessage(message);
+        return /** @type {import('display').DirectApiReturn<TName>} */ (await yomitan.crossFrame.invoke(
+            this._frameClient.frameId,
+            'displayPopupMessage1',
+            /** @type {import('display').DirectApiFrameClientMessageAny} */ (wrappedMessage)
+        ));
     }
 
-    // TODO : Type safety
     /**
-     * @template {import('core').SerializableObject} TParams
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {TParams} params
-     * @returns {Promise<TReturn|undefined>}
+     * @template {import('display').DirectApiNames} TName
+     * @param {TName} action
+     * @param {import('display').DirectApiParams<TName>} params
+     * @returns {Promise<import('display').DirectApiReturn<TName>|undefined>}
      */
     async _invokeSafe(action, params) {
         try {
