@@ -252,7 +252,7 @@ describe('DOMTextScanner', () => {
                 seekNode = seekNode.firstChild;
             }
 
-            const expectedResultContent2 = Array.isArray(expectedResultContent) ? expectedResultContent.join('\n') : expectedResultContent;
+            const expectedResultContent2 = expectedResultContent.join('\n');
 
             /** @type {?Node} */
             let expectedResultNode = testElement.querySelector(/** @type {string} */ (expectedResultNodeSelector));

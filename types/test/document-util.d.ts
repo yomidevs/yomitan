@@ -38,5 +38,5 @@ export type DOMTextScannerTestData = {
     expectedResultNodeSelector: string;
     expectedResultNodeIsText: boolean;
     expectedResultOffset: number;
-    expectedResultContent: string;
+    expectedResultContent: string[];
 };
