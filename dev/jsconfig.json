@@ -37,7 +37,8 @@
             "translation": ["../types/ext/translation"],
             "translation-internal": ["../types/ext/translation-internal"],
             "dev/*": ["../types/dev/*"],
-            "rollup/parseAst": ["../types/other/rollup-parse-ast"]
+            "rollup/parseAst": ["../types/other/rollup-parse-ast"],
+            "chai": ["../node_modules/@vitest/expect/dist/chai.d.cts"]
         },
         "types": [
             "node",
@@ -66,7 +67,7 @@
         "../ext/js/language/deinflector.js",
         "../ext/js/dictionary/dictionary-importer.js",
         "../ext/js/dictionary/dictionary-database.js",
-        "../ext/js/language/sandbox/dictionary-data-util.js",
+        "../ext/js/dictionary/dictionary-data-util.js",
         "../ext/js/language/sandbox/japanese-util.js",
         "../ext/js/language/translator.js",
         "../ext/js/media/media-util.js",

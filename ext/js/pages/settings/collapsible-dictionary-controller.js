@@ -70,7 +70,7 @@ export class CollapsibleDictionaryController {
     }
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         this._eventListeners.removeAllEventListeners();

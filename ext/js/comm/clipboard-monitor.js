@@ -19,7 +19,7 @@
 import {EventDispatcher} from '../core.js';
 
 /**
- * @augments EventDispatcher<import('clipboard-monitor').EventType>
+ * @augments EventDispatcher<import('clipboard-monitor').Events>
  */
 export class ClipboardMonitor extends EventDispatcher {
     /**
@@ -47,11 +47,13 @@ export class ClipboardMonitor extends EventDispatcher {
     start() {
         this.stop();
 
-        // The token below is used as a unique identifier to ensure that a new clipboard monitor
-        // hasn't been started during the await call. The check below the await call
-        // will exit early if the reference has changed.
         let canChange = false;
-        /** @type {?import('core').TokenObject} */
+        /**
+         * This token is used as a unique identifier to ensure that a new clipboard monitor
+         * hasn't been started during the await call. The check below the await call
+         * will exit early if the reference has changed.
+         * @type {?import('core').TokenObject}
+         */
         const token = {};
         const intervalCallback = async () => {
             this._timerId = null;
@@ -71,7 +73,7 @@ export class ClipboardMonitor extends EventDispatcher {
             ) {
                 this._previousText = text;
                 if (canChange && this._japaneseUtil.isStringPartiallyJapanese(text)) {
-                    this.trigger('change', /** @type {import('clipboard-monitor').ChangeEvent} */ ({text}));
+                    this.trigger('change', {text});
                 }
             }
 

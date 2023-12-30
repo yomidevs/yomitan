@@ -962,5 +962,4 @@ function main() {
     testDeinflections();
 }
 
-
 main();

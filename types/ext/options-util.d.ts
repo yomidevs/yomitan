@@ -23,13 +23,4 @@ export type IntermediateOptions = Core.SafeAny;
 
 export type LegacyUpdateFunction = (options: LegacyOptions) => void;
 
-export type ModernUpdateFunction = ModernUpdateFunctionSync | ModernUpdateFunctionAsync;
-
-export type ModernUpdateFunctionSync = (options: IntermediateOptions) => IntermediateOptions;
-
-export type ModernUpdateFunctionAsync = (options: IntermediateOptions) => Promise<IntermediateOptions>;
-
-export type ModernUpdate = {
-    async: boolean;
-    update: ModernUpdateFunction;
-};
+export type UpdateFunction = (options: IntermediateOptions) => void | Promise<void>;

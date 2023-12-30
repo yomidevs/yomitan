@@ -232,7 +232,7 @@ export class AnkiTemplateRenderer {
 
     /** @type {import('template-renderer').HelperFunction<string>} */
     _multiLine(_args, context, options) {
-        return this._stringToMultiLineHtml(this._asString(options.fn(context)));
+        return this._stringToMultiLineHtml(this._computeValueString(options, context));
     }
 
     /** @type {import('template-renderer').HelperFunction<string>} */
@@ -244,7 +244,7 @@ export class AnkiTemplateRenderer {
         // flags: optional flags for regular expression
         //   e.g. "i" for case-insensitive, "g" for replace all
         const argCount = args.length;
-        let value = this._asString(options.fn(context));
+        let value = this._computeValueString(options, context);
         if (argCount > 3) {
             value = `${args.slice(3, -1).join('')}${value}`;
         }
@@ -270,7 +270,7 @@ export class AnkiTemplateRenderer {
         // flags: optional flags for regular expression
         //   e.g. "i" for case-insensitive, "g" for match all
         const argCount = args.length;
-        let value = this._asString(options.fn(context));
+        let value = this._computeValueString(options, context);
         if (argCount > 2) {
             value = `${args.slice(2, -1).join('')}${value}`;
         }
@@ -327,14 +327,14 @@ export class AnkiTemplateRenderer {
             for (const entry of iterable) {
                 any = true;
                 if (results.length >= maxCount) { break; }
-                const processedEntry = options.fn(entry);
+                const processedEntry = this._computeValue(options, entry);
                 results.push(processedEntry);
             }
             if (any) {
                 return results.join('');
             }
         }
-        return this._asString(options.inverse(context));
+        return this._computeInverseString(options, context);
     }
 
     /** @type {import('template-renderer').HelperFunction<unknown[]>} */
@@ -446,7 +446,7 @@ export class AnkiTemplateRenderer {
             case 1:
                 {
                     const [key] = /** @type {[key: string]} */ (args);
-                    const value = options.fn(context);
+                    const value = this._computeValue(options, context);
                     stateStack[stateStack.length - 1].set(key, value);
                 }
                 break;
@@ -466,7 +466,7 @@ export class AnkiTemplateRenderer {
         if (stateStack === null) { throw new Error('Invalid state'); }
         try {
             stateStack.push(new Map());
-            return options.fn(context);
+            return this._computeValue(options, context);
         } finally {
             if (stateStack.length > 1) {
                 stateStack.pop();
@@ -502,7 +502,7 @@ export class AnkiTemplateRenderer {
 
     /** @type {import('template-renderer').HelperFunction<unknown>} */
     _noop(_args, context, options) {
-        return options.fn(context);
+        return this._computeValue(options, context);
     }
 
     /** @type {import('template-renderer').HelperFunction<boolean>} */
@@ -520,7 +520,7 @@ export class AnkiTemplateRenderer {
     /** @type {import('template-renderer').HelperFunction<import('core').TypeofResult>} */
     _getTypeof(args, context, options) {
         const ii = args.length;
-        const value = (ii > 0 ? args[0] : options.fn(context));
+        const value = (ii > 0 ? args[0] : this._computeValue(options, context));
         return typeof value;
     }
 
@@ -543,12 +543,13 @@ export class AnkiTemplateRenderer {
         const [data] = /** @type {[data: import('anki-templates').NoteData]} */ (args);
         const {dictionaryEntry} = data;
         if (dictionaryEntry.type !== 'term') { return []; }
-        const {pronunciations, headwords} = dictionaryEntry;
+        const {pronunciations: termPronunciations, headwords} = dictionaryEntry;
         /** @type {Set<string>} */
         const categories = new Set();
-        for (const {headwordIndex, pitches} of pronunciations) {
+        for (const {headwordIndex, pronunciations} of termPronunciations) {
             const {reading, wordClasses} = headwords[headwordIndex];
             const isVerbOrAdjective = DictionaryDataUtil.isNonNounVerbOrAdjective(wordClasses);
+            const pitches = DictionaryDataUtil.getPronunciationsOfType(pronunciations, 'pitch-accent');
             for (const {position} of pitches) {
                 const category = this._japaneseUtil.getPitchCategory(reading, position, isVerbOrAdjective);
                 if (category !== null) {
@@ -669,7 +670,7 @@ export class AnkiTemplateRenderer {
     /**
      * @type {import('template-renderer').HelperFunction<string>}
      */
-    _formatGlossary(args, context, options) {
+    _formatGlossary(args, _context, options) {
         const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossary]} */ (args);
         const data = options.data.root;
         if (typeof content === 'string') { return this._stringToMultiLineHtml(this._escape(content)); }
@@ -750,7 +751,7 @@ export class AnkiTemplateRenderer {
     _hiragana(args, context, options) {
         const ii = args.length;
         const {keepProlongedSoundMarks} = options.hash;
-        const value = (ii > 0 ? args[0] : options.fn(context));
+        const value = (ii > 0 ? args[0] : this._computeValue(options, context));
         return typeof value === 'string' ? this._japaneseUtil.convertKatakanaToHiragana(value, keepProlongedSoundMarks === true) : '';
     }
 
@@ -759,7 +760,7 @@ export class AnkiTemplateRenderer {
      */
     _katakana(args, context, options) {
         const ii = args.length;
-        const value = (ii > 0 ? args[0] : options.fn(context));
+        const value = (ii > 0 ? args[0] : this._computeValue(options, context));
         return typeof value === 'string' ? this._japaneseUtil.convertHiraganaToKatakana(value) : '';
     }
 
@@ -769,5 +770,41 @@ export class AnkiTemplateRenderer {
      */
     _asString(value) {
         return typeof value === 'string' ? value : `${value}`;
+    }
+
+    /**
+     * @param {import('template-renderer').HelperOptions} options
+     * @param {unknown} context
+     * @returns {unknown}
+     */
+    _computeValue(options, context) {
+        return typeof options.fn === 'function' ? options.fn(context) : '';
+    }
+
+    /**
+     * @param {import('template-renderer').HelperOptions} options
+     * @param {unknown} context
+     * @returns {string}
+     */
+    _computeValueString(options, context) {
+        return this._asString(this._computeValue(options, context));
+    }
+
+    /**
+     * @param {import('template-renderer').HelperOptions} options
+     * @param {unknown} context
+     * @returns {unknown}
+     */
+    _computeInverse(options, context) {
+        return typeof options.inverse === 'function' ? options.inverse(context) : '';
+    }
+
+    /**
+     * @param {import('template-renderer').HelperOptions} options
+     * @param {unknown} context
+     * @returns {string}
+     */
+    _computeInverseString(options, context) {
+        return this._asString(this._computeInverse(options, context));
     }
 }

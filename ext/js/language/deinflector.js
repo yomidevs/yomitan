@@ -50,7 +50,7 @@ export class Deinflector {
      * @example
      * const deinflector = new Deinflector(deinflectionReasons);
      * // [{ term: '食べた', rules: 0, reasons: [] }, { term: '食べる', rules: 1, reasons: ['past'] }, { term: '食ぶ', rules: 2, reasons: ['potential', 'past'] }]
-     * console.log(deinflector.deinflect('食べさせられる'));
+     * console.log(deinflector.deinflect('食べた'));
      */
     deinflect(source) {
         const results = [this._createDeinflection(source, 0, [])];

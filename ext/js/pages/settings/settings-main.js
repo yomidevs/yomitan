@@ -53,7 +53,7 @@ import {TranslationTextReplacementsController} from './translation-text-replacem
 /**
  * @param {GenericSettingController} genericSettingController
  */
-async function setupGenericSettingsController(genericSettingController) {
+async function setupGenericSettingController(genericSettingController) {
     await genericSettingController.prepare();
     await genericSettingController.refresh();
 }
@@ -107,7 +107,7 @@ async function main() {
         dictionaryImportController.prepare();
 
         const genericSettingController = new GenericSettingController(settingsController);
-        preparePromises.push(setupGenericSettingsController(genericSettingController));
+        preparePromises.push(setupGenericSettingController(genericSettingController));
 
         const audioController = new AudioController(settingsController, modalController);
         audioController.prepare();

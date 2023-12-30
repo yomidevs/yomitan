@@ -475,7 +475,7 @@ export class ProfileController {
     }
 
     /**
-     * @param {import('profile-conditions-ui').ConditionGroupCountChangedEvent} details
+     * @param {import('profile-conditions-ui').EventArgument<'conditionGroupCountChanged'>} details
      */
     _onConditionGroupCountChanged({count, profileIndex}) {
         if (profileIndex >= 0 && profileIndex < this._profileEntryList.length) {

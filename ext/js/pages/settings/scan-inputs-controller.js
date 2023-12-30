@@ -110,7 +110,7 @@ export class ScanInputsController {
     // Private
 
     /**
-     * @param {import('settings-controller').ScanInputsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'scanInputsChanged'>} details
      */
     _onScanInputsChanged({source}) {
         if (source === this) { return; }
@@ -118,7 +118,7 @@ export class ScanInputsController {
     }
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         const {inputs} = options.scanning;
@@ -190,7 +190,7 @@ export class ScanInputsController {
 
     /** */
     _triggerScanInputsChanged() {
-        /** @type {import('settings-controller').ScanInputsChangedEvent} */
+        /** @type {import('settings-controller').EventArgument<'scanInputsChanged'>} */
         const event = {source: this};
         this._settingsController.trigger('scanInputsChanged', event);
     }
@@ -312,7 +312,7 @@ class ScanInputField {
     // Private
 
     /**
-     * @param {import('keyboard-mouse-input-field').ChangeEvent} details
+     * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} details
      */
     _onIncludeValueChange({modifiers}) {
         const modifiers2 = this._joinModifiers(modifiers);
@@ -320,7 +320,7 @@ class ScanInputField {
     }
 
     /**
-     * @param {import('keyboard-mouse-input-field').ChangeEvent} details
+     * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} details
      */
     _onExcludeValueChange({modifiers}) {
         const modifiers2 = this._joinModifiers(modifiers);

@@ -50,7 +50,7 @@ export class NestedPopupsController {
     // Private
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         this._updatePopupNestingMaxDepth(options.scanning.popupNestingMaxDepth);

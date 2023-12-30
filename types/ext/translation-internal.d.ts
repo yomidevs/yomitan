@@ -40,13 +40,13 @@ export type TextDeinflectionOptionsArrays = [
 
 export enum DeinflectionRuleFlags {
     None = 0x0,
-    VerbIchidan = 0b00000001, // Verb ichidan
-    VerbGodan = 0b00000010, // Verb godan
-    VerbSuru = 0b00000100, // Verb suru
-    VerbKuru = 0b00001000, // Verb kuru
-    VerbZuru = 0b00010000, // Verb zuru
-    AdjectiveI = 0b00100000, // Adjective i
-    IruEndingIntermediate = 0b01000000, // Intermediate -iru endings for progressive or perfect tense
+    VerbIchidan = 0b00000001,
+    VerbGodan = 0b00000010,
+    VerbSuru = 0b00000100,
+    VerbKuru = 0b00001000,
+    VerbZuru = 0b00010000,
+    AdjectiveI = 0b00100000,
+    IruEndingIntermediate = 0b01000000,
 }
 
 export type Deinflection = {

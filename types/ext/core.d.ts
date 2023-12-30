@@ -74,17 +74,18 @@ export type ResponseError = {
 
 export type Response<T = unknown> = ResponseSuccess<T> | ResponseError;
 
-export type MessageHandler = (params: SafeAny, ...extraArgs: SafeAny[]) => (
-    MessageHandlerResult |
-    Promise<MessageHandlerResult>
-);
-
-export type MessageHandlerResult = SafeAny;
-
-export type MessageHandlerMap = Map<string, MessageHandler>;
-
-export type MessageHandlerMapInit = MessageHandlerMapInitItem[];
-
-export type MessageHandlerMapInitItem = [key: string, handlerDetails: MessageHandler];
-
 export type Timeout = number | NodeJS.Timeout;
+
+export type EventSurface = {[name: string]: unknown};
+
+export type EventNames<TSurface extends EventSurface> = keyof TSurface & string;
+
+export type EventArgument<TSurface extends EventSurface, TName extends EventNames<TSurface>> = TSurface[TName];
+
+export type EventDispatcherOffGeneric = {
+    off(eventName: string, callback: (...args: SafeAny) => void): boolean;
+};
+
+export type EventHandler<TSurface extends EventSurface, TName extends EventNames<TSurface>> = (details: EventArgument<TSurface, TName>) => void;
+
+export type EventHandlerAny = (details: SafeAny) => void;

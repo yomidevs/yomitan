@@ -48,7 +48,7 @@ export class RecommendedPermissionsController {
     // Private
 
     /**
-     * @param {import('settings-controller').PermissionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'permissionsChanged'>} details
      */
     _onPermissionsChanged({permissions}) {
         this._eventListeners.removeAllEventListeners();

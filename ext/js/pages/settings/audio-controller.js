@@ -21,7 +21,7 @@ import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {AudioSystem} from '../../media/audio-system.js';
 
 /**
- * @augments EventDispatcher<import('audio-controller').EventType>
+ * @augments EventDispatcher<import('audio-controller').Events>
  */
 export class AudioController extends EventDispatcher {
     /**
@@ -117,7 +117,7 @@ export class AudioController extends EventDispatcher {
     // Private
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         for (const entry of this._audioSourceEntries) {
@@ -163,7 +163,7 @@ export class AudioController extends EventDispatcher {
         );
         voices.sort(this._textToSpeechVoiceCompare.bind(this));
         this._voices = voices;
-        this.trigger('voicesUpdated');
+        this.trigger('voicesUpdated', {});
     }
 
     /**

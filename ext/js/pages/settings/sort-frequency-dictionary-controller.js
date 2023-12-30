@@ -68,7 +68,7 @@ export class SortFrequencyDictionaryController {
     }
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         const {sortFrequencyDictionary, sortFrequencyDictionaryOrder} = options.general;

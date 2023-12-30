@@ -161,6 +161,7 @@ export class DictionaryImportController {
             };
 
             let statusPrefix = '';
+            /** @type {import('dictionary-importer.js').ImportStep} */
             let stepIndex = -2;
             /** @type {import('dictionary-worker').ImportProgressCallback} */
             const onProgress = (data) => {
@@ -178,8 +179,8 @@ export class DictionaryImportController {
                 for (const label of statusLabels) { label.textContent = statusString; }
 
                 switch (stepIndex2) {
-                    case -2: // Initialize
-                    case 5: // Data import
+                    case -2:
+                    case 5:
                         this._triggerStorageChanged();
                         break;
                 }
@@ -210,11 +211,12 @@ export class DictionaryImportController {
     }
 
     /**
-     * @param {number} stepIndex
+     * @param {import('dictionary-importer').ImportStep} stepIndex
      * @returns {string}
      */
     _getImportLabel(stepIndex) {
         switch (stepIndex) {
+            case -2: return '';
             case -1:
             case 0: return 'Loading dictionary';
             case 1: return 'Loading schemas';
@@ -222,7 +224,6 @@ export class DictionaryImportController {
             case 3: return 'Formatting data';
             case 4: return 'Importing media';
             case 5: return 'Importing data';
-            default: return '';
         }
     }
 
@@ -397,6 +398,6 @@ export class DictionaryImportController {
 
     /** */
     _triggerStorageChanged() {
-        yomitan.trigger('storageChanged');
+        yomitan.triggerStorageChanged();
     }
 }

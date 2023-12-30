@@ -20,7 +20,7 @@ import {EventDispatcher} from '../core.js';
 import {TextToSpeechAudio} from './text-to-speech-audio.js';
 
 /**
- * @augments EventDispatcher<import('audio-system').EventType>
+ * @augments EventDispatcher<import('audio-system').Events>
  */
 export class AudioSystem extends EventDispatcher {
     constructor() {

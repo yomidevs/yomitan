@@ -47,8 +47,6 @@ export type ChromeRuntimeSendMessageArgs5 = [
 
 export type ChromeRuntimeSendMessageArgs = ChromeRuntimeSendMessageArgs1 | ChromeRuntimeSendMessageArgs2 | ChromeRuntimeSendMessageArgs3 | ChromeRuntimeSendMessageArgs4 | ChromeRuntimeSendMessageArgs5;
 
-export type ExtensionEventType = 'extensionUnloaded' | 'optionsUpdated' | 'databaseUpdated' | 'zoomChanged' | 'closePopups' | 'dynamicLoaderSentinel' | 'storageChanged';
-
 export type HtmlElementWithContentWindow = HTMLIFrameElement | HTMLFrameElement | HTMLObjectElement;
 
 export type ContentOrigin = {
@@ -56,16 +54,7 @@ export type ContentOrigin = {
     frameId?: number;
 };
 
-export type ChromeRuntimeMessage = {
-    action: string;
-    params?: Core.SerializableObject;
-};
-
-export type ChromeRuntimeMessageWithFrameId = ChromeRuntimeMessage & {
-    frameId?: number;
-};
-
-export type ChromeRuntimeOnMessageCallback<TMessage = ChromeRuntimeMessage> = (
+export type ChromeRuntimeOnMessageCallback<TMessage = unknown> = (
     message: TMessage,
     sender: chrome.runtime.MessageSender,
     sendResponse: ChromeRuntimeMessageSendResponseFunction,

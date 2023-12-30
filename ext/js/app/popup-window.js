@@ -21,7 +21,7 @@ import {yomitan} from '../yomitan.js';
 
 /**
  * This class represents a popup that is hosted in a new native window.
- * @augments EventDispatcher<import('popup').PopupAnyEventType>
+ * @augments EventDispatcher<import('popup').Events>
  */
 export class PopupWindow extends EventDispatcher {
     /**
@@ -126,7 +126,7 @@ export class PopupWindow extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async setOptionsContext(optionsContext) {
-        await this._invoke(false, 'Display.setOptionsContext', {id: this._id, optionsContext});
+        await this._invoke(false, 'displaySetOptionsContext', {optionsContext});
     }
 
     /**
@@ -183,7 +183,7 @@ export class PopupWindow extends EventDispatcher {
      */
     async showContent(_details, displayDetails) {
         if (displayDetails === null) { return; }
-        await this._invoke(true, 'Display.setContent', {id: this._id, details: displayDetails});
+        await this._invoke(true, 'displaySetContent', {details: displayDetails});
     }
 
     /**
@@ -192,7 +192,7 @@ export class PopupWindow extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async setCustomCss(css) {
-        await this._invoke(false, 'Display.setCustomCss', {id: this._id, css});
+        await this._invoke(false, 'displaySetCustomCss', {css});
     }
 
     /**
@@ -200,7 +200,7 @@ export class PopupWindow extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async clearAutoPlayTimer() {
-        await this._invoke(false, 'Display.clearAutoPlayTimer', {id: this._id});
+        await this._invoke(false, 'displayAudioClearAutoPlayTimer', void 0);
     }
 
     /**
@@ -267,22 +267,28 @@ export class PopupWindow extends EventDispatcher {
     // Private
 
     /**
-     * @template {import('core').SerializableObject} TParams
-     * @template [TReturn=unknown]
+     * @template {import('display').DirectApiNames} TName
      * @param {boolean} open
-     * @param {string} action
-     * @param {TParams} params
-     * @returns {Promise<TReturn|undefined>}
+     * @param {TName} action
+     * @param {import('display').DirectApiParams<TName>} params
+     * @returns {Promise<import('display').DirectApiReturn<TName>|undefined>}
      */
     async _invoke(open, action, params) {
         if (yomitan.isExtensionUnloaded) {
             return void 0;
         }
 
+        const message = /** @type {import('display').DirectApiMessageAny} */ ({action, params});
+
         const frameId = 0;
         if (this._popupTabId !== null) {
             try {
-                return await yomitan.crossFrame.invokeTab(this._popupTabId, frameId, 'popupMessage', {action, params});
+                return /** @type {import('display').DirectApiReturn<TName>} */ (await yomitan.crossFrame.invokeTab(
+                    this._popupTabId,
+                    frameId,
+                    'displayPopupMessage2',
+                    message
+                ));
             } catch (e) {
                 if (yomitan.isExtensionUnloaded) {
                     open = false;
@@ -298,6 +304,11 @@ export class PopupWindow extends EventDispatcher {
         const {tabId} = await yomitan.api.getOrCreateSearchPopup({focus: 'ifCreated'});
         this._popupTabId = tabId;
 
-        return await yomitan.crossFrame.invokeTab(this._popupTabId, frameId, 'popupMessage', {action, params});
+        return /** @type {import('display').DirectApiReturn<TName>} */ (await yomitan.crossFrame.invokeTab(
+            this._popupTabId,
+            frameId,
+            'displayPopupMessage2',
+            message
+        ));
     }
 }

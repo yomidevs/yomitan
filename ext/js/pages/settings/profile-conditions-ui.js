@@ -22,7 +22,7 @@ import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
 /**
- * @augments EventDispatcher<import('profile-conditions-ui').EventType>
+ * @augments EventDispatcher<import('profile-conditions-ui').Events>
  */
 export class ProfileConditionsUI extends EventDispatcher {
     /**
@@ -440,9 +440,7 @@ export class ProfileConditionsUI extends EventDispatcher {
      * @param {number} count
      */
     _triggerConditionGroupCountChanged(count) {
-        /** @type {import('profile-conditions-ui').ConditionGroupCountChangedEvent} */
-        const event = {count, profileIndex: this._profileIndex};
-        this.trigger('conditionGroupCountChanged', event);
+        this.trigger('conditionGroupCountChanged', {count, profileIndex: this._profileIndex});
     }
 }
 
@@ -747,7 +745,7 @@ class ProfileConditionUI {
 
     /**
      * @param {import('profile-conditions-ui').InputData} details
-     * @param {import('keyboard-mouse-input-field').ChangeEvent} event
+     * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} event
      */
     _onModifierInputChange({validate, normalize}, event) {
         const modifiers = this._joinModifiers(event.modifiers);
@@ -863,10 +861,6 @@ class ProfileConditionUI {
         let inputValue = value;
         let inputStep = null;
         let showMouseButton = false;
-        /** @type {import('event-listener-collection').AddEventListenerArgs[]} */
-        const events1 = [];
-        /** @type {import('event-listener-collection').OnArgs[]} */
-        const events2 = [];
         /** @type {import('profile-conditions-ui').InputData} */
         const inputData = {validate, normalize};
         const node = this._valueInput;
@@ -875,7 +869,6 @@ class ProfileConditionUI {
             case 'integer':
                 inputType = 'number';
                 inputStep = '1';
-                events1.push([node, 'change', this._onValueInputChange.bind(this, inputData), false]);
                 break;
             case 'modifierKeys':
             case 'modifierInputs':
@@ -883,10 +876,6 @@ class ProfileConditionUI {
                 showMouseButton = (type === 'modifierInputs');
                 this._kbmInputField = this._parent.parent.createKeyboardMouseInputField(node, this._mouseButton);
                 this._kbmInputField.prepare(null, this._splitModifiers(value), showMouseButton, false);
-                events2.push([this._kbmInputField, 'change', this._onModifierInputChange.bind(this, inputData)]);
-                break;
-            default: // 'string'
-                events1.push([node, 'change', this._onValueInputChange.bind(this, inputData), false]);
                 break;
         }
 
@@ -902,11 +891,17 @@ class ProfileConditionUI {
             node.removeAttribute('step');
         }
         this._mouseButtonContainer.hidden = !showMouseButton;
-        for (const args of events1) {
-            this._inputEventListeners.addEventListener(...args);
-        }
-        for (const args of events2) {
-            this._inputEventListeners.on(...args);
+
+        switch (type) {
+            case 'modifierKeys':
+            case 'modifierInputs':
+                if (this._kbmInputField !== null) {
+                    this._inputEventListeners.on(this._kbmInputField, 'change', this._onModifierInputChange.bind(this, inputData));
+                }
+                break;
+            default: // 'integer', 'string'
+                this._inputEventListeners.addEventListener(node, 'change', this._onValueInputChange.bind(this, inputData), false);
+                break;
         }
 
         return this._validateValue(value, validate);

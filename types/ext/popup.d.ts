@@ -21,6 +21,7 @@ import type {PopupWindow} from '../../ext/js/app/popup-window';
 import type {FrameOffsetForwarder} from '../../ext/js/comm/frame-offset-forwarder';
 import type * as DocumentUtil from './document-util';
 import type * as Settings from './settings';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type PopupAny = Popup | PopupWindow | PopupProxy;
 
@@ -90,20 +91,6 @@ export type ValidSize = {
     valid: boolean;
 };
 
-export type CustomOuterCssChangedEvent = {
-    node: HTMLStyleElement | HTMLLinkElement | null;
-    useWebExtensionApi: boolean;
-    inShadow: boolean;
-};
-
-export type PopupAnyEventType = PopupEventType | PopupProxyEventType | PopupWindowEventType;
-
-export type PopupEventType = 'customOuterCssChanged' | 'framePointerOver' | 'framePointerOut' | 'offsetNotFound';
-
-export type PopupProxyEventType = 'offsetNotFound';
-
-export type PopupWindowEventType = never;
-
 export type PopupConstructorDetails = {
     /** The ID of the popup. */
     id: string;
@@ -134,3 +121,16 @@ export type PopupProxyConstructorDetails = {
     /** A `FrameOffsetForwarder` instance which is used to determine frame positioning. */
     frameOffsetForwarder: FrameOffsetForwarder | null;
 };
+
+export type Events = {
+    customOuterCssChanged: {
+        node: HTMLStyleElement | HTMLLinkElement | null;
+        useWebExtensionApi: boolean;
+        inShadow: boolean;
+    };
+    framePointerOver: Record<string, never>;
+    framePointerOut: Record<string, never>;
+    offsetNotFound: Record<string, never>;
+};
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;

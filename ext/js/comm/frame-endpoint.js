@@ -41,7 +41,7 @@ export class FrameEndpoint {
         }
         /** @type {import('frame-client').FrameEndpointReadyDetails} */
         const details = {secret: this._secret};
-        yomitan.api.broadcastTab('frameEndpointReady', details);
+        yomitan.api.broadcastTab({action: 'frameEndpointReady', params: details});
     }
 
     /**
@@ -83,6 +83,6 @@ export class FrameEndpoint {
         this._eventListeners.removeAllEventListeners();
         /** @type {import('frame-client').FrameEndpointConnectedDetails} */
         const details = {secret, token};
-        yomitan.api.sendMessageToFrame(hostFrameId, 'frameEndpointConnected', details);
+        yomitan.api.sendMessageToFrame(hostFrameId, {action: 'frameEndpointConnected', params: details});
     }
 }

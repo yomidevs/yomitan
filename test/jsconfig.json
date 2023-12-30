@@ -17,7 +17,8 @@
             "test/*": ["../types/test/*"],
             "rollup/parseAst": ["../types/other/rollup-parse-ast"],
             "ext/json-schema": ["../types/ext/json-schema"],
-            "json-schema": ["json-schema"]
+            "json-schema": ["json-schema"],
+            "chai": ["../node_modules/@vitest/expect/dist/chai.d.cts"]
         },
         "types": [
             "chrome",

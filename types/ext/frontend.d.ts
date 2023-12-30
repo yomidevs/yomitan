@@ -47,15 +47,3 @@ export type ConstructorDetails = {
 };
 
 export type PageType = 'web' | 'popup' | 'search';
-
-export type FrontendRequestReadyBroadcastParams = {
-    frameId: number;
-};
-
-export type GetPopupInfoResult = {
-    popupId: string | null;
-};
-
-export type FrontendReadyDetails = {
-    frameId: number;
-};

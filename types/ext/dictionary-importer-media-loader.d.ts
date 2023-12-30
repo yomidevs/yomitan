@@ -30,7 +30,6 @@ export type GetImageDetailsFunction = (
     transfer?: Transferable[]
 ) => Promise<{content: ArrayBuffer, width: number, height: number}>;
 
-
 export type GenericMediaLoader = {
     getImageDetails: GetImageDetailsFunction;
 };

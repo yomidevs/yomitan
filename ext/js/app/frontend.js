@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {GoogleDocsUtil} from '../accessibility/google-docs-util.js';
-import {EventListenerCollection, invokeMessageHandler, log, promiseAnimationFrame} from '../core.js';
+import {EventListenerCollection, log, promiseAnimationFrame} from '../core.js';
+import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
@@ -107,12 +107,12 @@ export class Frontend {
         this._optionsContextOverride = null;
 
         /* eslint-disable no-multi-spaces */
-        /** @type {import('core').MessageHandlerMap} */
-        this._runtimeMessageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
-            ['Frontend.requestReadyBroadcast',   this._onMessageRequestFrontendReadyBroadcast.bind(this)],
-            ['Frontend.setAllVisibleOverride',   this._onApiSetAllVisibleOverride.bind(this)],
-            ['Frontend.clearAllVisibleOverride', this._onApiClearAllVisibleOverride.bind(this)]
-        ]));
+        /** @type {import('application').ApiMap} */
+        this._runtimeApiMap = createApiMap([
+            ['frontendRequestReadyBroadcast',   this._onMessageRequestFrontendReadyBroadcast.bind(this)],
+            ['frontendSetAllVisibleOverride',   this._onApiSetAllVisibleOverride.bind(this)],
+            ['frontendClearAllVisibleOverride', this._onApiClearAllVisibleOverride.bind(this)]
+        ]);
 
         this._hotkeyHandler.registerActions([
             ['scanSelectedText', this._onActionScanSelectedText.bind(this)],
@@ -178,11 +178,11 @@ export class Frontend {
 
         /* eslint-disable no-multi-spaces */
         yomitan.crossFrame.registerHandlers([
-            ['Frontend.closePopup',       this._onApiClosePopup.bind(this)],
-            ['Frontend.copySelection',    this._onApiCopySelection.bind(this)],
-            ['Frontend.getSelectionText', this._onApiGetSelectionText.bind(this)],
-            ['Frontend.getPopupInfo',     this._onApiGetPopupInfo.bind(this)],
-            ['Frontend.getPageInfo',      this._onApiGetPageInfo.bind(this)]
+            ['frontendClosePopup',       this._onApiClosePopup.bind(this)],
+            ['frontendCopySelection',    this._onApiCopySelection.bind(this)],
+            ['frontendGetSelectionText', this._onApiGetSelectionText.bind(this)],
+            ['frontendGetPopupInfo',     this._onApiGetPopupInfo.bind(this)],
+            ['frontendGetPageInfo',      this._onApiGetPageInfo.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
 
@@ -240,9 +240,7 @@ export class Frontend {
 
     // Message handlers
 
-    /**
-     * @param {import('frontend').FrontendRequestReadyBroadcastParams} params
-     */
+    /** @type {import('application').ApiHandler<'frontendRequestReadyBroadcast'>} */
     _onMessageRequestFrontendReadyBroadcast({frameId}) {
         this._signalFrontendReady(frameId);
     }
@@ -265,48 +263,31 @@ export class Frontend {
 
     // API message handlers
 
-    /**
-     * @returns {string}
-     */
-    _onApiGetUrl() {
-        return window.location.href;
-    }
-
-    /**
-     * @returns {void}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'frontendClosePopup'>} */
     _onApiClosePopup() {
         this._clearSelection(false);
     }
 
-    /**
-     * @returns {void}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'frontendCopySelection'>} */
     _onApiCopySelection() {
         // This will not work on Firefox if a popup has focus, which is usually the case when this function is called.
         document.execCommand('copy');
     }
 
-    /**
-     * @returns {string}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'frontendGetSelectionText'>} */
     _onApiGetSelectionText() {
         const selection = document.getSelection();
         return selection !== null ? selection.toString() : '';
     }
 
-    /**
-     * @returns {import('frontend').GetPopupInfoResult}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'frontendGetPopupInfo'>} */
     _onApiGetPopupInfo() {
         return {
             popupId: (this._popup !== null ? this._popup.id : null)
         };
     }
 
-    /**
-     * @returns {{url: string, documentTitle: string}}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'frontendGetPageInfo'>} */
     _onApiGetPageInfo() {
         return {
             url: window.location.href,
@@ -314,10 +295,7 @@ export class Frontend {
         };
     }
 
-    /**
-     * @param {{value: boolean, priority: number, awaitFrame: boolean}} params
-     * @returns {Promise<import('core').TokenString>}
-     */
+    /** @type {import('application').ApiHandler<'frontendSetAllVisibleOverride'>} */
     async _onApiSetAllVisibleOverride({value, priority, awaitFrame}) {
         const result = await this._popupFactory.setAllVisibleOverride(value, priority);
         if (awaitFrame) {
@@ -326,10 +304,7 @@ export class Frontend {
         return result;
     }
 
-    /**
-     * @param {{token: import('core').TokenString}} params
-     * @returns {Promise<boolean>}
-     */
+    /** @type {import('application').ApiHandler<'frontendClearAllVisibleOverride'>} */
     async _onApiClearAllVisibleOverride({token}) {
         return await this._popupFactory.clearAllVisibleOverride(token);
     }
@@ -343,11 +318,9 @@ export class Frontend {
         this._updatePopupPosition();
     }
 
-    /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
-    _onRuntimeMessage({action, params}, sender, callback) {
-        const messageHandler = this._runtimeMessageHandlers.get(action);
-        if (typeof messageHandler === 'undefined') { return false; }
-        return invokeMessageHandler(messageHandler, params, callback, sender);
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
+    _onRuntimeMessage({action, params}, _sender, callback) {
+        return invokeApiMapHandler(this._runtimeApiMap, action, params, [], callback);
     }
 
     /**
@@ -562,9 +535,11 @@ export class Frontend {
             }
         }
 
-        // The token below is used as a unique identifier to ensure that a new _updatePopup call
-        // hasn't been started during the await.
-        /** @type {?import('core').TokenObject} */
+        /**
+         * The token below is used as a unique identifier to ensure that a new _updatePopup call
+         * hasn't been started during the await.
+         * @type {?import('core').TokenObject}
+         */
         const token = {};
         this._updatePopupToken = token;
         const popup = await popupPromise;
@@ -628,8 +603,7 @@ export class Frontend {
             return await this._getDefaultPopup();
         }
 
-        /** @type {import('frontend').GetPopupInfoResult} */
-        const {popupId} = await yomitan.crossFrame.invoke(targetFrameId, 'Frontend.getPopupInfo', {});
+        const {popupId} = await yomitan.crossFrame.invoke(targetFrameId, 'frontendGetPopupInfo', void 0);
         if (popupId === null) {
             return null;
         }
@@ -828,12 +802,12 @@ export class Frontend {
      * @param {?number} targetFrameId
      */
     _signalFrontendReady(targetFrameId) {
-        /** @type {import('frontend').FrontendReadyDetails} */
-        const params = {frameId: this._frameId};
+        /** @type {import('application').ApiMessageNoFrameId<'frontendReady'>} */
+        const message = {action: 'frontendReady', params: {frameId: this._frameId}};
         if (targetFrameId === null) {
-            yomitan.api.broadcastTab('frontendReady', params);
+            yomitan.api.broadcastTab(message);
         } else {
-            yomitan.api.sendMessageToFrame(targetFrameId, 'frontendReady', params);
+            yomitan.api.sendMessageToFrame(targetFrameId, message);
         }
     }
 
@@ -854,11 +828,11 @@ export class Frontend {
                 }
                 chrome.runtime.onMessage.removeListener(onMessage);
             };
-            /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
+            /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
             const onMessage = (message, _sender, sendResponse) => {
                 try {
-                    const {action, params} = message;
-                    if (action === 'frontendReady' && /** @type {import('frontend').FrontendReadyDetails} */ (params).frameId === frameId) {
+                    const {action} = message;
+                    if (action === 'frontendReady' && message.params.frameId === frameId) {
                         cleanup();
                         resolve();
                         sendResponse();
@@ -877,7 +851,7 @@ export class Frontend {
             }
 
             chrome.runtime.onMessage.addListener(onMessage);
-            yomitan.api.broadcastTab('Frontend.requestReadyBroadcast', {frameId: this._frameId});
+            yomitan.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._frameId}});
         });
     }
 
@@ -913,7 +887,7 @@ export class Frontend {
         let documentTitle = document.title;
         if (this._useProxyPopup && this._parentFrameId !== null) {
             try {
-                ({url, documentTitle} = await yomitan.crossFrame.invoke(this._parentFrameId, 'Frontend.getPageInfo', {}));
+                ({url, documentTitle} = await yomitan.crossFrame.invoke(this._parentFrameId, 'frontendGetPageInfo', void 0));
             } catch (e) {
                 // NOP
             }
@@ -964,7 +938,7 @@ export class Frontend {
     _prepareSiteSpecific() {
         switch (location.hostname.toLowerCase()) {
             case 'docs.google.com':
-                this._prepareGoogleDocsWrapper();
+                this._prepareGoogleDocs();
                 break;
         }
     }
@@ -972,19 +946,8 @@ export class Frontend {
     /**
      * @returns {Promise<void>}
      */
-    async _prepareGoogleDocsWrapper() {
-        if (typeof GoogleDocsUtil !== 'undefined') { return; }
-        await yomitan.api.loadExtensionScripts([
-            '/js/accessibility/google-docs-util.js'
-        ]);
-        this._prepareGoogleDocs();
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
     async _prepareGoogleDocs() {
-        if (typeof GoogleDocsUtil === 'undefined') { return; }
+        const {GoogleDocsUtil} = await import('../accessibility/google-docs-util.js');
         DocumentUtil.registerGetRangeFromPointHandler(GoogleDocsUtil.getRangeFromPoint.bind(GoogleDocsUtil));
     }
 }

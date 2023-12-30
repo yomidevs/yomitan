@@ -20,28 +20,28 @@ import {pathToFileURL} from 'url';
 import {expect, root, test} from './playwright-util';
 
 test.beforeEach(async ({context}) => {
-    // wait for the on-install welcome.html tab to load, which becomes the foreground tab
+    // Wait for the on-install welcome.html tab to load, which becomes the foreground tab
     const welcome = await context.waitForEvent('page');
     welcome.close(); // close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
 });
 
 test('visual', async ({page, extensionId}) => {
-    // open settings
+    // Open settings
     await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
     await expect(page.locator('id=dictionaries')).toBeVisible();
 
-    // get the locator for the disk usage indicator so we can later mask it out of the screenshot
+    // Get the locator for the disk usage indicator so we can later mask it out of the screenshot
     const storage_locator = page.locator('.storage-use-finite >> xpath=..');
 
-    // take a simple screenshot of the settings page
+    // Take a simple screenshot of the settings page
     await expect.soft(page).toHaveScreenshot('settings-fresh.png', {mask: [storage_locator]});
 
-    // load in jmdict_english.zip
+    // Load in jmdict_english.zip
     await page.locator('input[id="dictionary-import-file-input"]').setInputFiles(path.join(root, 'dictionaries/jmdict_english.zip'));
     await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
 
-    // take a screenshot of the settings page with jmdict loaded
+    // Take a screenshot of the settings page with jmdict loaded
     await expect.soft(page).toHaveScreenshot('settings-jmdict-loaded.png', {mask: [storage_locator]});
 
     /**
@@ -55,10 +55,10 @@ test('visual', async ({page, extensionId}) => {
 
         const box = (await el.boundingBox()) || {x: 0, y: 0, width: 0, height: 0};
 
-        // find the popup frame if it exists
+        // Find the popup frame if it exists
         let popup_frame = page.frames().find((f) => f.url().includes('popup.html'));
 
-        // otherwise prepare for it to be attached
+        // Otherwise prepare for it to be attached
         let frame_attached;
         if (popup_frame === undefined) {
             frame_attached = page.waitForEvent('frameattached');

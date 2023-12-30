@@ -15,7 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type EventType = 'voicesUpdated';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
+
+export type Events = {
+    voicesUpdated: Record<string, never>;
+};
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
 export type VoiceInfo = {
     voice: SpeechSynthesisVoice;

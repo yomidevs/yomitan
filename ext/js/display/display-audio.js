@@ -89,7 +89,7 @@ export class DisplayAudio {
             ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)]
         ]);
         this._display.registerDirectMessageHandlers([
-            ['Display.clearAutoPlayTimer', this._onMessageClearAutoPlayTimer.bind(this)]
+            ['displayAudioClearAutoPlayTimer', this._onMessageClearAutoPlayTimer.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
@@ -162,7 +162,7 @@ export class DisplayAudio {
     // Private
 
     /**
-     * @param {import('display').OptionsUpdatedEvent} details
+     * @param {import('display').EventArgument<'optionsUpdated'>} details
      */
     _onOptionsUpdated({options}) {
         const {enabled, autoPlay, volume, sources} = options.audio;
@@ -201,7 +201,7 @@ export class DisplayAudio {
     }
 
     /**
-     * @param {import('display').ContentUpdateEntryEvent} details
+     * @param {import('display').EventArgument<'contentUpdateEntry'>} details
      */
     _onContentUpdateEntry({element}) {
         const eventListeners = this._eventListeners;
@@ -237,7 +237,7 @@ export class DisplayAudio {
     }
 
     /**
-     * @param {import('display').FrameVisibilityChangeEvent} details
+     * @param {import('display').EventArgument<'frameVisibilityChange'>} details
      */
     _onFrameVisibilityChange({value}) {
         if (!value) {
@@ -260,7 +260,7 @@ export class DisplayAudio {
         this.playAudio(this._display.selectedIndex, 0, source);
     }
 
-    /** */
+    /** @type {import('display').DirectApiHandler<'displayAudioClearAutoPlayTimer'>} */
     _onMessageClearAutoPlayTimer() {
         this.clearAutoPlayTimer();
     }
@@ -779,7 +779,7 @@ export class DisplayAudio {
     }
 
     /**
-     * @param {import('popup-menu').MenuCloseEventDetails} details
+     * @param {import('popup-menu').EventArgument<'close'>} details
      */
     _onPopupMenuClose({menu}) {
         this._openMenus.delete(menu);
