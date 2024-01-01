@@ -52,7 +52,7 @@ jobs:
           path: dictionaries
 
       - name: Grab latest screenshots from master branch
-        uses: dawidd6/action-download-artifact@268677152d06ba59fcec7a7f0b5d961b6ccd7e1e # pin@v2
+        uses: dawidd6/action-download-artifact@e7466d1a7587ed14867642c2ca74b5bcc1e19a2d # pin@v2
         continue-on-error: true
         id: master-screenshots
         with:

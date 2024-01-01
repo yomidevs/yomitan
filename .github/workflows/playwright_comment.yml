@@ -16,7 +16,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Grab playwright-output from PR run
-        uses: dawidd6/action-download-artifact@268677152d06ba59fcec7a7f0b5d961b6ccd7e1e # pin@v2
+        uses: dawidd6/action-download-artifact@e7466d1a7587ed14867642c2ca74b5bcc1e19a2d # pin@v2
         continue-on-error: true
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -24,7 +24,7 @@ jobs:
           name: playwright-output
 
       - name: Grab master-screenshots-outcome from PR run
-        uses: dawidd6/action-download-artifact@268677152d06ba59fcec7a7f0b5d961b6ccd7e1e # pin@v2
+        uses: dawidd6/action-download-artifact@e7466d1a7587ed14867642c2ca74b5bcc1e19a2d # pin@v2
         continue-on-error: true
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
