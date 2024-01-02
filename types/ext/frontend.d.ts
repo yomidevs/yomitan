@@ -47,7 +47,3 @@ export type ConstructorDetails = {
 };
 
 export type PageType = 'web' | 'popup' | 'search';
-
-export type GetPopupInfoResult = {
-    popupId: string | null;
-};

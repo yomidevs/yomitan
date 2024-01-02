@@ -52,7 +52,7 @@ jobs:
           path: dictionaries
 
       - name: Grab latest screenshots from master branch
-        uses: dawidd6/action-download-artifact@268677152d06ba59fcec7a7f0b5d961b6ccd7e1e # pin@v2
+        uses: dawidd6/action-download-artifact@e7466d1a7587ed14867642c2ca74b5bcc1e19a2d # pin@v2
         continue-on-error: true
         id: master-screenshots
         with:
@@ -76,12 +76,12 @@ jobs:
         run: npx playwright test -u
         if: github.event_name == 'push'
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: playwright-screenshots
           path: test/playwright/__screenshots__/
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: playwright-report/
@@ -90,13 +90,13 @@ jobs:
         run: echo ${{ steps.master-screenshots.outcome }} > ./master-screenshots-outcome
         if: github.event_name == 'pull_request'
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: master-screenshots-outcome
           path: master-screenshots-outcome
         if: github.event_name == 'pull_request'
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: playwright-output
           path: playwright-output

@@ -321,38 +321,6 @@ export function promiseAnimationFrame(timeout) {
 }
 
 /**
- * Invokes a standard message handler. This function is used to react and respond
- * to communication messages within the extension.
- * @template {import('core').SafeAny} TParams
- * @param {import('core').MessageHandler} handler The message handler function.
- * @param {TParams} params Information which was passed with the original message.
- * @param {(response: import('core').Response) => void} callback A callback function which is invoked after the handler has completed. The value passed
- *   to the function is in the format:
- *   - `{result: unknown}` if the handler invoked successfully.
- *   - `{error: object}` if the handler thew an error. The error is serialized.
- * @param {...*} extraArgs Additional arguments which are passed to the `handler` function.
- * @returns {boolean} `true` if the function is invoked asynchronously, `false` otherwise.
- */
-export function invokeMessageHandler(handler, params, callback, ...extraArgs) {
-    try {
-        const promiseOrResult = handler(params, ...extraArgs);
-        if (promiseOrResult instanceof Promise) {
-            /** @type {Promise<any>} */ (promiseOrResult).then(
-                (result) => { callback({result}); },
-                (error) => { callback({error: ExtensionError.serialize(error)}); }
-            );
-            return true;
-        } else {
-            callback({result: promiseOrResult});
-            return false;
-        }
-    } catch (error) {
-        callback({error: ExtensionError.serialize(error)});
-        return false;
-    }
-}
-
-/**
  * The following typedef is required because the JSDoc `implements` tag doesn't work with `import()`.
  * https://github.com/microsoft/TypeScript/issues/49905
  * @typedef {import('core').EventDispatcherOffGeneric} EventDispatcherOffGeneric
