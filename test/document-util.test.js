@@ -24,6 +24,7 @@ import {DOMTextScanner} from '../ext/js/dom/dom-text-scanner.js';
 import {TextSourceElement} from '../ext/js/dom/text-source-element.js';
 import {TextSourceRange} from '../ext/js/dom/text-source-range.js';
 import {createDomTest} from './fixtures/dom-test.js';
+import {parseJson} from '../dev/json.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -116,6 +117,7 @@ describe('DocumentUtil', () => {
         const {document} = window;
         for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case[data-test-type=scan]'))) {
             // Get test parameters
+            /** @type {import('test/document-util').DocumentUtilTestData} */
             const {
                 elementFromPointSelector,
                 caretRangeFromPointSelector,
@@ -128,17 +130,15 @@ describe('DocumentUtil', () => {
                 sentence,
                 hasImposter,
                 terminateAtNewlines
-            } = testElement.dataset;
+            } = parseJson(/** @type {string} */ (testElement.dataset.testData));
 
             const elementFromPointValue = querySelectorChildOrSelf(testElement, elementFromPointSelector);
             const caretRangeFromPointValue = querySelectorChildOrSelf(testElement, caretRangeFromPointSelector);
             const startNode = getChildTextNodeOrSelf(window, querySelectorChildOrSelf(testElement, startNodeSelector));
             const endNode = getChildTextNodeOrSelf(window, querySelectorChildOrSelf(testElement, endNodeSelector));
 
-            const startOffset2 = parseInt(/** @type {string} */ (startOffset), 10);
-            const endOffset2 = parseInt(/** @type {string} */ (endOffset), 10);
-            const sentenceScanExtent2 = parseInt(/** @type {string} */ (sentenceScanExtent), 10);
-            const terminateAtNewlines2 = (terminateAtNewlines !== 'false');
+            // Defaults to true
+            const terminateAtNewlines2 = typeof terminateAtNewlines === 'boolean' ? terminateAtNewlines : true;
 
             expect(elementFromPointValue).not.toStrictEqual(null);
             expect(caretRangeFromPointValue).not.toStrictEqual(null);
@@ -150,11 +150,11 @@ describe('DocumentUtil', () => {
 
             document.caretRangeFromPoint = (x, y) => {
                 const imposter = getChildTextNodeOrSelf(window, findImposterElement(document));
-                expect(!!imposter).toStrictEqual(hasImposter === 'true');
+                expect(!!imposter).toStrictEqual(!!hasImposter);
 
                 const range = document.createRange();
-                range.setStart(/** @type {Node} */ (imposter ? imposter : startNode), startOffset2);
-                range.setEnd(/** @type {Node} */ (imposter ? imposter : startNode), endOffset2);
+                range.setStart(/** @type {Node} */ (imposter ? imposter : startNode), startOffset);
+                range.setEnd(/** @type {Node} */ (imposter ? imposter : startNode), endOffset);
 
                 // Override getClientRects to return a rect guaranteed to contain (x, y)
                 range.getClientRects = () => {
@@ -214,7 +214,7 @@ describe('DocumentUtil', () => {
             const sentenceActual = DocumentUtil.extractSentence(
                 source,
                 false,
-                sentenceScanExtent2,
+                sentenceScanExtent,
                 terminateAtNewlines2,
                 terminatorMap,
                 forwardQuoteMap,
@@ -233,6 +233,7 @@ describe('DOMTextScanner', () => {
         const {document} = window;
         for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case[data-test-type=text-source-range-seek]'))) {
             // Get test parameters
+            /** @type {import('test/document-util').DOMTextScannerTestData} */
             const {
                 seekNodeSelector,
                 seekNodeIsText,
@@ -243,33 +244,31 @@ describe('DOMTextScanner', () => {
                 expectedResultNodeIsText,
                 expectedResultOffset,
                 expectedResultContent
-            } = testElement.dataset;
-
-            const seekOffset2 = parseInt(/** @type {string} */ (seekOffset), 10);
-            const seekLength2 = parseInt(/** @type {string} */ (seekLength), 10);
-            const expectedResultOffset2 = parseInt(/** @type {string} */ (expectedResultOffset), 10);
+            } = parseJson(/** @type {string} */ (testElement.dataset.testData));
 
             /** @type {?Node} */
             let seekNode = testElement.querySelector(/** @type {string} */ (seekNodeSelector));
-            if (seekNodeIsText === 'true' && seekNode !== null) {
+            if (seekNodeIsText && seekNode !== null) {
                 seekNode = seekNode.firstChild;
             }
 
+            const expectedResultContent2 = expectedResultContent.join('\n');
+
             /** @type {?Node} */
             let expectedResultNode = testElement.querySelector(/** @type {string} */ (expectedResultNodeSelector));
-            if (expectedResultNodeIsText === 'true' && expectedResultNode !== null) {
+            if (expectedResultNodeIsText && expectedResultNode !== null) {
                 expectedResultNode = expectedResultNode.firstChild;
             }
 
             const {node, offset, content} = (
                 seekDirection === 'forward' ?
-                new DOMTextScanner(/** @type {Node} */ (seekNode), seekOffset2, true, false).seek(seekLength2) :
-                new DOMTextScanner(/** @type {Node} */ (seekNode), seekOffset2, true, false).seek(-seekLength2)
+                new DOMTextScanner(/** @type {Node} */ (seekNode), seekOffset, true, false).seek(seekLength) :
+                new DOMTextScanner(/** @type {Node} */ (seekNode), seekOffset, true, false).seek(-seekLength)
             );
 
             expect(node).toStrictEqual(expectedResultNode);
-            expect(offset).toStrictEqual(expectedResultOffset2);
-            expect(content).toStrictEqual(expectedResultContent);
+            expect(offset).toStrictEqual(expectedResultOffset);
+            expect(content).toStrictEqual(expectedResultContent2);
         }
     });
 });
