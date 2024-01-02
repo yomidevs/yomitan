@@ -210,7 +210,7 @@ export type TermDictionaryEntry = {
     /**
      * A list of inflections that was applied to get the term.
      */
-    inflectionHypotheses: DictionaryData.InflectionHypothesis[];
+    inflectionHypotheses: InflectionHypothesis[];
     /**
      * A score for the dictionary entry.
      */
@@ -251,6 +251,11 @@ export type TermDictionaryEntry = {
      * Frequencies for the entry.
      */
     frequencies: TermFrequency[];
+};
+
+export type InflectionHypothesis = {
+    source: string;
+    inflections: DictionaryData.InflectionHypothesis;
 };
 
 /**

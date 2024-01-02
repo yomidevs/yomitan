@@ -72,7 +72,6 @@ export type TermV3 = [
 
 export type InflectionHypothesis = string[];
 
-
 export type KanjiV1Array = KanjiV1[];
 
 export type KanjiV1 = [

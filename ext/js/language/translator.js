@@ -222,7 +222,7 @@ export class Translator {
         /** @type {import('dictionary').TermDictionaryEntry[]} */
         const dictionaryEntries = [];
         const ids = new Set();
-        for (const {databaseEntries, originalText, transformedText, deinflectedText, reasons} of deinflections) {
+        for (const {databaseEntries, originalText, transformedText, deinflectedText, inflectionHypotheses} of deinflections) {
             if (databaseEntries.length === 0) { continue; }
             originalTextLength = Math.max(originalTextLength, originalText.length);
             for (const databaseEntry of databaseEntries) {
@@ -231,19 +231,34 @@ export class Translator {
                     const existingEntry = dictionaryEntries.find((entry) => {
                         return entry.definitions.some((definition) => definition.id === id);
                     });
-                    if (existingEntry) {
-                        if (
-                            !this._isHypothesisInHypotheses(existingEntry, reasons) &&
-                            existingEntry.headwords[0].sources[0].transformedText.length <= transformedText.length
-                        ) {
-                            existingEntry.inflectionHypotheses.push(reasons);
-                        }
-                        continue;
+                    if (!existingEntry) { continue; }
+                    if (transformedText.length >= existingEntry.headwords[0].sources[0].transformedText.length) {
+                        const existingHypotheses = existingEntry.inflectionHypotheses;
+
+                        /** @type {import('dictionary').InflectionHypothesis[]} */
+                        const newHypotheses = [];
+
+                        inflectionHypotheses.forEach(({source, inflections}) => {
+                            const duplicate = existingHypotheses.find((hypothesis) => this._areInflectionHyphothesesEqual(hypothesis.inflections, inflections));
+                            if (!duplicate) {
+                                newHypotheses.push({source, inflections});
+                            } else if (duplicate.source !== source) {
+                                duplicate.source = 'both';
+                            }
+                        });
+
+                        existingEntry.inflectionHypotheses = [
+                            ...existingEntry.inflectionHypotheses,
+                            ...newHypotheses
+                        ];
                     }
-                    // TODO: make configurable
-                    if (databaseEntry.formOf) { continue; }
+
+                    continue;
                 }
-                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, [reasons], true, enabledDictionaryMap, tagAggregator);
+                // TODO: make configurable
+                if (databaseEntry.formOf) { continue; }
+
+                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionHypotheses, true, enabledDictionaryMap, tagAggregator);
                 dictionaryEntries.push(dictionaryEntry);
                 ids.add(id);
             }
@@ -253,27 +268,15 @@ export class Translator {
     }
 
     /**
-     * @param {import('dictionary').TermDictionaryEntry} existingEntry
-     * @param {import('dictionary-data').InflectionHypothesis} hypothesis
+     * @param {import('dictionary-data').InflectionHypothesis} hypothesis1
+     * @param {import('dictionary-data').InflectionHypothesis} hypothesis2
      * @returns {boolean}
      */
-    _isHypothesisInHypotheses({inflectionHypotheses}, hypothesis) {
-        return inflectionHypotheses.some((h) => Translator.areArraysEqual(h, hypothesis));
-    }
+    _areInflectionHyphothesesEqual(hypothesis1, hypothesis2) {
+        const set1 = new Set(hypothesis1);
+        const set2 = new Set(hypothesis2);
 
-    /**
-     * @template [T=unknown]
-     * @param {T[]} array1
-     * @param {T[]} array2
-     * @returns {boolean}
-     */
-    static areArraysEqual(array1, array2) {
-        const ii = array1.length;
-        if (ii !== array2.length) { return false; }
-        for (let i = 0; i < ii; ++i) {
-            if (array1[i] !== array2[i]) { return false; }
-        }
-        return true;
+        return set1.size === set2.size && [...set1].every((x) => set2.has(x));
     }
 
     /**
@@ -283,42 +286,103 @@ export class Translator {
      * @returns {Promise<import('translation-internal').DatabaseDeinflection[]>}
      */
     async _getDeinflections(text, enabledDictionaryMap, options) {
-        const deinflections = (
+        let deinflections = (
             options.deinflect ?
-            this._getAllDeinflections(text, options) :
+            this._getAlgorithmDeinflections(text, options) :
             [this._createDeinflection(text, text, text, 0, [])]
         );
         if (deinflections.length === 0) { return []; }
 
-        const uniqueDeinflectionTerms = [];
-        const uniqueDeinflectionArrays = [];
-        const uniqueDeinflectionsMap = new Map();
-        for (const deinflection of deinflections) {
-            const term = deinflection.deinflectedText;
-            let deinflectionArray = uniqueDeinflectionsMap.get(term);
-            if (typeof deinflectionArray === 'undefined') {
-                deinflectionArray = [];
-                uniqueDeinflectionTerms.push(term);
-                uniqueDeinflectionArrays.push(deinflectionArray);
-                uniqueDeinflectionsMap.set(term, deinflectionArray);
-            }
-            deinflectionArray.push(deinflection);
-        }
-
         const {matchType} = options;
-        const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
 
+        await this._addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType);
+
+        deinflections = deinflections.filter((deinflection) => deinflection.databaseEntries.length > 0);
+
+        if (options.deinflectionSource !== 'algorithm') {
+            const dictionaryDeinflections = await this._getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType);
+            deinflections.push(...dictionaryDeinflections);
+        }
+        return deinflections;
+    }
+
+    /**
+     * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
+     * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
+     * @param {import('dictionary').TermSourceMatchType} matchType
+     * @returns {Promise<import('translation-internal').DatabaseDeinflection[]>}
+     */
+    async _getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType) {
+        /** @type {import('translation-internal').DatabaseDeinflection[]} */
+        const dictionaryDeinflections = [];
+        deinflections.forEach((deinflection) => {
+            const {originalText, transformedText, inflectionHypotheses: algHypotheses, databaseEntries} = deinflection;
+            databaseEntries.forEach((entry) => {
+                const {formOf, inflectionHypotheses} = entry;
+                if (formOf) {
+                    const hypotheses = (inflectionHypotheses || [])
+                        .flatMap((hypothesis) => algHypotheses.map(({inflections}) => {
+                            return {
+                                source: inflections.length === 0 ? 'dictionary' : 'both',
+                                inflections: [...inflections, ...hypothesis]
+                            };
+                        }));
+
+                    const dictionaryDeinflection = this._createDeinflection(originalText, transformedText, formOf, 0, hypotheses);
+                    dictionaryDeinflections.push(dictionaryDeinflection);
+                }
+            });
+        });
+
+        await this._addEntriesToDeinflections(dictionaryDeinflections, enabledDictionaryMap, matchType, false);
+
+        return dictionaryDeinflections;
+    }
+
+    /**
+     * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
+     * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
+     * @param {import('dictionary').TermSourceMatchType} matchType
+     * @param {boolean} partsOfSpeechFilter
+     */
+    async _addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType, partsOfSpeechFilter = true) {
+        const uniqueDeinflectionsMap = this._groupDeinflectionsByTerm(deinflections);
+        const uniqueDeinflectionArrays = Object.values(uniqueDeinflectionsMap);
+        const uniqueDeinflectionTerms = Object.keys(uniqueDeinflectionsMap);
+
+        const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
+        this._matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, partsOfSpeechFilter);
+    }
+
+    /**
+     * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
+     * @returns {Map<string, import('translation-internal').DatabaseDeinflection[]>}
+     */
+    _groupDeinflectionsByTerm(deinflections) {
+        return deinflections.reduce((map, deinflection) => {
+            const term = deinflection.deinflectedText;
+            const deinflectionArray = map.get(term) || [];
+            deinflectionArray.push(deinflection);
+            map.set(term, deinflectionArray);
+            return map;
+        }, /** @type {Map<string, import('translation-internal').DatabaseDeinflection[]>} */ new Map());
+    }
+
+    /**
+     * @param {import('dictionary-database').TermEntry[]} databaseEntries
+     * @param {import('translation-internal').DatabaseDeinflection[][]} uniqueDeinflectionArrays
+     * @param {boolean} partsOfSpeechFilter
+     */
+    _matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, partsOfSpeechFilter) {
         for (const databaseEntry of databaseEntries) {
             const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
                 const deinflectionRules = deinflection.rules;
-                if (deinflectionRules === 0 || (definitionRules & deinflectionRules) !== 0) {
+                if (!partsOfSpeechFilter || deinflectionRules === 0 || (definitionRules & deinflectionRules) !== 0) {
                     deinflection.databaseEntries.push(databaseEntry);
                 }
             }
         }
-
-        return deinflections;
     }
 
     // Deinflections and text transformations
@@ -328,7 +392,7 @@ export class Translator {
      * @param {import('translation').FindTermsOptions} options
      * @returns {import('translation-internal').DatabaseDeinflection[]}
      */
-    _getAllDeinflections(text, options) {
+    _getAlgorithmDeinflections(text, options) {
         /** @type {import('translation-internal').TextDeinflectionOptionsArrays} */
         const textOptionVariantArray = [
             this._getTextReplacementsVariants(options),
@@ -472,11 +536,11 @@ export class Translator {
      * @param {string} transformedText
      * @param {string} deinflectedText
      * @param {import('translation-internal').DeinflectionRuleFlags} rules
-     * @param {string[]} reasons
+     * @param {import('dictionary').InflectionHypothesis[]} inflectionHypotheses
      * @returns {import('translation-internal').DatabaseDeinflection}
      */
-    _createDeinflection(originalText, transformedText, deinflectedText, rules, reasons) {
-        return {originalText, transformedText, deinflectedText, rules, reasons, databaseEntries: []};
+    _createDeinflection(originalText, transformedText, deinflectedText, rules, inflectionHypotheses) {
+        return {originalText, transformedText, deinflectedText, rules, inflectionHypotheses, databaseEntries: []};
     }
 
     // Term dictionary entry grouping
