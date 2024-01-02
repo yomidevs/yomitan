@@ -235,7 +235,6 @@ export type TranslationOptions = {
     collapseEmphaticSequences: TranslationCollapseEmphaticSequences;
     textReplacements: TranslationTextReplacementOptions;
     searchResolution: SearchResolution;
-    partsOfSpeechFilter: boolean;
 };
 
 export type SearchResolution = 'letter' | 'word';
@@ -259,6 +258,7 @@ export type DictionaryOptions = {
     enabled: boolean;
     allowSecondarySearches: boolean;
     definitionsCollapsible: DictionaryDefinitionsCollapsible;
+    partsOfSpeechFilter: boolean;
 };
 
 export type ParsingOptions = {

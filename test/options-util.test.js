@@ -413,7 +413,6 @@ function createProfileOptionsUpdatedTestData1() {
             convertHiraganaToKatakana: 'false',
             convertKatakanaToHiragana: 'variant',
             collapseEmphaticSequences: 'false',
-            partsOfSpeechFilter: true,
             searchResolution: 'letter',
             textReplacements: {
                 searchOriginal: true,
@@ -426,7 +425,8 @@ function createProfileOptionsUpdatedTestData1() {
                 priority: 0,
                 enabled: true,
                 allowSecondarySearches: false,
-                definitionsCollapsible: 'not-collapsible'
+                definitionsCollapsible: 'not-collapsible',
+                partsOfSpeechFilter: true
             }
         ],
         parsing: {

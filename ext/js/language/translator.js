@@ -265,11 +265,14 @@ export class Translator {
             deinflectionArray.push(deinflection);
         }
 
-        const {matchType, partsOfSpeechFilter} = options;
+        const {matchType} = options;
 
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
 
         for (const databaseEntry of databaseEntries) {
+            const entryDictionary = enabledDictionaryMap.get(databaseEntry.dictionary);
+            const partsOfSpeechFilter = entryDictionary?.partsOfSpeechFilter ?? true;
+
             const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
                 const deinflectionRules = deinflection.rules;

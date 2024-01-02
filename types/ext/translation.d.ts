@@ -121,10 +121,6 @@ export type FindTermsOptions = {
      * Whether every substring should be searched for, or only whole words.
      */
     searchResolution: SearchResolution;
-    /**
-     * Whether algorithm deinflections should be filtered using parts of speech.
-     */
-    partsOfSpeechFilter: boolean;
 };
 
 /**
@@ -177,6 +173,10 @@ export type FindTermDictionary = {
      * Whether or not secondary term searches are allowed for this dictionary.
      */
     allowSecondarySearches: boolean;
+    /**
+     * Whether this dictionary's part of speech rules should be used to filter results.
+     */
+    partsOfSpeechFilter: boolean;
 };
 
 export type TermEnabledDictionaryMap = Map<string, FindTermDictionary>;

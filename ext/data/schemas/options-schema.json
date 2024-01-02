@@ -729,8 +729,7 @@
                                     "convertKatakanaToHiragana",
                                     "collapseEmphaticSequences",
                                     "textReplacements",
-                                    "searchResolution",
-                                    "partsOfSpeechFilter"
+                                    "searchResolution"
                                 ],
                                 "properties": {
                                     "searchResolution": {
@@ -811,10 +810,6 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "partsOfSpeechFilter": {
-                                        "type": "boolean",
-                                        "default": true
                                     }
                                 }
                             },
@@ -827,7 +822,8 @@
                                         "priority",
                                         "enabled",
                                         "allowSecondarySearches",
-                                        "definitionsCollapsible"
+                                        "definitionsCollapsible",
+                                        "partsOfSpeechFilter"
                                     ],
                                     "properties": {
                                         "name": {
@@ -850,6 +846,10 @@
                                             "type": "string",
                                             "enum": ["not-collapsible", "expanded", "collapsed", "force-collapsed", "force-expanded"],
                                             "default": "not-collapsible"
+                                        },
+                                        "partsOfSpeechFilter": {
+                                            "type": "boolean",
+                                            "default": true
                                         }
                                     }
                                 }

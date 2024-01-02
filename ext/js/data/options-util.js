@@ -1144,12 +1144,14 @@ export class OptionsUtil {
     }
 
     /**
-     * - Added translation.partsOfSpeechFilter.
+     * - Added dictionaries[].partsOfSpeechFilter.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion23(options) {
         for (const {options: profileOptions} of options.profiles) {
-            profileOptions.translation.partsOfSpeechFilter = true;
+            for (const dictionary of profileOptions.dictionaries) {
+                dictionary.partsOfSpeechFilter = true;
+            }
         }
     }
 
