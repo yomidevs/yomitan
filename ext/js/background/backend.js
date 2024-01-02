@@ -2259,13 +2259,9 @@ export class Backend {
                     if (typeof error3 !== 'string') { continue; }
                     switch (/** @type {import('backend').NetError} */ (error3)) {
                         case 'net::ERR_FAILED':
-                            // This is potentially an error due to the extension not having enough URL privileges.
-                            // The message logged to the console looks like this:
-                            //  Access to fetch at '<URL>' from origin 'chrome-extension://<ID>' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
                             return this._createAudioDownloadError('Audio download failed due to possible extension permissions error', 'audio-download-failed-permissions-error', errors);
-                        case 'net::ERR_CERT_DATE_INVALID': // Chrome
-                        case 'Peer’s Certificate has expired.': // Firefox
-                            // This error occurs when a server certificate expires.
+                        case 'net::ERR_CERT_DATE_INVALID':
+                        case 'Peer’s Certificate has expired.':
                             return this._createAudioDownloadError('Audio download failed due to an expired server certificate', 'audio-download-failed-expired-server-certificate', errors);
                     }
                 }
