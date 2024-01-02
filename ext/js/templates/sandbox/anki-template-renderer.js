@@ -269,7 +269,7 @@ export class AnkiTemplateRenderer {
      * {{#regexMatch regex [flags] [content]...}}content{{/regexMatch}}
      * - regex: regular expression string
      * - flags: optional flags for regular expression
-     * e.g) "i" for case-insensitive, "g" for match all
+     * e.g. "i" for case-insensitive, "g" for match all
      * @type {import('template-renderer').HelperFunction<string>}
      */
     _regexMatch(args, context, options) {
