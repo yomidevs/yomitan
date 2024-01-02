@@ -2257,7 +2257,7 @@ export class Backend {
                     if (!(typeof details === 'object' && details !== null)) { continue; }
                     const error3 = /** @type {import('core').SerializableObject} */ (details).error;
                     if (typeof error3 !== 'string') { continue; }
-                    switch (error3) {
+                    switch (/** @type {import('backend').NetError} */ (error3)) {
                         case 'net::ERR_FAILED':
                             // This is potentially an error due to the extension not having enough URL privileges.
                             // The message logged to the console looks like this:
@@ -2629,14 +2629,14 @@ export class Backend {
     }
 
     /**
+     * Only request this permission for Firefox versions >= 77.
+     * https://bugzilla.mozilla.org/show_bug.cgi?id=1630413
      * @returns {Promise<void>}
      */
     async _requestPersistentStorage() {
         try {
             if (await navigator.storage.persisted()) { return; }
 
-            // Only request this permission for Firefox versions >= 77.
-            // https://bugzilla.mozilla.org/show_bug.cgi?id=1630413
             const {vendor, version} = await browser.runtime.getBrowserInfo();
             if (vendor !== 'Mozilla') { return; }
 
