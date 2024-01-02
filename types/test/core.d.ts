@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2023  Yomitan Authors
- * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,19 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import fs from 'fs';
-import {describe, expect, test} from 'vitest';
-import {formatRulesJson, generateRules, getTargets} from '../dev/generate-css-json';
+type Operation = 'set.defaultValue' | 'setOverride' | 'clearOverride';
 
-/** */
-function main() {
-    describe('css-json', () => {
-        test.each(getTargets())('css-json-test-%#', ({cssFilePath, overridesCssFilePath, outputPath}) => {
-            const actual = fs.readFileSync(outputPath, {encoding: 'utf8'});
-            const expected = formatRulesJson(generateRules(cssFilePath, overridesCssFilePath));
-            expect(actual).toStrictEqual(expected);
-        });
-    });
-}
+type DynamicPropertyTestOperation = {
+    operation: Operation | null;
+    expectedDefaultValue: number;
+    expectedValue: number;
+    expectedOverrideCount: number;
+    expectedEventOccurred: boolean;
+    args: [value: number, priority?: number];
+};
 
-main();
+export type DynamicPropertyTestData = {
+    initialValue: number;
+    operations: DynamicPropertyTestOperation[];
+}[];
+
+export type DeepEqualTestData = {
+    value1: unknown;
+    value2: unknown;
+    expected: boolean;
+}[];

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {expect, test} from 'vitest';
+import {describe, expect, test} from 'vitest';
 import {TextSourceMap} from '../ext/js/general/text-source-map.js';
 import {JapaneseUtil} from '../ext/js/language/sandbox/japanese-util.js';
 import * as wanakana from '../ext/lib/wanakana.js';
@@ -25,7 +25,7 @@ const jp = new JapaneseUtil(wanakana);
 
 /** */
 function testIsCodePointKanji() {
-    test('isCodePointKanji', () => {
+    describe('isCodePointKanji', () => {
         /** @type {[characters: string, expected: boolean][]} */
         const data = [
             ['力方', true],
@@ -34,19 +34,19 @@ function testIsCodePointKanji() {
             ['逸逸', true]
         ];
 
-        for (const [characters, expected] of data) {
+        test.each(data)('%s -> %o', (characters, expected) => {
             for (const character of characters) {
                 const codePoint = /** @type {number} */ (character.codePointAt(0));
                 const actual = jp.isCodePointKanji(codePoint);
                 expect(actual).toStrictEqual(expected); // `isCodePointKanji failed for ${character} (\\u{${codePoint.toString(16)}})`
             }
-        }
+        });
     });
 }
 
 /** */
 function testIsCodePointKana() {
-    test('isCodePointKana', () => {
+    describe('isCodePointKana', () => {
         /** @type {[characters: string, expected: boolean][]} */
         const data = [
             ['かたカタ', true],
@@ -54,19 +54,19 @@ function testIsCodePointKana() {
             ['\u53f1\u{20b9f}', false]
         ];
 
-        for (const [characters, expected] of data) {
+        test.each(data)('%s -> %o', (characters, expected) => {
             for (const character of characters) {
                 const codePoint = /** @type {number} */ (character.codePointAt(0));
                 const actual = jp.isCodePointKana(codePoint);
                 expect(actual).toStrictEqual(expected); // `isCodePointKana failed for ${character} (\\u{${codePoint.toString(16)}})`
             }
-        }
+        });
     });
 }
 
 /** */
 function testIsCodePointJapanese() {
-    test('isCodePointJapanese', () => {
+    describe('isCodePointJapanese', () => {
         /** @type {[characters: string, expected: boolean][]} */
         const data = [
             ['かたカタ力方々、。？', true],
@@ -75,19 +75,19 @@ function testIsCodePointJapanese() {
             ['逸逸', true]
         ];
 
-        for (const [characters, expected] of data) {
+        test.each(data)('%s -> %o', (characters, expected) => {
             for (const character of characters) {
                 const codePoint = /** @type {number} */ (character.codePointAt(0));
                 const actual = jp.isCodePointJapanese(codePoint);
                 expect(actual).toStrictEqual(expected); // `isCodePointJapanese failed for ${character} (\\u{${codePoint.toString(16)}})`
             }
-        }
+        });
     });
 }
 
 /** */
 function testIsStringEntirelyKana() {
-    test('isStringEntirelyKana', () => {
+    describe('isStringEntirelyKana', () => {
         /** @type {[string: string, expected: boolean][]} */
         const data = [
             ['かたかな', true],
@@ -103,9 +103,9 @@ function testIsStringEntirelyKana() {
             ['kata,.?かた', false]
         ];
 
-        for (const [string, expected] of data) {
+        test.each(data)('%s -> %o', (string, expected) => {
             expect(jp.isStringEntirelyKana(string)).toStrictEqual(expected);
-        }
+        });
     });
 }
 
