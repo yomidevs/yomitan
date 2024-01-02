@@ -1,5 +1,5 @@
 {
-    "$id": "dictionaryTermBankV4",
+    "$id": "dictionaryTermBankV3",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
         "structuredContent": {
@@ -545,11 +545,11 @@
                 "description": "String of space-separated tags for the term. An empty string is treated as no tags."
             },
             {
-                "type": ["string"],
+                "type": "string",
                 "description": "Lemma (uninflected) form of the term. Empty for lemmas."
             },
             {
-                "type": ["array"],
+                "type": "array",
                 "description": "Array of possible inflection combinations that produce the term. Empty for lemmas.",
                 "items": {
                     "type": "array",
