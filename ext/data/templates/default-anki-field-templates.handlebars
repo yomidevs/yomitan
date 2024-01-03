@@ -262,6 +262,7 @@
 
 {{#*inline "conjugation"}}
     {{~#if (op ">" definition.inflectionHypotheses.length 0)~}}
+        {{~set "multiple" false~}}
         {{~#if (op ">" definition.inflectionHypotheses.length 1)~}}
             {{~set "multiple" true~}}
         {{~/if~}}
