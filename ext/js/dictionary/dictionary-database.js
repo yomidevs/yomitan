@@ -578,7 +578,7 @@ export class DictionaryDatabase {
      * @returns {import('dictionary-database').TermEntry}
      */
     _createTerm(matchSource, matchType, row, index) {
-        const {sequence, reading, score, dictionary, formOf, inflectionHypotheses} = row;
+        const {sequence, reading, score, dictionary} = row;
         return {
             index,
             matchType,
@@ -592,9 +592,7 @@ export class DictionaryDatabase {
             score,
             dictionary,
             id: row.id,
-            sequence: typeof sequence === 'number' ? sequence : -1,
-            formOf,
-            inflectionHypotheses
+            sequence: typeof sequence === 'number' ? sequence : -1
         };
     }
 

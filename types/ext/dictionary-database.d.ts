@@ -51,8 +51,6 @@ export type DatabaseTermEntry = {
     glossary: DictionaryData.TermGlossary[];
     sequence?: number;
     termTags?: string;
-    formOf?: string;
-    inflectionHypotheses?: DictionaryData.InflectionHypothesis[];
     dictionary: string;
 };
 
@@ -72,8 +70,6 @@ export type TermEntry = {
     dictionary: string;
     id: number;
     sequence: number;
-    formOf?: string;
-    inflectionHypotheses?: DictionaryData.InflectionHypothesis[];
 };
 
 export type DatabaseKanjiEntry = {

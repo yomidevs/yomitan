@@ -66,11 +66,7 @@ export type TermV3 = [
     glossary: TermGlossary[],
     sequence: number,
     termTags: string,
-    formOf: string,
-    inflectionHypotheses: InflectionHypothesis[],
 ];
-
-export type InflectionHypothesis = string[];
 
 export type KanjiV1Array = KanjiV1[];
 
@@ -97,13 +93,17 @@ export type TermGlossary = (
     TermGlossaryString |
     TermGlossaryText |
     TermGlossaryImage |
-    TermGlossaryStructuredContent
+    TermGlossaryStructuredContent |
+    TermGlossaryDeinflection
 );
 
 export type TermGlossaryString = string;
 export type TermGlossaryText = {type: 'text', text: string};
 export type TermGlossaryImage = {type: 'image'} & TermImage;
 export type TermGlossaryStructuredContent = {type: 'structured-content', content: StructuredContent.Content};
+export type TermGlossaryDeinflection = [formOf: string, InflectionHypothesis: InflectionHypothesis];
+
+export type InflectionHypothesis = string[];
 
 export type TermImage = StructuredContent.ImageElementBase & {
     // Compatibility properties

@@ -380,7 +380,6 @@
         "type": "array",
         "description": "Information about a single term.",
         "minItems": 8,
-        "maxItems": 10,
         "additionalItems": false,
         "items": [
             {
@@ -532,6 +531,24 @@
                                     }
                                 }
                             ]
+                        },
+                        {
+                            "type":"array",
+                            "description": "Deinflection of the term to a non-inflected term.",
+                            "items": [
+                                {
+                                    "type": "string",
+                                    "description": "The deinflected term."
+                                },
+                                {
+                                    "type": "array",
+                                    "description": "A possible inflection combination that produced the inflected term",
+                                    "items": {
+                                        "type": "string",
+                                        "description": "An inflection."
+                                    }
+                                }
+                            ]
                         }
                     ]
                 }
@@ -543,22 +560,6 @@
             {
                 "type": "string",
                 "description": "String of space-separated tags for the term. An empty string is treated as no tags."
-            },
-            {
-                "type": "string",
-                "description": "Lemma (uninflected) form of the term. Empty for lemmas."
-            },
-            {
-                "type": "array",
-                "description": "Array of possible inflection combinations that produce the term. Empty for lemmas.",
-                "items": {
-                    "type": "array",
-                    "description": "An inflection combination.",
-                    "items": {
-                        "type": "string",
-                        "description": "An inflection."
-                    }
-                }
             }
         ]
     }

@@ -376,7 +376,7 @@ export class AnkiNoteDataCreator {
             case 'merge': type = 'termMerged'; break;
         }
 
-        const {inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, definitions} = dictionaryEntry;
+        const {inflectionHypotheses, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, definitions} = dictionaryEntry;
 
         let {url} = context;
         if (typeof url !== 'string') { url = ''; }
@@ -401,7 +401,7 @@ export class AnkiNoteDataCreator {
             source: (primarySource !== null ? primarySource.transformedText : null),
             rawSource: (primarySource !== null ? primarySource.originalText : null),
             sourceTerm: (type !== 'termMerged' ? (primarySource !== null ? primarySource.deinflectedText : null) : void 0),
-            reasons: inflections,
+            inflectionHypotheses,
             score,
             isPrimary: (type === 'term' ? dictionaryEntry.isPrimary : void 0),
             get sequence() { return self.getCachedValue(sequence); },

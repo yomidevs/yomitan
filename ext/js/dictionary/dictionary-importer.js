@@ -159,7 +159,7 @@ export class DictionaryImporter {
             const glossaryList = entry.glossary;
             for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
                 const glossary = glossaryList[j];
-                if (typeof glossary !== 'object' || glossary === null) { continue; }
+                if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
                 glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
             }
             if ((i % formatProgressInterval) === 0) {
@@ -613,10 +613,10 @@ export class DictionaryImporter {
      * @returns {import('dictionary-database').DatabaseTermEntry}
      */
     _convertTermBankEntryV3(entry, dictionary) {
-        let [expression, reading, definitionTags, rules, score, glossary, sequence, termTags, formOf, inflectionHypotheses] = entry;
+        let [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
         expression = this._normalizeTermOrReading(expression);
         reading = this._normalizeTermOrReading(reading.length > 0 ? reading : expression);
-        return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, formOf, inflectionHypotheses, dictionary};
+        return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, dictionary};
     }
 
     /**

@@ -255,7 +255,7 @@ export type TermDictionaryEntry = {
 
 export type InflectionHypothesis = {
     source: InflectionSource;
-    inflections: DictionaryData.InflectionHypothesis;
+    inflections: string[];
 };
 
 export type InflectionSource = 'algorithm' | 'dictionary' | 'both';

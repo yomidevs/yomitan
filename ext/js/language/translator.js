@@ -255,8 +255,6 @@ export class Translator {
 
                     continue;
                 }
-                // TODO: make configurable
-                if (databaseEntry.formOf) { continue; }
 
                 const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionHypotheses, true, enabledDictionaryMap, tagAggregator);
                 dictionaryEntries.push(dictionaryEntry);
@@ -317,22 +315,25 @@ export class Translator {
         deinflections.forEach((deinflection) => {
             const {originalText, transformedText, inflectionHypotheses: algHypotheses, databaseEntries} = deinflection;
             databaseEntries.forEach((entry) => {
-                const entryDictionary = enabledDictionaryMap.get(entry.dictionary);
+                const {dictionary, definitions} = entry;
+                const entryDictionary = enabledDictionaryMap.get(dictionary);
                 const useDeinflections = entryDictionary?.useDeinflections ?? true;
                 if (!useDeinflections) { return; }
+                for (const definition of definitions) {
+                    if (Array.isArray(definition)) {
+                        const [formOf, inflections] = definition;
+                        if (!formOf) { continue; }
 
-                const {formOf, inflectionHypotheses} = entry;
-                if (formOf) {
-                    const hypotheses = (inflectionHypotheses || [])
-                        .flatMap((hypothesis) => algHypotheses.map(({inflections}) => {
+                        const inflectionHypotheses = algHypotheses.map(({inflections: algInflections}) => {
                             return {
-                                source: /** @type {import('dictionary').InflectionSource} */ (inflections.length === 0 ? 'dictionary' : 'both'),
-                                inflections: [...inflections, ...hypothesis]
+                                source: /** @type {import('dictionary').InflectionSource} */ (algInflections.length === 0 ? 'dictionary' : 'both'),
+                                inflections: [...algInflections, ...inflections]
                             };
-                        }));
+                        });
 
-                    const dictionaryDeinflection = this._createDeinflection(originalText, transformedText, formOf, 0, hypotheses);
-                    dictionaryDeinflections.push(dictionaryDeinflection);
+                        const dictionaryDeinflection = this._createDeinflection(originalText, transformedText, formOf, 0, inflectionHypotheses);
+                        dictionaryDeinflections.push(dictionaryDeinflection);
+                    }
                 }
             });
         });
