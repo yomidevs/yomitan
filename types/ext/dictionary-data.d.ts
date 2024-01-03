@@ -93,17 +93,13 @@ export type TermGlossary = (
     TermGlossaryString |
     TermGlossaryText |
     TermGlossaryImage |
-    TermGlossaryStructuredContent |
-    TermGlossaryDeinflection
+    TermGlossaryStructuredContent
 );
 
 export type TermGlossaryString = string;
 export type TermGlossaryText = {type: 'text', text: string};
 export type TermGlossaryImage = {type: 'image'} & TermImage;
 export type TermGlossaryStructuredContent = {type: 'structured-content', content: StructuredContent.Content};
-export type TermGlossaryDeinflection = [formOf: string, InflectionHypothesis: InflectionHypothesis];
-
-export type InflectionHypothesis = string[];
 
 export type TermImage = StructuredContent.ImageElementBase & {
     // Compatibility properties

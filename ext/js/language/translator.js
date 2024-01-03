@@ -267,8 +267,8 @@ export class Translator {
     }
 
     /**
-     * @param {import('dictionary-data').InflectionHypothesis} hypothesis1
-     * @param {import('dictionary-data').InflectionHypothesis} hypothesis2
+     * @param {import('dictionary').Inflections} hypothesis1
+     * @param {import('dictionary').Inflections} hypothesis2
      * @returns {boolean}
      */
     _areInflectionHyphothesesEqual(hypothesis1, hypothesis2) {

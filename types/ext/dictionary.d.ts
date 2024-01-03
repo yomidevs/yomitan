@@ -255,8 +255,10 @@ export type TermDictionaryEntry = {
 
 export type InflectionHypothesis = {
     source: InflectionSource;
-    inflections: string[];
+    inflections: Inflections;
 };
+
+export type Inflections = string[];
 
 export type InflectionSource = 'algorithm' | 'dictionary' | 'both';
 
