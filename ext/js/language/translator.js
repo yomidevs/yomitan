@@ -299,10 +299,9 @@ export class Translator {
 
         deinflections = deinflections.filter((deinflection) => deinflection.databaseEntries.length > 0);
 
-        if (options.deinflectionSource !== 'algorithm') {
-            const dictionaryDeinflections = await this._getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType);
-            deinflections.push(...dictionaryDeinflections);
-        }
+        const dictionaryDeinflections = await this._getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType);
+        deinflections.push(...dictionaryDeinflections);
+
         return deinflections;
     }
 
@@ -318,12 +317,16 @@ export class Translator {
         deinflections.forEach((deinflection) => {
             const {originalText, transformedText, inflectionHypotheses: algHypotheses, databaseEntries} = deinflection;
             databaseEntries.forEach((entry) => {
+                const entryDictionary = enabledDictionaryMap.get(entry.dictionary);
+                const useDeinflections = entryDictionary?.useDeinflections ?? true;
+                if (!useDeinflections) { return; }
+
                 const {formOf, inflectionHypotheses} = entry;
                 if (formOf) {
                     const hypotheses = (inflectionHypotheses || [])
                         .flatMap((hypothesis) => algHypotheses.map(({inflections}) => {
                             return {
-                                source: inflections.length === 0 ? 'dictionary' : 'both',
+                                source: /** @type {import('dictionary').InflectionSource} */ (inflections.length === 0 ? 'dictionary' : 'both'),
                                 inflections: [...inflections, ...hypothesis]
                             };
                         }));
@@ -347,8 +350,8 @@ export class Translator {
      */
     async _addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType, partsOfSpeechFilter = true) {
         const uniqueDeinflectionsMap = this._groupDeinflectionsByTerm(deinflections);
-        const uniqueDeinflectionArrays = Object.values(uniqueDeinflectionsMap);
-        const uniqueDeinflectionTerms = Object.keys(uniqueDeinflectionsMap);
+        const uniqueDeinflectionArrays = Array.from(uniqueDeinflectionsMap.values());
+        const uniqueDeinflectionTerms = Array.from(uniqueDeinflectionsMap.keys());
 
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
         this._matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, partsOfSpeechFilter);
@@ -359,13 +362,14 @@ export class Translator {
      * @returns {Map<string, import('translation-internal').DatabaseDeinflection[]>}
      */
     _groupDeinflectionsByTerm(deinflections) {
-        return deinflections.reduce((map, deinflection) => {
+        const result = deinflections.reduce((map, deinflection) => {
             const term = deinflection.deinflectedText;
             const deinflectionArray = map.get(term) || [];
             deinflectionArray.push(deinflection);
             map.set(term, deinflectionArray);
             return map;
         }, /** @type {Map<string, import('translation-internal').DatabaseDeinflection[]>} */ new Map());
+        return result;
     }
 
     /**
@@ -443,7 +447,12 @@ export class Translator {
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
                 for (const {term, rules, reasons} of /** @type {Deinflector} */ (this._deinflector).deinflect(source)) {
-                    deinflections.push(this._createDeinflection(rawSource, source, term, rules, reasons));
+                    /** @type {import('dictionary').InflectionHypothesis} */
+                    const inflectionHypothesis = {
+                        source: 'algorithm',
+                        inflections: reasons
+                    };
+                    deinflections.push(this._createDeinflection(rawSource, source, term, rules, [inflectionHypothesis]));
                 }
             }
         }
@@ -698,8 +707,8 @@ export class Translator {
     _groupDictionaryEntriesByHeadword(dictionaryEntries, tagAggregator) {
         const groups = new Map();
         for (const dictionaryEntry of dictionaryEntries) {
-            const {inflections, headwords: [{term, reading}]} = dictionaryEntry;
-            const key = this._createMapKey([term, reading, ...inflections]);
+            const {inflectionHypotheses, headwords: [{term, reading}]} = dictionaryEntry;
+            const key = this._createMapKey([term, reading, ...inflectionHypotheses]);
             let groupDictionaryEntries = groups.get(key);
             if (typeof groupDictionaryEntries === 'undefined') {
                 groupDictionaryEntries = [];
@@ -1522,7 +1531,7 @@ export class Translator {
 
     /**
      * @param {boolean} isPrimary
-     * @param {string[]} inflections
+     * @param {import('dictionary').InflectionHypothesis[]} inflectionHypotheses
      * @param {number} score
      * @param {number} dictionaryIndex
      * @param {number} dictionaryPriority
@@ -1532,11 +1541,11 @@ export class Translator {
      * @param {import('dictionary').TermDefinition[]} definitions
      * @returns {import('dictionary').TermDictionaryEntry}
      */
-    _createTermDictionaryEntry(isPrimary, inflections, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxTransformedTextLength, headwords, definitions) {
+    _createTermDictionaryEntry(isPrimary, inflectionHypotheses, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxTransformedTextLength, headwords, definitions) {
         return {
             type: 'term',
             isPrimary,
-            inflections,
+            inflectionHypotheses,
             score,
             frequencyOrder: 0,
             dictionaryIndex,
@@ -1555,13 +1564,13 @@ export class Translator {
      * @param {string} originalText
      * @param {string} transformedText
      * @param {string} deinflectedText
-     * @param {string[]} reasons
+     * @param {import('dictionary').InflectionHypothesis[]} inflectionHypotheses
      * @param {boolean} isPrimary
      * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
      * @param {TranslatorTagAggregator} tagAggregator
      * @returns {import('dictionary').TermDictionaryEntry}
      */
-    _createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, reasons, isPrimary, enabledDictionaryMap, tagAggregator) {
+    _createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionHypotheses, isPrimary, enabledDictionaryMap, tagAggregator) {
         const {matchType, matchSource, term, reading: rawReading, definitionTags, termTags, definitions, score, dictionary, id, sequence: rawSequence, rules} = databaseEntry;
         const reading = (rawReading.length > 0 ? rawReading : term);
         const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
@@ -1580,7 +1589,7 @@ export class Translator {
 
         return this._createTermDictionaryEntry(
             isPrimary,
-            reasons,
+            inflectionHypotheses,
             score,
             dictionaryIndex,
             dictionaryPriority,
@@ -1631,7 +1640,7 @@ export class Translator {
             if (dictionaryEntry.isPrimary) {
                 isPrimary = true;
                 maxTransformedTextLength = Math.max(maxTransformedTextLength, dictionaryEntry.maxTransformedTextLength);
-                const dictionaryEntryInflections = dictionaryEntry.inflections;
+                const dictionaryEntryInflections = dictionaryEntry.inflectionHypotheses;
                 if (inflections === null || dictionaryEntryInflections.length < inflections.length) {
                     inflections = dictionaryEntryInflections;
                 }
@@ -1843,7 +1852,7 @@ export class Translator {
             if (i !== 0) { return i; }
 
             // Sort by the number of inflection reasons
-            i = v1.inflections.length - v2.inflections.length;
+            i = v1.inflectionHypotheses.length - v2.inflectionHypotheses.length;
             if (i !== 0) { return i; }
 
             // Sort by how many terms exactly match the source (e.g. for exact kana prioritization)

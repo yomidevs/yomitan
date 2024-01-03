@@ -254,9 +254,11 @@ export type TermDictionaryEntry = {
 };
 
 export type InflectionHypothesis = {
-    source: string;
+    source: InflectionSource;
     inflections: DictionaryData.InflectionHypothesis;
 };
+
+export type InflectionSource = 'algorithm' | 'dictionary' | 'both';
 
 /**
  * A term headword is a combination of a term, reading, and auxiliary information.

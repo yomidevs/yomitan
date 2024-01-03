@@ -822,7 +822,8 @@
                                         "priority",
                                         "enabled",
                                         "allowSecondarySearches",
-                                        "definitionsCollapsible"
+                                        "definitionsCollapsible",
+                                        "useDeinflections"
                                     ],
                                     "properties": {
                                         "name": {
@@ -845,6 +846,10 @@
                                             "type": "string",
                                             "enum": ["not-collapsible", "expanded", "collapsed", "force-collapsed", "force-expanded"],
                                             "default": "not-collapsible"
+                                        },
+                                        "useDeinflections": {
+                                            "type": "boolean",
+                                            "default": true
                                         }
                                     }
                                 }

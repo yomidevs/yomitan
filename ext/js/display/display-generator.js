@@ -357,14 +357,43 @@ export class DisplayGenerator {
     }
 
     /**
-     * @param {import('dictionary-data').InflectionHypothesis} inflectionHypothesis
-     * @returns {DocumentFragment}
+     * @param {import('dictionary').InflectionHypothesis} inflectionHypothesis
+     * @returns {?HTMLElement}
      */
     _createInflectionHypothesis(inflectionHypothesis) {
-        const fragment = this._templates.instantiateFragment('inflection-hypothesis');
-        const node = this._querySelector(fragment, '.inflection-hypothesis');
-        this._appendMultiple(node, this._createTermInflection.bind(this), inflectionHypothesis);
+        const {source, inflections} = inflectionHypothesis;
+        if (!Array.isArray(inflections) || inflections.length === 0) { return null; }
+        const fragment = this._instantiate('inflection-hypothesis');
+
+        const sourceIcon = this._getInflectionSourceIcon(source);
+
+        fragment.appendChild(sourceIcon);
+
+        this._appendMultiple(fragment, this._createTermInflection.bind(this), inflections);
         return fragment;
+    }
+
+    /**
+     * @param {import('dictionary').InflectionSource} source
+     * @returns {HTMLElement}
+     */
+    _getInflectionSourceIcon(source) {
+        const icon = document.createElement('span');
+        icon.style.marginRight = '0.5em';
+        switch (source) {
+            case 'dictionary':
+                icon.textContent = '📖';
+                icon.title = 'Dictionary Deinflection';
+                return icon;
+            case 'algorithm':
+                icon.textContent = '🧩';
+                icon.title = 'Algorithm Deinflection';
+                return icon;
+            case 'both':
+                icon.textContent = '📖🧩';
+                icon.title = 'Dictionary and Algorithm Deinflection';
+                return icon;
+        }
     }
 
     /**

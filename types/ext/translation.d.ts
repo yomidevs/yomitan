@@ -173,6 +173,10 @@ export type FindTermDictionary = {
      * Whether or not secondary term searches are allowed for this dictionary.
      */
     allowSecondarySearches: boolean;
+    /**
+     * Whether to use the deinflections from this dictionary.
+     */
+    useDeinflections: boolean;
 };
 
 export type TermEnabledDictionaryMap = Map<string, FindTermDictionary>;

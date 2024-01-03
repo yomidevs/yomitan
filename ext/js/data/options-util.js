@@ -1145,6 +1145,18 @@ export class OptionsUtil {
     }
 
     /**
+     * - Added dictionaries[].useDeinflections.
+     * @type {import('options-util').UpdateFunction}
+     */
+    _updateVersion23(options) {
+        for (const {options: profileOptions} of options.profiles) {
+            for (const dictionary of profileOptions.dictionaries) {
+                dictionary.useDeinflections = true;
+            }
+        }
+    }
+
+    /**
      * @param {string} url
      * @returns {Promise<chrome.tabs.Tab>}
      */

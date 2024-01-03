@@ -425,7 +425,8 @@ function createProfileOptionsUpdatedTestData1() {
                 priority: 0,
                 enabled: true,
                 allowSecondarySearches: false,
-                definitionsCollapsible: 'not-collapsible'
+                definitionsCollapsible: 'not-collapsible',
+                useDeinflections: true
             }
         ],
         parsing: {

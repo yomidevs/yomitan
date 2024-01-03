@@ -258,6 +258,7 @@ export type DictionaryOptions = {
     enabled: boolean;
     allowSecondarySearches: boolean;
     definitionsCollapsible: DictionaryDefinitionsCollapsible;
+    useDeinflections: boolean;
 };
 
 export type ParsingOptions = {
