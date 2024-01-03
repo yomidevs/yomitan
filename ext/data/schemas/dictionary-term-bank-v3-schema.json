@@ -380,6 +380,7 @@
         "type": "array",
         "description": "Information about a single term.",
         "minItems": 8,
+        "maxItems": 8,
         "additionalItems": false,
         "items": [
             {
