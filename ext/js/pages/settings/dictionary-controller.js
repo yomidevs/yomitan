@@ -164,7 +164,6 @@ class DictionaryEntry {
 
     /** */
     _showDetails() {
-        console.log(this._dictionaryInfo);
         const {title, revision, version, counts, prefixWildcardsSupported} = this._dictionaryInfo;
 
         const modal = this._dictionaryController.modalController.getModal('dictionary-details');
