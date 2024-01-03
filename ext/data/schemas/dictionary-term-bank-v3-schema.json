@@ -534,7 +534,7 @@
                             ]
                         },
                         {
-                            "type":"array",
+                            "type": "array",
                             "description": "Deinflection of the term to a non-inflected term.",
                             "items": [
                                 {
