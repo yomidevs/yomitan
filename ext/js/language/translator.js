@@ -295,10 +295,16 @@ export class Translator {
 
         await this._addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType);
 
-        deinflections = deinflections.filter((deinflection) => deinflection.databaseEntries.length > 0);
-
         const dictionaryDeinflections = await this._getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType);
         deinflections.push(...dictionaryDeinflections);
+
+        deinflections.forEach((deinflection) => {
+            deinflection.databaseEntries.forEach((entry) => {
+                entry.definitions = entry.definitions.filter((definition) => !Array.isArray(definition));
+            });
+            deinflection.databaseEntries = deinflection.databaseEntries.filter((entry) => entry.definitions.length);
+        });
+        deinflections = deinflections.filter((deinflection) => deinflection.databaseEntries.length);
 
         return deinflections;
     }
