@@ -231,26 +231,9 @@ export class Translator {
                     const existingEntry = dictionaryEntries.find((entry) => {
                         return entry.definitions.some((definition) => definition.id === id);
                     });
-                    if (!existingEntry) { continue; }
-                    if (transformedText.length >= existingEntry.headwords[0].sources[0].transformedText.length) {
-                        const existingHypotheses = existingEntry.inflectionHypotheses;
 
-                        /** @type {import('dictionary').InflectionHypothesis[]} */
-                        const newHypotheses = [];
-
-                        inflectionHypotheses.forEach(({source, inflections}) => {
-                            const duplicate = existingHypotheses.find((hypothesis) => this._areInflectionHyphothesesEqual(hypothesis.inflections, inflections));
-                            if (!duplicate) {
-                                newHypotheses.push({source, inflections});
-                            } else if (duplicate.source !== source) {
-                                duplicate.source = 'both';
-                            }
-                        });
-
-                        existingEntry.inflectionHypotheses = [
-                            ...existingEntry.inflectionHypotheses,
-                            ...newHypotheses
-                        ];
+                    if (existingEntry && transformedText.length >= existingEntry.headwords[0].sources[0].transformedText.length) {
+                        this._mergeInflectionHypotheses(existingEntry, inflectionHypotheses);
                     }
 
                     continue;
@@ -263,6 +246,24 @@ export class Translator {
         }
 
         return {dictionaryEntries, originalTextLength};
+    }
+
+    /**
+     *
+     * @param {import('dictionary').TermDictionaryEntry} existingEntry
+     * @param {import('dictionary').InflectionHypothesis[]} inflectionHypotheses
+     */
+    _mergeInflectionHypotheses(existingEntry, inflectionHypotheses) {
+        const existingHypotheses = existingEntry.inflectionHypotheses;
+
+        inflectionHypotheses.forEach(({source, inflections}) => {
+            const duplicate = existingHypotheses.find((hypothesis) => this._areInflectionHyphothesesEqual(hypothesis.inflections, inflections));
+            if (!duplicate) {
+                existingEntry.inflectionHypotheses.push({source, inflections});
+            } else if (duplicate.source !== source) {
+                duplicate.source = 'both';
+            }
+        });
     }
 
     /**
