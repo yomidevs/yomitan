@@ -164,6 +164,7 @@ class DictionaryEntry {
 
     /** */
     _showDetails() {
+        console.log(this._dictionaryInfo);
         const {title, revision, version, counts, prefixWildcardsSupported} = this._dictionaryInfo;
 
         const modal = this._dictionaryController.modalController.getModal('dictionary-details');
@@ -192,7 +193,7 @@ class DictionaryEntry {
         countsElement.textContent = this._counts !== null ? JSON.stringify(this._counts, null, 4) : '';
         wildcardSupportedElement.checked = prefixWildcardsSupported;
         useDeinflectionsSetting.hidden = !counts.terms.total;
-        useDeinflectionsToggle.dataset.setting = `dictionaries[${this._index}].partsOfSpeechFilter`;
+        useDeinflectionsToggle.dataset.setting = `dictionaries[${this._index}].useDeinflections`;
 
         this._setupDetails(detailsTableElement);
 

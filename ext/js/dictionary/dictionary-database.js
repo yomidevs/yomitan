@@ -578,19 +578,19 @@ export class DictionaryDatabase {
      * @returns {import('dictionary-database').TermEntry}
      */
     _createTerm(matchSource, matchType, row, index) {
-        const {sequence, reading, score, dictionary} = row;
+        const {sequence} = row;
         return {
             index,
             matchType,
             matchSource,
             term: row.expression,
-            reading,
+            reading: row.reading,
             definitionTags: this._splitField(row.definitionTags || row.tags),
             termTags: this._splitField(row.termTags),
             rules: this._splitField(row.rules),
             definitions: row.glossary,
-            score,
-            dictionary,
+            score: row.score,
+            dictionary: row.dictionary,
             id: row.id,
             sequence: typeof sequence === 'number' ? sequence : -1
         };
