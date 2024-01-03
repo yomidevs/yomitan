@@ -267,12 +267,14 @@
         {{~/if~}}
         {{~#if (get "multiple")~}}<ul>{{/if~}}
             {{~#each definition.inflectionHypotheses~}}
-                {{~#if (get "multiple")~}}<li>{{/if~}}
-                {{~#each inflections~}}
-                    {{~#if (op ">" @index 0)}} « {{/if~}}
-                    {{.}}
-                {{~/each~}}
-                {{~#if (get "multiple")~}}</li>{{/if~}}
+                {{~#if (op ">" inflections.length 0)~}}
+                    {{~#if (get "multiple")~}}<li>{{/if~}}
+                    {{~#each inflections~}}
+                        {{~#if (op ">" @index 0)}} « {{/if~}}
+                        {{.}}
+                    {{~/each~}}
+                    {{~#if (get "multiple")~}}</li>{{/if~}}
+                {{~/if~}}
             {{~/each~}}
         {{~#if (get "multiple")~}}</ul>{{/if~}}
     {{~/if~}}
