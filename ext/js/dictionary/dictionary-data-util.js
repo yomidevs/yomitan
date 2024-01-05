@@ -331,8 +331,8 @@ export class DictionaryDataUtil {
                 const pitchAccent2 = /** @type {import('dictionary').PitchAccent} */ (pronunciation2);
                 return (
                     pronunciation1.position === pitchAccent2.position &&
-                    this._areArraysEqual(pronunciation1.nasalPositions, pitchAccent2.nasalPositions) &&
-                    this._areArraysEqual(pronunciation1.devoicePositions, pitchAccent2.devoicePositions)
+                    this.areArraysEqual(pronunciation1.nasalPositions, pitchAccent2.nasalPositions) &&
+                    this.areArraysEqual(pronunciation1.devoicePositions, pitchAccent2.devoicePositions)
                 );
             }
             case 'phonetic-transcription':
@@ -351,7 +351,7 @@ export class DictionaryDataUtil {
      * @param {T[]} array2
      * @returns {boolean}
      */
-    static _areArraysEqual(array1, array2) {
+    static areArraysEqual(array1, array2) {
         const ii = array1.length;
         if (ii !== array2.length) { return false; }
         for (let i = 0; i < ii; ++i) {
@@ -372,7 +372,7 @@ export class DictionaryDataUtil {
         for (let i = 0; i < ii; ++i) {
             const tag1 = tagList1[i];
             const tag2 = tagList2[i];
-            if (tag1.name !== tag2.name || !this._areArraysEqual(tag1.dictionaries, tag2.dictionaries)) {
+            if (tag1.name !== tag2.name || !this.areArraysEqual(tag1.dictionaries, tag2.dictionaries)) {
                 return false;
             }
         }

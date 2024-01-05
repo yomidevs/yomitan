@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {DictionaryDataUtil} from '../dictionary/dictionary-data-util.js';
 import {RegexUtil} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {Deinflector} from './deinflector.js';
-
 /**
  * Class which finds term and kanji dictionary entries for text.
  */
@@ -256,26 +256,14 @@ export class Translator {
     _mergeInflectionHypotheses(existingEntry, inflectionHypotheses) {
         const existingHypotheses = existingEntry.inflectionHypotheses;
 
-        inflectionHypotheses.forEach(({source, inflections}) => {
-            const duplicate = existingHypotheses.find((hypothesis) => this._areInflectionHyphothesesEqual(hypothesis.inflections, inflections));
+        for (const {source, inflections} of inflectionHypotheses) {
+            const duplicate = existingHypotheses.find((hypothesis) => DictionaryDataUtil.areArraysEqual(hypothesis.inflections.sort(), inflections.sort()));
             if (!duplicate) {
                 existingEntry.inflectionHypotheses.push({source, inflections});
             } else if (duplicate.source !== source) {
                 duplicate.source = 'both';
             }
-        });
-    }
-
-    /**
-     * @param {import('dictionary').Inflections} hypothesis1
-     * @param {import('dictionary').Inflections} hypothesis2
-     * @returns {boolean}
-     */
-    _areInflectionHyphothesesEqual(hypothesis1, hypothesis2) {
-        const set1 = new Set(hypothesis1);
-        const set2 = new Set(hypothesis2);
-
-        return set1.size === set2.size && [...set1].every((x) => set2.has(x));
+        }
     }
 
     /**
@@ -299,12 +287,12 @@ export class Translator {
         const dictionaryDeinflections = await this._getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType);
         deinflections.push(...dictionaryDeinflections);
 
-        deinflections.forEach((deinflection) => {
-            deinflection.databaseEntries.forEach((entry) => {
+        for (const deinflection of deinflections) {
+            for (const entry of deinflection.databaseEntries) {
                 entry.definitions = entry.definitions.filter((definition) => !Array.isArray(definition));
-            });
+            }
             deinflection.databaseEntries = deinflection.databaseEntries.filter((entry) => entry.definitions.length);
-        });
+        }
         deinflections = deinflections.filter((deinflection) => deinflection.databaseEntries.length);
 
         return deinflections;
@@ -358,8 +346,8 @@ export class Translator {
      */
     async _addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType, partsOfSpeechFilter = true) {
         const uniqueDeinflectionsMap = this._groupDeinflectionsByTerm(deinflections);
-        const uniqueDeinflectionArrays = Array.from(uniqueDeinflectionsMap.values());
-        const uniqueDeinflectionTerms = Array.from(uniqueDeinflectionsMap.keys());
+        const uniqueDeinflectionArrays = [...uniqueDeinflectionsMap.values()];
+        const uniqueDeinflectionTerms = [...uniqueDeinflectionsMap.keys()];
 
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
         this._matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, partsOfSpeechFilter);
@@ -370,13 +358,16 @@ export class Translator {
      * @returns {Map<string, import('translation-internal').DatabaseDeinflection[]>}
      */
     _groupDeinflectionsByTerm(deinflections) {
-        const result = deinflections.reduce((map, deinflection) => {
-            const term = deinflection.deinflectedText;
-            const deinflectionArray = map.get(term) || [];
+        const result = new Map();
+        for (const deinflection of deinflections) {
+            const {deinflectedText} = deinflection;
+            let deinflectionArray = result.get(deinflectedText);
+            if (typeof deinflectionArray === 'undefined') {
+                deinflectionArray = [];
+                result.set(deinflectedText, deinflectionArray);
+            }
             deinflectionArray.push(deinflection);
-            map.set(term, deinflectionArray);
-            return map;
-        }, /** @type {Map<string, import('translation-internal').DatabaseDeinflection[]>} */ new Map());
+        }
         return result;
     }
 
