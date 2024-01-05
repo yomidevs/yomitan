@@ -257,7 +257,10 @@ export class Translator {
         const existingHypotheses = existingEntry.inflectionHypotheses;
 
         for (const {source, inflections} of inflectionHypotheses) {
-            const duplicate = existingHypotheses.find((hypothesis) => DictionaryDataUtil.areArraysEqual(hypothesis.inflections.sort(), inflections.sort()));
+            const duplicate = existingHypotheses.find((hypothesis) => DictionaryDataUtil.areArraysEqual(
+                [...hypothesis.inflections].sort(),
+                [...inflections].sort()
+            ));
             if (!duplicate) {
                 existingEntry.inflectionHypotheses.push({source, inflections});
             } else if (duplicate.source !== source) {
