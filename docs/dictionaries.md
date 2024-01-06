@@ -48,4 +48,4 @@ Unfortunately, as most of the dictionaries released in this format are proprieta
 Yomitan. Instead, you will need to procure these dictionaries yourself and import them using [Yomitan
 Import](https://github.com/themoeway/yomitan-import). Check the project page for additional details.
 
-![Pocket EPWING dictionaries](img/epwing-devices.jpg)
+![Pocket EPWING dictionaries](../img/epwing-devices.jpg)
