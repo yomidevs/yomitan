@@ -266,12 +266,11 @@ export class Translator {
         }
 
         const {matchType} = options;
-
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
 
         for (const databaseEntry of databaseEntries) {
-            const entryDictionary = enabledDictionaryMap.get(databaseEntry.dictionary);
-            const partsOfSpeechFilter = entryDictionary?.partsOfSpeechFilter ?? true;
+            const entryDictionary = /** @type {import('translation').FindTermDictionary} */ (enabledDictionaryMap.get(databaseEntry.dictionary));
+            const partsOfSpeechFilter = entryDictionary.partsOfSpeechFilter;
 
             const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
