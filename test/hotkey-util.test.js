@@ -18,12 +18,12 @@
 
 /* eslint-disable no-multi-spaces */
 
-import {expect, test} from 'vitest';
+import {describe, expect, test} from 'vitest';
 import {HotkeyUtil} from '../ext/js/input/hotkey-util.js';
 
 /** */
 function testCommandConversions() {
-    test('CommandConversions', () => {
+    describe('CommandConversions', () => {
         /** @type {{os: import('environment').OperatingSystem, command: string, expectedCommand: string, expectedInput: {key: string, modifiers: import('input').Modifier[]}}[]} */
         const data = [
             {os: 'win', command: 'Alt+F', expectedCommand: 'Alt+F', expectedInput: {key: 'KeyF', modifiers: ['alt']}},
@@ -44,18 +44,20 @@ function testCommandConversions() {
 
         const hotkeyUtil = new HotkeyUtil();
         for (const {command, os, expectedInput, expectedCommand} of data) {
-            hotkeyUtil.os = os;
-            const input = structuredClone(hotkeyUtil.convertCommandToInput(command));
-            expect(input).toStrictEqual(expectedInput);
-            const command2 = hotkeyUtil.convertInputToCommand(input.key, input.modifiers);
-            expect(command2).toStrictEqual(expectedCommand);
+            test(`${command} on ${os} -> ${JSON.stringify(expectedInput)}`, () => {
+                hotkeyUtil.os = os;
+                const input = structuredClone(hotkeyUtil.convertCommandToInput(command));
+                expect(input).toStrictEqual(expectedInput);
+                const command2 = hotkeyUtil.convertInputToCommand(input.key, input.modifiers);
+                expect(command2).toStrictEqual(expectedCommand);
+            });
         }
     });
 }
 
 /** */
 function testDisplayNames() {
-    test('DisplayNames', () => {
+    describe('DisplayNames', () => {
         /** @type {{os: import('environment').OperatingSystem, key: ?string, modifiers: import('input').Modifier[], expected: string}[]} */
         const data = [
             {os: 'win', key: null,   modifiers: [], expected: ''},
@@ -136,17 +138,18 @@ function testDisplayNames() {
         ];
 
         const hotkeyUtil = new HotkeyUtil();
-        for (const {os, key, modifiers, expected} of data) {
+
+        test.each(data)('$key with $modifiers on $os -> display value $expected', ({os, key, modifiers, expected}) => {
             hotkeyUtil.os = os;
             const displayName = hotkeyUtil.getInputDisplayValue(key, modifiers);
             expect(displayName).toStrictEqual(expected);
-        }
+        });
     });
 }
 
 /** */
 function testSortModifiers() {
-    test('SortModifiers', () => {
+    describe('SortModifiers', () => {
         /** @type {{modifiers: import('input').Modifier[], expected: import('input').Modifier[]}[]} */
         const data = [
             {modifiers: [], expected: []},
@@ -155,9 +158,11 @@ function testSortModifiers() {
 
         const hotkeyUtil = new HotkeyUtil();
         for (const {modifiers, expected} of data) {
-            const modifiers2 = hotkeyUtil.sortModifiers(modifiers);
-            expect(modifiers2).toStrictEqual(modifiers);
-            expect(modifiers2).toStrictEqual(expected);
+            test(`[${modifiers}] -> [${expected}]`, () => {
+                const modifiers2 = hotkeyUtil.sortModifiers(modifiers);
+                expect(modifiers2).toStrictEqual(modifiers);
+                expect(modifiers2).toStrictEqual(expected);
+            });
         }
     });
 }

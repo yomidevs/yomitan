@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {expect, test} from 'vitest';
+import {describe, expect, test} from 'vitest';
 import {TextSourceMap} from '../ext/js/general/text-source-map.js';
 import {JapaneseUtil} from '../ext/js/language/sandbox/japanese-util.js';
 import * as wanakana from '../ext/lib/wanakana.js';
@@ -25,7 +25,7 @@ const jp = new JapaneseUtil(wanakana);
 
 /** */
 function testIsCodePointKanji() {
-    test('isCodePointKanji', () => {
+    describe('isCodePointKanji', () => {
         /** @type {[characters: string, expected: boolean][]} */
         const data = [
             ['力方', true],
@@ -34,19 +34,19 @@ function testIsCodePointKanji() {
             ['逸逸', true]
         ];
 
-        for (const [characters, expected] of data) {
+        test.each(data)('%s -> %o', (characters, expected) => {
             for (const character of characters) {
                 const codePoint = /** @type {number} */ (character.codePointAt(0));
                 const actual = jp.isCodePointKanji(codePoint);
                 expect(actual).toStrictEqual(expected); // `isCodePointKanji failed for ${character} (\\u{${codePoint.toString(16)}})`
             }
-        }
+        });
     });
 }
 
 /** */
 function testIsCodePointKana() {
-    test('isCodePointKana', () => {
+    describe('isCodePointKana', () => {
         /** @type {[characters: string, expected: boolean][]} */
         const data = [
             ['かたカタ', true],
@@ -54,19 +54,19 @@ function testIsCodePointKana() {
             ['\u53f1\u{20b9f}', false]
         ];
 
-        for (const [characters, expected] of data) {
+        test.each(data)('%s -> %o', (characters, expected) => {
             for (const character of characters) {
                 const codePoint = /** @type {number} */ (character.codePointAt(0));
                 const actual = jp.isCodePointKana(codePoint);
                 expect(actual).toStrictEqual(expected); // `isCodePointKana failed for ${character} (\\u{${codePoint.toString(16)}})`
             }
-        }
+        });
     });
 }
 
 /** */
 function testIsCodePointJapanese() {
-    test('isCodePointJapanese', () => {
+    describe('isCodePointJapanese', () => {
         /** @type {[characters: string, expected: boolean][]} */
         const data = [
             ['かたカタ力方々、。？', true],
@@ -75,19 +75,19 @@ function testIsCodePointJapanese() {
             ['逸逸', true]
         ];
 
-        for (const [characters, expected] of data) {
+        test.each(data)('%s -> %o', (characters, expected) => {
             for (const character of characters) {
                 const codePoint = /** @type {number} */ (character.codePointAt(0));
                 const actual = jp.isCodePointJapanese(codePoint);
                 expect(actual).toStrictEqual(expected); // `isCodePointJapanese failed for ${character} (\\u{${codePoint.toString(16)}})`
             }
-        }
+        });
     });
 }
 
 /** */
 function testIsStringEntirelyKana() {
-    test('isStringEntirelyKana', () => {
+    describe('isStringEntirelyKana', () => {
         /** @type {[string: string, expected: boolean][]} */
         const data = [
             ['かたかな', true],
@@ -103,15 +103,15 @@ function testIsStringEntirelyKana() {
             ['kata,.?かた', false]
         ];
 
-        for (const [string, expected] of data) {
+        test.each(data)('%s -> %o', (string, expected) => {
             expect(jp.isStringEntirelyKana(string)).toStrictEqual(expected);
-        }
+        });
     });
 }
 
 /** */
 function testIsStringPartiallyJapanese() {
-    test('isStringPartiallyJapanese', () => {
+    describe('isStringPartiallyJapanese', () => {
         /** @type {[string: string, expected: boolean][]} */
         const data = [
             ['かたかな', true],
@@ -128,15 +128,15 @@ function testIsStringPartiallyJapanese() {
             ['逸逸', true]
         ];
 
-        for (const [string, expected] of data) {
+        test.each(data)('%s -> %o', (string, expected) => {
             expect(jp.isStringPartiallyJapanese(string)).toStrictEqual(expected);
-        }
+        });
     });
 }
 
 /** */
 function testConvertKatakanaToHiragana() {
-    test('convertKatakanaToHiragana', () => {
+    describe('convertKatakanaToHiragana', () => {
         /** @type {[string: string, expected: string, keepProlongedSoundMarks?: boolean][]} */
         const data = [
             ['かたかな', 'かたかな'],
@@ -153,14 +153,16 @@ function testConvertKatakanaToHiragana() {
         ];
 
         for (const [string, expected, keepProlongedSoundMarks = false] of data) {
-            expect(jp.convertKatakanaToHiragana(string, keepProlongedSoundMarks)).toStrictEqual(expected);
+            test(`${string}${keepProlongedSoundMarks ? ' keeping prolonged sound marks' : ''} -> ${expected}`, () => {
+                expect(jp.convertKatakanaToHiragana(string, keepProlongedSoundMarks)).toStrictEqual(expected);
+            });
         }
     });
 }
 
 /** */
 function testConvertHiraganaToKatakana() {
-    test('ConvertHiraganaToKatakana', () => {
+    describe('ConvertHiraganaToKatakana', () => {
         /** @type {[string: string, expected: string][]} */
         const data = [
             ['かたかな', 'カタカナ'],
@@ -174,15 +176,15 @@ function testConvertHiraganaToKatakana() {
             ['hiragana', 'hiragana']
         ];
 
-        for (const [string, expected] of data) {
+        test.each(data)('%s -> %o', (string, expected) => {
             expect(jp.convertHiraganaToKatakana(string)).toStrictEqual(expected);
-        }
+        });
     });
 }
 
 /** */
 function testConvertToRomaji() {
-    test('ConvertToRomaji', () => {
+    describe('ConvertToRomaji', () => {
         /** @type {[string: string, expected: string][]} */
         const data = [
             ['かたかな', 'katakana'],
@@ -196,15 +198,15 @@ function testConvertToRomaji() {
             ['hiragana', 'hiragana']
         ];
 
-        for (const [string, expected] of data) {
+        test.each(data)('%s -> %o', (string, expected) => {
             expect(jp.convertToRomaji(string)).toStrictEqual(expected);
-        }
+        });
     });
 }
 
 /** */
 function testConvertNumericToFullWidth() {
-    test('ConvertNumericToFullWidth', () => {
+    describe('ConvertNumericToFullWidth', () => {
         /** @type {[string: string, expected: string][]} */
         const data = [
             ['0123456789', '０１２３４５６７８９'],
@@ -213,15 +215,15 @@ function testConvertNumericToFullWidth() {
             ['ひらがな', 'ひらがな']
         ];
 
-        for (const [string, expected] of data) {
+        test.each(data)('%s -> %o', (string, expected) => {
             expect(jp.convertNumericToFullWidth(string)).toStrictEqual(expected);
-        }
+        });
     });
 }
 
 /** */
 function testConvertHalfWidthKanaToFullWidth() {
-    test('ConvertHalfWidthKanaToFullWidth', () => {
+    describe('ConvertHalfWidthKanaToFullWidth', () => {
         /** @type {[string: string, expected: string, expectedSourceMapping?: number[]][]} */
         const data = [
             ['0123456789', '0123456789'],
@@ -235,21 +237,23 @@ function testConvertHalfWidthKanaToFullWidth() {
         ];
 
         for (const [string, expected, expectedSourceMapping] of data) {
-            const sourceMap = new TextSourceMap(string);
-            const actual1 = jp.convertHalfWidthKanaToFullWidth(string, null);
-            const actual2 = jp.convertHalfWidthKanaToFullWidth(string, sourceMap);
-            expect(actual1).toStrictEqual(expected);
-            expect(actual2).toStrictEqual(expected);
-            if (typeof expectedSourceMapping !== 'undefined') {
-                expect(sourceMap.equals(new TextSourceMap(string, expectedSourceMapping))).toBe(true);
-            }
+            test(`${string} -> ${expected}${typeof expectedSourceMapping !== 'undefined' ? ', ' + JSON.stringify(expectedSourceMapping) : ''}`, () => {
+                const sourceMap = new TextSourceMap(string);
+                const actual1 = jp.convertHalfWidthKanaToFullWidth(string, null);
+                const actual2 = jp.convertHalfWidthKanaToFullWidth(string, sourceMap);
+                expect(actual1).toStrictEqual(expected);
+                expect(actual2).toStrictEqual(expected);
+                if (typeof expectedSourceMapping !== 'undefined') {
+                    expect(sourceMap.equals(new TextSourceMap(string, expectedSourceMapping))).toBe(true);
+                }
+            });
         }
     });
 }
 
 /** */
 function testConvertAlphabeticToKana() {
-    test('ConvertAlphabeticToKana', () => {
+    describe('ConvertAlphabeticToKana', () => {
         /** @type {[string: string, expected: string, expectedSourceMapping?: number[]][]} */
         const data = [
             ['0123456789', '0123456789'],
@@ -262,21 +266,23 @@ function testConvertAlphabeticToKana() {
         ];
 
         for (const [string, expected, expectedSourceMapping] of data) {
-            const sourceMap = new TextSourceMap(string);
-            const actual1 = jp.convertAlphabeticToKana(string, null);
-            const actual2 = jp.convertAlphabeticToKana(string, sourceMap);
-            expect(actual1).toStrictEqual(expected);
-            expect(actual2).toStrictEqual(expected);
-            if (typeof expectedSourceMapping !== 'undefined') {
-                expect(sourceMap.equals(new TextSourceMap(string, expectedSourceMapping))).toBe(true);
-            }
+            test(`${string} -> ${string}${typeof expectedSourceMapping !== 'undefined' ? ', ' + JSON.stringify(expectedSourceMapping) : ''}`, () => {
+                const sourceMap = new TextSourceMap(string);
+                const actual1 = jp.convertAlphabeticToKana(string, null);
+                const actual2 = jp.convertAlphabeticToKana(string, sourceMap);
+                expect(actual1).toStrictEqual(expected);
+                expect(actual2).toStrictEqual(expected);
+                if (typeof expectedSourceMapping !== 'undefined') {
+                    expect(sourceMap.equals(new TextSourceMap(string, expectedSourceMapping))).toBe(true);
+                }
+            });
         }
     });
 }
 
 /** */
 function testDistributeFurigana() {
-    test('DistributeFurigana', () => {
+    describe('DistributeFurigana', () => {
         /** @type {[input: [term: string, reading: string], expected: {text: string, reading: string}[]][]} */
         const data = [
             [
@@ -736,16 +742,17 @@ function testDistributeFurigana() {
             ]
         ];
 
-        for (const [[term, reading], expected] of data) {
+        test.each(data)('%o -> %o', (input, expected) => {
+            const [term, reading] = input;
             const actual = jp.distributeFurigana(term, reading);
             expect(actual).toStrictEqual(expected);
-        }
+        });
     });
 }
 
 /** */
 function testDistributeFuriganaInflected() {
-    test('DistributeFuriganaInflected', () => {
+    describe('DistributeFuriganaInflected', () => {
         /** @type {[input: [term: string, reading: string, source: string], expected: {text: string, reading: string}[]][]} */
         const data = [
             [
@@ -789,16 +796,17 @@ function testDistributeFuriganaInflected() {
             ]
         ];
 
-        for (const [[term, reading, source], expected] of data) {
+        test.each(data)('%o -> %o', (input, expected) => {
+            const [term, reading, source] = input;
             const actual = jp.distributeFuriganaInflected(term, reading, source);
             expect(actual).toStrictEqual(expected);
-        }
+        });
     });
 }
 
 /** */
 function testCollapseEmphaticSequences() {
-    test('CollapseEmphaticSequences', () => {
+    describe('CollapseEmphaticSequences', () => {
         /** @type {[input: [text: string, fullCollapse: boolean], output: [expected: string, expectedSourceMapping: number[]]][]} */
         const data = [
             [['かこい', false], ['かこい', [1, 1, 1]]],
@@ -840,7 +848,10 @@ function testCollapseEmphaticSequences() {
             [['っっっ', true], ['', [3]]]
         ];
 
-        for (const [[text, fullCollapse], [expected, expectedSourceMapping]] of data) {
+        test.each(data)('%o -> %o', (input, output) => {
+            const [text, fullCollapse] = input;
+            const [expected, expectedSourceMapping] = output;
+
             const sourceMap = new TextSourceMap(text);
             const actual1 = jp.collapseEmphaticSequences(text, fullCollapse, null);
             const actual2 = jp.collapseEmphaticSequences(text, fullCollapse, sourceMap);
@@ -849,13 +860,13 @@ function testCollapseEmphaticSequences() {
             if (typeof expectedSourceMapping !== 'undefined') {
                 expect(sourceMap.equals(new TextSourceMap(text, expectedSourceMapping))).toBe(true);
             }
-        }
+        });
     });
 }
 
 /** */
 function testIsMoraPitchHigh() {
-    test('IsMoraPitchHigh', () => {
+    describe('IsMoraPitchHigh', () => {
         /** @type {[input: [moraIndex: number, pitchAccentDownstepPosition: number], expected: boolean][]} */
         const data = [
             [[0, 0], false],
@@ -884,16 +895,17 @@ function testIsMoraPitchHigh() {
             [[3, 4], true]
         ];
 
-        for (const [[moraIndex, pitchAccentDownstepPosition], expected] of data) {
+        test.each(data)('%o -> %o', (input, expected) => {
+            const [moraIndex, pitchAccentDownstepPosition] = input;
             const actual = jp.isMoraPitchHigh(moraIndex, pitchAccentDownstepPosition);
             expect(actual).toStrictEqual(expected);
-        }
+        });
     });
 }
 
 /** */
 function testGetKanaMorae() {
-    test('GetKanaMorae', () => {
+    describe('GetKanaMorae', () => {
         /** @type {[text: string, expected: string[]][]} */
         const data = [
             ['かこ', ['か', 'こ']],
@@ -907,10 +919,10 @@ function testGetKanaMorae() {
             ['ディスコ', ['ディ', 'ス', 'コ']]
         ];
 
-        for (const [text, expected] of data) {
+        test.each(data)('%s -> %o', (text, expected) => {
             const actual = jp.getKanaMorae(text);
             expect(actual).toStrictEqual(expected);
-        }
+        });
     });
 }
 
