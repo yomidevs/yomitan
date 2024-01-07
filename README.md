@@ -1,4 +1,4 @@
-# Yomitan <!-- omit from toc --> ・[![Chrome Release (Stable)](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&logoColor=lightblue&color=lightblue&label=chrome%20release%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn) [![Firefox Release (Stable)](<https://img.shields.io/amo/v/yomitan?logo=Firefox&color=orange&label=firefox%20release%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/) [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan) [![Discord Server](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC) 
+# Yomitan <!-- omit from toc --> ・[![Chrome Release](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&logoColor=lightblue&color=lightblue&label=chrome%20release%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn) [![Firefox Release](<https://img.shields.io/amo/v/yomitan?logo=Firefox&color=orange&label=firefox%20release%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/) [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan) [![Discord](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC) 
 
 :wave: **This project is a community fork of Yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023). We have made a number of foundational changes to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**:
 
@@ -18,7 +18,7 @@ Since the owner requested forks be uniquely named, we have chosen a new name, _y
 ## What's Yomitan?<!-- omit from toc -->
 
 Yomitan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
-which would be otherwise too difficult tackle.
+which would be otherwise too difficult tackle. This extension is similar to [10ten Japanese Reader (formerly Rikaichamp)](https://addons.mozilla.org/en-US/firefox/addon/10ten-ja-reader/) for Firefox and [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp?hl=en) for Chrome, but it stands apart in its goal of being an all-encompassing learning tool as opposed to a mere browser-based dictionary.
 
 Yomitan provides advanced features not available in other browser-based dictionaries:
 
@@ -35,12 +35,12 @@ Yomitan provides advanced features not available in other browser-based dictiona
 [![Dictionary options](img/ss-dictionaries-thumb.png)](img/ss-dictionaries.png)
 [![Anki options](img/ss-anki-thumb.png)](img/ss-anki.png)
 
-## Documentation<!-- omit from toc -->
+## Helpful information<!-- omit from toc -->
 
-- [Migrating from Yomichan](./docs/yomichan-migration.md#migrating-from-yomichan)
-- [Adding dictionaries](./docs/dictionaries.md#dictionaries)
-- [Anki integration and flashcards](./docs/anki-integration.md#anki-integration)
-- [Advanced options](./docs/advanced-options.md#advanced-options)
+- [Migrating from Yomichan (legacy)](./docs/yomichan-migration.md#migrating-from-yomichan)
+- [Importing standardised and custom dictionaries](./docs/dictionaries.md#dictionaries)
+- [Anki integration and flashcards creation](./docs/anki-integration.md#anki-integration)
+- [Advanced options, including MeCab](./docs/advanced-options.md#advanced-options)
 - [Frequently asked questions](./docs/faq.md#frequently-asked-questions)
 - [Keyboard shortcuts](./docs/keyboard-shortcuts.md)
 
@@ -71,7 +71,7 @@ updates automatically.
     - The <img src="ext/images/question-mark-circle.svg" width="16" height="16" alt="question mark symbol"> _question mark_ button will open the Information page.
     - The <img src="ext/images/profile.svg" width="16" height="16" alt="profile icon"> _profile_ button will appear when multiple profiles exist, allowing the current profile to be quickly changed.
 
-2.  Import the dictionaries you wish to use for term and kanji searches, head over to the [the dictionary docs](./docs/dictionaries.md) to get set up!. If you do not have any dictionaries installed or enabled, Yomitan will warn you that it is not ready for use by displaying an orange exclamation mark over its icon. This exclamation mark will disappear once you have installed and enabled at least one dictionary.
+2.  Import the dictionaries you wish to use for term and kanji searches, head over to the [the dictionary docs](./docs/dictionaries.md) to get set up! If you do not have any dictionaries installed or enabled, Yomitan will warn you that it is not ready for use by displaying an orange exclamation mark over its icon. This exclamation mark will disappear once you have installed and enabled at least one dictionary.
 
     <img src="resources/images/settings-dictionaries-popup.png" width="300" alt="custom dictionaries list">
 
@@ -84,6 +84,8 @@ updates automatically.
 5.  Click on individual kanji in the term definition results to view additional information about those characters, including stroke order diagrams, readings, meanings, as well as other useful data.
 
     <img src="resources/images/search-popup-kanji.png" width="300" alt="popup with kanji details">
+
+To further enhance your Yomitan experience, it's worth [integrating with Anki](./docs/anki-integration.md), a spaced-repetition flashcard program to help solidify the words you encounter
 
 ## Contributing
 
