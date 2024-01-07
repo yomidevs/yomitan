@@ -85,7 +85,7 @@ updates automatically.
 
     <img src="resources/images/search-popup-kanji.png" width="300" alt="popup with kanji details">
 
-To further enhance your Yomitan experience, it's worth [integrating with Anki](./docs/anki-integration.md), a spaced-repetition flashcard program to help solidify the words you encounter
+To further enhance your Yomitan experience, it's worth [integrating with Anki](./docs/anki-integration.md), a spaced-repetition flashcard program to help solidify the words you encounter.
 
 ## Contributing
 
