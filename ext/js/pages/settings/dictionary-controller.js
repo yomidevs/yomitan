@@ -718,7 +718,7 @@ export class DictionaryController {
         const modal = /** @type {import('./modal.js').Modal} */ (this._modalController.getModal('dictionary-move-location'));
         const index = modal.node.dataset.index ?? '';
         const indexNumber = Number.parseInt(index, 10);
-        if (isNaN(indexNumber)) { return; }
+        if (Number.isNaN(indexNumber)) { return; }
 
         /** @type {HTMLInputElement} */
         const targetStringInput = querySelectorNotNull(document, '#dictionary-move-location');
