@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {DictionaryDataUtil} from '../dictionary/dictionary-data-util.js';
 import {RegexUtil} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {Deinflector} from './deinflector.js';
@@ -249,7 +248,6 @@ export class Translator {
     }
 
     /**
-     *
      * @param {import('dictionary').TermDictionaryEntry} existingEntry
      * @param {import('dictionary').InflectionHypothesis[]} inflectionHypotheses
      */
@@ -257,10 +255,7 @@ export class Translator {
         const existingHypotheses = existingEntry.inflectionHypotheses;
 
         for (const {source, inflections} of inflectionHypotheses) {
-            const duplicate = existingHypotheses.find((hypothesis) => DictionaryDataUtil.areArraysEqual(
-                [...hypothesis.inflections].sort(),
-                [...inflections].sort()
-            ));
+            const duplicate = existingHypotheses.find((hypothesis) => this._areArraysEqualIgnoreOrder(hypothesis.inflections, inflections));
             if (!duplicate) {
                 existingEntry.inflectionHypotheses.push({source, inflections});
             } else if (duplicate.source !== source) {
@@ -268,6 +263,34 @@ export class Translator {
             }
         }
     }
+
+    /**
+     * @param {string[]} array1
+     * @param {string[]} array2
+     * @returns {boolean}
+     */
+    _areArraysEqualIgnoreOrder(array1, array2) {
+        if (array1.length !== array2.length) {
+            return false;
+        }
+
+        const frequencyCounter = new Map();
+
+        for (const element of array1) {
+            frequencyCounter.set(element, (frequencyCounter.get(element) || 0) + 1);
+        }
+
+        for (const element of array2) {
+            const frequency = frequencyCounter.get(element);
+            if (!frequency) {
+                return false;
+            }
+            frequencyCounter.set(element, frequency - 1);
+        }
+
+        return true;
+    }
+
 
     /**
      * @param {string} text
