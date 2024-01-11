@@ -830,16 +830,16 @@ button.action-button:active {
     width: 1.4em;
     margin-right: 0.2em;
 }
-.inflection-source-icon[data-inflection-source="dictionary"]::after {
+.inflection-source-icon[data-inflection-source='dictionary']::after {
     content: '📖';
 }
-.inflection-source-icon[data-inflection-source="algorithm"]::after {
+.inflection-source-icon[data-inflection-source='algorithm']::after {
     content: '🧩';
 }
-.inflection-source-icon[data-inflection-source="both"] {
+.inflection-source-icon[data-inflection-source='both'] {
     width: 2.8em;
 }
-.inflection-source-icon[data-inflection-source="both"]::after {
+.inflection-source-icon[data-inflection-source='both']::after {
     content: '🧩📖';
 }
 
