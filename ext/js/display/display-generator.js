@@ -379,18 +379,18 @@ export class DisplayGenerator {
      */
     _getInflectionSourceIcon(source) {
         const icon = document.createElement('span');
-        icon.style.marginRight = '0.5em';
+        icon.classList.add('inflection-source-icon');
         switch (source) {
             case 'dictionary':
-                icon.textContent = '📖';
+                icon.dataset.inflectionSource = 'dictionary';
                 icon.title = 'Dictionary Deinflection';
                 return icon;
             case 'algorithm':
-                icon.textContent = '🧩';
+                icon.dataset.inflectionSource = 'algorithm';
                 icon.title = 'Algorithm Deinflection';
                 return icon;
             case 'both':
-                icon.textContent = '📖🧩';
+                icon.dataset.inflectionSource = 'both';
                 icon.title = 'Dictionary and Algorithm Deinflection';
                 return icon;
         }

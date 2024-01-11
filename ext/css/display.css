@@ -823,6 +823,25 @@ button.action-button:active {
     content: var(--inflection-separator);
     padding: 0 0.25em;
 }
+.inflection-source-icon {
+    display: inline-block;
+    white-space: nowrap;
+    text-align: center;
+    width: 1.4em;
+    margin-right: 0.2em;
+}
+.inflection-source-icon[data-inflection-source="dictionary"]::after {
+    content: '📖';
+}
+.inflection-source-icon[data-inflection-source="algorithm"]::after {
+    content: '🧩';
+}
+.inflection-source-icon[data-inflection-source="both"] {
+    width: 2.8em;
+}
+.inflection-source-icon[data-inflection-source="both"]::after {
+    content: '🧩📖';
+}
 
 
 /* Headwords */
