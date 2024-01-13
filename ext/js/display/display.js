@@ -480,7 +480,7 @@ export class Display extends EventDispatcher {
             case 'overwrite':
                 this._history.replaceState(state, content, url);
                 break;
-            default: // 'new'
+            case 'new':
                 this._updateHistoryState();
                 this._history.pushState(state, content, url);
                 break;
