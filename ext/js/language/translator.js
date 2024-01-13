@@ -333,13 +333,13 @@ export class Translator {
     async _getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType) {
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const dictionaryDeinflections = [];
-        deinflections.forEach((deinflection) => {
+        for (const deinflection of deinflections) {
             const {originalText, transformedText, inflectionPossibilities: algPossibilities, databaseEntries} = deinflection;
-            databaseEntries.forEach((entry) => {
+            for (const entry of databaseEntries) {
                 const {dictionary, definitions} = entry;
                 const entryDictionary = enabledDictionaryMap.get(dictionary);
                 const useDeinflections = entryDictionary?.useDeinflections ?? true;
-                if (!useDeinflections) { return; }
+                if (!useDeinflections) { continue; }
                 for (const definition of definitions) {
                     if (Array.isArray(definition)) {
                         const [formOf, inflections] = definition;
@@ -356,8 +356,8 @@ export class Translator {
                         dictionaryDeinflections.push(dictionaryDeinflection);
                     }
                 }
-            });
-        });
+            }
+        }
 
         await this._addEntriesToDeinflections(dictionaryDeinflections, enabledDictionaryMap, matchType);
 
