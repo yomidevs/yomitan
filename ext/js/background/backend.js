@@ -2428,6 +2428,7 @@ export class Backend {
                 index: enabledDictionaryMap.size,
                 priority: 0,
                 allowSecondarySearches: false,
+                partsOfSpeechFilter: true,
                 useDeinflections: true
             });
             excludeDictionaryDefinitions = new Set();
@@ -2474,11 +2475,12 @@ export class Backend {
         const enabledDictionaryMap = new Map();
         for (const dictionary of options.dictionaries) {
             if (!dictionary.enabled) { continue; }
-            const {name, priority, allowSecondarySearches, useDeinflections} = dictionary;
+            const {name, priority, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
             enabledDictionaryMap.set(name, {
                 index: enabledDictionaryMap.size,
                 priority,
                 allowSecondarySearches,
+                partsOfSpeechFilter,
                 useDeinflections
             });
         }
@@ -2632,14 +2634,14 @@ export class Backend {
     }
 
     /**
+     * Only request this permission for Firefox versions >= 77.
+     * https://bugzilla.mozilla.org/show_bug.cgi?id=1630413
      * @returns {Promise<void>}
      */
     async _requestPersistentStorage() {
         try {
             if (await navigator.storage.persisted()) { return; }
 
-            // Only request this permission for Firefox versions >= 77.
-            // https://bugzilla.mozilla.org/show_bug.cgi?id=1630413
             const {vendor, version} = await browser.runtime.getBrowserInfo();
             if (vendor !== 'Mozilla') { return; }
 

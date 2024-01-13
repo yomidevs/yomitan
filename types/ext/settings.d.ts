@@ -258,6 +258,7 @@ export type DictionaryOptions = {
     enabled: boolean;
     allowSecondarySearches: boolean;
     definitionsCollapsible: DictionaryDefinitionsCollapsible;
+    partsOfSpeechFilter: boolean;
     useDeinflections: boolean;
 };
 

@@ -555,7 +555,8 @@ export class OptionsUtil {
             this._updateVersion19,
             this._updateVersion20,
             this._updateVersion21,
-            this._updateVersion22
+            this._updateVersion22,
+            this._updateVersion23
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -1140,8 +1141,18 @@ export class OptionsUtil {
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.translation.searchResolution = 'letter';
         }
+    }
 
-        return options;
+    /**
+     * - Added dictionaries[].partsOfSpeechFilter.
+     * @type {import('options-util').UpdateFunction}
+     */
+    _updateVersion23(options) {
+        for (const {options: profileOptions} of options.profiles) {
+            for (const dictionary of profileOptions.dictionaries) {
+                dictionary.partsOfSpeechFilter = true;
+            }
+        }
     }
 
     /**

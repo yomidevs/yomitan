@@ -864,7 +864,6 @@ export class Frontend {
             case 'web': return preventMiddleMouseOptions.onWebPages;
             case 'popup': return preventMiddleMouseOptions.onPopupPages;
             case 'search': return preventMiddleMouseOptions.onSearchPages;
-            default: return false;
         }
     }
 

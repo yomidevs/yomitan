@@ -35,6 +35,7 @@
                         "index": 0,
                         "priority": 0,
                         "allowSecondarySearches": false,
+                        "partsOfSpeechFilter": true,
                         "useDeinflections": true
                     }
                 ]

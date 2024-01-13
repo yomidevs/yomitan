@@ -174,6 +174,10 @@ export type FindTermDictionary = {
      */
     allowSecondarySearches: boolean;
     /**
+     * Whether this dictionary's part of speech rules should be used to filter results.
+     */
+    partsOfSpeechFilter: boolean;
+    /**
      * Whether to use the deinflections from this dictionary.
      */
     useDeinflections: boolean;

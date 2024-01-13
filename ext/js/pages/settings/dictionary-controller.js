@@ -182,6 +182,10 @@ class DictionaryEntry {
         /** @type {HTMLElement} */
         const detailsTableElement = querySelectorNotNull(modal.node, '.dictionary-details-table');
         /** @type {HTMLElement} */
+        const partsOfSpeechFilterSetting = querySelectorNotNull(modal.node, '.dictionary-parts-of-speech-filter-setting');
+        /** @type {HTMLElement} */
+        const partsOfSpeechFilterToggle = querySelectorNotNull(partsOfSpeechFilterSetting, '.dictionary-parts-of-speech-filter-toggle');
+        /** @type {HTMLElement} */
         const useDeinflectionsSetting = querySelectorNotNull(modal.node, '.dictionary-use-deinflections-setting');
         /** @type {HTMLElement} */
         const useDeinflectionsToggle = querySelectorNotNull(useDeinflectionsSetting, '.dictionary-use-deinflections-toggle');
@@ -191,6 +195,9 @@ class DictionaryEntry {
         outdateElement.hidden = (version >= 3);
         countsElement.textContent = this._counts !== null ? JSON.stringify(this._counts, null, 4) : '';
         wildcardSupportedElement.checked = prefixWildcardsSupported;
+        partsOfSpeechFilterSetting.hidden = !counts.terms.total;
+        partsOfSpeechFilterToggle.dataset.setting = `dictionaries[${this._index}].partsOfSpeechFilter`;
+
         useDeinflectionsSetting.hidden = !counts.terms.total;
         useDeinflectionsToggle.dataset.setting = `dictionaries[${this._index}].useDeinflections`;
 
@@ -521,6 +528,7 @@ export class DictionaryController {
             enabled,
             allowSecondarySearches: false,
             definitionsCollapsible: 'not-collapsible',
+            partsOfSpeechFilter: true,
             useDeinflections: true
         };
     }
@@ -724,9 +732,9 @@ export class DictionaryController {
     /** */
     _onDictionaryMoveButtonClick() {
         const modal = /** @type {import('./modal.js').Modal} */ (this._modalController.getModal('dictionary-move-location'));
-        const {index} = modal.node.dataset;
-        if (typeof index !== 'number') { return; }
+        const index = modal.node.dataset.index ?? '';
         const indexNumber = Number.parseInt(index, 10);
+        if (Number.isNaN(indexNumber)) { return; }
 
         /** @type {HTMLInputElement} */
         const targetStringInput = querySelectorNotNull(document, '#dictionary-move-location');

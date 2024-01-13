@@ -235,14 +235,16 @@ export class AnkiTemplateRenderer {
         return this._stringToMultiLineHtml(this._computeValueString(options, context));
     }
 
-    /** @type {import('template-renderer').HelperFunction<string>} */
+    /**
+     * Usage:
+     * ```{{#regexReplace regex string [flags] [content]...}}content{{/regexReplace}}```
+     * - regex: regular expression string
+     * - string: string to replace
+     * - flags: optional flags for regular expression.
+     * e.g. "i" for case-insensitive, "g" for replace all
+     * @type {import('template-renderer').HelperFunction<string>}
+     */
     _regexReplace(args, context, options) {
-        // Usage:
-        // {{#regexReplace regex string [flags] [content]...}}content{{/regexReplace}}
-        // regex: regular expression string
-        // string: string to replace
-        // flags: optional flags for regular expression
-        //   e.g. "i" for case-insensitive, "g" for replace all
         const argCount = args.length;
         let value = this._computeValueString(options, context);
         if (argCount > 3) {
@@ -262,13 +264,15 @@ export class AnkiTemplateRenderer {
         return value;
     }
 
-    /** @type {import('template-renderer').HelperFunction<string>} */
+    /**
+     * Usage:
+     * {{#regexMatch regex [flags] [content]...}}content{{/regexMatch}}
+     * - regex: regular expression string
+     * - flags: optional flags for regular expression
+     * e.g. "i" for case-insensitive, "g" for match all
+     * @type {import('template-renderer').HelperFunction<string>}
+     */
     _regexMatch(args, context, options) {
-        // Usage:
-        // {{#regexMatch regex [flags] [content]...}}content{{/regexMatch}}
-        // regex: regular expression string
-        // flags: optional flags for regular expression
-        //   e.g. "i" for case-insensitive, "g" for match all
         const argCount = args.length;
         let value = this._computeValueString(options, context);
         if (argCount > 2) {

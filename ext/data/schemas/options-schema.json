@@ -823,6 +823,7 @@
                                         "enabled",
                                         "allowSecondarySearches",
                                         "definitionsCollapsible",
+                                        "partsOfSpeechFilter",
                                         "useDeinflections"
                                     ],
                                     "properties": {
@@ -846,6 +847,10 @@
                                             "type": "string",
                                             "enum": ["not-collapsible", "expanded", "collapsed", "force-collapsed", "force-expanded"],
                                             "default": "not-collapsible"
+                                        },
+                                        "partsOfSpeechFilter": {
+                                            "type": "boolean",
+                                            "default": true
                                         },
                                         "useDeinflections": {
                                             "type": "boolean",
