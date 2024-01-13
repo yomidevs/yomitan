@@ -61,6 +61,6 @@ export type DatabaseDeinflection = {
     transformedText: string;
     deinflectedText: string;
     rules: DeinflectionRuleFlags;
-    inflectionHypotheses: Dictionary.InflectionHypothesis[];
+    inflectionPossibilities: Dictionary.InflectionPossibility[];
     databaseEntries: DictionaryDatabase.TermEntry[];
 };

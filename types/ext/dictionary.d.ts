@@ -208,9 +208,9 @@ export type TermDictionaryEntry = {
      */
     isPrimary: boolean;
     /**
-     * A list of inflections that was applied to get the term.
+     * Possible inflection combinations by which the original search text might have been derived from this term.
      */
-    inflectionHypotheses: InflectionHypothesis[];
+    inflectionPossibilities: InflectionPossibility[];
     /**
      * A score for the dictionary entry.
      */
@@ -253,7 +253,7 @@ export type TermDictionaryEntry = {
     frequencies: TermFrequency[];
 };
 
-export type InflectionHypothesis = {
+export type InflectionPossibility = {
     source: InflectionSource;
     inflections: Inflections;
 };

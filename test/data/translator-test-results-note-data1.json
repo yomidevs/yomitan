@@ -341,7 +341,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -652,7 +652,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -977,7 +977,7 @@
           "source": "打つ",
           "rawSource": "打つ",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -1288,7 +1288,7 @@
           "source": "打つ",
           "rawSource": "打つ",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -1599,7 +1599,7 @@
           "source": "打つ",
           "rawSource": "打つ",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -1910,7 +1910,7 @@
           "source": "打つ",
           "rawSource": "打つ",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -2221,7 +2221,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -2532,7 +2532,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -2857,7 +2857,7 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -3276,7 +3276,7 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -3695,7 +3695,7 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -4114,7 +4114,7 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -4533,7 +4533,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -4846,7 +4846,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -5159,7 +5159,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -5472,7 +5472,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -5785,7 +5785,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -6096,7 +6096,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -6421,7 +6421,7 @@
           "source": "画像",
           "rawSource": "画像",
           "sourceTerm": "画像",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -6580,7 +6580,7 @@
           "source": "だ",
           "rawSource": "だ",
           "sourceTerm": "だ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -6896,7 +6896,7 @@
           "source": "ダース",
           "rawSource": "ダース",
           "sourceTerm": "ダース",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -7221,7 +7221,7 @@
           "source": "うつ",
           "rawSource": "うつ",
           "sourceTerm": "うつ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -7532,7 +7532,7 @@
           "source": "うつ",
           "rawSource": "うつ",
           "sourceTerm": "うつ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -7848,7 +7848,7 @@
           "source": "ぶつ",
           "rawSource": "ぶつ",
           "sourceTerm": "ぶつ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -8159,7 +8159,7 @@
           "source": "ぶつ",
           "rawSource": "ぶつ",
           "sourceTerm": "ぶつ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -8475,7 +8475,7 @@
           "source": "うちこむ",
           "rawSource": "うちこむ",
           "sourceTerm": "うちこむ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -8894,7 +8894,7 @@
           "source": "うちこむ",
           "rawSource": "うちこむ",
           "sourceTerm": "うちこむ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -9313,7 +9313,7 @@
           "source": "うち",
           "rawSource": "うち",
           "sourceTerm": "うつ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -9626,7 +9626,7 @@
           "source": "うち",
           "rawSource": "うち",
           "sourceTerm": "うつ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -9944,7 +9944,7 @@
           "source": "ぶちこむ",
           "rawSource": "ぶちこむ",
           "sourceTerm": "ぶちこむ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -10363,7 +10363,7 @@
           "source": "ぶちこむ",
           "rawSource": "ぶちこむ",
           "sourceTerm": "ぶちこむ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -10782,7 +10782,7 @@
           "source": "ぶち",
           "rawSource": "ぶち",
           "sourceTerm": "ぶつ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -11095,7 +11095,7 @@
           "source": "ぶち",
           "rawSource": "ぶち",
           "sourceTerm": "ぶつ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -11413,7 +11413,7 @@
           "source": "がぞう",
           "rawSource": "がぞう",
           "sourceTerm": "がぞう",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -11583,7 +11583,7 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -12025,7 +12025,7 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -12467,7 +12467,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -12811,7 +12811,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -13155,7 +13155,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -13464,7 +13464,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -13786,7 +13786,7 @@
           "type": "termMerged",
           "source": "打ち込む",
           "rawSource": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -14556,7 +14556,7 @@
           "type": "termMerged",
           "source": "打ち",
           "rawSource": "打ち",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -15133,7 +15133,7 @@
           "type": "termMerged",
           "source": "打",
           "rawSource": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -15435,7 +15435,7 @@
           "type": "termMerged",
           "source": "打",
           "rawSource": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -15753,7 +15753,7 @@
           "source": "打ち込んでいませんでした",
           "rawSource": "打ち込んでいませんでした",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -16176,7 +16176,7 @@
           "source": "打ち込んでいませんでした",
           "rawSource": "打ち込んでいませんでした",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -16599,7 +16599,7 @@
           "source": "打ち込んでいませんでした",
           "rawSource": "打ち込んでいませんでした",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -17022,7 +17022,7 @@
           "source": "打ち込んでいませんでした",
           "rawSource": "打ち込んでいませんでした",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -17445,7 +17445,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -17758,7 +17758,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -18071,7 +18071,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -18384,7 +18384,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -18697,7 +18697,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -19008,7 +19008,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -19333,7 +19333,7 @@
           "source": "打ち込む",
           "rawSource": "打(う)ち込(こ)む",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -19752,7 +19752,7 @@
           "source": "打ち込む",
           "rawSource": "打(う)ち込(こ)む",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -20171,7 +20171,7 @@
           "source": "打ち込む",
           "rawSource": "打(う)ち込(こ)む",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -20590,7 +20590,7 @@
           "source": "打ち込む",
           "rawSource": "打(う)ち込(こ)む",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -21009,7 +21009,7 @@
           "source": "打ち",
           "rawSource": "打(う)ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -21322,7 +21322,7 @@
           "source": "打ち",
           "rawSource": "打(う)ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -21635,7 +21635,7 @@
           "source": "打ち",
           "rawSource": "打(う)ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -21948,7 +21948,7 @@
           "source": "打ち",
           "rawSource": "打(う)ち",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -22261,7 +22261,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -22572,7 +22572,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -22897,7 +22897,7 @@
           "source": "打ち込む",
           "rawSource": "(打)(ち)(込)(む)",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -23316,7 +23316,7 @@
           "source": "打ち込む",
           "rawSource": "(打)(ち)(込)(む)",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -23735,7 +23735,7 @@
           "source": "打ち込む",
           "rawSource": "(打)(ち)(込)(む)",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -24154,7 +24154,7 @@
           "source": "打ち込む",
           "rawSource": "(打)(ち)(込)(む)",
           "sourceTerm": "打ち込む",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -24573,7 +24573,7 @@
           "source": "打ち",
           "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -24886,7 +24886,7 @@
           "source": "打ち",
           "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -25199,7 +25199,7 @@
           "source": "打ち",
           "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -25512,7 +25512,7 @@
           "source": "打ち",
           "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -25825,7 +25825,7 @@
           "source": "打",
           "rawSource": "(打)",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -26136,7 +26136,7 @@
           "source": "打",
           "rawSource": "(打)",
           "sourceTerm": "打",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -26461,7 +26461,7 @@
           "source": "よみ",
           "rawSource": "test",
           "sourceTerm": "よむ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -26620,7 +26620,7 @@
           "source": "つよみ",
           "rawSource": "つtest",
           "sourceTerm": "つよみ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -26777,7 +26777,7 @@
           "source": "よみました",
           "rawSource": "testました",
           "sourceTerm": "よむ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -26934,7 +26934,7 @@
           "type": "termMerged",
           "source": "うちこむ",
           "rawSource": "うちこむ",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -27704,7 +27704,7 @@
           "type": "termMerged",
           "source": "うち",
           "rawSource": "うち",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": [
@@ -28288,7 +28288,7 @@
           "source": "お手前",
           "rawSource": "お手前",
           "sourceTerm": "お手前",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -28621,7 +28621,7 @@
           "source": "番号",
           "rawSource": "番号",
           "sourceTerm": "番号",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -28806,7 +28806,7 @@
           "source": "中腰",
           "rawSource": "中腰",
           "sourceTerm": "中腰",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -28991,7 +28991,7 @@
           "source": "所業",
           "rawSource": "所業",
           "sourceTerm": "所業",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -29176,7 +29176,7 @@
           "source": "土木工事",
           "rawSource": "土木工事",
           "sourceTerm": "土木工事",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -29361,7 +29361,7 @@
           "source": "好き",
           "rawSource": "好き",
           "sourceTerm": "好き",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []
@@ -29574,7 +29574,7 @@
           "source": "構造",
           "rawSource": "構造",
           "sourceTerm": "構造",
-          "inflectionHypotheses": [
+          "inflectionPossibilities": [
             {
               "source": "algorithm",
               "inflections": []

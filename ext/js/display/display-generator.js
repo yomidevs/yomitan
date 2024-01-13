@@ -67,13 +67,13 @@ export class DisplayGenerator {
         const node = this._instantiate('term-entry');
 
         const headwordsContainer = this._querySelector(node, '.headword-list');
-        const inflectionHypothesesContainer = this._querySelector(node, '.inflection-hypotheses');
+        const inflectionPossibilitiesContainer = this._querySelector(node, '.inflection-possibilities');
         const groupedPronunciationsContainer = this._querySelector(node, '.pronunciation-group-list');
         const frequencyGroupListContainer = this._querySelector(node, '.frequency-group-list');
         const definitionsContainer = this._querySelector(node, '.definition-list');
         const headwordTagsContainer = this._querySelector(node, '.headword-list-tag-list');
 
-        const {headwords, type, inflectionHypotheses, definitions, frequencies, pronunciations} = dictionaryEntry;
+        const {headwords, type, inflectionPossibilities, definitions, frequencies, pronunciations} = dictionaryEntry;
         const groupedPronunciations = DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry);
         const pronunciationCount = groupedPronunciations.reduce((i, v) => i + v.pronunciations.length, 0);
         const groupedFrequencies = DictionaryDataUtil.groupTermFrequencies(dictionaryEntry);
@@ -112,7 +112,7 @@ export class DisplayGenerator {
         }
         headwordsContainer.dataset.count = `${headwords.length}`;
 
-        this._appendMultiple(inflectionHypothesesContainer, this._createInflectionHypothesis.bind(this), inflectionHypotheses);
+        this._appendMultiple(inflectionPossibilitiesContainer, this._createInflectionPossibility.bind(this), inflectionPossibilities);
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations);
         this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length);
@@ -357,13 +357,13 @@ export class DisplayGenerator {
     }
 
     /**
-     * @param {import('dictionary').InflectionHypothesis} inflectionHypothesis
+     * @param {import('dictionary').InflectionPossibility} inflectionPossibility
      * @returns {?HTMLElement}
      */
-    _createInflectionHypothesis(inflectionHypothesis) {
-        const {source, inflections} = inflectionHypothesis;
+    _createInflectionPossibility(inflectionPossibility) {
+        const {source, inflections} = inflectionPossibility;
         if (!Array.isArray(inflections) || inflections.length === 0) { return null; }
-        const fragment = this._instantiate('inflection-hypothesis');
+        const fragment = this._instantiate('inflection-possibility');
 
         const sourceIcon = this._getInflectionSourceIcon(source);
 

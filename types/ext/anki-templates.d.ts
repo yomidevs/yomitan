@@ -172,7 +172,7 @@ export type TermDictionaryEntry = {
     source: string | null;
     rawSource: string | null;
     sourceTerm?: string | null;
-    inflectionHypotheses: Dictionary.InflectionHypothesis[];
+    inflectionPossibilities: Dictionary.InflectionPossibility[];
     score: number;
     isPrimary?: boolean;
     readonly sequence: number;

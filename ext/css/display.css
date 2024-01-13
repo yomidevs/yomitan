@@ -809,17 +809,17 @@ button.action-button:active {
 
 
 /* Inflections */
-.inflection-hypotheses {
+.inflection-possibilities {
     padding-inline-start: 0;
     list-style-type: none;
 }
-.inflection-hypothesis {
+.inflection-possibility {
     color: var(--reason-text-color);
 }
-.inflection-hypothesis:empty {
+.inflection-possibility:empty {
     display: none;
 }
-.inflection-hypothesis>.inflection+.inflection-separator+.inflection::before {
+.inflection-possibility>.inflection+.inflection-separator+.inflection::before {
     content: var(--inflection-separator);
     padding: 0 0.25em;
 }
