@@ -2632,14 +2632,14 @@ export class Backend {
     }
 
     /**
+     * Only request this permission for Firefox versions >= 77.
+     * https://bugzilla.mozilla.org/show_bug.cgi?id=1630413
      * @returns {Promise<void>}
      */
     async _requestPersistentStorage() {
         try {
             if (await navigator.storage.persisted()) { return; }
 
-            // Only request this permission for Firefox versions >= 77.
-            // https://bugzilla.mozilla.org/show_bug.cgi?id=1630413
             const {vendor, version} = await browser.runtime.getBrowserInfo();
             if (vendor !== 'Mozilla') { return; }
 
