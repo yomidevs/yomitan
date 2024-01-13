@@ -345,6 +345,13 @@
             "mode": "split",
             "text": "構造",
             "options": "default"
+        },
+        {
+            "name": "Test dictionary deinflection",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "のたもうた",
+            "options": "default"
         }
     ]
 }

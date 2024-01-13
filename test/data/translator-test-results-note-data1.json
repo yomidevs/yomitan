@@ -29719,5 +29719,118 @@
         "media": {}
       }
     ]
+  },
+  {
+    "name": "Test dictionary deinflection",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 24,
+          "source": "のたもうた",
+          "rawSource": "のたもうた",
+          "sourceTerm": "のたまう",
+          "inflectionPossibilities": [
+            {
+              "source": "both",
+              "inflections": [
+                "past"
+              ]
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 16,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "のたまう",
+          "reading": "のたまう",
+          "expressions": [
+            {
+              "sourceTerm": "のたまう",
+              "expression": "のたまう",
+              "reading": "のたまう",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "のたまう",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
+            }
+          ],
+          "glossary": [
+            "notamau definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "v5",
+              "category": "default",
+              "notes": "",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "のたまう",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "のたまう"
+        ],
+        "uniqueReadings": [
+          "のたまう"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
   }
 ]
