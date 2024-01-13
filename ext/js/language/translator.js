@@ -269,10 +269,13 @@ export class Translator {
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
 
         for (const databaseEntry of databaseEntries) {
+            const entryDictionary = /** @type {import('translation').FindTermDictionary} */ (enabledDictionaryMap.get(databaseEntry.dictionary));
+            const partsOfSpeechFilter = entryDictionary.partsOfSpeechFilter;
+
             const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
                 const deinflectionRules = deinflection.rules;
-                if (deinflectionRules === 0 || (definitionRules & deinflectionRules) !== 0) {
+                if (!partsOfSpeechFilter || deinflectionRules === 0 || (definitionRules & deinflectionRules) !== 0) {
                     deinflection.databaseEntries.push(databaseEntry);
                 }
             }

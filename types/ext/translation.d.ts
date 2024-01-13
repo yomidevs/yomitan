@@ -173,6 +173,10 @@ export type FindTermDictionary = {
      * Whether or not secondary term searches are allowed for this dictionary.
      */
     allowSecondarySearches: boolean;
+    /**
+     * Whether this dictionary's part of speech rules should be used to filter results.
+     */
+    partsOfSpeechFilter: boolean;
 };
 
 export type TermEnabledDictionaryMap = Map<string, FindTermDictionary>;

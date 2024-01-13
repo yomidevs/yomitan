@@ -164,7 +164,7 @@ class DictionaryEntry {
 
     /** */
     _showDetails() {
-        const {title, revision, version, prefixWildcardsSupported} = this._dictionaryInfo;
+        const {title, revision, version, counts, prefixWildcardsSupported} = this._dictionaryInfo;
 
         const modal = this._dictionaryController.modalController.getModal('dictionary-details');
         if (modal === null) { return; }
@@ -181,12 +181,19 @@ class DictionaryEntry {
         const wildcardSupportedElement = querySelectorNotNull(modal.node, '.dictionary-prefix-wildcard-searches-supported');
         /** @type {HTMLElement} */
         const detailsTableElement = querySelectorNotNull(modal.node, '.dictionary-details-table');
+        /** @type {HTMLElement} */
+        const partsOfSpeechFilterSetting = querySelectorNotNull(modal.node, '.dictionary-parts-of-speech-filter-setting');
+        /** @type {HTMLElement} */
+        const partsOfSpeechFilterToggle = querySelectorNotNull(partsOfSpeechFilterSetting, '.dictionary-parts-of-speech-filter-toggle');
 
         titleElement.textContent = title;
         versionElement.textContent = `rev.${revision}`;
         outdateElement.hidden = (version >= 3);
         countsElement.textContent = this._counts !== null ? JSON.stringify(this._counts, null, 4) : '';
         wildcardSupportedElement.checked = prefixWildcardsSupported;
+        partsOfSpeechFilterSetting.hidden = !counts.terms.total;
+        partsOfSpeechFilterToggle.dataset.setting = `dictionaries[${this._index}].partsOfSpeechFilter`;
+
         this._setupDetails(detailsTableElement);
 
         modal.setVisible(true);
@@ -513,7 +520,8 @@ export class DictionaryController {
             priority: 0,
             enabled,
             allowSecondarySearches: false,
-            definitionsCollapsible: 'not-collapsible'
+            definitionsCollapsible: 'not-collapsible',
+            partsOfSpeechFilter: true
         };
     }
 

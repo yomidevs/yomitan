@@ -34,7 +34,8 @@
                     {
                         "index": 0,
                         "priority": 0,
-                        "allowSecondarySearches": false
+                        "allowSecondarySearches": false,
+                        "partsOfSpeechFilter": true
                     }
                 ]
             ]
