@@ -29727,7 +29727,7 @@
         "marker": "{marker}",
         "definition": {
           "type": "term",
-          "id": 24,
+          "id": 23,
           "source": "のたもうた",
           "rawSource": "のたもうた",
           "sourceTerm": "のたまう",
@@ -29741,7 +29741,7 @@
           ],
           "score": 1,
           "isPrimary": true,
-          "sequence": 16,
+          "sequence": 15,
           "dictionary": "Test Dictionary 2",
           "dictionaryOrder": {
             "index": 0,

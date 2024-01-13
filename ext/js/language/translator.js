@@ -1507,7 +1507,7 @@ export class Translator {
      * @param {number[]} sequences
      * @param {boolean} isPrimary
      * @param {import('dictionary').Tag[]} tags
-     * @param {import('dictionary-data').TermGlossary[]} entries
+     * @param {import('dictionary-data').TermGlossaryContent[]} entries
      * @returns {import('dictionary').TermDefinition}
      */
     _createTermDefinition(index, headwordIndices, dictionary, dictionaryIndex, dictionaryPriority, id, score, sequences, isPrimary, tags, entries) {
@@ -1598,7 +1598,22 @@ export class Translator {
      * @returns {import('dictionary').TermDictionaryEntry}
      */
     _createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionPossibilities, isPrimary, enabledDictionaryMap, tagAggregator) {
-        const {matchType, matchSource, term, reading: rawReading, definitionTags, termTags, definitions, score, dictionary, id, sequence: rawSequence, rules} = databaseEntry;
+        const {
+            matchType,
+            matchSource,
+            term,
+            reading: rawReading,
+            definitionTags,
+            termTags,
+            definitions,
+            score,
+            dictionary,
+            id,
+            sequence: rawSequence,
+            rules
+        } = databaseEntry;
+        // cast is safe because getDeinflections filters out deinflection definitions
+        const contentDefinitions = /** @type {import('dictionary-data').TermGlossaryContent[]} */ (definitions);
         const reading = (rawReading.length > 0 ? rawReading : term);
         const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const sourceTermExactMatchCount = (isPrimary && deinflectedText === term ? 1 : 0);
@@ -1623,7 +1638,7 @@ export class Translator {
             sourceTermExactMatchCount,
             maxTransformedTextLength,
             [this._createTermHeadword(0, term, reading, [source], headwordTagGroups, rules)],
-            [this._createTermDefinition(0, [0], dictionary, dictionaryIndex, dictionaryPriority, id, score, [sequence], isPrimary, definitionTagGroups, definitions)]
+            [this._createTermDefinition(0, [0], dictionary, dictionaryIndex, dictionaryPriority, id, score, [sequence], isPrimary, definitionTagGroups, contentDefinitions)]
         );
     }
 

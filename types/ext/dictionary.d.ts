@@ -346,7 +346,7 @@ export type TermDefinition = {
     /**
      * The definition entries.
      */
-    entries: DictionaryData.TermGlossary[];
+    entries: DictionaryData.TermGlossaryContent[];
 };
 
 /**

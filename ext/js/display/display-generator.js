@@ -436,7 +436,7 @@ export class DisplayGenerator {
     }
 
     /**
-     * @param {import('dictionary-data').TermGlossary} entry
+     * @param {import('dictionary-data').TermGlossaryContent} entry
      * @param {string} dictionary
      * @returns {?HTMLElement}
      */
