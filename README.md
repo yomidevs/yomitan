@@ -15,6 +15,10 @@ In addition, we are beginning to make important bug fixes and minor enhancements
 
 Since the owner requested forks be uniquely named, we have chosen a new name, _yomitan_. (_-tan_ is an honorific used for anthropomorphic moe characters.) While we've made some substantial changes, the majority of the extension's functionality is thanks to hard work of foosoft and numerous other open source contributors from 2016-2023.
 
+## Contributing
+
+Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the [issue tracker](https://github.com/themoeway/yomitan/issues), and read our [contributing guidelines](./CONTRIBUTING.md). You can also find us on [TheMoeWay Discord](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
+
 ## What's Yomitan?<!-- omit from toc -->
 
 Yomitan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
@@ -86,10 +90,6 @@ updates automatically.
     <img src="resources/images/search-popup-kanji.png" width="300" alt="popup with kanji details">
 
 To further enhance your Yomitan experience, it's worth [integrating with Anki](./docs/anki-integration.md), a spaced-repetition flashcard program to help solidify the words you encounter.
-
-## Contributing
-
-Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the [issue tracker](https://github.com/themoeway/yomitan/issues), and read our [contributing guidelines](./CONTRIBUTING.md). You can also find us on [TheMoeWay Discord](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
 
 ## Licenses
 
