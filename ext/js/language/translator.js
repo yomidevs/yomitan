@@ -359,7 +359,7 @@ export class Translator {
             });
         });
 
-        await this._addEntriesToDeinflections(dictionaryDeinflections, enabledDictionaryMap, matchType, false);
+        await this._addEntriesToDeinflections(dictionaryDeinflections, enabledDictionaryMap, matchType);
 
         return dictionaryDeinflections;
     }
@@ -368,15 +368,14 @@ export class Translator {
      * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
      * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
      * @param {import('dictionary').TermSourceMatchType} matchType
-     * @param {boolean} partsOfSpeechFilter
      */
-    async _addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType, partsOfSpeechFilter = true) {
+    async _addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType) {
         const uniqueDeinflectionsMap = this._groupDeinflectionsByTerm(deinflections);
         const uniqueDeinflectionArrays = [...uniqueDeinflectionsMap.values()];
         const uniqueDeinflectionTerms = [...uniqueDeinflectionsMap.keys()];
 
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
-        this._matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, partsOfSpeechFilter);
+        this._matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, enabledDictionaryMap);
     }
 
     /**
@@ -400,12 +399,12 @@ export class Translator {
     /**
      * @param {import('dictionary-database').TermEntry[]} databaseEntries
      * @param {import('translation-internal').DatabaseDeinflection[][]} uniqueDeinflectionArrays
-     * @param {boolean} partsOfSpeechFilter
+     * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
      */
-    _matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, partsOfSpeechFilter) {
+    _matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, enabledDictionaryMap) {
         for (const databaseEntry of databaseEntries) {
             const entryDictionary = /** @type {import('translation').FindTermDictionary} */ (enabledDictionaryMap.get(databaseEntry.dictionary));
-            const partsOfSpeechFilter = entryDictionary.partsOfSpeechFilter;
+            const {partsOfSpeechFilter} = entryDictionary;
 
             const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {

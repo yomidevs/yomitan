@@ -556,7 +556,8 @@ export class OptionsUtil {
             this._updateVersion20,
             this._updateVersion21,
             this._updateVersion22,
-            this._updateVersion23
+            this._updateVersion23,
+            this._updateVersion24
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -1159,7 +1160,7 @@ export class OptionsUtil {
      * - Added dictionaries[].useDeinflections.
      * @type {import('options-util').UpdateFunction}
      */
-    _updateVersion23(options) {
+    _updateVersion24(options) {
         for (const {options: profileOptions} of options.profiles) {
             for (const dictionary of profileOptions.dictionaries) {
                 dictionary.useDeinflections = true;
