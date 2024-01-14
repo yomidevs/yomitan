@@ -114,13 +114,13 @@ export class DictionaryImporter {
 
         // Files
         /** @type {import('dictionary-importer').QueryDetails} */
-        const queryDetails = new Map([
+        const queryDetails = [
             ['termFiles', /^term_bank_(\d+)\.json$/],
             ['termMetaFiles', /^term_meta_bank_(\d+)\.json$/],
             ['kanjiFiles', /^kanji_bank_(\d+)\.json$/],
             ['kanjiMetaFiles', /^kanji_meta_bank_(\d+)\.json$/],
             ['tagFiles', /^tag_bank_(\d+)\.json$/]
-        ]);
+        ];
         const {termFiles, termMetaFiles, kanjiFiles, kanjiMetaFiles, tagFiles} = Object.fromEntries(this._getArchiveFiles(fileMap, queryDetails));
 
         // Load data
@@ -691,18 +691,18 @@ export class DictionaryImporter {
     _getArchiveFiles(fileMap, queryDetails) {
         /** @type {import('dictionary-importer').QueryResult} */
         const results = new Map();
-        for (const [name, value] of fileMap.entries()) {
-            for (const [fileType, fileNameFormat] of queryDetails.entries()) {
+        for (const [fileName, fileEntry] of fileMap.entries()) {
+            for (const [fileType, fileNameFormat] of queryDetails) {
+                if (!fileNameFormat.test(fileName)) { continue; }
+
                 let entries = results.get(fileType);
                 if (typeof entries === 'undefined') {
                     entries = [];
                     results.set(fileType, entries);
                 }
 
-                if (fileNameFormat.test(name)) {
-                    entries.push(value);
-                    break;
-                }
+                entries.push(fileEntry);
+                break;
             }
         }
         return results;

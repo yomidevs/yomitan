@@ -115,7 +115,7 @@ export type ArchiveFileMap = Map<string, ZipJS.Entry>;
 /**
  * A map of file types inside a dictionary and its corresponding regular expressions.
  */
-export type QueryDetails = Map<string, RegExp>;
+export type QueryDetails = [string, RegExp][];
 
 /**
  * A map of file types inside a dictionary and its matching entries.
