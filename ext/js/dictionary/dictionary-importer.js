@@ -25,6 +25,7 @@ import {
     configure
 } from '../../lib/zip.js';
 import {stringReverse} from '../core.js';
+import {asError} from '../core/as-error.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
 import {MediaUtil} from '../media/media-util.js';
@@ -206,7 +207,7 @@ export class DictionaryImporter {
                 try {
                     await dictionaryDatabase.bulkAdd(objectStoreName, entries, i, count);
                 } catch (e) {
-                    errors.push(e instanceof Error ? e : new Error(`${e}`));
+                    errors.push(asError(e));
                 }
 
                 this._progressData.index += count;

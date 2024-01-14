@@ -18,6 +18,7 @@
 
 import {Dexie} from '../../../lib/dexie.js';
 import {isObject, log} from '../../core.js';
+import {asError} from '../../core/as-error.js';
 import {parseJson} from '../../core/json.js';
 import {OptionsUtil} from '../../data/options-util.js';
 import {ArrayBufferUtil} from '../../data/sandbox/array-buffer-util.js';
@@ -498,7 +499,7 @@ export class BackupController {
         try {
             await this._importSettingsFile(file);
         } catch (error) {
-            this._showSettingsImportError(error instanceof Error ? error : new Error(`${error}`));
+            this._showSettingsImportError(asError(error));
         }
     }
 

@@ -21,6 +21,7 @@ import JSZip from 'jszip';
 import path from 'path';
 import {performance} from 'perf_hooks';
 import {fileURLToPath} from 'url';
+import {asError} from './as-error.js';
 import {parseJson} from './json.js';
 import {createJsonSchema} from './schema-validate.js';
 
@@ -47,7 +48,7 @@ async function validateDictionaryBanks(mode, zip, fileNameFormat, schema) {
     try {
         jsonSchema = createJsonSchema(mode, schema);
     } catch (e) {
-        const e2 = e instanceof Error ? e : new Error(`${e}`);
+        const e2 = asError(e);
         e2.message += `\n(in file ${fileNameFormat})}`;
         throw e2;
     }
@@ -62,7 +63,7 @@ async function validateDictionaryBanks(mode, zip, fileNameFormat, schema) {
         try {
             jsonSchema.validate(data);
         } catch (e) {
-            const e2 = e instanceof Error ? e : new Error(`${e}`);
+            const e2 = asError(e);
             e2.message += `\n(in file ${fileName})}`;
             throw e2;
         }
@@ -92,7 +93,7 @@ export async function validateDictionary(mode, archive, schemas) {
         const jsonSchema = createJsonSchema(mode, schemas.index);
         jsonSchema.validate(index);
     } catch (e) {
-        const e2 = e instanceof Error ? e : new Error(`${e}`);
+        const e2 = asError(e);
         e2.message += `\n(in file ${indexFileName})}`;
         throw e2;
     }

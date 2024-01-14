@@ -20,6 +20,7 @@ import {ThemeController} from '../app/theme-controller.js';
 import {FrameEndpoint} from '../comm/frame-endpoint.js';
 import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, log, promiseTimeout} from '../core.js';
 import {extendApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {asError} from '../core/as-error.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
@@ -787,7 +788,7 @@ export class Display extends EventDispatcher {
                     break;
             }
         } catch (e) {
-            this.onError(e instanceof Error ? e : new Error(`${e}`));
+            this.onError(asError(e));
         }
     }
 
@@ -922,7 +923,7 @@ export class Display extends EventDispatcher {
             };
             this.setContent(details);
         } catch (error) {
-            this.onError(error instanceof Error ? error : new Error(`${error}`));
+            this.onError(asError(error));
         }
     }
 
