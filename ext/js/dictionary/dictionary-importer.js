@@ -691,18 +691,19 @@ export class DictionaryImporter {
     _getArchiveFiles(fileMap, queryDetails) {
         /** @type {import('dictionary-importer').QueryResult} */
         const results = new Map();
+
+        for (const [fileType] of queryDetails) {
+            results.set(fileType, []);
+        }
+
         for (const [fileName, fileEntry] of fileMap.entries()) {
             for (const [fileType, fileNameFormat] of queryDetails) {
-                let entries = results.get(fileType);
-                if (typeof entries === 'undefined') {
-                    entries = [];
-                    results.set(fileType, entries);
-                }
+                if (!fileNameFormat.test(fileName)) { continue; }
+                const entries = results.get(fileType);
 
-                if (fileNameFormat.test(fileName)) {
-                    entries.push(fileEntry);
-                    break;
-                }
+                // @ts-expect-error - entries should be initialized
+                entries.push(fileEntry);
+                break;
             }
         }
         return results;
