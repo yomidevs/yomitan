@@ -122,8 +122,8 @@ describe('Document utility tests', () => {
             const {document} = window;
             for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case[data-test-type=scan]'))) {
                 test(`test-case-${testIndex++}`, () => {
-                // Get test parameters
-                /** @type {import('test/document-util').DocumentUtilTestData} */
+                    // Get test parameters
+                    /** @type {import('test/document-util').DocumentUtilTestData} */
                     const {
                         elementFromPointSelector,
                         caretRangeFromPointSelector,

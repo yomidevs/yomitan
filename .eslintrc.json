@@ -347,6 +347,7 @@
         ],
         "jsonc/array-element-newline": [
             "error",
+            o
             "consistent"
         ],
         "jsonc/comma-style": [
