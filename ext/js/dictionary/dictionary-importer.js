@@ -693,16 +693,16 @@ export class DictionaryImporter {
         const results = new Map();
         for (const [fileName, fileEntry] of fileMap.entries()) {
             for (const [fileType, fileNameFormat] of queryDetails) {
-                if (!fileNameFormat.test(fileName)) { continue; }
-
                 let entries = results.get(fileType);
                 if (typeof entries === 'undefined') {
                     entries = [];
                     results.set(fileType, entries);
                 }
 
-                entries.push(fileEntry);
-                break;
+                if (fileNameFormat.test(fileName)) {
+                    entries.push(fileEntry);
+                    break;
+                }
             }
         }
         return results;
