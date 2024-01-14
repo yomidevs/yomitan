@@ -36,6 +36,20 @@ function prepareWindow(window) {
 }
 
 /**
+ *
+ * @param {string} [htmlFilePath]
+ * @returns {Promise<{window: import('jsdom').DOMWindow; teardown: (global: unknown) => import('vitest').Awaitable<void>}>}
+ */
+export async function setupDomTest(htmlFilePath) {
+    const html = typeof htmlFilePath === 'string' ? fs.readFileSync(htmlFilePath, {encoding: 'utf8'}) : '<!DOCTYPE html>';
+    const env = builtinEnvironments.jsdom;
+    const {teardown} = await env.setup(global, {jsdom: {html}});
+    const window = /** @type {import('jsdom').DOMWindow} */ (/** @type {unknown} */ (global.window));
+    prepareWindow(window);
+    return {window, teardown};
+}
+
+/**
  * @param {string} [htmlFilePath]
  * @returns {import('vitest').TestAPI<{window: import('jsdom').DOMWindow}>}
  */
