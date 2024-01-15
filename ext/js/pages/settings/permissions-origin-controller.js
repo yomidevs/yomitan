@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
-import {asError} from '../../core/as-error.js';
+import {toError} from '../../core/to-error.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class PermissionsOriginController {
@@ -156,7 +156,7 @@ export class PermissionsOriginController {
         } catch (e) {
             const errorContainer = /** @type {HTMLElement} */ (this._errorContainer);
             errorContainer.hidden = false;
-            errorContainer.textContent = asError(e).message;
+            errorContainer.textContent = toError(e).message;
         }
         if (!added) { return false; }
         await this._updatePermissions();

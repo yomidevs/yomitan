@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../core.js';
-import {asError} from '../core/as-error.js';
+import {toError} from '../core/to-error.js';
 
 /**
  * This class is used to connect Yomitan to a native component that is
@@ -236,7 +236,7 @@ export class Mecab {
         try {
             await this._setupPortPromise;
         } catch (e) {
-            throw asError(e);
+            throw toError(e);
         }
     }
 

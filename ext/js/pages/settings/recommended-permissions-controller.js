@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core.js';
-import {asError} from '../../core/as-error.js';
+import {toError} from '../../core/to-error.js';
 
 export class RecommendedPermissionsController {
     /**
@@ -93,7 +93,7 @@ export class RecommendedPermissionsController {
         } catch (e) {
             if (this._errorContainer !== null) {
                 this._errorContainer.hidden = false;
-                this._errorContainer.textContent = asError(e).message;
+                this._errorContainer.textContent = toError(e).message;
             }
         }
         if (!added) { return false; }

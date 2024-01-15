@@ -15,4 +15,4 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export {asError} from '../ext/js/core/as-error.js';
+export {toError} from '../ext/js/core/to-error.js';

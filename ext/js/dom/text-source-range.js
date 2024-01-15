@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {asError} from '../core/as-error.js';
+import {toError} from '../core/to-error.js';
 import {DocumentUtil} from './document-util.js';
 import {DOMTextScanner} from './dom-text-scanner.js';
 
@@ -229,7 +229,7 @@ export class TextSourceRange {
             try {
                 return this._range.compareBoundaryPoints(Range.START_TO_START, other.range) === 0;
             } catch (e) {
-                if (asError(e).name === 'WrongDocumentError') {
+                if (toError(e).name === 'WrongDocumentError') {
                     // This can happen with shadow DOMs if the ranges are in different documents.
                     return false;
                 }

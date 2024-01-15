@@ -21,6 +21,6 @@
  * @param {unknown} value
  * @returns {Error}
  */
-export function asError(value) {
+export function toError(value) {
     return value instanceof Error ? value : new Error(`${value}`);
 }

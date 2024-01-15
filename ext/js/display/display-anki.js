@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection, deferPromise} from '../core.js';
-import {asError} from '../core/as-error.js';
+import {toError} from '../core/to-error.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
 import {AnkiUtil} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
@@ -160,7 +160,7 @@ export class DisplayAnki {
             try {
                 ({note: note, errors, requirements} = await this._createNote(dictionaryEntry, mode, []));
             } catch (e) {
-                errors = [asError(e)];
+                errors = [toError(e)];
             }
             /** @type {import('display-anki').AnkiNoteLogData} */
             const entry = {mode, note};
@@ -175,7 +175,7 @@ export class DisplayAnki {
 
         return {
             ankiNoteData,
-            ankiNoteDataException: asError(ankiNoteDataException),
+            ankiNoteDataException: toError(ankiNoteDataException),
             ankiNotes
         };
     }
@@ -491,7 +491,7 @@ export class DisplayAnki {
                 addNoteOkay = true;
             } catch (e) {
                 allErrors.length = 0;
-                allErrors.push(asError(e));
+                allErrors.push(toError(e));
             }
 
             if (addNoteOkay) {
@@ -502,7 +502,7 @@ export class DisplayAnki {
                         try {
                             await yomitan.api.suspendAnkiCardsForNote(noteId);
                         } catch (e) {
-                            allErrors.push(asError(e));
+                            allErrors.push(toError(e));
                         }
                     }
                     button.disabled = true;
@@ -510,7 +510,7 @@ export class DisplayAnki {
                 }
             }
         } catch (e) {
-            allErrors.push(asError(e));
+            allErrors.push(toError(e));
         } finally {
             progressIndicatorVisible.clearOverride(overrideToken);
         }
@@ -648,7 +648,7 @@ export class DisplayAnki {
             }
         } catch (e) {
             infos = this._getAnkiNoteInfoForceValue(notes, false);
-            ankiError = asError(e);
+            ankiError = toError(e);
         }
 
         /** @type {import('display-anki').DictionaryEntryDetails[]} */
@@ -856,11 +856,11 @@ export class DisplayAnki {
             await yomitan.api.noteView(noteIds[0], this._noteGuiMode, false);
         } catch (e) {
             const displayErrors = (
-                asError(e).message === 'Mode not supported' ?
+                toError(e).message === 'Mode not supported' ?
                 [this._display.displayGenerator.instantiateTemplateFragment('footer-notification-anki-view-note-error')] :
                 void 0
             );
-            this._showErrorNotification([asError(e)], displayErrors);
+            this._showErrorNotification([toError(e)], displayErrors);
             return;
         }
     }

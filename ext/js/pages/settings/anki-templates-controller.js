@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {asError} from '../../core/as-error.js';
 import {ExtensionError} from '../../core/extension-error.js';
+import {toError} from '../../core/to-error.js';
 import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {JapaneseUtil} from '../../language/sandbox/japanese-util.js';
@@ -267,7 +267,7 @@ export class AnkiTemplatesController {
                 allErrors.push(...errors);
             }
         } catch (e) {
-            allErrors.push(asError(e));
+            allErrors.push(toError(e));
         }
 
         /**

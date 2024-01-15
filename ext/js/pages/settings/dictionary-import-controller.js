@@ -17,8 +17,8 @@
  */
 
 import {log} from '../../core.js';
-import {asError} from '../../core/as-error.js';
 import {ExtensionError} from '../../core/extension-error.js';
+import {toError} from '../../core/to-error.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
@@ -127,7 +127,7 @@ export class DictionaryImportController {
                 this._showErrors(errors);
             }
         } catch (error) {
-            this._showErrors([asError(error)]);
+            this._showErrors([toError(error)]);
         } finally {
             prevention.end();
             this._setModifying(false);
@@ -201,7 +201,7 @@ export class DictionaryImportController {
                 await this._importDictionary(files[i], importDetails, onProgress);
             }
         } catch (err) {
-            this._showErrors([asError(err)]);
+            this._showErrors([toError(err)]);
         } finally {
             prevention.end();
             for (const progress of progressContainers) { progress.hidden = true; }
