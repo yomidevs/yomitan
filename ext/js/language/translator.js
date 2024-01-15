@@ -410,7 +410,7 @@ export class Translator {
             const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
                 const deinflectionRules = deinflection.rules;
-                if (!partsOfSpeechFilter || deinflectionRules === 0 || (definitionRules & deinflectionRules) !== 0) {
+                if (!partsOfSpeechFilter || Deinflector.rulesMatch(deinflectionRules, definitionRules)) {
                     deinflection.databaseEntries.push(databaseEntry);
                 }
             }
