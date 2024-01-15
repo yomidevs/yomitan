@@ -19,7 +19,23 @@ import {describe, test} from 'vitest';
 import {Handlebars} from '../ext/lib/handlebars.js';
 
 describe('Handlebars', () => {
-    test('compile vs compileAST', ({expect}) => {
+    test('compile vs compileAST 1', ({expect}) => {
+        const template = '{{~test1~}}';
+
+        const data = {
+            test1: '<div style="font-size: 4em;">Test</div>'
+        };
+
+        const instance1 = Handlebars.compile(template);
+        const instance2 = Handlebars.compileAST(template);
+
+        const result1 = instance1(data);
+        const result2 = instance2(data);
+
+        expect.soft(result1).equals('&lt;div style&#x3D;&quot;font-size: 4em;&quot;&gt;Test&lt;/div&gt;');
+        expect.soft(result2).equals('&lt;div style&#x3D;&quot;font-size: 4em;&quot;&gt;Test&lt;/div&gt;');
+    });
+    test('compile vs compileAST 2', ({expect}) => {
         const template = '{{~test1.test2~}}';
 
         const data = {
