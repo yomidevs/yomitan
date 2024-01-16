@@ -18,6 +18,7 @@
 
 import {generateId} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {toError} from '../core/to-error.js';
 import {yomitan} from '../yomitan.js';
 
 export class OptionToggleHotkeyHandler {
@@ -132,7 +133,7 @@ export class OptionToggleHotkeyHandler {
      * @returns {DocumentFragment}
      */
     _createErrorMessage(path, error) {
-        const message = error instanceof Error ? error.message : `${error}`;
+        const message = toError(error).message;
         const fragment = document.createDocumentFragment();
         const n1 = document.createElement('em');
         n1.textContent = path;

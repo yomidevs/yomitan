@@ -27,6 +27,7 @@ import {
 import {stringReverse} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
+import {toError} from '../core/to-error.js';
 import {MediaUtil} from '../media/media-util.js';
 
 const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
@@ -206,7 +207,7 @@ export class DictionaryImporter {
                 try {
                     await dictionaryDatabase.bulkAdd(objectStoreName, entries, i, count);
                 } catch (e) {
-                    errors.push(e instanceof Error ? e : new Error(`${e}`));
+                    errors.push(toError(e));
                 }
 
                 this._progressData.index += count;

@@ -19,6 +19,7 @@
 import {Dexie} from '../../../lib/dexie.js';
 import {isObject, log} from '../../core.js';
 import {parseJson} from '../../core/json.js';
+import {toError} from '../../core/to-error.js';
 import {OptionsUtil} from '../../data/options-util.js';
 import {ArrayBufferUtil} from '../../data/sandbox/array-buffer-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
@@ -498,7 +499,7 @@ export class BackupController {
         try {
             await this._importSettingsFile(file);
         } catch (error) {
-            this._showSettingsImportError(error instanceof Error ? error : new Error(`${error}`));
+            this._showSettingsImportError(toError(error));
         }
     }
 
