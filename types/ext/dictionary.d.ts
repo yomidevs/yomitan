@@ -208,9 +208,9 @@ export type TermDictionaryEntry = {
      */
     isPrimary: boolean;
     /**
-     * Possible inflection combinations by which the original search text might have been derived from this term.
+     * Ways that a looked-up word might be an inflected form of this term.
      */
-    inflectionPossibilities: InflectionPossibility[];
+    possibleInflectionRuleChains: PossibleInflectionRuleChain[];
     /**
      * A score for the dictionary entry.
      */
@@ -253,12 +253,12 @@ export type TermDictionaryEntry = {
     frequencies: TermFrequency[];
 };
 
-export type InflectionPossibility = {
+export type PossibleInflectionRuleChain = {
     source: InflectionSource;
-    inflections: Inflections;
+    inflectionRules: InflectionRuleChain;
 };
 
-export type Inflections = string[];
+export type InflectionRuleChain = string[];
 
 export type InflectionSource = 'algorithm' | 'dictionary' | 'both';
 

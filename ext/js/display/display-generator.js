@@ -67,13 +67,13 @@ export class DisplayGenerator {
         const node = this._instantiate('term-entry');
 
         const headwordsContainer = this._querySelector(node, '.headword-list');
-        const inflectionPossibilitiesContainer = this._querySelector(node, '.inflection-possibilities');
+        const inflectionRuleChainsContainer = this._querySelector(node, '.inflection-rule-chains');
         const groupedPronunciationsContainer = this._querySelector(node, '.pronunciation-group-list');
         const frequencyGroupListContainer = this._querySelector(node, '.frequency-group-list');
         const definitionsContainer = this._querySelector(node, '.definition-list');
         const headwordTagsContainer = this._querySelector(node, '.headword-list-tag-list');
 
-        const {headwords, type, inflectionPossibilities, definitions, frequencies, pronunciations} = dictionaryEntry;
+        const {headwords, type, possibleInflectionRuleChains, definitions, frequencies, pronunciations} = dictionaryEntry;
         const groupedPronunciations = DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry);
         const pronunciationCount = groupedPronunciations.reduce((i, v) => i + v.pronunciations.length, 0);
         const groupedFrequencies = DictionaryDataUtil.groupTermFrequencies(dictionaryEntry);
@@ -112,7 +112,7 @@ export class DisplayGenerator {
         }
         headwordsContainer.dataset.count = `${headwords.length}`;
 
-        this._appendMultiple(inflectionPossibilitiesContainer, this._createInflectionPossibility.bind(this), inflectionPossibilities);
+        this._appendMultiple(inflectionRuleChainsContainer, this._createInflectionRuleChain.bind(this), possibleInflectionRuleChains);
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations);
         this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length);
@@ -357,19 +357,19 @@ export class DisplayGenerator {
     }
 
     /**
-     * @param {import('dictionary').InflectionPossibility} inflectionPossibility
+     * @param {import('dictionary').PossibleInflectionRuleChain} inflectionRuleChain
      * @returns {?HTMLElement}
      */
-    _createInflectionPossibility(inflectionPossibility) {
-        const {source, inflections} = inflectionPossibility;
-        if (!Array.isArray(inflections) || inflections.length === 0) { return null; }
-        const fragment = this._instantiate('inflection-possibility');
+    _createInflectionRuleChain(inflectionRuleChain) {
+        const {source, inflectionRules} = inflectionRuleChain;
+        if (!Array.isArray(inflectionRules) || inflectionRules.length === 0) { return null; }
+        const fragment = this._instantiate('inflection-rule-chain');
 
         const sourceIcon = this._getInflectionSourceIcon(source);
 
         fragment.appendChild(sourceIcon);
 
-        this._appendMultiple(fragment, this._createTermInflection.bind(this), inflections);
+        this._appendMultiple(fragment, this._createTermInflection.bind(this), inflectionRules);
         return fragment;
     }
 
@@ -380,17 +380,15 @@ export class DisplayGenerator {
     _getInflectionSourceIcon(source) {
         const icon = document.createElement('span');
         icon.classList.add('inflection-source-icon');
+        icon.dataset.inflectionSource = source;
         switch (source) {
             case 'dictionary':
-                icon.dataset.inflectionSource = 'dictionary';
                 icon.title = 'Dictionary Deinflection';
                 return icon;
             case 'algorithm':
-                icon.dataset.inflectionSource = 'algorithm';
                 icon.title = 'Algorithm Deinflection';
                 return icon;
             case 'both':
-                icon.dataset.inflectionSource = 'both';
                 icon.title = 'Dictionary and Algorithm Deinflection';
                 return icon;
         }

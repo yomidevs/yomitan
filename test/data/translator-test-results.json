@@ -291,10 +291,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -459,10 +459,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -646,10 +646,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -816,10 +816,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -986,10 +986,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -1156,10 +1156,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -1326,10 +1326,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -1494,10 +1494,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -1681,10 +1681,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -1875,10 +1875,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -2069,10 +2069,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -2263,10 +2263,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -2457,10 +2457,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -2629,10 +2629,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -2801,10 +2801,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -2973,10 +2973,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -3145,10 +3145,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -3313,10 +3313,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -3500,10 +3500,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -3618,10 +3618,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -3792,10 +3792,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -3979,10 +3979,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -4149,10 +4149,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -4325,10 +4325,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -4495,10 +4495,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -4671,10 +4671,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -4865,10 +4865,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -5059,10 +5059,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -5231,10 +5231,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -5409,10 +5409,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -5603,10 +5603,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -5797,10 +5797,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -5969,10 +5969,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -6147,10 +6147,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -6275,10 +6275,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -6337,10 +6337,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -6399,10 +6399,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -6461,10 +6461,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -6523,10 +6523,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -6587,10 +6587,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -6651,10 +6651,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -6715,10 +6715,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -6779,10 +6779,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -6841,10 +6841,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -6909,10 +6909,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -7151,10 +7151,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -7393,10 +7393,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -7613,10 +7613,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -7833,10 +7833,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -8001,10 +8001,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -8188,10 +8188,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -8648,10 +8648,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -9063,10 +9063,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -9231,10 +9231,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -9418,10 +9418,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "-te",
               "progressive or perfect",
               "polite past negative"
@@ -9616,10 +9616,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "-te",
               "progressive or perfect",
               "polite past negative"
@@ -9814,10 +9814,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "-te",
               "progressive or perfect",
               "polite past negative"
@@ -10012,10 +10012,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "-te",
               "progressive or perfect",
               "polite past negative"
@@ -10210,10 +10210,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -10382,10 +10382,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -10554,10 +10554,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -10726,10 +10726,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -10898,10 +10898,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -11066,10 +11066,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -11253,10 +11253,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -11447,10 +11447,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -11641,10 +11641,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -11835,10 +11835,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -12029,10 +12029,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -12201,10 +12201,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -12373,10 +12373,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -12545,10 +12545,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -12717,10 +12717,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -12885,10 +12885,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -13072,10 +13072,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -13266,10 +13266,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -13460,10 +13460,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -13654,10 +13654,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -13848,10 +13848,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -14020,10 +14020,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -14192,10 +14192,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -14364,10 +14364,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -14536,10 +14536,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -14704,10 +14704,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -14891,10 +14891,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -15001,10 +15001,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 90,
@@ -15109,10 +15109,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "polite past"
             ]
           }
@@ -15219,10 +15219,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 10,
@@ -15679,10 +15679,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": [
+            "inflectionRules": [
               "masu stem"
             ]
           }
@@ -16100,10 +16100,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -16254,10 +16254,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -16354,10 +16354,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -16454,10 +16454,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -16554,10 +16554,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -16654,10 +16654,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 1,
@@ -16771,10 +16771,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "algorithm",
-            "inflections": []
+            "inflectionRules": []
           }
         ],
         "score": 35,
@@ -16887,10 +16887,10 @@
       {
         "type": "term",
         "isPrimary": true,
-        "inflectionPossibilities": [
+        "possibleInflectionRuleChains": [
           {
             "source": "both",
-            "inflections": [
+            "inflectionRules": [
               "past"
             ]
           }

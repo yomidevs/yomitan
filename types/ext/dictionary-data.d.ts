@@ -107,7 +107,7 @@ export type TermGlossaryImage = {type: 'image'} & TermImage;
 export type TermGlossaryStructuredContent = {type: 'structured-content', content: StructuredContent.Content};
 export type TermGlossaryDeinflection = [
     uninflected: string,
-    inflections: string[],
+    inflectionRuleChain: string[],
 ];
 
 export type TermImage = StructuredContent.ImageElementBase & {
