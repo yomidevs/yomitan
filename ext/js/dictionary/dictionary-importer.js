@@ -701,9 +701,10 @@ export class DictionaryImporter {
                 if (!fileNameFormat.test(fileName)) { continue; }
                 const entries = results.get(fileType);
 
-                // @ts-expect-error - entries should be initialized
-                entries.push(fileEntry);
-                break;
+                if (typeof entries !== 'undefined') {
+                    entries.push(fileEntry);
+                    break;
+                }
             }
         }
         return results;
