@@ -95,7 +95,7 @@ export async function validateDictionary(mode, archive, schemas) {
         throw e2;
     }
 
-    /** @type {import('dev/dictionary-validate').SchemasDetails} */
+    /** @type {import('dev/dictionary-validate').SchemasDetail[]} */
     const schemasDetails = [
         [/^term_bank_(\d+)\.json$/, version === 1 ? schemas.termBankV1 : schemas.termBankV3],
         [/^term_meta_bank_(\d+)\.json$/, schemas.termMetaBankV3],
