@@ -538,18 +538,18 @@
                         },
                         {
                             "type": "array",
-                            "description": "Deinflection of the term to a non-inflected term.",
+                            "description": "Deinflection of the term to an uninflected term.",
                             "items": [
                                 {
                                     "type": "string",
-                                    "description": "The deinflected term."
+                                    "description": "The uninflected term."
                                 },
                                 {
                                     "type": "array",
-                                    "description": "A possible inflection combination that produced the inflected term",
+                                    "description": "A chain of inflection rules that produced the inflected term",
                                     "items": {
                                         "type": "string",
-                                        "description": "An inflection."
+                                        "description": "A single inflection rule."
                                     }
                                 }
                             ]
