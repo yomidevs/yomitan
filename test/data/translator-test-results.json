@@ -291,7 +291,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -459,7 +459,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -646,7 +646,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -816,7 +816,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -986,7 +986,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -1156,7 +1156,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -1326,7 +1326,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -1494,7 +1494,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -1681,7 +1681,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -1875,7 +1875,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -2069,7 +2069,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -2263,7 +2263,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -2457,7 +2457,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -2629,7 +2629,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -2801,7 +2801,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -2973,7 +2973,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -3145,7 +3145,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -3313,7 +3313,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -3500,7 +3500,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -3618,7 +3618,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -3792,7 +3792,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -3979,7 +3979,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -4149,7 +4149,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -4325,7 +4325,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -4495,7 +4495,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -4671,7 +4671,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -4865,7 +4865,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -5059,7 +5059,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -5231,7 +5231,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -5409,7 +5409,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -5603,7 +5603,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -5797,7 +5797,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -5969,7 +5969,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -6147,7 +6147,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -6275,7 +6275,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -6337,7 +6337,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -6399,7 +6399,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -6461,7 +6461,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -6523,7 +6523,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -6587,7 +6587,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -6651,7 +6651,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -6715,7 +6715,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -6779,7 +6779,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -6841,7 +6841,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -6909,7 +6909,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -7151,7 +7151,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -7393,7 +7393,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -7613,7 +7613,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -7833,7 +7833,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -8001,7 +8001,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -8188,7 +8188,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -8648,7 +8648,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -9063,7 +9063,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -9231,7 +9231,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -9418,7 +9418,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -9616,7 +9616,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -9814,7 +9814,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -10012,7 +10012,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -10210,7 +10210,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -10382,7 +10382,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -10554,7 +10554,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -10726,7 +10726,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -10898,7 +10898,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -11066,7 +11066,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -11253,7 +11253,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -11447,7 +11447,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -11641,7 +11641,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -11835,7 +11835,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -12029,7 +12029,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -12201,7 +12201,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -12373,7 +12373,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -12545,7 +12545,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -12717,7 +12717,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -12885,7 +12885,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -13072,7 +13072,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -13266,7 +13266,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -13460,7 +13460,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -13654,7 +13654,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -13848,7 +13848,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -14020,7 +14020,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -14192,7 +14192,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -14364,7 +14364,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -14536,7 +14536,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -14704,7 +14704,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -14891,7 +14891,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -15001,7 +15001,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -15109,7 +15109,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -15219,7 +15219,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -15679,7 +15679,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": [
@@ -16100,7 +16100,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -16254,7 +16254,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -16354,7 +16354,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -16454,7 +16454,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -16554,7 +16554,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -16654,7 +16654,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -16771,7 +16771,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
             "inflectionRules": []
@@ -16887,7 +16887,7 @@
       {
         "type": "term",
         "isPrimary": true,
-        "possibleInflectionRuleChains": [
+        "inflectionRuleChainCandidates": [
           {
             "source": "both",
             "inflectionRules": [

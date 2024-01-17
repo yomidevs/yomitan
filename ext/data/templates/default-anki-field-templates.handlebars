@@ -261,13 +261,13 @@
 {{/inline}}
 
 {{#*inline "conjugation"}}
-    {{~#if (op ">" definition.possibleInflectionRuleChains.length 0)~}}
+    {{~#if (op ">" definition.inflectionRuleChainCandidates.length 0)~}}
         {{~set "multiple" false~}}
-        {{~#if (op ">" definition.possibleInflectionRuleChains.length 1)~}}
+        {{~#if (op ">" definition.inflectionRuleChainCandidates.length 1)~}}
             {{~set "multiple" true~}}
         {{~/if~}}
         {{~#if (get "multiple")~}}<ul>{{/if~}}
-            {{~#each definition.possibleInflectionRuleChains~}}
+            {{~#each definition.inflectionRuleChainCandidates~}}
                 {{~#if (op ">" inflectionRules.length 0)~}}
                     {{~#if (get "multiple")~}}<li>{{/if~}}
                     {{~#each inflectionRules~}}

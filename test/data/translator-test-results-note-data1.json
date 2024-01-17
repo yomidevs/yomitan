@@ -341,7 +341,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -652,7 +652,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -977,7 +977,7 @@
           "source": "打つ",
           "rawSource": "打つ",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -1288,7 +1288,7 @@
           "source": "打つ",
           "rawSource": "打つ",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -1599,7 +1599,7 @@
           "source": "打つ",
           "rawSource": "打つ",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -1910,7 +1910,7 @@
           "source": "打つ",
           "rawSource": "打つ",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -2221,7 +2221,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -2532,7 +2532,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -2857,7 +2857,7 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -3276,7 +3276,7 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -3695,7 +3695,7 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -4114,7 +4114,7 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -4533,7 +4533,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -4846,7 +4846,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -5159,7 +5159,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -5472,7 +5472,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -5785,7 +5785,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -6096,7 +6096,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -6421,7 +6421,7 @@
           "source": "画像",
           "rawSource": "画像",
           "sourceTerm": "画像",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -6580,7 +6580,7 @@
           "source": "だ",
           "rawSource": "だ",
           "sourceTerm": "だ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -6896,7 +6896,7 @@
           "source": "ダース",
           "rawSource": "ダース",
           "sourceTerm": "ダース",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -7221,7 +7221,7 @@
           "source": "うつ",
           "rawSource": "うつ",
           "sourceTerm": "うつ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -7532,7 +7532,7 @@
           "source": "うつ",
           "rawSource": "うつ",
           "sourceTerm": "うつ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -7848,7 +7848,7 @@
           "source": "ぶつ",
           "rawSource": "ぶつ",
           "sourceTerm": "ぶつ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -8159,7 +8159,7 @@
           "source": "ぶつ",
           "rawSource": "ぶつ",
           "sourceTerm": "ぶつ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -8475,7 +8475,7 @@
           "source": "うちこむ",
           "rawSource": "うちこむ",
           "sourceTerm": "うちこむ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -8894,7 +8894,7 @@
           "source": "うちこむ",
           "rawSource": "うちこむ",
           "sourceTerm": "うちこむ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -9313,7 +9313,7 @@
           "source": "うち",
           "rawSource": "うち",
           "sourceTerm": "うつ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -9626,7 +9626,7 @@
           "source": "うち",
           "rawSource": "うち",
           "sourceTerm": "うつ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -9944,7 +9944,7 @@
           "source": "ぶちこむ",
           "rawSource": "ぶちこむ",
           "sourceTerm": "ぶちこむ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -10363,7 +10363,7 @@
           "source": "ぶちこむ",
           "rawSource": "ぶちこむ",
           "sourceTerm": "ぶちこむ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -10782,7 +10782,7 @@
           "source": "ぶち",
           "rawSource": "ぶち",
           "sourceTerm": "ぶつ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -11095,7 +11095,7 @@
           "source": "ぶち",
           "rawSource": "ぶち",
           "sourceTerm": "ぶつ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -11413,7 +11413,7 @@
           "source": "がぞう",
           "rawSource": "がぞう",
           "sourceTerm": "がぞう",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -11583,7 +11583,7 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -12025,7 +12025,7 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -12467,7 +12467,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -12811,7 +12811,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -13155,7 +13155,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -13464,7 +13464,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -13786,7 +13786,7 @@
           "type": "termMerged",
           "source": "打ち込む",
           "rawSource": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -14556,7 +14556,7 @@
           "type": "termMerged",
           "source": "打ち",
           "rawSource": "打ち",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -15133,7 +15133,7 @@
           "type": "termMerged",
           "source": "打",
           "rawSource": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -15435,7 +15435,7 @@
           "type": "termMerged",
           "source": "打",
           "rawSource": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -15753,7 +15753,7 @@
           "source": "打ち込んでいませんでした",
           "rawSource": "打ち込んでいませんでした",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -16176,7 +16176,7 @@
           "source": "打ち込んでいませんでした",
           "rawSource": "打ち込んでいませんでした",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -16599,7 +16599,7 @@
           "source": "打ち込んでいませんでした",
           "rawSource": "打ち込んでいませんでした",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -17022,7 +17022,7 @@
           "source": "打ち込んでいませんでした",
           "rawSource": "打ち込んでいませんでした",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -17445,7 +17445,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -17758,7 +17758,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -18071,7 +18071,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -18384,7 +18384,7 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -18697,7 +18697,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -19008,7 +19008,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -19333,7 +19333,7 @@
           "source": "打ち込む",
           "rawSource": "打(う)ち込(こ)む",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -19752,7 +19752,7 @@
           "source": "打ち込む",
           "rawSource": "打(う)ち込(こ)む",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -20171,7 +20171,7 @@
           "source": "打ち込む",
           "rawSource": "打(う)ち込(こ)む",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -20590,7 +20590,7 @@
           "source": "打ち込む",
           "rawSource": "打(う)ち込(こ)む",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -21009,7 +21009,7 @@
           "source": "打ち",
           "rawSource": "打(う)ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -21322,7 +21322,7 @@
           "source": "打ち",
           "rawSource": "打(う)ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -21635,7 +21635,7 @@
           "source": "打ち",
           "rawSource": "打(う)ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -21948,7 +21948,7 @@
           "source": "打ち",
           "rawSource": "打(う)ち",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -22261,7 +22261,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -22572,7 +22572,7 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -22897,7 +22897,7 @@
           "source": "打ち込む",
           "rawSource": "(打)(ち)(込)(む)",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -23316,7 +23316,7 @@
           "source": "打ち込む",
           "rawSource": "(打)(ち)(込)(む)",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -23735,7 +23735,7 @@
           "source": "打ち込む",
           "rawSource": "(打)(ち)(込)(む)",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -24154,7 +24154,7 @@
           "source": "打ち込む",
           "rawSource": "(打)(ち)(込)(む)",
           "sourceTerm": "打ち込む",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -24573,7 +24573,7 @@
           "source": "打ち",
           "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -24886,7 +24886,7 @@
           "source": "打ち",
           "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -25199,7 +25199,7 @@
           "source": "打ち",
           "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -25512,7 +25512,7 @@
           "source": "打ち",
           "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -25825,7 +25825,7 @@
           "source": "打",
           "rawSource": "(打)",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -26136,7 +26136,7 @@
           "source": "打",
           "rawSource": "(打)",
           "sourceTerm": "打",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -26461,7 +26461,7 @@
           "source": "よみ",
           "rawSource": "test",
           "sourceTerm": "よむ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -26620,7 +26620,7 @@
           "source": "つよみ",
           "rawSource": "つtest",
           "sourceTerm": "つよみ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -26777,7 +26777,7 @@
           "source": "よみました",
           "rawSource": "testました",
           "sourceTerm": "よむ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -26934,7 +26934,7 @@
           "type": "termMerged",
           "source": "うちこむ",
           "rawSource": "うちこむ",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -27704,7 +27704,7 @@
           "type": "termMerged",
           "source": "うち",
           "rawSource": "うち",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": [
@@ -28288,7 +28288,7 @@
           "source": "お手前",
           "rawSource": "お手前",
           "sourceTerm": "お手前",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -28621,7 +28621,7 @@
           "source": "番号",
           "rawSource": "番号",
           "sourceTerm": "番号",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -28806,7 +28806,7 @@
           "source": "中腰",
           "rawSource": "中腰",
           "sourceTerm": "中腰",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -28991,7 +28991,7 @@
           "source": "所業",
           "rawSource": "所業",
           "sourceTerm": "所業",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -29176,7 +29176,7 @@
           "source": "土木工事",
           "rawSource": "土木工事",
           "sourceTerm": "土木工事",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -29361,7 +29361,7 @@
           "source": "好き",
           "rawSource": "好き",
           "sourceTerm": "好き",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -29574,7 +29574,7 @@
           "source": "構造",
           "rawSource": "構造",
           "sourceTerm": "構造",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "algorithm",
               "inflectionRules": []
@@ -29731,7 +29731,7 @@
           "source": "のたもうた",
           "rawSource": "のたもうた",
           "sourceTerm": "のたまう",
-          "possibleInflectionRuleChains": [
+          "inflectionRuleChainCandidates": [
             {
               "source": "both",
               "inflectionRules": [

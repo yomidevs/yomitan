@@ -210,7 +210,7 @@ export type TermDictionaryEntry = {
     /**
      * Ways that a looked-up word might be an inflected form of this term.
      */
-    possibleInflectionRuleChains: PossibleInflectionRuleChain[];
+    inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
     /**
      * A score for the dictionary entry.
      */
@@ -253,7 +253,7 @@ export type TermDictionaryEntry = {
     frequencies: TermFrequency[];
 };
 
-export type PossibleInflectionRuleChain = {
+export type InflectionRuleChainCandidate = {
     source: InflectionSource;
     inflectionRules: InflectionRuleChain;
 };

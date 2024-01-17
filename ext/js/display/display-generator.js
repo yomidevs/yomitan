@@ -73,7 +73,7 @@ export class DisplayGenerator {
         const definitionsContainer = this._querySelector(node, '.definition-list');
         const headwordTagsContainer = this._querySelector(node, '.headword-list-tag-list');
 
-        const {headwords, type, possibleInflectionRuleChains, definitions, frequencies, pronunciations} = dictionaryEntry;
+        const {headwords, type, inflectionRuleChainCandidates, definitions, frequencies, pronunciations} = dictionaryEntry;
         const groupedPronunciations = DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry);
         const pronunciationCount = groupedPronunciations.reduce((i, v) => i + v.pronunciations.length, 0);
         const groupedFrequencies = DictionaryDataUtil.groupTermFrequencies(dictionaryEntry);
@@ -112,7 +112,7 @@ export class DisplayGenerator {
         }
         headwordsContainer.dataset.count = `${headwords.length}`;
 
-        this._appendMultiple(inflectionRuleChainsContainer, this._createInflectionRuleChain.bind(this), possibleInflectionRuleChains);
+        this._appendMultiple(inflectionRuleChainsContainer, this._createInflectionRuleChain.bind(this), inflectionRuleChainCandidates);
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations);
         this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length);
@@ -357,7 +357,7 @@ export class DisplayGenerator {
     }
 
     /**
-     * @param {import('dictionary').PossibleInflectionRuleChain} inflectionRuleChain
+     * @param {import('dictionary').InflectionRuleChainCandidate} inflectionRuleChain
      * @returns {?HTMLElement}
      */
     _createInflectionRuleChain(inflectionRuleChain) {
