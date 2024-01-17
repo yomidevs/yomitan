@@ -31,6 +31,6 @@ export type Schemas = {
 };
 
 /**
- * A map of regular expression identifiers of file types inside a dictionary and its corresponding schemas.
+ * A tuple of a regular expression identifier of file types inside a dictionary and its corresponding schema.
  */
-export type SchemasDetails = [RegExp, unknown][];
+export type SchemasDetail = [RegExp, unknown];
