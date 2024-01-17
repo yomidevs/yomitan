@@ -1160,7 +1160,9 @@ export class OptionsUtil {
      * - Added dictionaries[].useDeinflections.
      * @type {import('options-util').UpdateFunction}
      */
-    _updateVersion24(options) {
+    async _updateVersion24(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v24.handlebars');
+
         for (const {options: profileOptions} of options.profiles) {
             for (const dictionary of profileOptions.dictionaries) {
                 dictionary.useDeinflections = true;
