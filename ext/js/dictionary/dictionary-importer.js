@@ -113,7 +113,7 @@ export class DictionaryImporter {
         const dataBankSchemas = this._getDataBankSchemas(version);
 
         // Files
-        /** @type {import('dictionary-importer').QueryDetail[]} */
+        /** @type {import('dictionary-importer').QueryDetails} */
         const queryDetails = [
             ['termFiles', /^term_bank_(\d+)\.json$/],
             ['termMetaFiles', /^term_meta_bank_(\d+)\.json$/],
@@ -685,7 +685,7 @@ export class DictionaryImporter {
 
     /**
      * @param {import('dictionary-importer').ArchiveFileMap} fileMap
-     * @param {import('dictionary-importer').QueryDetail[]} queryDetails
+     * @param {import('dictionary-importer').QueryDetails} queryDetails
      * @returns {import('dictionary-importer').QueryResult}
      */
     _getArchiveFiles(fileMap, queryDetails) {

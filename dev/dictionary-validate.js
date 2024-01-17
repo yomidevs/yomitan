@@ -39,7 +39,7 @@ function readSchema(relativeFileName) {
 /**
  * @param {import('dev/schema-validate').ValidateMode} mode
  * @param {import('jszip')} zip
- * @param {import('dev/dictionary-validate').SchemasDetail[]} schemasDetails
+ * @param {import('dev/dictionary-validate').SchemasDetails} schemasDetails
  */
 async function validateDictionaryBanks(mode, zip, schemasDetails) {
     for (const [fileName, file] of Object.entries(zip.files)) {
@@ -95,7 +95,7 @@ export async function validateDictionary(mode, archive, schemas) {
         throw e2;
     }
 
-    /** @type {import('dev/dictionary-validate').SchemasDetail[]} */
+    /** @type {import('dev/dictionary-validate').SchemasDetails} */
     const schemasDetails = [
         [/^term_bank_(\d+)\.json$/, version === 1 ? schemas.termBankV1 : schemas.termBankV3],
         [/^term_meta_bank_(\d+)\.json$/, schemas.termMetaBankV3],
