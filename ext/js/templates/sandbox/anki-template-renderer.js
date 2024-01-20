@@ -248,7 +248,7 @@ export class AnkiTemplateRenderer {
         const argCount = args.length;
         let value = this._computeValueString(options, context);
         if (argCount > 3) {
-            value = `${args.slice(3, -1).join('')}${value}`;
+            value = `${args.slice(3).join('')}${value}`;
         }
         if (argCount > 1) {
             try {
@@ -276,7 +276,7 @@ export class AnkiTemplateRenderer {
         const argCount = args.length;
         let value = this._computeValueString(options, context);
         if (argCount > 2) {
-            value = `${args.slice(2, -1).join('')}${value}`;
+            value = `${args.slice(2).join('')}${value}`;
         }
         if (argCount > 0) {
             try {
