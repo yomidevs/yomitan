@@ -115,7 +115,7 @@ function testDeinflections() {
                 {term: '食べる', source: '食べたり',         rule: 'v1', reasons: ['-tari']},
                 {term: '食べる', source: '食べず',           rule: 'v1', reasons: ['-zu']},
                 {term: '食べる', source: '食べぬ',           rule: 'v1', reasons: ['-nu']},
-                {term: '食べる', source: '食べ',             rule: 'v1', reasons: ['masu stem']},
+                {term: '食べる', source: '食べ',             rule: 'v1d', reasons: ['masu stem']},
                 {term: '食べる', source: '食べましょう',     rule: 'v1', reasons: ['polite volitional']},
                 {term: '食べる', source: '食べよう',         rule: 'v1', reasons: ['volitional']},
                 // ['causative passive']
