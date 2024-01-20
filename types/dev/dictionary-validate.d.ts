@@ -29,3 +29,8 @@ export type Schemas = {
     termBankV3: Schema;
     termMetaBankV3: Schema;
 };
+
+/**
+ * An array of tuples of a regular expression for file types inside a dictionary and its corresponding schema.
+ */
+export type SchemasDetails = [fileNameFormat: RegExp, schema: unknown][];
