@@ -49,9 +49,11 @@ import {injectStylesheet} from './script-manager.js';
  */
 export class Backend {
     /**
-     * Creates a new instance.
+     * @param {import('../extension/web-extension.js').WebExtension} webExtension
      */
-    constructor() {
+    constructor(webExtension) {
+        /** @type {import('../extension/web-extension.js').WebExtension} */
+        this._webExtension = webExtension;
         /** @type {JapaneseUtil} */
         this._japaneseUtil = new JapaneseUtil(wanakana);
         /** @type {Environment} */
@@ -80,7 +82,7 @@ export class Backend {
             });
         } else {
             /** @type {?OffscreenProxy} */
-            this._offscreen = new OffscreenProxy();
+            this._offscreen = new OffscreenProxy(webExtension);
             /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
             this._dictionaryDatabase = new DictionaryDatabaseProxy(this._offscreen);
             /** @type {Translator|TranslatorProxy} */
@@ -1902,8 +1904,7 @@ export class Backend {
      * @param {import('application').ApiMessage<TName>} message
      */
     _sendMessageIgnoreResponse(message) {
-        const callback = () => this._checkLastError(chrome.runtime.lastError);
-        chrome.runtime.sendMessage(message, callback);
+        this._webExtension.sendMessagePromise(message);
     }
 
     /**

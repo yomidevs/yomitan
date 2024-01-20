@@ -23,7 +23,7 @@ import {Backend} from './backend.js';
 async function main() {
     yomitan.prepare(true);
 
-    const backend = new Backend();
+    const backend = new Backend(yomitan.webExtension);
     await backend.prepare();
 }
 
