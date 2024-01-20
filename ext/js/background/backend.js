@@ -144,10 +144,13 @@ export class Backend {
         this._permissions = null;
         /** @type {PermissionsUtil} */
         this._permissionsUtil = new PermissionsUtil();
+        /** @type {Map<string, (() => void)[]>} */
+        this._applicationReadyHandlers = new Map();
 
         /* eslint-disable no-multi-spaces */
         /** @type {import('api').ApiMap} */
         this._apiMap = createApiMap([
+            ['applicationReady',             this._onApiApplicationReady.bind(this)],
             ['requestBackendReadySignal',    this._onApiRequestBackendReadySignal.bind(this)],
             ['optionsGet',                   this._onApiOptionsGet.bind(this)],
             ['optionsGetFull',               this._onApiOptionsGetFull.bind(this)],
@@ -424,6 +427,21 @@ export class Backend {
     }
 
     // Message handlers
+
+    /** @type {import('api').ApiHandler<'applicationReady'>} */
+    _onApiApplicationReady(_params, sender) {
+        const {tab, frameId} = sender;
+        if (!tab || typeof frameId !== 'number') { return; }
+        const {id} = tab;
+        if (typeof id !== 'number') { return; }
+        const key = `${id}:${frameId}`;
+        const handlers = this._applicationReadyHandlers.get(key);
+        if (typeof handlers === 'undefined') { return; }
+        for (const handler of handlers) {
+            handler();
+        }
+        this._applicationReadyHandlers.delete(key);
+    }
 
     /** @type {import('api').ApiHandler<'requestBackendReadySignal'>} */
     _onApiRequestBackendReadySignal(_params, sender) {
@@ -1806,18 +1824,8 @@ export class Backend {
         return new Promise((resolve, reject) => {
             /** @type {?import('core').Timeout} */
             let timer = null;
-            /** @type {?import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
-            let onMessage = (message, sender) => {
-                if (
-                    !sender.tab ||
-                    sender.tab.id !== tabId ||
-                    sender.frameId !== frameId ||
-                    !(typeof message === 'object' && message !== null) ||
-                    message.action !== 'applicationReady'
-                ) {
-                    return;
-                }
 
+            const readyHandler = () => {
                 cleanup();
                 resolve();
             };
@@ -1826,13 +1834,10 @@ export class Backend {
                     clearTimeout(timer);
                     timer = null;
                 }
-                if (onMessage !== null) {
-                    chrome.runtime.onMessage.removeListener(onMessage);
-                    onMessage = null;
-                }
+                this._removeApplicationReadyHandler(tabId, frameId, readyHandler);
             };
 
-            chrome.runtime.onMessage.addListener(onMessage);
+            this._addApplicationReadyHandler(tabId, frameId, readyHandler);
 
             this._sendMessageTabPromise(tabId, {action: 'applicationIsReady'}, {frameId})
                 .then(
@@ -2685,5 +2690,39 @@ export class Backend {
             default:
                 return defaultValue;
         }
+    }
+
+    /**
+     * @param {number} tabId
+     * @param {number} frameId
+     * @param {() => void} handler
+     */
+    _addApplicationReadyHandler(tabId, frameId, handler) {
+        const key = `${tabId}:${frameId}`;
+        let handlers = this._applicationReadyHandlers.get(key);
+        if (typeof handlers === 'undefined') {
+            handlers = [];
+            this._applicationReadyHandlers.set(key, handlers);
+        }
+        handlers.push(handler);
+    }
+
+    /**
+     * @param {number} tabId
+     * @param {number} frameId
+     * @param {() => void} handler
+     * @returns {boolean}
+     */
+    _removeApplicationReadyHandler(tabId, frameId, handler) {
+        const key = `${tabId}:${frameId}`;
+        const handlers = this._applicationReadyHandlers.get(key);
+        if (typeof handlers === 'undefined') { return false; }
+        const index = handlers.indexOf(handler);
+        if (index < 0) { return false; }
+        handlers.splice(index, 1);
+        if (handlers.length === 0) {
+            this._applicationReadyHandlers.delete(key);
+        }
+        return true;
     }
 }

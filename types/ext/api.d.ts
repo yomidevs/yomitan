@@ -112,6 +112,10 @@ export type GetTermFrequenciesDetailsTermReadingListItem = {
 };
 
 type ApiSurface = {
+    applicationReady: {
+        params: void;
+        return: void;
+    };
     optionsGet: {
         params: {
             optionsContext: Settings.OptionsContext;
