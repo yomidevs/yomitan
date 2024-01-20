@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {log} from '../core.js';
+import {log} from '../core/logger.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {yomitan} from '../yomitan.js';
 import {Frontend} from './frontend.js';

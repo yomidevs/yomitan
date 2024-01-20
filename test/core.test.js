@@ -17,7 +17,8 @@
  */
 
 import {describe, expect, test} from 'vitest';
-import {DynamicProperty, deepEqual} from '../ext/js/core.js';
+import {DynamicProperty} from '../ext/js/core/dynamic-property.js';
+import {deepEqual} from '../ext/js/core/utilities.js';
 
 /** */
 function testDynamicProperty() {

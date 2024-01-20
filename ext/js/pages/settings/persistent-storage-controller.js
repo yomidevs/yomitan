@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../../core.js';
+import {isObject} from '../../core/utilities.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 

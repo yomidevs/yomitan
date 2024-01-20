@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deferPromise, generateId, isObject} from '../core.js';
+import {deferPromise, generateId, isObject} from '../core/utilities.js';
 
 export class FrameClient {
     constructor() {

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {escapeRegExp, isObject} from '../core.js';
+import {escapeRegExp, isObject} from '../core/utilities.js';
 import {parseJson, readResponseJson} from '../core/json.js';
 import {TemplatePatcher} from '../templates/template-patcher.js';
 import {JsonSchema} from './json-schema.js';

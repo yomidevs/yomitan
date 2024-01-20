@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, generateId, isObject} from '../core.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {generateId, isObject} from '../core/utilities.js';
 
 /**
  * @augments EventDispatcher<import('display-history').Events>

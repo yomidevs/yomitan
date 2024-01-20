@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {generateId} from '../core.js';
+import {generateId} from '../core/utilities.js';
 import {yomitan} from '../yomitan.js';
 
 /**

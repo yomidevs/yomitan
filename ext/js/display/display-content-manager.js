@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection} from '../core.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {yomitan} from '../yomitan.js';
 

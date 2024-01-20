@@ -17,8 +17,9 @@
  */
 
 import {AnkiConnect} from '../../comm/anki-connect.js';
-import {EventListenerCollection, log} from '../../core.js';
+import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {ExtensionError} from '../../core/extension-error.js';
+import {log} from '../../core/logger.js';
 import {toError} from '../../core/to-error.js';
 import {AnkiUtil} from '../../data/anki-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';

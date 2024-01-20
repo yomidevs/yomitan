@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core.js';
+import {isObject} from '../core/utilities.js';
 import {parseJson} from '../core/json.js';
 import {yomitan} from '../yomitan.js';
 import {HotkeyUtil} from './hotkey-util.js';

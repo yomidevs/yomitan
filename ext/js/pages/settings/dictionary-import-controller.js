@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {log} from '../../core.js';
 import {ExtensionError} from '../../core/extension-error.js';
+import {log} from '../../core/logger.js';
 import {toError} from '../../core/to-error.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';

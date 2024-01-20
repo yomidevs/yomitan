@@ -386,7 +386,7 @@ export class DocumentUtil {
     /**
      * Adds a fullscreen change event listener. This function handles all of the browser-specific variants.
      * @param {EventListener} onFullscreenChanged The event callback.
-     * @param {?import('../core.js').EventListenerCollection} eventListenerCollection An optional `EventListenerCollection` to add the registration to.
+     * @param {?import('../core/event-listener-collection.js').EventListenerCollection} eventListenerCollection An optional `EventListenerCollection` to add the registration to.
      */
     static addFullscreenChangeEventListener(onFullscreenChanged, eventListenerCollection = null) {
         const target = document;

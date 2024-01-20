@@ -18,8 +18,8 @@
 
 import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
-import {EventListenerCollection} from '../core.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {yomitan} from '../yomitan.js';
 

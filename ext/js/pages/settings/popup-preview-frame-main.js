@@ -17,7 +17,7 @@
  */
 
 import {PopupFactory} from '../../app/popup-factory.js';
-import {log} from '../../core.js';
+import {log} from '../../core/logger.js';
 import {HotkeyHandler} from '../../input/hotkey-handler.js';
 import {yomitan} from '../../yomitan.js';
 import {PopupPreviewFrame} from './popup-preview-frame.js';

@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection, isObject} from '../../core.js';
+import {EventListenerCollection} from '../../core/event-listener-collection.js';
+import {isObject} from '../../core/utilities.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
 import {yomitan} from '../../yomitan.js';
