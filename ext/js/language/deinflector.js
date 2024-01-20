@@ -59,7 +59,7 @@ export class Deinflector {
             for (const [reason, variants] of this.reasons) {
                 for (const [kanaIn, kanaOut, rulesIn, rulesOut] of variants) {
                     if (
-                        (rules !== 0 && (rules & rulesIn) === 0) ||
+                        !Deinflector.rulesMatch(rules, rulesIn) ||
                         !term.endsWith(kanaIn) ||
                         (term.length - kanaIn.length + kanaOut.length) <= 0
                     ) {
@@ -123,5 +123,16 @@ export class Deinflector {
             value |= ruleBits;
         }
         return value;
+    }
+
+    /**
+     * If `currentRules` is `0`, then `nextRules` is ignored and `true` is returned.
+     * Otherwise, there must be at least one shared rule between `currentRules` and `nextRules`.
+     * @param {number} currentRules
+     * @param {number} nextRules
+     * @returns {boolean}
+     */
+    static rulesMatch(currentRules, nextRules) {
+        return currentRules === 0 || (currentRules & nextRules) !== 0;
     }
 }
