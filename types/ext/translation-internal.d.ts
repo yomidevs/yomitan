@@ -16,6 +16,7 @@
  */
 
 import type * as DictionaryDatabase from './dictionary-database';
+import type * as Dictionary from './dictionary';
 import type * as Translation from './translation';
 
 export type TextDeinflectionOptions = [
@@ -52,7 +53,7 @@ export enum DeinflectionRuleFlags {
 export type Deinflection = {
     term: string;
     rules: DeinflectionRuleFlags;
-    reasons: string[];
+    reasons: Dictionary.InflectionRuleChain;
 };
 
 export type DatabaseDeinflection = {
@@ -60,6 +61,6 @@ export type DatabaseDeinflection = {
     transformedText: string;
     deinflectedText: string;
     rules: DeinflectionRuleFlags;
-    reasons: string[];
+    inflectionRuleChainCandidates: Dictionary.InflectionRuleChainCandidate[];
     databaseEntries: DictionaryDatabase.TermEntry[];
 };

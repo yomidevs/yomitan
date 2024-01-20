@@ -185,6 +185,10 @@ class DictionaryEntry {
         const partsOfSpeechFilterSetting = querySelectorNotNull(modal.node, '.dictionary-parts-of-speech-filter-setting');
         /** @type {HTMLElement} */
         const partsOfSpeechFilterToggle = querySelectorNotNull(partsOfSpeechFilterSetting, '.dictionary-parts-of-speech-filter-toggle');
+        /** @type {HTMLElement} */
+        const useDeinflectionsSetting = querySelectorNotNull(modal.node, '.dictionary-use-deinflections-setting');
+        /** @type {HTMLElement} */
+        const useDeinflectionsToggle = querySelectorNotNull(useDeinflectionsSetting, '.dictionary-use-deinflections-toggle');
 
         titleElement.textContent = title;
         versionElement.textContent = `rev.${revision}`;
@@ -193,6 +197,9 @@ class DictionaryEntry {
         wildcardSupportedElement.checked = prefixWildcardsSupported;
         partsOfSpeechFilterSetting.hidden = !counts.terms.total;
         partsOfSpeechFilterToggle.dataset.setting = `dictionaries[${this._index}].partsOfSpeechFilter`;
+
+        useDeinflectionsSetting.hidden = !counts.terms.total;
+        useDeinflectionsToggle.dataset.setting = `dictionaries[${this._index}].useDeinflections`;
 
         this._setupDetails(detailsTableElement);
 
@@ -521,7 +528,8 @@ export class DictionaryController {
             enabled,
             allowSecondarySearches: false,
             definitionsCollapsible: 'not-collapsible',
-            partsOfSpeechFilter: true
+            partsOfSpeechFilter: true,
+            useDeinflections: true
         };
     }
 

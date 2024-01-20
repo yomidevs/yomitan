@@ -2428,7 +2428,8 @@ export class Backend {
                 index: enabledDictionaryMap.size,
                 priority: 0,
                 allowSecondarySearches: false,
-                partsOfSpeechFilter: true
+                partsOfSpeechFilter: true,
+                useDeinflections: true
             });
             excludeDictionaryDefinitions = new Set();
             excludeDictionaryDefinitions.add(mainDictionary);
@@ -2474,12 +2475,13 @@ export class Backend {
         const enabledDictionaryMap = new Map();
         for (const dictionary of options.dictionaries) {
             if (!dictionary.enabled) { continue; }
-            const {name, priority, allowSecondarySearches, partsOfSpeechFilter} = dictionary;
+            const {name, priority, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
             enabledDictionaryMap.set(name, {
                 index: enabledDictionaryMap.size,
                 priority,
                 allowSecondarySearches,
-                partsOfSpeechFilter
+                partsOfSpeechFilter,
+                useDeinflections
             });
         }
         return enabledDictionaryMap;

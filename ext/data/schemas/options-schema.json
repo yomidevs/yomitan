@@ -823,7 +823,8 @@
                                         "enabled",
                                         "allowSecondarySearches",
                                         "definitionsCollapsible",
-                                        "partsOfSpeechFilter"
+                                        "partsOfSpeechFilter",
+                                        "useDeinflections"
                                     ],
                                     "properties": {
                                         "name": {
@@ -848,6 +849,10 @@
                                             "default": "not-collapsible"
                                         },
                                         "partsOfSpeechFilter": {
+                                            "type": "boolean",
+                                            "default": true
+                                        },
+                                        "useDeinflections": {
                                             "type": "boolean",
                                             "default": true
                                         }

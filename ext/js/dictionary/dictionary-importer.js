@@ -160,7 +160,7 @@ export class DictionaryImporter {
             const glossaryList = entry.glossary;
             for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
                 const glossary = glossaryList[j];
-                if (typeof glossary !== 'object' || glossary === null) { continue; }
+                if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
                 glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
             }
             if ((i % formatProgressInterval) === 0) {

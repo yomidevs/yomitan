@@ -556,7 +556,8 @@ export class OptionsUtil {
             this._updateVersion20,
             this._updateVersion21,
             this._updateVersion22,
-            this._updateVersion23
+            this._updateVersion23,
+            this._updateVersion24
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -1151,6 +1152,20 @@ export class OptionsUtil {
         for (const {options: profileOptions} of options.profiles) {
             for (const dictionary of profileOptions.dictionaries) {
                 dictionary.partsOfSpeechFilter = true;
+            }
+        }
+    }
+
+    /**
+     * - Added dictionaries[].useDeinflections.
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion24(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v24.handlebars');
+
+        for (const {options: profileOptions} of options.profiles) {
+            for (const dictionary of profileOptions.dictionaries) {
+                dictionary.useDeinflections = true;
             }
         }
     }
