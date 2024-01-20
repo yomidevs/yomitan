@@ -177,6 +177,10 @@ export type FindTermDictionary = {
      * Whether this dictionary's part of speech rules should be used to filter results.
      */
     partsOfSpeechFilter: boolean;
+    /**
+     * Whether to use the deinflections from this dictionary.
+     */
+    useDeinflections: boolean;
 };
 
 export type TermEnabledDictionaryMap = Map<string, FindTermDictionary>;

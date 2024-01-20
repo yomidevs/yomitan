@@ -248,7 +248,7 @@ export class AnkiTemplateRenderer {
         const argCount = args.length;
         let value = this._computeValueString(options, context);
         if (argCount > 3) {
-            value = `${args.slice(3, -1).join('')}${value}`;
+            value = `${args.slice(3).join('')}${value}`;
         }
         if (argCount > 1) {
             try {
@@ -276,7 +276,7 @@ export class AnkiTemplateRenderer {
         const argCount = args.length;
         let value = this._computeValueString(options, context);
         if (argCount > 2) {
-            value = `${args.slice(2, -1).join('')}${value}`;
+            value = `${args.slice(2).join('')}${value}`;
         }
         if (argCount > 0) {
             try {
@@ -675,7 +675,7 @@ export class AnkiTemplateRenderer {
      * @type {import('template-renderer').HelperFunction<string>}
      */
     _formatGlossary(args, _context, options) {
-        const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossary]} */ (args);
+        const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossaryContent]} */ (args);
         const data = options.data.root;
         if (typeof content === 'string') { return this._stringToMultiLineHtml(this._escape(content)); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }

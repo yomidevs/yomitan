@@ -27,6 +27,7 @@ import {
 import {stringReverse} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
+import {toError} from '../core/to-error.js';
 import {MediaUtil} from '../media/media-util.js';
 
 const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
@@ -159,7 +160,7 @@ export class DictionaryImporter {
             const glossaryList = entry.glossary;
             for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
                 const glossary = glossaryList[j];
-                if (typeof glossary !== 'object' || glossary === null) { continue; }
+                if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
                 glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
             }
             if ((i % formatProgressInterval) === 0) {
@@ -206,7 +207,7 @@ export class DictionaryImporter {
                 try {
                     await dictionaryDatabase.bulkAdd(objectStoreName, entries, i, count);
                 } catch (e) {
-                    errors.push(e instanceof Error ? e : new Error(`${e}`));
+                    errors.push(toError(e));
                 }
 
                 this._progressData.index += count;

@@ -426,7 +426,8 @@ function createProfileOptionsUpdatedTestData1() {
                 enabled: true,
                 allowSecondarySearches: false,
                 definitionsCollapsible: 'not-collapsible',
-                partsOfSpeechFilter: true
+                partsOfSpeechFilter: true,
+                useDeinflections: true
             }
         ],
         parsing: {
@@ -603,7 +604,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 23,
+        version: 24,
         global: {
             database: {
                 prefixWildcardsSupported: false

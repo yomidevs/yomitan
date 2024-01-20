@@ -63,6 +63,7 @@ export type StructuredContentStyle = {
     borderWidth?: string;
     verticalAlign?: VerticalAlign;
     textAlign?: TextAlign;
+    textShadow?: string;
     margin?: string;
     marginTop?: number | string;
     marginLeft?: number | string;

@@ -80,7 +80,7 @@ export class Deinflector {
     /**
      * @param {string} term
      * @param {import('translation-internal').DeinflectionRuleFlags} rules
-     * @param {string[]} reasons
+     * @param {import('dictionary').InflectionRuleChain} reasons
      * @returns {import('translation-internal').Deinflection}
      */
     _createDeinflection(term, rules, reasons) {
