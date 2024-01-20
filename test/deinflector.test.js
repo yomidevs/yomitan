@@ -31,7 +31,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
  * @param {Deinflector} deinflector
  * @param {string} source
  * @param {string} expectedTerm
- * @param {string} expectedRule
+ * @param {string|undefined} expectedRule
  * @param {string[]|undefined} expectedReasons
  * @returns {{has: false, reasons: null, rules: null}|{has: true, reasons: string[], rules: number}}
  */
@@ -895,7 +895,9 @@ function testDeinflections() {
                 {term: 'くる', source: 'くさせられない', rule: 'vk'},
 
                 {term: 'かわいい', source: 'かわいげ',   rule: 'adj-i', reasons: ['-ge']},
-                {term: '可愛い',   source: 'かわいげ',   rule: 'adj-i', reasons: ['-ge']}
+                {term: '可愛い',   source: 'かわいげ',   rule: 'adj-i', reasons: ['-ge']},
+
+                {term: '食べる', source: '食べて', reasons: ['-te', 'progressive or perfect', 'masu stem']}
             ]
         },
         {
