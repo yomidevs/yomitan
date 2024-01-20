@@ -77,7 +77,7 @@ export class Yomitan extends EventDispatcher {
         /** @type {?string} */
         this._extensionUrlBase = null;
         try {
-            this._extensionUrlBase = chrome.runtime.getURL('/');
+            this._extensionUrlBase = this._webExtension.getUrl('/');
         } catch (e) {
             // NOP
         }
