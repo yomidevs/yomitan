@@ -1904,7 +1904,7 @@ export class Backend {
      * @param {import('application').ApiMessage<TName>} message
      */
     _sendMessageIgnoreResponse(message) {
-        this._webExtension.sendMessagePromise(message);
+        this._webExtension.sendMessageIgnoreResponse(message);
     }
 
     /**

@@ -77,6 +77,16 @@ export class WebExtension extends EventDispatcher {
     }
 
     /**
+     * @param {unknown} message
+     */
+    sendMessageIgnoreResponse(message) {
+        this.sendMessage(message, () => {
+            // Clear the last error
+            this.getLastError();
+        });
+    }
+
+    /**
      * @returns {?Error}
      */
     getLastError() {
