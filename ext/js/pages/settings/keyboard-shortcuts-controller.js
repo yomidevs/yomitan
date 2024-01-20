@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection} from '../../core.js';
+import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {DocumentUtil} from '../../dom/document-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';

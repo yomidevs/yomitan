@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {clone} from '../core.js';
+import {clone} from '../core/utilities.js';
 import {CacheMap} from '../general/cache-map.js';
 
 export class JsonSchemaError extends Error {

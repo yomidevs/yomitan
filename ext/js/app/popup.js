@@ -17,8 +17,11 @@
  */
 
 import {FrameClient} from '../comm/frame-client.js';
-import {DynamicProperty, EventDispatcher, EventListenerCollection, deepEqual} from '../core.js';
+import {DynamicProperty} from '../core/dynamic-property.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {deepEqual} from '../core/utilities.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {loadStyle} from '../dom/style-util.js';
 import {yomitan} from '../yomitan.js';

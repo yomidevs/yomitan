@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core.js';
+import {isObject} from '../core/utilities.js';
 
 /**
  * This class has some general utility functions for working with Anki data.

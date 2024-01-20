@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher} from '../core.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
 import {yomitan} from '../yomitan.js';
 
 /**

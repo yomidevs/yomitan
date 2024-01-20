@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core.js';
+import {isObject} from '../core/utilities.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {DictionaryDataUtil} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';

@@ -16,10 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, EventListenerCollection, log} from '../core.js';
 import {extendApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
+import {log} from '../core/logger.js';
 import {yomitan} from '../yomitan.js';
 
 /**

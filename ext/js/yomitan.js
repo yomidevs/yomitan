@@ -18,9 +18,11 @@
 
 import {API} from './comm/api.js';
 import {CrossFrameAPI} from './comm/cross-frame-api.js';
-import {EventDispatcher, deferPromise, log} from './core.js';
 import {createApiMap, invokeApiMapHandler} from './core/api-map.js';
+import {EventDispatcher} from './core/event-dispatcher.js';
 import {ExtensionError} from './core/extension-error.js';
+import {log} from './core/logger.js';
+import {deferPromise} from './core/utilities.js';
 
 /**
  * @returns {boolean}

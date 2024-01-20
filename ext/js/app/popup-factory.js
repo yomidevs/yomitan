@@ -17,7 +17,7 @@
  */
 
 import {FrameOffsetForwarder} from '../comm/frame-offset-forwarder.js';
-import {generateId} from '../core.js';
+import {generateId} from '../core/utilities.js';
 import {yomitan} from '../yomitan.js';
 import {PopupProxy} from './popup-proxy.js';
 import {PopupWindow} from './popup-window.js';

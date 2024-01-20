@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, log} from '../core.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {log} from '../core/logger.js';
 import {yomitan} from '../yomitan.js';
 
 /**

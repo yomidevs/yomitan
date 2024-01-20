@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core.js';
+import {isObject} from '../core/utilities.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 

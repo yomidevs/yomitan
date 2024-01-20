@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deferPromise} from '../core.js';
+import {deferPromise} from '../core/utilities.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {yomitan} from '../yomitan.js';
 import {AnkiUtil} from './anki-util.js';

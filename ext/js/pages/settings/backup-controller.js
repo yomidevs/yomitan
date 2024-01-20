@@ -17,9 +17,10 @@
  */
 
 import {Dexie} from '../../../lib/dexie.js';
-import {isObject, log} from '../../core.js';
 import {parseJson} from '../../core/json.js';
+import {log} from '../../core/logger.js';
 import {toError} from '../../core/to-error.js';
+import {isObject} from '../../core/utilities.js';
 import {OptionsUtil} from '../../data/options-util.js';
 import {ArrayBufferUtil} from '../../data/sandbox/array-buffer-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';

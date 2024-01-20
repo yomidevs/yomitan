@@ -16,8 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection, log, promiseAnimationFrame} from '../core.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {log} from '../core/logger.js';
+import {promiseAnimationFrame} from '../core/utilities.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceRange} from '../dom/text-source-range.js';

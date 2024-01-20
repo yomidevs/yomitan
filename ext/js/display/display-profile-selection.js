@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection, generateId} from '../core.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {generateId} from '../core/utilities.js';
 import {PanelElement} from '../dom/panel-element.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {yomitan} from '../yomitan.js';

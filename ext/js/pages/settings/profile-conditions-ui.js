@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, EventListenerCollection} from '../../core.js';
+import {EventDispatcher} from '../../core/event-dispatcher.js';
+import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {DocumentUtil} from '../../dom/document-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';

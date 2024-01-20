@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection} from '../core.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
 
 /**
  * Class used for loading and validating media during the dictionary import process.

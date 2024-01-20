@@ -24,7 +24,7 @@ import {
     ZipReader as ZipReader0,
     configure
 } from '../../lib/zip.js';
-import {stringReverse} from '../core.js';
+import {stringReverse} from '../core/utilities.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
 import {toError} from '../core/to-error.js';
