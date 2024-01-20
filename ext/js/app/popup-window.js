@@ -274,7 +274,7 @@ export class PopupWindow extends EventDispatcher {
      * @returns {Promise<import('display').DirectApiReturn<TName>|undefined>}
      */
     async _invoke(open, action, params) {
-        if (yomitan.isExtensionUnloaded) {
+        if (yomitan.webExtension.unloaded) {
             return void 0;
         }
 
@@ -290,7 +290,7 @@ export class PopupWindow extends EventDispatcher {
                     message
                 ));
             } catch (e) {
-                if (yomitan.isExtensionUnloaded) {
+                if (yomitan.webExtension.unloaded) {
                     open = false;
                 }
             }
