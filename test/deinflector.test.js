@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-multi-spaces */
-
 import fs from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
@@ -62,6 +60,7 @@ function hasTermReasons(deinflector, source, expectedTerm, expectedRule, expecte
 
 /** */
 function testDeinflections() {
+    /* eslint-disable no-multi-spaces */
     const data = [
         {
             valid: true,
@@ -931,6 +930,7 @@ function testDeinflections() {
             ]
         }
     ];
+    /* eslint-enable no-multi-spaces */
 
     /** @type {import('deinflector').ReasonsRaw} */
     const deinflectionReasons = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/deinflect.json'), {encoding: 'utf8'}));
