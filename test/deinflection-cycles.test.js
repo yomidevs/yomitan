@@ -108,11 +108,11 @@ describe('Deinflection data', () => {
         const dirname = pathDirname(fileURLToPath(import.meta.url));
 
         /** @type {import('deinflector').ReasonsRaw} */
-        const content = parseJson(readFileSync(join(dirname, '../ext/data/deinflect.json'), {encoding: 'utf8'}));
+        const deinflectionReasons = parseJson(readFileSync(join(dirname, '../ext/data/deinflect.json'), {encoding: 'utf8'}));
 
         /** @type {RuleNode[]} */
         const ruleNodes = [];
-        for (const [groupName, rules] of Object.entries(content)) {
+        for (const [groupName, rules] of Object.entries(deinflectionReasons)) {
             for (const rule of rules) {
                 ruleNodes.push(new RuleNode(groupName, rule));
             }
