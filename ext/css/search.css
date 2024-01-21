@@ -150,6 +150,9 @@ h1 {
 .search-option-pre-label {
     padding-right: 0.5em;
 }
+#search-option-profile-select {
+    margin-left: auto;
+}
 #query-parser-mode-container {
     flex: 1 1 auto;
 }

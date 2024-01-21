@@ -118,6 +118,12 @@ export class SearchDisplayController {
         if (displayOptions !== null) {
             this._onDisplayOptionsUpdated({options: displayOptions});
         }
+
+        const optionsFull = await yomitan.api.optionsGetFull();
+        this._optionsFull = optionsFull;
+        const {profiles, profileCurrent} = optionsFull;
+
+        this._updateProfileSelect(profiles, profileCurrent);
     }
 
     /**
@@ -314,6 +320,32 @@ export class SearchDisplayController {
     /** */
     _onModeChange() {
         this._updateClipboardMonitorEnabled();
+    }
+
+    /**
+     * @param {Event} event
+     */
+    _onProfileSelectChange(event) {
+        const node = /** @type {HTMLInputElement} */ (event.currentTarget);
+        const value = parseInt(node.value, 10);
+        if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= /** @type {import('settings').Options} */ (this._optionsFull).profiles.length) {
+            this._setPrimaryProfileIndex(value);
+        }
+    }
+
+    /**
+     * @param {number} value
+     */
+    async _setPrimaryProfileIndex(value) {
+        /** @type {import('settings-modifications').ScopedModificationSet} */
+        const modification = {
+            action: 'set',
+            path: 'profileCurrent',
+            value,
+            scope: 'global',
+            optionsContext: null
+        };
+        await yomitan.api.modifySettings([modification], 'action-popup');
     }
 
     /**
@@ -548,5 +580,29 @@ export class SearchDisplayController {
         }
         if (element instanceof HTMLElement && element.isContentEditable) { return true; }
         return false;
+    }
+
+    /**
+     * @param {import('settings').Profile[]} profiles
+     * @param {number} profileCurrent
+     */
+    _updateProfileSelect(profiles, profileCurrent) {
+        /** @type {HTMLSelectElement} */
+        const select = querySelectorNotNull(document, '#profile-select');
+        /** @type {HTMLElement} */
+        const optionGroup = querySelectorNotNull(document, '#profile-select-option-group');
+        const fragment = document.createDocumentFragment();
+        for (let i = 0, ii = profiles.length; i < ii; ++i) {
+            const {name} = profiles[i];
+            const option = document.createElement('option');
+            option.textContent = name;
+            option.value = `${i}`;
+            fragment.appendChild(option);
+        }
+        optionGroup.textContent = '';
+        optionGroup.appendChild(fragment);
+        select.value = `${profileCurrent}`;
+
+        select.addEventListener('change', this._onProfileSelectChange.bind(this), false);
     }
 }
