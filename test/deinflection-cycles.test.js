@@ -124,8 +124,6 @@ for (const [groupName, rules] of Object.entries(content)) {
     }
 }
 
-// TODO : Change this value
-const checkRules = false;
 /** @type {DeinflectionNode[]} */
 const deinflectionNodes = [];
 for (const ruleNode of ruleNodes) {
@@ -137,7 +135,7 @@ for (let i = 0; i < deinflectionNodes.length; ++i) {
     for (const ruleNode of ruleNodes) {
         const {kanaIn, kanaOut, rulesIn, rulesOut} = ruleNode.rule;
         if (
-            (checkRules && ruleNames.length !== 0 && getIntersection(ruleNames, rulesIn).length === 0) ||
+            (ruleNames.length !== 0 && getIntersection(ruleNames, rulesIn).length === 0) ||
             !text.endsWith(kanaIn) ||
             (text.length - kanaIn.length + kanaOut.length) <= 0
         ) {
