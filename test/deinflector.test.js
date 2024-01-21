@@ -38,7 +38,7 @@ function hasTermReasons(deinflector, source, expectedTerm, expectedRule, expecte
         if (term !== expectedTerm) { continue; }
         if (typeof expectedRule !== 'undefined') {
             const expectedFlags = Deinflector.rulesToRuleFlags([expectedRule]);
-            if (rules !== 0 && (rules & expectedFlags) !== expectedFlags) { continue; }
+            if (!Deinflector.rulesMatch(rules, expectedFlags)) { continue; }
         }
         let okay = true;
         if (typeof expectedReasons !== 'undefined') {
