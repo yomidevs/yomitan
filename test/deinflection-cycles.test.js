@@ -112,8 +112,8 @@ describe('Deinflection data', () => {
 
         /** @type {RuleNode[]} */
         const ruleNodes = [];
-        for (const [groupName, rules] of Object.entries(deinflectionReasons)) {
-            for (const rule of rules) {
+        for (const [groupName, reasonInfo] of Object.entries(deinflectionReasons)) {
+            for (const rule of reasonInfo) {
                 ruleNodes.push(new RuleNode(groupName, rule));
             }
         }
