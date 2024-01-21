@@ -26,7 +26,6 @@ import {createDictionaryArchive} from '../../dev/util.js';
 import {AnkiNoteDataCreator} from '../../ext/js/data/sandbox/anki-note-data-creator.js';
 import {DictionaryDatabase} from '../../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../../ext/js/dictionary/dictionary-importer.js';
-import {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util.js';
 import {Translator} from '../../ext/js/language/translator.js';
 import {chrome, fetch} from '../mocks/common.js';
 import {DictionaryImporterMediaLoader} from '../mocks/dictionary-importer-media-loader.js';
@@ -65,14 +64,13 @@ async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
     expect(errors.length).toEqual(0);
 
     // Setup translator
-    const japaneseUtil = new JapaneseUtil(null);
-    const translator = new Translator({japaneseUtil, database: dictionaryDatabase});
+    const translator = new Translator({database: dictionaryDatabase});
     /** @type {import('deinflector').ReasonsRaw} */
     const deinflectionReasons = parseJson(readFileSync(deinflectionReasonsPath, {encoding: 'utf8'}));
     translator.prepare(deinflectionReasons);
 
     // Assign properties
-    const ankiNoteDataCreator = new AnkiNoteDataCreator(japaneseUtil);
+    const ankiNoteDataCreator = new AnkiNoteDataCreator();
     return {translator, ankiNoteDataCreator};
 }
 

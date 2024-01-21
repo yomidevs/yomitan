@@ -48,11 +48,10 @@ export class Display extends EventDispatcher {
      * @param {number|undefined} tabId
      * @param {number|undefined} frameId
      * @param {import('display').DisplayPageType} pageType
-     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      * @param {import('../dom/document-focus-controller.js').DocumentFocusController} documentFocusController
      * @param {import('../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
-    constructor(tabId, frameId, pageType, japaneseUtil, documentFocusController, hotkeyHandler) {
+    constructor(tabId, frameId, pageType, documentFocusController, hotkeyHandler) {
         super();
         /** @type {number|undefined} */
         this._tabId = tabId;
@@ -60,8 +59,6 @@ export class Display extends EventDispatcher {
         this._frameId = frameId;
         /** @type {import('display').DisplayPageType} */
         this._pageType = pageType;
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
         /** @type {import('../dom/document-focus-controller.js').DocumentFocusController} */
         this._documentFocusController = documentFocusController;
         /** @type {import('../input/hotkey-handler.js').HotkeyHandler} */
@@ -90,7 +87,6 @@ export class Display extends EventDispatcher {
         this._hotkeyHelpController = new HotkeyHelpController();
         /** @type {DisplayGenerator} */
         this._displayGenerator = new DisplayGenerator({
-            japaneseUtil,
             contentManager: this._contentManager,
             hotkeyHelpController: this._hotkeyHelpController
         });
@@ -132,8 +128,7 @@ export class Display extends EventDispatcher {
         this._queryParserContainer = querySelectorNotNull(document, '#query-parser-container');
         /** @type {QueryParser} */
         this._queryParser = new QueryParser({
-            getSearchContext: this._getSearchContext.bind(this),
-            japaneseUtil
+            getSearchContext: this._getSearchContext.bind(this)
         });
         /** @type {HTMLElement} */
         this._contentScrollElement = querySelectorNotNull(document, '#content-scroll');
@@ -238,11 +233,6 @@ export class Display extends EventDispatcher {
     set queryParserVisible(value) {
         this._queryParserVisible = value;
         this._updateQueryParser();
-    }
-
-    /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
-    get japaneseUtil() {
-        return this._japaneseUtil;
     }
 
     /** @type {number} */

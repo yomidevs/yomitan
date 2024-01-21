@@ -23,14 +23,13 @@ import {JsonSchema} from '../data/json-schema.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';
 import {SimpleDOMParser} from '../dom/simple-dom-parser.js';
+import {isStringEntirelyKana} from '../language/japanese.js';
 
 export class AudioDownloader {
     /**
-     * @param {{japaneseUtil: import('../language/sandbox/japanese-util.js').JapaneseUtil, requestBuilder: RequestBuilder}} details
+     * @param {{requestBuilder: RequestBuilder}} details
      */
-    constructor({japaneseUtil, requestBuilder}) {
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
+    constructor({requestBuilder}) {
         /** @type {RequestBuilder} */
         this._requestBuilder = requestBuilder;
         /** @type {?JsonSchema} */
@@ -111,7 +110,7 @@ export class AudioDownloader {
 
     /** @type {import('audio-downloader').GetInfoHandler} */
     async _getInfoJpod101(term, reading) {
-        if (reading === term && this._japaneseUtil.isStringEntirelyKana(term)) {
+        if (reading === term && isStringEntirelyKana(term)) {
             reading = term;
             term = '';
         }

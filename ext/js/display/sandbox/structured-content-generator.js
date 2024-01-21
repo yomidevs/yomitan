@@ -16,17 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {isStringPartiallyJapanese} from '../../language/japanese.js';
+
 export class StructuredContentGenerator {
     /**
      * @param {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} contentManager
-     * @param {import('../../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      * @param {Document} document
      */
-    constructor(contentManager, japaneseUtil, document) {
+    constructor(contentManager, document) {
         /** @type {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} */
         this._contentManager = contentManager;
-        /** @type {import('../../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
         /** @type {Document} */
         this._document = document;
     }
@@ -164,7 +163,7 @@ export class StructuredContentGenerator {
         if (typeof content === 'string') {
             if (content.length > 0) {
                 container.appendChild(this._createTextNode(content));
-                if (language === null && this._japaneseUtil.isStringPartiallyJapanese(content)) {
+                if (language === null && isStringPartiallyJapanese(content)) {
                     container.lang = 'ja';
                 }
             }
