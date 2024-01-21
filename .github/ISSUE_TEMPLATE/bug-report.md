@@ -17,4 +17,4 @@ assignees: ''
 (e.g. 20.11.1.1)
 
 **Exported settings file**
-(If you think it might be relevant, create a settings export file using the _Export Settings_ button on the settings page.)
+(If you think it might be relevant, create a settings export file using the _Export Settings_ button on the settings page and attach it to this issue.)
