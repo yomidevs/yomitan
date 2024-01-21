@@ -18,6 +18,7 @@
 import {readFileSync} from 'fs';
 import {join, dirname as pathDirname} from 'path';
 import {fileURLToPath} from 'url';
+import {describe, test} from 'vitest';
 import {parseJson} from '../dev/json.js';
 import {Deinflector} from '../ext/js/language/deinflector.js';
 
@@ -102,58 +103,63 @@ function arraysAreEqual(rules1, rules2) {
     return true;
 }
 
-const dirname = pathDirname(fileURLToPath(import.meta.url));
+describe('Deinflection data', () => {
+    test('Check for cycles', ({expect}) => {
+        const dirname = pathDirname(fileURLToPath(import.meta.url));
 
-/** @type {import('deinflector').ReasonsRaw} */
-const content = parseJson(readFileSync(join(dirname, '../ext/data/deinflect.json'), {encoding: 'utf8'}));
+        /** @type {import('deinflector').ReasonsRaw} */
+        const content = parseJson(readFileSync(join(dirname, '../ext/data/deinflect.json'), {encoding: 'utf8'}));
 
-/** @type {RuleNode[]} */
-const ruleNodes = [];
-for (const [groupName, rules] of Object.entries(content)) {
-    for (const rule of rules) {
-        ruleNodes.push(new RuleNode(groupName, rule));
-    }
-}
-
-/** @type {DeinflectionNode[]} */
-const deinflectionNodes = [];
-for (const ruleNode of ruleNodes) {
-    deinflectionNodes.push(new DeinflectionNode(`?${ruleNode.rule.kanaIn}`, [], null, null));
-}
-for (let i = 0; i < deinflectionNodes.length; ++i) {
-    const deinflectionNode = deinflectionNodes[i];
-    const {text, ruleNames} = deinflectionNode;
-    for (const ruleNode of ruleNodes) {
-        const {kanaIn, kanaOut, rulesIn, rulesOut} = ruleNode.rule;
-        if (
-            !Deinflector.rulesMatch(Deinflector.rulesToRuleFlags(ruleNames), Deinflector.rulesToRuleFlags(rulesIn)) ||
-            !text.endsWith(kanaIn) ||
-            (text.length - kanaIn.length + kanaOut.length) <= 0
-        ) {
-            continue;
-        }
-
-        const newDeinflectionNode = new DeinflectionNode(
-            text.substring(0, text.length - kanaIn.length) + kanaOut,
-            rulesOut,
-            ruleNode,
-            deinflectionNode
-        );
-
-        // Cycle check
-        if (deinflectionNode.historyIncludes(newDeinflectionNode)) {
-            const stack = [];
-            for (const item of newDeinflectionNode.getHistory()) {
-                stack.push(
-                    item.ruleNode === null ?
-                    `${item.text} (start)` :
-                    `${item.text} (${item.ruleNode.groupName}, ${item.ruleNode.rule.rulesIn.join(',')}=>${item.ruleNode.rule.rulesOut.join(',')}, ${item.ruleNode.rule.kanaIn}=>${item.ruleNode.rule.kanaOut})`
-                );
+        /** @type {RuleNode[]} */
+        const ruleNodes = [];
+        for (const [groupName, rules] of Object.entries(content)) {
+            for (const rule of rules) {
+                ruleNodes.push(new RuleNode(groupName, rule));
             }
-            console.log(`Cycle detected:\n  ${stack.join('\n  ')}`);
-            continue;
         }
 
-        deinflectionNodes.push(newDeinflectionNode);
-    }
-}
+        /** @type {DeinflectionNode[]} */
+        const deinflectionNodes = [];
+        for (const ruleNode of ruleNodes) {
+            deinflectionNodes.push(new DeinflectionNode(`?${ruleNode.rule.kanaIn}`, [], null, null));
+        }
+        for (let i = 0; i < deinflectionNodes.length; ++i) {
+            const deinflectionNode = deinflectionNodes[i];
+            const {text, ruleNames} = deinflectionNode;
+            for (const ruleNode of ruleNodes) {
+                const {kanaIn, kanaOut, rulesIn, rulesOut} = ruleNode.rule;
+                if (
+                    !Deinflector.rulesMatch(Deinflector.rulesToRuleFlags(ruleNames), Deinflector.rulesToRuleFlags(rulesIn)) ||
+                    !text.endsWith(kanaIn) ||
+                    (text.length - kanaIn.length + kanaOut.length) <= 0
+                ) {
+                    continue;
+                }
+
+                const newDeinflectionNode = new DeinflectionNode(
+                    text.substring(0, text.length - kanaIn.length) + kanaOut,
+                    rulesOut,
+                    ruleNode,
+                    deinflectionNode
+                );
+
+                // Cycle check
+                if (deinflectionNode.historyIncludes(newDeinflectionNode)) {
+                    const stack = [];
+                    for (const item of newDeinflectionNode.getHistory()) {
+                        stack.push(
+                            item.ruleNode === null ?
+                            `${item.text} (start)` :
+                            `${item.text} (${item.ruleNode.groupName}, ${item.ruleNode.rule.rulesIn.join(',')}=>${item.ruleNode.rule.rulesOut.join(',')}, ${item.ruleNode.rule.kanaIn}=>${item.ruleNode.rule.kanaOut})`
+                        );
+                    }
+                    const message = `Cycle detected:\n  ${stack.join('\n  ')}`;
+                    expect.soft(true, message).toEqual(false);
+                    continue;
+                }
+
+                deinflectionNodes.push(newDeinflectionNode);
+            }
+        }
+    });
+});
