@@ -19,6 +19,7 @@
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {log} from '../core/logger.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {convertHiraganaToKatakana, convertKatakanaToHiragana, isStringEntirelyKana} from '../language/japanese.js';
 import {TextScanner} from '../language/text-scanner.js';
 import {yomitan} from '../yomitan.js';
 
@@ -29,12 +30,10 @@ export class QueryParser extends EventDispatcher {
     /**
      * @param {import('display').QueryParserConstructorDetails} details
      */
-    constructor({getSearchContext, japaneseUtil}) {
+    constructor({getSearchContext}) {
         super();
         /** @type {import('display').GetSearchContextCallback} */
         this._getSearchContext = getSearchContext;
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
         /** @type {string} */
         this._text = '';
         /** @type {?import('core').TokenObject} */
@@ -65,6 +64,10 @@ export class QueryParser extends EventDispatcher {
             searchKanji: false,
             searchOnClick: true
         });
+        /** @type {?(import('../language/japanese-wanakana.js'))} */
+        this._japaneseWanakanaModule = null;
+        /** @type {?Promise<import('../language/japanese-wanakana.js')>} */
+        this._japaneseWanakanaModuleImport = null;
     }
 
     /** @type {string} */
@@ -93,7 +96,7 @@ export class QueryParser extends EventDispatcher {
             this._queryParser.dataset.termSpacing = `${termSpacing}`;
         }
         if (typeof readingMode === 'string') {
-            this._readingMode = readingMode;
+            this._setReadingMode(readingMode);
         }
         if (typeof useInternalParser === 'boolean') {
             this._useInternalParser = useInternalParser;
@@ -346,15 +349,15 @@ export class QueryParser extends EventDispatcher {
     _convertReading(term, reading) {
         switch (this._readingMode) {
             case 'hiragana':
-                return this._japaneseUtil.convertKatakanaToHiragana(reading);
+                return convertKatakanaToHiragana(reading);
             case 'katakana':
-                return this._japaneseUtil.convertHiraganaToKatakana(reading);
+                return convertHiraganaToKatakana(reading);
             case 'romaji':
-                if (this._japaneseUtil.convertToRomajiSupported()) {
+                if (this._japaneseWanakanaModule !== null) {
                     if (reading.length > 0) {
-                        return this._japaneseUtil.convertToRomaji(reading);
-                    } else if (this._japaneseUtil.isStringEntirelyKana(term)) {
-                        return this._japaneseUtil.convertToRomaji(term);
+                        return this._japaneseWanakanaModule.convertToRomaji(reading);
+                    } else if (isStringEntirelyKana(term)) {
+                        return this._japaneseWanakanaModule.convertToRomaji(term);
                     }
                 }
                 return reading;
@@ -397,5 +400,22 @@ export class QueryParser extends EventDispatcher {
             if (node.nodeType === ELEMENT_NODE) { return /** @type {Element} */ (node); }
             node = node.parentNode;
         }
+    }
+
+    /**
+     * @param {import('settings').ParsingReadingMode} value
+     */
+    _setReadingMode(value) {
+        this._readingMode = value;
+        if (value === 'romaji') {
+            this._loadJapaneseWanakanaModule();
+        }
+    }
+
+    /** */
+    _loadJapaneseWanakanaModule() {
+        if (this._japaneseWanakanaModuleImport !== null) { return; }
+        this._japaneseWanakanaModuleImport = import('../language/japanese-wanakana.js');
+        this._japaneseWanakanaModuleImport.then((value) => { this._japaneseWanakanaModule = value; });
     }
 }

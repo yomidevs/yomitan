@@ -19,7 +19,6 @@
 import {log} from '../core/logger.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
-import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
 import {yomitan} from '../yomitan.js';
 import {DisplayAnki} from './display-anki.js';
 import {DisplayAudio} from './display-audio.js';
@@ -37,18 +36,16 @@ async function main() {
 
         const {tabId, frameId} = await yomitan.api.frameInformationGet();
 
-        const japaneseUtil = new JapaneseUtil(null);
-
         const hotkeyHandler = new HotkeyHandler();
         hotkeyHandler.prepare();
 
-        const display = new Display(tabId, frameId, 'popup', japaneseUtil, documentFocusController, hotkeyHandler);
+        const display = new Display(tabId, frameId, 'popup', documentFocusController, hotkeyHandler);
         await display.prepare();
 
         const displayAudio = new DisplayAudio(display);
         displayAudio.prepare();
 
-        const displayAnki = new DisplayAnki(display, displayAudio, japaneseUtil);
+        const displayAnki = new DisplayAnki(display, displayAudio);
         displayAnki.prepare();
 
         const displayProfileSelection = new DisplayProfileSelection(display);

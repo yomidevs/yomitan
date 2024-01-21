@@ -16,12 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
-import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
 import {Translator} from '../language/translator.js';
 
 /**
@@ -33,13 +31,10 @@ export class Offscreen {
      * Creates a new instance.
      */
     constructor() {
-        /** @type {JapaneseUtil} */
-        this._japaneseUtil = new JapaneseUtil(wanakana);
         /** @type {DictionaryDatabase} */
         this._dictionaryDatabase = new DictionaryDatabase();
         /** @type {Translator} */
         this._translator = new Translator({
-            japaneseUtil: this._japaneseUtil,
             database: this._dictionaryDatabase
         });
         /** @type {ClipboardReader} */

@@ -17,21 +17,13 @@
  */
 
 import {DictionaryDataUtil} from '../../dictionary/dictionary-data-util.js';
+import {distributeFurigana} from '../../language/japanese.js';
 
 /**
  * This class is used to convert the internal dictionary entry format to the
  * format used by Anki, for backwards compatibility.
  */
 export class AnkiNoteDataCreator {
-    /**
-     * Creates a new instance.
-     * @param {import('../../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil An instance of `JapaneseUtil`.
-     */
-    constructor(japaneseUtil) {
-        /** @type {import('../../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
-    }
-
     /**
      * Creates a compatibility representation of the specified data.
      * @param {string} marker The marker that is being used for template rendering.
@@ -860,7 +852,7 @@ export class AnkiNoteDataCreator {
     _getTermHeadwordFuriganaSegments(term, reading) {
         /** @type {import('anki-templates').FuriganaSegment[]} */
         const result = [];
-        for (const {text, reading: reading2} of this._japaneseUtil.distributeFurigana(term, reading)) {
+        for (const {text, reading: reading2} of distributeFurigana(term, reading)) {
             result.push({text, furigana: reading2});
         }
         return result;

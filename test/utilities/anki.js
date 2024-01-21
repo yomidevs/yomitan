@@ -16,7 +16,6 @@
  */
 
 import {AnkiNoteBuilder} from '../../ext/js/data/anki-note-builder.js';
-import {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util.js';
 import {AnkiTemplateRenderer} from '../../ext/js/templates/sandbox/anki-template-renderer.js';
 
 /**
@@ -130,7 +129,6 @@ export async function getTemplateRenderResults(dictionaryEntries, type, mode, te
 
     const ankiTemplateRenderer = new AnkiTemplateRenderer();
     await ankiTemplateRenderer.prepare();
-    const japaneseUtil = new JapaneseUtil(null);
     const clozePrefix = 'cloze-prefix';
     const clozeSuffix = 'cloze-suffix';
     const results = [];
@@ -146,7 +144,7 @@ export async function getTemplateRenderResults(dictionaryEntries, type, mode, te
                 }
                 break;
         }
-        const ankiNoteBuilder = new AnkiNoteBuilder(japaneseUtil, ankiTemplateRenderer.templateRenderer);
+        const ankiNoteBuilder = new AnkiNoteBuilder(ankiTemplateRenderer.templateRenderer);
         const context = {
             url: 'url:',
             sentence: {

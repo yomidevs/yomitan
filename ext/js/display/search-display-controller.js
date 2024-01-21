@@ -29,10 +29,9 @@ export class SearchDisplayController {
      * @param {number|undefined} frameId
      * @param {import('./display.js').Display} display
      * @param {import('./display-audio.js').DisplayAudio} displayAudio
-     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      * @param {import('./search-persistent-state-controller.js').SearchPersistentStateController} searchPersistentStateController
      */
-    constructor(tabId, frameId, display, displayAudio, japaneseUtil, searchPersistentStateController) {
+    constructor(tabId, frameId, display, displayAudio, searchPersistentStateController) {
         /** @type {number|undefined} */
         this._tabId = tabId;
         /** @type {number|undefined} */
@@ -71,7 +70,6 @@ export class SearchDisplayController {
         this._clipboardMonitorEnabled = false;
         /** @type {ClipboardMonitor} */
         this._clipboardMonitor = new ClipboardMonitor({
-            japaneseUtil,
             clipboardReader: {
                 getText: yomitan.api.clipboardGet.bind(yomitan.api)
             }

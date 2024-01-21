@@ -16,11 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../lib/wanakana.js';
 import {log} from '../core/logger.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
-import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
 import {yomitan} from '../yomitan.js';
 import {DisplayAnki} from './display-anki.js';
 import {DisplayAudio} from './display-audio.js';
@@ -45,21 +43,19 @@ async function main() {
 
         const {tabId, frameId} = await yomitan.api.frameInformationGet();
 
-        const japaneseUtil = new JapaneseUtil(wanakana);
-
         const hotkeyHandler = new HotkeyHandler();
         hotkeyHandler.prepare();
 
-        const display = new Display(tabId, frameId, 'search', japaneseUtil, documentFocusController, hotkeyHandler);
+        const display = new Display(tabId, frameId, 'search', documentFocusController, hotkeyHandler);
         await display.prepare();
 
         const displayAudio = new DisplayAudio(display);
         displayAudio.prepare();
 
-        const displayAnki = new DisplayAnki(display, displayAudio, japaneseUtil);
+        const displayAnki = new DisplayAnki(display, displayAudio);
         displayAnki.prepare();
 
-        const searchDisplayController = new SearchDisplayController(tabId, frameId, display, displayAudio, japaneseUtil, searchPersistentStateController);
+        const searchDisplayController = new SearchDisplayController(tabId, frameId, display, displayAudio, searchPersistentStateController);
         await searchDisplayController.prepare();
 
         display.initializeState();

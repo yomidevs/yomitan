@@ -16,20 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deferPromise} from '../core/utilities.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {deferPromise} from '../core/utilities.js';
+import {convertHiraganaToKatakana, convertKatakanaToHiragana} from '../language/japanese.js';
 import {yomitan} from '../yomitan.js';
 import {AnkiUtil} from './anki-util.js';
 
 export class AnkiNoteBuilder {
     /**
      * Initiate an instance of AnkiNoteBuilder.
-     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      * @param {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} templateRenderer
      */
-    constructor(japaneseUtil, templateRenderer) {
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
+    constructor(templateRenderer) {
         /** @type {RegExp} */
         this._markerPattern = AnkiUtil.cloneFieldMarkerPattern(true);
         /** @type {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} */
@@ -530,9 +528,9 @@ export class AnkiNoteBuilder {
     _convertReading(reading, readingMode) {
         switch (readingMode) {
             case 'hiragana':
-                return this._japaneseUtil.convertKatakanaToHiragana(reading);
+                return convertKatakanaToHiragana(reading);
             case 'katakana':
-                return this._japaneseUtil.convertHiraganaToKatakana(reading);
+                return convertHiraganaToKatakana(reading);
             default:
                 return reading;
         }

@@ -17,7 +17,6 @@
 
 import type {DisplayContentManager} from '../../ext/js/display/display-content-manager';
 import type {HotkeyHelpController} from '../../ext/js/input/hotkey-help-controller';
-import type {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util';
 import type * as Dictionary from './dictionary';
 import type * as Extension from './extension';
 import type * as Settings from './settings';
@@ -128,7 +127,6 @@ export type GetSearchContextCallback = TextScannerTypes.GetSearchContextCallback
 
 export type QueryParserConstructorDetails = {
     getSearchContext: GetSearchContextCallback;
-    japaneseUtil: JapaneseUtil;
 };
 
 export type QueryParserOptions = {
@@ -169,7 +167,6 @@ export type Events = {
 export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
 export type DisplayGeneratorConstructorDetails = {
-    japaneseUtil: JapaneseUtil;
     contentManager: DisplayContentManager;
     hotkeyHelpController?: HotkeyHelpController | null;
 };
