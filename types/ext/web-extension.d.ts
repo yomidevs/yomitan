@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type HtmlElementWithContentWindow = HTMLIFrameElement | HTMLFrameElement | HTMLObjectElement;
-
-export type ContentOrigin = {
-    tabId?: number;
-    frameId?: number;
+export type Events = {
+    unloaded: Record<string, never>;
 };
-
-export type ChromeRuntimeOnMessageCallback<TMessage = unknown> = (
-    message: TMessage,
-    sender: chrome.runtime.MessageSender,
-    sendResponse: ChromeRuntimeMessageSendResponseFunction,
-) => boolean | void;
-
-export type ChromeRuntimeMessageSendResponseFunction = (response?: unknown) => void;

@@ -226,7 +226,7 @@ export class Frontend {
         try {
             await this._updateOptionsInternal();
         } catch (e) {
-            if (!yomitan.isExtensionUnloaded) {
+            if (!yomitan.webExtension.unloaded) {
                 throw e;
             }
         }
@@ -368,7 +368,7 @@ export class Frontend {
         const scanningOptions = /** @type {import('settings').ProfileOptions} */ (this._options).scanning;
 
         if (error !== null) {
-            if (yomitan.isExtensionUnloaded) {
+            if (yomitan.webExtension.unloaded) {
                 if (textSource !== null && !passive) {
                     this._showExtensionUnloaded(textSource);
                 }
@@ -655,7 +655,7 @@ export class Frontend {
         try {
             return this._popup !== null && await this._popup.containsPoint(x, y);
         } catch (e) {
-            if (!yomitan.isExtensionUnloaded) {
+            if (!yomitan.webExtension.unloaded) {
                 throw e;
             }
             return false;
@@ -742,7 +742,7 @@ export class Frontend {
             Promise.resolve()
         );
         this._lastShowPromise.catch((error) => {
-            if (yomitan.isExtensionUnloaded) { return; }
+            if (yomitan.webExtension.unloaded) { return; }
             log.error(error);
         });
         return this._lastShowPromise;
