@@ -19,6 +19,7 @@ import {readFileSync} from 'fs';
 import {join, dirname as pathDirname} from 'path';
 import {fileURLToPath} from 'url';
 import {parseJson} from '../dev/json.js';
+import {Deinflector} from '../ext/js/language/deinflector.js';
 
 class DeinflectionNode {
     /**
@@ -101,16 +102,6 @@ function arraysAreEqual(rules1, rules2) {
     return true;
 }
 
-/**
- * @template [T=unknown]
- * @param {T[]} rules1
- * @param {T[]} rules2
- * @returns {T[]}
- */
-function getIntersection(rules1, rules2) {
-    return rules1.filter((item) => rules2.includes(item));
-}
-
 const dirname = pathDirname(fileURLToPath(import.meta.url));
 
 /** @type {import('deinflector').ReasonsRaw} */
@@ -135,7 +126,7 @@ for (let i = 0; i < deinflectionNodes.length; ++i) {
     for (const ruleNode of ruleNodes) {
         const {kanaIn, kanaOut, rulesIn, rulesOut} = ruleNode.rule;
         if (
-            (ruleNames.length !== 0 && getIntersection(ruleNames, rulesIn).length === 0) ||
+            !Deinflector.rulesMatch(Deinflector.rulesToRuleFlags(ruleNames), Deinflector.rulesToRuleFlags(rulesIn)) ||
             !text.endsWith(kanaIn) ||
             (text.length - kanaIn.length + kanaOut.length) <= 0
         ) {
