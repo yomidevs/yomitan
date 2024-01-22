@@ -554,7 +554,7 @@
                                                             "padding": "0.15em 0.2em",
                                                             "borderRadius": "100%",
                                                             "cursor": "help",
-                                                            "backgroundColor": "purple",
+                                                            "background": "radial-gradient(purple 55%, black 100%)",
                                                             "color": "white"
                                                         },
                                                         "content": "稀"
@@ -609,11 +609,10 @@
                                                         "textAlign": "center"
                                                     },
                                                     "content": {
-                                                        "tag": "span",
+                                                        "tag": "div",
                                                         "title": "rarely used form",
                                                         "style": {
-                                                            "padding": "0.15em 0.2em",
-                                                            "borderRadius": "100%",
+                                                            "clipPath": "circle()",
                                                             "cursor": "help",
                                                             "backgroundColor": "purple",
                                                             "color": "white"

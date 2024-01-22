@@ -270,6 +270,9 @@
                 "color": {
                     "type": "string"
                 },
+                "background": {
+                    "type": "string"
+                },
                 "backgroundColor": {
                     "type": "string"
                 },
@@ -308,6 +311,9 @@
                     "type": "string"
                 },
                 "borderWidth": {
+                    "type": "string"
+                },
+                "clipPath": {
                     "type": "string"
                 },
                 "verticalAlign": {

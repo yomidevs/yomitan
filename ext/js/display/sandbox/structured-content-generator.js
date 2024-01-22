@@ -344,6 +344,7 @@ export class StructuredContentGenerator {
             fontWeight,
             fontSize,
             color,
+            background,
             backgroundColor,
             textDecorationLine,
             textDecorationStyle,
@@ -352,6 +353,7 @@ export class StructuredContentGenerator {
             borderStyle,
             borderRadius,
             borderWidth,
+            clipPath,
             verticalAlign,
             textAlign,
             textShadow,
@@ -374,6 +376,7 @@ export class StructuredContentGenerator {
         if (typeof fontWeight === 'string') { style.fontWeight = fontWeight; }
         if (typeof fontSize === 'string') { style.fontSize = fontSize; }
         if (typeof color === 'string') { style.color = color; }
+        if (typeof background === 'string') { style.background = background; }
         if (typeof backgroundColor === 'string') { style.backgroundColor = backgroundColor; }
         if (typeof verticalAlign === 'string') { style.verticalAlign = verticalAlign; }
         if (typeof textAlign === 'string') { style.textAlign = textAlign; }
@@ -393,6 +396,7 @@ export class StructuredContentGenerator {
         if (typeof borderStyle === 'string') { style.borderStyle = borderStyle; }
         if (typeof borderRadius === 'string') { style.borderRadius = borderRadius; }
         if (typeof borderWidth === 'string') { style.borderWidth = borderWidth; }
+        if (typeof clipPath === 'string') { style.clipPath = clipPath; }
         if (typeof margin === 'string') { style.margin = margin; }
         if (typeof marginTop === 'number') { style.marginTop = `${marginTop}em`; }
         if (typeof marginTop === 'string') { style.marginTop = marginTop; }
