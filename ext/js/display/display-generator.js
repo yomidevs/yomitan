@@ -361,37 +361,12 @@ export class DisplayGenerator {
      * @returns {?HTMLElement}
      */
     _createInflectionRuleChain(inflectionRuleChain) {
-        const {source, inflectionRules} = inflectionRuleChain;
+        const {inflectionRules} = inflectionRuleChain;
         if (!Array.isArray(inflectionRules) || inflectionRules.length === 0) { return null; }
         const fragment = this._instantiate('inflection-rule-chain');
 
-        const sourceIcon = this._getInflectionSourceIcon(source);
-
-        fragment.appendChild(sourceIcon);
-
         this._appendMultiple(fragment, this._createTermInflection.bind(this), inflectionRules);
         return fragment;
-    }
-
-    /**
-     * @param {import('dictionary').InflectionSource} source
-     * @returns {HTMLElement}
-     */
-    _getInflectionSourceIcon(source) {
-        const icon = document.createElement('span');
-        icon.classList.add('inflection-source-icon');
-        icon.dataset.inflectionSource = source;
-        switch (source) {
-            case 'dictionary':
-                icon.title = 'Dictionary Deinflection';
-                return icon;
-            case 'algorithm':
-                icon.title = 'Algorithm Deinflection';
-                return icon;
-            case 'both':
-                icon.title = 'Dictionary and Algorithm Deinflection';
-                return icon;
-        }
     }
 
     /**
