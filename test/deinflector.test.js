@@ -124,8 +124,8 @@ function testDeinflections() {
                 {term: '食べる', source: '食べよう',         rule: 'v1', reasons: ['volitional']},
                 // ['causative passive']
                 {term: '食べる', source: '食べとく',         rule: 'v1', reasons: ['-toku']},
-                {term: '食べる', source: '食べている', rule: 'v1', reasons: ['-te', 'progressive or perfect']},
-                {term: '食べる', source: '食べておる', rule: 'v1', reasons: ['-te', 'progressive or perfect']},
+                {term: '食べる', source: '食べている',       rule: 'v1', reasons: ['-te', 'progressive or perfect']},
+                {term: '食べる', source: '食べておる',       rule: 'v1', reasons: ['-te', 'progressive or perfect']},
                 {term: '食べる', source: '食べてる',         rule: 'v1', reasons: ['-te', 'progressive or perfect']},
                 {term: '食べる', source: '食べとる',         rule: 'v1', reasons: ['-te', 'progressive or perfect']},
                 {term: '食べる', source: '食べてしまう',     rule: 'v1', reasons: ['-te', '-shimau']}
