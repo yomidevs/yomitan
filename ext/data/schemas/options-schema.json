@@ -728,12 +728,6 @@
                             "translation": {
                                 "type": "object",
                                 "required": [
-                                    "convertHalfWidthCharacters",
-                                    "convertNumericCharacters",
-                                    "convertAlphabeticCharacters",
-                                    "convertHiraganaToKatakana",
-                                    "convertKatakanaToHiragana",
-                                    "collapseEmphaticSequences",
                                     "textReplacements",
                                     "searchResolution"
                                 ],
@@ -745,36 +739,6 @@
                                             "word"
                                         ],
                                         "default": "letter"
-                                    },
-                                    "convertHalfWidthCharacters": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "false"
-                                    },
-                                    "convertNumericCharacters": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "false"
-                                    },
-                                    "convertAlphabeticCharacters": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "false"
-                                    },
-                                    "convertHiraganaToKatakana": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "false"
-                                    },
-                                    "convertKatakanaToHiragana": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "variant"
-                                    },
-                                    "collapseEmphaticSequences": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "full"],
-                                        "default": "false"
                                     },
                                     "textReplacements": {
                                         "type": "object",

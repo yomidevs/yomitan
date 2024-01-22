@@ -30,7 +30,7 @@ export type TextTransformation = {
     description: string;
     options: {
         false: 'Disabled';
-        [key: string]: string | undefined;
+        [key: string]: string;
     };
     transform: (str: string) => string;
 };

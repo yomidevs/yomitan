@@ -408,16 +408,22 @@ function createProfileOptionsUpdatedTestData1() {
             ]
         },
         translation: {
-            convertHalfWidthCharacters: 'false',
-            convertNumericCharacters: 'false',
-            convertAlphabeticCharacters: 'false',
-            convertHiraganaToKatakana: 'false',
-            convertKatakanaToHiragana: 'variant',
-            collapseEmphaticSequences: 'false',
             searchResolution: 'letter',
             textReplacements: {
                 searchOriginal: true,
                 groups: []
+            }
+        },
+        languages: {
+            ja: {
+                textTransformations: {
+                    convertHalfWidthCharacters: 'false',
+                    convertNumericCharacters: 'false',
+                    convertAlphabeticCharacters: 'false',
+                    convertHiraganaToKatakana: 'false',
+                    convertKatakanaToHiragana: 'variant',
+                    collapseEmphaticSequences: 'false'
+                }
             }
         },
         dictionaries: [

@@ -64,15 +64,17 @@ export class TextTransformationsController {
     /** */
     _clearSettingsItems() {
         const settingsItems = document.querySelectorAll('.text-transformation');
-        settingsItems.forEach((transformation) => transformation.remove());
+        for (const transformation of settingsItems) {
+            transformation.remove();
+        }
     }
 
     /** */
     _renderSettingsItems() {
-        this._transformations.forEach((transformation) => {
+        for (const transformation of this._transformations) {
             const settingsItem = this._createSettingsItem(transformation);
             this._container.appendChild(settingsItem);
-        });
+        }
     }
 
     /**
@@ -151,12 +153,12 @@ export class TextTransformationsController {
         const select = document.createElement('select');
         select.setAttribute('data-setting', `languages.${this._language}.textTransformations.${transformation.id}`);
 
-        Object.entries(transformation.options).forEach(([optionValue, optionLabel]) => {
+        for (const [optionValue, optionLabel] of Object.entries(transformation.options)) {
             const optionElement = document.createElement('option');
             optionElement.value = optionValue;
             optionElement.textContent = optionLabel;
             select.appendChild(optionElement);
-        });
+        }
 
         return select;
     }

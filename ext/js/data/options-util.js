@@ -524,7 +524,7 @@ export class OptionsUtil {
             if (result instanceof Promise) { await result; }
         }
 
-        options.version = Math.min(targetVersion, 24);
+        options.version = targetVersion;
         return options;
     }
 
@@ -1189,17 +1189,16 @@ export class OptionsUtil {
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.general.language = 'ja';
 
-            // Refactor text transformations
             profileOptions.languages = {
                 ja: {
                     textTransformations: {}
                 }
             };
 
-            textTransformations.forEach((transformation) => {
+            for (const transformation of textTransformations) {
                 profileOptions.languages.ja.textTransformations[transformation] = profileOptions.translation[transformation];
-                // delete profileOptions.translation[transformation];
-            });
+                delete profileOptions.translation[transformation];
+            }
         }
     }
 
