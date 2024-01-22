@@ -73,11 +73,11 @@ function testDeinflections() {
                 {term: '愛しい', source: '愛しかったら',           rule: 'adj-i', reasons: ['-tara']},
                 {term: '愛しい', source: '愛しかったり',           rule: 'adj-i', reasons: ['-tari']},
                 {term: '愛しい', source: '愛しくて',               rule: 'adj-i', reasons: ['-te']},
-                {term: '愛しい', source: '愛しく', rule: 'adj-i', reasons: ['adv']},
-                {term: '愛しい', source: '愛しくない', rule: 'adj-i', reasons: ['negative']},
+                {term: '愛しい', source: '愛しく',                 rule: 'adj-i', reasons: ['adv']},
+                {term: '愛しい', source: '愛しくない',             rule: 'adj-i', reasons: ['negative']},
                 {term: '愛しい', source: '愛しさ',                 rule: 'adj-i', reasons: ['noun']},
                 {term: '愛しい', source: '愛しかった',             rule: 'adj-i', reasons: ['past']},
-                {term: '愛しい', source: '愛しくありません',       rule: 'adj-i', reasons: ['polite negative']},
+                {term: '愛しい', source: '愛しくありません',      rule: 'adj-i', reasons: ['polite negative']},
                 {term: '愛しい', source: '愛しくありませんでした', rule: 'adj-i', reasons: ['polite past negative']},
                 {term: '愛しい', source: '愛しき',                 rule: 'adj-i', reasons: ['-ki']},
                 {term: '愛しい', source: '愛しげ',                 rule: 'adj-i', reasons: ['-ge']}
@@ -1008,14 +1008,15 @@ function testDeinflections() {
     const deinflector = new Deinflector(deinflectionReasons);
 
     describe('deinflections', () => {
-        for (const {valid, tests} of data) {
+        // for (const {valid, tests} of data) {
+        describe.each(data)('$category', ({valid, tests}) => {
             for (const {source, term, rule, reasons} of tests) {
                 const {has} = hasTermReasons(deinflector, source, term, rule, reasons);
                 let message = `${source} ${valid ? 'has' : 'does not have'} term candidate ${JSON.stringify(term)}`;
                 if (typeof rule !== 'undefined') {
                     message += ` with rule ${JSON.stringify(rule)}`;
                 }
-                if (typeof reasons !== 'undefined') {
+                if (reasons !== null) {
                     message += (typeof rule !== 'undefined' ? ' and' : ' with');
                     message += ` reasons ${JSON.stringify(reasons)}`;
                 }
@@ -1023,7 +1024,7 @@ function testDeinflections() {
                     expect(has).toStrictEqual(valid);
                 });
             }
-        }
+        });
     });
 }
 
