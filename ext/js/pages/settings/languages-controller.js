@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 
@@ -28,10 +29,13 @@ export class LanguagesController {
         this._settingsController = settingsController;
         /** @type {import('language').Language[]} */
         this._languages = [];
+        /** @type {EventListenerCollection} */
+        this._eventListeners = new EventListenerCollection();
     }
 
     /** */
     async prepare() {
+        await this._updateOptions();
         this._languages = await yomitan.api.getLanguages();
         this._languages.sort((a, b) => a.iso.localeCompare(b.iso));
         this._fillSelect();
@@ -46,6 +50,22 @@ export class LanguagesController {
             option.text = `(${iso}) ${name} ${flag}`;
             selectElement.appendChild(option);
         }
+        selectElement.addEventListener('settingChanged', this._updateOptions.bind(this), false);
+    }
+
+    /** */
+    async _updateOptions() {
+        const options = await this._settingsController.getOptions();
+        const {general: {language}} = options;
+        if (!options.languages[language]) {
+            await this._settingsController.modifyProfileSettings([{
+                action: 'set',
+                path: 'languages',
+                value: {
+                    ...options.languages,
+                    [language]: {}
+                }
+            }]);
+        }
     }
 }
-

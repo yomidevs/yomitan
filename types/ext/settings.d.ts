@@ -97,6 +97,7 @@ export type ProfileOptions = {
     inputs: InputsOptions;
     clipboard: ClipboardOptions;
     accessibility: AccessibilityOptions;
+    languages: LanguagesOptions;
 };
 
 export type GeneralOptions = {
@@ -340,6 +341,18 @@ export type ClipboardOptions = {
 
 export type AccessibilityOptions = {
     forceGoogleDocsHtmlRendering: boolean;
+};
+
+type TextTransformations = {
+    [id: string]: string;
+};
+
+type LanguageProperties = {
+    textTransformations?: TextTransformations;
+};
+
+type LanguagesOptions = {
+    [iso: string]: LanguageProperties;
 };
 
 export type PreventMiddleMouseOptions = {

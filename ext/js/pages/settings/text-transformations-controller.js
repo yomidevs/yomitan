@@ -40,6 +40,9 @@ export class TextTransformationsController {
     async prepare() {
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
+        const languageSelect = querySelectorNotNull(document, '#language-select');
+        languageSelect.addEventListener('settingChanged', this._updateOptions.bind(this), false);
+
         await this._updateOptions();
     }
 
@@ -49,61 +52,113 @@ export class TextTransformationsController {
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     async _onOptionsChanged({options}) {
-        console.log('TextTransformationsController._onOptionsChanged', options);
         if (options.general.language !== this._language) {
             this._language = options.general.language;
 
-            const settingsItems = document.querySelectorAll('.text-transformation');
-            settingsItems.forEach((transformation) => {
-                transformation.remove();
-            });
-
+            this._clearSettingsItems();
             this._transformations = await yomitan.api.getTextTransformations(this._language);
-            this._transformations.forEach((transformation) => {
-                const settingsItem = document.createElement('div');
-                settingsItem.classList.add('settings-item');
-                settingsItem.classList.add('text-transformation');
-
-                const innerWrappableDiv = document.createElement('div');
-                innerWrappableDiv.classList.add('settings-item-inner', 'settings-item-inner-wrappable');
-
-                const leftSide = document.createElement('div');
-                leftSide.classList.add('settings-item-left');
-
-                const label = document.createElement('div');
-                label.classList.add('settings-item-label');
-                label.textContent = transformation.name;
-
-                const description = document.createElement('div');
-                description.classList.add('settings-item-description');
-                description.textContent = transformation.description;
-
-                leftSide.appendChild(label);
-                leftSide.appendChild(description);
-
-                const rightSide = document.createElement('div');
-                rightSide.classList.add('settings-item-right');
-
-                const select = document.createElement('select');
-                select.setAttribute('data-setting', `languages.${this._language}.textTransformations.${transformation.id}`);
-
-                Object.entries(transformation.options).forEach(([optionValue, optionLabel]) => {
-                    const optionElement = document.createElement('option');
-                    optionElement.value = optionValue;
-                    optionElement.textContent = optionLabel;
-                    select.appendChild(optionElement);
-                });
-
-                rightSide.appendChild(select);
-
-                innerWrappableDiv.appendChild(leftSide);
-                innerWrappableDiv.appendChild(rightSide);
-
-                settingsItem.appendChild(innerWrappableDiv);
-
-                this._container.appendChild(settingsItem);
-            });
+            this._renderSettingsItems();
         }
+    }
+
+    /** */
+    _clearSettingsItems() {
+        const settingsItems = document.querySelectorAll('.text-transformation');
+        settingsItems.forEach((transformation) => transformation.remove());
+    }
+
+    /** */
+    _renderSettingsItems() {
+        this._transformations.forEach((transformation) => {
+            const settingsItem = this._createSettingsItem(transformation);
+            this._container.appendChild(settingsItem);
+        });
+    }
+
+    /**
+     * @param {import('language').TextTransformation} transformation
+     * @returns {HTMLElement}
+     */
+    _createSettingsItem(transformation) {
+        const settingsItem = document.createElement('div');
+        settingsItem.classList.add('settings-item', 'text-transformation');
+
+        const innerWrappableDiv = document.createElement('div');
+        innerWrappableDiv.classList.add('settings-item-inner', 'settings-item-inner-wrappable');
+
+        innerWrappableDiv.appendChild(this._createLeftSide(transformation));
+        innerWrappableDiv.appendChild(this._createRightSide(transformation));
+
+        settingsItem.appendChild(innerWrappableDiv);
+
+        return settingsItem;
+    }
+
+    /**
+     * @param {import('language').TextTransformation} transformation
+     * @returns {HTMLElement}
+     */
+    _createLeftSide(transformation) {
+        const leftSide = document.createElement('div');
+        leftSide.classList.add('settings-item-left');
+
+        leftSide.appendChild(this._createLabel(transformation));
+        leftSide.appendChild(this._createDescription(transformation));
+
+        return leftSide;
+    }
+
+    /**
+     * @param {import('language').TextTransformation} transformation
+     * @returns {HTMLElement}
+     */
+    _createLabel(transformation) {
+        const label = document.createElement('div');
+        label.classList.add('settings-item-label');
+        label.textContent = transformation.name;
+        return label;
+    }
+
+    /**
+     * @param {import('language').TextTransformation} transformation
+     * @returns {HTMLElement}
+     */
+    _createDescription(transformation) {
+        const description = document.createElement('div');
+        description.classList.add('settings-item-description');
+        description.textContent = transformation.description;
+        return description;
+    }
+
+    /**
+     * @param {import('language').TextTransformation} transformation
+     * @returns {HTMLElement}
+     */
+    _createRightSide(transformation) {
+        const rightSide = document.createElement('div');
+        rightSide.classList.add('settings-item-right');
+
+        rightSide.appendChild(this._createSelect(transformation));
+
+        return rightSide;
+    }
+
+    /**
+     * @param {import('language').TextTransformation} transformation
+     * @returns {HTMLSelectElement}
+     */
+    _createSelect(transformation) {
+        const select = document.createElement('select');
+        select.setAttribute('data-setting', `languages.${this._language}.textTransformations.${transformation.id}`);
+
+        Object.entries(transformation.options).forEach(([optionValue, optionLabel]) => {
+            const optionElement = document.createElement('option');
+            optionElement.value = optionValue;
+            optionElement.textContent = optionLabel;
+            select.appendChild(optionElement);
+        });
+
+        return select;
     }
 
 
