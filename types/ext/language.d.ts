@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {TextSourceMap} from '../../ext/js/general/text-source-map.js';
+
 export type LanguageProperties = {
     name: string;
     iso: string;
@@ -24,15 +26,14 @@ export type LanguageProperties = {
 
 export type LanguagePropertiesArray = LanguageProperties[];
 
-export type TextTransformation = {
+export type TextTransformationOption<T = unknown> = [string, string, T[]];
+
+export type TextTransformation<T = unknown> = {
     id: string;
     name: string;
     description: string;
-    options: {
-        false: 'Disabled';
-        [key: string]: string;
-    };
-    transform: (str: string) => string;
+    options: TextTransformationOption<T>[];
+    transform: (str: string, setting: T, sourceMap?: TextSourceMap) => string;
 };
 
 export type LanguageFeatures = {

@@ -343,16 +343,16 @@ export type AccessibilityOptions = {
     forceGoogleDocsHtmlRendering: boolean;
 };
 
-type TextTransformations = {
+export type TextTransformationsOptions = {
     [id: string]: string;
 };
 
-type LanguageProperties = {
-    textTransformations?: TextTransformations;
+export type LanguageOptions = {
+    textTransformations?: TextTransformationsOptions;
 };
 
-type LanguagesOptions = {
-    [iso: string]: LanguageProperties;
+export type LanguagesOptions = {
+    [iso: string]: LanguageOptions;
 };
 
 export type PreventMiddleMouseOptions = {

@@ -15,18 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @type {import('language').TextTransformationOption[]} */
+export const basicTextTransformationOptions = [
+    ['false', 'Disabled', [false]],
+    ['true', 'Enabled', [true]],
+    ['variant', 'Use both variants', [false, true]]
+];
+
 /** @type {import('language').TextTransformation} */
 export const decapitalize = {
     id: 'decapitalize',
     name: 'Decapitalize text',
     description: 'CAPITALIZED TEXT → capitalized text',
-    options: {
-        false: 'Disabled',
-        true: 'Enabled',
-        variant: 'Use both variants'
-    },
-
-    transform: (str) => str.toLowerCase()
+    options: basicTextTransformationOptions,
+    transform: (str, setting) => setting ? str.toLowerCase() : str
 };
 
 /** @type {import('language').TextTransformation} */
@@ -34,10 +36,7 @@ export const capitalizeFirstLetter = {
     id: 'capitalizeFirstLetter',
     name: 'Capitalize first letter',
     description: 'lowercase text → Lowercase text',
-    options: {
-        false: 'Disabled',
-        true: 'Enabled',
-        variant: 'Use both variants'
-    },
-    transform: (str) => str.charAt(0).toUpperCase() + str.slice(1)
+    options: basicTextTransformationOptions,
+    transform: (str, setting) => setting ? str.charAt(0).toUpperCase() + str.slice(1) : str
 };
+

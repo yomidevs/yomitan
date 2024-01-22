@@ -19,9 +19,8 @@
 import {RegexUtil} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {Deinflector} from './deinflector.js';
-import {convertAlphabeticToKana} from './languages/ja/japanese-wanakana.js';
-import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth, isCodePointJapanese} from './languages/ja/japanese.js';
-
+import {LanguageUtil} from './language-util.js';
+import {isCodePointJapanese} from './languages/ja/japanese.js';
 /**
  * Class which finds term and kanji dictionary entries for text.
  */
@@ -30,7 +29,9 @@ export class Translator {
      * Creates a new Translator instance.
      * @param {import('translator').ConstructorDetails} details The details for the class.
      */
-    constructor({database}) {
+    constructor({languageUtil, database}) {
+        /** @type {LanguageUtil} */
+        this._languageUtil = languageUtil;
         /** @type {import('../dictionary/dictionary-database.js').DictionaryDatabase} */
         this._database = database;
         /** @type {?Deinflector} */
@@ -425,43 +426,41 @@ export class Translator {
      * @returns {import('translation-internal').DatabaseDeinflection[]}
      */
     _getAlgorithmDeinflections(text, options) {
-        /** @type {import('translation-internal').TextDeinflectionOptionsArrays} */
-        const textOptionVariantArray = [
-            this._getTextReplacementsVariants(options),
-            this._getTextOptionEntryVariants(options.convertHalfWidthCharacters),
-            this._getTextOptionEntryVariants(options.convertNumericCharacters),
-            this._getTextOptionEntryVariants(options.convertAlphabeticCharacters),
-            this._getTextOptionEntryVariants(options.convertHiraganaToKatakana),
-            this._getTextOptionEntryVariants(options.convertKatakanaToHiragana),
-            this._getCollapseEmphaticOptions(options)
-        ];
+        const textTransformations = this._getTextTransformations(options);
+
+        const textTransformationsVectorSpace = new Map();
+        for (const [id, transformation] of textTransformations) {
+            textTransformationsVectorSpace.set(id, this._getTextTransformationVariants(transformation));
+        }
+
+        // const variantVectorSpace = {
+        //     textReplacements: this._getTextReplacementsVariants(options),
+        //     ...textTransformationsVectorSpace
+        // };
+
+        const variantVectorSpace = new Map([
+            ['textReplacements', this._getTextReplacementsVariants(options)],
+            ...textTransformationsVectorSpace
+        ]);
 
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const deinflections = [];
         const used = new Set();
-        for (const [textReplacements, halfWidth, numeric, alphabetic, katakana, hiragana, [collapseEmphatic, collapseEmphaticFull]] of /** @type {Generator<import('translation-internal').TextDeinflectionOptions, void, unknown>} */ (this._getArrayVariants(textOptionVariantArray))) {
+
+        for (const arrayVariant of this._generateArrayVariants(variantVectorSpace)) {
+            const textReplacements = /** @type {import('translation').FindTermsTextReplacement[] | null} */ (arrayVariant.get('textReplacements'));
+
             let text2 = text;
             const sourceMap = new TextSourceMap(text2);
+
             if (textReplacements !== null) {
                 text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
             }
-            if (halfWidth) {
-                text2 = convertHalfWidthKanaToFullWidth(text2, sourceMap);
-            }
-            if (numeric) {
-                text2 = convertNumericToFullWidth(text2);
-            }
-            if (alphabetic) {
-                text2 = convertAlphabeticToKana(text2, sourceMap);
-            }
-            if (katakana) {
-                text2 = convertHiraganaToKatakana(text2);
-            }
-            if (hiragana) {
-                text2 = convertKatakanaToHiragana(text2);
-            }
-            if (collapseEmphatic) {
-                text2 = collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
+
+            for (const textTransformation of textTransformations.values()) {
+                const {id, transform} = textTransformation;
+                const setting = arrayVariant.get(id);
+                text2 = transform(text2, setting, sourceMap);
             }
 
             for (
@@ -501,6 +500,31 @@ export class Translator {
     }
 
     /**
+     * @param {import('translation').FindTermsOptions} options
+     * @returns {Map<string, import('translation-internal').TextTransformation>}
+     */
+    _getTextTransformations(options) {
+        const {textTransformationsOptions, language} = options;
+        const textTransformationsData = this._languageUtil.getTextTransformations(language);
+
+        /** @type {Map<string, import('translation-internal').TextTransformation>} */
+        const textTransformations = new Map();
+
+        for (const transformation of textTransformationsData) {
+            const {id} = transformation;
+            const value = textTransformationsOptions[id];
+            if (value) {
+                textTransformations.set(id, {
+                    ...transformation,
+                    setting: value
+                });
+            }
+        }
+
+        return textTransformations;
+    }
+
+    /**
      * @param {string} text
      * @param {TextSourceMap} sourceMap
      * @param {import('translation').FindTermsTextReplacement[]} replacements
@@ -529,15 +553,16 @@ export class Translator {
     }
 
     /**
-     * @param {import('translation').FindTermsVariantMode} value
-     * @returns {boolean[]}
+     * @param {import('translation-internal').TextTransformation} transformation
+     * @returns {unknown[]}
      */
-    _getTextOptionEntryVariants(value) {
-        switch (value) {
-            case 'true': return [true];
-            case 'variant': return [false, true];
-            default: return [false];
+    _getTextTransformationVariants(transformation) {
+        for (const [optionValue, , optionSetting] of transformation.options) {
+            if (optionValue === transformation.setting) {
+                return optionSetting;
+            }
         }
+        return [false];
     }
 
     /**
@@ -1345,26 +1370,32 @@ export class Translator {
     }
 
     /**
-     * @param {[...args: unknown[][]]} arrayVariants
-     * @yields {[...args: unknown[]]}
-     * @returns {Generator<unknown[], void, unknown>}
+     * @param {Map<string, unknown[]>} arrayVariants
+     * @yields {Map<string, unknown>}
+     * @returns {Generator<Map<string, unknown>, void, void>}
      */
-    *_getArrayVariants(arrayVariants) {
-        const ii = arrayVariants.length;
-
-        let total = 1;
-        for (let i = 0; i < ii; ++i) {
-            total *= arrayVariants[i].length;
+    *_generateArrayVariants(arrayVariants) {
+        const variantKeys = Array.from(arrayVariants.keys());
+        const entryVariantLengths = [];
+        for (const key of variantKeys) {
+            const entryVariants = /** @type {unknown[]} */ (arrayVariants.get(key));
+            entryVariantLengths.push(entryVariants.length);
         }
+        const totalVariants = entryVariantLengths.reduce((acc, length) => acc * length, 1);
 
-        for (let a = 0; a < total; ++a) {
-            const variant = [];
-            let index = a;
-            for (let i = 0; i < ii; ++i) {
-                const entryVariants = arrayVariants[i];
-                variant.push(entryVariants[index % entryVariants.length]);
-                index = Math.floor(index / entryVariants.length);
+        for (let variantIndex = 0; variantIndex < totalVariants; ++variantIndex) {
+            /** @type {Map<string, unknown>} */
+            const variant = new Map();
+            let remainingIndex = variantIndex;
+
+            for (let keyIndex = 0; keyIndex < variantKeys.length; ++keyIndex) {
+                const key = variantKeys[keyIndex];
+                const entryVariants = /** @type {unknown[]} */ (arrayVariants.get(key));
+                const entryIndex = remainingIndex % entryVariants.length;
+                variant.set(key, entryVariants[entryIndex]);
+                remainingIndex = Math.floor(remainingIndex / entryVariants.length);
             }
+
             yield variant;
         }
     }

@@ -26,6 +26,7 @@ import {createDictionaryArchive} from '../../dev/util.js';
 import {AnkiNoteDataCreator} from '../../ext/js/data/sandbox/anki-note-data-creator.js';
 import {DictionaryDatabase} from '../../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../../ext/js/dictionary/dictionary-importer.js';
+import {LanguageUtil} from '../../ext/js/language/language-util.js';
 import {Translator} from '../../ext/js/language/translator.js';
 import {chrome, fetch} from '../mocks/common.js';
 import {DictionaryImporterMediaLoader} from '../mocks/dictionary-importer-media-loader.js';
@@ -54,6 +55,8 @@ async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
     const dictionaryImporter = new DictionaryImporter(dictionaryImporterMediaLoader);
     const dictionaryDatabase = new DictionaryDatabase();
     await dictionaryDatabase.prepare();
+    const languageUtil = new LanguageUtil();
+    languageUtil.prepare();
 
     const {errors} = await dictionaryImporter.importDictionary(
         dictionaryDatabase,
@@ -64,7 +67,7 @@ async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
     expect(errors.length).toEqual(0);
 
     // Setup translator
-    const translator = new Translator({database: dictionaryDatabase});
+    const translator = new Translator({database: dictionaryDatabase, languageUtil});
     /** @type {import('deinflector').ReasonsRaw} */
     const deinflectionReasons = parseJson(readFileSync(deinflectionReasonsPath, {encoding: 'utf8'}));
     translator.prepare(deinflectionReasons);

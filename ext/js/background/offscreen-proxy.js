@@ -149,6 +149,38 @@ export class DictionaryDatabaseProxy {
     }
 }
 
+export class LanguageUtilProxy {
+    /**
+     * @param {OffscreenProxy} offscreen
+     */
+    constructor(offscreen) {
+        /** @type {OffscreenProxy} */
+        this._offscreen = offscreen;
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async prepare() {
+        await this._offscreen.sendMessagePromise({action: 'languageUtilPrepareOffscreen'});
+    }
+
+    /**
+     * @param {string} iso
+     * @returns {Promise<import('language').TextTransformation[]>}
+     */
+    async getTextTransformations(iso) {
+        return this._offscreen.sendMessagePromise({action: 'getTextTransformationsOffscreen', params: {iso}});
+    }
+
+    /**
+     * @returns {Promise<import('language').Language[]>}
+     */
+    async getLanguages() {
+        return this._offscreen.sendMessagePromise({action: 'getLanguagesOffscreen'});
+    }
+}
+
 export class TranslatorProxy {
     /**
      * @param {OffscreenProxy} offscreen

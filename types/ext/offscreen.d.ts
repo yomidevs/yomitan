@@ -22,6 +22,8 @@ import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
+import type * as Language from './language';
+
 import type {
     ApiMap as BaseApiMap,
     ApiMapInit as BaseApiMapInit,
@@ -49,6 +51,20 @@ type ApiSurface = {
             targets: DictionaryDatabase.MediaRequest[];
         };
         return: DictionaryDatabase.Media<string>[];
+    };
+    languageUtilPrepareOffscreen: {
+        params: void;
+        return: void;
+    };
+    getLanguagesOffscreen: {
+        params: void;
+        return: Language.Language[];
+    };
+    getTextTransformationsOffscreen: {
+        params: {
+            iso: string;
+        };
+        return: Language.TextTransformation[];
     };
     translatorPrepareOffscreen: {
         params: {

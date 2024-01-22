@@ -29,6 +29,7 @@
             "error": ["../types/ext/error"],
             "event-listener-collection": ["../types/ext/event-listener-collection"],
             "japanese-util": ["../types/ext/japanese-util"],
+            "language": ["../types/ext/language"],
             "ext/json-schema": ["../types/ext/json-schema"],
             "log": ["../types/ext/log"],
             "settings": ["../types/ext/settings"],

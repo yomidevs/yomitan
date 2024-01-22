@@ -153,7 +153,7 @@ export class TextTransformationsController {
         const select = document.createElement('select');
         select.setAttribute('data-setting', `languages.${this._language}.textTransformations.${transformation.id}`);
 
-        for (const [optionValue, optionLabel] of Object.entries(transformation.options)) {
+        for (const [optionValue, optionLabel] of transformation.options) {
             const optionElement = document.createElement('option');
             optionElement.value = optionValue;
             optionElement.textContent = optionLabel;
@@ -163,10 +163,7 @@ export class TextTransformationsController {
         return select;
     }
 
-
-    /**
-     *
-     */
+    /** */
     async _updateOptions() {
         const options = await this._settingsController.getOptions();
         const optionsContext = this._settingsController.getOptionsContext();

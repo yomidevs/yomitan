@@ -18,8 +18,11 @@
 import type {DictionaryDatabase} from '../../ext/js/dictionary/dictionary-database';
 import type * as Dictionary from './dictionary';
 import type * as DictionaryDatabaseTypes from './dictionary-database';
+import type {LanguageUtil} from '../../ext/js/language/language-util';
 
 export type ConstructorDetails = {
+    /** An instance of LanguageUtil. */
+    languageUtil: LanguageUtil;
     /** An instance of DictionaryDatabase. */
     database: DictionaryDatabase;
 };

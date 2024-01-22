@@ -37,7 +37,7 @@ import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapan
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {MediaUtil} from '../media/media-util.js';
-import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
+import {ClipboardReaderProxy, DictionaryDatabaseProxy, LanguageUtilProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
 import {ProfileConditionsUtil} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
@@ -53,8 +53,6 @@ export class Backend {
     constructor(webExtension) {
         /** @type {import('../extension/web-extension.js').WebExtension} */
         this._webExtension = webExtension;
-        /** @type {LanguageUtil} */
-        this._languageUtil = new LanguageUtil();
         /** @type {Environment} */
         this._environment = new Environment();
         /** @type {AnkiConnect} */
@@ -67,8 +65,11 @@ export class Backend {
             this._offscreen = null;
             /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
             this._dictionaryDatabase = new DictionaryDatabase();
+            /** @type {LanguageUtil|LanguageUtilProxy} */
+            this._languageUtil = new LanguageUtil();
             /** @type {Translator|TranslatorProxy} */
             this._translator = new Translator({
+                languageUtil: this._languageUtil,
                 database: this._dictionaryDatabase
             });
             /** @type {ClipboardReader|ClipboardReaderProxy} */
@@ -83,6 +84,8 @@ export class Backend {
             this._offscreen = new OffscreenProxy(webExtension);
             /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
             this._dictionaryDatabase = new DictionaryDatabaseProxy(this._offscreen);
+            /** @type {LanguageUtil|LanguageUtilProxy} */
+            this._languageUtil = new LanguageUtilProxy(this._offscreen);
             /** @type {Translator|TranslatorProxy} */
             this._translator = new TranslatorProxy(this._offscreen);
             /** @type {ClipboardReader|ClipboardReaderProxy} */
@@ -286,15 +289,15 @@ export class Backend {
                 log.error(e);
             }
 
-            /** @type {import('deinflector').ReasonsRaw} */
-            const deinflectionReasons = await fetchJson('/data/deinflect.json');
-            this._translator.prepare(deinflectionReasons);
-
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
             this._options = await this._optionsUtil.load();
 
             await this._languageUtil.prepare();
+
+            /** @type {import('deinflector').ReasonsRaw} */
+            const deinflectionReasons = await fetchJson('/data/deinflect.json');
+            this._translator.prepare(deinflectionReasons);
 
             this._applyOptions('background');
 
@@ -2384,7 +2387,7 @@ export class Backend {
         if (typeof deinflect !== 'boolean') { deinflect = true; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
-            general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder},
+            general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language},
             scanning: {alphanumeric},
             translation: {
                 convertHalfWidthCharacters,
@@ -2397,6 +2400,7 @@ export class Backend {
                 searchResolution
             }
         } = options;
+        const textTransformationsOptions = options.languages[language].textTransformations || {};
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
         let excludeDictionaryDefinitions = null;
         if (mode === 'merge' && !enabledDictionaryMap.has(mainDictionary)) {
@@ -2426,7 +2430,9 @@ export class Backend {
             searchResolution,
             textReplacements,
             enabledDictionaryMap,
-            excludeDictionaryDefinitions
+            excludeDictionaryDefinitions,
+            language,
+            textTransformationsOptions
         };
     }
 

@@ -15,75 +15,65 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {basicTextTransformationOptions} from '../textTransformations.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
-import {convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth} from './japanese.js';
+import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth} from './japanese.js';
 
-/** @type {import('language').TextTransformation[]} */
+/** @type {import('language').TextTransformation<boolean[]>}*/
+const collapseEmphaticSequencesTransform = {
+    id: 'collapseEmphaticSequences',
+    name: 'Collapse emphatic character sequences',
+    description: 'すっっごーーい → すっごーい / すごい',
+    options: [
+        ['false', 'Disabled', [[false, false]]],
+        ['true', 'Collapse into single character', [[false, false], [true, false]]],
+        ['full', 'Remove all characters', [[false, false], [true, false], [true, true]]]
+    ],
+    transform: (str, setting, sourceMap) => {
+        const [collapseEmphatic, collapseEmphaticFull] = setting;
+        if (collapseEmphatic) {
+            str = collapseEmphaticSequences(str, collapseEmphaticFull, sourceMap);
+        }
+        return str;
+    }
+};
+
+/** @type {import('language').TextTransformation<any>[]} */
 export const textTransformations = [
     {
         id: 'convertHalfWidthCharacters',
         name: 'Convert half width characters to full width',
         description: 'ﾖﾐﾁｬﾝ → ヨミチャン',
-        options: {
-            false: 'Disabled',
-            true: 'Enabled',
-            variant: 'Use both variants'
-        },
-        transform: convertHalfWidthKanaToFullWidth
+        options: basicTextTransformationOptions,
+        transform: (str, setting, sourceMap) => setting ? convertHalfWidthKanaToFullWidth(str, sourceMap) : str
     },
     {
         id: 'convertNumericCharacters',
         name: 'Convert numeric characters to full width',
         description: '1234 → １２３４',
-        options: {
-            false: 'Disabled',
-            true: 'Enabled',
-            variant: 'Use both variants'
-        },
-        transform: convertNumericToFullWidth
+        options: basicTextTransformationOptions,
+        transform: (str, setting) => setting ? convertNumericToFullWidth(str) : str
     },
     {
         id: 'convertAlphabeticCharacters',
         name: 'Convert alphabetic characters to hiragana',
         description: 'yomichan → よみちゃん',
-        options: {
-            false: 'Disabled',
-            true: 'Enabled',
-            variant: 'Use both variants'
-        },
-        transform: convertAlphabeticToKana
+        options: basicTextTransformationOptions,
+        transform: (str, setting, sourceMap) => setting ? convertAlphabeticToKana(str, sourceMap) : str
     },
     {
         id: 'convertHiraganaToKatakana',
         name: 'Convert hiragana to katakana',
         description: 'よみちゃん → ヨミチャン',
-        options: {
-            false: 'Disabled',
-            true: 'Enabled',
-            variant: 'Use both variants'
-        },
-        transform: convertHiraganaToKatakana
+        options: basicTextTransformationOptions,
+        transform: (str, setting) => setting ? convertHiraganaToKatakana(str) : str
     },
     {
         id: 'convertKatakanaToHiragana',
         name: 'Convert katakana to hiragana',
         description: 'ヨミチャン → よみちゃん',
-        options: {
-            false: 'Disabled',
-            true: 'Enabled',
-            variant: 'Use both variants'
-        },
-        transform: convertKatakanaToHiragana
+        options: basicTextTransformationOptions,
+        transform: (str, setting) => setting ? convertKatakanaToHiragana(str) : str
     },
-    {
-        id: 'collapseEmphaticSequences',
-        name: 'Collapse emphatic character sequences',
-        description: 'すっっごーーい → すっごーい / すごい',
-        options: {
-            false: 'Disabled',
-            true: 'Collapse into single character',
-            full: 'Remove all characters'
-        },
-        transform: /** @type {(str: string) => string} */((str) => str)
-    }
+    collapseEmphaticSequencesTransform
 ];
