@@ -21,7 +21,7 @@
 import fs from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import {expect, test, describe, vi} from 'vitest';
+import {describe, expect, test, vi} from 'vitest';
 import {OptionsUtil} from '../ext/js/data/options-util.js';
 import {TemplatePatcher} from '../ext/js/templates/template-patcher.js';
 import {chrome, fetch} from './mocks/common.js';
@@ -243,6 +243,7 @@ function createProfileOptionsUpdatedTestData1() {
     return {
         general: {
             enable: true,
+            language: 'ja',
             resultOutputMode: 'group',
             debugInfo: false,
             maxResults: 32,
@@ -604,7 +605,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 24,
+        version: 25,
         global: {
             database: {
                 prefixWildcardsSupported: false

@@ -95,6 +95,11 @@
             "type": "AjvSchema"
         },
         {
+            "path": "ext/js/language/languages/index.json",
+            "typeFile": "types/ext/language.d.ts",
+            "type": "LanguagePropertiesArray"
+        },
+        {
             "path": "test/data/translator-test-inputs.json",
             "typeFile": "types/test/translator.d.ts",
             "type": "TranslatorTestInputs",

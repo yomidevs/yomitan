@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isStringPartiallyJapanese} from '../../language/japanese.js';
+import {isStringPartiallyJapanese} from '../../language/languages/ja/japanese.js';
 
 export class StructuredContentGenerator {
     /**

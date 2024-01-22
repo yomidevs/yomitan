@@ -17,7 +17,7 @@
  */
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
-import {isStringPartiallyJapanese} from '../language/japanese.js';
+import {isStringPartiallyJapanese} from '../language/languages/ja/japanese.js';
 
 /**
  * @augments EventDispatcher<import('clipboard-monitor').Events>

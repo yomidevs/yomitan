@@ -18,8 +18,8 @@
 
 import {describe, expect, test} from 'vitest';
 import {TextSourceMap} from '../ext/js/general/text-source-map.js';
-import * as jpw from '../ext/js/language/japanese-wanakana.js';
-import * as jp from '../ext/js/language/japanese.js';
+import * as jpw from '../ext/js/language/languages/ja/japanese-wanakana.js';
+import * as jp from '../ext/js/language/languages/ja/japanese.js';
 
 /** */
 function testIsCodePointKanji() {

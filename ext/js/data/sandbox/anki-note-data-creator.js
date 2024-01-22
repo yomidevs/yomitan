@@ -17,7 +17,7 @@
  */
 
 import {DictionaryDataUtil} from '../../dictionary/dictionary-data-util.js';
-import {distributeFurigana} from '../../language/japanese.js';
+import {distributeFurigana} from '../../language/languages/ja/japanese.js';
 
 /**
  * This class is used to convert the internal dictionary entry format to the

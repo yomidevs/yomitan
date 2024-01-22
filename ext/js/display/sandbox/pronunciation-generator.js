@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {getKanaDiacriticInfo, isMoraPitchHigh} from '../../language/japanese.js';
+import {getKanaDiacriticInfo, isMoraPitchHigh} from '../../language/languages/ja/japanese.js';
 
 export class PronunciationGenerator {
     /**

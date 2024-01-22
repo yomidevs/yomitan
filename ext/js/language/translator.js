@@ -19,8 +19,8 @@
 import {RegexUtil} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {Deinflector} from './deinflector.js';
-import {convertAlphabeticToKana} from './japanese-wanakana.js';
-import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth, isCodePointJapanese} from './japanese.js';
+import {convertAlphabeticToKana} from './languages/ja/japanese-wanakana.js';
+import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth, isCodePointJapanese} from './languages/ja/japanese.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.

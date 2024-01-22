@@ -18,7 +18,7 @@
 
 import {ExtensionError} from '../core/extension-error.js';
 import {deferPromise} from '../core/utilities.js';
-import {convertHiraganaToKatakana, convertKatakanaToHiragana} from '../language/japanese.js';
+import {convertHiraganaToKatakana, convertKatakanaToHiragana} from '../language/languages/ja/japanese.js';
 import {yomitan} from '../yomitan.js';
 import {AnkiUtil} from './anki-util.js';
 

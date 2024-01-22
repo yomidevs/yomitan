@@ -101,6 +101,7 @@ export type ProfileOptions = {
 
 export type GeneralOptions = {
     enable: boolean;
+    language: string;
     resultOutputMode: ResultOutputMode;
     debugInfo: boolean;
     maxResults: number;

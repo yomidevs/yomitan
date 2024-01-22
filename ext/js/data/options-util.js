@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {escapeRegExp, isObject} from '../core/utilities.js';
 import {parseJson, readResponseJson} from '../core/json.js';
+import {escapeRegExp, isObject} from '../core/utilities.js';
 import {TemplatePatcher} from '../templates/template-patcher.js';
 import {JsonSchema} from './json-schema.js';
 
@@ -524,7 +524,7 @@ export class OptionsUtil {
             if (result instanceof Promise) { await result; }
         }
 
-        options.version = targetVersion;
+        options.version = Math.min(targetVersion, 24);
         return options;
     }
 
@@ -557,7 +557,8 @@ export class OptionsUtil {
             this._updateVersion21,
             this._updateVersion22,
             this._updateVersion23,
-            this._updateVersion24
+            this._updateVersion24,
+            this._updateVersion25
         ];
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
@@ -1169,6 +1170,39 @@ export class OptionsUtil {
             }
         }
     }
+
+    /**
+     * - Added general.language
+     * - Modularized text transformations
+     * @type {import('options-util').UpdateFunction}
+     */
+    _updateVersion25(options) {
+        const textTransformations = [
+            'convertHalfWidthCharacters',
+            'convertNumericCharacters',
+            'convertAlphabeticCharacters',
+            'convertHiraganaToKatakana',
+            'convertKatakanaToHiragana',
+            'collapseEmphaticSequences'
+        ];
+
+        for (const {options: profileOptions} of options.profiles) {
+            profileOptions.general.language = 'ja';
+
+            // Refactor text transformations
+            profileOptions.languages = {
+                ja: {
+                    textTransformations: {}
+                }
+            };
+
+            textTransformations.forEach((transformation) => {
+                profileOptions.languages.ja.textTransformations[transformation] = profileOptions.translation[transformation];
+                // delete profileOptions.translation[transformation];
+            });
+        }
+    }
+
 
     /**
      * @param {string} url

@@ -19,7 +19,7 @@
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {log} from '../core/logger.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
-import {convertHiraganaToKatakana, convertKatakanaToHiragana, isStringEntirelyKana} from '../language/japanese.js';
+import {convertHiraganaToKatakana, convertKatakanaToHiragana, isStringEntirelyKana} from '../language/languages/ja/japanese.js';
 import {TextScanner} from '../language/text-scanner.js';
 import {yomitan} from '../yomitan.js';
 
@@ -64,9 +64,9 @@ export class QueryParser extends EventDispatcher {
             searchKanji: false,
             searchOnClick: true
         });
-        /** @type {?(import('../language/japanese-wanakana.js'))} */
+        /** @type {?(import('../language/languages/ja/japanese-wanakana.js'))} */
         this._japaneseWanakanaModule = null;
-        /** @type {?Promise<import('../language/japanese-wanakana.js')>} */
+        /** @type {?Promise<import('../language/languages/ja/japanese-wanakana.js')>} */
         this._japaneseWanakanaModuleImport = null;
     }
 
@@ -415,7 +415,7 @@ export class QueryParser extends EventDispatcher {
     /** */
     _loadJapaneseWanakanaModule() {
         if (this._japaneseWanakanaModuleImport !== null) { return; }
-        this._japaneseWanakanaModuleImport = import('../language/japanese-wanakana.js');
+        this._japaneseWanakanaModuleImport = import('../language/languages/ja/japanese-wanakana.js');
         this._japaneseWanakanaModuleImport.then((value) => { this._japaneseWanakanaModule = value; });
     }
 }

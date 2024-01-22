@@ -26,6 +26,7 @@ import type * as DictionaryDatabase from './dictionary-database';
 import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
 import type * as Extension from './extension';
+import type * as Language from './language';
 import type * as Log from './log';
 import type * as Settings from './settings';
 import type * as SettingsModifications from './settings-modifications';
@@ -379,6 +380,16 @@ type ApiSurface = {
     requestBackendReadySignal: {
         params: void;
         return: boolean;
+    };
+    getLanguages: {
+        params: void;
+        return: Language.Language[];
+    };
+    getTextTransformations: {
+        params: {
+            language: string;
+        };
+        return: Language.TextTransformation[];
     };
 };
 

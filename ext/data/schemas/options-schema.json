@@ -74,13 +74,15 @@
                             "sentenceParsing",
                             "inputs",
                             "clipboard",
-                            "accessibility"
+                            "accessibility",
+                            "languages"
                         ],
                         "properties": {
                             "general": {
                                 "type": "object",
                                 "required": [
                                     "enable",
+                                    "language",
                                     "resultOutputMode",
                                     "debugInfo",
                                     "maxResults",
@@ -125,6 +127,10 @@
                                     "enable": {
                                         "type": "boolean",
                                         "default": true
+                                    },
+                                    "language": {
+                                        "type": "string",
+                                        "default": "ja"
                                     },
                                     "resultOutputMode": {
                                         "type": "string",
@@ -808,6 +814,27 @@
                                                         }
                                                     }
                                                 }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "languages": {
+                                "type": "object",
+                                "propertyNames": {
+                                    "type": "string"
+                                },
+                                "additionalProperties": {
+                                    "type": "object",
+                                    "properties": {
+                                        "textTransformations": {
+                                            "type": "object",
+                                            "propertyNames": {
+                                                "type": "string"
+                                            },
+                                            "additionalProperties": {
+                                                "type": "string",
+                                                "default": "false"
                                             }
                                         }
                                     }

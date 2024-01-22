@@ -31,6 +31,7 @@ import {DictionaryImportController} from './dictionary-import-controller.js';
 import {ExtensionKeyboardShortcutController} from './extension-keyboard-shortcuts-controller.js';
 import {GenericSettingController} from './generic-setting-controller.js';
 import {KeyboardShortcutController} from './keyboard-shortcuts-controller.js';
+import {LanguagesController} from './languages-controller.js';
 import {MecabController} from './mecab-controller.js';
 import {ModalController} from './modal-controller.js';
 import {NestedPopupsController} from './nested-popups-controller.js';
@@ -48,6 +49,7 @@ import {SettingsDisplayController} from './settings-display-controller.js';
 import {SortFrequencyDictionaryController} from './sort-frequency-dictionary-controller.js';
 import {StatusFooter} from './status-footer.js';
 import {StorageController} from './storage-controller.js';
+import {TextTransformationsController} from './text-transformations-controller.js';
 import {TranslationTextReplacementsController} from './translation-text-replacements-controller.js';
 
 /**
@@ -141,6 +143,12 @@ async function main() {
 
         const secondarySearchDictionaryController = new SecondarySearchDictionaryController(settingsController);
         secondarySearchDictionaryController.prepare();
+
+        const languagesController = new LanguagesController(settingsController);
+        languagesController.prepare();
+
+        const textTransformationsController = new TextTransformationsController(settingsController);
+        textTransformationsController.prepare();
 
         const translationTextReplacementsController = new TranslationTextReplacementsController(settingsController);
         translationTextReplacementsController.prepare();
