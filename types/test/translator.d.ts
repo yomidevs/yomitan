@@ -16,6 +16,7 @@
  */
 
 import type {FindTermsMatchType, FindTermsSortOrder, FindTermsVariantMode, FindTermsEmphaticSequencesMode, FindKanjiDictionary, FindTermDictionary} from '../ext/translation';
+import type {SearchResolution, TextTransformationsOptions} from '../ext/settings';
 import type {FindTermsMode} from 'translator';
 import type {DictionaryEntry} from 'dictionary';
 import type {NoteData} from 'anki-templates';
@@ -50,6 +51,9 @@ export type FindTermsOptionsPreset = {
     textReplacements?: (FindTermsTextReplacement[] | null)[];
     enabledDictionaryMap?: [key: string, value: FindTermDictionary][];
     excludeDictionaryDefinitions?: string[] | null;
+    searchResolution?: SearchResolution;
+    language?: string;
+    textTransformationsOptions?: TextTransformationsOptions;
 };
 
 export type FindTermsTextReplacement = {

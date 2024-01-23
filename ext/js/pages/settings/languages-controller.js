@@ -63,7 +63,9 @@ export class LanguagesController {
                 path: 'languages',
                 value: {
                     ...options.languages,
-                    [language]: {}
+                    [language]: {
+                        textTransformations: {}
+                    }
                 }
             }]);
         }

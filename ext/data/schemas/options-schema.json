@@ -802,6 +802,18 @@
                                             }
                                         }
                                     }
+                                },
+                                "default": {
+                                    "ja": {
+                                        "textTransformations": {
+                                            "convertHalfWidthCharacters": "false",
+                                            "convertNumericCharacters": "false",
+                                            "convertAlphabeticCharacters": "false",
+                                            "convertHiraganaToKatakana": "false",
+                                            "convertKatakanaToHiragana": "variant",
+                                            "collapseEmphaticSequences": "false"
+                                        }
+                                    }
                                 }
                             },
                             "dictionaries": {
