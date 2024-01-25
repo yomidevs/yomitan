@@ -73,6 +73,10 @@ export class StructuredContentGenerator {
             collapsed,
             collapsible,
             verticalAlign,
+            borderRadius,
+            borderStyle,
+            borderWidth,
+            borderColor,
             sizeUnits
         } = data;
 
@@ -130,6 +134,10 @@ export class StructuredContentGenerator {
         }
 
         imageContainer.style.width = `${usedWidth}em`;
+        if (typeof borderRadius === 'string') { imageContainer.style.borderRadius = borderRadius; }
+        if (typeof borderStyle === 'string') { imageContainer.style.borderStyle = borderStyle; }
+        if (typeof borderWidth === 'string') { imageContainer.style.borderWidth = borderWidth; }
+        if (typeof borderColor === 'string') { imageContainer.style.borderColor = borderColor; }
         if (typeof title === 'string') {
             imageContainer.title = title;
         }

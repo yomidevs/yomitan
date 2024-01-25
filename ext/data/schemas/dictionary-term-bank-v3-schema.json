@@ -152,7 +152,7 @@
                                 },
                                 "height": {
                                     "type": "number",
-                                    "description": "Preferred width of the image.",
+                                    "description": "Preferred height of the image.",
                                     "minimum": 0
                                 },
                                 "title": {
@@ -203,6 +203,22 @@
                                     "type": "string",
                                     "description": "The vertical alignment of the image.",
                                     "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"]
+                                },
+                                "borderRadius": {
+                                    "type": "string",
+                                    "description": "Roundness of the corners of the image's outer border edge."
+                                },
+                                "borderStyle": {
+                                    "type": "string",
+                                    "description": "Line style for all four sides of the image's border."
+                                },
+                                "borderWidth": {
+                                    "type": "string",
+                                    "description": "Width of the image's border."
+                                },
+                                "borderColor": {
+                                    "type": "string",
+                                    "description": "Color of the image's border."
                                 },
                                 "sizeUnits": {
                                     "type": "string",
@@ -485,7 +501,7 @@
                                         },
                                         "height": {
                                             "type": "integer",
-                                            "description": "Preferred width of the image.",
+                                            "description": "Preferred height of the image.",
                                             "minimum": 1
                                         },
                                         "title": {
