@@ -539,6 +539,8 @@
                         {
                             "type": "array",
                             "description": "Deinflection of the term to an uninflected term.",
+                            "minItems": 2,
+                            "maxItems": 2,
                             "items": [
                                 {
                                     "type": "string",
