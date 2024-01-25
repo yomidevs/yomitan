@@ -436,7 +436,7 @@
         {"kanaIn": "副うた", "kanaOut": "副う", "rulesIn": [], "rulesOut": ["v5"]},
         {"kanaIn": "厭うた", "kanaOut": "厭う", "rulesIn": [], "rulesOut": ["v5"]},
         {"kanaIn": "のたもうた", "kanaOut": "のたまう", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "ませんでした", "kanaOut": "ません", "rulesIn": ["v"], "rulesOut": ["v"]}
+        {"kanaIn": "ませんでした", "kanaOut": "ません", "rulesIn": [], "rulesOut": ["v"]}
     ],
     "polite": [
         {"kanaIn": "ます", "kanaOut": "る", "rulesIn": ["v"], "rulesOut": ["v1"]},
