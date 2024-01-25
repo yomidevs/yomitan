@@ -21,7 +21,7 @@
 import fs from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import {expect, test, describe, vi} from 'vitest';
+import {describe, expect, test, vi} from 'vitest';
 import {OptionsUtil} from '../ext/js/data/options-util.js';
 import {TemplatePatcher} from '../ext/js/templates/template-patcher.js';
 import {chrome, fetch} from './mocks/common.js';
@@ -56,7 +56,7 @@ function createProfileOptionsTestData1() {
             popupScalingFactor: 1,
             popupScaleRelativeToPageZoom: false,
             popupScaleRelativeToVisualViewport: true,
-            showGuide: true,
+            showWelcomePage: true,
             compactTags: false,
             compactGlossaries: false,
             mainDictionary: '',
@@ -259,7 +259,7 @@ function createProfileOptionsUpdatedTestData1() {
             popupScalingFactor: 1,
             popupScaleRelativeToPageZoom: false,
             popupScaleRelativeToVisualViewport: true,
-            showGuide: true,
+            showWelcomePage: true,
             compactTags: false,
             glossaryLayoutMode: 'default',
             mainDictionary: '',

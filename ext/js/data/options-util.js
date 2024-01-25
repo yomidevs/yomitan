@@ -189,7 +189,7 @@ export class OptionsUtil {
                 options.general.audioSource = options.general.audioPlayback ? 'jpod101' : 'disabled';
             },
             (options) => {
-                options.general.showGuide = false;
+                options.general.showWelcomePage = false;
             },
             (options) => {
                 options.scanning.modifier = options.scanning.requireShift ? 'shift' : 'none';
@@ -294,7 +294,7 @@ export class OptionsUtil {
                 popupScalingFactor: 1,
                 popupScaleRelativeToPageZoom: false,
                 popupScaleRelativeToVisualViewport: true,
-                showGuide: true,
+                showWelcomePage: false,
                 compactTags: false,
                 compactGlossaries: false,
                 mainDictionary: '',
@@ -1129,7 +1129,7 @@ export class OptionsUtil {
         if (customTemplates && isObject(chrome.storage)) {
             chrome.storage.session.set({'needsCustomTemplatesWarning': true});
             await this._createTab(chrome.runtime.getURL('/welcome.html'));
-            chrome.storage.session.set({'openedWelcomePage': true});
+            chrome.storage.local.set({'openedWelcomePage': true});
         }
     }
 

@@ -293,8 +293,8 @@ export class Backend {
             this._applyOptions('background');
 
             const options = this._getProfileOptions({current: true}, false);
-            if (options.general.showGuide) {
-                this._openWelcomeGuidePageOnce();
+            if (options.general.showWelcomePage) {
+                this._openWelcomePage();
             }
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
@@ -420,6 +420,7 @@ export class Backend {
     _onInstalled({reason}) {
         if (reason !== 'install') { return; }
         this._requestPersistentStorage();
+        this._openWelcomePageOnce();
     }
 
     // Message handlers
@@ -2518,19 +2519,19 @@ export class Backend {
     /**
      * @returns {Promise<void>}
      */
-    async _openWelcomeGuidePageOnce() {
-        chrome.storage.session.get(['openedWelcomePage']).then((result) => {
-            if (!result.openedWelcomePage) {
-                this._openWelcomeGuidePage();
-                chrome.storage.session.set({'openedWelcomePage': true});
-            }
-        });
+    async _openWelcomePageOnce() {
+        const {openedWelcomePage} = await chrome.storage.local.get(['openedWelcomePage']);
+
+        if (!openedWelcomePage) {
+            this._openWelcomePage();
+            chrome.storage.local.set({'openedWelcomePage': true});
+        }
     }
 
     /**
      * @returns {Promise<void>}
      */
-    async _openWelcomeGuidePage() {
+    async _openWelcomePage() {
         await this._createTab(chrome.runtime.getURL('/welcome.html'));
     }
 

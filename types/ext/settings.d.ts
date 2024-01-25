@@ -117,7 +117,7 @@ export type GeneralOptions = {
     popupScalingFactor: number;
     popupScaleRelativeToPageZoom: boolean;
     popupScaleRelativeToVisualViewport: boolean;
-    showGuide: boolean;
+    showWelcomePage: boolean;
     compactTags: boolean;
     glossaryLayoutMode: GlossaryLayoutMode;
     mainDictionary: string;

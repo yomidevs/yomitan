@@ -97,7 +97,7 @@
                                     "popupScalingFactor",
                                     "popupScaleRelativeToPageZoom",
                                     "popupScaleRelativeToVisualViewport",
-                                    "showGuide",
+                                    "showWelcomePage",
                                     "compactTags",
                                     "glossaryLayoutMode",
                                     "mainDictionary",
@@ -197,9 +197,9 @@
                                         "type": "boolean",
                                         "default": true
                                     },
-                                    "showGuide": {
+                                    "showWelcomePage": {
                                         "type": "boolean",
-                                        "default": true
+                                        "default": false
                                     },
                                     "compactTags": {
                                         "type": "boolean",
