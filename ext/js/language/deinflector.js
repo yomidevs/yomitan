@@ -20,7 +20,7 @@ export class Deinflector {
     /* eslint-disable no-multi-spaces */
     /** @type {Map<string, import('translation-internal').DeinflectionRuleFlags>} @readonly */
     static _ruleTypes = new Map([
-        ['v',     /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b000000111)], // Verb
+        ['v',     /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b000111111)], // Verb
         ['v1',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b000000011)], // Verb ichidan
         ['v1d',   /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b000000010)], // Verb ichidan dictionary form
         ['v1p',   /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b000000001)], // Verb ichidan progressive or perfect

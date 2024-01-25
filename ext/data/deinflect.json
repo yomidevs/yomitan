@@ -321,7 +321,7 @@
         {"kanaIn": "來い", "kanaOut": "來る", "rulesIn": [], "rulesOut": ["vk"]}
     ],
     "imperative negative": [
-        {"kanaIn": "な", "kanaOut": "", "rulesIn": [], "rulesOut": ["v1", "v5", "vk", "vs", "vz"]}
+        {"kanaIn": "な", "kanaOut": "", "rulesIn": [], "rulesOut": ["v"]}
     ],
     "masu stem": [
         {"kanaIn": "い", "kanaOut": "いる", "rulesIn": [], "rulesOut": ["v1d"]},
