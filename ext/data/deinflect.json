@@ -475,24 +475,6 @@
         {"kanaIn": "来ませんでした", "kanaOut": "来る", "rulesIn": [], "rulesOut": ["vk"]},
         {"kanaIn": "來ませんでした", "kanaOut": "來る", "rulesIn": [], "rulesOut": ["vk"]}
     ],
-    "polite volitional": [
-        {"kanaIn": "ましょう", "kanaOut": "る", "rulesIn": [], "rulesOut": ["v1"]},
-        {"kanaIn": "いましょう", "kanaOut": "う", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "きましょう", "kanaOut": "く", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "ぎましょう", "kanaOut": "ぐ", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "しましょう", "kanaOut": "す", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "ちましょう", "kanaOut": "つ", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "にましょう", "kanaOut": "ぬ", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "びましょう", "kanaOut": "ぶ", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "みましょう", "kanaOut": "む", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "りましょう", "kanaOut": "る", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "じましょう", "kanaOut": "ずる", "rulesIn": [], "rulesOut": ["vz"]},
-        {"kanaIn": "しましょう", "kanaOut": "する", "rulesIn": [], "rulesOut": ["vs"]},
-        {"kanaIn": "為ましょう", "kanaOut": "為る", "rulesIn": [], "rulesOut": ["vs"]},
-        {"kanaIn": "きましょう", "kanaOut": "くる", "rulesIn": [], "rulesOut": ["vk"]},
-        {"kanaIn": "来ましょう", "kanaOut": "来る", "rulesIn": [], "rulesOut": ["vk"]},
-        {"kanaIn": "來ましょう", "kanaOut": "來る", "rulesIn": [], "rulesOut": ["vk"]}
-    ],
     "potential": [
         {"kanaIn": "れる", "kanaOut": "る", "rulesIn": ["v1"], "rulesOut": ["v1", "v5"]},
         {"kanaIn": "える", "kanaOut": "う", "rulesIn": ["v1"], "rulesOut": ["v5"]},
@@ -535,7 +517,8 @@
         {"kanaIn": "為よう", "kanaOut": "為る", "rulesIn": [], "rulesOut": ["vs"]},
         {"kanaIn": "こよう", "kanaOut": "くる", "rulesIn": [], "rulesOut": ["vk"]},
         {"kanaIn": "来よう", "kanaOut": "来る", "rulesIn": [], "rulesOut": ["vk"]},
-        {"kanaIn": "來よう", "kanaOut": "來る", "rulesIn": [], "rulesOut": ["vk"]}
+        {"kanaIn": "來よう", "kanaOut": "來る", "rulesIn": [], "rulesOut": ["vk"]},
+        {"kanaIn": "ましょう", "kanaOut": "ます", "rulesIn": [], "rulesOut": ["v"]}
     ],
     "causative passive": [
         {"kanaIn": "かされる", "kanaOut": "く", "rulesIn": ["v1"], "rulesOut": ["v5"]},
