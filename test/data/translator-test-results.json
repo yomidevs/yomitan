@@ -15113,7 +15113,8 @@
           {
             "source": "algorithm",
             "inflectionRules": [
-              "polite past"
+              "polite",
+              "past"
             ]
           }
         ],
