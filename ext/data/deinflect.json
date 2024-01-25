@@ -435,7 +435,8 @@
         {"kanaIn": "添うた", "kanaOut": "添う", "rulesIn": [], "rulesOut": ["v5"]},
         {"kanaIn": "副うた", "kanaOut": "副う", "rulesIn": [], "rulesOut": ["v5"]},
         {"kanaIn": "厭うた", "kanaOut": "厭う", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "のたもうた", "kanaOut": "のたまう", "rulesIn": [], "rulesOut": ["v5"]}
+        {"kanaIn": "のたもうた", "kanaOut": "のたまう", "rulesIn": [], "rulesOut": ["v5"]},
+        {"kanaIn": "ませんでした", "kanaOut": "ません", "rulesIn": ["v"], "rulesOut": ["v"]}
     ],
     "polite": [
         {"kanaIn": "ます", "kanaOut": "る", "rulesIn": ["v"], "rulesOut": ["v1"]},
@@ -455,25 +456,6 @@
         {"kanaIn": "来ます", "kanaOut": "来る", "rulesIn": ["v"], "rulesOut": ["vk"]},
         {"kanaIn": "來ます", "kanaOut": "來る", "rulesIn": ["v"], "rulesOut": ["vk"]},
         {"kanaIn": "くあります", "kanaOut": "い", "rulesIn": ["v"], "rulesOut": ["adj-i"]}
-    ],
-    "polite past negative": [
-        {"kanaIn": "くありませんでした", "kanaOut": "い", "rulesIn": [], "rulesOut": ["adj-i"]},
-        {"kanaIn": "ませんでした", "kanaOut": "る", "rulesIn": [], "rulesOut": ["v1"]},
-        {"kanaIn": "いませんでした", "kanaOut": "う", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "きませんでした", "kanaOut": "く", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "ぎませんでした", "kanaOut": "ぐ", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "しませんでした", "kanaOut": "す", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "ちませんでした", "kanaOut": "つ", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "にませんでした", "kanaOut": "ぬ", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "びませんでした", "kanaOut": "ぶ", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "みませんでした", "kanaOut": "む", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "りませんでした", "kanaOut": "る", "rulesIn": [], "rulesOut": ["v5"]},
-        {"kanaIn": "じませんでした", "kanaOut": "ずる", "rulesIn": [], "rulesOut": ["vz"]},
-        {"kanaIn": "しませんでした", "kanaOut": "する", "rulesIn": [], "rulesOut": ["vs"]},
-        {"kanaIn": "為ませんでした", "kanaOut": "為る", "rulesIn": [], "rulesOut": ["vs"]},
-        {"kanaIn": "きませんでした", "kanaOut": "くる", "rulesIn": [], "rulesOut": ["vk"]},
-        {"kanaIn": "来ませんでした", "kanaOut": "来る", "rulesIn": [], "rulesOut": ["vk"]},
-        {"kanaIn": "來ませんでした", "kanaOut": "來る", "rulesIn": [], "rulesOut": ["vk"]}
     ],
     "potential": [
         {"kanaIn": "れる", "kanaOut": "る", "rulesIn": ["v1"], "rulesOut": ["v1", "v5"]},

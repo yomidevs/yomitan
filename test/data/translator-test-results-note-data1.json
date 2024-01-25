@@ -15759,7 +15759,9 @@
               "inflectionRules": [
                 "-te",
                 "progressive or perfect",
-                "polite past negative"
+                "polite",
+                "negative",
+                "past"
               ]
             }
           ],
@@ -16182,7 +16184,9 @@
               "inflectionRules": [
                 "-te",
                 "progressive or perfect",
-                "polite past negative"
+                "polite",
+                "negative",
+                "past"
               ]
             }
           ],
@@ -16605,7 +16609,9 @@
               "inflectionRules": [
                 "-te",
                 "progressive or perfect",
-                "polite past negative"
+                "polite",
+                "negative",
+                "past"
               ]
             }
           ],
@@ -17028,7 +17034,9 @@
               "inflectionRules": [
                 "-te",
                 "progressive or perfect",
-                "polite past negative"
+                "polite",
+                "negative",
+                "past"
               ]
             }
           ],
