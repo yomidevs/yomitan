@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-multi-spaces */
-
 import {describe, expect, test} from 'vitest';
 import {CacheMap} from '../ext/js/general/cache-map.js';
 
@@ -39,6 +37,7 @@ function testConstructor() {
 /** */
 function testApi() {
     describe('api', () => {
+        /* eslint-disable no-multi-spaces */
         const data = [
             {
                 maxSize: 1,
@@ -90,6 +89,7 @@ function testApi() {
                 ]
             }
         ];
+        /* eslint-enable no-multi-spaces */
 
         test.each(data)('api-test-%#', ({maxSize, expectedSize, calls}) => {
             const cache = new CacheMap(maxSize);

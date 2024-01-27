@@ -190,7 +190,6 @@ for (let i = 0, ii = kana.length; i < ii; i += 3) {
  * @param {import('japanese-util').CodepointRange} range
  * @returns {boolean}
  */
-// eslint-disable-next-line no-implicit-globals
 function isCodePointInRange(codePoint, [min, max]) {
     return (codePoint >= min && codePoint <= max);
 }
@@ -200,7 +199,6 @@ function isCodePointInRange(codePoint, [min, max]) {
  * @param {import('japanese-util').CodepointRange[]} ranges
  * @returns {boolean}
  */
-// eslint-disable-next-line no-implicit-globals
 function isCodePointInRanges(codePoint, ranges) {
     for (const [min, max] of ranges) {
         if (codePoint >= min && codePoint <= max) {
@@ -214,7 +212,6 @@ function isCodePointInRanges(codePoint, ranges) {
  * @param {string} previousCharacter
  * @returns {?string}
  */
-// eslint-disable-next-line no-implicit-globals
 function getProlongedHiragana(previousCharacter) {
     switch (KANA_TO_VOWEL_MAPPING.get(previousCharacter)) {
         case 'a': return 'あ';
