@@ -73,6 +73,8 @@ export class StructuredContentGenerator {
             collapsed,
             collapsible,
             verticalAlign,
+            border,
+            borderRadius,
             sizeUnits
         } = data;
 
@@ -130,6 +132,8 @@ export class StructuredContentGenerator {
         }
 
         imageContainer.style.width = `${usedWidth}em`;
+        if (typeof border === 'string') { imageContainer.style.border = border; }
+        if (typeof borderRadius === 'string') { imageContainer.style.borderRadius = borderRadius; }
         if (typeof title === 'string') {
             imageContainer.title = title;
         }
