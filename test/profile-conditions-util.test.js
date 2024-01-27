@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-multi-spaces */
-
 import {describe, expect, test} from 'vitest';
 import {ProfileConditionsUtil} from '../ext/js/background/profile-conditions-util.js';
 
@@ -62,6 +60,7 @@ function testNormalizeContext() {
 /** */
 function testSchemas() {
     describe('Schemas', () => {
+        /* eslint-disable no-multi-spaces */
         /** @type {{conditionGroups: import('settings').ProfileConditionGroup[], expectedSchema?: import('ext/json-schema').Schema, inputs?: {expected: boolean, context: import('settings').OptionsContext}[]}[]} */
         const data = [
             // Empty
@@ -1099,6 +1098,7 @@ function testSchemas() {
                 ]
             }
         ];
+        /* eslint-enable no-multi-spaces */
 
         test.each(data)('schemas-test-%#', ({conditionGroups, expectedSchema, inputs}) => {
             const profileConditionsUtil = new ProfileConditionsUtil();

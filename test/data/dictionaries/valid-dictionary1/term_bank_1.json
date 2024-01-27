@@ -81,7 +81,7 @@
                 "Image alt text tests.\n𬵪 = Unicode character\n",
                 {"tag": "img", "alt": "𬵪", "path": "aosaba_mono.png", "height": 1.0, "width": 1.0, "background": false, "sizeUnits": "em", "collapsed": false, "collapsible": false, "appearance": "monochrome"},
                 " = monochrome PNG\n",
-                {"tag": "img", "alt": "𬵪", "path": "aosaba_auto.png", "height": 1.0, "width": 1.0, "background": false, "sizeUnits": "em", "collapsed": false, "collapsible": false, "appearance": "auto"},
+                {"tag": "img", "alt": "𬵪", "path": "aosaba_auto.png", "height": 1.0, "width": 1.0, "background": false, "sizeUnits": "em", "collapsed": false, "collapsible": false, "appearance": "auto", "borderRadius": "20%", "border": "solid 1px red"},
                 " = color PNG"
             ]},
             {"type": "structured-content", "content": [

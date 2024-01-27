@@ -32,7 +32,6 @@ export async function createAnkiTemplateRendererTest() {
     /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, ankiTemplateRenderer: AnkiTemplateRenderer}>} */
     const result = test.extend({
         window: async ({window}, use) => { await use(window); },
-        // eslint-disable-next-line no-empty-pattern
         ankiTemplateRenderer: async ({window}, use) => {
             // The window property needs to be referenced for it to be initialized.
             // It is needed for DOM access for structured content.
