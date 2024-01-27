@@ -113,6 +113,8 @@ export type TermGlossaryDeinflection = [
 export type TermImage = StructuredContent.ImageElementBase & {
     // Compatibility properties
     verticalAlign?: undefined;
+    border?: undefined;
+    borderRadius?: undefined;
     sizeUnits?: undefined;
 };
 

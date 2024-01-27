@@ -46,10 +46,6 @@ export type ApiSurface = {
         };
         return: void;
     };
-    applicationReady: {
-        params: void;
-        return: void;
-    };
     applicationIsReady: {
         params: void;
         return: boolean;

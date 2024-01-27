@@ -714,7 +714,7 @@ export class Popup extends EventDispatcher {
         try {
             return await this._invoke(action, params);
         } catch (e) {
-            if (!yomitan.isExtensionUnloaded) { throw e; }
+            if (!yomitan.webExtension.unloaded) { throw e; }
             return void 0;
         }
     }

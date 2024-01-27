@@ -390,7 +390,7 @@ export class Display extends EventDispatcher {
      * @param {Error} error
      */
     onError(error) {
-        if (yomitan.isExtensionUnloaded) { return; }
+        if (yomitan.webExtension.unloaded) { return; }
         log.error(error);
     }
 
@@ -727,8 +727,7 @@ export class Display extends EventDispatcher {
 
     /** @type {import('display').WindowApiHandler<'displayExtensionUnloaded'>} */
     _onMessageExtensionUnloaded() {
-        if (yomitan.isExtensionUnloaded) { return; }
-        yomitan.triggerExtensionUnloaded();
+        yomitan.webExtension.triggerUnloaded();
     }
 
     // Private
@@ -1894,7 +1893,7 @@ export class Display extends EventDispatcher {
      * @param {import('text-scanner').SearchedEventDetails} details
      */
     _onContentTextScannerSearched({type, dictionaryEntries, sentence, textSource, optionsContext, error}) {
-        if (error !== null && !yomitan.isExtensionUnloaded) {
+        if (error !== null && !yomitan.webExtension.unloaded) {
             log.error(error);
         }
 
