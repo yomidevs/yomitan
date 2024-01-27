@@ -3,6 +3,7 @@
     "extends": [
         "eslint:recommended",
         "plugin:jsonc/recommended-with-json",
+        "plugin:eslint-comments/recommended",
         "plugin:@typescript-eslint/recommended"
     ],
     "parser": "@typescript-eslint/parser",
@@ -378,6 +379,7 @@
                 "allowAllPropertiesOnSameLine": true
             }
         ],
+        "eslint-comments/no-unused-disable": "error",
         "@typescript-eslint/ban-ts-comment": [
             "error",
             {
