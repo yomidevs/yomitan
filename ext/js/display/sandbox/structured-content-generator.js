@@ -360,6 +360,7 @@ export class StructuredContentGenerator {
             clipPath,
             verticalAlign,
             textAlign,
+            textEmphasis,
             textShadow,
             margin,
             marginTop,
@@ -384,6 +385,7 @@ export class StructuredContentGenerator {
         if (typeof backgroundColor === 'string') { style.backgroundColor = backgroundColor; }
         if (typeof verticalAlign === 'string') { style.verticalAlign = verticalAlign; }
         if (typeof textAlign === 'string') { style.textAlign = textAlign; }
+        if (typeof textEmphasis === 'string') { style.textEmphasis = textEmphasis; }
         if (typeof textShadow === 'string') { style.textShadow = textShadow; }
         if (typeof textDecorationLine === 'string') {
             style.textDecoration = textDecorationLine;

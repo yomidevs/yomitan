@@ -67,6 +67,7 @@ export type StructuredContentStyle = {
     clipPath?: string;
     verticalAlign?: VerticalAlign;
     textAlign?: TextAlign;
+    textEmphasis?: string;
     textShadow?: string;
     margin?: string;
     marginTop?: number | string;

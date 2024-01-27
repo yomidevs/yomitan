@@ -334,6 +334,9 @@
                     "enum": ["start", "end", "left", "right", "center", "justify", "justify-all", "match-parent"],
                     "default": "start"
                 },
+                "textEmphasis": {
+                    "type": "string"
+                },
                 "textShadow": {
                     "type": "string"
                 },
