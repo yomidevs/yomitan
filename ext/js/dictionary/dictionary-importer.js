@@ -488,18 +488,14 @@ export class DictionaryImporter {
     async _resolveStructuredContentImage(context, target, source, entry) {
         const {
             verticalAlign,
+            border,
             borderRadius,
-            borderStyle,
-            borderWidth,
-            borderColor,
             sizeUnits
         } = source;
         await this._createImageData(context, target, source, entry);
         if (typeof verticalAlign === 'string') { target.verticalAlign = verticalAlign; }
+        if (typeof border === 'string') { target.border = border; }
         if (typeof borderRadius === 'string') { target.borderRadius = borderRadius; }
-        if (typeof borderStyle === 'string') { target.borderStyle = borderStyle; }
-        if (typeof borderWidth === 'string') { target.borderWidth = borderWidth; }
-        if (typeof borderColor === 'string') { target.borderColor = borderColor; }
         if (typeof sizeUnits === 'string') { target.sizeUnits = sizeUnits; }
     }
 
