@@ -1,5 +1,4 @@
 [
     {"name": "English",     "iso": "en", "flag": "🇬🇧", "exampleText": "read"},
-    {"name": "Japanese",    "iso": "ja", "flag": "🇯🇵", "exampleText": "読め"},
-    {"name": "Portuguese",  "iso": "pt", "flag": "🇯🇵", "exampleText": "読め"}
+    {"name": "Japanese",    "iso": "ja", "flag": "🇯🇵", "exampleText": "読め"}
 ]

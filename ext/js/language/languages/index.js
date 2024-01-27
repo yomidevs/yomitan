@@ -18,7 +18,6 @@
 // English
 import {textTransformations as textTransformationsEN} from './en/textTransformations.js';
 import {textTransformations as textTransformationsJA} from './ja/textTransformations.js';
-import {textTransformations as textTransformationsPT} from './pt/textTransformations.js';
 /** @type {Map<string, import('language').LanguageFeatures>} */
 export const languageParts = new Map([
     ['ja', {
@@ -26,9 +25,6 @@ export const languageParts = new Map([
     }],
     ['en', {
         textTransformations: textTransformationsEN
-    }],
-    ['pt', {
-        textTransformations: textTransformationsPT
     }]
 ]);
 
