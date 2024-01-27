@@ -20,13 +20,15 @@ export class Deinflector {
     /* eslint-disable no-multi-spaces */
     /** @type {Map<string, import('translation-internal').DeinflectionRuleFlags>} @readonly */
     static _ruleTypes = new Map([
-        ['v1',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00000001)], // Verb ichidan
-        ['v5',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00000010)], // Verb godan
-        ['vs',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00000100)], // Verb suru
-        ['vk',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00001000)], // Verb kuru
-        ['vz',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00010000)], // Verb zuru
-        ['adj-i', /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b00100000)], // Adjective i
-        ['iru',   /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b01000000)] // Intermediate -iru endings for progressive or perfect tense
+        ['v1',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b000000011)], // Verb ichidan
+        ['v1d',   /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b000000010)], // Verb ichidan dictionary form
+        ['v1p',   /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b000000001)], // Verb ichidan progressive or perfect
+        ['v5',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b000000100)], // Verb godan
+        ['vs',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b000001000)], // Verb suru
+        ['vk',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b000010000)], // Verb kuru
+        ['vz',    /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b000100000)], // Verb zuru
+        ['adj-i', /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b001000000)], // Adjective i
+        ['iru',   /** @type {import('translation-internal').DeinflectionRuleFlags} */ (0b010000000)] // Intermediate -iru endings for progressive or perfect tense
     ]);
     /* eslint-enable no-multi-spaces */
 

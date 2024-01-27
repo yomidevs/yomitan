@@ -227,6 +227,10 @@
 {{#*inline "pitch-accent-positions"}}
     {{~> pitch-accent-list format='position'~}}
 {{/inline}}
+
+{{~#*inline "pitch-accent-categories"~}}
+    {{~#each (pitchCategories @root)~}}{{~.~}}{{~#unless @last~}},{{~/unless~}}{{~/each~}}
+{{~/inline~}}
 {{! End Pitch Accents }}
 
 {{#*inline "phonetic-transcriptions"}}
