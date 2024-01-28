@@ -16,13 +16,10 @@
  */
 
 import type {DictionaryDatabase} from '../../ext/js/dictionary/dictionary-database';
-import type {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util';
 import type * as Dictionary from './dictionary';
 import type * as DictionaryDatabaseTypes from './dictionary-database';
 
 export type ConstructorDetails = {
-    /** An instance of JapaneseUtil. */
-    japaneseUtil: JapaneseUtil;
     /** An instance of DictionaryDatabase. */
     database: DictionaryDatabase;
 };

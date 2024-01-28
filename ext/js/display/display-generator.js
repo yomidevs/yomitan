@@ -16,10 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core/utilities.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {isObject} from '../core/utilities.js';
 import {DictionaryDataUtil} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
+import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji, isStringPartiallyJapanese} from '../language/japanese.js';
 import {yomitan} from '../yomitan.js';
 import {PronunciationGenerator} from './sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
@@ -28,9 +29,7 @@ export class DisplayGenerator {
     /**
      * @param {import('display').DisplayGeneratorConstructorDetails} details
      */
-    constructor({japaneseUtil, contentManager, hotkeyHelpController = null}) {
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
+    constructor({contentManager, hotkeyHelpController = null}) {
         /** @type {import('./display-content-manager.js').DisplayContentManager} */
         this._contentManager = contentManager;
         /** @type {?import('../input/hotkey-help-controller.js').HotkeyHelpController} */
@@ -38,9 +37,9 @@ export class DisplayGenerator {
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();
         /** @type {StructuredContentGenerator} */
-        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, japaneseUtil, document);
+        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document);
         /** @type {PronunciationGenerator} */
-        this._pronunciationGenerator = new PronunciationGenerator(japaneseUtil);
+        this._pronunciationGenerator = new PronunciationGenerator();
     }
 
     /** */
@@ -725,11 +724,9 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createPronunciationPitchAccent(pitchAccent, details) {
-        const jp = this._japaneseUtil;
-
         const {position, nasalPositions, devoicePositions, tags} = pitchAccent;
         const {reading, exclusiveTerms, exclusiveReadings} = details;
-        const morae = jp.getKanaMorae(reading);
+        const morae = getKanaMorae(reading);
 
         const node = this._instantiate('pronunciation');
 
@@ -912,10 +909,9 @@ export class DisplayGenerator {
      * @param {string} text
      */
     _appendKanjiLinks(container, text) {
-        const jp = this._japaneseUtil;
         let part = '';
         for (const c of text) {
-            if (jp.isCodePointKanji(/** @type {number} */ (c.codePointAt(0)))) {
+            if (isCodePointKanji(/** @type {number} */ (c.codePointAt(0)))) {
                 if (part.length > 0) {
                     container.appendChild(document.createTextNode(part));
                     part = '';
@@ -969,7 +965,7 @@ export class DisplayGenerator {
      */
     _appendFurigana(container, term, reading, addText) {
         container.lang = 'ja';
-        const segments = this._japaneseUtil.distributeFurigana(term, reading);
+        const segments = distributeFurigana(term, reading);
         for (const {text, reading: furigana} of segments) {
             if (furigana) {
                 const ruby = document.createElement('ruby');
@@ -1000,7 +996,7 @@ export class DisplayGenerator {
     _setTextContent(node, value, language) {
         if (typeof language === 'string') {
             node.lang = language;
-        } else if (this._japaneseUtil.isStringPartiallyJapanese(value)) {
+        } else if (isStringPartiallyJapanese(value)) {
             node.lang = 'ja';
         }
 
@@ -1017,7 +1013,7 @@ export class DisplayGenerator {
         // cause the text to not copy correctly.
         if (typeof language === 'string') {
             node.lang = language;
-        } else if (this._japaneseUtil.isStringPartiallyJapanese(value)) {
+        } else if (isStringPartiallyJapanese(value)) {
             node.lang = 'ja';
         }
 
@@ -1051,7 +1047,7 @@ export class DisplayGenerator {
             if (termPronunciation.headwordIndex !== headwordIndex) { continue; }
             for (const pronunciation of termPronunciation.pronunciations) {
                 if (pronunciation.type !== 'pitch-accent') { continue; }
-                const category = this._japaneseUtil.getPitchCategory(reading, pronunciation.position, isVerbOrAdjective);
+                const category = getPitchCategory(reading, pronunciation.position, isVerbOrAdjective);
                 if (category !== null) {
                     categories.add(category);
                 }

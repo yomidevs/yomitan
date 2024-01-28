@@ -19,6 +19,8 @@
 import {RegexUtil} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {Deinflector} from './deinflector.js';
+import {convertAlphabeticToKana} from './japanese-wanakana.js';
+import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth, isCodePointJapanese} from './japanese.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.
@@ -28,9 +30,7 @@ export class Translator {
      * Creates a new Translator instance.
      * @param {import('translator').ConstructorDetails} details The details for the class.
      */
-    constructor({japaneseUtil, database}) {
-        /** @type {import('./sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
+    constructor({database}) {
         /** @type {import('../dictionary/dictionary-database.js').DictionaryDatabase} */
         this._database = database;
         /** @type {?Deinflector} */
@@ -436,7 +436,6 @@ export class Translator {
             this._getCollapseEmphaticOptions(options)
         ];
 
-        const jp = this._japaneseUtil;
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const deinflections = [];
         const used = new Set();
@@ -447,22 +446,22 @@ export class Translator {
                 text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
             }
             if (halfWidth) {
-                text2 = jp.convertHalfWidthKanaToFullWidth(text2, sourceMap);
+                text2 = convertHalfWidthKanaToFullWidth(text2, sourceMap);
             }
             if (numeric) {
-                text2 = jp.convertNumericToFullWidth(text2);
+                text2 = convertNumericToFullWidth(text2);
             }
             if (alphabetic) {
-                text2 = jp.convertAlphabeticToKana(text2, sourceMap);
+                text2 = convertAlphabeticToKana(text2, sourceMap);
             }
             if (katakana) {
-                text2 = jp.convertHiraganaToKatakana(text2);
+                text2 = convertHiraganaToKatakana(text2);
             }
             if (hiragana) {
-                text2 = jp.convertKatakanaToHiragana(text2);
+                text2 = convertKatakanaToHiragana(text2);
             }
             if (collapseEmphatic) {
-                text2 = jp.collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
+                text2 = collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
             }
 
             for (
@@ -519,10 +518,9 @@ export class Translator {
      * @returns {string}
      */
     _getJapaneseOnlyText(text) {
-        const jp = this._japaneseUtil;
         let length = 0;
         for (const c of text) {
-            if (!jp.isCodePointJapanese(/** @type {number} */ (c.codePointAt(0)))) {
+            if (!isCodePointJapanese(/** @type {number} */ (c.codePointAt(0)))) {
                 return text.substring(0, length);
             }
             length += c.length;

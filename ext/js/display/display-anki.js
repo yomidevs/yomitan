@@ -30,9 +30,8 @@ export class DisplayAnki {
     /**
      * @param {import('./display.js').Display} display
      * @param {import('./display-audio.js').DisplayAudio} displayAudio
-     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      */
-    constructor(display, displayAudio, japaneseUtil) {
+    constructor(display, displayAudio) {
         /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {import('./display-audio.js').DisplayAudio} */
@@ -42,7 +41,7 @@ export class DisplayAnki {
         /** @type {?string} */
         this._ankiFieldTemplatesDefault = null;
         /** @type {AnkiNoteBuilder} */
-        this._ankiNoteBuilder = new AnkiNoteBuilder(japaneseUtil, new TemplateRendererProxy());
+        this._ankiNoteBuilder = new AnkiNoteBuilder(new TemplateRendererProxy());
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._errorNotification = null;
         /** @type {?EventListenerCollection} */

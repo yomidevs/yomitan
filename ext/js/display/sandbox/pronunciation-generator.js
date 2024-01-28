@@ -16,15 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export class PronunciationGenerator {
-    /**
-     * @param {import('../../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
-     */
-    constructor(japaneseUtil) {
-        /** @type {import('../../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
-    }
+import {getKanaDiacriticInfo, isMoraPitchHigh} from '../../language/japanese.js';
 
+export class PronunciationGenerator {
     /**
      * @param {string[]} morae
      * @param {number} downstepPosition
@@ -33,7 +27,6 @@ export class PronunciationGenerator {
      * @returns {HTMLSpanElement}
      */
     createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions) {
-        const jp = this._japaneseUtil;
         const nasalPositionsSet = nasalPositions.length > 0 ? new Set(nasalPositions) : null;
         const devoicePositionsSet = devoicePositions.length > 0 ? new Set(devoicePositions) : null;
         const container = document.createElement('span');
@@ -41,8 +34,8 @@ export class PronunciationGenerator {
         for (let i = 0, ii = morae.length; i < ii; ++i) {
             const i1 = i + 1;
             const mora = morae[i];
-            const highPitch = jp.isMoraPitchHigh(i, downstepPosition);
-            const highPitchNext = jp.isMoraPitchHigh(i1, downstepPosition);
+            const highPitch = isMoraPitchHigh(i, downstepPosition);
+            const highPitchNext = isMoraPitchHigh(i1, downstepPosition);
             const nasal = nasalPositionsSet !== null && nasalPositionsSet.has(i1);
             const devoice = devoicePositionsSet !== null && devoicePositionsSet.has(i1);
 
@@ -76,7 +69,7 @@ export class PronunciationGenerator {
                 const n2 = characterNodes[0];
                 const character = /** @type {string} */ (n2.textContent);
 
-                const characterInfo = jp.getKanaDiacriticInfo(character);
+                const characterInfo = getKanaDiacriticInfo(character);
                 if (characterInfo !== null) {
                     n1.dataset.originalText = mora;
                     n2.dataset.originalText = character;
@@ -111,7 +104,6 @@ export class PronunciationGenerator {
      * @returns {SVGSVGElement}
      */
     createPronunciationGraph(morae, downstepPosition) {
-        const jp = this._japaneseUtil;
         const ii = morae.length;
 
         const svgns = 'http://www.w3.org/2000/svg';
@@ -131,8 +123,8 @@ export class PronunciationGenerator {
 
         const pathPoints = [];
         for (let i = 0; i < ii; ++i) {
-            const highPitch = jp.isMoraPitchHigh(i, downstepPosition);
-            const highPitchNext = jp.isMoraPitchHigh(i + 1, downstepPosition);
+            const highPitch = isMoraPitchHigh(i, downstepPosition);
+            const highPitchNext = isMoraPitchHigh(i + 1, downstepPosition);
             const x = i * 50 + 25;
             const y = highPitch ? 25 : 75;
             if (highPitch && !highPitchNext) {
@@ -148,7 +140,7 @@ export class PronunciationGenerator {
 
         pathPoints.splice(0, ii - 1);
         {
-            const highPitch = jp.isMoraPitchHigh(ii, downstepPosition);
+            const highPitch = isMoraPitchHigh(ii, downstepPosition);
             const x = ii * 50 + 25;
             const y = highPitch ? 25 : 75;
             this._addGraphTriangle(svg, svgns, x, y);

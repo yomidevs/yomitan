@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../lib/wanakana.js';
 import {AccessibilityController} from '../accessibility/accessibility-controller.js';
 import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
@@ -34,7 +33,7 @@ import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
-import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
+import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/japanese.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {MediaUtil} from '../media/media-util.js';
@@ -54,8 +53,6 @@ export class Backend {
     constructor(webExtension) {
         /** @type {import('../extension/web-extension.js').WebExtension} */
         this._webExtension = webExtension;
-        /** @type {JapaneseUtil} */
-        this._japaneseUtil = new JapaneseUtil(wanakana);
         /** @type {Environment} */
         this._environment = new Environment();
         /** @type {AnkiConnect} */
@@ -70,7 +67,6 @@ export class Backend {
             this._dictionaryDatabase = new DictionaryDatabase();
             /** @type {Translator|TranslatorProxy} */
             this._translator = new Translator({
-                japaneseUtil: this._japaneseUtil,
                 database: this._dictionaryDatabase
             });
             /** @type {ClipboardReader|ClipboardReaderProxy} */
@@ -93,7 +89,6 @@ export class Backend {
 
         /** @type {ClipboardMonitor} */
         this._clipboardMonitor = new ClipboardMonitor({
-            japaneseUtil: this._japaneseUtil,
             clipboardReader: this._clipboardReader
         });
         /** @type {?import('settings').Options} */
@@ -108,7 +103,6 @@ export class Backend {
         this._requestBuilder = new RequestBuilder();
         /** @type {AudioDownloader} */
         this._audioDownloader = new AudioDownloader({
-            japaneseUtil: this._japaneseUtil,
             requestBuilder: this._requestBuilder
         });
         /** @type {OptionsUtil} */
@@ -852,7 +846,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'textHasJapaneseCharacters'>} */
     _onApiTextHasJapaneseCharacters({text}) {
-        return this._japaneseUtil.isStringPartiallyJapanese(text);
+        return isStringPartiallyJapanese(text);
     }
 
     /** @type {import('api').ApiHandler<'getTermFrequencies'>} */
@@ -1376,7 +1370,6 @@ export class Backend {
      * @returns {Promise<import('api').ParseTextLine[]>}
      */
     async _textParseScanning(text, scanLength, optionsContext) {
-        const jp = this._japaneseUtil;
         /** @type {import('translator').FindTermsMode} */
         const mode = 'simple';
         const options = this._getProfileOptions(optionsContext, false);
@@ -1398,13 +1391,13 @@ export class Backend {
             if (
                 dictionaryEntries.length > 0 &&
                 originalTextLength > 0 &&
-                (originalTextLength !== character.length || jp.isCodePointJapanese(codePoint))
+                (originalTextLength !== character.length || isCodePointJapanese(codePoint))
             ) {
                 previousUngroupedSegment = null;
                 const {headwords: [{term, reading}]} = dictionaryEntries[0];
                 const source = text.substring(i, i + originalTextLength);
                 const textSegments = [];
-                for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(term, reading, source)) {
+                for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, source)) {
                     textSegments.push({text: text2, reading: reading2});
                 }
                 results.push(textSegments);
@@ -1427,8 +1420,6 @@ export class Backend {
      * @returns {Promise<import('backend').MecabParseResults>}
      */
     async _textParseMecab(text) {
-        const jp = this._japaneseUtil;
-
         let parseTextResults;
         try {
             parseTextResults = await this._mecab.parseText(text);
@@ -1444,9 +1435,9 @@ export class Backend {
             for (const line of lines) {
                 for (const {term, reading, source} of line) {
                     const termParts = [];
-                    for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(
+                    for (const {text: text2, reading: reading2} of distributeFuriganaInflected(
                         term.length > 0 ? term : source,
-                        jp.convertKatakanaToHiragana(reading),
+                        jpConvertKatakanaToHiragana(reading),
                         source
                     )) {
                         termParts.push({text: text2, reading: reading2});

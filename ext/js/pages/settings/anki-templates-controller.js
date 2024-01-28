@@ -20,7 +20,6 @@ import {ExtensionError} from '../../core/extension-error.js';
 import {toError} from '../../core/to-error.js';
 import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {JapaneseUtil} from '../../language/sandbox/japanese-util.js';
 import {TemplateRendererProxy} from '../../templates/template-renderer-proxy.js';
 import {yomitan} from '../../yomitan.js';
 
@@ -56,7 +55,7 @@ export class AnkiTemplatesController {
         /** @type {?import('./modal.js').Modal} */
         this._fieldTemplateResetModal = null;
         /** @type {AnkiNoteBuilder} */
-        this._ankiNoteBuilder = new AnkiNoteBuilder(new JapaneseUtil(null), new TemplateRendererProxy());
+        this._ankiNoteBuilder = new AnkiNoteBuilder(new TemplateRendererProxy());
     }
 
     /** */
