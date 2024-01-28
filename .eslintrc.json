@@ -17,7 +17,8 @@
         "project": [
             "./jsconfig.json",
             "./dev/jsconfig.json",
-            "./test/jsconfig.json"
+            "./test/jsconfig.json",
+            "./benches/jsconfig.json"
         ]
     },
     "env": {
