@@ -408,7 +408,7 @@ export class Translator {
 
             const definitionConditions = this._languageTransformer.getConditionFlagsFromPartsOfSpeech(databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
-                if (!partsOfSpeechFilter || LanguageTransformer.conditionsMatch(deinflection.rules, definitionConditions)) {
+                if (!partsOfSpeechFilter || LanguageTransformer.conditionsMatch(deinflection.conditions, definitionConditions)) {
                     deinflection.databaseEntries.push(databaseEntry);
                 }
             }
@@ -568,12 +568,12 @@ export class Translator {
      * @param {string} originalText
      * @param {string} transformedText
      * @param {string} deinflectedText
-     * @param {number} rules
+     * @param {number} conditions
      * @param {import('dictionary').InflectionRuleChainCandidate[]} inflectionRuleChainCandidates
      * @returns {import('translation-internal').DatabaseDeinflection}
      */
-    _createDeinflection(originalText, transformedText, deinflectedText, rules, inflectionRuleChainCandidates) {
-        return {originalText, transformedText, deinflectedText, rules, inflectionRuleChainCandidates, databaseEntries: []};
+    _createDeinflection(originalText, transformedText, deinflectedText, conditions, inflectionRuleChainCandidates) {
+        return {originalText, transformedText, deinflectedText, conditions, inflectionRuleChainCandidates, databaseEntries: []};
     }
 
     // Term dictionary entry grouping

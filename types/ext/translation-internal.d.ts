@@ -43,7 +43,7 @@ export type DatabaseDeinflection = {
     originalText: string;
     transformedText: string;
     deinflectedText: string;
-    rules: number; // TODO : Rename this
+    conditions: number;
     inflectionRuleChainCandidates: Dictionary.InflectionRuleChainCandidate[];
     databaseEntries: DictionaryDatabase.TermEntry[];
 };
