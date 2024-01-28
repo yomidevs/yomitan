@@ -30,11 +30,6 @@
             "type": "ManifestConfig"
         },
         {
-            "path": "ext/data/deinflect.json",
-            "typeFile": "types/ext/deinflector.d.ts",
-            "type": "ReasonsRaw"
-        },
-        {
             "path": "ext/data/pronunciation-style.json",
             "typeFile": "types/ext/css-style-applier.d.ts",
             "type": "RawStyleData"

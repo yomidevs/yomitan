@@ -568,7 +568,7 @@ export class Translator {
      * @param {string} originalText
      * @param {string} transformedText
      * @param {string} deinflectedText
-     * @param {import('translation-internal').DeinflectionRuleFlags} rules
+     * @param {number} rules
      * @param {import('dictionary').InflectionRuleChainCandidate[]} inflectionRuleChainCandidates
      * @returns {import('translation-internal').DatabaseDeinflection}
      */
