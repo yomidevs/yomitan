@@ -39,4 +39,4 @@ export type JsonFileParseInfo = {
 
 export type AjvSchema = Schema;
 
-export type JsconfigType = 'main' | 'dev' | 'test';
+export type JsconfigType = 'main' | 'dev' | 'test' | 'benches';

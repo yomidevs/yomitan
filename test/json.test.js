@@ -36,6 +36,7 @@ function getJsconfigPath(jsconfigType) {
     switch (jsconfigType) {
         case 'dev': path = '../dev/jsconfig.json'; break;
         case 'test': path = '../test/jsconfig.json'; break;
+        case 'benches': path = '../benches/jsconfig.json'; break;
         default: path = '../jsconfig.json'; break;
     }
     return join(dirname, path);
