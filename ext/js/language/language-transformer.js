@@ -88,16 +88,17 @@ export class LanguageTransformer {
     transform(sourceText) {
         const results = [this._createTransformedText(sourceText, 0, [])];
         for (let i = 0; i < results.length; ++i) {
-            const {text, conditions, rules} = results[i];
-            for (const {name, rules: rules2} of this._transforms) {
-                for (const rule of rules2) {
+            const {text, conditions, trace} = results[i];
+            for (const {name, rules} of this._transforms) {
+                for (let j = 0, jj = rules.length; j < jj; ++j) {
+                    const rule = rules[j];
                     if (!LanguageTransformer.conditionsMatch(conditions, rule.conditionsIn)) { continue; }
                     const {suffixIn, suffixOut} = rule;
                     if (!text.endsWith(suffixIn) || (text.length - suffixIn.length + suffixOut.length) <= 0) { continue; }
                     results.push(this._createTransformedText(
                         text.substring(0, text.length - suffixIn.length) + suffixOut,
                         rule.conditionsOut,
-                        [name, ...rules]
+                        this._extendTrace(trace, {transform: name, ruleIndex: j})
                     ));
                 }
             }
@@ -167,11 +168,24 @@ export class LanguageTransformer {
     /**
      * @param {string} text
      * @param {number} conditions
-     * @param {string[]} rules
+     * @param {import('language-transformer-internal').Trace} trace
      * @returns {import('language-transformer-internal').TransformedText}
      */
-    _createTransformedText(text, conditions, rules) {
-        return {text, conditions, rules};
+    _createTransformedText(text, conditions, trace) {
+        return {text, conditions, trace};
+    }
+
+    /**
+     * @param {import('language-transformer-internal').Trace} trace
+     * @param {import('language-transformer-internal').TraceFrame} newFrame
+     * @returns {import('language-transformer-internal').Trace}
+     */
+    _extendTrace(trace, newFrame) {
+        const newTrace = [newFrame];
+        for (const {transform, ruleIndex} of trace) {
+            newTrace.push({transform, ruleIndex});
+        }
+        return newTrace;
     }
 
     /**

@@ -30,5 +30,12 @@ export type Rule = {
 export type TransformedText = {
     text: string;
     conditions: number;
-    rules: string[];
+    trace: Trace;
+};
+
+export type Trace = TraceFrame[];
+
+export type TraceFrame = {
+    transform: string;
+    ruleIndex: number;
 };
