@@ -22,6 +22,8 @@ export class LanguageTransformer {
         /** @type {import('language-transformer-internal').Transform[]} */
         this._transforms = [];
         /** @type {Map<string, number>} */
+        this._conditionTypeToConditionFlagsMap = new Map();
+        /** @type {Map<string, number>} */
         this._partOfSpeechToConditionFlagsMap = new Map();
     }
 
@@ -29,6 +31,7 @@ export class LanguageTransformer {
     clear() {
         this._nextFlagIndex = 0;
         this._transforms = [];
+        this._conditionTypeToConditionFlagsMap.clear();
         this._partOfSpeechToConditionFlagsMap.clear();
     }
 
@@ -73,6 +76,7 @@ export class LanguageTransformer {
         for (const [type, condition] of conditionEntries) {
             const flags = conditionFlagsMap.get(type);
             if (typeof flags === 'undefined') { continue; } // This case should never happen
+            this._conditionTypeToConditionFlagsMap.set(type, flags);
             for (const partOfSpeech of condition.partsOfSpeech) {
                 this._partOfSpeechToConditionFlagsMap.set(partOfSpeech, this.getConditionFlagsFromPartOfSpeech(partOfSpeech) | flags);
             }
@@ -98,6 +102,15 @@ export class LanguageTransformer {
             result |= this.getConditionFlagsFromPartOfSpeech(partOfSpeech);
         }
         return result;
+    }
+
+    /**
+     * @param {string} conditionType
+     * @returns {number}
+     */
+    getConditionFlagsFromConditionType(conditionType) {
+        const conditionFlags = this._conditionTypeToConditionFlagsMap.get(conditionType);
+        return typeof conditionFlags !== 'undefined' ? conditionFlags : 0;
     }
 
     /**
