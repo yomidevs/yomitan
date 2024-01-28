@@ -17,7 +17,7 @@
  */
 
 import {Handlebars} from '../../../lib/handlebars.js';
-import {AnkiNoteDataCreator} from '../../data/sandbox/anki-note-data-creator.js';
+import {createAnkiNoteData} from '../../data/sandbox/anki-note-data-creator.js';
 import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../../dictionary/dictionary-data-util.js';
 import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from '../../display/sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';
@@ -44,8 +44,6 @@ export class AnkiTemplateRenderer {
         this._structuredContentDatasetKeyIgnorePattern = /^sc([^a-z]|$)/;
         /** @type {TemplateRenderer} */
         this._templateRenderer = new TemplateRenderer();
-        /** @type {AnkiNoteDataCreator} */
-        this._ankiNoteDataCreator = new AnkiNoteDataCreator();
         /** @type {TemplateRendererMediaProvider} */
         this._mediaProvider = new TemplateRendererMediaProvider();
         /** @type {?(Map<string, unknown>[])} */
@@ -102,7 +100,7 @@ export class AnkiTemplateRenderer {
         ]);
         /* eslint-enable no-multi-spaces */
         this._templateRenderer.registerDataType('ankiNote', {
-            modifier: ({marker, commonData}) => this._ankiNoteDataCreator.create(marker, commonData),
+            modifier: ({marker, commonData}) => createAnkiNoteData(marker, commonData),
             composeData: ({marker}, commonData) => ({marker, commonData})
         });
         this._templateRenderer.setRenderCallbacks(
