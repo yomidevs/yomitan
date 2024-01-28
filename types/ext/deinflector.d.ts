@@ -20,12 +20,14 @@ import type * as TranslationInternal from './translation-internal';
 export type ReasonTypeRaw = 'v1' | 'v1d' | 'v1p' | 'v5' | 'vs' | 'vk' | 'vz' | 'adj-i' | 'iru';
 
 export type ReasonsRaw = {
-    [reason: string]: {
-        kanaIn: string;
-        kanaOut: string;
-        rulesIn: ReasonTypeRaw[];
-        rulesOut: ReasonTypeRaw[];
-    }[];
+    [reason: string]: ReasonRaw[];
+};
+
+export type ReasonRaw = {
+    kanaIn: string;
+    kanaOut: string;
+    rulesIn: ReasonTypeRaw[];
+    rulesOut: ReasonTypeRaw[];
 };
 
 export type ReasonVariant = [
