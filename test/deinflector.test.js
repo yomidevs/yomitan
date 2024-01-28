@@ -127,7 +127,7 @@ function testDeinflections() {
                 {term: '食べる', source: '食べておる',       rule: 'v1', reasons: ['-te', 'progressive or perfect']},
                 {term: '食べる', source: '食べてる',         rule: 'v1', reasons: ['-te', 'progressive or perfect']},
                 {term: '食べる', source: '食べとる',         rule: 'v1', reasons: ['-te', 'progressive or perfect']},
-                {term: '食べる', source: '食べてしまう',     rule: 'v1', reasons: ['-te', '-shimau']},
+                {term: '食べる', source: '食べてしまう',     rule: 'v1', reasons: ['-te', '-shimau']}
             ]
         },
         {
