@@ -22,6 +22,7 @@ import {ExtensionError} from '../../core/extension-error.js';
 import {log} from '../../core/logger.js';
 import {toError} from '../../core/to-error.js';
 import {stringContainsAnyFieldMarker} from '../../data/anki-util.js';
+import {getRequiredPermissionsForAnkiFieldValue, hasPermissions, setPermissionsGranted} from '../../data/permissions-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
@@ -211,7 +212,7 @@ export class AnkiController {
      * @returns {string[]}
      */
     getRequiredPermissions(fieldValue) {
-        return this._settingsController.permissionsUtil.getRequiredPermissionsForAnkiFieldValue(fieldValue);
+        return getRequiredPermissionsForAnkiFieldValue(fieldValue);
     }
 
     // Private
@@ -936,7 +937,7 @@ class AnkiCardController {
      */
     async _requestPermissions(permissions) {
         try {
-            await this._settingsController.permissionsUtil.setPermissionsGranted({permissions}, true);
+            await setPermissionsGranted({permissions}, true);
         } catch (e) {
             log.error(e);
         }
@@ -952,12 +953,12 @@ class AnkiCardController {
         const permissions = this._ankiController.getRequiredPermissions(fieldValue);
         if (permissions.length > 0) {
             node.dataset.requiredPermission = permissions.join(' ');
-            const hasPermissions = await (
+            const hasPermissions2 = await (
                 request ?
-                this._settingsController.permissionsUtil.setPermissionsGranted({permissions}, true) :
-                this._settingsController.permissionsUtil.hasPermissions({permissions})
+                setPermissionsGranted({permissions}, true) :
+                hasPermissions({permissions})
             );
-            node.dataset.hasPermissions = `${hasPermissions}`;
+            node.dataset.hasPermissions = `${hasPermissions2}`;
         } else {
             delete node.dataset.requiredPermission;
             delete node.dataset.hasPermissions;
@@ -977,15 +978,15 @@ class AnkiCardController {
             if (typeof requiredPermission !== 'string') { continue; }
             const requiredPermissionArray = (requiredPermission.length === 0 ? [] : requiredPermission.split(' '));
 
-            let hasPermissions = true;
+            let hasPermissions2 = true;
             for (const permission of requiredPermissionArray) {
                 if (!permissionsSet.has(permission)) {
-                    hasPermissions = false;
+                    hasPermissions2 = false;
                     break;
                 }
             }
 
-            inputField.dataset.hasPermissions = `${hasPermissions}`;
+            inputField.dataset.hasPermissions = `${hasPermissions2}`;
             this._validateField(inputField, i);
         }
     }
