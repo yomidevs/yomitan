@@ -26,7 +26,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {readResponseJson} from '../core/json.js';
 import {log} from '../core/logger.js';
 import {clone, deferPromise, isObject, promiseTimeout} from '../core/utilities.js';
-import {AnkiUtil} from '../data/anki-util.js';
+import {isNoteDataValid} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {PermissionsUtil} from '../data/permissions-util.js';
 import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
@@ -545,7 +545,7 @@ export class Backend {
         for (let i = 0; i < notes.length; ++i) {
             const note = notes[i];
             let canAdd = canAddArray[i];
-            const valid = AnkiUtil.isNoteDataValid(note);
+            const valid = isNoteDataValid(note);
             if (!valid) { canAdd = false; }
             const info = {canAdd, valid, noteIds: null};
             results.push(info);

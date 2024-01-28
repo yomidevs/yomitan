@@ -20,7 +20,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {deferPromise} from '../core/utilities.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana} from '../language/japanese.js';
 import {yomitan} from '../yomitan.js';
-import {AnkiUtil} from './anki-util.js';
+import {cloneFieldMarkerPattern, getRootDeckName} from './anki-util.js';
 
 export class AnkiNoteBuilder {
     /**
@@ -29,7 +29,7 @@ export class AnkiNoteBuilder {
      */
     constructor(templateRenderer) {
         /** @type {RegExp} */
-        this._markerPattern = AnkiUtil.cloneFieldMarkerPattern(true);
+        this._markerPattern = cloneFieldMarkerPattern(true);
         /** @type {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} */
         this._templateRenderer = templateRenderer;
         /** @type {import('anki-note-builder').BatchedRequestGroup[]} */
@@ -64,7 +64,7 @@ export class AnkiNoteBuilder {
         let duplicateScopeCheckChildren = false;
         if (duplicateScope === 'deck-root') {
             duplicateScope = 'deck';
-            duplicateScopeDeckName = AnkiUtil.getRootDeckName(deckName);
+            duplicateScopeDeckName = getRootDeckName(deckName);
             duplicateScopeCheckChildren = true;
         }
 

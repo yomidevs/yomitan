@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {AnkiUtil} from './anki-util.js';
+import {getFieldMarkers} from './anki-util.js';
 
 export class PermissionsUtil {
     constructor() {
@@ -88,7 +88,7 @@ export class PermissionsUtil {
      * @returns {string[]}
      */
     getRequiredPermissionsForAnkiFieldValue(fieldValue) {
-        const markers = AnkiUtil.getFieldMarkers(fieldValue);
+        const markers = getFieldMarkers(fieldValue);
         const markerPermissions = this._ankiFieldMarkersRequiringClipboardPermission;
         for (const marker of markers) {
             if (markerPermissions.has(marker)) {
@@ -123,7 +123,7 @@ export class PermissionsUtil {
             ];
             for (const fields of fieldsList) {
                 for (const fieldValue of Object.values(fields)) {
-                    const markers = AnkiUtil.getFieldMarkers(fieldValue);
+                    const markers = getFieldMarkers(fieldValue);
                     for (const marker of markers) {
                         if (fieldMarkersRequiringClipboardPermission.has(marker)) {
                             return false;

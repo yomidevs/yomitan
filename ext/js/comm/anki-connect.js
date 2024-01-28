@@ -18,7 +18,7 @@
 
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
-import {AnkiUtil} from '../data/anki-util.js';
+import {getRootDeckName} from '../data/anki-util.js';
 
 /**
  * This class controls communication with Anki via the AnkiConnect plugin.
@@ -499,7 +499,7 @@ export class AnkiConnect {
                 query = `"deck:${this._escapeQuery(note.deckName)}" `;
                 break;
             case 'deck-root':
-                query = `"deck:${this._escapeQuery(AnkiUtil.getRootDeckName(note.deckName))}" `;
+                query = `"deck:${this._escapeQuery(getRootDeckName(note.deckName))}" `;
                 break;
         }
         query += this._fieldsToQuery(note.fields);

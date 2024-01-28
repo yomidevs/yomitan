@@ -21,7 +21,7 @@ import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {ExtensionError} from '../../core/extension-error.js';
 import {log} from '../../core/logger.js';
 import {toError} from '../../core/to-error.js';
-import {AnkiUtil} from '../../data/anki-util.js';
+import {stringContainsAnyFieldMarker} from '../../data/anki-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
@@ -738,7 +738,7 @@ class AnkiCardController {
      */
     _validateField(node, index) {
         let valid = (node.dataset.hasPermissions !== 'false');
-        if (valid && index === 0 && !AnkiUtil.stringContainsAnyFieldMarker(node.value)) {
+        if (valid && index === 0 && !stringContainsAnyFieldMarker(node.value)) {
             valid = false;
         }
         node.dataset.invalid = `${!valid}`;
