@@ -114,6 +114,18 @@ export class LanguageTransformer {
     }
 
     /**
+     * @param {string[]} conditionTypes
+     * @returns {number}
+     */
+    getConditionFlagsFromConditionTypes(conditionTypes) {
+        let result = 0;
+        for (const conditionType of conditionTypes) {
+            result |= this.getConditionFlagsFromConditionType(conditionType);
+        }
+        return result;
+    }
+
+    /**
      * @param {string} sourceText
      * @returns {import('language-transformer-internal').TransformedText[]}
      */
