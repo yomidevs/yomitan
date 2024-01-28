@@ -22,7 +22,7 @@ import {DictionaryDataUtil} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji, isStringPartiallyJapanese} from '../language/japanese.js';
 import {yomitan} from '../yomitan.js';
-import {PronunciationGenerator} from './sandbox/pronunciation-generator.js';
+import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from './sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
 
 export class DisplayGenerator {
@@ -38,8 +38,6 @@ export class DisplayGenerator {
         this._templates = new HtmlTemplateCollection();
         /** @type {StructuredContentGenerator} */
         this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document);
-        /** @type {PronunciationGenerator} */
-        this._pronunciationGenerator = new PronunciationGenerator();
     }
 
     /** */
@@ -742,15 +740,15 @@ export class DisplayGenerator {
         this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
 
         n = this._querySelector(node, '.pronunciation-downstep-notation-container');
-        n.appendChild(this._pronunciationGenerator.createPronunciationDownstepPosition(position));
+        n.appendChild(createPronunciationDownstepPosition(position));
 
         n = this._querySelector(node, '.pronunciation-text-container');
 
         n.lang = 'ja';
-        n.appendChild(this._pronunciationGenerator.createPronunciationText(morae, position, nasalPositions, devoicePositions));
+        n.appendChild(createPronunciationText(morae, position, nasalPositions, devoicePositions));
 
         n = this._querySelector(node, '.pronunciation-graph-container');
-        n.appendChild(this._pronunciationGenerator.createPronunciationGraph(morae, position));
+        n.appendChild(createPronunciationGraph(morae, position));
 
         return node;
     }

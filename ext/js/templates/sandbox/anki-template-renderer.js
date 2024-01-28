@@ -19,7 +19,7 @@
 import {Handlebars} from '../../../lib/handlebars.js';
 import {AnkiNoteDataCreator} from '../../data/sandbox/anki-note-data-creator.js';
 import {DictionaryDataUtil} from '../../dictionary/dictionary-data-util.js';
-import {PronunciationGenerator} from '../../display/sandbox/pronunciation-generator.js';
+import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from '../../display/sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';
 import {CssStyleApplier} from '../../dom/sandbox/css-style-applier.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../../language/japanese.js';
@@ -48,8 +48,6 @@ export class AnkiTemplateRenderer {
         this._ankiNoteDataCreator = new AnkiNoteDataCreator();
         /** @type {TemplateRendererMediaProvider} */
         this._mediaProvider = new TemplateRendererMediaProvider();
-        /** @type {PronunciationGenerator} */
-        this._pronunciationGenerator = new PronunciationGenerator();
         /** @type {?(Map<string, unknown>[])} */
         this._stateStack = null;
         /** @type {?import('anki-note-builder').Requirement[]} */
@@ -737,11 +735,11 @@ export class AnkiTemplateRenderer {
 
         switch (format) {
             case 'text':
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions));
+                return this._getPronunciationHtml(createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions));
             case 'graph':
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationGraph(morae, downstepPosition));
+                return this._getPronunciationHtml(createPronunciationGraph(morae, downstepPosition));
             case 'position':
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationDownstepPosition(downstepPosition));
+                return this._getPronunciationHtml(createPronunciationDownstepPosition(downstepPosition));
             default:
                 return '';
         }
