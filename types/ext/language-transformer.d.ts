@@ -16,6 +16,7 @@
  */
 
 export type LanguageTransformDescriptor = {
+    language: string;
     conditions: ConditionMapObject;
     transforms: Transform[];
 };
