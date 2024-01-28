@@ -32081,5 +32081,227 @@
         "media": {}
       }
     ]
+  },
+  {
+    "name": "Test text transformations - capitalizeFirstLetter",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 27,
+          "source": "English",
+          "rawSource": "english",
+          "sourceTerm": "English",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 19,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "English",
+          "reading": "English",
+          "expressions": [
+            {
+              "sourceTerm": "English",
+              "expression": "English",
+              "reading": "English",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "English",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "English definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "English",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "English"
+        ],
+        "uniqueReadings": [
+          "English"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test text transformations - decapitalize",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 28,
+          "source": "language",
+          "rawSource": "LANGUAGE",
+          "sourceTerm": "language",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 20,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "language",
+          "reading": "language",
+          "expressions": [
+            {
+              "sourceTerm": "language",
+              "expression": "language",
+              "reading": "language",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "language",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "language definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "language",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "language"
+        ],
+        "uniqueReadings": [
+          "language"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
   }
 ]

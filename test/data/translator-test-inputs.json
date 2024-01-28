@@ -442,6 +442,38 @@
                     }
                 }
             ]
+        },
+        {
+            "name": "Test text transformations - capitalizeFirstLetter",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "english",
+            "options": [
+                "default",
+                {
+                    "language": "en",
+                    "removeNonJapaneseCharacters": false,
+                    "textTransformationsOptions": {
+                        "capitalizeFirstLetter": "true"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Test text transformations - decapitalize",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "LANGUAGE",
+            "options": [
+                "default",
+                {
+                    "language": "en",
+                    "removeNonJapaneseCharacters": false,
+                    "textTransformationsOptions": {
+                        "decapitalize": "true"
+                    }
+                }
+            ]
         }
     ]
 }

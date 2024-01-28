@@ -15,8 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {parseJson} from '../core/json.js';
-import {fetchText} from '../core/utilities.js';
+import {fetchJson} from '../core/utilities.js';
 import {languageFeatures} from './languages/index.js';
 
 export class LanguageUtil {
@@ -28,7 +27,7 @@ export class LanguageUtil {
     /** */
     async prepare() {
         /** @type {import('language').Language[]} */
-        const languages = parseJson(await fetchText('/js/language/languages/index.json'));
+        const languages = await fetchJson('/js/language/languages/index.json');
         for (const {iso, name, flag, exampleText} of languages) {
             this.languages.set(iso, {...languageFeatures.get(iso), iso, name, flag, exampleText});
         }
