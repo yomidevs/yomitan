@@ -25,6 +25,13 @@ export class LanguageTransformer {
         this._partOfSpeechToFlagsMap = new Map();
     }
 
+    /** */
+    clear() {
+        this._nextFlagIndex = 0;
+        this._transforms = [];
+        this._partOfSpeechToFlagsMap.clear();
+    }
+
     /**
      * Note: this function does not currently combine properly with previous descriptors,
      * they are treated as completely separate collections. This should eventually be changed.
