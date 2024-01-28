@@ -29,19 +29,19 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
  * @param {Deinflector} deinflector
  * @param {string} source
  * @param {string} expectedTerm
- * @param {string|undefined} expectedRule
- * @param {string[]|undefined} expectedReasons
+ * @param {string|null} expectedRule
+ * @param {string[]|null} expectedReasons
  * @returns {{has: false, reasons: null, rules: null}|{has: true, reasons: string[], rules: number}}
  */
 function hasTermReasons(deinflector, source, expectedTerm, expectedRule, expectedReasons) {
     for (const {term, reasons, rules} of deinflector.deinflect(source)) {
         if (term !== expectedTerm) { continue; }
-        if (typeof expectedRule !== 'undefined') {
+        if (expectedRule !== null) {
             const expectedFlags = Deinflector.rulesToRuleFlags([expectedRule]);
             if (!Deinflector.rulesMatch(rules, expectedFlags)) { continue; }
         }
         let okay = true;
-        if (typeof expectedReasons !== 'undefined') {
+        if (expectedReasons !== null) {
             if (reasons.length !== expectedReasons.length) { continue; }
             for (let i = 0, ii = expectedReasons.length; i < ii; ++i) {
                 if (expectedReasons[i] !== reasons[i]) {
@@ -63,9 +63,9 @@ function testDeinflections() {
     /* eslint-disable no-multi-spaces */
     const data = [
         {
+            category: 'adjectives',
             valid: true,
             tests: [
-                // Adjective
                 {term: '愛しい', source: '愛しい',                 rule: 'adj-i', reasons: []},
                 {term: '愛しい', source: '愛しそう',               rule: 'adj-i', reasons: ['-sou']},
                 {term: '愛しい', source: '愛しすぎる',             rule: 'adj-i', reasons: ['-sugiru']},
@@ -76,12 +76,16 @@ function testDeinflections() {
                 {term: '愛しい', source: '愛しくない',             rule: 'adj-i', reasons: ['negative']},
                 {term: '愛しい', source: '愛しさ',                 rule: 'adj-i', reasons: ['noun']},
                 {term: '愛しい', source: '愛しかった',             rule: 'adj-i', reasons: ['past']},
-                {term: '愛しい', source: '愛しくありません',       rule: 'adj-i', reasons: ['polite negative']},
+                {term: '愛しい', source: '愛しくありません',      rule: 'adj-i', reasons: ['polite negative']},
                 {term: '愛しい', source: '愛しくありませんでした', rule: 'adj-i', reasons: ['polite past negative']},
                 {term: '愛しい', source: '愛しき',                 rule: 'adj-i', reasons: ['-ki']},
-                {term: '愛しい', source: '愛しげ',                 rule: 'adj-i', reasons: ['-ge']},
-
-                // Common verbs
+                {term: '愛しい', source: '愛しげ',                 rule: 'adj-i', reasons: ['-ge']}
+            ]
+        },
+        {
+            category: 'ichidan verbs',
+            valid: true,
+            tests: [
                 {term: '食べる', source: '食べる',           rule: 'v1', reasons: []},
                 {term: '食べる', source: '食べます',         rule: 'v1', reasons: ['polite']},
                 {term: '食べる', source: '食べた',           rule: 'v1', reasons: ['past']},
@@ -123,8 +127,13 @@ function testDeinflections() {
                 {term: '食べる', source: '食べておる',       rule: 'v1', reasons: ['-te', 'progressive or perfect']},
                 {term: '食べる', source: '食べてる',         rule: 'v1', reasons: ['-te', 'progressive or perfect']},
                 {term: '食べる', source: '食べとる',         rule: 'v1', reasons: ['-te', 'progressive or perfect']},
-                {term: '食べる', source: '食べてしまう',     rule: 'v1', reasons: ['-te', '-shimau']},
-
+                {term: '食べる', source: '食べてしまう',     rule: 'v1', reasons: ['-te', '-shimau']}
+            ]
+        },
+        {
+            category: '-u verbs',
+            valid: true,
+            tests: [
                 {term: '買う', source: '買う',             rule: 'v5', reasons: []},
                 {term: '買う', source: '買います',         rule: 'v5', reasons: ['polite']},
                 {term: '買う', source: '買った',           rule: 'v5', reasons: ['past']},
@@ -166,8 +175,13 @@ function testDeinflections() {
                 {term: '買う', source: '買っておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '買う', source: '買ってる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '買う', source: '買っとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-                {term: '買う', source: '買ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
-
+                {term: '買う', source: '買ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
+            ]
+        },
+        {
+            category: '-ku verbs',
+            valid: true,
+            tests: [
                 {term: '行く', source: '行く',             rule: 'v5', reasons: []},
                 {term: '行く', source: '行きます',         rule: 'v5', reasons: ['polite']},
                 {term: '行く', source: '行った',           rule: 'v5', reasons: ['past']},
@@ -209,8 +223,13 @@ function testDeinflections() {
                 {term: '行く', source: '行っておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '行く', source: '行ってる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '行く', source: '行っとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-                {term: '行く', source: '行ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
-
+                {term: '行く', source: '行ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
+            ]
+        },
+        {
+            category: '-gu verbs',
+            valid: true,
+            tests: [
                 {term: '泳ぐ', source: '泳ぐ',             rule: 'v5', reasons: []},
                 {term: '泳ぐ', source: '泳ぎます',         rule: 'v5', reasons: ['polite']},
                 {term: '泳ぐ', source: '泳いだ',           rule: 'v5', reasons: ['past']},
@@ -251,8 +270,13 @@ function testDeinflections() {
                 {term: '泳ぐ', source: '泳いでいる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '泳ぐ', source: '泳いでおる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '泳ぐ', source: '泳いでる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-                {term: '泳ぐ', source: '泳いでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
-
+                {term: '泳ぐ', source: '泳いでしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
+            ]
+        },
+        {
+            category: '-su verbs',
+            valid: true,
+            tests: [
                 {term: '話す', source: '話す',             rule: 'v5', reasons: []},
                 {term: '話す', source: '話します',         rule: 'v5', reasons: ['polite']},
                 {term: '話す', source: '話した',           rule: 'v5', reasons: ['past']},
@@ -294,8 +318,13 @@ function testDeinflections() {
                 {term: '話す', source: '話しておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '話す', source: '話してる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '話す', source: '話しとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-                {term: '話す', source: '話してしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
-
+                {term: '話す', source: '話してしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
+            ]
+        },
+        {
+            category: '-tsu verbs',
+            valid: true,
+            tests: [
                 {term: '待つ', source: '待つ',             rule: 'v5', reasons: []},
                 {term: '待つ', source: '待ちます',         rule: 'v5', reasons: ['polite']},
                 {term: '待つ', source: '待った',           rule: 'v5', reasons: ['past']},
@@ -337,8 +366,13 @@ function testDeinflections() {
                 {term: '待つ', source: '待っておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '待つ', source: '待ってる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '待つ', source: '待っとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-                {term: '待つ', source: '待ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
-
+                {term: '待つ', source: '待ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
+            ]
+        },
+        {
+            category: '-nu verbs',
+            valid: true,
+            tests: [
                 {term: '死ぬ', source: '死ぬ',             rule: 'v5', reasons: []},
                 {term: '死ぬ', source: '死にます',         rule: 'v5', reasons: ['polite']},
                 {term: '死ぬ', source: '死んだ',           rule: 'v5', reasons: ['past']},
@@ -379,8 +413,13 @@ function testDeinflections() {
                 {term: '死ぬ', source: '死んでいる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '死ぬ', source: '死んでおる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '死ぬ', source: '死んでる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-                {term: '死ぬ', source: '死んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
-
+                {term: '死ぬ', source: '死んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
+            ]
+        },
+        {
+            category: '-bu verbs',
+            valid: true,
+            tests: [
                 {term: '遊ぶ', source: '遊ぶ',             rule: 'v5', reasons: []},
                 {term: '遊ぶ', source: '遊びます',         rule: 'v5', reasons: ['polite']},
                 {term: '遊ぶ', source: '遊んだ',           rule: 'v5', reasons: ['past']},
@@ -421,8 +460,13 @@ function testDeinflections() {
                 {term: '遊ぶ', source: '遊んでいる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '遊ぶ', source: '遊んでおる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '遊ぶ', source: '遊んでる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-                {term: '遊ぶ', source: '遊んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
-
+                {term: '遊ぶ', source: '遊んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
+            ]
+        },
+        {
+            category: '-mu verbs',
+            valid: true,
+            tests: [
                 {term: '飲む', source: '飲む',             rule: 'v5', reasons: []},
                 {term: '飲む', source: '飲みます',         rule: 'v5', reasons: ['polite']},
                 {term: '飲む', source: '飲んだ',           rule: 'v5', reasons: ['past']},
@@ -463,8 +507,13 @@ function testDeinflections() {
                 {term: '飲む', source: '飲んでいる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '飲む', source: '飲んでおる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '飲む', source: '飲んでる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-                {term: '飲む', source: '飲んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
-
+                {term: '飲む', source: '飲んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
+            ]
+        },
+        {
+            category: 'godan verbs',
+            valid: true,
+            tests: [
                 {term: '作る', source: '作る',             rule: 'v5', reasons: []},
                 {term: '作る', source: '作ります',         rule: 'v5', reasons: ['polite']},
                 {term: '作る', source: '作った',           rule: 'v5', reasons: ['past']},
@@ -506,9 +555,13 @@ function testDeinflections() {
                 {term: '作る', source: '作っておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '作る', source: '作ってる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
                 {term: '作る', source: '作っとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-                {term: '作る', source: '作ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
-
-                // Irregular verbs
+                {term: '作る', source: '作ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
+            ]
+        },
+        {
+            category: 'irregular verbs',
+            valid: true,
+            tests: [
                 {term: '為る', source: '為る',           rule: 'vs', reasons: []},
                 {term: '為る', source: '為ます',         rule: 'vs', reasons: ['polite']},
                 {term: '為る', source: '為た',           rule: 'vs', reasons: ['past']},
@@ -732,9 +785,13 @@ function testDeinflections() {
                 {term: 'くる', source: 'きておる',       rule: 'vk', reasons: ['-te', 'progressive or perfect']},
                 {term: 'くる', source: 'きてる',         rule: 'vk', reasons: ['-te', 'progressive or perfect']},
                 {term: 'くる', source: 'きとる',         rule: 'vk', reasons: ['-te', 'progressive or perfect']},
-                {term: 'くる', source: 'きてしまう',     rule: 'vk', reasons: ['-te', '-shimau']},
-
-                // Zuru verbs
+                {term: 'くる', source: 'きてしまう',     rule: 'vk', reasons: ['-te', '-shimau']}
+            ]
+        },
+        {
+            category: '-zuru verbs',
+            valid: true,
+            tests: [
                 {term: '論ずる', source: '論ずる',           rule: 'vz', reasons: []},
                 {term: '論ずる', source: '論じます',         rule: 'vz', reasons: ['polite']},
                 {term: '論ずる', source: '論じた',           rule: 'vz', reasons: ['past']},
@@ -783,9 +840,86 @@ function testDeinflections() {
                 {term: '論ずる', source: '論じておる',       rule: 'vz', reasons: ['-te', 'progressive or perfect']},
                 {term: '論ずる', source: '論じてる',         rule: 'vz', reasons: ['-te', 'progressive or perfect']},
                 {term: '論ずる', source: '論じとる',         rule: 'vz', reasons: ['-te', 'progressive or perfect']},
-                {term: '論ずる', source: '論じてしまう',     rule: 'vz', reasons: ['-te', '-shimau']},
+                {term: '論ずる', source: '論じてしまう',     rule: 'vz', reasons: ['-te', '-shimau']}
+            ]
+        },
+        {
+            category: '-e verbs',
+            valid: true,
+            tests: [
+                {term: 'すごい',     source: 'すげえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'やばい',     source: 'やべえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'うるさい',   source: 'うるせえ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'ひどい',     source: 'ひでえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'ない',       source: 'ねえ',       rule: 'adj-i', reasons: ['-e']},
+                {term: 'できる',     source: 'できねえ',   rule: 'v1',    reasons: ['negative', '-e']},
+                {term: 'しんじる',   source: 'しんじねえ', rule: 'v1',    reasons: ['negative', '-e']},
+                {term: 'さむい',     source: 'さめえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'さむい',     source: 'さみい',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'あつい',     source: 'あちぇえ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'あつい',     source: 'あちい',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'やすい',     source: 'やせえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'たかい',     source: 'たけえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'かわいい',   source: 'かわええ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'つよい',     source: 'ついぇえ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'こわい',     source: 'こうぇえ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'みじかい',   source: 'みじけえ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'ながい',     source: 'なげえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'くさい',     source: 'くせえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'うまい',     source: 'うめえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'でかい',     source: 'でけえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'まずい',     source: 'まっぜえ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'ちっちゃい', source: 'ちっちぇえ', rule: 'adj-i', reasons: ['-e']},
+                {term: 'あかい',     source: 'あけえ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'こわい',     source: 'こええ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'つよい',     source: 'つええ',     rule: 'adj-i', reasons: ['-e']}
+            ]
+        },
+        {
+            category: 'irregular verbs',
+            valid: false,
+            tests: [
+                {term: 'する', source: 'すます',         rule: 'vs', reasons: null},
+                {term: 'する', source: 'すた',           rule: 'vs', reasons: null},
+                {term: 'する', source: 'すました',       rule: 'vs', reasons: null},
+                {term: 'する', source: 'すて',           rule: 'vs', reasons: null},
+                {term: 'する', source: 'すれる',         rule: 'vs', reasons: null},
+                {term: 'する', source: 'すせる',         rule: 'vs', reasons: null},
+                {term: 'する', source: 'すせられる',     rule: 'vs', reasons: null},
+                {term: 'する', source: 'すろ',           rule: 'vs', reasons: null},
+                {term: 'する', source: 'すない',         rule: 'vs', reasons: null},
+                {term: 'する', source: 'すません',       rule: 'vs', reasons: null},
+                {term: 'する', source: 'すなかった',     rule: 'vs', reasons: null},
+                {term: 'する', source: 'すませんでした', rule: 'vs', reasons: null},
+                {term: 'する', source: 'すなくて',       rule: 'vs', reasons: null},
+                {term: 'する', source: 'すれない',       rule: 'vs', reasons: null},
+                {term: 'する', source: 'すせない',       rule: 'vs', reasons: null},
+                {term: 'する', source: 'すせられない',   rule: 'vs', reasons: null},
 
-                // Uncommon irregular verbs
+                {term: 'くる', source: 'くます',         rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くた',           rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くました',       rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くて',           rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くられる',       rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くられる',       rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くさせる',       rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くさせられる',   rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くい',           rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くない',         rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くません',       rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くなかった',     rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くませんでした', rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くなくて',       rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くられない',     rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くられない',     rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くさせない',     rule: 'vk', reasons: null},
+                {term: 'くる', source: 'くさせられない', rule: 'vk', reasons: null}
+            ]
+        },
+        {
+            category: 'uncommon irregular verbs',
+            valid: true,
+            tests: [
                 {term: 'のたまう', source: 'のたもうて',   rule: 'v5', reasons: ['-te']},
                 {term: 'のたまう', source: 'のたもうた',   rule: 'v5', reasons: ['past']},
                 {term: 'のたまう', source: 'のたもうたら', rule: 'v5', reasons: ['-tara']},
@@ -845,9 +979,13 @@ function testDeinflections() {
                 {term: '沿う', source: '沿うたり', rule: 'v5', reasons: ['-tari']},
                 {term: '添う', source: '添うたり', rule: 'v5', reasons: ['-tari']},
                 {term: '副う', source: '副うたり', rule: 'v5', reasons: ['-tari']},
-                {term: '厭う', source: '厭うたり', rule: 'v5', reasons: ['-tari']},
-
-                // Combinations
+                {term: '厭う', source: '厭うたり', rule: 'v5', reasons: ['-tari']}
+            ]
+        },
+        {
+            category: 'combinations',
+            valid: true,
+            tests: [
                 {term: '抱き抱える', source: '抱き抱えていなければ', rule: 'v1', reasons: ['-te', 'progressive or perfect', 'negative', '-ba']},
                 {term: '抱きかかえる', source: '抱きかかえていなければ', rule: 'v1', reasons: ['-te', 'progressive or perfect', 'negative', '-ba']},
                 {term: '打ち込む', source: '打ち込んでいませんでした', rule: 'v5', reasons: ['-te', 'progressive or perfect', 'polite past negative']},
@@ -855,80 +993,18 @@ function testDeinflections() {
             ]
         },
         {
+            category: 'kawaii (this leads to infinite expansions)',
             valid: false,
             tests: [
-                {term: 'する', source: 'すます',         rule: 'vs'},
-                {term: 'する', source: 'すた',           rule: 'vs'},
-                {term: 'する', source: 'すました',       rule: 'vs'},
-                {term: 'する', source: 'すて',           rule: 'vs'},
-                {term: 'する', source: 'すれる',         rule: 'vs'},
-                {term: 'する', source: 'すせる',         rule: 'vs'},
-                {term: 'する', source: 'すせられる',     rule: 'vs'},
-                {term: 'する', source: 'すろ',           rule: 'vs'},
-                {term: 'する', source: 'すない',         rule: 'vs'},
-                {term: 'する', source: 'すません',       rule: 'vs'},
-                {term: 'する', source: 'すなかった',     rule: 'vs'},
-                {term: 'する', source: 'すませんでした', rule: 'vs'},
-                {term: 'する', source: 'すなくて',       rule: 'vs'},
-                {term: 'する', source: 'すれない',       rule: 'vs'},
-                {term: 'する', source: 'すせない',       rule: 'vs'},
-                {term: 'する', source: 'すせられない',   rule: 'vs'},
-
-                {term: 'くる', source: 'くます',         rule: 'vk'},
-                {term: 'くる', source: 'くた',           rule: 'vk'},
-                {term: 'くる', source: 'くました',       rule: 'vk'},
-                {term: 'くる', source: 'くて',           rule: 'vk'},
-                {term: 'くる', source: 'くられる',       rule: 'vk'},
-                {term: 'くる', source: 'くられる',       rule: 'vk'},
-                {term: 'くる', source: 'くさせる',       rule: 'vk'},
-                {term: 'くる', source: 'くさせられる',   rule: 'vk'},
-                {term: 'くる', source: 'くい',           rule: 'vk'},
-                {term: 'くる', source: 'くない',         rule: 'vk'},
-                {term: 'くる', source: 'くません',       rule: 'vk'},
-                {term: 'くる', source: 'くなかった',     rule: 'vk'},
-                {term: 'くる', source: 'くませんでした', rule: 'vk'},
-                {term: 'くる', source: 'くなくて',       rule: 'vk'},
-                {term: 'くる', source: 'くられない',     rule: 'vk'},
-                {term: 'くる', source: 'くられない',     rule: 'vk'},
-                {term: 'くる', source: 'くさせない',     rule: 'vk'},
-                {term: 'くる', source: 'くさせられない', rule: 'vk'},
-
                 {term: 'かわいい', source: 'かわいげ',   rule: 'adj-i', reasons: ['-ge']},
-                {term: '可愛い',   source: 'かわいげ',   rule: 'adj-i', reasons: ['-ge']},
-
-                {term: '食べる', source: '食べて', reasons: ['-te', 'progressive or perfect', 'masu stem']}
+                {term: '可愛い',   source: 'かわいげ',   rule: 'adj-i', reasons: ['-ge']}
             ]
         },
         {
-            valid: true,
+            category: 'incorrect -te rule chain',
+            valid: false,
             tests: [
-                // -e
-                {term: 'すごい',     source: 'すげえ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'やばい',     source: 'やべえ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'うるさい',   source: 'うるせえ',   rule: 'adj-i', reasons: ['-e']},
-                {term: 'ひどい',     source: 'ひでえ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'ない',       source: 'ねえ',       rule: 'adj-i', reasons: ['-e']},
-                {term: 'できる',     source: 'できねえ',   rule: 'v1',    reasons: ['negative', '-e']},
-                {term: 'しんじる',   source: 'しんじねえ', rule: 'v1',    reasons: ['negative', '-e']},
-                {term: 'さむい',     source: 'さめえ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'さむい',     source: 'さみい',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'あつい',     source: 'あちぇえ',   rule: 'adj-i', reasons: ['-e']},
-                {term: 'あつい',     source: 'あちい',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'やすい',     source: 'やせえ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'たかい',     source: 'たけえ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'かわいい',   source: 'かわええ',   rule: 'adj-i', reasons: ['-e']},
-                {term: 'つよい',     source: 'ついぇえ',   rule: 'adj-i', reasons: ['-e']},
-                {term: 'こわい',     source: 'こうぇえ',   rule: 'adj-i', reasons: ['-e']},
-                {term: 'みじかい',   source: 'みじけえ',   rule: 'adj-i', reasons: ['-e']},
-                {term: 'ながい',     source: 'なげえ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'くさい',     source: 'くせえ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'うまい',     source: 'うめえ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'でかい',     source: 'でけえ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'まずい',     source: 'まっぜえ',   rule: 'adj-i', reasons: ['-e']},
-                {term: 'ちっちゃい', source: 'ちっちぇえ', rule: 'adj-i', reasons: ['-e']},
-                {term: 'あかい',     source: 'あけえ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'こわい',     source: 'こええ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'つよい',     source: 'つええ',     rule: 'adj-i', reasons: ['-e']}
+                {term: '食べる', source: '食べて', rule: null, reasons: ['-te', 'progressive or perfect', 'masu stem']}
             ]
         }
     ];
@@ -939,14 +1015,15 @@ function testDeinflections() {
     const deinflector = new Deinflector(deinflectionReasons);
 
     describe('deinflections', () => {
-        for (const {valid, tests} of data) {
+        // for (const {valid, tests} of data) {
+        describe.each(data)('$category', ({valid, tests}) => {
             for (const {source, term, rule, reasons} of tests) {
                 const {has} = hasTermReasons(deinflector, source, term, rule, reasons);
                 let message = `${source} ${valid ? 'has' : 'does not have'} term candidate ${JSON.stringify(term)}`;
                 if (typeof rule !== 'undefined') {
                     message += ` with rule ${JSON.stringify(rule)}`;
                 }
-                if (typeof reasons !== 'undefined') {
+                if (reasons !== null) {
                     message += (typeof rule !== 'undefined' ? ' and' : ' with');
                     message += ` reasons ${JSON.stringify(reasons)}`;
                 }
@@ -954,7 +1031,7 @@ function testDeinflections() {
                     expect(has).toStrictEqual(valid);
                 });
             }
-        }
+        });
     });
 }
 
