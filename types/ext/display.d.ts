@@ -17,6 +17,7 @@
 
 import type {DisplayContentManager} from '../../ext/js/display/display-content-manager';
 import type {HotkeyHelpController} from '../../ext/js/input/hotkey-help-controller';
+import type {TextSourceGenerator} from '../../ext/js/dom/text-source-generator';
 import type * as Dictionary from './dictionary';
 import type * as Extension from './extension';
 import type * as Settings from './settings';
@@ -127,6 +128,7 @@ export type GetSearchContextCallback = TextScannerTypes.GetSearchContextCallback
 
 export type QueryParserConstructorDetails = {
     getSearchContext: GetSearchContextCallback;
+    textSourceGenerator: TextSourceGenerator;
 };
 
 export type QueryParserOptions = {

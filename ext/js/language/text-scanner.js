@@ -39,7 +39,8 @@ export class TextScanner extends EventDispatcher {
         searchTerms = false,
         searchKanji = false,
         searchOnClick = false,
-        searchOnClickOnly = false
+        searchOnClickOnly = false,
+        textSourceGenerator
     }) {
         super();
         /** @type {HTMLElement|Window} */
@@ -58,6 +59,8 @@ export class TextScanner extends EventDispatcher {
         this._searchOnClick = searchOnClick;
         /** @type {boolean} */
         this._searchOnClickOnly = searchOnClickOnly;
+        /** @type {import('../dom/text-source-generator').TextSourceGenerator} */
+        this._textSourceGenerator = textSourceGenerator;
 
         /** @type {boolean} */
         this._isPrepared = false;
@@ -1274,7 +1277,7 @@ export class TextScanner extends EventDispatcher {
                 return;
             }
 
-            const textSource = DocumentUtil.getRangeFromPoint(x, y, {
+            const textSource = this._textSourceGenerator.getRangeFromPoint(x, y, {
                 deepContentScan: this._deepContentScan,
                 normalizeCssZoom: this._normalizeCssZoom
             });
