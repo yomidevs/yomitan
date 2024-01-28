@@ -16,12 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-multi-spaces */
-
 import fs from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import {expect, test, describe, vi} from 'vitest';
+import {describe, expect, test, vi} from 'vitest';
 import {OptionsUtil} from '../ext/js/data/options-util.js';
 import {TemplatePatcher} from '../ext/js/templates/template-patcher.js';
 import {chrome, fetch} from './mocks/common.js';
@@ -477,6 +475,7 @@ function createProfileOptionsUpdatedTestData1() {
             ]
         },
         inputs: {
+            /* eslint-disable no-multi-spaces */
             hotkeys: [
                 {action: 'close',             argument: '',  key: 'Escape',    modifiers: [],       scopes: ['popup'], enabled: true},
                 {action: 'focusSearchBox',    argument: '',  key: 'Escape',    modifiers: [],       scopes: ['search'], enabled: true},
@@ -495,6 +494,7 @@ function createProfileOptionsUpdatedTestData1() {
                 {action: 'viewNote',          argument: '',  key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'copyHostSelection', argument: '',  key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true}
             ]
+            /* eslint-enable no-multi-spaces */
         },
         popupWindow: {
             width: 400,
@@ -667,10 +667,10 @@ async function testFieldTemplatesUpdate() {
             return templatePatcher.parsePatch(content).addition;
         };
         const updates = [
-            {version: 2,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v2.handlebars')},
-            {version: 4,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars')},
-            {version: 6,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars')},
-            {version: 8,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
+            {version: 2, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v2.handlebars')},
+            {version: 4, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars')},
+            {version: 6, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars')},
+            {version: 8, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
             {version: 10, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars')},
             {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')},
             {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')},

@@ -17,7 +17,7 @@
 
 import type * as TranslationInternal from './translation-internal';
 
-export type ReasonTypeRaw = 'v1' | 'v5' | 'vs' | 'vk' | 'vz' | 'adj-i' | 'iru';
+export type ReasonTypeRaw = 'v1' | 'v1d' | 'v1p' | 'v5' | 'vs' | 'vk' | 'vz' | 'adj-i' | 'iru';
 
 export type ReasonsRaw = {
     [reason: string]: {

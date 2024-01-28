@@ -486,9 +486,16 @@ export class DictionaryImporter {
      * @param {import('dictionary-database').DatabaseTermEntry} entry
      */
     async _resolveStructuredContentImage(context, target, source, entry) {
-        const {verticalAlign, sizeUnits} = source;
+        const {
+            verticalAlign,
+            border,
+            borderRadius,
+            sizeUnits
+        } = source;
         await this._createImageData(context, target, source, entry);
         if (typeof verticalAlign === 'string') { target.verticalAlign = verticalAlign; }
+        if (typeof border === 'string') { target.border = border; }
+        if (typeof borderRadius === 'string') { target.borderRadius = borderRadius; }
         if (typeof sizeUnits === 'string') { target.sizeUnits = sizeUnits; }
     }
 

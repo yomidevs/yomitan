@@ -287,7 +287,7 @@ export class DictionaryDataUtil {
                 case 'vs':
                     isVerbOrAdjective = true;
                     isSuruVerb = true;
-                    break;
+                    // falls through
                 case 'n':
                     isNoun = true;
                     break;

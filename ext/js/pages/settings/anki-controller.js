@@ -147,6 +147,7 @@ export class AnkiController {
                     'pitch-accents',
                     'pitch-accent-graphs',
                     'pitch-accent-positions',
+                    'pitch-accent-categories',
                     'phonetic-transcriptions',
                     'reading',
                     'screenshot',

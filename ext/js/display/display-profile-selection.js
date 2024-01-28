@@ -30,7 +30,7 @@ export class DisplayProfileSelection {
         /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {HTMLElement} */
-        this._profielList = querySelectorNotNull(document, '#profile-list');
+        this._profileList = querySelectorNotNull(document, '#profile-list');
         /** @type {HTMLButtonElement} */
         this._profileButton = querySelectorNotNull(document, '#profile-button');
         /** @type {HTMLElement} */
@@ -111,8 +111,8 @@ export class DisplayProfileSelection {
             fragment.appendChild(entry);
             this._eventListeners.addEventListener(radio, 'change', this._onProfileRadioChange.bind(this, i), false);
         }
-        this._profielList.textContent = '';
-        this._profielList.appendChild(fragment);
+        this._profileList.textContent = '';
+        this._profileList.appendChild(fragment);
     }
 
     /**
