@@ -949,6 +949,7 @@ export class Frontend {
      */
     async _prepareGoogleDocs() {
         const {GoogleDocsUtil} = await import('../accessibility/google-docs-util.js');
-        DocumentUtil.registerGetRangeFromPointHandler(GoogleDocsUtil.getRangeFromPoint.bind(GoogleDocsUtil));
+        const googleDocsUtil = new GoogleDocsUtil();
+        DocumentUtil.registerGetRangeFromPointHandler(googleDocsUtil.getRangeFromPoint.bind(googleDocsUtil));
     }
 }
