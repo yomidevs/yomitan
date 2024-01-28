@@ -21,37 +21,41 @@ import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {describe, expect, test} from 'vitest';
 import {parseJson} from '../dev/json.js';
-import {Deinflector} from '../ext/js/language/deinflector.js';
+import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * @param {Deinflector} deinflector
+ * @param {LanguageTransformer} languageTransformer
  * @param {string} source
  * @param {string} expectedTerm
- * @param {string|null} expectedRule
+ * @param {string|null} expectedConditionName
  * @param {string[]|null} expectedReasons
  * @returns {{has: false, reasons: null, rules: null}|{has: true, reasons: string[], rules: number}}
  */
-function hasTermReasons(deinflector, source, expectedTerm, expectedRule, expectedReasons) {
-    for (const {term, reasons, rules} of deinflector.deinflect(source)) {
-        if (term !== expectedTerm) { continue; }
-        if (expectedRule !== null) {
-            const expectedFlags = Deinflector.rulesToRuleFlags([expectedRule]);
-            if (!Deinflector.rulesMatch(rules, expectedFlags)) { continue; }
+function hasTermReasons(languageTransformer, source, expectedTerm, expectedConditionName, expectedReasons) {
+    for (const {text, conditions, trace} of languageTransformer.transform(source)) {
+        if (text !== expectedTerm) { continue; }
+        if (expectedConditionName !== null) {
+            const expectedConditions = languageTransformer.getConditionFlagsFromConditionType(expectedConditionName);
+            if (!LanguageTransformer.conditionsMatch(conditions, expectedConditions)) { continue; }
         }
         let okay = true;
         if (expectedReasons !== null) {
-            if (reasons.length !== expectedReasons.length) { continue; }
+            if (trace.length !== expectedReasons.length) { continue; }
             for (let i = 0, ii = expectedReasons.length; i < ii; ++i) {
-                if (expectedReasons[i] !== reasons[i]) {
+                if (expectedReasons[i] !== trace[i].transform) {
                     okay = false;
                     break;
                 }
             }
         }
         if (okay) {
-            return {has: true, reasons, rules};
+            return {
+                has: true,
+                reasons: trace.map((frame) => frame.transform),
+                rules: conditions
+            };
         }
     }
     return {has: false, reasons: null, rules: null};
@@ -1010,15 +1014,16 @@ function testDeinflections() {
     ];
     /* eslint-enable no-multi-spaces */
 
-    /** @type {import('deinflector').ReasonsRaw} */
-    const deinflectionReasons = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/deinflect.json'), {encoding: 'utf8'}));
-    const deinflector = new Deinflector(deinflectionReasons);
+    /** @type {import('language-transformer').LanguageTransformDescriptor} */
+    const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/language/japanese-transforms.json'), {encoding: 'utf8'}));
+    const languageTransformer = new LanguageTransformer();
+    languageTransformer.addDescriptor(descriptor);
 
     describe('deinflections', () => {
         // for (const {valid, tests} of data) {
         describe.each(data)('$category', ({valid, tests}) => {
             for (const {source, term, rule, reasons} of tests) {
-                const {has} = hasTermReasons(deinflector, source, term, rule, reasons);
+                const {has} = hasTermReasons(languageTransformer, source, term, rule, reasons);
                 let message = `${source} ${valid ? 'has' : 'does not have'} term candidate ${JSON.stringify(term)}`;
                 if (typeof rule !== 'undefined') {
                     message += ` with rule ${JSON.stringify(rule)}`;

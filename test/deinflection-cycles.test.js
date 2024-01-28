@@ -20,19 +20,19 @@ import {join, dirname as pathDirname} from 'path';
 import {fileURLToPath} from 'url';
 import {describe, test} from 'vitest';
 import {parseJson} from '../dev/json.js';
-import {Deinflector} from '../ext/js/language/deinflector.js';
+import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
 
 class DeinflectionNode {
     /**
      * @param {string} text
-     * @param {import('deinflector').ReasonTypeRaw[]} ruleNames
+     * @param {string[]} ruleNames
      * @param {?RuleNode} ruleNode
      * @param {?DeinflectionNode} previous
      */
     constructor(text, ruleNames, ruleNode, previous) {
         /** @type {string} */
         this.text = text;
-        /** @type {import('deinflector').ReasonTypeRaw[]} */
+        /** @type {string[]} */
         this.ruleNames = ruleNames;
         /** @type {?RuleNode} */
         this.ruleNode = ruleNode;
@@ -79,12 +79,12 @@ class DeinflectionNode {
 class RuleNode {
     /**
      * @param {string} groupName
-     * @param {import('deinflector').ReasonRaw} rule
+     * @param {import('language-transformer').Rule} rule
      */
     constructor(groupName, rule) {
         /** @type {string} */
         this.groupName = groupName;
-        /** @type {import('deinflector').ReasonRaw} */
+        /** @type {import('language-transformer').Rule} */
         this.rule = rule;
     }
 }
@@ -107,13 +107,15 @@ describe('Deinflection data', () => {
     test('Check for cycles', ({expect}) => {
         const dirname = pathDirname(fileURLToPath(import.meta.url));
 
-        /** @type {import('deinflector').ReasonsRaw} */
-        const deinflectionReasons = parseJson(readFileSync(join(dirname, '../ext/data/deinflect.json'), {encoding: 'utf8'}));
+        /** @type {import('language-transformer').LanguageTransformDescriptor} */
+        const descriptor = parseJson(readFileSync(join(dirname, '../ext/data/language/japanese-transforms.json'), {encoding: 'utf8'}));
+        const languageTransformer = new LanguageTransformer();
+        languageTransformer.addDescriptor(descriptor);
 
         /** @type {RuleNode[]} */
         const ruleNodes = [];
-        for (const [groupName, reasonInfo] of Object.entries(deinflectionReasons)) {
-            for (const rule of reasonInfo) {
+        for (const [groupName, reasonInfo] of Object.entries(descriptor.transforms)) {
+            for (const rule of reasonInfo.rules) {
                 ruleNodes.push(new RuleNode(groupName, rule));
             }
         }
@@ -121,24 +123,27 @@ describe('Deinflection data', () => {
         /** @type {DeinflectionNode[]} */
         const deinflectionNodes = [];
         for (const ruleNode of ruleNodes) {
-            deinflectionNodes.push(new DeinflectionNode(`?${ruleNode.rule.kanaIn}`, [], null, null));
+            deinflectionNodes.push(new DeinflectionNode(`?${ruleNode.rule.suffixIn}`, [], null, null));
         }
         for (let i = 0; i < deinflectionNodes.length; ++i) {
             const deinflectionNode = deinflectionNodes[i];
             const {text, ruleNames} = deinflectionNode;
             for (const ruleNode of ruleNodes) {
-                const {kanaIn, kanaOut, rulesIn, rulesOut} = ruleNode.rule;
+                const {suffixIn, suffixOut, conditionsIn, conditionsOut} = ruleNode.rule;
                 if (
-                    !Deinflector.rulesMatch(Deinflector.rulesToRuleFlags(ruleNames), Deinflector.rulesToRuleFlags(rulesIn)) ||
-                    !text.endsWith(kanaIn) ||
-                    (text.length - kanaIn.length + kanaOut.length) <= 0
+                    !LanguageTransformer.conditionsMatch(
+                        languageTransformer.getConditionFlagsFromConditionTypes(ruleNames),
+                        languageTransformer.getConditionFlagsFromConditionTypes(conditionsIn)
+                    ) ||
+                    !text.endsWith(suffixIn) ||
+                    (text.length - suffixIn.length + suffixOut.length) <= 0
                 ) {
                     continue;
                 }
 
                 const newDeinflectionNode = new DeinflectionNode(
-                    text.substring(0, text.length - kanaIn.length) + kanaOut,
-                    rulesOut,
+                    text.substring(0, text.length - suffixIn.length) + suffixOut,
+                    conditionsOut,
                     ruleNode,
                     deinflectionNode
                 );
@@ -150,7 +155,7 @@ describe('Deinflection data', () => {
                         stack.push(
                             item.ruleNode === null ?
                             `${item.text} (start)` :
-                            `${item.text} (${item.ruleNode.groupName}, ${item.ruleNode.rule.rulesIn.join(',')}=>${item.ruleNode.rule.rulesOut.join(',')}, ${item.ruleNode.rule.kanaIn}=>${item.ruleNode.rule.kanaOut})`
+                            `${item.text} (${item.ruleNode.groupName}, ${item.ruleNode.rule.conditionsIn.join(',')}=>${item.ruleNode.rule.conditionsOut.join(',')}, ${item.ruleNode.rule.suffixIn}=>${item.ruleNode.rule.suffixOut})`
                         );
                     }
                     const message = `Cycle detected:\n  ${stack.join('\n  ')}`;
