@@ -17,7 +17,7 @@
  */
 
 import {describe, expect, test} from 'vitest';
-import {ProfileConditionsUtil} from '../ext/js/background/profile-conditions-util.js';
+import {createSchema, normalizeContext} from '../ext/js/background/profile-conditions-util.js';
 
 /** */
 function testNormalizeContext() {
@@ -50,8 +50,7 @@ function testNormalizeContext() {
         ];
 
         test.each(data)('normalize-context-test-%#', ({context, expected}) => {
-            const profileConditionsUtil = new ProfileConditionsUtil();
-            const actual = profileConditionsUtil.normalizeContext(context);
+            const actual = normalizeContext(context);
             expect(actual).toStrictEqual(expected);
         });
     });
@@ -1101,14 +1100,13 @@ function testSchemas() {
         /* eslint-enable no-multi-spaces */
 
         test.each(data)('schemas-test-%#', ({conditionGroups, expectedSchema, inputs}) => {
-            const profileConditionsUtil = new ProfileConditionsUtil();
-            const schema = profileConditionsUtil.createSchema(conditionGroups);
+            const schema = createSchema(conditionGroups);
             if (typeof expectedSchema !== 'undefined') {
                 expect(schema.schema).toStrictEqual(expectedSchema);
             }
             if (Array.isArray(inputs)) {
                 for (const {expected, context} of inputs) {
-                    const normalizedContext = profileConditionsUtil.normalizeContext(context);
+                    const normalizedContext = normalizeContext(context);
                     const actual = schema.isValid(normalizedContext);
                     expect(actual).toStrictEqual(expected);
                 }

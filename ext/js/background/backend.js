@@ -38,7 +38,7 @@ import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
 import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
-import {ProfileConditionsUtil} from './profile-conditions-util.js';
+import {createSchema, normalizeContext} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
 
@@ -95,8 +95,6 @@ export class Backend {
         this._options = null;
         /** @type {import('../data/json-schema.js').JsonSchema[]} */
         this._profileConditionsSchemaCache = [];
-        /** @type {ProfileConditionsUtil} */
-        this._profileConditionsUtil = new ProfileConditionsUtil();
         /** @type {?string} */
         this._defaultAnkiFieldTemplates = null;
         /** @type {RequestBuilder} */
@@ -1300,7 +1298,7 @@ export class Backend {
      * @returns {?import('settings').Profile}
      */
     _getProfileFromContext(options, optionsContext) {
-        const normalizedOptionsContext = this._profileConditionsUtil.normalizeContext(optionsContext);
+        const normalizedOptionsContext = normalizeContext(optionsContext);
 
         let index = 0;
         for (const profile of options.profiles) {
@@ -1310,7 +1308,7 @@ export class Backend {
             if (index < this._profileConditionsSchemaCache.length) {
                 schema = this._profileConditionsSchemaCache[index];
             } else {
-                schema = this._profileConditionsUtil.createSchema(conditionGroups);
+                schema = createSchema(conditionGroups);
                 this._profileConditionsSchemaCache.push(schema);
             }
 
