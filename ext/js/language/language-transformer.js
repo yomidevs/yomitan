@@ -32,7 +32,7 @@ export class LanguageTransformer {
     addDescriptor(descriptor) {
         const {conditions, transforms} = descriptor;
         const conditionEntries = Object.entries(conditions);
-        const {conditionFlagsMap, nextFlagIndex} = LanguageTransformer.getConditionFlagsMap(conditionEntries, this._nextFlagIndex);
+        const {conditionFlagsMap, nextFlagIndex} = this._getConditionFlagsMap(conditionEntries, this._nextFlagIndex);
 
         /** @type {import('language-transformer-internal').Transform[]} */
         const transforms2 = [];
@@ -42,9 +42,9 @@ export class LanguageTransformer {
             const rules2 = [];
             for (let j = 0, jj = rules.length; j < jj; ++j) {
                 const {suffixIn, suffixOut, conditionsIn, conditionsOut} = rules[j];
-                const conditionFlagsIn = LanguageTransformer.getConditionFlags(conditionFlagsMap, conditionsIn);
+                const conditionFlagsIn = this._getConditionFlags(conditionFlagsMap, conditionsIn);
                 if (conditionFlagsIn === null) { throw new Error(`Invalid conditionsIn for transform[${i}].rules[${j}]`); }
-                const conditionFlagsOut = LanguageTransformer.getConditionFlags(conditionFlagsMap, conditionsOut);
+                const conditionFlagsOut = this._getConditionFlags(conditionFlagsMap, conditionsOut);
                 if (conditionFlagsOut === null) { throw new Error(`Invalid conditionsOut for transform[${i}].rules[${j}]`); }
                 rules2.push({
                     suffixIn,
@@ -85,7 +85,7 @@ export class LanguageTransformer {
      * @returns {{conditionFlagsMap: Map<string, number>, nextFlagIndex: number}}
      * @throws {Error}
      */
-    static getConditionFlagsMap(conditions, nextFlagIndex) {
+    _getConditionFlagsMap(conditions, nextFlagIndex) {
         /** @type {Map<string, number>} */
         const conditionFlagsMap = new Map();
         /** @type {import('language-transformer').ConditionMapEntries} */
@@ -104,7 +104,7 @@ export class LanguageTransformer {
                     flags = 1 << nextFlagIndex;
                     ++nextFlagIndex;
                 } else {
-                    const multiFlags = LanguageTransformer.getConditionFlags(conditionFlagsMap, subConditions);
+                    const multiFlags = this._getConditionFlags(conditionFlagsMap, subConditions);
                     if (multiFlags === null) {
                         nextTargets.push(target);
                         continue;
@@ -128,7 +128,7 @@ export class LanguageTransformer {
      * @param {string[]} conditionTypes
      * @returns {?number}
      */
-    static getConditionFlags(conditionFlagsMap, conditionTypes) {
+    _getConditionFlags(conditionFlagsMap, conditionTypes) {
         let flags = 0;
         for (const conditionType of conditionTypes) {
             const flags2 = conditionFlagsMap.get(conditionType);
