@@ -89,6 +89,18 @@ export class LanguageTransformer {
     }
 
     /**
+     * @param {string[]} partsOfSpeech
+     * @returns {number}
+     */
+    getMultiplePartOfSpeechFlags(partsOfSpeech) {
+        let result = 0;
+        for (const partOfSpeech of partsOfSpeech) {
+            result |= this.getPartOfSpeechFlags(partOfSpeech);
+        }
+        return result;
+    }
+
+    /**
      * @param {string} sourceText
      * @returns {import('language-transformer-internal').TransformedText[]}
      */
