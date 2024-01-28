@@ -39,6 +39,7 @@ export type TextTransformation<T = unknown> = {
 export type LanguageFeatures = {
     textTransformations?: TextTransformation[];
 };
+
 export type Language = LanguageProperties & LanguageFeatures;
 
 export type LanguageMap = Map<string, Language>;

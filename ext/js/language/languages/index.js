@@ -19,7 +19,7 @@
 import {textTransformations as textTransformationsEN} from './en/textTransformations.js';
 import {textTransformations as textTransformationsJA} from './ja/textTransformations.js';
 /** @type {Map<string, import('language').LanguageFeatures>} */
-export const languageParts = new Map([
+export const languageFeatures = new Map([
     ['ja', {
         textTransformations: textTransformationsJA
     }],

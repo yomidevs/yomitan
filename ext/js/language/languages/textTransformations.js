@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @type {import('language').TextTransformationOption[]} */
+/** @type {import('language').TextTransformationOption<boolean>[]} */
 export const basicTextTransformationOptions = [
     ['false', 'Disabled', [false]],
     ['true', 'Enabled', [true]],
