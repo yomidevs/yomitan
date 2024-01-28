@@ -282,9 +282,9 @@ export class Backend {
                 log.error(e);
             }
 
-            /** @type {import('deinflector').ReasonsRaw} */
-            const deinflectionReasons = await this._fetchJson('/data/deinflect.json');
-            this._translator.prepare(deinflectionReasons);
+            /** @type {import('language-transformer').LanguageTransformDescriptor} */
+            const descriptor = await this._fetchJson('/data/language/japanese-transforms.json');
+            this._translator.prepare(descriptor);
 
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await this._fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();

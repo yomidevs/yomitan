@@ -159,10 +159,10 @@ export class TranslatorProxy {
     }
 
     /**
-     * @param {import('deinflector').ReasonsRaw} deinflectionReasons
+     * @param {import('language-transformer').LanguageTransformDescriptor} descriptor
      */
-    async prepare(deinflectionReasons) {
-        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {deinflectionReasons}});
+    async prepare(descriptor) {
+        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {descriptor}});
     }
 
     /**
