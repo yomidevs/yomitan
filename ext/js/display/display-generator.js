@@ -18,7 +18,7 @@
 
 import {ExtensionError} from '../core/extension-error.js';
 import {isObject} from '../core/utilities.js';
-import {DictionaryDataUtil} from '../dictionary/dictionary-data-util.js';
+import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKanjiFrequencies, groupTermFrequencies, groupTermTags, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji, isStringPartiallyJapanese} from '../language/japanese.js';
 import {yomitan} from '../yomitan.js';
@@ -71,10 +71,10 @@ export class DisplayGenerator {
         const headwordTagsContainer = this._querySelector(node, '.headword-list-tag-list');
 
         const {headwords, type, inflectionRuleChainCandidates, definitions, frequencies, pronunciations} = dictionaryEntry;
-        const groupedPronunciations = DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry);
+        const groupedPronunciations = getGroupedPronunciations(dictionaryEntry);
         const pronunciationCount = groupedPronunciations.reduce((i, v) => i + v.pronunciations.length, 0);
-        const groupedFrequencies = DictionaryDataUtil.groupTermFrequencies(dictionaryEntry);
-        const termTags = DictionaryDataUtil.groupTermTags(dictionaryEntry);
+        const groupedFrequencies = groupTermFrequencies(dictionaryEntry);
+        const termTags = groupTermTags(dictionaryEntry);
 
         /** @type {Set<string>} */
         const uniqueTerms = new Set();
@@ -164,7 +164,7 @@ export class DisplayGenerator {
         const dictionaryIndicesContainer = this._querySelector(node, '.kanji-dictionary-indices');
 
         this._setTextContent(glyphContainer, dictionaryEntry.character, 'ja');
-        const groupedFrequencies = DictionaryDataUtil.groupKanjiFrequencies(dictionaryEntry.frequencies);
+        const groupedFrequencies = groupKanjiFrequencies(dictionaryEntry.frequencies);
 
         const dictionaryTag = this._createDictionaryTag(dictionaryEntry.dictionary);
 
@@ -332,7 +332,7 @@ export class DisplayGenerator {
 
         node.dataset.isPrimary = `${isPrimaryAny}`;
         node.dataset.readingIsSame = `${reading === term}`;
-        node.dataset.frequency = DictionaryDataUtil.getTermFrequency(tags);
+        node.dataset.frequency = getTermFrequency(tags);
         node.dataset.matchTypes = [...matchTypes].join(' ');
         node.dataset.matchSources = [...matchSources].join(' ');
 
@@ -413,7 +413,7 @@ export class DisplayGenerator {
      */
     _createTermDefinition(definition, dictionaryTag, headwords, uniqueTerms, uniqueReadings) {
         const {dictionary, tags, headwordIndices, entries} = definition;
-        const disambiguations = DictionaryDataUtil.getDisambiguations(headwords, headwordIndices, uniqueTerms, uniqueReadings);
+        const disambiguations = getDisambiguations(headwords, headwordIndices, uniqueTerms, uniqueReadings);
 
         const node = this._instantiate('definition-item');
 
@@ -1038,7 +1038,7 @@ export class DisplayGenerator {
      */
     _getPronunciationCategories(reading, termPronunciations, wordClasses, headwordIndex) {
         if (termPronunciations.length === 0) { return null; }
-        const isVerbOrAdjective = DictionaryDataUtil.isNonNounVerbOrAdjective(wordClasses);
+        const isVerbOrAdjective = isNonNounVerbOrAdjective(wordClasses);
         /** @type {Set<import('japanese-util').PitchCategory>} */
         const categories = new Set();
         for (const termPronunciation of termPronunciations) {

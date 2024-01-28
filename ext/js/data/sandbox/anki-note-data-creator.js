@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {DictionaryDataUtil} from '../../dictionary/dictionary-data-util.js';
+import {getDisambiguations, getGroupedPronunciations, getPronunciationsOfType, getTermFrequency, groupTermTags} from '../../dictionary/dictionary-data-util.js';
 import {distributeFurigana} from '../../language/japanese.js';
 
 /**
@@ -185,7 +185,7 @@ export class AnkiNoteDataCreator {
         /** @type {import('anki-templates').PitchGroup[]} */
         const results = [];
         if (dictionaryEntry.type === 'term') {
-            for (const {dictionary, pronunciations} of DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry)) {
+            for (const {dictionary, pronunciations} of getGroupedPronunciations(dictionaryEntry)) {
                 /** @type {import('anki-templates').Pitch[]} */
                 const pitches = [];
                 for (const groupedPronunciation of pronunciations) {
@@ -217,7 +217,7 @@ export class AnkiNoteDataCreator {
     _getPhoneticTranscriptions(dictionaryEntry) {
         const results = [];
         if (dictionaryEntry.type === 'term') {
-            for (const {dictionary, pronunciations} of DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry)) {
+            for (const {dictionary, pronunciations} of getGroupedPronunciations(dictionaryEntry)) {
                 const phoneticTranscriptions = [];
                 for (const groupedPronunciation of pronunciations) {
                     const {pronunciation} = groupedPronunciation;
@@ -469,7 +469,7 @@ export class AnkiNoteDataCreator {
                 definitionTags2.push(this._convertTag(tag));
             }
             if (!hasDefinitions) { continue; }
-            const only = merged ? DictionaryDataUtil.getDisambiguations(dictionaryEntry.headwords, headwordIndices, allTermsSet, allReadingsSet) : void 0;
+            const only = merged ? getDisambiguations(dictionaryEntry.headwords, headwordIndices, allTermsSet, allReadingsSet) : void 0;
             definitions.push({
                 sequence: sequences[0],
                 dictionary,
@@ -524,7 +524,7 @@ export class AnkiNoteDataCreator {
         const {headwords} = dictionaryEntry;
         for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pronunciations} of dictionaryEntry.pronunciations) {
             const {term, reading} = headwords[headwordIndex];
-            const pitches = DictionaryDataUtil.getPronunciationsOfType(pronunciations, 'pitch-accent');
+            const pitches = getPronunciationsOfType(pronunciations, 'pitch-accent');
             const cachedPitches = this.createCachedValue(this._getTermPitchesInner.bind(this, pitches));
             results.push({
                 index: results.length,
@@ -569,7 +569,7 @@ export class AnkiNoteDataCreator {
         const {headwords} = dictionaryEntry;
         for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pronunciations} of dictionaryEntry.pronunciations) {
             const {term, reading} = headwords[headwordIndex];
-            const phoneticTranscriptions = DictionaryDataUtil.getPronunciationsOfType(pronunciations, 'phonetic-transcription');
+            const phoneticTranscriptions = getPronunciationsOfType(pronunciations, 'phonetic-transcription');
             const termPhoneticTranscriptions = this._getTermPhoneticTranscriptionsInner(phoneticTranscriptions);
             results.push({
                 index: results.length,
@@ -679,7 +679,7 @@ export class AnkiNoteDataCreator {
         for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pronunciations} of termPronunciations) {
             if (headwordIndex !== i) { continue; }
             const {term, reading} = headwords[headwordIndex];
-            const pitches = DictionaryDataUtil.getPronunciationsOfType(pronunciations, 'pitch-accent');
+            const pitches = getPronunciationsOfType(pronunciations, 'pitch-accent');
             const cachedPitches = this.createCachedValue(this._getTermPitchesInner.bind(this, pitches));
             results.push({
                 index: results.length,
@@ -703,7 +703,7 @@ export class AnkiNoteDataCreator {
      */
     _getTermExpressionTermFrequency(cachedTermTags) {
         const termTags = this.getCachedValue(cachedTermTags);
-        return DictionaryDataUtil.getTermFrequency(termTags);
+        return getTermFrequency(termTags);
     }
 
     /**
@@ -730,7 +730,7 @@ export class AnkiNoteDataCreator {
     _getTermTags(dictionaryEntry, type) {
         if (type !== 'termMerged') {
             const results = [];
-            for (const {tag} of DictionaryDataUtil.groupTermTags(dictionaryEntry)) {
+            for (const {tag} of groupTermTags(dictionaryEntry)) {
                 results.push(this._convertTag(tag));
             }
             return results;

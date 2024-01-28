@@ -18,7 +18,7 @@
 
 import {Handlebars} from '../../../lib/handlebars.js';
 import {AnkiNoteDataCreator} from '../../data/sandbox/anki-note-data-creator.js';
-import {DictionaryDataUtil} from '../../dictionary/dictionary-data-util.js';
+import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../../dictionary/dictionary-data-util.js';
 import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from '../../display/sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';
 import {CssStyleApplier} from '../../dom/sandbox/css-style-applier.js';
@@ -548,8 +548,8 @@ export class AnkiTemplateRenderer {
         const categories = new Set();
         for (const {headwordIndex, pronunciations} of termPronunciations) {
             const {reading, wordClasses} = headwords[headwordIndex];
-            const isVerbOrAdjective = DictionaryDataUtil.isNonNounVerbOrAdjective(wordClasses);
-            const pitches = DictionaryDataUtil.getPronunciationsOfType(pronunciations, 'pitch-accent');
+            const isVerbOrAdjective = isNonNounVerbOrAdjective(wordClasses);
+            const pitches = getPronunciationsOfType(pronunciations, 'pitch-accent');
             for (const {position} of pitches) {
                 const category = getPitchCategory(reading, position, isVerbOrAdjective);
                 if (category !== null) {
