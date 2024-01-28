@@ -16,8 +16,8 @@
  */
 
 // English
-import {textTransformations as textTransformationsEN} from './en/textTransformations.js';
-import {textTransformations as textTransformationsJA} from './ja/textTransformations.js';
+import {textTransformations as textTransformationsEN} from './en/text-transformations.js';
+import {textTransformations as textTransformationsJA} from './ja/text-transformations.js';
 /** @type {Map<string, import('language').LanguageFeatures>} */
 export const languageFeatures = new Map([
     ['ja', {

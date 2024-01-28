@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextTransformationOptions} from '../textTransformations.js';
+import {basicTextTransformationOptions} from '../text-transformations.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth} from './japanese.js';
 
