@@ -1002,6 +1002,7 @@ function testDeinflections() {
             ]
         }
     ];
+    /* eslint-enable no-multi-spaces */
 
     /** @type {import('deinflector').ReasonsRaw} */
     const deinflectionReasons = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/deinflect.json'), {encoding: 'utf8'}));
