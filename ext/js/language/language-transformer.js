@@ -22,14 +22,14 @@ export class LanguageTransformer {
         /** @type {import('language-transformer-internal').Transform[]} */
         this._transforms = [];
         /** @type {Map<string, number>} */
-        this._partOfSpeechToFlagsMap = new Map();
+        this._partOfSpeechToConditionFlagsMap = new Map();
     }
 
     /** */
     clear() {
         this._nextFlagIndex = 0;
         this._transforms = [];
-        this._partOfSpeechToFlagsMap.clear();
+        this._partOfSpeechToConditionFlagsMap.clear();
     }
 
     /**
@@ -74,7 +74,7 @@ export class LanguageTransformer {
             const flags = conditionFlagsMap.get(type);
             if (typeof flags === 'undefined') { continue; } // This case should never happen
             for (const partOfSpeech of condition.partsOfSpeech) {
-                this._partOfSpeechToFlagsMap.set(partOfSpeech, this.getPartOfSpeechFlags(partOfSpeech) | flags);
+                this._partOfSpeechToConditionFlagsMap.set(partOfSpeech, this.getConditionFlagsFromPartOfSpeech(partOfSpeech) | flags);
             }
         }
     }
@@ -83,19 +83,19 @@ export class LanguageTransformer {
      * @param {string} partOfSpeech
      * @returns {number}
      */
-    getPartOfSpeechFlags(partOfSpeech) {
-        const partOfSpeechFlags = this._partOfSpeechToFlagsMap.get(partOfSpeech);
-        return typeof partOfSpeechFlags !== 'undefined' ? partOfSpeechFlags : 0;
+    getConditionFlagsFromPartOfSpeech(partOfSpeech) {
+        const conditionFlags = this._partOfSpeechToConditionFlagsMap.get(partOfSpeech);
+        return typeof conditionFlags !== 'undefined' ? conditionFlags : 0;
     }
 
     /**
      * @param {string[]} partsOfSpeech
      * @returns {number}
      */
-    getMultiplePartOfSpeechFlags(partsOfSpeech) {
+    getConditionFlagsFromPartsOfSpeech(partsOfSpeech) {
         let result = 0;
         for (const partOfSpeech of partsOfSpeech) {
-            result |= this.getPartOfSpeechFlags(partOfSpeech);
+            result |= this.getConditionFlagsFromPartOfSpeech(partOfSpeech);
         }
         return result;
     }
