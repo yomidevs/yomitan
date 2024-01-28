@@ -36,7 +36,7 @@ import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/japanese.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
-import {MediaUtil} from '../media/media-util.js';
+import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
 import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
 import {ProfileConditionsUtil} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
@@ -2128,7 +2128,7 @@ export class Backend {
             return null;
         }
 
-        let extension = contentType !== null ? MediaUtil.getFileExtensionFromAudioMediaType(contentType) : null;
+        let extension = contentType !== null ? getFileExtensionFromAudioMediaType(contentType) : null;
         if (extension === null) { extension = '.mp3'; }
         let fileName = this._generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp, definitionDetails);
         fileName = fileName.replace(/\]/g, '');
@@ -2147,7 +2147,7 @@ export class Backend {
         const dataUrl = await this._getScreenshot(tabId, frameId, format, quality);
 
         const {mediaType, data} = this._getDataUrlInfo(dataUrl);
-        const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
+        const extension = getFileExtensionFromImageMediaType(mediaType);
         if (extension === null) {
             throw new Error('Unknown media type for screenshot image');
         }
@@ -2169,7 +2169,7 @@ export class Backend {
         }
 
         const {mediaType, data} = this._getDataUrlInfo(dataUrl);
-        const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
+        const extension = getFileExtensionFromImageMediaType(mediaType);
         if (extension === null) {
             throw new Error('Unknown media type for clipboard image');
         }
@@ -2215,7 +2215,7 @@ export class Backend {
             let fileName = null;
             if (media !== null) {
                 const {content, mediaType} = media;
-                const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
+                const extension = getFileExtensionFromImageMediaType(mediaType);
                 fileName = this._generateAnkiNoteMediaFileName(
                     `yomitan_dictionary_media_${i + 1}`,
                     extension !== null ? extension : '',
