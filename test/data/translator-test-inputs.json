@@ -352,6 +352,81 @@
             "mode": "split",
             "text": "のたもうた",
             "options": "default"
+        },
+        {
+            "name": "Test text transformations - convertNumericCharacters",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "39",
+            "options": [
+                "default",
+                {
+                    "convertNumericCharacters": "true",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
+        },
+        {
+            "name": "Test text transformations - convertAlphabeticCharacters",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "utsu",
+            "options": [
+                "default",
+                {
+                    "convertAlphabeticCharacters": "true",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
+        },
+        {
+            "name": "Test text transformations - convertKatakanaToHiragana",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "ウツ",
+            "options": [
+                "default",
+                {
+                    "convertKatakanaToHiragana": "true"
+                }
+            ]
+        },
+        {
+            "name": "Test text transformations - convertHiraganaToKatakana",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "てきすと",
+            "options": [
+                "default",
+                {
+                    "convertHiraganaToKatakana": "true"
+                }
+            ]
+        },
+        {
+            "name": "Test text transformations - convertHalfWidthCharacters, convertKatakanaToHiragana",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "ｳﾂ",
+            "options": [
+                "default",
+                {
+                    "convertHalfWidthCharacters": "true",
+                    "convertKatakanaToHiragana": "true"
+                }
+            ]
+        },
+        {
+            "name": "Test text transformations - collapseEmphaticSequences",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "すっっごーーい",
+            "options": [
+                "default",
+                {
+                    "collapseEmphaticSequences": "full"
+                }
+            ]
         }
     ]
 }
