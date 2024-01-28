@@ -21,6 +21,8 @@ export class LanguageTransformer {
         this._nextFlagIndex = 0;
         /** @type {import('language-transformer-internal').Transform[]} */
         this._transforms = [];
+        /** @type {Map<string, number>} */
+        this._partOfSpeechToFlagsMap = new Map();
     }
 
     /**
@@ -58,6 +60,23 @@ export class LanguageTransformer {
         for (const transform of transforms2) {
             this._transforms.push(transform);
         }
+
+        for (const [type, condition] of conditionEntries) {
+            const flags = conditionFlagsMap.get(type);
+            if (typeof flags === 'undefined') { continue; } // This case should never happen
+            for (const partOfSpeech of condition.partsOfSpeech) {
+                this._partOfSpeechToFlagsMap.set(partOfSpeech, this.getPartOfSpeechFlags(partOfSpeech) | flags);
+            }
+        }
+    }
+
+    /**
+     * @param {string} partOfSpeech
+     * @returns {number}
+     */
+    getPartOfSpeechFlags(partOfSpeech) {
+        const partOfSpeechFlags = this._partOfSpeechToFlagsMap.get(partOfSpeech);
+        return typeof partOfSpeechFlags !== 'undefined' ? partOfSpeechFlags : 0;
     }
 
     /**
