@@ -128,7 +128,6 @@ function testDeinflections() {
                 {term: '食べる', source: '食べてる',         rule: 'v1', reasons: ['-te', 'progressive or perfect']},
                 {term: '食べる', source: '食べとる',         rule: 'v1', reasons: ['-te', 'progressive or perfect']},
                 {term: '食べる', source: '食べてしまう',     rule: 'v1', reasons: ['-te', '-shimau']},
-                {term: '食べる', source: '食べて',          rule: null, reasons: ['-te', 'progressive or perfect', 'masu stem']}
             ]
         },
         {
@@ -999,6 +998,13 @@ function testDeinflections() {
             tests: [
                 {term: 'かわいい', source: 'かわいげ',   rule: 'adj-i', reasons: ['-ge']},
                 {term: '可愛い',   source: 'かわいげ',   rule: 'adj-i', reasons: ['-ge']}
+            ]
+        },
+        {
+            category: 'incorrect -te rule chain',
+            valid: false,
+            tests: [
+                {term: '食べる', source: '食べて', rule: null, reasons: ['-te', 'progressive or perfect', 'masu stem']}
             ]
         }
     ];
