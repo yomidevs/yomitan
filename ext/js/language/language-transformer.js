@@ -82,6 +82,30 @@ export class LanguageTransformer {
     }
 
     /**
+     * @param {string} sourceText
+     * @returns {import('language-transformer-internal').TransformedText[]}
+     */
+    transform(sourceText) {
+        const results = [this._createTransformedText(sourceText, 0, [])];
+        for (let i = 0; i < results.length; ++i) {
+            const {text, conditions, rules} = results[i];
+            for (const {name, rules: rules2} of this._transforms) {
+                for (const rule of rules2) {
+                    if (!LanguageTransformer.conditionsMatch(conditions, rule.conditionsIn)) { continue; }
+                    const {suffixIn, suffixOut} = rule;
+                    if (!text.endsWith(suffixIn) || (text.length - suffixIn.length + suffixOut.length) <= 0) { continue; }
+                    results.push(this._createTransformedText(
+                        text.substring(0, text.length - suffixIn.length) + suffixOut,
+                        rule.conditionsOut,
+                        [name, ...rules]
+                    ));
+                }
+            }
+        }
+        return results;
+    }
+
+    /**
      * @param {import('language-transformer').ConditionMapEntries} conditions
      * @param {number} nextFlagIndex
      * @returns {{conditionFlagsMap: Map<string, number>, nextFlagIndex: number}}
@@ -138,5 +162,26 @@ export class LanguageTransformer {
             flags |= flags2;
         }
         return flags;
+    }
+
+    /**
+     * @param {string} text
+     * @param {number} conditions
+     * @param {string[]} rules
+     * @returns {import('language-transformer-internal').TransformedText}
+     */
+    _createTransformedText(text, conditions, rules) {
+        return {text, conditions, rules};
+    }
+
+    /**
+     * If `currentConditions` is `0`, then `nextConditions` is ignored and `true` is returned.
+     * Otherwise, there must be at least one shared condition between `currentConditions` and `nextConditions`.
+     * @param {number} currentConditions
+     * @param {number} nextConditions
+     * @returns {boolean}
+     */
+    static conditionsMatch(currentConditions, nextConditions) {
+        return currentConditions === 0 || (currentConditions & nextConditions) !== 0;
     }
 }

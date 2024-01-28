@@ -26,3 +26,9 @@ export type Rule = {
     conditionsIn: number;
     conditionsOut: number;
 };
+
+export type TransformedText = {
+    text: string;
+    conditions: number;
+    rules: string[];
+};
