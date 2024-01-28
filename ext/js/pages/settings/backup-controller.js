@@ -22,7 +22,7 @@ import {log} from '../../core/logger.js';
 import {toError} from '../../core/to-error.js';
 import {isObject} from '../../core/utilities.js';
 import {OptionsUtil} from '../../data/options-util.js';
-import {ArrayBufferUtil} from '../../data/sandbox/array-buffer-util.js';
+import {arrayBufferUtf8Decode} from '../../data/sandbox/array-buffer-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {yomitan} from '../../yomitan.js';
 import {DictionaryController} from './dictionary-controller.js';
@@ -425,7 +425,7 @@ export class BackupController {
     async _importSettingsFile(file) {
         if (this._optionsUtil === null) { throw new Error('OptionsUtil invalid'); }
 
-        const dataString = ArrayBufferUtil.arrayBufferUtf8Decode(await this._readFileArrayBuffer(file));
+        const dataString = arrayBufferUtf8Decode(await this._readFileArrayBuffer(file));
         /** @type {import('backup-controller').BackupData} */
         const data = parseJson(dataString);
 

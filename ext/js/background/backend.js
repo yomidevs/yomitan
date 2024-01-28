@@ -29,7 +29,7 @@ import {clone, deferPromise, isObject, promiseTimeout} from '../core/utilities.j
 import {AnkiUtil} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {PermissionsUtil} from '../data/permissions-util.js';
-import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
@@ -2663,7 +2663,7 @@ export class Backend {
         const results = [];
         for (const item of await this._dictionaryDatabase.getMedia(targets)) {
             const {content, dictionary, height, mediaType, path, width} = item;
-            const content2 = ArrayBufferUtil.arrayBufferToBase64(content);
+            const content2 = arrayBufferToBase64(content);
             results.push({content: content2, dictionary, height, mediaType, path, width});
         }
         return results;
