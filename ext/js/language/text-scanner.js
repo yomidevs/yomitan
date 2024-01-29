@@ -395,11 +395,10 @@ export class TextScanner extends EventDispatcher {
     /**
      * @param {import('text-source').TextSource} textSource
      * @param {import('text-scanner').InputInfoDetail} [inputDetail]
-     * @returns {Promise<?import('text-scanner').SearchedEventDetails>}
      */
     async search(textSource, inputDetail) {
         const inputInfo = this._createInputInfo(null, 'script', 'script', true, [], [], inputDetail);
-        return await this._search(textSource, this._searchTerms, this._searchKanji, inputInfo);
+        await this._search(textSource, this._searchTerms, this._searchKanji, inputInfo);
     }
 
     // Private
@@ -422,7 +421,6 @@ export class TextScanner extends EventDispatcher {
      * @param {boolean} searchTerms
      * @param {boolean} searchKanji
      * @param {import('text-scanner').InputInfo} inputInfo
-     * @returns {Promise<?import('text-scanner').SearchedEventDetails>}
      */
     async _search(textSource, searchTerms, searchKanji, inputInfo) {
         /** @type {?import('dictionary').DictionaryEntry[]} */
@@ -448,7 +446,7 @@ export class TextScanner extends EventDispatcher {
             );
 
             if (this._textSourceCurrent !== null && this._textSourceCurrent.hasSameStart(textSource)) {
-                return null;
+                return;
             }
 
             const getSearchContextPromise = this._getSearchContext();
@@ -482,7 +480,7 @@ export class TextScanner extends EventDispatcher {
             error = e instanceof Error ? e : new Error(`A search error occurred: ${e}`);
         }
 
-        if (!searched) { return null; }
+        if (!searched) { return; }
 
         /** @type {import('text-scanner').SearchedEventDetails} */
         const results = {
@@ -497,7 +495,6 @@ export class TextScanner extends EventDispatcher {
             error
         };
         this.trigger('searched', results);
-        return results;
     }
 
     /** */
