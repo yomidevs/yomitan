@@ -94,6 +94,7 @@ export type InputConfig = {
     preventPenScrolling: boolean;
 };
 
+// TODO : this event should be split into 3 different types : searchSuccess, searchEmpty, searchError
 export type SearchedEventDetails = {
     textScanner: TextScanner;
     type: Display.PageType | null;
