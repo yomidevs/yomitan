@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Application} from '../yomitan.js';
+import {Application} from '../application.js';
 import {Backend} from './backend.js';
 
 /** Entry point. */

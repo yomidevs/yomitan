@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {Application} from '../../application.js';
 import {log} from '../../core/logger.js';
 import {DocumentFocusController} from '../../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {Application} from '../../yomitan.js';
 import {ExtensionContentController} from '../common/extension-content-controller.js';
 import {AnkiController} from './anki-controller.js';
 import {AnkiTemplatesController} from './anki-templates-controller.js';

@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {Application} from '../application.js';
 import {log} from '../core/logger.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
-import {Application} from '../yomitan.js';
 import {Frontend} from './frontend.js';
 import {PopupFactory} from './popup-factory.js';
 

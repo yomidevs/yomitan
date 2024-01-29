@@ -49,7 +49,7 @@ export class Frontend {
         childrenSupported = true,
         hotkeyHandler
     }) {
-        /** @type {import('../yomitan.js').Application} */
+        /** @type {import('../application.js').Application} */
         this._application = application;
         /** @type {import('frontend').PageType} */
         this._pageType = pageType;

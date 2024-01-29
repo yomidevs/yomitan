@@ -17,7 +17,7 @@
 
 import type {PopupFactory} from '../../ext/js/app/popup-factory';
 import type {HotkeyHandler} from '../../ext/js/input/hotkey-handler';
-import type {Application} from '../../ext/js/yomitan';
+import type {Application} from '../../ext/js/application';
 
 /** Details about how to set up the instance. */
 export type ConstructorDetails = {

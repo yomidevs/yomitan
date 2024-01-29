@@ -52,7 +52,7 @@ function setInjectedStylesheet(id, parentNode, value) {
 }
 
 /**
- * @param {import('../yomitan.js').Application} application
+ * @param {import('../application.js').Application} application
  * @param {string} id
  * @param {'code'|'file'|'file-content'} type
  * @param {string} value

@@ -43,7 +43,7 @@ export class Popup extends EventDispatcher {
         childrenSupported
     }) {
         super();
-        /** @type {import('../yomitan.js').Application} */
+        /** @type {import('../application.js').Application} */
         this._application = application;
         /** @type {string} */
         this._id = id;

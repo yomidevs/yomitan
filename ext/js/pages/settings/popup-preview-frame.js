@@ -23,14 +23,14 @@ import {TextSourceRange} from '../../dom/text-source-range.js';
 
 export class PopupPreviewFrame {
     /**
-     * @param {import('../../yomitan.js').Application} application
+     * @param {import('../../application.js').Application} application
      * @param {number} tabId
      * @param {number} frameId
      * @param {import('../../app/popup-factory.js').PopupFactory} popupFactory
      * @param {import('../../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
     constructor(application, tabId, frameId, popupFactory, hotkeyHandler) {
-        /** @type {import('../../yomitan.js').Application} */
+        /** @type {import('../../application.js').Application} */
         this._application = application;
         /** @type {number} */
         this._tabId = tabId;

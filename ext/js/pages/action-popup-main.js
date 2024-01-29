@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {Application} from '../application.js';
 import {getAllPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
-import {Application} from '../yomitan.js';
 
 class DisplayController {
     /**

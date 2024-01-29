@@ -21,16 +21,16 @@ import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class PersistentStorageController {
     /**
-     * @param {import('../../yomitan.js').Application} application
+     * @param {import('../../application.js').Application} application
      */
     constructor(application) {
-        /** @type {import('../../yomitan.js').Application} */
+        /** @type {import('../../application.js').Application} */
         this._application = application;
         /** @type {HTMLInputElement} */
         this._persistentStorageCheckbox = querySelectorNotNull(document, '#storage-persistent-checkbox');
     }
 
-    /** @type {import('../../yomitan.js').Application} */
+    /** @type {import('../../application.js').Application} */
     get application() {
         return this._application;
     }

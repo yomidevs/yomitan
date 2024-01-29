@@ -28,11 +28,11 @@ import {HtmlTemplateCollection} from '../../dom/html-template-collection.js';
  */
 export class SettingsController extends EventDispatcher {
     /**
-     * @param {import('../../yomitan.js').Application} application
+     * @param {import('../../application.js').Application} application
      */
     constructor(application) {
         super();
-        /** @type {import('../../yomitan.js').Application} */
+        /** @type {import('../../application.js').Application} */
         this._application = application;
         /** @type {number} */
         this._profileIndex = 0;
@@ -47,7 +47,7 @@ export class SettingsController extends EventDispatcher {
         this._templates.load(document);
     }
 
-    /** @type {import('../../yomitan.js').Application} */
+    /** @type {import('../../application.js').Application} */
     get application() {
         return this._application;
     }

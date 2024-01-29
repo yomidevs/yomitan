@@ -37,7 +37,7 @@ export class PopupProxy extends EventDispatcher {
         frameOffsetForwarder
     }) {
         super();
-        /** @type {import('../yomitan.js').Application} */
+        /** @type {import('../application.js').Application} */
         this._application = application;
         /** @type {string} */
         this._id = id;

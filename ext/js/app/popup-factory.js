@@ -28,11 +28,11 @@ import {Popup} from './popup.js';
 export class PopupFactory {
     /**
      * Creates a new instance.
-     * @param {import('../yomitan.js').Application} application
+     * @param {import('../application.js').Application} application
      * @param {number} frameId The frame ID of the host frame.
      */
     constructor(application, frameId) {
-        /** @type {import('../yomitan.js').Application} */
+        /** @type {import('../application.js').Application} */
         this._application = application;
         /** @type {number} */
         this._frameId = frameId;

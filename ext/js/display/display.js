@@ -45,7 +45,7 @@ import {QueryParser} from './query-parser.js';
  */
 export class Display extends EventDispatcher {
     /**
-     * @param {import('../yomitan.js').Application} application
+     * @param {import('../application.js').Application} application
      * @param {number|undefined} tabId
      * @param {number|undefined} frameId
      * @param {import('display').DisplayPageType} pageType
@@ -54,7 +54,7 @@ export class Display extends EventDispatcher {
      */
     constructor(application, tabId, frameId, pageType, documentFocusController, hotkeyHandler) {
         super();
-        /** @type {import('../yomitan.js').Application} */
+        /** @type {import('../application.js').Application} */
         this._application = application;
         /** @type {number|undefined} */
         this._tabId = tabId;
@@ -227,7 +227,7 @@ export class Display extends EventDispatcher {
         /* eslint-enable no-multi-spaces */
     }
 
-    /** @type {import('../yomitan.js').Application} */
+    /** @type {import('../application.js').Application} */
     get application() {
         return this._application;
     }
