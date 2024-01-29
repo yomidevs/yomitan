@@ -17,7 +17,6 @@
  */
 
 import {generateId} from '../core/utilities.js';
-import {yomitan} from '../yomitan.js';
 
 /**
  * This class is used to return the ancestor frame IDs for the current frame.
@@ -28,9 +27,12 @@ import {yomitan} from '../yomitan.js';
 export class FrameAncestryHandler {
     /**
      * Creates a new instance.
+     * @param {import('../comm/cross-frame-api.js').CrossFrameAPI} crossFrameApi
      * @param {number} frameId The frame ID of the current frame the instance is instantiated in.
      */
-    constructor(frameId) {
+    constructor(crossFrameApi, frameId) {
+        /** @type {import('../comm/cross-frame-api.js').CrossFrameAPI} */
+        this._crossFrameApi = crossFrameApi;
         /** @type {number} */
         this._frameId = frameId;
         /** @type {boolean} */
@@ -59,7 +61,7 @@ export class FrameAncestryHandler {
     prepare() {
         if (this._isPrepared) { return; }
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
-        yomitan.crossFrame.registerHandlers([
+        this._crossFrameApi.registerHandlers([
             ['frameAncestryHandlerRequestFrameInfoResponse', this._onFrameAncestryHandlerRequestFrameInfoResponse.bind(this)]
         ]);
         this._isPrepared = true;
@@ -211,7 +213,7 @@ export class FrameAncestryHandler {
             const more = (window !== parent);
 
             try {
-                const response = await yomitan.crossFrame.invoke(originFrameId, 'frameAncestryHandlerRequestFrameInfoResponse', {uniqueId, frameId, nonce, more});
+                const response = await this._crossFrameApi.invoke(originFrameId, 'frameAncestryHandlerRequestFrameInfoResponse', {uniqueId, frameId, nonce, more});
                 if (response === null) { return; }
                 const nonce2 = response.nonce;
                 if (typeof nonce2 !== 'string') { return; }

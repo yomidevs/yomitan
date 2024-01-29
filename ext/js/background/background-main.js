@@ -16,14 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {yomitan} from '../yomitan.js';
+import {Application} from '../yomitan.js';
 import {Backend} from './backend.js';
 
 /** Entry point. */
 async function main() {
-    yomitan.prepare(true);
+    const application = new Application();
+    application.prepare(true);
 
-    const backend = new Backend(yomitan.webExtension);
+    const backend = new Backend(application.webExtension);
     await backend.prepare();
 }
 

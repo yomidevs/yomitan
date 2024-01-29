@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {yomitan} from '../yomitan.js';
-
 /** @type {Map<string, ?HTMLStyleElement|HTMLLinkElement>} */
 const injectedStylesheets = new Map();
 /** @type {WeakMap<Node, Map<string, ?HTMLStyleElement|HTMLLinkElement>>} */
@@ -54,6 +52,7 @@ function setInjectedStylesheet(id, parentNode, value) {
 }
 
 /**
+ * @param {import('../yomitan.js').Application} application
  * @param {string} id
  * @param {'code'|'file'|'file-content'} type
  * @param {string} value
@@ -62,8 +61,8 @@ function setInjectedStylesheet(id, parentNode, value) {
  * @returns {Promise<?HTMLStyleElement|HTMLLinkElement>}
  * @throws {Error}
  */
-export async function loadStyle(id, type, value, useWebExtensionApi = false, parentNode = null) {
-    if (useWebExtensionApi && yomitan.isExtensionUrl(window.location.href)) {
+export async function loadStyle(application, id, type, value, useWebExtensionApi = false, parentNode = null) {
+    if (useWebExtensionApi && application.isExtensionUrl(window.location.href)) {
         // Permissions error will occur if trying to use the WebExtension API to inject into an extension page
         useWebExtensionApi = false;
     }
@@ -79,7 +78,7 @@ export async function loadStyle(id, type, value, useWebExtensionApi = false, par
     }
 
     if (type === 'file-content') {
-        value = await yomitan.api.getStylesheetContent(value);
+        value = await application.api.getStylesheetContent(value);
         type = 'code';
         useWebExtensionApi = false;
     }
@@ -91,7 +90,7 @@ export async function loadStyle(id, type, value, useWebExtensionApi = false, par
         }
 
         setInjectedStylesheet(id, parentNode, null);
-        await yomitan.api.injectStylesheet(type, value);
+        await application.api.injectStylesheet(type, value);
         return null;
     }
 

@@ -55,7 +55,7 @@ if (checkChromeNotAvailable()) {
  * The Yomitan class is a core component through which various APIs are handled and invoked.
  * @augments EventDispatcher<import('application').Events>
  */
-export class Yomitan extends EventDispatcher {
+export class Application extends EventDispatcher {
     /**
      * Creates a new instance. The instance should not be used until it has been fully prepare()'d.
      */
@@ -158,7 +158,7 @@ export class Yomitan extends EventDispatcher {
             await this._webExtension.sendMessagePromise({action: 'requestBackendReadySignal'});
             await this._isBackendReadyPromise;
 
-            this._crossFrame = new CrossFrameAPI();
+            this._crossFrame = new CrossFrameAPI(this._api);
             await this._crossFrame.prepare();
 
             log.on('log', this._onForwardLog.bind(this));
@@ -257,4 +257,4 @@ export class Yomitan extends EventDispatcher {
 /**
  * The default Yomitan class instance.
  */
-export const yomitan = new Yomitan();
+// export const yomitan = new Yomitan();

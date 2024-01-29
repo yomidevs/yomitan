@@ -19,6 +19,7 @@ import type {Popup} from '../../ext/js/app/popup';
 import type {PopupProxy} from '../../ext/js/app/popup-proxy';
 import type {PopupWindow} from '../../ext/js/app/popup-window';
 import type {FrameOffsetForwarder} from '../../ext/js/comm/frame-offset-forwarder';
+import type {Application} from '../../ext/js/yomitan';
 import type * as DocumentUtil from './document-util';
 import type * as Settings from './settings';
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
@@ -92,6 +93,8 @@ export type ValidSize = {
 };
 
 export type PopupConstructorDetails = {
+    /** The main application instance. */
+    application: Application;
     /** The ID of the popup. */
     id: string;
     /** The depth of the popup. */
@@ -103,6 +106,8 @@ export type PopupConstructorDetails = {
 };
 
 export type PopupWindowConstructorDetails = {
+    /** The main application instance. */
+    application: Application;
     /** The ID of the popup. */
     id: string;
     /** The depth of the popup. */
@@ -112,6 +117,8 @@ export type PopupWindowConstructorDetails = {
 };
 
 export type PopupProxyConstructorDetails = {
+    /** The main application instance. */
+    application: Application;
     /** The ID of the popup. */
     id: string;
     /** The depth of the popup. */

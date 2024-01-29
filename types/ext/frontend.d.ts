@@ -17,9 +17,12 @@
 
 import type {PopupFactory} from '../../ext/js/app/popup-factory';
 import type {HotkeyHandler} from '../../ext/js/input/hotkey-handler';
+import type {Application} from '../../ext/js/yomitan';
 
 /** Details about how to set up the instance. */
 export type ConstructorDetails = {
+    /** The main application instance. */
+    application: Application;
     /** The type of page, one of 'web', 'popup', or 'search'. */
     pageType: PageType;
     /** A PopupFactory instance to use for generating popups. */

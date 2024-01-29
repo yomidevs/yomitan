@@ -32,7 +32,6 @@ import {ScrollElement} from '../dom/scroll-element.js';
 import {TextSourceGenerator} from '../dom/text-source-generator.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {TextScanner} from '../language/text-scanner.js';
-import {yomitan} from '../yomitan.js';
 import {DisplayContentManager} from './display-content-manager.js';
 import {DisplayGenerator} from './display-generator.js';
 import {DisplayHistory} from './display-history.js';
@@ -46,14 +45,17 @@ import {QueryParser} from './query-parser.js';
  */
 export class Display extends EventDispatcher {
     /**
+     * @param {import('../yomitan.js').Application} application
      * @param {number|undefined} tabId
      * @param {number|undefined} frameId
      * @param {import('display').DisplayPageType} pageType
      * @param {import('../dom/document-focus-controller.js').DocumentFocusController} documentFocusController
      * @param {import('../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
-    constructor(tabId, frameId, pageType, documentFocusController, hotkeyHandler) {
+    constructor(application, tabId, frameId, pageType, documentFocusController, hotkeyHandler) {
         super();
+        /** @type {import('../yomitan.js').Application} */
+        this._application = application;
         /** @type {number|undefined} */
         this._tabId = tabId;
         /** @type {number|undefined} */
@@ -131,6 +133,7 @@ export class Display extends EventDispatcher {
         this._textSourceGenerator = new TextSourceGenerator();
         /** @type {QueryParser} */
         this._queryParser = new QueryParser({
+            api: application.api,
             getSearchContext: this._getSearchContext.bind(this),
             textSourceGenerator: this._textSourceGenerator
         });
@@ -163,7 +166,7 @@ export class Display extends EventDispatcher {
         /** @type {boolean} */
         this._childrenSupported = true;
         /** @type {?FrameEndpoint} */
-        this._frameEndpoint = (pageType === 'popup' ? new FrameEndpoint() : null);
+        this._frameEndpoint = (pageType === 'popup' ? new FrameEndpoint(this._application.api) : null);
         /** @type {?import('environment').Browser} */
         this._browser = null;
         /** @type {?HTMLTextAreaElement} */
@@ -222,6 +225,11 @@ export class Display extends EventDispatcher {
             ['displayExtensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
+    }
+
+    /** @type {import('../yomitan.js').Application} */
+    get application() {
+        return this._application;
     }
 
     /** @type {DisplayGenerator} */
@@ -307,7 +315,7 @@ export class Display extends EventDispatcher {
 
         // State setup
         const {documentElement} = document;
-        const {browser} = await yomitan.api.getEnvironmentInfo();
+        const {browser} = await this._application.api.getEnvironmentInfo();
         this._browser = browser;
 
         if (documentElement !== null) {
@@ -315,8 +323,8 @@ export class Display extends EventDispatcher {
         }
 
         // Prepare
-        await this._hotkeyHelpController.prepare();
-        await this._displayGenerator.prepare();
+        await this._hotkeyHelpController.prepare(this._application.api);
+        await this._displayGenerator.prepare(this._application.api);
         this._queryParser.prepare();
         this._history.prepare();
         this._optionToggleHotkeyHandler.prepare();
@@ -325,8 +333,8 @@ export class Display extends EventDispatcher {
         this._history.on('stateChanged', this._onStateChanged.bind(this));
         this._queryParser.on('searched', this._onQueryParserSearch.bind(this));
         this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
-        yomitan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
-        yomitan.crossFrame.registerHandlers([
+        this._application.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
+        this._application.crossFrame.registerHandlers([
             ['displayPopupMessage1', this._onDisplayPopupMessage1.bind(this)],
             ['displayPopupMessage2', this._onDisplayPopupMessage2.bind(this)]
         ]);
@@ -384,7 +392,7 @@ export class Display extends EventDispatcher {
      * @param {Error} error
      */
     onError(error) {
-        if (yomitan.webExtension.unloaded) { return; }
+        if (this._application.webExtension.unloaded) { return; }
         log.error(error);
     }
 
@@ -412,7 +420,7 @@ export class Display extends EventDispatcher {
 
     /** */
     async updateOptions() {
-        const options = await yomitan.api.optionsGet(this.getOptionsContext());
+        const options = await this._application.api.optionsGet(this.getOptionsContext());
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
 
@@ -586,7 +594,7 @@ export class Display extends EventDispatcher {
         if (typeof this._contentOriginTabId !== 'number' || typeof this._contentOriginFrameId !== 'number') {
             throw new Error('No content origin is assigned');
         }
-        return await yomitan.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
+        return await this._application.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
     }
 
     /**
@@ -599,7 +607,7 @@ export class Display extends EventDispatcher {
         if (this._parentFrameId === null || this._parentFrameId === this._frameId) {
             throw new Error('Invalid parent frame');
         }
-        return await yomitan.crossFrame.invoke(this._parentFrameId, action, params);
+        return await this._application.crossFrame.invoke(this._parentFrameId, action, params);
     }
 
     /**
@@ -721,7 +729,7 @@ export class Display extends EventDispatcher {
 
     /** @type {import('display').WindowApiHandler<'displayExtensionUnloaded'>} */
     _onMessageExtensionUnloaded() {
-        yomitan.webExtension.triggerUnloaded();
+        this._application.webExtension.triggerUnloaded();
     }
 
     // Private
@@ -900,7 +908,7 @@ export class Display extends EventDispatcher {
             const element = /** @type {Element} */ (e.currentTarget);
             let query = element.textContent;
             if (query === null) { query = ''; }
-            const dictionaryEntries = await yomitan.api.kanjiFind(query, optionsContext);
+            const dictionaryEntries = await this._application.api.kanjiFind(query, optionsContext);
             /** @type {import('display').ContentDetails} */
             const details = {
                 focus: false,
@@ -1136,7 +1144,7 @@ export class Display extends EventDispatcher {
      */
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
         if (isKanji) {
-            const dictionaryEntries = await yomitan.api.kanjiFind(source, optionsContext);
+            const dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
             return dictionaryEntries;
         } else {
             /** @type {import('api').FindTermsDetails} */
@@ -1155,7 +1163,7 @@ export class Display extends EventDispatcher {
                 }
             }
 
-            const {dictionaryEntries} = await yomitan.api.termsFind(source, findDetails, optionsContext);
+            const {dictionaryEntries} = await this._application.api.termsFind(source, findDetails, optionsContext);
             return dictionaryEntries;
         }
     }
@@ -1640,7 +1648,7 @@ export class Display extends EventDispatcher {
 
     /** */
     _closePopups() {
-        yomitan.triggerClosePopups();
+        this._application.triggerClosePopups();
     }
 
     /**
@@ -1711,11 +1719,12 @@ export class Display extends EventDispatcher {
             import('../app/frontend.js')
         ]);
 
-        const popupFactory = new PopupFactory(this._frameId);
+        const popupFactory = new PopupFactory(this._application, this._frameId);
         popupFactory.prepare();
 
         /** @type {import('frontend').ConstructorDetails} */
         const setupNestedPopupsOptions = {
+            application: this._application,
             useProxyPopup,
             parentPopupId,
             parentFrameId,
@@ -1828,6 +1837,7 @@ export class Display extends EventDispatcher {
 
         if (this._contentTextScanner === null) {
             this._contentTextScanner = new TextScanner({
+                api: this._application.api,
                 node: window,
                 getSearchContext: this._getSearchContext.bind(this),
                 searchTerms: true,
@@ -1888,7 +1898,7 @@ export class Display extends EventDispatcher {
      * @param {import('text-scanner').SearchedEventDetails} details
      */
     _onContentTextScannerSearched({type, dictionaryEntries, sentence, textSource, optionsContext, error}) {
-        if (error !== null && !yomitan.webExtension.unloaded) {
+        if (error !== null && !this._application.webExtension.unloaded) {
             log.error(error);
         }
 

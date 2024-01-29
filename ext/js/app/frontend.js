@@ -25,7 +25,6 @@ import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceGenerator} from '../dom/text-source-generator.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
 import {TextScanner} from '../language/text-scanner.js';
-import {yomitan} from '../yomitan.js';
 
 /**
  * This is the main class responsible for scanning and handling webpage content.
@@ -36,6 +35,7 @@ export class Frontend {
      * @param {import('frontend').ConstructorDetails} details Details about how to set up the instance.
      */
     constructor({
+        application,
         pageType,
         popupFactory,
         depth,
@@ -49,6 +49,8 @@ export class Frontend {
         childrenSupported = true,
         hotkeyHandler
     }) {
+        /** @type {import('../yomitan.js').Application} */
+        this._application = application;
         /** @type {import('frontend').PageType} */
         this._pageType = pageType;
         /** @type {import('./popup-factory.js').PopupFactory} */
@@ -89,6 +91,7 @@ export class Frontend {
         this._textSourceGenerator = new TextSourceGenerator();
         /** @type {TextScanner} */
         this._textScanner = new TextScanner({
+            api: application.api,
             node: window,
             ignoreElements: this._ignoreElements.bind(this),
             ignorePoint: this._ignorePoint.bind(this),
@@ -157,7 +160,7 @@ export class Frontend {
     async prepare() {
         await this.updateOptions();
         try {
-            const {zoomFactor} = await yomitan.api.getZoom();
+            const {zoomFactor} = await this._application.api.getZoom();
             this._pageZoomFactor = zoomFactor;
         } catch (e) {
             // Ignore exceptions which may occur due to being on an unsupported page (e.g. about:blank)
@@ -174,16 +177,16 @@ export class Frontend {
             visualViewport.addEventListener('resize', this._onVisualViewportResize.bind(this));
         }
 
-        yomitan.on('optionsUpdated', this.updateOptions.bind(this));
-        yomitan.on('zoomChanged', this._onZoomChanged.bind(this));
-        yomitan.on('closePopups', this._onClosePopups.bind(this));
+        this._application.on('optionsUpdated', this.updateOptions.bind(this));
+        this._application.on('zoomChanged', this._onZoomChanged.bind(this));
+        this._application.on('closePopups', this._onClosePopups.bind(this));
         chrome.runtime.onMessage.addListener(this._onRuntimeMessage.bind(this));
 
         this._textScanner.on('clear', this._onTextScannerClear.bind(this));
         this._textScanner.on('searched', this._onSearched.bind(this));
 
         /* eslint-disable no-multi-spaces */
-        yomitan.crossFrame.registerHandlers([
+        this._application.crossFrame.registerHandlers([
             ['frontendClosePopup',       this._onApiClosePopup.bind(this)],
             ['frontendCopySelection',    this._onApiCopySelection.bind(this)],
             ['frontendGetSelectionText', this._onApiGetSelectionText.bind(this)],
@@ -230,7 +233,7 @@ export class Frontend {
         try {
             await this._updateOptionsInternal();
         } catch (e) {
-            if (!yomitan.webExtension.unloaded) {
+            if (!this._application.webExtension.unloaded) {
                 throw e;
             }
         }
@@ -372,7 +375,7 @@ export class Frontend {
         const scanningOptions = /** @type {import('settings').ProfileOptions} */ (this._options).scanning;
 
         if (error !== null) {
-            if (yomitan.webExtension.unloaded) {
+            if (this._application.webExtension.unloaded) {
                 if (textSource !== null && !passive) {
                     this._showExtensionUnloaded(textSource);
                 }
@@ -461,7 +464,7 @@ export class Frontend {
      */
     async _updateOptionsInternal() {
         const optionsContext = await this._getOptionsContext();
-        const options = await yomitan.api.optionsGet(optionsContext);
+        const options = await this._application.api.optionsGet(optionsContext);
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
 
@@ -609,7 +612,7 @@ export class Frontend {
             return await this._getDefaultPopup();
         }
 
-        const {popupId} = await yomitan.crossFrame.invoke(targetFrameId, 'frontendGetPopupInfo', void 0);
+        const {popupId} = await this._application.crossFrame.invoke(targetFrameId, 'frontendGetPopupInfo', void 0);
         if (popupId === null) {
             return null;
         }
@@ -659,7 +662,7 @@ export class Frontend {
         try {
             return this._popup !== null && await this._popup.containsPoint(x, y);
         } catch (e) {
-            if (!yomitan.webExtension.unloaded) {
+            if (!this._application.webExtension.unloaded) {
                 throw e;
             }
             return false;
@@ -746,7 +749,7 @@ export class Frontend {
             Promise.resolve()
         );
         this._lastShowPromise.catch((error) => {
-            if (yomitan.webExtension.unloaded) { return; }
+            if (this._application.webExtension.unloaded) { return; }
             log.error(error);
         });
         return this._lastShowPromise;
@@ -811,9 +814,9 @@ export class Frontend {
         /** @type {import('application').ApiMessageNoFrameId<'frontendReady'>} */
         const message = {action: 'frontendReady', params: {frameId: this._frameId}};
         if (targetFrameId === null) {
-            yomitan.api.broadcastTab(message);
+            this._application.api.broadcastTab(message);
         } else {
-            yomitan.api.sendMessageToFrame(targetFrameId, message);
+            this._application.api.sendMessageToFrame(targetFrameId, message);
         }
     }
 
@@ -857,7 +860,7 @@ export class Frontend {
             }
 
             chrome.runtime.onMessage.addListener(onMessage);
-            yomitan.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._frameId}});
+            this._application.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._frameId}});
         });
     }
 
@@ -892,7 +895,7 @@ export class Frontend {
         let documentTitle = document.title;
         if (this._useProxyPopup && this._parentFrameId !== null) {
             try {
-                ({url, documentTitle} = await yomitan.crossFrame.invoke(this._parentFrameId, 'frontendGetPageInfo', void 0));
+                ({url, documentTitle} = await this._application.crossFrame.invoke(this._parentFrameId, 'frontendGetPageInfo', void 0));
             } catch (e) {
                 // NOP
             }

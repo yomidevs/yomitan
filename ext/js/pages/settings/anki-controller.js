@@ -26,7 +26,6 @@ import {getRequiredPermissionsForAnkiFieldValue, hasPermissions, setPermissionsG
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
-import {yomitan} from '../../yomitan.js';
 
 export class AnkiController {
     /**
@@ -510,7 +509,7 @@ export class AnkiController {
 
         let noteId = null;
         for (const query of queries) {
-            const notes = await yomitan.api.findAnkiNotes(query);
+            const notes = await this._settingsController.application.api.findAnkiNotes(query);
             if (notes.length > 0) {
                 noteId = notes[0];
                 break;
@@ -521,7 +520,7 @@ export class AnkiController {
             throw new Error('Could not find a note to test with');
         }
 
-        await yomitan.api.noteView(noteId, mode, false);
+        await this._settingsController.application.api.noteView(noteId, mode, false);
     }
 
     /**

@@ -17,9 +17,16 @@
  */
 
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 
 export class PopupWindowController {
+    /**
+     * @param {import('../../comm/api.js').API} api
+     */
+    constructor(api) {
+        /** @type {import('../../comm/api.js').API} */
+        this._api = api;
+    }
+
     /** */
     prepare() {
         /** @type {HTMLElement} */
@@ -39,6 +46,6 @@ export class PopupWindowController {
 
     /** */
     async _testWindowOpen() {
-        await yomitan.api.getOrCreateSearchPopup({focus: true});
+        await this._api.getOrCreateSearchPopup({focus: true});
     }
 }
