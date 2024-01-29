@@ -1296,10 +1296,10 @@ export class TextScanner extends EventDispatcher {
                 try {
                     await this._search(textSource, searchTerms, searchKanji, inputInfo);
                 } finally {
-                    if (textSource !== null) {
-                        textSource.cleanup();
-                    }
+                    textSource.cleanup();
                 }
+            } else {
+                this._triggerSearched(null, null, null, inputInfo, null, null, null, null);
             }
         } catch (e) {
             log.error(e);
