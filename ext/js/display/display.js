@@ -1902,7 +1902,7 @@ export class Display extends EventDispatcher {
             log.error(error);
         }
 
-        if (type === null) { return; }
+        if (type === null || textSource === null) { return; }
 
         const query = textSource.text();
         const url = window.location.href;

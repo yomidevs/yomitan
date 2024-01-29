@@ -165,7 +165,7 @@ export class QueryParser extends EventDispatcher {
             textSource,
             optionsContext
         } = e;
-        if (type === null || dictionaryEntries === null || sentence === null || optionsContext === null) { return; }
+        if (type === null || dictionaryEntries === null || sentence === null || optionsContext === null || textSource === null) { return; }
 
         this.trigger('searched', {
             textScanner,
@@ -175,7 +175,7 @@ export class QueryParser extends EventDispatcher {
             inputInfo,
             textSource,
             optionsContext,
-            sentenceOffset: this._getSentenceOffset(e.textSource)
+            sentenceOffset: this._getSentenceOffset(textSource)
         });
     }
 

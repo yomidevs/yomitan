@@ -382,7 +382,7 @@ export class Frontend {
             } else {
                 log.error(error);
             }
-        } if (type !== null && optionsContext !== null) {
+        } if (type !== null && optionsContext !== null && textSource !== null) {
             this._stopClearSelectionDelayed();
             let focus = (eventType === 'mouseMove');
             if (typeof inputInfoDetail === 'object' && inputInfoDetail !== null) {

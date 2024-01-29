@@ -100,7 +100,7 @@ export type SearchedEventDetails = {
     dictionaryEntries: Dictionary.DictionaryEntry[] | null;
     sentence: Display.HistoryStateSentence | null;
     inputInfo: InputInfo;
-    textSource: TextSource.TextSource;
+    textSource: TextSource.TextSource | null;
     optionsContext: Settings.OptionsContext | null;
     detail: SearchResultDetail | null;
     error: Error | null;

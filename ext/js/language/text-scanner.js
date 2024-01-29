@@ -482,8 +482,21 @@ export class TextScanner extends EventDispatcher {
 
         if (!searched) { return; }
 
-        /** @type {import('text-scanner').SearchedEventDetails} */
-        const results = {
+        this._triggerSearched(type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext, detail, error);
+    }
+
+    /**
+     * @param {?import('display').PageType} type
+     * @param {?import('dictionary').DictionaryEntry[]} dictionaryEntries
+     * @param {?import('display').HistoryStateSentence} sentence
+     * @param {import('text-scanner').InputInfo} inputInfo
+     * @param {?import('text-source').TextSource} textSource
+     * @param {?import('settings').OptionsContext} optionsContext
+     * @param {?import('text-scanner').SearchResultDetail} detail
+     * @param {?Error} error
+     */
+    _triggerSearched(type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext, detail, error) {
+        this.trigger('searched', {
             textScanner: this,
             type,
             dictionaryEntries,
@@ -493,8 +506,7 @@ export class TextScanner extends EventDispatcher {
             optionsContext,
             detail,
             error
-        };
-        this.trigger('searched', results);
+        });
     }
 
     /** */
