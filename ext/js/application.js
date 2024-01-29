@@ -253,8 +253,3 @@ export class Application extends EventDispatcher {
         }
     }
 }
-
-/**
- * The default Yomitan class instance.
- */
-// export const yomitan = new Yomitan();
