@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// English
 import {textTransformations as textTransformationsEN} from './en/text-transformations.js';
 import {textTransformations as textTransformationsJA} from './ja/text-transformations.js';
+
 /** @type {Map<string, import('language').LanguageFeatures>} */
 export const languageFeatures = new Map([
     ['ja', {
