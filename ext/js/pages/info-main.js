@@ -119,14 +119,13 @@ async function showDictionaryInfo(api) {
 /** Entry point. */
 async function main() {
     try {
-        const application = new Application();
-
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 
         const manifest = chrome.runtime.getManifest();
         const language = chrome.i18n.getUILanguage();
 
+        const application = new Application();
         await application.prepare();
 
         const {userAgent} = navigator;

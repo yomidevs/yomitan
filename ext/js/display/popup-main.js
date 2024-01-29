@@ -29,11 +29,10 @@ import {Display} from './display.js';
 /** Entry point. */
 async function main() {
     try {
-        const application = new Application();
-
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 
+        const application = new Application();
         await application.prepare();
 
         const {tabId, frameId} = await application.api.frameInformationGet();
