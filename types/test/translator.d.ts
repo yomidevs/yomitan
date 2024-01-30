@@ -30,11 +30,13 @@ export type OptionsList = string | (string | OptionsPreset)[];
 export type OptionsPreset = FindKanjiOptionsPreset | FindTermsOptionsPreset;
 
 export type FindKanjiOptionsPreset = {
+    type: 'kanji';
     enabledDictionaryMap?: [key: string, value: FindKanjiDictionary][];
     removeNonJapaneseCharacters?: boolean;
 };
 
 export type FindTermsOptionsPreset = {
+    type: 'terms';
     matchType?: FindTermsMatchType;
     deinflect?: boolean;
     mainDictionary?: string;
