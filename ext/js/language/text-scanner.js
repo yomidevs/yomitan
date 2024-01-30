@@ -423,20 +423,6 @@ export class TextScanner extends EventDispatcher {
      * @param {import('text-scanner').InputInfo} inputInfo
      */
     async _search(textSource, searchTerms, searchKanji, inputInfo) {
-        /** @type {?import('dictionary').DictionaryEntry[]} */
-        let dictionaryEntries = null;
-        /** @type {?import('display').HistoryStateSentence} */
-        let sentence = null;
-        /** @type {?import('display').PageType} */
-        let type = null;
-        /** @type {?Error} */
-        let error = null;
-        let searched = false;
-        /** @type {?import('settings').OptionsContext} */
-        let optionsContext = null;
-        /** @type {?import('text-scanner').SearchResultDetail} */
-        let detail = null;
-
         try {
             const inputInfoDetail = inputInfo.detail;
             const selectionRestoreInfo = (
@@ -451,62 +437,54 @@ export class TextScanner extends EventDispatcher {
 
             const getSearchContextPromise = this._getSearchContext();
             const getSearchContextResult = getSearchContextPromise instanceof Promise ? await getSearchContextPromise : getSearchContextPromise;
-            const {detail: detail2} = getSearchContextResult;
-            if (typeof detail2 !== 'undefined') { detail = detail2; }
-            optionsContext = this._createOptionsContextForInput(getSearchContextResult.optionsContext, inputInfo);
+            const {detail} = getSearchContextResult;
+            const optionsContext = this._createOptionsContextForInput(getSearchContextResult.optionsContext, inputInfo);
 
-            searched = true;
-
-            let valid = false;
+            /** @type {?import('dictionary').DictionaryEntry[]} */
+            let dictionaryEntries = null;
+            /** @type {?import('display').HistoryStateSentence} */
+            let sentence = null;
+            /** @type {'terms'|'kanji'} */
+            let type = 'terms';
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
-                valid = true;
             } else if (textSource !== null && textSource instanceof TextSourceElement && await this._hasJapanese(textSource.fullContent)) {
                 dictionaryEntries = [];
                 sentence = {text: '', offset: 0};
-                type = 'terms';
-                valid = true;
             }
 
-            if (valid) {
+            if (dictionaryEntries !== null && sentence !== null) {
                 this._inputInfoCurrent = inputInfo;
                 this.setCurrentTextSource(textSource);
-                if (typeof selectionRestoreInfo !== 'undefined') {
-                    this._selectionRestoreInfo = selectionRestoreInfo;
-                }
+                this._selectionRestoreInfo = selectionRestoreInfo;
+
+                this.trigger('searchSuccess', {
+                    type,
+                    dictionaryEntries,
+                    sentence,
+                    inputInfo,
+                    textSource,
+                    optionsContext,
+                    detail
+                });
+            } else {
+                this._triggerSearchEmpty(inputInfo);
             }
-        } catch (e) {
-            error = e instanceof Error ? e : new Error(`A search error occurred: ${e}`);
+        } catch (error) {
+            this.trigger('searchError', {
+                error: error instanceof Error ? error : new Error(`A search error occurred: ${error}`),
+                textSource,
+                inputInfo
+            });
         }
-
-        if (!searched) { return; }
-
-        this._triggerSearched(type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext, detail, error);
     }
 
     /**
-     * @param {?import('display').PageType} type
-     * @param {?import('dictionary').DictionaryEntry[]} dictionaryEntries
-     * @param {?import('display').HistoryStateSentence} sentence
      * @param {import('text-scanner').InputInfo} inputInfo
-     * @param {?import('text-source').TextSource} textSource
-     * @param {?import('settings').OptionsContext} optionsContext
-     * @param {?import('text-scanner').SearchResultDetail} detail
-     * @param {?Error} error
      */
-    _triggerSearched(type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext, detail, error) {
-        this.trigger('searched', {
-            textScanner: this,
-            type,
-            dictionaryEntries,
-            sentence,
-            inputInfo,
-            textSource,
-            optionsContext,
-            detail,
-            error
-        });
+    _triggerSearchEmpty(inputInfo) {
+        this.trigger('searchEmpty', {inputInfo});
     }
 
     /** */
@@ -1299,7 +1277,7 @@ export class TextScanner extends EventDispatcher {
                     textSource.cleanup();
                 }
             } else {
-                this._triggerSearched(null, null, null, inputInfo, null, null, null, null);
+                this._triggerSearchEmpty(inputInfo);
             }
         } catch (e) {
             log.error(e);

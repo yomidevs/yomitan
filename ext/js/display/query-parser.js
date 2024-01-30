@@ -82,7 +82,8 @@ export class QueryParser extends EventDispatcher {
     prepare() {
         this._textScanner.prepare();
         this._textScanner.on('clear', this._onTextScannerClear.bind(this));
-        this._textScanner.on('searched', this._onSearched.bind(this));
+        this._textScanner.on('searchSuccess', this._onSearchSuccess.bind(this));
+        this._textScanner.on('searchError', this._onSearchError.bind(this));
         this._queryParserModeSelect.addEventListener('change', this._onParserChange.bind(this), false);
     }
 
@@ -147,28 +148,11 @@ export class QueryParser extends EventDispatcher {
     }
 
     /**
-     * @param {import('text-scanner').SearchedEventDetails} e
+     * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
      */
-    _onSearched(e) {
-        const {error} = e;
-        if (error !== null) {
-            log.error(error);
-            return;
-        }
-
-        const {
-            textScanner,
-            type,
-            dictionaryEntries,
-            sentence,
-            inputInfo,
-            textSource,
-            optionsContext
-        } = e;
-        if (type === null || dictionaryEntries === null || sentence === null || optionsContext === null || textSource === null) { return; }
-
+    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext}) {
         this.trigger('searched', {
-            textScanner,
+            textScanner: this._textScanner,
             type,
             dictionaryEntries,
             sentence,
@@ -177,6 +161,13 @@ export class QueryParser extends EventDispatcher {
             optionsContext,
             sentenceOffset: this._getSentenceOffset(textSource)
         });
+    }
+
+    /**
+     * @param {import('text-scanner').EventArgument<'searchError'>} details
+     */
+    _onSearchError({error}) {
+        log.error(error);
     }
 
     /**
