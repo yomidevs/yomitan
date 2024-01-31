@@ -30,7 +30,7 @@ export class QueryParser extends EventDispatcher {
     /**
      * @param {import('display').QueryParserConstructorDetails} details
      */
-    constructor({getSearchContext}) {
+    constructor({getSearchContext, textSourceGenerator}) {
         super();
         /** @type {import('display').GetSearchContextCallback} */
         this._getSearchContext = getSearchContext;
@@ -62,7 +62,8 @@ export class QueryParser extends EventDispatcher {
             getSearchContext,
             searchTerms: true,
             searchKanji: false,
-            searchOnClick: true
+            searchOnClick: true,
+            textSourceGenerator
         });
         /** @type {?(import('../language/japanese-wanakana.js'))} */
         this._japaneseWanakanaModule = null;

@@ -29,6 +29,7 @@ import {clone, deepEqual, promiseTimeout} from '../core/utilities.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {ScrollElement} from '../dom/scroll-element.js';
+import {TextSourceGenerator} from '../dom/text-source-generator.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {TextScanner} from '../language/text-scanner.js';
 import {yomitan} from '../yomitan.js';
@@ -126,9 +127,12 @@ export class Display extends EventDispatcher {
         this._queryParserVisibleOverride = null;
         /** @type {HTMLElement} */
         this._queryParserContainer = querySelectorNotNull(document, '#query-parser-container');
+        /** @type {TextSourceGenerator} */
+        this._textSourceGenerator = new TextSourceGenerator();
         /** @type {QueryParser} */
         this._queryParser = new QueryParser({
-            getSearchContext: this._getSearchContext.bind(this)
+            getSearchContext: this._getSearchContext.bind(this),
+            textSourceGenerator: this._textSourceGenerator
         });
         /** @type {HTMLElement} */
         this._contentScrollElement = querySelectorNotNull(document, '#content-scroll');
@@ -1829,7 +1833,8 @@ export class Display extends EventDispatcher {
                 searchTerms: true,
                 searchKanji: false,
                 searchOnClick: true,
-                searchOnClickOnly: true
+                searchOnClickOnly: true,
+                textSourceGenerator: this._textSourceGenerator
             });
             this._contentTextScanner.includeSelector = '.click-scannable,.click-scannable *';
             this._contentTextScanner.excludeSelector = '.scan-disable,.scan-disable *';
