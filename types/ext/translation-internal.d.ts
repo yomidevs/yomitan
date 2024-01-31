@@ -40,28 +40,11 @@ export type TextDeinflectionOptionsArrays = [
     emphatic: [collapseEmphatic: boolean, collapseEmphaticFull: boolean][],
 ];
 
-export enum DeinflectionRuleFlags {
-    None = 0x0,
-    VerbIchidan = 0b00000001,
-    VerbGodan = 0b00000010,
-    VerbSuru = 0b00000100,
-    VerbKuru = 0b00001000,
-    VerbZuru = 0b00010000,
-    AdjectiveI = 0b00100000,
-    IruEndingIntermediate = 0b01000000,
-}
-
-export type Deinflection = {
-    term: string;
-    rules: DeinflectionRuleFlags;
-    reasons: Dictionary.InflectionRuleChain;
-};
-
 export type DatabaseDeinflection = {
     originalText: string;
     transformedText: string;
     deinflectedText: string;
-    rules: DeinflectionRuleFlags;
+    conditions: number;
     inflectionRuleChainCandidates: Dictionary.InflectionRuleChainCandidate[];
     databaseEntries: DictionaryDatabase.TermEntry[];
 };

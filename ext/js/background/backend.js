@@ -295,9 +295,9 @@ export class Backend {
 
             await this._languageUtil.prepare();
 
-            /** @type {import('deinflector').ReasonsRaw} */
-            const deinflectionReasons = await fetchJson('/data/deinflect.json');
-            this._translator.prepare(deinflectionReasons);
+            /** @type {import('language-transformer').LanguageTransformDescriptor} */
+            const descriptor = await fetchJson('/data/language/japanese-transforms.json');
+            this._translator.prepare(descriptor);
 
             this._applyOptions('background');
 

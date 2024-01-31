@@ -122,8 +122,8 @@ export class Offscreen {
     }
 
     /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */
-    _prepareTranslatorHandler({deinflectionReasons}) {
-        this._translator.prepare(deinflectionReasons);
+    _prepareTranslatorHandler({descriptor}) {
+        this._translator.prepare(descriptor);
     }
 
     /** @type {import('offscreen').ApiHandler<'languageUtilPrepareOffscreen'>}*/

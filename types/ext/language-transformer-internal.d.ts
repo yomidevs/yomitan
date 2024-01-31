@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,29 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as TranslationInternal from './translation-internal';
-
-export type ReasonTypeRaw = 'v1' | 'v1d' | 'v1p' | 'v5' | 'vs' | 'vk' | 'vz' | 'adj-i' | 'iru';
-
-export type ReasonsRaw = {
-    [reason: string]: ReasonRaw[];
+export type Transform = {
+    name: string;
+    rules: Rule[];
 };
 
-export type ReasonRaw = {
-    kanaIn: string;
-    kanaOut: string;
-    rulesIn: ReasonTypeRaw[];
-    rulesOut: ReasonTypeRaw[];
+export type Rule = {
+    suffixIn: string;
+    suffixOut: string;
+    conditionsIn: number;
+    conditionsOut: number;
 };
 
-export type ReasonVariant = [
-    kanaIn: string,
-    kanaOut: string,
-    rulesIn: TranslationInternal.DeinflectionRuleFlags,
-    rulesOut: TranslationInternal.DeinflectionRuleFlags,
-];
+export type TransformedText = {
+    text: string;
+    conditions: number;
+    trace: Trace;
+};
 
-export type Reason = [
-    reason: string,
-    variants: ReasonVariant[],
-];
+export type Trace = TraceFrame[];
+
+export type TraceFrame = {
+    transform: string;
+    ruleIndex: number;
+};

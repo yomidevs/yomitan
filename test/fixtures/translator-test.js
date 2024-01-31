@@ -33,7 +33,7 @@ import {DictionaryImporterMediaLoader} from '../mocks/dictionary-importer-media-
 import {createDomTest} from './dom-test.js';
 
 const extDir = join(dirname(fileURLToPath(import.meta.url)), '../../ext');
-const deinflectionReasonsPath = join(extDir, 'data/deinflect.json');
+const languageTransformDescriptorPath = join(extDir, 'data/language/japanese-transforms.json');
 
 vi.stubGlobal('indexedDB', indexedDB);
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
@@ -68,8 +68,8 @@ async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
 
     // Setup translator
     const translator = new Translator({database: dictionaryDatabase, languageUtil});
-    /** @type {import('deinflector').ReasonsRaw} */
-    const deinflectionReasons = parseJson(readFileSync(deinflectionReasonsPath, {encoding: 'utf8'}));
+    /** @type {import('language-transformer').LanguageTransformDescriptor} */
+    const deinflectionReasons = parseJson(readFileSync(languageTransformDescriptorPath, {encoding: 'utf8'}));
     translator.prepare(deinflectionReasons);
 
     // Assign properties
