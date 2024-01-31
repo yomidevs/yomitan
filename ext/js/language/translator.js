@@ -18,9 +18,9 @@
 
 import {RegexUtil} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
-import {Deinflector} from './deinflector.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth, isCodePointJapanese} from './japanese.js';
+import {LanguageTransformer} from './language-transformer.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.
@@ -33,8 +33,8 @@ export class Translator {
     constructor({database}) {
         /** @type {import('../dictionary/dictionary-database.js').DictionaryDatabase} */
         this._database = database;
-        /** @type {?Deinflector} */
-        this._deinflector = null;
+        /** @type {LanguageTransformer} */
+        this._languageTransformer = new LanguageTransformer();
         /** @type {import('translator').DictionaryTagCache} */
         this._tagCache = new Map();
         /** @type {Intl.Collator} */
@@ -44,12 +44,11 @@ export class Translator {
     }
 
     /**
-     * Initializes the instance for use. The public API should not be used until
-     * this function has been called.
-     * @param {import('deinflector').ReasonsRaw} deinflectionReasons The raw deinflections reasons data that the Deinflector uses.
+     * Initializes the instance for use. The public API should not be used until this function has been called.
+     * @param {import('language-transformer').LanguageTransformDescriptor} descriptor
      */
-    prepare(deinflectionReasons) {
-        this._deinflector = new Deinflector(deinflectionReasons);
+    prepare(descriptor) {
+        this._languageTransformer.addDescriptor(descriptor);
     }
 
     /**
@@ -407,10 +406,9 @@ export class Translator {
             const entryDictionary = /** @type {import('translation').FindTermDictionary} */ (enabledDictionaryMap.get(databaseEntry.dictionary));
             const {partsOfSpeechFilter} = entryDictionary;
 
-            const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
+            const definitionConditions = this._languageTransformer.getConditionFlagsFromPartsOfSpeech(databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
-                const deinflectionRules = deinflection.rules;
-                if (!partsOfSpeechFilter || Deinflector.rulesMatch(deinflectionRules, definitionRules)) {
+                if (!partsOfSpeechFilter || LanguageTransformer.conditionsMatch(deinflection.conditions, definitionConditions)) {
                     deinflection.databaseEntries.push(databaseEntry);
                 }
             }
@@ -473,13 +471,13 @@ export class Translator {
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                for (const {term, rules, reasons} of /** @type {Deinflector} */ (this._deinflector).deinflect(source)) {
+                for (const {text: transformedText, conditions, trace} of this._languageTransformer.transform(source)) {
                     /** @type {import('dictionary').InflectionRuleChainCandidate} */
                     const inflectionRuleChainCandidate = {
                         source: 'algorithm',
-                        inflectionRules: reasons
+                        inflectionRules: trace.map((frame) => frame.transform)
                     };
-                    deinflections.push(this._createDeinflection(rawSource, source, term, rules, [inflectionRuleChainCandidate]));
+                    deinflections.push(this._createDeinflection(rawSource, source, transformedText, conditions, [inflectionRuleChainCandidate]));
                 }
             }
         }
@@ -570,12 +568,12 @@ export class Translator {
      * @param {string} originalText
      * @param {string} transformedText
      * @param {string} deinflectedText
-     * @param {import('translation-internal').DeinflectionRuleFlags} rules
+     * @param {number} conditions
      * @param {import('dictionary').InflectionRuleChainCandidate[]} inflectionRuleChainCandidates
      * @returns {import('translation-internal').DatabaseDeinflection}
      */
-    _createDeinflection(originalText, transformedText, deinflectedText, rules, inflectionRuleChainCandidates) {
-        return {originalText, transformedText, deinflectedText, rules, inflectionRuleChainCandidates, databaseEntries: []};
+    _createDeinflection(originalText, transformedText, deinflectedText, conditions, inflectionRuleChainCandidates) {
+        return {originalText, transformedText, deinflectedText, conditions, inflectionRuleChainCandidates, databaseEntries: []};
     }
 
     // Term dictionary entry grouping
