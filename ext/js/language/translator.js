@@ -431,11 +431,6 @@ export class Translator {
             textTransformationsVectorSpace.set(id, this._getTextTransformationVariants(transformation));
         }
 
-        // const variantVectorSpace = {
-        //     textReplacements: this._getTextReplacementsVariants(options),
-        //     ...textTransformationsVectorSpace
-        // };
-
         const variantVectorSpace = new Map([
             ['textReplacements', this._getTextReplacementsVariants(options)],
             ...textTransformationsVectorSpace
