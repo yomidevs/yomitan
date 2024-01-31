@@ -17,9 +17,9 @@
  */
 
 import {Handlebars} from '../../../lib/handlebars.js';
-import {AnkiNoteDataCreator} from '../../data/sandbox/anki-note-data-creator.js';
-import {DictionaryDataUtil} from '../../dictionary/dictionary-data-util.js';
-import {PronunciationGenerator} from '../../display/sandbox/pronunciation-generator.js';
+import {createAnkiNoteData} from '../../data/sandbox/anki-note-data-creator.js';
+import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../../dictionary/dictionary-data-util.js';
+import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from '../../display/sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';
 import {CssStyleApplier} from '../../dom/sandbox/css-style-applier.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../../language/japanese.js';
@@ -44,12 +44,8 @@ export class AnkiTemplateRenderer {
         this._structuredContentDatasetKeyIgnorePattern = /^sc([^a-z]|$)/;
         /** @type {TemplateRenderer} */
         this._templateRenderer = new TemplateRenderer();
-        /** @type {AnkiNoteDataCreator} */
-        this._ankiNoteDataCreator = new AnkiNoteDataCreator();
         /** @type {TemplateRendererMediaProvider} */
         this._mediaProvider = new TemplateRendererMediaProvider();
-        /** @type {PronunciationGenerator} */
-        this._pronunciationGenerator = new PronunciationGenerator();
         /** @type {?(Map<string, unknown>[])} */
         this._stateStack = null;
         /** @type {?import('anki-note-builder').Requirement[]} */
@@ -104,7 +100,7 @@ export class AnkiTemplateRenderer {
         ]);
         /* eslint-enable no-multi-spaces */
         this._templateRenderer.registerDataType('ankiNote', {
-            modifier: ({marker, commonData}) => this._ankiNoteDataCreator.create(marker, commonData),
+            modifier: ({marker, commonData}) => createAnkiNoteData(marker, commonData),
             composeData: ({marker}, commonData) => ({marker, commonData})
         });
         this._templateRenderer.setRenderCallbacks(
@@ -550,8 +546,8 @@ export class AnkiTemplateRenderer {
         const categories = new Set();
         for (const {headwordIndex, pronunciations} of termPronunciations) {
             const {reading, wordClasses} = headwords[headwordIndex];
-            const isVerbOrAdjective = DictionaryDataUtil.isNonNounVerbOrAdjective(wordClasses);
-            const pitches = DictionaryDataUtil.getPronunciationsOfType(pronunciations, 'pitch-accent');
+            const isVerbOrAdjective = isNonNounVerbOrAdjective(wordClasses);
+            const pitches = getPronunciationsOfType(pronunciations, 'pitch-accent');
             for (const {position} of pitches) {
                 const category = getPitchCategory(reading, position, isVerbOrAdjective);
                 if (category !== null) {
@@ -737,11 +733,11 @@ export class AnkiTemplateRenderer {
 
         switch (format) {
             case 'text':
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions));
+                return this._getPronunciationHtml(createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions));
             case 'graph':
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationGraph(morae, downstepPosition));
+                return this._getPronunciationHtml(createPronunciationGraph(morae, downstepPosition));
             case 'position':
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationDownstepPosition(downstepPosition));
+                return this._getPronunciationHtml(createPronunciationDownstepPosition(downstepPosition));
             default:
                 return '';
         }

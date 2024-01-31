@@ -20,7 +20,7 @@ import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {toError} from '../core/to-error.js';
 import {deferPromise} from '../core/utilities.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
-import {AnkiUtil} from '../data/anki-util.js';
+import {isNoteDataValid} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
@@ -676,7 +676,7 @@ export class DisplayAnki {
     _getAnkiNoteInfoForceValue(notes, canAdd) {
         const results = [];
         for (const note of notes) {
-            const valid = AnkiUtil.isNoteDataValid(note);
+            const valid = isNoteDataValid(note);
             results.push({canAdd, valid, noteIds: null});
         }
         return results;

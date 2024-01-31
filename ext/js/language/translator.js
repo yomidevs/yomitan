@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {RegexUtil} from '../general/regex-util.js';
+import {applyTextReplacement} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth, isCodePointJapanese} from './japanese.js';
@@ -506,7 +506,7 @@ export class Translator {
      */
     _applyTextReplacements(text, sourceMap, replacements) {
         for (const {pattern, replacement} of replacements) {
-            text = RegexUtil.applyTextReplacement(text, sourceMap, pattern, replacement);
+            text = applyTextReplacement(text, sourceMap, pattern, replacement);
         }
         return text;
     }
