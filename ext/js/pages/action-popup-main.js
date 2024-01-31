@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {PermissionsUtil} from '../data/permissions-util.js';
+import {getAllPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {yomitan} from '../yomitan.js';
@@ -25,8 +25,6 @@ class DisplayController {
     constructor() {
         /** @type {?import('settings').Options} */
         this._optionsFull = null;
-        /** @type {PermissionsUtil} */
-        this._permissionsUtil = new PermissionsUtil();
     }
 
     /** */
@@ -286,8 +284,8 @@ class DisplayController {
      * @param {import('settings').ProfileOptions} options
      */
     async _updatePermissionsWarnings(options) {
-        const permissions = await this._permissionsUtil.getAllPermissions();
-        if (this._permissionsUtil.hasRequiredPermissionsForOptions(permissions, options)) { return; }
+        const permissions = await getAllPermissions();
+        if (hasRequiredPermissionsForOptions(permissions, options)) { return; }
 
         const warnings = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.action-open-permissions,.permissions-required-warning'));
         for (const node of warnings) {

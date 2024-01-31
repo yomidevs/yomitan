@@ -22,6 +22,7 @@ import {log} from '../core/logger.js';
 import {promiseAnimationFrame} from '../core/utilities.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
+import {TextSourceGenerator} from '../dom/text-source-generator.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
 import {TextScanner} from '../language/text-scanner.js';
 import {yomitan} from '../yomitan.js';
@@ -84,6 +85,8 @@ export class Frontend {
         this._contentScale = 1.0;
         /** @type {Promise<void>} */
         this._lastShowPromise = Promise.resolve();
+        /** @type {TextSourceGenerator} */
+        this._textSourceGenerator = new TextSourceGenerator();
         /** @type {TextScanner} */
         this._textScanner = new TextScanner({
             node: window,
@@ -91,7 +94,8 @@ export class Frontend {
             ignorePoint: this._ignorePoint.bind(this),
             getSearchContext: this._getSearchContext.bind(this),
             searchTerms: true,
-            searchKanji: true
+            searchKanji: true,
+            textSourceGenerator: this._textSourceGenerator
         });
         /** @type {boolean} */
         this._textScannerHasBeenEnabled = false;
@@ -949,6 +953,7 @@ export class Frontend {
      */
     async _prepareGoogleDocs() {
         const {GoogleDocsUtil} = await import('../accessibility/google-docs-util.js');
-        DocumentUtil.registerGetRangeFromPointHandler(GoogleDocsUtil.getRangeFromPoint.bind(GoogleDocsUtil));
+        const googleDocsUtil = new GoogleDocsUtil();
+        this._textSourceGenerator.registerGetRangeFromPointHandler(googleDocsUtil.getRangeFromPoint.bind(googleDocsUtil));
     }
 }

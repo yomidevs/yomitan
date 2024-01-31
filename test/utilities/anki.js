@@ -16,16 +16,16 @@
  */
 
 import {AnkiNoteBuilder} from '../../ext/js/data/anki-note-builder.js';
+import {createAnkiNoteData} from '../../ext/js/data/sandbox/anki-note-data-creator.js';
 import {AnkiTemplateRenderer} from '../../ext/js/templates/sandbox/anki-template-renderer.js';
 
 /**
- * @param {import('../../ext/js/data/sandbox/anki-note-data-creator.js').AnkiNoteDataCreator} ankiNoteDataCreator
  * @param {import('dictionary').DictionaryEntry} dictionaryEntry
  * @param {import('settings').ResultOutputMode} mode
  * @returns {import('anki-templates').NoteData}
  * @throws {Error}
  */
-export function createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, mode) {
+export function createTestAnkiNoteData(dictionaryEntry, mode) {
     const marker = '{marker}';
     /** @type {import('anki-templates-internal').CreateDetails} */
     const data = {
@@ -43,7 +43,7 @@ export function createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, mod
         },
         media: {}
     };
-    return ankiNoteDataCreator.create(marker, data);
+    return createAnkiNoteData(marker, data);
 }
 
 /**

@@ -20,7 +20,7 @@ import {EventDispatcher} from '../../core/event-dispatcher.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {generateId, isObject} from '../../core/utilities.js';
 import {OptionsUtil} from '../../data/options-util.js';
-import {PermissionsUtil} from '../../data/permissions-util.js';
+import {getAllPermissions} from '../../data/permissions-util.js';
 import {HtmlTemplateCollection} from '../../dom/html-template-collection.js';
 import {yomitan} from '../../yomitan.js';
 
@@ -41,8 +41,6 @@ export class SettingsController extends EventDispatcher {
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();
         this._templates.load(document);
-        /** @type {PermissionsUtil} */
-        this._permissionsUtil = new PermissionsUtil();
     }
 
     /** @type {string} */
@@ -58,11 +56,6 @@ export class SettingsController extends EventDispatcher {
     set profileIndex(value) {
         if (this._profileIndex === value) { return; }
         this._setProfileIndex(value, true);
-    }
-
-    /** @type {PermissionsUtil} */
-    get permissionsUtil() {
-        return this._permissionsUtil;
     }
 
     /** */
@@ -338,7 +331,7 @@ export class SettingsController extends EventDispatcher {
         const eventName = 'permissionsChanged';
         if (!this.hasListeners(eventName)) { return; }
 
-        const permissions = await this._permissionsUtil.getAllPermissions();
+        const permissions = await getAllPermissions();
         this.trigger(eventName, {permissions});
     }
 

@@ -20,7 +20,7 @@ import {RequestBuilder} from '../background/request-builder.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {readResponseJson} from '../core/json.js';
 import {JsonSchema} from '../data/json-schema.js';
-import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';
 import {SimpleDOMParser} from '../dom/simple-dom-parser.js';
 import {isStringEntirelyKana} from '../language/languages/ja/japanese.js';
@@ -358,7 +358,7 @@ export class AudioDownloader {
             throw new Error('Could not retrieve audio');
         }
 
-        const data = ArrayBufferUtil.arrayBufferToBase64(arrayBuffer);
+        const data = arrayBufferToBase64(arrayBuffer);
         const contentType = response.headers.get('Content-Type');
         return {data, contentType};
     }

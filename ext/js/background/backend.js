@@ -25,10 +25,10 @@ import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/logger.js';
 import {clone, deferPromise, fetchJson, fetchText, isObject, promiseTimeout} from '../core/utilities.js';
-import {AnkiUtil} from '../data/anki-util.js';
+import {isNoteDataValid} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
-import {PermissionsUtil} from '../data/permissions-util.js';
-import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
+import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
@@ -36,9 +36,9 @@ import {LanguageUtil} from '../language/language-util.js';
 import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/languages/ja/japanese.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
-import {MediaUtil} from '../media/media-util.js';
+import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
 import {ClipboardReaderProxy, DictionaryDatabaseProxy, LanguageUtilProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
-import {ProfileConditionsUtil} from './profile-conditions-util.js';
+import {createSchema, normalizeContext} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
 
@@ -100,8 +100,6 @@ export class Backend {
         this._options = null;
         /** @type {import('../data/json-schema.js').JsonSchema[]} */
         this._profileConditionsSchemaCache = [];
-        /** @type {ProfileConditionsUtil} */
-        this._profileConditionsUtil = new ProfileConditionsUtil();
         /** @type {?string} */
         this._defaultAnkiFieldTemplates = null;
         /** @type {RequestBuilder} */
@@ -143,8 +141,6 @@ export class Backend {
         this._logErrorLevel = null;
         /** @type {?chrome.permissions.Permissions} */
         this._permissions = null;
-        /** @type {PermissionsUtil} */
-        this._permissionsUtil = new PermissionsUtil();
         /** @type {Map<string, (() => void)[]>} */
         this._applicationReadyHandlers = new Map();
 
@@ -266,7 +262,7 @@ export class Backend {
         try {
             this._prepareInternalSync();
 
-            this._permissions = await this._permissionsUtil.getAllPermissions();
+            this._permissions = await getAllPermissions();
             this._defaultBrowserActionTitle = await this._getBrowserIconTitle();
             this._badgePrepareDelayTimer = setTimeout(() => {
                 this._badgePrepareDelayTimer = null;
@@ -554,7 +550,7 @@ export class Backend {
         for (let i = 0; i < notes.length; ++i) {
             const note = notes[i];
             let canAdd = canAddArray[i];
-            const valid = AnkiUtil.isNoteDataValid(note);
+            const valid = isNoteDataValid(note);
             if (!valid) { canAdd = false; }
             const info = {canAdd, valid, noteIds: null};
             results.push(info);
@@ -824,7 +820,7 @@ export class Backend {
 
         let permissionsOkay = false;
         try {
-            permissionsOkay = await this._permissionsUtil.hasPermissions({permissions: ['nativeMessaging']});
+            permissionsOkay = await hasPermissions({permissions: ['nativeMessaging']});
         } catch (e) {
             // NOP
         }
@@ -1321,7 +1317,7 @@ export class Backend {
      * @returns {?import('settings').Profile}
      */
     _getProfileFromContext(options, optionsContext) {
-        const normalizedOptionsContext = this._profileConditionsUtil.normalizeContext(optionsContext);
+        const normalizedOptionsContext = normalizeContext(optionsContext);
 
         let index = 0;
         for (const profile of options.profiles) {
@@ -1331,7 +1327,7 @@ export class Backend {
             if (index < this._profileConditionsSchemaCache.length) {
                 schema = this._profileConditionsSchemaCache[index];
             } else {
-                schema = this._profileConditionsUtil.createSchema(conditionGroups);
+                schema = createSchema(conditionGroups);
                 this._profileConditionsSchemaCache.push(schema);
             }
 
@@ -2109,7 +2105,7 @@ export class Backend {
             return null;
         }
 
-        let extension = contentType !== null ? MediaUtil.getFileExtensionFromAudioMediaType(contentType) : null;
+        let extension = contentType !== null ? getFileExtensionFromAudioMediaType(contentType) : null;
         if (extension === null) { extension = '.mp3'; }
         let fileName = this._generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp, definitionDetails);
         fileName = fileName.replace(/\]/g, '');
@@ -2128,7 +2124,7 @@ export class Backend {
         const dataUrl = await this._getScreenshot(tabId, frameId, format, quality);
 
         const {mediaType, data} = this._getDataUrlInfo(dataUrl);
-        const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
+        const extension = getFileExtensionFromImageMediaType(mediaType);
         if (extension === null) {
             throw new Error('Unknown media type for screenshot image');
         }
@@ -2150,7 +2146,7 @@ export class Backend {
         }
 
         const {mediaType, data} = this._getDataUrlInfo(dataUrl);
-        const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
+        const extension = getFileExtensionFromImageMediaType(mediaType);
         if (extension === null) {
             throw new Error('Unknown media type for clipboard image');
         }
@@ -2196,7 +2192,7 @@ export class Backend {
             let fileName = null;
             if (media !== null) {
                 const {content, mediaType} = media;
-                const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
+                const extension = getFileExtensionFromImageMediaType(mediaType);
                 fileName = this._generateAnkiNoteMediaFileName(
                     `yomitan_dictionary_media_${i + 1}`,
                     extension !== null ? extension : '',
@@ -2595,7 +2591,7 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _checkPermissions() {
-        this._permissions = await this._permissionsUtil.getAllPermissions();
+        this._permissions = await getAllPermissions();
         this._updateBadge();
     }
 
@@ -2612,7 +2608,7 @@ export class Backend {
      */
     _hasRequiredPermissionsForSettings(options) {
         if (!this._canObservePermissionsChanges()) { return true; }
-        return this._permissions === null || this._permissionsUtil.hasRequiredPermissionsForOptions(this._permissions, options);
+        return this._permissions === null || hasRequiredPermissionsForOptions(this._permissions, options);
     }
 
     /**
@@ -2647,7 +2643,7 @@ export class Backend {
         const results = [];
         for (const item of await this._dictionaryDatabase.getMedia(targets)) {
             const {content, dictionary, height, mediaType, path, width} = item;
-            const content2 = ArrayBufferUtil.arrayBufferToBase64(content);
+            const content2 = arrayBufferToBase64(content);
             results.push({content: content2, dictionary, height, mediaType, path, width});
         }
         return results;
