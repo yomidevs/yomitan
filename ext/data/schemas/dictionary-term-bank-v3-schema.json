@@ -278,6 +278,9 @@
                 "color": {
                     "type": "string"
                 },
+                "background": {
+                    "type": "string"
+                },
                 "backgroundColor": {
                     "type": "string"
                 },
@@ -318,6 +321,9 @@
                 "borderWidth": {
                     "type": "string"
                 },
+                "clipPath": {
+                    "type": "string"
+                },
                 "verticalAlign": {
                     "type": "string",
                     "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"],
@@ -327,6 +333,9 @@
                     "type": "string",
                     "enum": ["start", "end", "left", "right", "center", "justify", "justify-all", "match-parent"],
                     "default": "start"
+                },
+                "textEmphasis": {
+                    "type": "string"
                 },
                 "textShadow": {
                     "type": "string"

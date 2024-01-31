@@ -55,6 +55,7 @@ export type StructuredContentStyle = {
     fontWeight?: FontWeight;
     fontSize?: string;
     color?: string;
+    background?: string;
     backgroundColor?: string;
     textDecorationLine?: TextDecorationLineOrNone | TextDecorationLine[];
     textDecorationStyle?: TextDecorationStyle;
@@ -63,8 +64,10 @@ export type StructuredContentStyle = {
     borderStyle?: string;
     borderRadius?: string;
     borderWidth?: string;
+    clipPath?: string;
     verticalAlign?: VerticalAlign;
     textAlign?: TextAlign;
+    textEmphasis?: string;
     textShadow?: string;
     margin?: string;
     marginTop?: number | string;
