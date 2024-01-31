@@ -76,8 +76,9 @@ export default defineConfig({
             dependencies: ['playwright setup']
         },
         {
-          name: 'firefox',
-          use: { ...devices['Desktop Firefox'] },
+            name: 'firefox',
+            use: {...devices['Desktop Firefox']},
+            dependencies: ['playwright setup']
         }
 
         // {
