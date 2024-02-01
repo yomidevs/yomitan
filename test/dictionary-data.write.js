@@ -35,7 +35,10 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
-test('Write dictionary data expected data', async ({translator, expect}) => {
+test('Write dictionary data expected data', async ({window, translator, expect}) => {
+    // The window property needs to be referenced for it to be initialized.
+    // It is needed for DOM access for structured content.
+    void window;
     const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json');
     /** @type {import('test/translator').TranslatorTestInputs} */
     const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
