@@ -135,6 +135,8 @@ export type KanjiDictionaryEntry = {
     readonly tags: Tag[];
     readonly stats: KanjiStatGroups;
     readonly frequencies: KanjiFrequency[];
+    readonly frequencyHarmonic: number;
+    readonly frequencyAverage: number;
     url: string;
     readonly cloze: Cloze;
 };

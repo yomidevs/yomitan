@@ -272,6 +272,8 @@ function getKanjiDefinition(dictionaryEntry, context) {
     const stats = createCachedValue(getKanjiStats.bind(null, dictionaryEntry));
     const tags = createCachedValue(convertTags.bind(null, dictionaryEntry.tags));
     const frequencies = createCachedValue(getKanjiFrequencies.bind(null, dictionaryEntry));
+    const frequencyHarmonic = createCachedValue(getKanjiFrequencyHarmonic.bind(null, dictionaryEntry));
+    const frequencyAverage = createCachedValue(getKanjiFrequencyAverage.bind(null, dictionaryEntry));
     const cloze = createCachedValue(getCloze.bind(null, dictionaryEntry, context));
 
     return {
@@ -284,6 +286,8 @@ function getKanjiDefinition(dictionaryEntry, context) {
         get tags() { return getCachedValue(tags); },
         get stats() { return getCachedValue(stats); },
         get frequencies() { return getCachedValue(frequencies); },
+        get frequencyHarmonic() { return getCachedValue(frequencyHarmonic); },
+        get frequencyAverage() { return getCachedValue(frequencyAverage); },
         url,
         get cloze() { return getCachedValue(cloze); }
     };
@@ -338,6 +342,68 @@ function getKanjiFrequencies(dictionaryEntry) {
         });
     }
     return results;
+}
+
+/**
+ * @param {import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @returns {number}
+ */
+function getKanjiFrequencyHarmonic(dictionaryEntry) {
+    let total = 0;
+    let length = 0;
+    let previousDictionary;
+
+    if (dictionaryEntry.frequencies.length < 1) {
+        return -1;
+    }
+
+    for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
+        if (dictionary === previousDictionary) {
+            continue;
+        }
+        previousDictionary = dictionary;
+        length += 1;
+
+        const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
+        if (frequencyWorking !== null) {
+            total += 1 / Number(frequencyWorking);
+        } else {
+            total += 1 / frequency;
+        }
+    }
+    total = Math.floor(length / total);
+    return total;
+}
+
+/**
+ * @param {import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @returns {number}
+ */
+function getKanjiFrequencyAverage(dictionaryEntry) {
+    let total = 0;
+    let length = 0;
+    let previousDictionary;
+
+    if (dictionaryEntry.frequencies.length < 1) {
+        return -1;
+    }
+
+    for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
+        if (dictionary === previousDictionary) {
+            continue;
+        }
+        previousDictionary = dictionary;
+        length += 1;
+
+        const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
+        if (frequencyWorking !== null) {
+            total += Number(frequencyWorking);
+        } else {
+            total += frequency;
+        }
+    }
+    total = Math.floor(total / length);
+    return total;
 }
 
 /**

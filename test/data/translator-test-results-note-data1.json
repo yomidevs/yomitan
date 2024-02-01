@@ -131,6 +131,8 @@
               "frequency": 5
             }
           ],
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "url": "url:",
           "cloze": {
             "sentence": "",
@@ -294,6 +296,8 @@
               "frequency": "six"
             }
           ],
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "url": "url:",
           "cloze": {
             "sentence": "",
