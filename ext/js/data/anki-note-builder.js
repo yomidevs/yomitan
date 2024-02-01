@@ -19,15 +19,17 @@
 import {ExtensionError} from '../core/extension-error.js';
 import {deferPromise} from '../core/utilities.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana} from '../language/japanese.js';
-import {yomitan} from '../yomitan.js';
 import {cloneFieldMarkerPattern, getRootDeckName} from './anki-util.js';
 
 export class AnkiNoteBuilder {
     /**
      * Initiate an instance of AnkiNoteBuilder.
+     * @param {import('anki-note-builder').MinimalApi} api
      * @param {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} templateRenderer
      */
-    constructor(templateRenderer) {
+    constructor(api, templateRenderer) {
+        /** @type {import('anki-note-builder').MinimalApi} */
+        this._api = api;
         /** @type {RegExp} */
         this._markerPattern = cloneFieldMarkerPattern(true);
         /** @type {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} */
@@ -431,7 +433,7 @@ export class AnkiNoteBuilder {
 
         // Inject media
         const selectionText = injectSelectionText ? this._getSelectionText() : null;
-        const injectedMedia = await yomitan.api.injectAnkiNoteMedia(
+        const injectedMedia = await this._api.injectAnkiNoteMedia(
             timestamp,
             dictionaryEntryDetails,
             audioDetails,
@@ -483,7 +485,7 @@ export class AnkiNoteBuilder {
     async _getTextFurigana(entries, optionsContext, scanLength) {
         const results = [];
         for (const {text, readingMode} of entries) {
-            const parseResults = await yomitan.api.parseText(text, optionsContext, scanLength, true, false);
+            const parseResults = await this._api.parseText(text, optionsContext, scanLength, true, false);
             let data = null;
             for (const {source, content} of parseResults) {
                 if (source !== 'scanning-parser') { continue; }

@@ -22,7 +22,6 @@ import {log} from '../core/logger.js';
 import {clone} from '../core/utilities.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
-import {yomitan} from '../yomitan.js';
 
 /**
  * @augments EventDispatcher<import('text-scanner').Events>
@@ -32,6 +31,7 @@ export class TextScanner extends EventDispatcher {
      * @param {import('text-scanner').ConstructorDetails} details
      */
     constructor({
+        api,
         node,
         getSearchContext,
         ignoreElements = null,
@@ -43,6 +43,8 @@ export class TextScanner extends EventDispatcher {
         textSourceGenerator
     }) {
         super();
+        /** @type {import('../comm/api.js').API} */
+        this._api = api;
         /** @type {HTMLElement|Window} */
         this._node = node;
         /** @type {import('text-scanner').GetSearchContextCallback} */
@@ -1204,7 +1206,7 @@ export class TextScanner extends EventDispatcher {
         /** @type {import('api').FindTermsDetails} */
         const details = {};
         if (this._matchTypePrefix) { details.matchType = 'prefix'; }
-        const {dictionaryEntries, originalTextLength} = await yomitan.api.termsFind(searchText, details, optionsContext);
+        const {dictionaryEntries, originalTextLength} = await this._api.termsFind(searchText, details, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(originalTextLength, false, layoutAwareScan);
@@ -1236,7 +1238,7 @@ export class TextScanner extends EventDispatcher {
         const searchText = this.getTextSourceContent(textSource, 1, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
-        const dictionaryEntries = await yomitan.api.kanjiFind(searchText, optionsContext);
+        const dictionaryEntries = await this._api.kanjiFind(searchText, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(1, false, layoutAwareScan);
@@ -1564,7 +1566,7 @@ export class TextScanner extends EventDispatcher {
      */
     async _hasJapanese(text) {
         try {
-            return await yomitan.api.textHasJapaneseCharacters(text);
+            return await this._api.textHasJapaneseCharacters(text);
         } catch (e) {
             return false;
         }

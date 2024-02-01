@@ -25,7 +25,6 @@ import {OptionsUtil} from '../../data/options-util.js';
 import {getAllPermissions} from '../../data/permissions-util.js';
 import {arrayBufferUtf8Decode} from '../../data/sandbox/array-buffer-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 import {DictionaryController} from './dictionary-controller.js';
 
 export class BackupController {
@@ -134,8 +133,8 @@ export class BackupController {
      */
     async _getSettingsExportData(date) {
         const optionsFull = await this._settingsController.getOptionsFull();
-        const environment = await yomitan.api.getEnvironmentInfo();
-        const fieldTemplatesDefault = await yomitan.api.getDefaultAnkiFieldTemplates();
+        const environment = await this._settingsController.application.api.getEnvironmentInfo();
+        const fieldTemplatesDefault = await this._settingsController.application.api.getDefaultAnkiFieldTemplates();
         const permissions = await getAllPermissions();
 
         // Format options
@@ -644,10 +643,10 @@ export class BackupController {
      * @param {File} file
      */
     async _importDatabase(databaseName, file) {
-        await yomitan.api.purgeDatabase();
+        await this._settingsController.application.api.purgeDatabase();
         await Dexie.import(file, {progressCallback: this._databaseImportProgressCallback});
-        yomitan.api.triggerDatabaseUpdated('dictionary', 'import');
-        yomitan.triggerStorageChanged();
+        this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
+        this._settingsController.application.triggerStorageChanged();
     }
 
     /** */

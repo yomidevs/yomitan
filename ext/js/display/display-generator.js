@@ -21,7 +21,6 @@ import {isObject} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKanjiFrequencies, groupTermFrequencies, groupTermTags, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji, isStringPartiallyJapanese} from '../language/japanese.js';
-import {yomitan} from '../yomitan.js';
 import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from './sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
 
@@ -40,9 +39,11 @@ export class DisplayGenerator {
         this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document);
     }
 
-    /** */
-    async prepare() {
-        const html = await yomitan.api.getDisplayTemplatesHtml();
+    /**
+     * @param {import('../comm/api.js').API} api
+     */
+    async prepare(api) {
+        const html = await api.getDisplayTemplatesHtml();
         this._templates.load(html);
         this.updateHotkeys();
     }

@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {Application} from '../../application.js';
 import {log} from '../../core/logger.js';
 import {DocumentFocusController} from '../../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 import {ExtensionContentController} from '../common/extension-content-controller.js';
 import {AnkiController} from './anki-controller.js';
 import {AnkiTemplatesController} from './anki-templates-controller.js';
@@ -78,7 +78,8 @@ async function main() {
             document.documentElement.dataset.loadingStalled = 'true';
         }, 1000);
 
-        await yomitan.prepare();
+        const application = new Application();
+        await application.prepare();
 
         if (prepareTimer !== null) {
             clearTimeout(prepareTimer);
@@ -91,10 +92,10 @@ async function main() {
         const modalController = new ModalController();
         modalController.prepare();
 
-        const settingsController = new SettingsController();
+        const settingsController = new SettingsController(application);
         await settingsController.prepare();
 
-        const persistentStorageController = new PersistentStorageController();
+        const persistentStorageController = new PersistentStorageController(application);
         persistentStorageController.prepare();
 
         const storageController = new StorageController(persistentStorageController);
@@ -154,10 +155,10 @@ async function main() {
         const extensionKeyboardShortcutController = new ExtensionKeyboardShortcutController(settingsController);
         extensionKeyboardShortcutController.prepare();
 
-        const popupWindowController = new PopupWindowController();
+        const popupWindowController = new PopupWindowController(application.api);
         popupWindowController.prepare();
 
-        const mecabController = new MecabController();
+        const mecabController = new MecabController(application.api);
         mecabController.prepare();
 
         const collapsibleDictionaryController = new CollapsibleDictionaryController(settingsController);
