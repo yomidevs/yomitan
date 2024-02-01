@@ -302,6 +302,54 @@
     {{~/if~}}
 {{/inline}}
 
+{{#*inline "frequencies-num"}}
+    {{~#scope~}}
+        {{~set "result-freq" -1 ~}}
+        {{~set "prev-freq-dict" "" ~}}
+        {{~set "t" 1 ~}}
+
+        {{~#each definition.frequencies~}}
+            {{~set "read-freq" false ~}}
+            {{~#if (op "!==" (get "prev-freq-dict") this.dictionary ) ~}}
+                {{~set "read-freq" true ~}}
+                {{~set "prev-freq-dict" this.dictionary ~}}
+            {{/if~}}
+
+            {{~#if (get "read-freq") ~}}
+                {{~#set "numericFrequencyMatch"}}{{~#regexMatch "\d+" ""}}{{~this.frequency~}}{{/regexMatch~}}{{/set~}}
+                {{~set "f" (op "+" (get "numericFrequencyMatch")) ~}}
+                {{~#if (op "===" (get "result-freq") -1) ~}}
+                    {{~set "result-freq" (op "/" 1 (get "f")) ~}}
+                {{~else ~}}
+                    {{~set "result-freq"
+                        (op "+"
+                            (get "result-freq")
+                            (op "/" 1 (get "f"))
+                        )
+                    }}
+                    {{~set "t" (op "+" (get "t") 1) ~}}
+                {{~/if~}}
+            {{~/if~}}
+        {{~/each~}}
+
+        {{~#if (op "===" (get "result-freq") -1) ~}}
+            {{~set "result-freq" 9999999 ~}}
+        {{~else ~}}
+            {{~set "result-freq"
+                (op ">>"
+                    (op "*"
+                        (op "/" 1 (get "result-freq"))
+                        (get "t")
+                    )
+                    0
+                )
+            ~}}
+        {{~/if~}}
+
+        {{~get "result-freq"~}}
+    {{~/scope~}}
+{{/inline}}
+
 {{#*inline "stroke-count"}}
     {{~#scope~}}
         {{~set "found" false~}}

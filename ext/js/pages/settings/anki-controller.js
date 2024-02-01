@@ -139,6 +139,7 @@ export class AnkiController {
                     'document-title',
                     'expression',
                     'frequencies',
+                    'frequencies-num',
                     'furigana',
                     'furigana-plain',
                     'glossary',
