@@ -304,26 +304,26 @@
 
 {{#*inline "frequency-number"}}
     {{~#scope~}}
-        {{~set "result-freq" -1 ~}}
-        {{~set "prev-freq-dict" "" ~}}
+        {{~set "resultFrequency" -1 ~}}
+        {{~set "previousFrequencyDictionary" "" ~}}
         {{~set "t" 1 ~}}
 
         {{~#each definition.frequencies~}}
-            {{~set "read-freq" false ~}}
-            {{~#if (op "!==" (get "prev-freq-dict") this.dictionary ) ~}}
-                {{~set "read-freq" true ~}}
-                {{~set "prev-freq-dict" this.dictionary ~}}
+            {{~set "readFrequency" false ~}}
+            {{~#if (op "!==" (get "previousFrequencyDictionary") this.dictionary ) ~}}
+                {{~set "readFrequency" true ~}}
+                {{~set "previousFrequencyDictionary" this.dictionary ~}}
             {{/if~}}
 
-            {{~#if (get "read-freq") ~}}
+            {{~#if (get "readFrequency") ~}}
                 {{~#set "numericFrequencyMatch"}}{{~#regexMatch "\d+" ""}}{{~this.frequency~}}{{/regexMatch~}}{{/set~}}
                 {{~set "f" (op "+" (get "numericFrequencyMatch")) ~}}
-                {{~#if (op "===" (get "result-freq") -1) ~}}
-                    {{~set "result-freq" (op "/" 1 (get "f")) ~}}
+                {{~#if (op "===" (get "resultFrequency") -1) ~}}
+                    {{~set "resultFrequency" (op "/" 1 (get "f")) ~}}
                 {{~else ~}}
-                    {{~set "result-freq"
+                    {{~set "resultFrequency"
                         (op "+"
-                            (get "result-freq")
+                            (get "resultFrequency")
                             (op "/" 1 (get "f"))
                         )
                     }}
@@ -332,13 +332,13 @@
             {{~/if~}}
         {{~/each~}}
 
-        {{~#if (op "===" (get "result-freq") -1) ~}}
-            {{~set "result-freq" 9999999 ~}}
+        {{~#if (op "===" (get "resultFrequency") -1) ~}}
+            {{~set "resultFrequency" 9999999 ~}}
         {{~else ~}}
-            {{~set "result-freq"
+            {{~set "resultFrequency"
                 (op ">>"
                     (op "*"
-                        (op "/" 1 (get "result-freq"))
+                        (op "/" 1 (get "resultFrequency"))
                         (get "t")
                     )
                     0
@@ -346,7 +346,7 @@
             ~}}
         {{~/if~}}
 
-        {{~get "result-freq"~}}
+        {{~get "resultFrequency"~}}
     {{~/scope~}}
 {{/inline}}
 
