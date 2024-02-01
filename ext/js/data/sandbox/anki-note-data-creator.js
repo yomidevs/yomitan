@@ -366,6 +366,8 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode) {
     const termTags = createCachedValue(getTermTags.bind(null, dictionaryEntry, type));
     const expressions = createCachedValue(getTermExpressions.bind(null, dictionaryEntry));
     const frequencies = createCachedValue(getTermFrequencies.bind(null, dictionaryEntry));
+    const frequencyHarmonic = createCachedValue(getTermFrequencyHarmonic.bind(null, dictionaryEntry));
+    const frequencyAverage = createCachedValue(getTermFrequencyAverage.bind(null, dictionaryEntry));
     const pitches = createCachedValue(getTermPitches.bind(null, dictionaryEntry));
     const phoneticTranscriptions = createCachedValue(getTermPhoneticTranscriptions.bind(null, dictionaryEntry));
     const glossary = createCachedValue(getTermGlossaryArray.bind(null, dictionaryEntry, type));
@@ -403,6 +405,8 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode) {
         get termTags() { return getCachedValue(termTags); },
         get definitions() { return getCachedValue(commonInfo).definitions; },
         get frequencies() { return getCachedValue(frequencies); },
+        get frequencyHarmonic() { return getCachedValue(frequencyHarmonic); },
+        get frequencyAverage() { return getCachedValue(frequencyAverage); },
         get pitches() { return getCachedValue(pitches); },
         get phoneticTranscriptions() { return getCachedValue(phoneticTranscriptions); },
         sourceTermExactMatchCount,
@@ -497,6 +501,68 @@ function getTermFrequencies(dictionaryEntry) {
         });
     }
     return results;
+}
+
+/**
+ * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+ * @returns {import('anki-templates').TermFrequencyHarmonic}
+ */
+function getTermFrequencyHarmonic(dictionaryEntry) {
+    let total = 0;
+    let length = 0;
+    let previousDictionary;
+
+    if (dictionaryEntry.frequencies.length < 1) {
+        return ({frequency: -1});
+    }
+
+    for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
+        if (dictionary === previousDictionary) {
+            continue;
+        }
+        previousDictionary = dictionary;
+        length += 1;
+
+        const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
+        if (frequencyWorking !== null) {
+            total += 1 / Number(frequencyWorking);
+        } else {
+            total += 1 / frequency;
+        }
+    }
+    total = Math.floor(length / total);
+    return ({frequency: total});
+}
+
+/**
+ * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+ * @returns {import('anki-templates').TermFrequencyAverage}
+ */
+function getTermFrequencyAverage(dictionaryEntry) {
+    let total = 0;
+    let length = 0;
+    let previousDictionary;
+
+    if (dictionaryEntry.frequencies.length < 1) {
+        return ({frequency: -1});
+    }
+
+    for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
+        if (dictionary === previousDictionary) {
+            continue;
+        }
+        previousDictionary = dictionary;
+        length += 1;
+
+        const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
+        if (frequencyWorking !== null) {
+            total += Number(frequencyWorking);
+        } else {
+            total += frequency;
+        }
+    }
+    total = Math.floor(total / length);
+    return ({frequency: total});
 }
 
 /**

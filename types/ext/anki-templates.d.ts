@@ -190,6 +190,8 @@ export type TermDictionaryEntry = {
     readonly termTags?: Tag[];
     readonly definitions?: TermDefinition[];
     readonly frequencies: TermFrequency[];
+    readonly frequencyHarmonic: TermFrequencyHarmonic;
+    readonly frequencyAverage: TermFrequencyAverage;
     readonly pitches: TermPitchAccent[];
     readonly phoneticTranscriptions: TermPhoneticTranscription[];
     sourceTermExactMatchCount: number;
@@ -239,6 +241,14 @@ export type TermFrequency = {
     reading: string;
     hasReading: boolean;
     frequency: number | string;
+};
+
+export type TermFrequencyHarmonic = {
+    frequency: number;
+};
+
+export type TermFrequencyAverage = {
+    frequency: number;
 };
 
 export type TermPitchAccent = {

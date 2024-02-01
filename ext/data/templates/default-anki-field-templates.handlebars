@@ -302,52 +302,36 @@
     {{~/if~}}
 {{/inline}}
 
-{{#*inline "frequency-number"}}
-    {{~#scope~}}
-        {{~set "resultFrequency" -1 ~}}
-        {{~set "previousFrequencyDictionary" "" ~}}
-        {{~set "total" 1 ~}}
+{{#*inline "frequency-harmonic-rank"}}
+    {{~#if (op "===" definition.frequencyHarmonic.frequency -1) ~}}
+        9999999
+    {{~else ~}}
+        {{definition.frequencyHarmonic.frequency}}
+    {{~/if~}}
+{{/inline}}
 
-        {{~#each definition.frequencies~}}
-            {{~set "readFrequency" false ~}}
-            {{~#if (op "!==" (get "previousFrequencyDictionary") this.dictionary ) ~}}
-                {{~set "readFrequency" true ~}}
-                {{~set "previousFrequencyDictionary" this.dictionary ~}}
-            {{/if~}}
+{{#*inline "frequency-harmonic-occurance"}}
+    {{~#if (op "===" definition.frequencyHarmonic.frequency -1) ~}}
+        0
+    {{~else ~}}
+        {{definition.frequencyHarmonic.frequency}}
+    {{~/if~}}
+{{/inline}}
 
-            {{~#if (get "readFrequency") ~}}
-                {{~#set "numericFrequencyMatch"}}{{~#regexMatch "\d+" ""}}{{~this.frequency~}}{{/regexMatch~}}{{/set~}}
-                {{~set "frequency" (op "+" (get "numericFrequencyMatch")) ~}}
-                {{~#if (op "===" (get "resultFrequency") -1) ~}}
-                    {{~set "resultFrequency" (op "/" 1 (get "frequency")) ~}}
-                {{~else ~}}
-                    {{~set "resultFrequency"
-                        (op "+"
-                            (get "resultFrequency")
-                            (op "/" 1 (get "frequency"))
-                        )
-                    }}
-                    {{~set "total" (op "+" (get "total") 1) ~}}
-                {{~/if~}}
-            {{~/if~}}
-        {{~/each~}}
+{{#*inline "frequency-average-rank"}}
+    {{~#if (op "===" definition.frequencyAverage.frequency -1) ~}}
+        9999999
+    {{~else ~}}
+        {{definition.frequencyAverage.frequency}}
+    {{~/if~}}
+{{/inline}}
 
-        {{~#if (op "===" (get "resultFrequency") -1) ~}}
-            {{~set "resultFrequency" 9999999 ~}}
-        {{~else ~}}
-            {{~set "resultFrequency"
-                (op ">>"
-                    (op "*"
-                        (op "/" 1 (get "resultFrequency"))
-                        (get "total")
-                    )
-                    0
-                )
-            ~}}
-        {{~/if~}}
-
-        {{~get "resultFrequency"~}}
-    {{~/scope~}}
+{{#*inline "frequency-average-occurance"}}
+    {{~#if (op "===" definition.frequencyAverage.frequency -1) ~}}
+        0
+    {{~else ~}}
+        {{definition.frequencyAverage.frequency}}
+    {{~/if~}}
 {{/inline}}
 
 {{#*inline "stroke-count"}}
