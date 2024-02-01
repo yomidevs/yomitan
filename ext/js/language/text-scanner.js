@@ -1210,7 +1210,7 @@ export class TextScanner extends EventDispatcher {
         if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(originalTextLength, false, layoutAwareScan);
-        const sentence = DocumentUtil.extractSentence(
+        const sentence = this._textSourceGenerator.extractSentence(
             textSource,
             layoutAwareScan,
             sentenceScanExtent,
@@ -1242,7 +1242,7 @@ export class TextScanner extends EventDispatcher {
         if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(1, false, layoutAwareScan);
-        const sentence = DocumentUtil.extractSentence(
+        const sentence = this._textSourceGenerator.extractSentence(
             textSource,
             layoutAwareScan,
             sentenceScanExtent,
