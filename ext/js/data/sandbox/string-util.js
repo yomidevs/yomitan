@@ -68,11 +68,3 @@ export function readCodePointsBackward(text, position, count) {
     }
     return result;
 }
-
-/**
- * @param {string} string
- * @returns {boolean}
- */
-export function isWhitespace(string) {
-    return string.trim().length === 0;
-}

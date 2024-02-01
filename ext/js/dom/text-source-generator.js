@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isWhitespace} from '../data/sandbox/string-util.js';
 import {DocumentUtil} from './document-util.js';
 import {DOMTextScanner} from './dom-text-scanner.js';
 import {TextSourceElement} from './text-source-element.js';
@@ -169,8 +168,8 @@ export class TextSourceGenerator {
         }
 
         // Trim whitespace
-        for (; cursorStart < startLength && isWhitespace(text[cursorStart]); ++cursorStart) { /* NOP */ }
-        for (; cursorEnd > textEndAnchor && isWhitespace(text[cursorEnd - 1]); --cursorEnd) { /* NOP */ }
+        for (; cursorStart < startLength && this._isWhitespace(text[cursorStart]); ++cursorStart) { /* NOP */ }
+        for (; cursorEnd > textEndAnchor && this._isWhitespace(text[cursorEnd - 1]); --cursorEnd) { /* NOP */ }
 
         // Result
         return {
@@ -371,7 +370,7 @@ export class TextSourceGenerator {
             const {node, offset, content} = new DOMTextScanner(nodePre, offsetPre, true, false).seek(1);
             range.setEnd(node, offset);
 
-            if (!isWhitespace(content) && DocumentUtil.isPointInAnyRect(x, y, range.getClientRects())) {
+            if (!this._isWhitespace(content) && DocumentUtil.isPointInAnyRect(x, y, range.getClientRects())) {
                 return true;
             }
         } finally {
@@ -382,7 +381,7 @@ export class TextSourceGenerator {
         const {node, offset, content} = new DOMTextScanner(startContainer, range.startOffset, true, false).seek(-1);
         range.setStart(node, offset);
 
-        if (!isWhitespace(content) && DocumentUtil.isPointInAnyRect(x, y, range.getClientRects())) {
+        if (!this._isWhitespace(content) && DocumentUtil.isPointInAnyRect(x, y, range.getClientRects())) {
             // This purposefully leaves the starting offset as modified and sets the range length to 0.
             range.setEnd(node, offset);
             return true;
@@ -635,5 +634,13 @@ export class TextSourceGenerator {
      */
     _isElementUserSelectAll(element) {
         return getComputedStyle(element).userSelect === 'all';
+    }
+
+    /**
+     * @param {string} string
+     * @returns {boolean}
+     */
+    _isWhitespace(string) {
+        return string.trim().length === 0;
     }
 }
