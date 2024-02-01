@@ -601,12 +601,8 @@
               "frequency": 26
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -927,12 +923,8 @@
               "frequency": "twenty-seven"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -1245,12 +1237,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -1562,12 +1550,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -1879,12 +1863,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -2196,12 +2176,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -2517,12 +2493,8 @@
               "frequency": 26
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -2843,12 +2815,8 @@
               "frequency": "twenty-seven"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -3191,12 +3159,8 @@
               "frequency": 30
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -3616,12 +3580,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -4041,12 +4001,8 @@
               "frequency": 30
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -4466,12 +4422,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -4863,12 +4815,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -5182,12 +5130,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -5501,12 +5445,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -5820,12 +5760,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -6141,12 +6077,8 @@
               "frequency": 26
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -6467,12 +6399,8 @@
               "frequency": "twenty-seven"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -6632,12 +6560,8 @@
             }
           ],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -6954,12 +6878,8 @@
               "frequency": 26
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -7285,12 +7205,8 @@
               "frequency": "twenty-seven"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -7603,12 +7519,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -7920,12 +7832,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -8242,12 +8150,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -8559,12 +8463,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -8911,12 +8811,8 @@
               "frequency": 30
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -9336,12 +9232,8 @@
               "frequency": 30
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -9733,12 +9625,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -10052,12 +9940,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -10404,12 +10288,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -10829,12 +10709,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -11226,12 +11102,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -11545,12 +11417,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -11714,12 +11582,8 @@
             }
           ],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -12115,12 +11979,8 @@
               "frequency": 30
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -12563,12 +12423,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -12983,12 +12839,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -13333,12 +13185,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -13648,12 +13496,8 @@
               "frequency": 26
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -13972,12 +13816,8 @@
               "frequency": "twenty-seven"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -14617,12 +14457,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -15335,12 +15171,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 2,
@@ -15644,12 +15476,8 @@
               "frequency": 26
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -15961,12 +15789,8 @@
               "frequency": "twenty-seven"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -16307,12 +16131,8 @@
               "frequency": 30
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -16736,12 +16556,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -17165,12 +16981,8 @@
               "frequency": 30
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -17594,12 +17406,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -17991,12 +17799,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -18310,12 +18114,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -18629,12 +18429,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -18948,12 +18744,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -19269,12 +19061,8 @@
               "frequency": 26
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -19595,12 +19383,8 @@
               "frequency": "twenty-seven"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -19943,12 +19727,8 @@
               "frequency": 30
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -20368,12 +20148,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -20793,12 +20569,8 @@
               "frequency": 30
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -21218,12 +20990,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -21615,12 +21383,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -21934,12 +21698,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -22253,12 +22013,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -22572,12 +22328,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -22893,12 +22645,8 @@
               "frequency": 26
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -23219,12 +22967,8 @@
               "frequency": "twenty-seven"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -23567,12 +23311,8 @@
               "frequency": 30
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -23992,12 +23732,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -24417,12 +24153,8 @@
               "frequency": 30
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -24842,12 +24574,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -25239,12 +24967,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -25558,12 +25282,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -25877,12 +25597,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -26196,12 +25912,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -26517,12 +26229,8 @@
               "frequency": 26
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -26843,12 +26551,8 @@
               "frequency": "twenty-seven"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 1
-          },
-          "frequencyAverage": {
-            "frequency": 1
-          },
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -27004,12 +26708,8 @@
             }
           ],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -27167,12 +26867,8 @@
             }
           ],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -27332,12 +27028,8 @@
             }
           ],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -27987,12 +27679,8 @@
               "frequency": "thirty-one"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 3
-          },
-          "frequencyAverage": {
-            "frequency": 3
-          },
+          "frequencyHarmonic": 3,
+          "frequencyAverage": 3,
           "pitches": [
             {
               "index": 0,
@@ -28705,12 +28393,8 @@
               "frequency": "twenty-nine"
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -28877,12 +28561,8 @@
           ],
           "termTags": [],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [
             {
               "index": 0,
@@ -29174,12 +28854,8 @@
           ],
           "termTags": [],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [
             {
               "index": 0,
@@ -29365,12 +29041,8 @@
           ],
           "termTags": [],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [
             {
               "index": 0,
@@ -29556,12 +29228,8 @@
           ],
           "termTags": [],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [
             {
               "index": 0,
@@ -29747,12 +29415,8 @@
           ],
           "termTags": [],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [
             {
               "index": 0,
@@ -29944,12 +29608,8 @@
           ],
           "termTags": [],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [
             {
               "index": 0,
@@ -30185,12 +29845,8 @@
             }
           ],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -30304,12 +29960,8 @@
           ],
           "termTags": [],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -30409,12 +30061,8 @@
           "definitionTags": [],
           "termTags": [],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -30727,12 +30375,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -31044,12 +30688,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -31366,12 +31006,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -31683,12 +31319,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -31843,12 +31475,8 @@
             }
           ],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
@@ -32161,12 +31789,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -32478,12 +32102,8 @@
               "frequency": 28
             }
           ],
-          "frequencyHarmonic": {
-            "frequency": 2
-          },
-          "frequencyAverage": {
-            "frequency": 2
-          },
+          "frequencyHarmonic": 2,
+          "frequencyAverage": 2,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
@@ -32603,12 +32223,8 @@
           ],
           "termTags": [],
           "frequencies": [],
-          "frequencyHarmonic": {
-            "frequency": -1
-          },
-          "frequencyAverage": {
-            "frequency": -1
-          },
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
           "pitches": [],
           "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,

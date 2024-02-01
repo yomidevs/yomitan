@@ -505,7 +505,7 @@ function getTermFrequencies(dictionaryEntry) {
 
 /**
  * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
- * @returns {import('anki-templates').TermFrequencyHarmonic}
+ * @returns {number}
  */
 function getTermFrequencyHarmonic(dictionaryEntry) {
     let total = 0;
@@ -513,7 +513,7 @@ function getTermFrequencyHarmonic(dictionaryEntry) {
     let previousDictionary;
 
     if (dictionaryEntry.frequencies.length < 1) {
-        return ({frequency: -1});
+        return -1;
     }
 
     for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
@@ -531,12 +531,12 @@ function getTermFrequencyHarmonic(dictionaryEntry) {
         }
     }
     total = Math.floor(length / total);
-    return ({frequency: total});
+    return total;
 }
 
 /**
  * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
- * @returns {import('anki-templates').TermFrequencyAverage}
+ * @returns {number}
  */
 function getTermFrequencyAverage(dictionaryEntry) {
     let total = 0;
@@ -544,7 +544,7 @@ function getTermFrequencyAverage(dictionaryEntry) {
     let previousDictionary;
 
     if (dictionaryEntry.frequencies.length < 1) {
-        return ({frequency: -1});
+        return -1;
     }
 
     for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
@@ -562,7 +562,7 @@ function getTermFrequencyAverage(dictionaryEntry) {
         }
     }
     total = Math.floor(total / length);
-    return ({frequency: total});
+    return total;
 }
 
 /**
