@@ -65,6 +65,7 @@ function getFieldMarkers(type) {
                 'document-title',
                 'expression',
                 'frequencies',
+                'frequency-number',
                 'furigana',
                 'furigana-plain',
                 'glossary',
