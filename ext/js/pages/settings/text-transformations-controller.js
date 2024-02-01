@@ -17,7 +17,6 @@
 
 
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 
 export class TextTransformationsController {
     /**
@@ -56,7 +55,7 @@ export class TextTransformationsController {
             this._language = options.general.language;
 
             this._clearSettingsItems();
-            this._transformations = await yomitan.api.getTextTransformations(this._language);
+            this._transformations = await this._settingsController.application.api.getTextTransformations(this._language);
             this._renderSettingsItems();
         }
     }

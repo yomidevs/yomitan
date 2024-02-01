@@ -18,7 +18,6 @@
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 
 export class LanguagesController {
     /**
@@ -36,7 +35,7 @@ export class LanguagesController {
     /** */
     async prepare() {
         await this._updateOptions();
-        this._languages = await yomitan.api.getLanguages();
+        this._languages = await this._settingsController.application.api.getLanguages();
         this._languages.sort((a, b) => a.iso.localeCompare(b.iso));
         this._fillSelect();
     }
