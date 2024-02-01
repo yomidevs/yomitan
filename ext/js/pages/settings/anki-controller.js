@@ -143,7 +143,6 @@ export class AnkiController {
                     'frequency-harmonic-occurance',
                     'frequency-average-rank',
                     'frequency-average-occurance',
-                    'frequency-number',
                     'furigana',
                     'furigana-plain',
                     'glossary',
