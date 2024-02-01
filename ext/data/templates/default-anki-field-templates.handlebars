@@ -306,7 +306,7 @@
     {{~#scope~}}
         {{~set "resultFrequency" -1 ~}}
         {{~set "previousFrequencyDictionary" "" ~}}
-        {{~set "t" 1 ~}}
+        {{~set "total" 1 ~}}
 
         {{~#each definition.frequencies~}}
             {{~set "readFrequency" false ~}}
@@ -317,17 +317,17 @@
 
             {{~#if (get "readFrequency") ~}}
                 {{~#set "numericFrequencyMatch"}}{{~#regexMatch "\d+" ""}}{{~this.frequency~}}{{/regexMatch~}}{{/set~}}
-                {{~set "f" (op "+" (get "numericFrequencyMatch")) ~}}
+                {{~set "frequency" (op "+" (get "numericFrequencyMatch")) ~}}
                 {{~#if (op "===" (get "resultFrequency") -1) ~}}
-                    {{~set "resultFrequency" (op "/" 1 (get "f")) ~}}
+                    {{~set "resultFrequency" (op "/" 1 (get "frequency")) ~}}
                 {{~else ~}}
                     {{~set "resultFrequency"
                         (op "+"
                             (get "resultFrequency")
-                            (op "/" 1 (get "f"))
+                            (op "/" 1 (get "frequency"))
                         )
                     }}
-                    {{~set "t" (op "+" (get "t") 1) ~}}
+                    {{~set "total" (op "+" (get "total") 1) ~}}
                 {{~/if~}}
             {{~/if~}}
         {{~/each~}}
@@ -339,7 +339,7 @@
                 (op ">>"
                     (op "*"
                         (op "/" 1 (get "resultFrequency"))
-                        (get "t")
+                        (get "total")
                     )
                     0
                 )
