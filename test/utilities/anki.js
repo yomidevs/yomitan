@@ -144,7 +144,8 @@ export async function getTemplateRenderResults(dictionaryEntries, type, mode, te
                 }
                 break;
         }
-        const ankiNoteBuilder = new AnkiNoteBuilder(ankiTemplateRenderer.templateRenderer);
+        const api = new MinimalApi();
+        const ankiNoteBuilder = new AnkiNoteBuilder(api, ankiTemplateRenderer.templateRenderer);
         const context = {
             url: 'url:',
             sentence: {
@@ -185,4 +186,20 @@ export async function getTemplateRenderResults(dictionaryEntries, type, mode, te
     }
 
     return results;
+}
+
+class MinimalApi {
+    /**
+     * @type {import('anki-note-builder.js').MinimalApi['injectAnkiNoteMedia']}
+     */
+    async injectAnkiNoteMedia() {
+        throw new Error('Not supported');
+    }
+
+    /**
+     * @type {import('anki-note-builder.js').MinimalApi['parseText']}
+     */
+    async parseText() {
+        throw new Error('Not supported');
+    }
 }

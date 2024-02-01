@@ -18,10 +18,14 @@
 
 import {toError} from '../../core/to-error.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 
 export class MecabController {
-    constructor() {
+    /**
+     * @param {import('../../comm/api.js').API} api
+     */
+    constructor(api) {
+        /** @type {import('../../comm/api.js').API} */
+        this._api = api;
         /** @type {HTMLButtonElement} */
         this._testButton = querySelectorNotNull(document, '#test-mecab-button');
         /** @type {HTMLElement} */
@@ -55,7 +59,7 @@ export class MecabController {
             /** @type {HTMLButtonElement} */ (this._testButton).disabled = true;
             resultsContainer.textContent = '';
             resultsContainer.hidden = true;
-            await yomitan.api.testMecab();
+            await this._api.testMecab();
             this._setStatus('Connection was successful', false);
         } catch (e) {
             this._setStatus(toError(e).message, true);

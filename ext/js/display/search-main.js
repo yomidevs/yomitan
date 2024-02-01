@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {Application} from '../application.js';
 import {log} from '../core/logger.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
-import {yomitan} from '../yomitan.js';
 import {DisplayAnki} from './display-anki.js';
 import {DisplayAudio} from './display-audio.js';
 import {Display} from './display.js';
@@ -30,6 +30,8 @@ import {SearchPersistentStateController} from './search-persistent-state-control
 /** Entry point. */
 async function main() {
     try {
+        const application = new Application();
+
         const documentFocusController = new DocumentFocusController('#search-textbox');
         documentFocusController.prepare();
 
@@ -39,14 +41,14 @@ async function main() {
         const searchActionPopupController = new SearchActionPopupController(searchPersistentStateController);
         searchActionPopupController.prepare();
 
-        await yomitan.prepare();
+        await application.prepare();
 
-        const {tabId, frameId} = await yomitan.api.frameInformationGet();
+        const {tabId, frameId} = await application.api.frameInformationGet();
 
         const hotkeyHandler = new HotkeyHandler();
-        hotkeyHandler.prepare();
+        hotkeyHandler.prepare(application.crossFrame);
 
-        const display = new Display(tabId, frameId, 'search', documentFocusController, hotkeyHandler);
+        const display = new Display(application, tabId, frameId, 'search', documentFocusController, hotkeyHandler);
         await display.prepare();
 
         const displayAudio = new DisplayAudio(display);
@@ -62,7 +64,7 @@ async function main() {
 
         document.documentElement.dataset.loaded = 'true';
 
-        yomitan.ready();
+        application.ready();
     } catch (e) {
         log.error(e);
     }

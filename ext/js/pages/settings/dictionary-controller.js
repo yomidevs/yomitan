@@ -20,7 +20,6 @@ import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {log} from '../../core/logger.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 
 class DictionaryEntry {
     /**
@@ -437,7 +436,7 @@ export class DictionaryController {
         /** @type {HTMLButtonElement} */
         const dictionaryMoveButton = querySelectorNotNull(document, '#dictionary-move-button');
 
-        yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+        this._settingsController.application.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._allCheckbox.addEventListener('change', this._onAllCheckboxChange.bind(this), false);
         dictionaryDeleteButton.addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
@@ -917,7 +916,7 @@ export class DictionaryController {
      */
     async _deleteDictionaryInternal(dictionaryTitle, onProgress) {
         await new DictionaryWorker().deleteDictionary(dictionaryTitle, onProgress);
-        yomitan.api.triggerDatabaseUpdated('dictionary', 'delete');
+        this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'delete');
     }
 
     /**
@@ -947,7 +946,7 @@ export class DictionaryController {
 
     /** */
     _triggerStorageChanged() {
-        yomitan.triggerStorageChanged();
+        this._settingsController.application.triggerStorageChanged();
     }
 
     /** */

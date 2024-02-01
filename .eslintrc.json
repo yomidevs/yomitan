@@ -658,9 +658,8 @@
         },
         {
             "files": [
-                "ext/js/core.js",
                 "ext/js/core/extension-error.js",
-                "ext/js/yomitan.js",
+                "ext/js/application.js",
                 "ext/js/accessibility/accessibility-controller.js",
                 "ext/js/background/backend.js",
                 "ext/js/background/offscreen.js",
