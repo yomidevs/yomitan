@@ -95,6 +95,7 @@
         "dexie": "^3.2.4",
         "dexie-export-import": "^4.0.7",
         "handlebars": "^4.7.8",
+        "kbn-handlebars": "git+https://github.com/toasted-nutbread/kbn-handlebars.git#12aff5e3550954d7d3a98a5917ff7d579f3cce25",
         "parse5": "^7.1.2",
         "wanakana": "^5.3.1"
     },
