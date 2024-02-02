@@ -122,6 +122,8 @@ function testDeinflections() {
                 {term: '食べる', source: '食べたり',         rule: 'v1', reasons: ['-tari']},
                 {term: '食べる', source: '食べず',           rule: 'v1', reasons: ['-zu']},
                 {term: '食べる', source: '食べぬ',           rule: 'v1', reasons: ['-nu']},
+                {term: '食べる', source: '食べざる',           rule: 'v1', reasons: ['-zaru']},
+                {term: '食べる', source: '食べねば',           rule: 'v1', reasons: ['-neba']},
                 {term: '食べる', source: '食べ',             rule: 'v1d', reasons: ['masu stem']},
                 {term: '食べる', source: '食べましょう',     rule: 'v1', reasons: ['polite volitional']},
                 {term: '食べる', source: '食べよう',         rule: 'v1', reasons: ['volitional']},
@@ -170,6 +172,8 @@ function testDeinflections() {
                 {term: '買う', source: '買ったり',         rule: 'v5', reasons: ['-tari']},
                 {term: '買う', source: '買わず',           rule: 'v5', reasons: ['-zu']},
                 {term: '買う', source: '買わぬ',           rule: 'v5', reasons: ['-nu']},
+                {term: '買う', source: '買わざる',           rule: 'v5', reasons: ['-zaru']},
+                {term: '買う', source: '買わねば',           rule: 'v5', reasons: ['-neba']},
                 {term: '買う', source: '買い',             rule: 'v5', reasons: ['masu stem']},
                 {term: '買う', source: '買いましょう',     rule: 'v5', reasons: ['polite volitional']},
                 {term: '買う', source: '買おう',           rule: 'v5', reasons: ['volitional']},
@@ -218,6 +222,8 @@ function testDeinflections() {
                 {term: '行く', source: '行いたり',         rule: 'v5', reasons: ['-tari']},
                 {term: '行く', source: '行かず',           rule: 'v5', reasons: ['-zu']},
                 {term: '行く', source: '行かぬ',           rule: 'v5', reasons: ['-nu']},
+                {term: '行く', source: '行かざる',           rule: 'v5', reasons: ['-zaru']},
+                {term: '行く', source: '行かねば',           rule: 'v5', reasons: ['-neba']},
                 {term: '行く', source: '行き',             rule: 'v5', reasons: ['masu stem']},
                 {term: '行く', source: '行きましょう',     rule: 'v5', reasons: ['polite volitional']},
                 {term: '行く', source: '行こう',           rule: 'v5', reasons: ['volitional']},
@@ -266,6 +272,8 @@ function testDeinflections() {
                 {term: '泳ぐ', source: '泳いだり',         rule: 'v5', reasons: ['-tari']},
                 {term: '泳ぐ', source: '泳がず',           rule: 'v5', reasons: ['-zu']},
                 {term: '泳ぐ', source: '泳がぬ',           rule: 'v5', reasons: ['-nu']},
+                {term: '泳ぐ', source: '泳がざる',           rule: 'v5', reasons: ['-zaru']},
+                {term: '泳ぐ', source: '泳がねば',           rule: 'v5', reasons: ['-neba']},
                 {term: '泳ぐ', source: '泳ぎ',             rule: 'v5', reasons: ['masu stem']},
                 {term: '泳ぐ', source: '泳ぎましょう',     rule: 'v5', reasons: ['polite volitional']},
                 {term: '泳ぐ', source: '泳ごう',           rule: 'v5', reasons: ['volitional']},
@@ -313,6 +321,8 @@ function testDeinflections() {
                 {term: '話す', source: '話したり',         rule: 'v5', reasons: ['-tari']},
                 {term: '話す', source: '話さず',           rule: 'v5', reasons: ['-zu']},
                 {term: '話す', source: '話さぬ',           rule: 'v5', reasons: ['-nu']},
+                {term: '話す', source: '話さざる',           rule: 'v5', reasons: ['-zaru']},
+                {term: '話す', source: '話さねば',           rule: 'v5', reasons: ['-neba']},
                 {term: '話す', source: '話し',             rule: 'v5', reasons: ['masu stem']},
                 {term: '話す', source: '話しましょう',     rule: 'v5', reasons: ['polite volitional']},
                 {term: '話す', source: '話そう',           rule: 'v5', reasons: ['volitional']},
@@ -361,6 +371,8 @@ function testDeinflections() {
                 {term: '待つ', source: '待ったり',         rule: 'v5', reasons: ['-tari']},
                 {term: '待つ', source: '待たず',           rule: 'v5', reasons: ['-zu']},
                 {term: '待つ', source: '待たぬ',           rule: 'v5', reasons: ['-nu']},
+                {term: '待つ', source: '待たざる',           rule: 'v5', reasons: ['-zaru']},
+                {term: '待つ', source: '待たねば',           rule: 'v5', reasons: ['-neba']},
                 {term: '待つ', source: '待ち',             rule: 'v5', reasons: ['masu stem']},
                 {term: '待つ', source: '待ちましょう',     rule: 'v5', reasons: ['polite volitional']},
                 {term: '待つ', source: '待とう',           rule: 'v5', reasons: ['volitional']},
@@ -409,6 +421,8 @@ function testDeinflections() {
                 {term: '死ぬ', source: '死んだり',         rule: 'v5', reasons: ['-tari']},
                 {term: '死ぬ', source: '死なず',           rule: 'v5', reasons: ['-zu']},
                 {term: '死ぬ', source: '死なぬ',           rule: 'v5', reasons: ['-nu']},
+                {term: '死ぬ', source: '死なざる',           rule: 'v5', reasons: ['-zaru']},
+                {term: '死ぬ', source: '死なねば',           rule: 'v5', reasons: ['-neba']},
                 {term: '死ぬ', source: '死に',             rule: 'v5', reasons: ['masu stem']},
                 {term: '死ぬ', source: '死にましょう',     rule: 'v5', reasons: ['polite volitional']},
                 {term: '死ぬ', source: '死のう',           rule: 'v5', reasons: ['volitional']},
@@ -456,6 +470,8 @@ function testDeinflections() {
                 {term: '遊ぶ', source: '遊んだり',         rule: 'v5', reasons: ['-tari']},
                 {term: '遊ぶ', source: '遊ばず',           rule: 'v5', reasons: ['-zu']},
                 {term: '遊ぶ', source: '遊ばぬ',           rule: 'v5', reasons: ['-nu']},
+                {term: '遊ぶ', source: '遊ばざる',           rule: 'v5', reasons: ['-zaru']},
+                {term: '遊ぶ', source: '遊ばねば',           rule: 'v5', reasons: ['-neba']},
                 {term: '遊ぶ', source: '遊び',             rule: 'v5', reasons: ['masu stem']},
                 {term: '遊ぶ', source: '遊びましょう',     rule: 'v5', reasons: ['polite volitional']},
                 {term: '遊ぶ', source: '遊ぼう',           rule: 'v5', reasons: ['volitional']},
@@ -503,6 +519,8 @@ function testDeinflections() {
                 {term: '飲む', source: '飲んだり',         rule: 'v5', reasons: ['-tari']},
                 {term: '飲む', source: '飲まず',           rule: 'v5', reasons: ['-zu']},
                 {term: '飲む', source: '飲まぬ',           rule: 'v5', reasons: ['-nu']},
+                {term: '飲む', source: '飲まざる',           rule: 'v5', reasons: ['-zaru']},
+                {term: '飲む', source: '飲まねば',           rule: 'v5', reasons: ['-neba']},
                 {term: '飲む', source: '飲み',             rule: 'v5', reasons: ['masu stem']},
                 {term: '飲む', source: '飲みましょう',     rule: 'v5', reasons: ['polite volitional']},
                 {term: '飲む', source: '飲もう',           rule: 'v5', reasons: ['volitional']},
@@ -550,6 +568,8 @@ function testDeinflections() {
                 {term: '作る', source: '作ったり',         rule: 'v5', reasons: ['-tari']},
                 {term: '作る', source: '作らず',           rule: 'v5', reasons: ['-zu']},
                 {term: '作る', source: '作らぬ',           rule: 'v5', reasons: ['-nu']},
+                {term: '作る', source: '作らざる',           rule: 'v5', reasons: ['-zaru']},
+                {term: '作る', source: '作らねば',           rule: 'v5', reasons: ['-neba']},
                 {term: '作る', source: '作り',             rule: 'v5', reasons: ['masu stem']},
                 {term: '作る', source: '作りましょう',     rule: 'v5', reasons: ['polite volitional']},
                 {term: '作る', source: '作ろう',           rule: 'v5', reasons: ['volitional']},
@@ -602,6 +622,8 @@ function testDeinflections() {
                 {term: '為る', source: '為たり',         rule: 'vs', reasons: ['-tari']},
                 {term: '為る', source: '為ず',           rule: 'vs', reasons: ['-zu']},
                 {term: '為る', source: '為ぬ',           rule: 'vs', reasons: ['-nu']},
+                {term: '為る', source: '為ざる',           rule: 'vs', reasons: ['-zaru']},
+                {term: '為る', source: '為ねば',           rule: 'vs', reasons: ['-neba']},
                 // ['masu stem']
                 {term: '為る', source: '為ましょう',     rule: 'vs', reasons: ['polite volitional']},
                 {term: '為る', source: '為よう',         rule: 'vs', reasons: ['volitional']},
@@ -651,6 +673,8 @@ function testDeinflections() {
                 {term: 'する', source: 'したり',         rule: 'vs', reasons: ['-tari']},
                 {term: 'する', source: 'せず',           rule: 'vs', reasons: ['-zu']},
                 {term: 'する', source: 'せぬ',           rule: 'vs', reasons: ['-nu']},
+                {term: 'する', source: 'せざる',           rule: 'vs', reasons: ['-zaru']},
+                {term: 'する', source: 'せねば',           rule: 'vs', reasons: ['-neba']},
                 // ['masu stem']
                 {term: 'する', source: 'しましょう',     rule: 'vs', reasons: ['polite volitional']},
                 {term: 'する', source: 'しよう',         rule: 'vs', reasons: ['volitional']},
@@ -694,6 +718,8 @@ function testDeinflections() {
                 {term: '来る', source: '来たり',         rule: 'vk', reasons: ['-tari']},
                 {term: '来る', source: '来ず',           rule: 'vk', reasons: ['-zu']},
                 {term: '来る', source: '来ぬ',           rule: 'vk', reasons: ['-nu']},
+                {term: '来る', source: '来ざる',           rule: 'vk', reasons: ['-zaru']},
+                {term: '来る', source: '来ねば',           rule: 'vk', reasons: ['-neba']},
                 {term: '来る', source: '来',             rule: 'vk', reasons: ['masu stem']},
                 {term: '来る', source: '来ましょう',     rule: 'vk', reasons: ['polite volitional']},
                 {term: '来る', source: '来よう',         rule: 'vk', reasons: ['volitional']},
@@ -737,6 +763,8 @@ function testDeinflections() {
                 {term: '來る', source: '來たり',         rule: 'vk', reasons: ['-tari']},
                 {term: '來る', source: '來ず',           rule: 'vk', reasons: ['-zu']},
                 {term: '來る', source: '來ぬ',           rule: 'vk', reasons: ['-nu']},
+                {term: '來る', source: '來ざる',           rule: 'vk', reasons: ['-zaru']},
+                {term: '來る', source: '來ねば',           rule: 'vk', reasons: ['-neba']},
                 {term: '來る', source: '來',             rule: 'vk', reasons: ['masu stem']},
                 {term: '來る', source: '來ましょう',     rule: 'vk', reasons: ['polite volitional']},
                 {term: '來る', source: '來よう',         rule: 'vk', reasons: ['volitional']},
@@ -780,6 +808,8 @@ function testDeinflections() {
                 {term: 'くる', source: 'きたり',         rule: 'vk', reasons: ['-tari']},
                 {term: 'くる', source: 'こず',           rule: 'vk', reasons: ['-zu']},
                 {term: 'くる', source: 'こぬ',           rule: 'vk', reasons: ['-nu']},
+                {term: 'くる', source: 'こざる',           rule: 'vk', reasons: ['-zaru']},
+                {term: 'くる', source: 'こねば',           rule: 'vk', reasons: ['-neba']},
                 {term: 'くる', source: 'き',             rule: 'vk', reasons: ['masu stem']},
                 {term: 'くる', source: 'きましょう',     rule: 'vk', reasons: ['polite volitional']},
                 {term: 'くる', source: 'こよう',         rule: 'vk', reasons: ['volitional']},
@@ -835,6 +865,8 @@ function testDeinflections() {
                 {term: '論ずる', source: '論じたり',         rule: 'vz', reasons: ['-tari']},
                 {term: '論ずる', source: '論ぜず',           rule: 'vz', reasons: ['-zu']},
                 {term: '論ずる', source: '論ぜぬ',           rule: 'vz', reasons: ['-nu']},
+                {term: '論ずる', source: '論ぜざる',           rule: 'vz', reasons: ['-zaru']},
+                {term: '論ずる', source: '論ぜねば',           rule: 'vz', reasons: ['-neba']},
                 // ['masu stem']
                 {term: '論ずる', source: '論じましょう',     rule: 'vz', reasons: ['polite volitional']},
                 {term: '論ずる', source: '論じよう',         rule: 'vz', reasons: ['volitional']},
@@ -876,7 +908,27 @@ function testDeinflections() {
                 {term: 'ちっちゃい', source: 'ちっちぇえ', rule: 'adj-i', reasons: ['-e']},
                 {term: 'あかい',     source: 'あけえ',     rule: 'adj-i', reasons: ['-e']},
                 {term: 'こわい',     source: 'こええ',     rule: 'adj-i', reasons: ['-e']},
-                {term: 'つよい',     source: 'つええ',     rule: 'adj-i', reasons: ['-e']}
+                {term: 'つよい',     source: 'つええ',     rule: 'adj-i', reasons: ['-e']},
+                // small -e
+                {term: 'すごい',     source: 'すげぇ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'やばい',     source: 'やべぇ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'うるさい',   source: 'うるせぇ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'ひどい',     source: 'ひでぇ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'ない',       source: 'ねぇ',       rule: 'adj-i', reasons: ['-e']},
+                {term: 'できる',     source: 'できねぇ',   rule: 'v1',    reasons: ['negative', '-e']},
+                {term: 'しんじる',   source: 'しんじねぇ', rule: 'v1',    reasons: ['negative', '-e']},
+                {term: 'さむい',     source: 'さめぇ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'さむい',     source: 'さみぃ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'あつい',     source: 'あちぃ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'やすい',     source: 'やせぇ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'たかい',     source: 'たけぇ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'みじかい',   source: 'みじけぇ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'ながい',     source: 'なげぇ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'くさい',     source: 'くせぇ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'うまい',     source: 'うめぇ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'でかい',     source: 'でけぇ',     rule: 'adj-i', reasons: ['-e']},
+                {term: 'まずい',     source: 'まっぜぇ',   rule: 'adj-i', reasons: ['-e']},
+                {term: 'あかい',     source: 'あけぇ',     rule: 'adj-i', reasons: ['-e']}
             ]
         },
         {
@@ -1010,6 +1062,14 @@ function testDeinflections() {
             tests: [
                 {term: '食べる', source: '食べて', rule: null, reasons: ['-te', 'progressive or perfect', 'masu stem']}
             ]
+        },
+        {
+            category: 'kansaiben',
+            valid: true,
+            tests: [
+                {term: '食べる', source: '食べへん', rule: null, reasons: ['negative', 'ksb verb negative']},
+                {term: '食べる', source: '食べへんかった', rule: null, reasons: ['negative', 'past', 'ksb verb negative']}
+            ]
         }
     ];
     /* eslint-enable no-multi-spaces */
@@ -1025,7 +1085,7 @@ function testDeinflections() {
             for (const {source, term, rule, reasons} of tests) {
                 const {has} = hasTermReasons(languageTransformer, source, term, rule, reasons);
                 let message = `${source} ${valid ? 'has' : 'does not have'} term candidate ${JSON.stringify(term)}`;
-                if (typeof rule !== 'undefined') {
+                if (rule !== null) {
                     message += ` with rule ${JSON.stringify(rule)}`;
                 }
                 if (reasons !== null) {
