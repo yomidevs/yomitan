@@ -183,12 +183,14 @@ function getFrequencyNumbers(dictionaryEntry) {
         }
         previousDictionary = dictionary;
 
-        const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
-        if (frequencyWorking !== null) {
-            frequencies.push(Number(frequencyWorking));
-        } else {
-            frequencies.push(frequency);
+        if (displayValue !== null) {
+            const frequencyMatch = displayValue.match(/\d+/);
+            if (frequencyMatch !== null) {
+                frequencies.push(Number.parseInt(frequencyMatch[0], 10));
+                continue;
+            }
         }
+        frequencies.push(frequency);
     }
     return frequencies;
 }
