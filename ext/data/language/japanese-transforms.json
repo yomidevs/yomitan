@@ -449,7 +449,7 @@
                 {"suffixIn": "為ざる", "suffixOut": "為る", "conditionsIn": [], "conditionsOut": ["vs"]},
                 {"suffixIn": "こざる", "suffixOut": "くる", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "来ざる", "suffixOut": "来る", "conditionsIn": [], "conditionsOut": ["vk"]},
-                {"suffixIn": "來ざる", "suffixOut": "來る", "conditionsIn": [], "conditionsOut": ["vk"]}                
+                {"suffixIn": "來ざる", "suffixOut": "來る", "conditionsIn": [], "conditionsOut": ["vk"]}
             ]
         },
         {
@@ -964,7 +964,7 @@
                 {"suffixIn": "うて", "suffixOut": "くて", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "こうて", "suffixOut": "かくて", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ごうて", "suffixOut": "がくて", "conditionsIn": [], "conditionsOut": []},
-                {"suffixIn": "そうて", "suffixOut": "さくて", "conditionsIn": [], "conditionsOut": []},                
+                {"suffixIn": "そうて", "suffixOut": "さくて", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "とうて", "suffixOut": "たくて", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "のうて", "suffixOut": "なくて", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ぼうて", "suffixOut": "ばくて", "conditionsIn": [], "conditionsOut": []},
@@ -978,7 +978,7 @@
                 {"suffixIn": "うない", "suffixOut": "くない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "こうない", "suffixOut": "かくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "ごうない", "suffixOut": "がくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
-                {"suffixIn": "そうない", "suffixOut": "さくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},                
+                {"suffixIn": "そうない", "suffixOut": "さくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "とうない", "suffixOut": "たくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "のうない", "suffixOut": "なくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "ぼうない", "suffixOut": "ばくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
