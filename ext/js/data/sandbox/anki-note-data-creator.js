@@ -171,6 +171,65 @@ function getPublicContext(context) {
 }
 
 /**
+ * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @returns {number[]}
+ */
+function getFrequencyNumbers(dictionaryEntry) {
+    let previousDictionary;
+    const frequencies = [];
+    for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
+        if (dictionary === previousDictionary) {
+            continue;
+        }
+        previousDictionary = dictionary;
+
+        const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
+        if (frequencyWorking !== null) {
+            frequencies.push(Number(frequencyWorking));
+        } else {
+            frequencies.push(frequency);
+        }
+    }
+    return frequencies;
+}
+
+/**
+ * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @returns {number}
+ */
+function getFrequencyHarmonic(dictionaryEntry) {
+    const frequencies = getFrequencyNumbers(dictionaryEntry);
+
+    if (frequencies.length < 1) {
+        return -1;
+    }
+
+    let total = 0;
+    for (const frequency of frequencies) {
+        total += 1 / frequency;
+    }
+    return Math.floor(frequencies.length / total);
+}
+
+/**
+ * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @returns {number}
+ */
+function getFrequencyAverage(dictionaryEntry) {
+    const frequencies = getFrequencyNumbers(dictionaryEntry);
+
+    if (frequencies.length < 1) {
+        return -1;
+    }
+
+    let total = 0;
+    for (const frequency of frequencies) {
+        total += frequency;
+    }
+    return Math.floor(total / frequencies.length);
+}
+
+/**
  * @param {import('dictionary').DictionaryEntry} dictionaryEntry
  * @returns {import('anki-templates').PitchGroup[]}
  */
@@ -272,8 +331,8 @@ function getKanjiDefinition(dictionaryEntry, context) {
     const stats = createCachedValue(getKanjiStats.bind(null, dictionaryEntry));
     const tags = createCachedValue(convertTags.bind(null, dictionaryEntry.tags));
     const frequencies = createCachedValue(getKanjiFrequencies.bind(null, dictionaryEntry));
-    const frequencyHarmonic = createCachedValue(getKanjiFrequencyHarmonic.bind(null, dictionaryEntry));
-    const frequencyAverage = createCachedValue(getKanjiFrequencyAverage.bind(null, dictionaryEntry));
+    const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry));
+    const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry));
     const cloze = createCachedValue(getCloze.bind(null, dictionaryEntry, context));
 
     return {
@@ -345,66 +404,6 @@ function getKanjiFrequencies(dictionaryEntry) {
 }
 
 /**
- * @param {import('dictionary').KanjiDictionaryEntry} dictionaryEntry
- * @returns {number}
- */
-function getKanjiFrequencyHarmonic(dictionaryEntry) {
-    let total = 0;
-    let length = 0;
-    let previousDictionary;
-
-    if (dictionaryEntry.frequencies.length < 1) {
-        return -1;
-    }
-
-    for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
-        if (dictionary === previousDictionary) {
-            continue;
-        }
-        previousDictionary = dictionary;
-        length++;
-
-        const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
-        if (frequencyWorking !== null) {
-            total += 1 / Number(frequencyWorking);
-        } else {
-            total += 1 / frequency;
-        }
-    }
-    return Math.floor(length / total);
-}
-
-/**
- * @param {import('dictionary').KanjiDictionaryEntry} dictionaryEntry
- * @returns {number}
- */
-function getKanjiFrequencyAverage(dictionaryEntry) {
-    let total = 0;
-    let length = 0;
-    let previousDictionary;
-
-    if (dictionaryEntry.frequencies.length < 1) {
-        return -1;
-    }
-
-    for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
-        if (dictionary === previousDictionary) {
-            continue;
-        }
-        previousDictionary = dictionary;
-        length++;
-
-        const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
-        if (frequencyWorking !== null) {
-            total += Number(frequencyWorking);
-        } else {
-            total += frequency;
-        }
-    }
-    return Math.floor(total / length);
-}
-
-/**
  * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
  * @param {import('anki-templates-internal').Context} context
  * @param {import('settings').ResultOutputMode} resultOutputMode
@@ -430,8 +429,8 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode) {
     const termTags = createCachedValue(getTermTags.bind(null, dictionaryEntry, type));
     const expressions = createCachedValue(getTermExpressions.bind(null, dictionaryEntry));
     const frequencies = createCachedValue(getTermFrequencies.bind(null, dictionaryEntry));
-    const frequencyHarmonic = createCachedValue(getTermFrequencyHarmonic.bind(null, dictionaryEntry));
-    const frequencyAverage = createCachedValue(getTermFrequencyAverage.bind(null, dictionaryEntry));
+    const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry));
+    const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry));
     const pitches = createCachedValue(getTermPitches.bind(null, dictionaryEntry));
     const phoneticTranscriptions = createCachedValue(getTermPhoneticTranscriptions.bind(null, dictionaryEntry));
     const glossary = createCachedValue(getTermGlossaryArray.bind(null, dictionaryEntry, type));
@@ -565,66 +564,6 @@ function getTermFrequencies(dictionaryEntry) {
         });
     }
     return results;
-}
-
-/**
- * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
- * @returns {number}
- */
-function getTermFrequencyHarmonic(dictionaryEntry) {
-    let total = 0;
-    let length = 0;
-    let previousDictionary;
-
-    if (dictionaryEntry.frequencies.length < 1) {
-        return -1;
-    }
-
-    for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
-        if (dictionary === previousDictionary) {
-            continue;
-        }
-        previousDictionary = dictionary;
-        length++;
-
-        const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
-        if (frequencyWorking !== null) {
-            total += 1 / Number(frequencyWorking);
-        } else {
-            total += 1 / frequency;
-        }
-    }
-    return Math.floor(length / total);
-}
-
-/**
- * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
- * @returns {number}
- */
-function getTermFrequencyAverage(dictionaryEntry) {
-    let total = 0;
-    let length = 0;
-    let previousDictionary;
-
-    if (dictionaryEntry.frequencies.length < 1) {
-        return -1;
-    }
-
-    for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
-        if (dictionary === previousDictionary) {
-            continue;
-        }
-        previousDictionary = dictionary;
-        length++;
-
-        const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
-        if (frequencyWorking !== null) {
-            total += Number(frequencyWorking);
-        } else {
-            total += frequency;
-        }
-    }
-    return Math.floor(total / length);
 }
 
 /**
