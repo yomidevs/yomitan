@@ -944,22 +944,37 @@
             ]
         },
         {
-            "name": "ksb verb negative",
+            "name": "ksb",
+            "description": "Negative form of kansai-ben verbs",
             "rules": [
                 {"suffixIn": "へん", "suffixOut": "ない", "conditionsIn": [], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "ひん", "suffixOut": "ない", "conditionsIn": [], "conditionsOut": ["adj-i"]},
+                {"suffixIn": "せえへん", "suffixOut": "しない", "conditionsIn": [], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "へんかった", "suffixOut": "なかった", "conditionsIn": [], "conditionsOut": []},
-                {"suffixIn": "ひんかった", "suffixOut": "なかった", "conditionsIn": [], "conditionsOut": []}
+                {"suffixIn": "ひんかった", "suffixOut": "なかった", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "うてへん", "suffixOut": "ってない", "conditionsIn": [], "conditionsOut": ["adj-i"]}
             ]
         },
         {
-            "name": "ksb -u",
+            "name": "ksb",
+            "description": "-ku stem of kansai-ben adjectives",
             "rules": [
-                {"suffixIn": "う", "suffixOut": "く", "conditionsIn": [], "conditionsOut": []}
+                {"suffixIn": "う", "suffixOut": "く", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "こう", "suffixOut": "かく", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ごう", "suffixOut": "がく", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "そう", "suffixOut": "さく", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "とう", "suffixOut": "たく", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "のう", "suffixOut": "なく", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ぼう", "suffixOut": "ばく", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "もう", "suffixOut": "まく", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ろう", "suffixOut": "らく", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "よう", "suffixOut": "よく", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "しゅう", "suffixOut": "しく", "conditionsIn": [], "conditionsOut": []}
             ]
         },
         {
-            "name": "ksb adj -te",
+            "name": "ksb",
+            "description": "-te form of kansai-ben adjectives",
             "rules": [
                 {"suffixIn": "うて", "suffixOut": "くて", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "こうて", "suffixOut": "かくて", "conditionsIn": [], "conditionsOut": []},
@@ -969,11 +984,14 @@
                 {"suffixIn": "のうて", "suffixOut": "なくて", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ぼうて", "suffixOut": "ばくて", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "もうて", "suffixOut": "まくて", "conditionsIn": [], "conditionsOut": []},
-                {"suffixIn": "ろうて", "suffixOut": "らくて", "conditionsIn": [], "conditionsOut": []}
+                {"suffixIn": "ろうて", "suffixOut": "らくて", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ようて", "suffixOut": "よくて", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "しゅうて", "suffixOut": "しくて", "conditionsIn": [], "conditionsOut": []}
             ]
         },
         {
-            "name": "ksb adj negative",
+            "name": "ksb",
+            "description": "Negative form of kansai-ben adjectives",
             "rules": [
                 {"suffixIn": "うない", "suffixOut": "くない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "こうない", "suffixOut": "かくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
@@ -984,11 +1002,13 @@
                 {"suffixIn": "ぼうない", "suffixOut": "ばくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "もうない", "suffixOut": "まくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "ろうない", "suffixOut": "らくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
+                {"suffixIn": "ようない", "suffixOut": "よくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "しゅうない", "suffixOut": "しくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]}
             ]
         },
         {
-            "name": "ksb verb -te",
+            "name": "ksb",
+            "description": "-te form of kansai-ben verbs",
             "rules": [
                 {"suffixIn": "うて", "suffixOut": "って", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "おうて", "suffixOut": "あって", "conditionsIn": [], "conditionsOut": []},
@@ -1003,12 +1023,13 @@
                 {"suffixIn": "ぼうて", "suffixOut": "ばって", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "もうて", "suffixOut": "まって", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ろうて", "suffixOut": "らって", "conditionsIn": [], "conditionsOut": []},
-                {"suffixIn": "しゅうて", "suffixOut": "しくて", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ようて", "suffixOut": "やって", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ゆうて", "suffixOut": "いって", "conditionsIn": [], "conditionsOut": []}
             ]
         },
         {
-            "name": "ksb past",
+            "name": "ksb",
+            "description": "past form of kansai-ben terms",
             "rules": [
                 {"suffixIn": "うた", "suffixOut": "った", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "おうた", "suffixOut": "あった", "conditionsIn": [], "conditionsOut": []},
@@ -1023,6 +1044,7 @@
                 {"suffixIn": "ぼうた", "suffixOut": "ばった", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "もうた", "suffixOut": "まった", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ろうた", "suffixOut": "らった", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ようた", "suffixOut": "やった", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ゆうた", "suffixOut": "いった", "conditionsIn": [], "conditionsOut": []}
             ]
         }
