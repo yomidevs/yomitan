@@ -59,7 +59,6 @@ export class OffscreenProxy {
      */
     async _hasOffscreenDocument() {
         const offscreenUrl = chrome.runtime.getURL('offscreen.html');
-        // @ts-expect-error - API not defined yet
         if (!chrome.runtime.getContexts) { // chrome version below 116
             // Clients: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/clients
             // @ts-expect-error - Types not set up for service workers yet
@@ -68,12 +67,13 @@ export class OffscreenProxy {
             return await matchedClients.some((client) => client.url === offscreenUrl);
         }
 
-        // @ts-expect-error - API not defined yet
         const contexts = await chrome.runtime.getContexts({
-            contextTypes: ['OFFSCREEN_DOCUMENT'],
+            contextTypes: [
+                /** @type {chrome.runtime.ContextType} */ ('OFFSCREEN_DOCUMENT')
+            ],
             documentUrls: [offscreenUrl]
         });
-        return !!contexts.length;
+        return contexts.length > 0;
     }
 
     /**
