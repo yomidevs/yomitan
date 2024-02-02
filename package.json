@@ -50,7 +50,7 @@
         "@stylistic/stylelint-plugin": "^2.0.0",
         "@types/assert": "^1.5.10",
         "@types/browserify": "^12.0.40",
-        "@types/chrome": "^0.0.254",
+        "@types/chrome": "^0.0.260",
         "@types/css": "^0.0.37",
         "@types/events": "^3.0.3",
         "@types/firefox-webext-browser": "^120.0.0",
