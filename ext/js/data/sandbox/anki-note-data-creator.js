@@ -362,7 +362,7 @@ function getKanjiFrequencyHarmonic(dictionaryEntry) {
             continue;
         }
         previousDictionary = dictionary;
-        length += 1;
+        length++;
 
         const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
         if (frequencyWorking !== null) {
@@ -371,8 +371,7 @@ function getKanjiFrequencyHarmonic(dictionaryEntry) {
             total += 1 / frequency;
         }
     }
-    total = Math.floor(length / total);
-    return total;
+    return Math.floor(length / total);
 }
 
 /**
@@ -393,7 +392,7 @@ function getKanjiFrequencyAverage(dictionaryEntry) {
             continue;
         }
         previousDictionary = dictionary;
-        length += 1;
+        length++;
 
         const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
         if (frequencyWorking !== null) {
@@ -402,8 +401,7 @@ function getKanjiFrequencyAverage(dictionaryEntry) {
             total += frequency;
         }
     }
-    total = Math.floor(total / length);
-    return total;
+    return Math.floor(total / length);
 }
 
 /**
@@ -587,7 +585,7 @@ function getTermFrequencyHarmonic(dictionaryEntry) {
             continue;
         }
         previousDictionary = dictionary;
-        length += 1;
+        length++;
 
         const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
         if (frequencyWorking !== null) {
@@ -596,8 +594,7 @@ function getTermFrequencyHarmonic(dictionaryEntry) {
             total += 1 / frequency;
         }
     }
-    total = Math.floor(length / total);
-    return total;
+    return Math.floor(length / total);
 }
 
 /**
@@ -618,7 +615,7 @@ function getTermFrequencyAverage(dictionaryEntry) {
             continue;
         }
         previousDictionary = dictionary;
-        length += 1;
+        length++;
 
         const frequencyWorking = displayValue !== null ? displayValue.match(/\d+/) : frequency;
         if (frequencyWorking !== null) {
@@ -627,8 +624,7 @@ function getTermFrequencyAverage(dictionaryEntry) {
             total += frequency;
         }
     }
-    total = Math.floor(total / length);
-    return total;
+    return Math.floor(total / length);
 }
 
 /**
