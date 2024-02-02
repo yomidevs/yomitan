@@ -200,7 +200,7 @@ function getFrequencyNumbers(dictionaryEntry) {
 function getFrequencyHarmonic(dictionaryEntry) {
     const frequencies = getFrequencyNumbers(dictionaryEntry);
 
-    if (frequencies.length < 1) {
+    if (frequencies.length === 0) {
         return -1;
     }
 
@@ -218,7 +218,7 @@ function getFrequencyHarmonic(dictionaryEntry) {
 function getFrequencyAverage(dictionaryEntry) {
     const frequencies = getFrequencyNumbers(dictionaryEntry);
 
-    if (frequencies.length < 1) {
+    if (frequencies.length === 0) {
         return -1;
     }
 
